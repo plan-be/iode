@@ -76,7 +76,7 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
 /**
  *  Syntax: $ModelSimulate per_from per_to equation_list
  *  
- *  @see https://iode.plan.be/doku.php?id=modelsimulate
+ *
  */
 int B_ModelSimulate(char *const_arg, int unused)
 {
@@ -125,7 +125,7 @@ err:
  *              eps  := convergence threshold
  *              0.1 <= relax <= 1.0
  *          
- *  @see https://iode.plan.be/doku.php?id=modelsimulateparms
+ *
  */
 int B_ModelSimulateParms(char* arg, int unused)
 {
@@ -168,7 +168,7 @@ fin :
  *           where eqname1, eqname2 are equation names (thus also endogenous vars)
  *                 varname1, varname2 are exogenous variables
  *  
- *  @see https://iode.plan.be/doku.php?id=modelexchange
+ *
  */
 int B_ModelExchange(char* const_arg, int unused)
 {
@@ -224,7 +224,7 @@ int KE_compile(KDBEquations* dbe)
 /**
  *  Syntax: $ModelCompile [eqname1, eqname2, ... ]
  *  
- *  @see https://iode.plan.be/doku.php?id=modelsimulate
+ *
  */
 int B_ModelCompile(char* arg, int unused)
 {
@@ -257,7 +257,7 @@ int B_ModelCompile(char* arg, int unused)
 /**
  *  Syntax: $ModelCalcSCC nbtris prename intername postname [eqs]
  *  
- *  @see https://iode.plan.be/doku.php?id=ModelCalcSCC
+ *
  */
 int B_ModelCalcSCC(char *const_arg, int unused)
 {
@@ -308,7 +308,7 @@ int B_ModelCalcSCC(char *const_arg, int unused)
  *  
  *  Syntax: $ModelSimulateSCC from to pre inter post
  *  
- *  @see https://iode.plan.be/doku.php?id=ModelSimulateSCC
+ *
  */
 int B_ModelSimulateSCC(char *const_arg, int unused)
 {
@@ -490,7 +490,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  *  
  *  Syntax: $ModelSimulateSaveNiters varname
  *  
- *  @see https://iode.plan.be/doku.php?id=ModelSimulateSaveNIters
+ *
  */
 int B_ModelSimulateSaveNIters(char *arg, int unused)
 {
@@ -503,7 +503,7 @@ int B_ModelSimulateSaveNIters(char *arg, int unused)
  *  
  *  Syntax: $ModelSimulateSaveNorms varname
  *  
- *  @see https://iode.plan.be/doku.php?id=ModelSimulateSaveNorms
+ *
  */
 int B_ModelSimulateSaveNorms(char *arg, int unused)
 {

@@ -28,7 +28,7 @@
  *  
  *  Syntax: $IdtExecute period_from period_to [idt1 idt2...]
  *  
- *  @see https://iode.plan.be/doku.php?id=idtexecute
+ *
  *  
  *  At the end of the function, the VarFiles and SclFiles defined by calls to B_IdtExecuteVarFiles() and
  *  B_IdtExecuteSclFiles() are reset to NULL.
@@ -82,7 +82,7 @@ int B_IdtExecute(char* arg, int unused)
  *  At the end of the functions, KEXEC_VFILES and KEXEC_SFILES are reset to NULL.
  *  The resulting variables are copied into global_ws_var.
  *  
- *  @see https://iode.plan.be/doku.php?id=idtexecute
+ *
  *  
  *  @param   [in]   Sample* smpl    Sample on which the identities must be calculated.
  *  @param   [in]   char**  idts    list of identity names or NULL to execute all the idts present in global_ws_idt.
@@ -150,7 +150,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
  *  
  *  Syntax: $IdtExecuteVarFiles file1 [file2 ...]
  *  
- *  @see https://iode.plan.be/doku.php?id=idtexecuteVarFiles
+ *
  *  
  *  @params See b_data.c for details on arg syntax
  *  
@@ -171,7 +171,7 @@ int B_IdtExecuteVarFiles(char* arg, int unused)
  *  
  *  Syntax: $IdtExecuteSclFiles file1 [file2 ...]
  *  
- *  @see https://iode.plan.be/doku.php?id=idtexecuteSclFiles
+ *
  *  
  *  @params See b_data.c for details on arg syntax
  *  
@@ -193,7 +193,7 @@ int B_IdtExecuteSclFiles(char* arg, int unused)
  *  
  *  Syntax:  $IdtExecuteTrace {Yes | No}
  *  
- *  @see https://iode.plan.be/doku.php?id=idtexecuteTrace
+ *
  *  
  *  @params See b_data.c for details on arg syntax
  *  

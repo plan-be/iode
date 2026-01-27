@@ -364,8 +364,8 @@ public:
 	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
 	    rc = B_WsLoad(fullfilename, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
@@ -382,8 +382,8 @@ public:
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_file, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
@@ -403,8 +403,8 @@ public:
 	    B_WsClear("", type);
 	    rc = B_WsLoad(out_fullfilename, type);
 	    EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsExport(char* source_file, char* out_file, int type)
@@ -437,8 +437,8 @@ public:
 	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
 	    rc = B_WsImport(fullfilename, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsClear(int type)
@@ -447,8 +447,8 @@ public:
 	
 	    rc = B_WsClear("", type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), 0);
-	    return get_global_db(type)->size() == 0;
+	    EXPECT_EQ(get_global_db(type).size(), 0);
+	    return get_global_db(type).size() == 0;
 	}
 
 	bool U_test_B_WsDescr(char* descr, int type)
@@ -457,8 +457,8 @@ public:
 	
 	    rc = B_WsDescr(descr, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->description, descr);
-	    return rc == 0 && get_global_db(type)->description == descr;
+	    EXPECT_EQ(get_global_db(type).description, descr);
+	    return rc == 0 && get_global_db(type).description == descr;
 	}
 
 	bool U_test_B_WsName(char* c_name, int type)
@@ -467,7 +467,7 @@ public:
 	
 	    rc = B_WsName(c_name, type);
         EXPECT_EQ(rc, 0);
-	    std::string name = get_global_db(type)->filepath;
+	    std::string name = get_global_db(type).filepath;
 	    EXPECT_EQ(name, std::string(c_name));
 	    return rc == 0 && name == std::string(c_name);
 	}
@@ -508,13 +508,13 @@ public:
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
 	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
-	
+        EXPECT_EQ(rc, 0);
+
 	    // 2.3 Tests
 	    ACAF91 = U_test_calc_lec("ACAF[1991Y1]", 0);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG90 = U_test_calc_lec("ACAG[1990Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
-        EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF91, 1.0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG90, IODE_NAN);	    
@@ -528,9 +528,10 @@ public:
 	    // Copy ACAF and ACAG (does not specify a sample)
 	    sprintf(arg,  "%sfun.av ACAF ACAG", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
+        EXPECT_EQ(rc, 0);
+        
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
-        EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
@@ -547,8 +548,8 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsCopy(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsMergeVar()
@@ -602,8 +603,8 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsMerge(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type)->size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type)->size() == expected_nb_objects;
+	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
+	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
@@ -1237,16 +1238,16 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
     kdbv = global_ws_var.get();
-    K_RWS[VARIABLES][0] = new KDBVariables(*kdbv);
+    global_ref_var[0] = new KDBVariables(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
     kdbt = global_ws_tbl.get();
-    K_RWS[TABLES][0] = new KDBTables(*kdbt);
+    global_ref_tbl[0] = new KDBTables(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
-    // Load a second VAR workspace in K_RWS[VARIABLES][2]
+    // Load a second VAR workspace in global_ref_var[2]
     sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
@@ -1500,22 +1501,21 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataDuplicate(char* arg, int type)
     // B_DataRename(char* arg, int type)
     // B_DataDelete(char* arg, int type)
-    KDB* kdb;
     int pos;
     char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
-        kdb = get_global_db(i);
+        KDB& kdb = get_global_db(i);
         char* x_name = (i == SCALARS) ? (char*) "xxx" : (char*) "XXX";
         rc = B_DataCreate(x_name, i);
         EXPECT_EQ(rc, 0);
-        found = kdb->contains(x_name);
+        found = kdb.contains(x_name);
         EXPECT_TRUE(found);
-        pos = kdb->index_of(x_name);
+        pos = kdb.index_of(x_name);
         EXPECT_TRUE(pos >= 0);
-        handle = kdb->get_handle(x_name);
+        handle = kdb.get_handle(x_name);
         EXPECT_TRUE(handle > 0);
-        ptr_obj = kdb->get_ptr_obj(x_name);
+        ptr_obj = kdb.get_ptr_obj(x_name);
         EXPECT_STRNE(ptr_obj, "");
 
         // Equations cannot be renamed or duplicated
@@ -1525,26 +1525,26 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
             char* dup_names = (i == SCALARS) ? (char*) "xxx yyy" : (char*) "XXX YYY";
             rc = B_DataDuplicate(dup_names, i);
             EXPECT_EQ(rc, 0);
-            found = kdb->contains(y_name);
+            found = kdb.contains(y_name);
             EXPECT_TRUE(found);
-            pos = kdb->index_of(y_name);
+            pos = kdb.index_of(y_name);
             EXPECT_TRUE(pos >= 0);
-            handle = kdb->get_handle(y_name);
+            handle = kdb.get_handle(y_name);
             EXPECT_TRUE(handle > 0);
-            ptr_obj = kdb->get_ptr_obj(y_name);
+            ptr_obj = kdb.get_ptr_obj(y_name);
             EXPECT_STRNE(ptr_obj, "");
 
             char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
             char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
             rc = B_DataRename(ren_name, i);
             EXPECT_EQ(rc, 0);
-            found = kdb->contains(z_name);
+            found = kdb.contains(z_name);
             EXPECT_TRUE(found);
         }
 
         rc = B_DataDelete(x_name, i);
         EXPECT_EQ(rc, 0);
-        found = kdb->contains(x_name);
+        found = kdb.contains(x_name);
         EXPECT_TRUE(!found);
     }
 
@@ -1661,16 +1661,20 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     rc = B_DataCompare(buf, LISTS);
     EXPECT_EQ(rc, 0);
     // names only in current WS
+    EXPECT_TRUE(global_ws_lst->contains("WS_ONLY"));
     expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
     EXPECT_EQ(std::string(global_ws_lst->get_obj("WS_ONLY")), expected_list);
     // names only in file
+    EXPECT_TRUE(global_ws_lst->contains("FILE_ONLY"));
     expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
     expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
     EXPECT_EQ(std::string(global_ws_lst->get_obj("FILE_ONLY")), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
+    EXPECT_TRUE(global_ws_lst->contains("BOTH_EQ"));
     expected_list = "";
     EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_EQ")), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
+    EXPECT_TRUE(global_ws_lst->contains("BOTH_DIFF"));
     expected_list = "_SCAL";
     EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_DIFF")), expected_list);
 

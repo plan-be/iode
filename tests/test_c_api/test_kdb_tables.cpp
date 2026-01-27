@@ -522,7 +522,7 @@ TEST_F(KDBTablesTest, Search)
 
 TEST_F(KDBTablesTest, PrintToFile)
 {
-    // WARNING: B_PrintTable() resets K_RWS (reference files)
+    // WARNING: B_PrintTable() resets global_ref_xxx (reference files)
 
     int res;
     std::string arg;
@@ -558,7 +558,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     arg = gsample + " " + names;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
     compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
 
@@ -570,7 +570,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
     compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 
@@ -585,7 +585,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
     compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
 
@@ -597,7 +597,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
     compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 
@@ -612,7 +612,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.csv", gsample, names, 4, 'C');
     compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
 
@@ -624,7 +624,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
     
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     global_ws_tbl->print_to_file(str_output_test_dir + "cpp_api_file.html", gsample, names, 4, 'H');
     compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 }

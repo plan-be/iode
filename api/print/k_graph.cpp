@@ -117,10 +117,12 @@ int T_GraphEnd()
 /**
  *  Generates one graph in A2M format from a Table struct and a GSample.
  *  
- *  @param [in] Table*    tbl     source Table
+ *  @param [in] Table*  tbl     source Table
  *  @param [in] char*   gsmpl   GSample definition
- *  @param [in] int     mode    0 for view mode, not null for print mode (generates A2M RTF topic)
- *  @return     int             0 on success, -1 on error (more than 2 cols in tbl or one of the ref files is not in K_RWS)
+ *  @param [in] int     mode    0 for view mode, not null for print mode 
+ *                              (generates A2M RTF topic)
+ *  @return     int             0 on success, -1 on error (more than 2 cols in tbl 
+ *                              or one of the ref files is not in global_ref_xxx)
  */
 int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
 {

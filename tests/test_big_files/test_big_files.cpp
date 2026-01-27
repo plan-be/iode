@@ -9,6 +9,7 @@
 
 TEST(BigFilesTest, Tests_BIG_WS)
 {
+    bool success;
     int nb_names = 0;
     int all_nb_names = 0;
     KDB* kdb_var = nullptr;
@@ -86,7 +87,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(STANDALONE - ALL VARS)  loaded " << std::to_string(kdb_var->size()) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl; 
+                  << " variables in " << elapsed.count() << " seconds" << std::endl; 
         delete kdb_var;
         kdb_var = nullptr;
 
@@ -103,7 +104,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(GLOBAL - SOME VARS)     loaded " << std::to_string(nb_names) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl;  
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;  
         delete kdb_var; 
         kdb_var = nullptr;
 
@@ -118,7 +119,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(STANDALONE - SOME VARS) loaded " << std::to_string(nb_names) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl; 
+                  << " variables in " << elapsed.count() << " seconds" << std::endl; 
         delete kdb_var;
         kdb_var = nullptr;
 
@@ -131,7 +132,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(B_WsLoad)               loaded " << std::to_string(global_ws_var->size()) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl;
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;
 
         // **** K_refer and K_quick_refer performance tests ****
 
@@ -141,7 +142,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl;
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
         kdb_shallow_copy->clear(false);
@@ -151,7 +152,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl;
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
         kdb_shallow_copy->clear(false);
@@ -172,7 +173,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
-                    << " variables in " << elapsed.count() << " seconds" << std::endl;
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
         kdb_shallow_copy->clear(false);
@@ -188,14 +189,14 @@ TEST(BigFilesTest, Tests_BIG_WS)
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "loaded " << std::to_string(global_ws_var->size()) << " variables in " 
-                    << elapsed.count() << " seconds" << std::endl;
+                  << elapsed.count() << " seconds" << std::endl;
 
         start = std::chrono::high_resolution_clock::now();
         std::size_t hash_val = hash_value(*global_ws_var);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "hashed " << std::to_string(global_ws_var->size()) << " variables in " 
-                    << elapsed.count() << " seconds" << std::endl;
+                  << elapsed.count() << " seconds" << std::endl;
         global_ws_var->clear();
 
         // **** save() performance tests ****
@@ -203,11 +204,12 @@ TEST(BigFilesTest, Tests_BIG_WS)
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.var");
         start = std::chrono::high_resolution_clock::now();
-        global_ws_var->save_binary(out_filename);
+        success = global_ws_var->save_binary(out_filename);
+        EXPECT_TRUE(success);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.var file]  saved " << std::to_string(global_ws_var->size()) 
-                << " variables in " << elapsed.count() << " seconds" << std::endl;
+                  << " variables in " << elapsed.count() << " seconds" << std::endl;
     }
     else
     {
@@ -252,7 +254,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         memset(out_filename, 0, sizeof(out_filename));
         sprintf(out_filename,  "%s%s", str_data_dir.c_str(), "big_save.av");
         start = std::chrono::high_resolution_clock::now();
-        global_ws_var->save_asc(out_filename);
+        success = global_ws_var->save_asc(out_filename);
+        EXPECT_TRUE(success);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_save) [.av file]  saved " << std::to_string(global_ws_var->size()) 

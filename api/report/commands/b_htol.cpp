@@ -306,7 +306,7 @@ done:
 /**
  *  Syntax: $WsHtoLLast Filename VarList
  *  
- *  @see https://iode.plan.be/doku.php?id=WsHtoLLast
+ *
  */
 int B_WsHtoLLast(char* arg, int unused)
 {
@@ -317,7 +317,7 @@ int B_WsHtoLLast(char* arg, int unused)
 /**
  *  Syntax: $WsHtoLMean Filename VarList
  *  
- *  @see https://iode.plan.be/doku.php?id=WsHtoLMean
+ *
  */
 int B_WsHtoLMean(char* arg, int unused)
 {
@@ -328,7 +328,7 @@ int B_WsHtoLMean(char* arg, int unused)
 /**
  *  Syntax: $WsHtoLSum Filename VarList
  *  
- *  @see https://iode.plan.be/doku.php?id=WsHtoLSum
+ *
  */
 int B_WsHtoLSum(char* arg, int unused)
 {

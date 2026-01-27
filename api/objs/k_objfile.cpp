@@ -11,8 +11,6 @@
  *      void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
  *      int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)           retrieves infos on an IODE file: type, number of objects, Sample
  *      int X_findtype(char* filename)                                                  returns the type of content of filename according to its extension
- *      int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)   reads a list of objects from a list of IODE object files and adds them to an existing KDB.
- *      int K_cat(KDB* ikdb, char* filename)                                            concatenates the content of a file to an existing kdb.
  *      int K_set_backup_on_save(int take_backup)                                       sets the backup choice before saving a kdb. 
  *      int K_get_backup_on_save()                                                      indicates if a backup must be taken before saving a kdb. 
  *      int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
@@ -634,7 +632,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
                 handle = SW_alloc(len);
-                this->k_objs[name] = handle;
+                this->set_handle(name, handle);
                 ptr = SW_getptr(handle);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
@@ -644,7 +642,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             {
                 // Si len >= 0 => version non zippée (dft)
                 handle = SW_alloc(len);
-                this->k_objs[name] = handle;
+                this->set_handle(name, handle);
                 ptr = SW_getptr(handle);
                 if(ptr == 0) 
                 {
@@ -659,7 +657,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                     goto error;
             }
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            K_setvers(this, i, vers);
+            this->convert_obj_version(i, vers);
         }
     }
     // load only the objects in the list objs
@@ -733,7 +731,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
 
             name = std::string(c_name);
             handle = SW_alloc(len);
-            this->k_objs[name] = handle;
+            this->set_handle(name, handle);
             ptr = SW_getptr(handle);
             if(ptr == 0) 
             {
@@ -767,7 +765,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             }
 
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            K_setvers(this, i, vers);
+            this->convert_obj_version(i, vers);
             lpos = pos + 1;
         }
     }
@@ -837,7 +835,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
         return(-1);
     }
 
-    KDBInfo* kdb_info = new KDBInfo(false);
+    KDBInfo* kdb_info = new KDBInfo(OBJECTS, false);
     nb_objs = kdb_info->preload(fd, std::string(file), vers);
     fclose(fd);
 
@@ -960,7 +958,7 @@ bool KDB::load(const std::string& filename)
 
     if(success)
     {
-        // K_RWS[iode_type][0] = new <sub_class>(this, "*");      
+        // global_ref_xxx[0] = new <sub_class>(this, "*");      
         if(this->k_db_type == DB_GLOBAL)
             this->update_reference_db();
         kmsg("%d objects loaded", (int) this->size());
@@ -1084,7 +1082,7 @@ bool KDB::save(const std::string& filename, const bool compress)
     if(file_type >= FILE_COMMENTS && file_type <= FILE_VARIABLES)
     {
         #ifdef DEBUG
-        msg = "KDB::save() -> save binary file '" + filename + "'";
+        msg = "KDBTemplate::save() -> save binary file '" + filename + "'";
         logger.info(msg);
         #endif
         success = this->save_binary(_filepath_);
@@ -1092,7 +1090,7 @@ bool KDB::save(const std::string& filename, const bool compress)
     else if(file_type >= ASCII_COMMENTS && file_type <= ASCII_VARIABLES)
     {
         #ifdef DEBUG
-        msg = "KDB::save() -> save ASCII file '" + filename + "'";
+        msg = "KDBTemplate::save() -> save ASCII file '" + filename + "'";
         logger.info(msg);
         #endif
         success = this->save_asc(_filepath_);
@@ -1100,7 +1098,7 @@ bool KDB::save(const std::string& filename, const bool compress)
     else if(file_type == FILE_CSV)
     {
         #ifdef DEBUG
-        msg = "KDB::save() -> save CSV file '" + filename + "'";
+        msg = "KDBTemplate::save() -> save CSV file '" + filename + "'";
         logger.info(msg);
         #endif
         success = this->save_csv(_filepath_);
@@ -1116,288 +1114,6 @@ bool KDB::save(const std::string& filename, const bool compress)
     }
 
     return success;
-}
-
-
-/**
- *  Copies a list of objects from an IODE object file to a KDB in memory. 
- *  Sub function of K_copy() acting on a single file.
- *  
- *  @param [in, out] to      KDB*       KDB destination 
- *  @param [in]      file    FNAME      filename
- *  @param [in]      no      int        number of object names in objs
- *  @param [in]      objs    char**     list of object names to copy
- *  @param [in, out] found   int*       indicates which names have been read (0 for still to read, 1 for already read) 
- *  @param [in]      smpl    Sample*    larger sample to read. 
- *                                      If the sample in file is smaller, only the common sample will be read.
- *  @return                             -1 on error 
- *                                      number of read objects on success. 
- *                                      0 if the vector "found" contains only ones or
- *                                      if none of the objects in objs are found in file.
- *  
- * @note Error codes are accumulated via a call to IodeErrorManager::append_error().
- *
- * TODO: refactor to, from...
- */
-static int K_copy_1(KDB* to, FNAME file, int no, char** objs, int* found, Sample* smpl)
-{
-    bool    obj_found;
-    int     i, rc = 0, nb_found = 0;
-    bool    success;
-    char    *ptr, *pack;
-    SWHDL   handle_to;
-    Sample  csmpl;
-    std::string name;
-
-    KDB* from = nullptr; 
-    switch(to->k_type) 
-    {
-        case COMMENTS :
-            from = new KDBComments(false);
-            break;
-        case EQUATIONS :
-            from = new KDBEquations(false);
-            break;
-        case IDENTITIES:
-            from = new KDBIdentities(false);
-            break;
-        case LISTS:
-            from = new KDBLists(false);
-            break;
-        case SCALARS :
-            from = new KDBScalars(false);
-            break;
-        case TABLES:
-            from = new KDBTables(false);
-            break;
-        case VARIABLES :
-            from = new KDBVariables(false);
-            break;
-        default :
-            error_manager.append_error("copy: cannot copy database of generic type 'OBJECTS");
-            return(-1);
-    }
-    
-    std::vector<std::string> v_objs;
-    for(i = 0; i < no; i++) 
-        v_objs.push_back(std::string(objs[i]));
-
-    from->load_binary(to->k_type, file, v_objs);
-
-    if(to->k_type == VARIABLES) 
-    {
-        if(smpl == NULL) 
-            csmpl = *from->sample;
-        else
-            csmpl = smpl->intersection(*from->sample);
-
-        if(rc < 0) 
-        {
-            error_manager.append_error("File sample and copy sample do not overlap");
-            goto the_end;
-        }
-
-        /* delete already found variables */
-        for(i = 0 ; i < no; i++) 
-        {
-            name = std::string(objs[i]);
-            obj_found = from->contains(name);
-            if(!obj_found) 
-                continue;
-            if(found[i]) 
-                from->remove(name);
-            found[i] = 1;
-        }
-
-        rc = KV_sample((KDBVariables*) from, &csmpl);
-        if(rc < 0) 
-            goto the_end;
-        nb_found = from->size();
-        rc = KV_merge((KDBVariables*) to, (KDBVariables*) from, 1);
-    }
-    else 
-    {
-        for(i = 0 ; i < no; i++) 
-        {
-            name = std::string(objs[i]);
-            if(found[i]) 
-                continue;
-            obj_found = from->contains(name);
-            if(!obj_found) 
-                continue;
-
-            found[i] = 1;
-
-            // copy packed object from "from" to char* pack
-            ptr = from->get_ptr_obj(name);
-            pack = SW_nalloc(P_len(ptr));
-            memcpy(pack, ptr, P_len(ptr));
-
-            // check if the object already exists in "to"
-            handle_to = to->get_handle(name);
-            // if yes -> delete the corresponding object
-            if(handle_to > 0)
-                SW_free(handle_to);
-            // if not -> create a new entry
-            else 
-                success = to->add_entry(objs[i]);
-                if(!success) 
-                {
-                    SW_nfree(pack);
-                    std::string msg = "Cannot add entry '" + name + "' to KDB";
-                    error_manager.append_error(msg);
-                    goto the_end;
-                }
-
-            // allocate memory in "to" and copy the packed object
-            handle_to = SW_alloc(P_len(pack));
-            to->k_objs[name] = handle_to;
-            memcpy(SW_getptr(handle_to), pack, P_len(pack));
-
-            SW_nfree(pack);
-            nb_found++;
-        }
-    }
-
-the_end:
-    delete from;
-    from = nullptr;
-    
-    if(rc < 0) 
-        return(0);
-    else 
-        return nb_found;
-}
-
-
-/**
- *  Reads objects from a list of IODE files and adds them to an existing KDB.
- *  If more than one file contains an object, the priority is given to the first file in the list.
- *  
- *  For Variables, if the sample in a file is smaller than the parameter smpl, the "intersection" sample is read.
- *  
- *  @param [in, out] to      KDB*       KDB destination (cannot be NULL)
- *  @param [in]      nf      int        number of files to read objects from
- *  @param [in]      files   char**     list of files to be read
- *  @param [in]      no      int        number of object names in objs (may not be 0)
- *  @param [in]      objs    char**     list of object names to copy (may not be 0)
- *  @param [in]      smpl    Sample*    larger sample to read. 
- *
- *  @return                             -1 on error: kdb is null, no list is given, one of the files does not exist
- *                                      -2 if not all object could be found
- *                                      0 if all objects have been found
- * @note Error codes are accumulated via a call to IodeErrorManager::append_error().
- */
-int K_copy(KDB* kdb, int nf, char** files, int no, char** objs, Sample* smpl)
-{
-    int     i, j, nb, nb_found = 0, *found = NULL;
-
-    if(!kdb) 
-        return(-1);
-    if(objs == NULL || no == 0) 
-        return(0);
-
-    found = (int*) SW_nalloc(no * sizeof(int));
-    if(files == NULL || nf == 0) 
-        goto fin;
-
-    for(i = 0; i < nf && nb_found < no; i++) 
-    {
-        nb = K_copy_1(kdb, files[i], no, objs, found, smpl);
-        if(nb < 0) 
-        {
-            SW_nfree(found);
-            return(-1);
-        }
-        nb_found += nb;
-    }
-
-fin:
-    if(nb_found < no) 
-    {
-        for(i = 0, j = 0 ; i < no && j < 10; i++) 
-        {
-            if(found[i] == 0)
-                error_manager.append_error(std::string("Var ") + std::string(objs[i]) + 
-                                           " not found");
-            j++;
-        }
-        if(j == 10) 
-            error_manager.append_error("... others skipped");
-        return(-2);
-    }
-
-    SW_nfree(found);
-    return(0);
-}
-
-/**
- *  Concatenates the content of a file to an existing kdb.
- *  If ikdb is empty, the current ikdb filename is replaced by filename.
- *  
- *  TODO: check object types between file and ikdb.
- *  
- *  @param [in, out]    ikdb        KDB*    existing KDB where to copy the content of filename
- *  @param [in]         filename    char*   file containing objects to copy to ikdb
- *  @return                         int     -1 on error, 0 on success
- *              
- */
- 
-int K_cat(KDB* ikdb, char* filename)
-{
-    KDB* kdb = nullptr;
-    switch(ikdb->k_type) 
-    {
-        case COMMENTS:
-            kdb = new KDBComments(false);
-            break;
-        case EQUATIONS:
-            kdb = new KDBEquations(false);
-            break;
-        case IDENTITIES:
-            kdb = new KDBIdentities(false);
-            break;
-        case LISTS:
-            kdb = new KDBLists(false);
-            break;
-        case SCALARS:
-            kdb = new KDBScalars(false);
-            break;
-        case TABLES:
-            kdb = new KDBTables(false);
-            break;
-        case VARIABLES:
-            kdb = new KDBVariables(false);
-            break;
-        default:
-            {
-                std::string msg = "Cannot concatenate the content of the file ";
-                msg += "'" + std::string(filename) + "' ";
-                msg += "to a database of generic type 'OBJECTS'";
-                kwarning(msg.c_str());
-                return NULL;
-            }
-    }
-
-    bool success = kdb->load(std::string(filename));
-    if(!success)
-    {
-        delete kdb;
-        return -1;
-    }
-
-    if(ikdb->size() == 0) 
-    {
-        ikdb->description = kdb->description;
-        ikdb->filepath = kdb->filepath;
-    }
-
-    if(ikdb->k_type == VARIABLES) 
-        KV_merge_del((KDBVariables*) ikdb, (KDBVariables*) kdb, 1);
-    else 
-        K_merge_del(ikdb, kdb, 1);
-
-    return(0);
 }
 
 
@@ -1528,7 +1244,6 @@ static int K_cwrite(int method, char* buf, OSIZE len, int nb, FILE* fd, int minl
  *           - kmsg() for notifications
  *           - kerror() for error messages (TODO: check the use of ksmg on errors)
  */
-
 bool KDB::save_binary(const std::string& filename, const bool override_filepath)
 {
     int     i, len, res;
@@ -1623,10 +1338,10 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     // prepare KOBJ table
     i = 0;
     k_objs = new KOBJ[this->size()];
-    for(const auto& [name, handle] : this->k_objs) 
+    for(const std::string& name : this->get_names())
     {
         strcpy(k_objs[i].o_name, name.c_str());
-        k_objs[i].o_val = handle;
+        k_objs[i].o_val = 0;
         i++;
     }
 
@@ -1643,8 +1358,10 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     delete[] k_objs;
 
     // dump object values as packed objects
-    for(const auto& [name, handle] : this->k_objs) 
+    SWHDL handle = 0;
+    for(const std::string& name : this->get_names())
     {
+        handle = this->get_handle(name);
         ptr = SW_getptr(handle);
         len = P_len(ptr);
         K_xdrobj[this->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);

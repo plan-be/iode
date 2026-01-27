@@ -15,12 +15,12 @@ inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
 /* k_objs.c */
-int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date);
+int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, 
+              char* instr, char* blk, float* tests, int date);
 int K_upd_tbl(char* name, char* arg);
 
 /* k_objvers.c */
 int K_calcvers(char *);
-void K_setvers(KDB* kdb, int i, int vers);
 
 /* k_objfile.c */
 char *K_add_ext(char* filename, char* ext);
@@ -29,10 +29,6 @@ int K_has_ext(char* filename);
 char *K_set_ext(char *,char *,int );
 char *K_set_ext_asc(char *,char *,int );
 void K_strip(char *);
-int K_merge(KDB *,KDB *,int );
-int K_merge_del(KDB *,KDB *,int );
-int K_copy(KDB *,int ,char **,int ,char **,Sample *);
-int K_cat(KDB *,char *);
 int K_set_backup_on_save(int take_backup);
 int K_get_backup_on_save();
 int K_backup(char *);

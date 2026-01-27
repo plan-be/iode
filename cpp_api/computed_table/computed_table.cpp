@@ -63,12 +63,12 @@ void ComputedTable::initialize()
         files_usage[column.cl_fnb[1]] = 1;
     }
 
-    KDB* kdb = nullptr;
+    KDBVariables* kdb = nullptr;
     for(int ref=1; ref < K_MAX_FREF + 1; ref++) 
     {
         if(files_usage.test(ref))
         {
-            kdb = K_RWS[VARIABLES][ref - 1];
+            kdb = global_ref_var[ref - 1];
             if(!kdb) 
                 throw std::invalid_argument("file[" + std::to_string(ref) + "] is not present");
             files.push_back(kdb->filepath);

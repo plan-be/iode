@@ -78,7 +78,7 @@ static bool load_global_database(std::unique_ptr<T>& global_ptr,
  *  @param [in] int     type    object type
  *  @return     int             0 on success, -1 on error
  *  
- *  @see https://iode.plan.be/doku.php?id=wsload
+ *
  */
 
 int B_WsLoad(char* arg, int type)
@@ -145,27 +145,33 @@ int B_WsDump(KDB* kdb, char* filename)
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wssave
  */
- 
 int B_WsSave(char* arg, int type)
 {
-    char    buf[K_MAX_FILE + 1];
+    char buf[K_MAX_FILE + 1];
 
     SCR_strip((unsigned char*) arg);
     if(strlen(arg) >= sizeof(FNAME)) 
     {
-        error_manager.append_error("Save workspace: filename too long");
-        return(-1);
+        error_manager.append_error("WsSave: filename too long");
+        return -1;
     }
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
     SCR_strip((unsigned char*) buf);
     if(buf[0] == 0) 
         return 0;
     
-    int res = B_WsDump(get_global_db(type), buf);
-    return res;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        int res = B_WsDump(&kdb, buf);
+        return res;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsSave: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -176,7 +182,7 @@ int B_WsSave(char* arg, int type)
  *  Same as $WsSave<type> but with LZH compression.
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  @see https://iode.plan.be/doku.php?id=wssave
+ *
  */
  
  int B_WsSaveCmp(char* arg, int type)
@@ -186,12 +192,25 @@ int B_WsSave(char* arg, int type)
 
     SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
     SCR_strip((unsigned char*) buf);
-    if(buf[0] == 0) return(0);
+    if(buf[0] == 0) 
+        return 0;
+    
     klzh = K_LZH;
     K_LZH = 2;
-    rc = B_WsDump(get_global_db(type), buf);
+    
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        rc = B_WsDump(&kdb, buf);
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsSaveCmp: " + std::string(e.what()));
+        rc = -1;
+    }
+    
     K_LZH = klzh;
-    return(rc);
+    return rc;
 }
 
 
@@ -200,14 +219,20 @@ int B_WsSave(char* arg, int type)
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wsexport
  */
-
 int B_WsExport(char* arg, int type)
 {
-    get_global_db(type)->save_asc(arg);
-    return 0;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.save_asc(arg);
+        return 0;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsExport: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -217,7 +242,7 @@ int B_WsExport(char* arg, int type)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  *  
- *  @see https://iode.plan.be/doku.php?id=wsimport
+ *
  */
 
 int B_WsImport(char* arg, int type)
@@ -229,7 +254,7 @@ int B_WsImport(char* arg, int type)
 /**
  *  Syntax: $WsSample period_from period_to
  *  
- *  @see https://iode.plan.be/doku.php?id=wssample
+ *
  */
 
 int B_WsSample(char* arg, int unused)
@@ -280,23 +305,29 @@ err:
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wsclear
  */
-
 int B_WsClear(char* arg, int type)
 {
     B_WsDescr("", type);
     B_WsName("", type);
-    get_global_db(type)->clear();
-    return 0;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.clear();
+        return 0;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsClear: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
 /**
  *  Syntax: $WsClearAll
  *    
- *  @see https://iode.plan.be/doku.php?id=wsclearall
+ *
  */
 int B_WsClearAll(char* arg, int unused)
 {
@@ -312,14 +343,20 @@ int B_WsClearAll(char* arg, int unused)
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wsdescr
  */
- 
 int B_WsDescr(char* arg, int type)
 {
-    get_global_db(type)->description = std::string(arg);
-    return 0;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.description = std::string(arg);
+        return 0;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsDescr: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -328,11 +365,19 @@ int B_WsDescr(char* arg, int type)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-
 int B_WsName(char* arg, int type)
 {
-    get_global_db(type)->filepath = std::string(arg);
-    return 0;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.filepath = std::string(arg);
+        return 0;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsName: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -340,86 +385,89 @@ int B_WsName(char* arg, int type)
  *  Syntax: 
  *      $WsCopy<type> fichier;fichier;.. obj1 obj2... 
  *          where type is in {cmt | eqs | idt | lst | scl | tbl}
- *      $WsCopyVar file;file;.. [from to] obj1 obj2...
- *  
- *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wscopy
+ *      $WsCopyVar file;file;.. [from to] obj1 obj2... 
  */
-
 int B_WsCopy(char* arg, int type)
-{
-    int     lg, shift = 0, rc = 0;
-    char    file[K_MAX_FILE + 1], **files;
-    char    **data, **data0, *lst;
-    Sample  *smpl = nullptr;
-    char    *oldseps = A_SEPS; // JMP 27/09/2022
-
-    lg = B_get_arg0(file, arg, K_MAX_FILE);
-    files = B_ainit_chk(file, NULL, 0);
-    if(files == 0) 
-        return(-1);
-
-    //A_SEPS = " ;\t\n"; // JMP 27/09/2022
-    A_SEPS = " ,;\t\n"; // JMP 25/04/2023
-    lst = K_expand(type, files[0], arg + lg, '*');
-    data0 = B_ainit_chk(lst, NULL, 0);
-    SCR_free(lst);
-    A_SEPS = oldseps; // JMP 27/09/2022   
-    
-    /*    data0 = B_ainit_chk(arg + lg, NULL, 0); */
-    if(data0 == 0 || data0[0] == 0) 
-    {   /* JMP 24-06-98 */
-        error_manager.append_error("WsCopy : invalid argument(s)");
-        SCR_free_tbl((unsigned char**) files);
-        SCR_free_tbl((unsigned char**) data0);
-        return(-1);
+{   
+    char c_files[K_MAX_FILE + 1];
+    int lg = B_get_arg0(c_files, arg, K_MAX_FILE);
+    std::vector<std::string> v_files = split_multi(std::string(c_files), " ,;\t\n");
+    if(v_files.size() == 0)
+    {
+        error_manager.append_error("WsCopy : filename(s) required");
+        return -1;
     }
 
-    if(type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
+    std::string data = std::string(arg + lg);
+    data = trim(data);
+    if(data.empty())
     {
-        // check if 'from' and 'to' passed as arguments
-        if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0]))
+        error_manager.append_error("WsCopy : object(s) name(s)/pattern required");
+        return -1;
+    }
+
+    bool success = false;
+    if(type == VARIABLES)
+    {
+        std::string from, to;
+        std::vector<std::string> v_data = split_multi(data, " ,;\t\n");
+        if(v_data.size() >= 2) 
         {
-            try
+            // check if 'from' and 'to' passed as arguments
+            std::string first_arg = v_data[0];
+            std::string second_arg = v_data[1];
+            if(SCR_is_num(first_arg[0]) && SCR_is_num(second_arg[0]))
             {
-                smpl = new Sample(std::string(data0[0]), std::string(data0[1]));
-                shift = 2;
+                size_t pos;
+                from = first_arg;
+                to = second_arg;
+                // remove 'from' from the list of arguments
+                pos = data.find(from);
+                if(pos != std::string::npos)
+                    data.erase(pos, from.length());
+                // remove 'to' from the list of arguments
+                pos = data.find(to);
+                if(pos != std::string::npos)
+                    data.erase(pos, to.length());
+                // check that 'from' and 'to' are valid periods for an IODE sample
+                try
+                {
+                    Sample * tmp_smpl = new Sample(from, to);
+                }
+                catch(const std::exception& e)
+                {
+                    std::string error_msg = "WsCopy : invalid values for the 'from' 'to' arguments\n";
+                    error_manager.append_error(error_msg + e.what());
+                    return -1;
+                }
             }
-            catch(const std::exception& e)
+            else
             {
-                error_manager.append_error("WsCopy : invalid sample\n" + std::string(e.what()));
-                SCR_free_tbl((unsigned char**) files);
-                SCR_free_tbl((unsigned char**) data0);
-                return(-1);
+                Sample* vars_sample = global_ws_var->get_sample();
+                if(vars_sample)
+                {
+                    from = vars_sample->start_period.to_string();
+                    to = vars_sample->end_period.to_string();
+                }
             }
         }
+
+        data = trim(data);
+        if(data.empty())
+        {
+            error_manager.append_error("WsCopy : filename(s) required");
+            return -1;
+        }
+
+        success = global_ws_var->copy_from(v_files, from, to, data);
+    }
+    else
+    {
+        KDB& kdb = get_global_db(type);
+        success = kdb.copy_from(v_files, data);
     }
 
-    if(data0 + shift == NULL) 
-    {
-        error_manager.append_error("WsCopy : object list required");
-        rc = -1;
-    }
-    else 
-    {
-        data = (char**) SCR_inter(((unsigned char**) data0) + shift, ((unsigned char**) data0) + shift);
-        rc = K_copy(get_global_db(type),
-                    SCR_tbl_size((unsigned char**) files), files,
-                    SCR_tbl_size((unsigned char**) data), data,
-                    smpl);
-        SCR_free_tbl((unsigned char**) data);
-    }
-    SCR_free_tbl((unsigned char**) data0);
-    SCR_free_tbl((unsigned char**) files);
-    if(smpl)
-        delete smpl;
-    smpl = nullptr;
-
-    if(rc < 0) 
-        return(-1);
-    else 
-        return(0);
+    return success ? 0 : -1;
 }
 
 
@@ -428,18 +476,23 @@ int B_WsCopy(char* arg, int type)
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
- *  
- *  @see https://iode.plan.be/doku.php?id=wsmerge
  */
- 
 int B_WsMerge(char* arg, int type)
 {
-    int     lg, shift = 0, rc;
-    char    file[K_MAX_FILE + 1];
+    char file[K_MAX_FILE + 1];
+    int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
-    lg = B_get_arg0(file, arg, K_MAX_FILE);
-    rc = K_cat(get_global_db(type), file);
-    return(rc);
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.merge_from(file);
+        return 0;
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("WsMerge: " + std::string(e.what()));
+        return -1;
+    }
 }
 
 
@@ -457,9 +510,8 @@ int B_WsMerge(char* arg, int type)
  *              from, to := periods
  *
  *  
- *  @see https://iode.plan.be/doku.php?id=wsextrapolate
+ *
  */
- 
 int B_WsExtrapolate(char* arg, int unused)
 {
     int     p = 0, method = 0, nb_vars = 0, rc = -1;
@@ -532,7 +584,6 @@ done:
  *  @param [in] char*   arg     pattern and optional filename
  *  @return     int             0 on success, < 0 on error
  */
- 
 int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
@@ -565,12 +616,7 @@ done:
 /**
  *  Syntax: $WsAggrChar char
  *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrchar 
- *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
- *  
  */
- 
 int B_WsAggrChar(char* arg, int unused)
 {
     if(arg == NULL || arg[0] == 0) K_AggrChar = ' ';
@@ -582,9 +628,9 @@ int B_WsAggrChar(char* arg, int unused)
 /**
  *  Syntax: $WsAggrSum pattern filename
  *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrsum
+ *
  */
- 
+
 int B_WsAggrSum(char* arg, int unused)
 {
     return(B_WsAggr(0, arg));
@@ -594,10 +640,9 @@ int B_WsAggrSum(char* arg, int unused)
 /**
  *  Syntax: $WsAggrProd pattern filename
  *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrprod
- *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
+ *
+ * for an example.
  */
-
 int B_WsAggrProd(char* arg, int unused)
 {
     return(B_WsAggr(1, arg));
@@ -607,16 +652,13 @@ int B_WsAggrProd(char* arg, int unused)
 /**
  *  Syntax: $WsAggrMean pattern filename
  *  
- *  @see https://iode.plan.be/doku.php?id=wsaggrmean
- *  @see https://iode.plan.be/doku.php?id=wsaggrsum for an example.
+ *
+ * for an example.
  */
-
 int B_WsAggrMean(char* arg, int unused)
 {
     return(B_WsAggr(2, arg));
 }
-
-
 
 
 /**
@@ -626,7 +668,6 @@ int B_WsAggrMean(char* arg, int unused)
  *  @param [in] print       0 to not print, print otherwise
  *  @return     double*  result of E_UnitRoot()
  */
-
 double *B_StatUnitRoot_1(char* arg, int print)
 {
     int     lg, drift, trend, order, rc = -1;
@@ -672,9 +713,8 @@ double *B_StatUnitRoot_1(char* arg, int print)
  // *  Warning: unlike E_UnitRoot(), only a variable name can be used as lec expression
  *  because the df test is saved in the scalar df_<var_name>.
  *  
- *  @see https://iode.plan.be/doku.php?id=statunitroot
+ *
  */
-
 int B_StatUnitRoot(char* arg, int unused)
 {
     int     rc = -1;
@@ -695,13 +735,10 @@ int B_StatUnitRoot(char* arg, int unused)
  *  Syntax: $CsvSave<type> file name1 name2 ...
  *  
  *  For Variables: $CsvSave<type> file [sample] [vars]
- *  
- *  @see https://iode.plan.be/doku.php?id=csvsave
  */
-
 int B_CsvSave(char* arg, int type)
 {
-    int     lg, shift = 0, rc = 0;
+    int     lg, shift = 0;
     char    file[K_MAX_FILE + 1], file_ext[K_MAX_FILE + 1];
     char    **data0, *lst;
     Sample  *smpl = nullptr;
@@ -761,22 +798,31 @@ int B_CsvSave(char* arg, int type)
             vars.push_back(std::string(data0[shift + i]));
     }
 
-    get_global_db(type)->save_csv(file_ext, vars, smpl);
+    int rc = 0;
+    try
+    {
+        KDB& kdb = get_global_db(type);
+        kdb.save_csv(file_ext, vars, smpl);
+    }
+    catch(const std::runtime_error& e)
+    {
+        error_manager.append_error("CsvSave: " + std::string(e.what()));
+        rc = -1;
+    }
 
     SCR_free_tbl((unsigned char**) data0);
     if(smpl) delete smpl;
     smpl = nullptr;
 
-    return 0;
+    return rc;
 }
 
 
 /**
  *  Syntax: $CsvNbDec nn
  *  
- *  @see https://iode.plan.be/doku.php?id=csvdigits
+ *
  */
-
 int B_CsvNbDec(char *nbdec, int unused)
 {
     KDBVariables::CSV_NBDEC = atoi(nbdec);
@@ -792,9 +838,8 @@ int B_CsvNbDec(char *nbdec, int unused)
 /**
  *  Syntax: $CsvSep char
  *  
- *  @see https://iode.plan.be/doku.php?id=csvsep
+ *
  */
-
 int B_CsvSep(char *sep, int unused)
 {
     SCR_free(KDBVariables::CSV_SEP);
@@ -806,9 +851,8 @@ int B_CsvSep(char *sep, int unused)
 /**
  *  Syntax: $CsvNaN text
  *  
- *  @see https://iode.plan.be/doku.php?id=csvnan
+ *
  */
-
 int B_CsvNaN(char *nan, int unused)
 {
     SCR_free(KDBVariables::CSV_NAN);
@@ -821,9 +865,8 @@ int B_CsvNaN(char *nan, int unused)
  *  
  *  Defines the name of the axis for the variable names (default "var")
  *  
- *  @see https://iode.plan.be/doku.php?id=csvsaxes
+ *
  */
-
 int B_CsvAxes(char *var, int unused)
 {
     SCR_free(KDBVariables::CSV_AXES);
@@ -836,9 +879,8 @@ int B_CsvAxes(char *var, int unused)
  *  
  *  Defines the decimal separator in the generated CSV files.
  *  
- *  @see https://iode.plan.be/doku.php?id=csvdec
+ *
  */
-
 int B_CsvDec(char *dec, int unused)
 {
     SCR_free(KDBVariables::CSV_DEC);

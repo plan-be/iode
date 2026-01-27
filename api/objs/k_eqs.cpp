@@ -384,9 +384,9 @@ bool KDBEquations::print_obj_def(const std::string& name)
 
 void KDBEquations::update_reference_db()
 {
-    if(K_RWS[this->k_type][0]) 
-        delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new KDBEquations(this, "*", false);      
+    if(global_ref_eqs[0]) 
+        delete global_ref_eqs[0];
+    global_ref_eqs[0] = new KDBEquations(this, "*", false);      
 }
 
 /**

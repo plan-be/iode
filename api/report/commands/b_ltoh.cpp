@@ -435,7 +435,7 @@ done:
  *         C stands fot Cubic Spliness
  *         S for interpolation by Steps
  *  
- *  @see https://iode.plan.be/doku.php?id=WsLtoHStock
+ *
  */
 int B_WsLtoHStock(char* arg, int unused)
 {
@@ -450,7 +450,7 @@ int B_WsLtoHStock(char* arg, int unused)
  *         C stands fot Cubic Splines
  *         S for interpolation by Steps
  *  
- *  @see https://iode.plan.be/doku.php?id=WsLtoHFlow
+ *
  */
 int B_WsLtoHFlow(char* arg, int unused)
 {

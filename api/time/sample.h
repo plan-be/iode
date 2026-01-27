@@ -104,7 +104,7 @@ public:
 		return periods;
 	}
 
-	Sample intersection(const Sample& other)
+	Sample intersection(const Sample& other) const
 	{
 		std::string error_msg = "Cannot calculate the intersection between the samples '" + 
 								to_string() + "' and '" + other.to_string() + "'.\n";

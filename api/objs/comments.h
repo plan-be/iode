@@ -45,6 +45,19 @@ struct KDBComments : public KDBTemplate<char>
 
     bool print_obj_def(const std::string& name) override;
 
+    void merge_from(const std::string& input_file) override
+    {
+        KDBComments from(false);    
+        KDB::merge_from(from, input_file);
+    }
+
+    bool copy_from_file(const std::string& file, const std::string& objs_names, 
+        std::set<std::string>& v_found)
+    {
+        KDBComments from(false);
+        return KDB::copy_from_file(from, file, objs_names, v_found);
+    }
+
 private:
     bool grep_obj(const std::string& name, const SWHDL handle, 
         const std::string& pattern, const bool ecase, const bool forms, 
@@ -57,6 +70,7 @@ private:
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::unique_ptr<KDBComments> global_ws_cmt = std::make_unique<KDBComments>(true);
+inline std::array<KDBComments*, 5> global_ref_cmt = { nullptr };
 
 /*------------------------- FUNCS ----------------------------*/
 

@@ -24,7 +24,7 @@
  *  
  *  Syntax: $SysMoveFile filein fileout
  *  
- *  @see https://iode.plan.be/doku.php?id=sysmovefile
+ *
  *  
  *  @params See b_data.c for details
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
@@ -56,7 +56,7 @@ fin:
 /**
  *  Syntax: $SysCopyFile filein fileout
  *  
- *  @see https://iode.plan.be/doku.php?id=syscopyfile
+ *
  */
 int B_SysCopy(char* arg, int unused) 
 {
@@ -84,7 +84,7 @@ fin:
 /**
  *  Syntax: $SysAppendFile filein fileout
  *  
- *  @see https://iode.plan.be/doku.php?id=sysappendfile
+ *
  */
 int B_SysAppend(char* arg, int unused) 
 {
@@ -112,7 +112,7 @@ fin:
 /**
  *  Syntax: $SysDeleteFile file1 file2 ...
  *  
- *  @see https://iode.plan.be/doku.php?id=sysdeletefile
+ *
  */
 int B_SysDelete(char* arg, int unused) 
 {
@@ -177,7 +177,7 @@ fin:
 /**
  *  Syntax: $SysOemToUTF8 inputfile outputfile
  *  
- *  @see https://iode.plan.be/doku.php?id=sysoemtoutf8
+ *
  */
 int B_SysOemToUTF8(char *arg, int unused)
 {
@@ -188,7 +188,7 @@ int B_SysOemToUTF8(char *arg, int unused)
 /**
  *  Syntax: $SysAnsiToUTF8 inputfile outputfile
  *  
- *  @see https://iode.plan.be/doku.php?id=sysansitoutf8
+ *
  */
 int B_SysAnsiToUTF8(char *arg, int unused)
 {
@@ -256,7 +256,7 @@ fin:
 /**
  *  Syntax: $SysAnsiToOem inputfile outputfile
  *  
- *  @see https://iode.plan.be/doku.php?id=sysansitooem
+ *
  */
 int B_SysAnsiToOem(char *arg, int unused)
 {
@@ -266,7 +266,7 @@ int B_SysAnsiToOem(char *arg, int unused)
 /**
  *  Syntax: $SysOemToAnsi inputfile outputfile
  *  
- *  @see https://iode.plan.be/doku.php?id=sysoemtoansi
+ *
  */
 int B_SysOemToAnsi(char *arg, int unused)
 {

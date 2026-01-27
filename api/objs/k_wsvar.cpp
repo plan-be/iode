@@ -1283,39 +1283,115 @@ std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& fr
 	}
 }
 
-void KDBVariables::copy_from(const std::string& input_file, const std::string& from, const std::string& to, 
-	const std::string objects_names)
-{
-	    std::string buf = input_file + " ";
+bool KDBVariables::copy_from_file(const std::string& file, const std::string& objs_names, 
+    std::set<std::string>& v_found, const Sample* copy_sample)
+{    
+    KDBVariables from(false);
+    bool success = from.load_binary(this->k_type, file);
+    if(!success)
+        return false;
 
-		if((!from.empty()) || (!to.empty()))
-		{
-			Sample* var_sample = get_sample();
-			buf += from.empty() ? var_sample->start_period.to_string() + " " : from + " ";
-			buf += to.empty() ? var_sample->end_period.to_string() + " " : to + " ";
-			// throw error if wrong samples
-			Sample copy_sample(from, to);
-		}
+    Sample merge_sample;
+    Sample file_sample = *(from.sample);
+    if(!copy_sample) 
+        merge_sample = file_sample;
+    else
+        merge_sample = copy_sample->intersection(file_sample);
 
-        buf += objects_names;
+    if(merge_sample.nb_periods == 0) 
+    {
+        error_manager.append_error("File sample and copy sample do not overlap");
+        return false;
+    }
 
-        int res = B_WsCopy(const_cast<char*>(buf.c_str()), VARIABLES);
+    int rc = KV_sample((KDBVariables*) &from, &merge_sample);
+    if(rc < 0) 
+        return false;
 
-        if (res < 0)
-		{
-			std::string last_error = error_manager.get_last_error();
-			if(!last_error.empty())
-				throw std::runtime_error("Cannot copy the content of file '" + input_file + 
-						"' into the Variables database.\n" + last_error);
-		}
+    std::set<std::string> s_objs;
+    try
+    {
+        s_objs = from.filter_names(objs_names);
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+        return false;
+    }
+
+    // delete objects already found in previous files
+    std::vector<std::string> objs_to_copy;
+    for(const std::string& name : s_objs)
+    {
+        if(!from.contains(name)) 
+            continue;
+        
+        // if already found in previous files -> remove from "from"
+        if(v_found.contains(name)) 
+            from.remove(name);
+        // object to be copied
+        else
+            objs_to_copy.push_back(name);
+    }
+
+    std::string msg = std::to_string(objs_to_copy.size()) + " "; 
+    msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
+    kmsg(msg.c_str());
+
+    rc = KV_merge((KDBVariables*) this, (KDBVariables*) &from, 1);
+    if(rc < 0) 
+        return false;
+
+    for(const std::string& name : objs_to_copy)
+        v_found.insert(name);
+    
+    return true;
 }
 
-void KDBVariables::copy_from(const std::string& input_file, const Period* from, const Period* to, 
+bool KDBVariables::copy_from(const std::vector<std::string>& input_files, const std::string& from, 
+    const std::string& to, const std::string& objects_names)
+{
+    if(input_files.size() == 0)
+        throw std::runtime_error("Input file(s) name(s) is(are) empty.");
+    // NOTE: objects_names.size() == 0 meaning all objects -> no error thrown
+
+    Sample* copy_sample = nullptr;
+    if((!from.empty()) || (!to.empty()))
+    {
+        Sample* var_sample = this->get_sample();
+        std::string _from_ = from.empty() ? var_sample->start_period.to_string() : from;
+        std::string _to_ = to.empty() ? var_sample->end_period.to_string() : to;
+        // throw an error if invalid values for from/to
+        copy_sample = new Sample(_from_, _to_);
+    }
+
+    // search in each file
+    bool success;
+    std::set<std::string> v_found;
+    for(const std::string& file : input_files) 
+    {
+        success = this->copy_from_file(file, objects_names, v_found, copy_sample);
+        if(!success)
+        {
+            error_manager.display_last_error();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool KDBVariables::copy_from(const std::string& input_files, const std::string& from, const std::string& to, 
 	const std::string& objects_names)
 {
-	std::string s_from = (from == nullptr) ? "" : from->to_string();
-	std::string s_to = (to == nullptr) ? "" : to->to_string();
-	copy_from(input_file, s_from, s_to, objects_names);
+    if(input_files.empty())
+        throw std::runtime_error("Input file(s) name(s) is(are) empty.");
+    if(objects_names.empty())
+        throw std::runtime_error("Variable(s) name(s)/pattern is empty.");
+
+    std::vector<std::string> files = split_multi(input_files, " ,;\t\n");
+    bool success = this->copy_from(files, from, to, objects_names);
+    return success;
 }
 
 void KDBVariables::extrapolate(const VariablesInitialization method, const std::string& from, 
@@ -1455,7 +1531,7 @@ bool KDBVariables::print_obj_def(const std::string& name)
 
 void KDBVariables::update_reference_db()
 {
-    if(K_RWS[this->k_type][0]) 
-        delete K_RWS[this->k_type][0];
-    K_RWS[this->k_type][0] = new KDBVariables(this, "*", false);      
+    if(global_ref_var[0]) 
+        delete global_ref_var[0];
+    global_ref_var[0] = new KDBVariables(this, "*", false);      
 }

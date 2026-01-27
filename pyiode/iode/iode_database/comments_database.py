@@ -383,16 +383,14 @@ class Comments(IodeDatabase):
 
         >>> # load all comments with a name starting with 'A'
         >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt", "A*")      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\fun.cmt
-        317 objects loaded
+        4 comment read from file '...fun.cmt'
         >>> comments.get_names("A*")
         ['ACAF', 'ACAG', 'AOUC', 'AQC']
 
         >>> comments.clear()
         >>> # load all comments
         >>> comments.copy_from(f"{SAMPLE_DATA_DIR}/fun.cmt")            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Loading ...\fun.cmt
-        317 objects loaded
+        317 comment read from file '...fun.cmt' 
         >>> len(comments)
         317
         """

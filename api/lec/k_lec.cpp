@@ -3,11 +3,11 @@
  *
  * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
- *      double *L_getvar(KDBVariables* kdb, int pos)  Retrieves a pointer to the first element of a VAR.
- *      double L_getscl(KDBScalars* kdb, int pos)   Retrieves a scalar value.
- *      Sample *L_getsmpl(KDB* kdb)             Retrieves the sample of a KDB.
- *      int L_findscl(KDBScalars* kdb, char *name)     Retrieves a scalar position.
- *      int L_findvar(KDBVariables* kdb, char* name)     Retrieves a variable position.
+ *      double *L_getvar(KDBVariables* kdb, int pos)    Retrieves a pointer to the first element of a VAR.
+ *      double L_getscl(KDBScalars* kdb, int pos)       Retrieves a scalar value.
+ *      Sample *L_getsmpl(KDBVariables* kdb)            Retrieves the sample of a KDB.
+ *      int L_findscl(KDBScalars* kdb, char *name)      Retrieves a scalar position.
+ *      int L_findvar(KDBVariables* kdb, char* name)    Retrieves a variable position.
  */
 
 #include "api/lec/lec.h"

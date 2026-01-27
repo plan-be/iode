@@ -232,7 +232,7 @@ bool KDBVariables::load_asc(const std::string& filename)
     bool success = load_asc_type_ask(std::string(asc_filename), 0, 0);
 
     if(success)
-        K_set_kdb_fullpath(this, (U_ch*) asc_filename);
+        this->set_fullpath(asc_filename);
 
     return success;
 }

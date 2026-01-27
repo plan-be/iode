@@ -78,8 +78,6 @@ extern "C" int  SCR_sleep(int);
 
 
 // $vseps <seps> 
-// @see https://iode.plan.be/doku.php?id=vseps
-
 int RP_vseps(char* seps, int unused)  
 {
     if(seps == 0 || strlen(seps) == 0) seps = ";, ";

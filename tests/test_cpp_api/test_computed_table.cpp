@@ -31,7 +31,7 @@ protected:
         }
         kdb_ref->save(ref_file);
 
-        load_reference_kdb(2, VARIABLES, ref_file);
+        load_reference_kdb(2, ref_file);
     }
 
     // void TearDown() override {}
@@ -729,7 +729,7 @@ TEST_F(ComputedTableTest, InitializePrinting)
 
 TEST_F(ComputedTableTest, PrintToFile)
 {
-    // WARNING: B_PrintTable() resets K_RWS (reference files)
+    // WARNING: B_PrintTable() resets global_ref_xxx (reference files)
 
     int res;
     std::string arg;
@@ -803,7 +803,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_simple.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
     
@@ -814,7 +814,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_simple.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
 
@@ -830,7 +830,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_grt.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
 
@@ -842,7 +842,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_grt.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
 
@@ -858,7 +858,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_2_files.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
     compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
 
@@ -870,7 +870,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_2_files.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
     compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
 
@@ -944,7 +944,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
 
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.csv", 'C');
     compare_files(output_test_dir + "bin_file.csv", output_test_dir + "bin_cpp_file.csv");
     
@@ -955,7 +955,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
-    load_reference_kdb(2, VARIABLES, ref_file);
+    load_reference_kdb(2, ref_file);
     table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.html", 'H');
     compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
 
