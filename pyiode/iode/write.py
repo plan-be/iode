@@ -85,24 +85,24 @@ def write_destination(filename: Union[str, Path], file_type: Union[WriteFileExt,
     <BODY >
     <!STARTHEADER>
     <!ENDHEADER>
-    <A NAME="REF1"></A><H2 class="tit_1"><FONT SIZE=+1><FONT FACE="Arial">My Title (level 1)</FONT></FONT></H2>
-    <P ALIGN=JUSTIFY class="par_1"><FONT SIZE=-1><FONT FACE="Arial">This is a simple text</FONT></FONT></P> 
-    <P ALIGN=JUSTIFY class="par_1"><FONT SIZE=-1><FONT FACE="Arial">This is a paragraph with level 1</FONT></FONT></P>
+    <A NAME="REF1"></A><H2 class="tit_1">My Title (level 1)</H2>
+    <P class="par_1">This is a simple text</P> 
+    <P class="par_1">This is a paragraph with level 1</P>
     <UL>
     <UL>
-    <LI ALIGN=JUSTIFY class="enum_1"><FONT SIZE=-1><FONT FACE="Arial">first item</FONT></FONT></LI>
-    <LI ALIGN=JUSTIFY class="enum_1"><FONT SIZE=-1><FONT FACE="Arial">second item</FONT></FONT></LI>        
+    <LI class="enum_1">first item</LI>
+    <LI class="enum_1">second item</LI>        
     <UL>
-    <LI ALIGN=JUSTIFY class="enum_2"><FONT SIZE=-1><FONT FACE="Arial">first sub-item</FONT></FONT></LI>     
-    <LI ALIGN=JUSTIFY class="enum_2"><FONT SIZE=-1><FONT FACE="Arial">second sub-item</FONT></FONT></LI>    
+    <LI class="enum_2">first sub-item</LI>     
+    <LI class="enum_2">second sub-item</LI>    
     </UL>
-    <LI ALIGN=JUSTIFY class="enum_1"><FONT SIZE=-1><FONT FACE="Arial">third item</FONT></FONT></LI>
+    <LI class="enum_1">third item</LI>
     </UL>
     </UL>
     <PRE class="cmd_1"><FONT COLOR="#008000"><B>equations.estimate('2000Y1', '2010Y1', 'ACAF')<BR> <BR> </B></FONT></PRE>
     <PRE class="cmd_1"><FONT COLOR="#008000"><B>equations.model_simulate('2000Y1', '2010Y1')<BR> <BR> </B></FONT></PRE>
-    <A NAME="REF2"></A><H3 class="tit_2"><FONT SIZE=+0><FONT FACE="Arial">Estimation/Simulation (level 2)<BR> </FONT></FONT></H3>
-    <P ALIGN=JUSTIFY class="par_2"><FONT SIZE=-1><FONT FACE="Arial">This is a paragraph with level 2<BR> <BR> </FONT></FONT></P>
+    <A NAME="REF2"></A><H3 class="tit_2">Estimation/Simulation (level 2)<BR> </H3>
+    <P class="par_2">This is a paragraph with level 2<BR> <BR> </P>
     <TABLE  class="A2mTable" BORDER=1 cellspacing="0" cellpadding="0">
     </TABLE>
     <!STARTFOOTER>
