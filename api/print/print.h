@@ -190,6 +190,7 @@ int V_graph(int ,int ,int ,int ,int ,int ,double ,double ,Sample *,char **);
 /* int.c */
 int T_prep_cls(Table *,char *,COLS **);
 int T_print_tbl(Table *,char *);
+void T_print_title(TableCell*, int);
 int T_print_line(Table *,int ,COLS *);
 void T_print_cell(TableCell *,COL *,int );
 void T_fmt_val(char *,double ,int ,int );

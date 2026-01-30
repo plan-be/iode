@@ -744,4 +744,25 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     delete bin_ref_table;
     delete bin_kdb_tables;
+
+    // ---- titles with special character '#' ----
+    
+    gsample = "2000:10";
+    title = "Test table with special char # in titles";
+    std::vector<std::string> variables = {"Q_I"};
+    Table test_table(2, title, variables, false, false, false);
+
+    test_table.add_title("title with special char # in #it");
+    test_table.add_line_separator();
+
+    TableLine* new_line = test_table.add_line_with_cells();
+    TableCell* first_cell = &new_line->cells[0];
+    first_cell->set_text("Q_F");
+    TableCell* second_cell = &new_line->cells[1];
+    second_cell->set_lec("Q_F");
+
+    ComputedTable computed_table_sharp(&test_table, gsample, 4);
+    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.a2m", 'A');
+    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.html", 'H');
+    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.csv", 'C');
 }
