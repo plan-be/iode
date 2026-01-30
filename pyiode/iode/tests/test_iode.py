@@ -341,7 +341,7 @@ def test_table_getitem_returned_type():
     assert isinstance(table[4], TableLine)
     assert isinstance(table[4][0], TableCell)
 
-def test_computed_table_a2m_format(tmp_path):
+def test_computed_table(tmp_path):
     comments.clear()
     lists.clear()
     tables.clear()
@@ -352,9 +352,10 @@ def test_computed_table_a2m_format(tmp_path):
     tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-    generalized_sample = '1990Y1:2'
-    nb_dec = 2
+    generalized_sample = '2000:10'
+    nb_dec = 4
 
+    # ---- test A2M format ----
     subset_tbl = tables["A*"]
     # test printing to A2M format
     for name in subset_tbl:
@@ -369,6 +370,25 @@ def test_computed_table_a2m_format(tmp_path):
         python_file_content = filepath.read_text()
         assert python_file_content != ""
 
+    # ---- test table with titles with special characters ----
+    title = "Test table with special char # in titles"
+
+    test_table = Table(2, title, ["Q_I"], mode=False, files=False, date=False)
+    test_table += "title with special char # in #it"
+    test_table += '-'
+    test_table += ['"Q_F:"', 'Q_F']
+
+    computed_tbl = test_table.compute(generalized_sample, nb_decimals=nb_dec)
+
+    file_stem: str = "table_sharp"
+    extensions = ["a2m", "html", "csv"]
+    for ext in extensions:
+        filename: str = f"{file_stem}.{ext}"
+        filepath: Path = tmp_path / filename
+        if filepath.exists():
+            filepath.unlink()
+        computed_tbl.print_to_file(filepath, format=ext[0].upper())
+        assert filepath.exists()
 
 # Variables
 # ---------

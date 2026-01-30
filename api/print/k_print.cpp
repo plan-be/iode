@@ -8,16 +8,17 @@
  *  
  *  List of functions 
  *  -----------------
- *      int T_prep_cls(Table* tbl, char* smpl, COLS** cls)            Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table
+ *      int T_prep_cls(Table* tbl, char* smpl, COLS** cls)          Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table
  *      void T_fmt_val(char* buf, double val, int lg, int nd)       Formats a double value
  *      void T_print_val(double val)                                Prints a double value using W_printf()
  *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
  *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
  *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
- *      void T_print_cell(TableCell* cell, COL* cl, int straddle)       Prints a Table cell on a specific GSample column. 
+ *      void T_print_title(TableCell* cell, int straddle)           Prints a Table line of type TITLE
+ *      void T_print_cell(TableCell* cell, COL* cl, int straddle)   Prints a Table cell on a specific GSample column. 
  *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
- *      unsigned char *T_get_title(Table* tbl)                        Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE
- *      int T_print_tbl(Table* tbl, char* smpl)                       Computes a table on a GSample and saves the result in A2M format
+ *      unsigned char *T_get_title(Table* tbl)                      Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE
+ *      int T_print_tbl(Table* tbl, char* smpl)                     Computes a table on a GSample and saves the result in A2M format
  *  
  *  Global variables
  *  ----------------
@@ -165,20 +166,46 @@ void T_close_attr(int attr)
     if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~U");
 }
 
+/**
+ * @brief Prints a Table line of type TITLE
+ * 
+ * @param cell 
+ * @param straddle 
+ * @return int 
+ */
+void T_print_title(TableCell* cell, int straddle)
+{
+    if(cell == nullptr || cell->is_null()) 
+    {
+        W_printf((char*) "%c1R", A2M_SEPCH); 
+        return;                
+    }
+
+    std::string content = cell->get_content(false, false);
+
+    int attribute = (int) cell->get_attribute();
+    T_open_cell(attribute, straddle, TABLE_CELL_STRING);
+    T_open_attr(attribute);
+
+    W_printf((char*) "%s", (char*) content.c_str());
+
+    T_close_attr(attribute);
+    W_printf("\n");
+}
+
 
 /**
  *  Prints a Table cell on a specific GSample column. 
  *  
  *  @param [in] TableCell*  cell        table cell to print
- *  @param [in] COL*    cl          GSample column definition with the value already calculated
- *  @param [in] int     straddle    nb of spanned columns int the resulting a2m table 
+ *  @param [in] COL*        cl          GSample column definition with the value already calculated
+ *  @param [in] int         straddle    nb of spanned columns int the resulting a2m table 
  *  
  */
 void T_print_cell(TableCell* cell, COL* cl, int straddle)
 {
     if(cell == nullptr || cell->is_null()) 
     {
-        //W_printf((char*) "%c1R", KT_sep); 
         W_printf((char*) "%c1R", A2M_SEPCH); 
         return;                
     }
@@ -460,6 +487,7 @@ int T_print_tbl(Table* tbl, char* smpl)
     W_printf((char*) ".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
     
     TableLine* line;
+    TableCell* cell;
     for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
     {
         line = &tbl->lines[i];
@@ -473,8 +501,8 @@ int T_print_tbl(Table* tbl, char* smpl)
                     first = 0;
                     break;
                 }
-                T_print_cell(&(line->cells[0]), NULL, dim);
-                W_printf((char*) "\n");
+                cell = &(line->cells[0]);
+                T_print_title(cell, dim);
                 break;
             case TABLE_LINE_DATE  :
                 T_print_date(dim);
