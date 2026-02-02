@@ -1,6 +1,6 @@
 #include "s_ydvlp.h"
 
-int YY_NO_COMMENT2 = 0; /* JMP 03-03-2004 */
+int YY_COMMENT2 = 1; /* JMP 03-03-2004 */
 
 /*NH*/
 /* =+====== YY_COMMENT ==========================================
@@ -353,6 +353,10 @@ Le type est toujours sauvé dans yy->yy_type.
 int YY_read(yy)
 YYFILE  *yy;
 {
+	#ifdef DEBUG
+	char    c_ch;		// for debug purpose
+	char    c_ch1;		// for debug purpose
+	#endif
     int     ch, ch1;
     YYFILE  *yy_root;
 
@@ -363,6 +367,9 @@ YYFILE  *yy;
 again:
     YY_skip_spaces(yy);
     ch = YY_getc(yy);
+	#ifdef DEBUG
+	c_ch = (char) ch;	// for debug purpose
+	#endif
     yy->yy_line = yy->yy_c_line;
     yy->yy_col = yy->yy_c_col;
 
@@ -383,12 +390,15 @@ again:
 /* Comments : new version */
     if(ch == YY_B_COMMENT[0]) {
 	ch1 = YY_getc(yy);
+	#ifdef DEBUG
+	c_ch1 = (char) ch1;	// for debug purpose
+	#endif
 	if(ch1 == YY_B_COMMENT[1]) {
 	    YY_comment(yy);
 	    return(yy->yy_type);
 	    }
 
-	if(ch1 == YY_B_COMMENT[0] && YY_NO_COMMENT2 == 0) { /* JMP 03-03-2004 */
+	if(ch1 == YY_B_COMMENT[0] && YY_COMMENT2 == 1) { /* JMP 03-03-2004 */
 	    YY_comment2(yy);
 	    return(yy->yy_type);
 	    }

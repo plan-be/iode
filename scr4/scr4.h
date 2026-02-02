@@ -905,7 +905,7 @@ extern int          TXT_nb_tt;
 extern int          ERR_TYPE;
 extern YYFILE       *SCR_YY;
 extern YYKEYS       YY_TBL[];
-extern int          YY_NO_COMMENT2; /* JMP 03-03-2004 */
+extern int          YY_COMMENT2; /* JMP 03-03-2004 */
 extern char         *ERR_MSG_TEXT[];
 extern char         *ERR_LEVEL[];
 extern char         **SCR_CFNS;
