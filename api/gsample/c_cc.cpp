@@ -687,6 +687,11 @@ static COLS *COL_read_y(YYFILE* yy)
     cls->cl_cols[0].cl_opy = COL_NOP;
     memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(Period));
 
+    // YY_COMMENT2 = 0 -> do not consider '//' as the beginning of a comment
+    // See function YY_read()
+    int YY_COMMENT2_OLD = YY_COMMENT2;
+    YY_COMMENT2 = 0;
+
     op = YY_lex(yy);
     if(op <= COL_NOP || op >= COL_LAST_OP) 
     {
@@ -694,12 +699,14 @@ static COLS *COL_read_y(YYFILE* yy)
         return(cls);
     }
 
+    YY_COMMENT2 = YY_COMMENT2_OLD;
+
     cls->cl_cols[0].cl_opy = op;
 
     if(COL_read_per(yy, &per)) 
     {
         COL_free_cols(cls);
-        return((COLS *)0);
+        return((COLS *) 0);
     }
     memcpy(&(cls->cl_cols[0].cl_per[1]), &per, sizeof(Period));
     return(cls);
@@ -1091,54 +1098,60 @@ static COLS *COL_read_cols(YYFILE* yy)
         key = YY_lex(yy);
         switch(key) 
         {
-            case YY_LONG :
-            case COL_EOS:   // JMP 21-05-2012
-            case COL_BOS:   // JMP 21-05-2012
-            case COL_NOW:   // JMP 22-05-2012
-            case COL_EOS1:   // JMP 21-05-2012
-            case COL_BOS1:   // JMP 21-05-2012
-            case COL_NOW1:   // JMP 22-05-2012
+            case YY_LONG :      // -2
+            case COL_BOS:       // 8
+            case COL_EOS:       // 9
+            case COL_NOW:       // 10
+            case COL_BOS1:      // 11
+            case COL_EOS1:      // 12
+            case COL_NOW1:      // 13
                 if(cltmp != 0) 
                     goto err;
                 YY_unread(yy);
+                // Reads a period or an operation on 2 periods
                 cltmp = COL_read_y(yy);
                 if(cltmp == 0) 
                     goto err;
                 break;
 
-            case COL_OPAR :
+            case COL_OPAR :     // 3 '('
                 if(cltmp != 0) 
                     goto err;
+                // COL_read_cols() -> recursive function to compile a GSample
                 cltmp = COL_read_cols(yy);
                 if(cltmp == 0) 
                     goto err;
                 break;
 
-            case COL_COLON :
+            case COL_COLON :    // 5 ':'
                 if(cltmp == 0) 
                     goto err;
                 if(rep.r_nb > 0) 
                     goto err;
+                // Reads a repetition factor
                 if(COL_read_rep(yy, &rep)) 
                     goto err;
                 break;
 
-            case COL_OBRACK :
+            case COL_OBRACK :   // 1 '['
                 if(cltmp == 0) 
                     goto err;
                 if(fils != 0) 
                     goto err;
+                // Reads in a GSample a list of FILE operations surrounded by brackets []
                 fils = COL_read_f(yy);
                 if(fils == 0) 
                     goto err;
                 break;
 
-            case COL_COMMA :
-            case COL_CPAR :
-            case YY_EOF :
+            case COL_COMMA :    // 6 ';'
+            case COL_CPAR :     // 4 ')'
+            case YY_EOF :       // -1
                 if(cltmp == 0) 
                     goto err;
-                //cls = COL_construct(cls, cltmp, fils, &rep, shiftdir, shiftval);
+                //  Given a COLS struct cltmp (result of a partial GSample compilation, 
+                //  adds it to the global GSample compiled struct cls.
+                //  The cltmp is added to cols rep->r_nb times * fils->fl_nb times.
                 cls = COL_construct(cls, cltmp, fils, &rep, 0, 0);
                 COL_free_fils(fils);
                 COL_free_cols(cltmp);
@@ -1150,14 +1163,17 @@ static COLS *COL_read_cols(YYFILE* yy)
                     return(cls);
                 break;
 
-            case COL_SHIFTL:
-            case COL_SHIFTR:
+            case COL_SHIFTL:    // 29 '<'
+            case COL_SHIFTR:    // 30 '>'
                 if(cltmp == 0) 
                     goto err;
+                // Reads "P", "PER", "S", "SUB" or a number returns the sub period 
+                // corresponding position
                 shiftval = COL_read_long_per(yy);
                 if(shiftval < 0) 
                     goto err;
                 shiftdir = key;
+                // Modifies a partial GSample by shifting all periods by nb positions
                 COL_shift(cltmp, shiftdir, shiftval);
                 break;
 
