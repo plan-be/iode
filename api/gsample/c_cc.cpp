@@ -69,7 +69,8 @@ static COLS *COL_read_cols(YYFILE* yy);
 
 
 // GSample tokens -- may be expanded
-YYKEYS COL_KEYWS[] = {
+YYKEYS COL_KEYWS[] = 
+{
     (unsigned char*) "[",    COL_OBRACK,
     (unsigned char*) "]",    COL_CBRACK,
     (unsigned char*) "(",    COL_OPAR,
@@ -199,8 +200,11 @@ YYKEYS COL_KEYWS[] = {
  
 static void COL_free_fils(FILS* fils)
 {
-    if(fils == 0) return;
-    if(fils->fl_nb != 0) SW_nfree(fils->fl_fils);
+    if(fils == 0) 
+        return;
+    
+    if(fils->fl_nb != 0) 
+        SW_nfree(fils->fl_fils);
     SW_nfree(fils);
 }
 
@@ -241,11 +245,17 @@ char *COL_ctoa(COL* cl, int ch, int n, int nbf)
 
     res[0] = res[1] = 0;
 
-    if(U_is_in(ch, "yYpPrRnNmMoO")) {
-        if(cl->cl_opy == COL_NOP && n == 1) return(res);
+    if(U_is_in(ch, "yYpPrRnNmMoO")) 
+    {
+        if(cl->cl_opy == COL_NOP && n == 1) 
+            return(res);
+        
         per = &(cl->cl_per[n]);
-        if(U_is_in(ch, "PpMmRrNn") && per->periodicity == 'Y') return(res);
-        switch(ch) {
+        if(U_is_in(ch, "PpMmRrNn") && per->periodicity == 'Y') 
+            return(res);
+        
+        switch(ch) 
+        {
             case 'y' :
                 sprintf(res, "%02ld", (per->year) % 100L);
                 break;
@@ -295,9 +305,11 @@ Num:
         return(res);
     }
 
-    if(U_is_in(ch, "fF")) {
+    if(U_is_in(ch, "fF")) 
+    {
         if(nbf < 2) 
             return(res);
+        
         if(cl->cl_opf == COL_NOP) 
             sprintf(res, "[%d]", cl->cl_fnb[0]);
         else    
@@ -329,42 +341,58 @@ char *COL_text(COL* cl, char* str, int nbnames)
     int     i, j, op, n, lg;
     char    *res, *txt, *tmp;
 
-    if(str == NULL) return(NULL);
+    if(str == NULL) 
+        return(NULL);
+    
     lg = (int)strlen(str) + 40;
     res = SW_nalloc(lg + 3);
 
-    for(i = j = 0 ; j < lg && str[i] ; i++) {
-        if(str[i] != '#') {
+    for(i = j = 0 ; j < lg && str[i] ; i++) 
+    {
+        if(str[i] != '#') 
+        {
             res[j++] = str[i];
             continue;
         }
+
         op = str[i + 1];
         n = 0;
-        if(!U_is_in(op, "yYpPrRnNmMfFoOtTsS")) continue;
+        if(!U_is_in(op, "yYpPrRnNmMfFoOtTsS")) 
+            continue;
+        
         i++;
-        if(U_is_in(str[i + 1], "12")) {
+        if(U_is_in(str[i + 1], "12")) 
+        {
             n = str[i + 1] - '1';
             i++;
         }
-        if(U_is_in(op, "sStT")) {
+
+        if(U_is_in(op, "sStT")) 
+        {
             if(op == 's')       tmp = "#t#f";
             else if(op == 'S')  tmp = "#T#F";
             else if(op == 't')  tmp = "#y1#P1#n1#o1#y2#P2#n2";
             else if(op == 'T')  tmp = "#Y1#P1#n1#o1#Y2#P2#n2";
             txt = COL_text(cl, tmp, nbnames);
-            if(j + strlen(txt) < lg) {
+            if(j + strlen(txt) < lg) 
+            {
                 strcat(res, txt);
                 SCR_free(txt);
             }
-            else break;
+            else 
+                break;
         }
-        else {
+        else 
+        {
             txt = COL_ctoa(cl, op, n, nbnames);
-            if(j + strlen(txt) >= lg) break;
+            if(j + strlen(txt) >= lg) 
+                break;
             strcat(res, txt);
         }
-        j = (int)strlen(res);
+
+        j = (int) strlen(res);
     }
+
     return(res);
 }
 
@@ -379,10 +407,11 @@ char *COL_text(COL* cl, char* str, int nbnames)
 
 COLS *COL_add_col(COLS* cls)
 {
-    if(cls == 0) {
+    if(cls == 0) 
         cls = (COLS *) SW_nalloc(sizeof(COLS));     // BUG corrected: was sizeof(COL)
-    }
-    if(cls->cl_nb % 20 == 0) // enlarges by chunks of 20
+    
+    // enlarges by chunks of 20
+    if(cls->cl_nb % 20 == 0)
         cls->cl_cols = (COL *) SW_nrealloc(cls->cl_cols,
                                            sizeof(COL) * cls->cl_nb,
                                            sizeof(COL) * (cls->cl_nb + 20));
@@ -401,11 +430,13 @@ COLS *COL_add_col(COLS* cls)
  
 static FILS* COL_add_fil(FILS* fils)
 {
-    if(fils == 0) {
-        fils = (FILS *) SW_nalloc(sizeof(FILS)); // BUG in previous versions: 
-                                                 // was SW_nalloc(sizeof(FIL)) instead of SW_nalloc(sizeof(FILS))
-    }
-    if(fils->fl_nb % 5 == 0)   // enlarges by chunks of 5
+    // BUG in previous versions: 
+    // was SW_nalloc(sizeof(FIL)) instead of SW_nalloc(sizeof(FILS))
+    if(fils == 0)
+        fils = (FILS *) SW_nalloc(sizeof(FILS));
+    
+    // enlarges by chunks of 5
+    if(fils->fl_nb % 5 == 0)
         fils->fl_fils = (FIL *) SW_nrealloc(fils->fl_fils,
                                            sizeof(FIL) * fils->fl_nb,
                                            sizeof(FIL) * (fils->fl_nb + 5));
@@ -425,7 +456,9 @@ static FILS* COL_add_fil(FILS* fils)
 
 static void COL_apply_fil(COL* cl, FIL* fl)
 {
-    if(cl->cl_fnb[0] != 0) return;
+    if(cl->cl_fnb[0] != 0) 
+        return;
+    
     cl->cl_fnb[0] = fl->fl_1;
     cl->cl_fnb[1] = fl->fl_2;
     cl->cl_opf = fl->fl_op;
@@ -446,7 +479,8 @@ static void COL_calc_now(Period *per)
 {
     memcpy(per, &(global_ws_var->sample->start_period), sizeof(Period));
     per->year = SCR_current_date() / 10000L;
-    switch(per->periodicity) {
+    switch(per->periodicity) 
+    {
         case 'M' :
             per->step = (SCR_current_date() / 100) % 100;
             break;
@@ -455,7 +489,8 @@ static void COL_calc_now(Period *per)
             break;
         case 'W' :
             per->step = DT_week_number(SCR_current_date());
-            if(per->step == 0) {
+            if(per->step == 0) 
+            {
                 per->year--;
                 per->step = 53;
             }
@@ -526,7 +561,8 @@ static int COL_read_per(YYFILE* yy, Period* per)
 
     // 1. year
     keyw = YY_lex(yy);
-    switch(keyw) {
+    switch(keyw) 
+    {
         case YY_LONG :
             per->year = yy->yy_long;
             if(per->year < 50) per->year += 2000;
@@ -566,42 +602,50 @@ static int COL_read_per(YYFILE* yy, Period* per)
 
     // 2. Pper
     ch1 = ch = YY_getc(yy);
-    if(ch1 >= 'a' && ch1 <= 'z')  ch1 += 'A' - 'a'; // JMP 21-05-2012
+    if(ch1 >= 'a' && ch1 <= 'z')    
+        ch1 += 'A' - 'a';
+    
     pos = get_pos_in_char_array((char*) periodicities.c_str(), ch1);
-    if(pos >= 0) {
+    if(pos >= 0) 
+    {
         per->periodicity = ch1;
-        if(YY_lex(yy) != YY_LONG) return(-1);
+        if(YY_lex(yy) != YY_LONG) 
+            return(-1);
+        
         per->step = yy->yy_long;
-        if(per->step < 1 || per->step > L_Period_NB[pos]) return(-1);
+        if(per->step < 1 || per->step > L_Period_NB[pos]) 
+            return(-1);
+        
         YY_skip_spaces(yy);
-        ch	= YY_getc(yy); // Lit la suite
+        ch = YY_getc(yy);       // read next char
     }
 
     // 3. <n ou >n avec possible répétition (<0>1 ou <0>N comptent pour la seule période courante)
 nextshift:
-    if(!U_is_in(ch, "<>")) {				// JMP 21-05-2012
+    if(!U_is_in(ch, "<>")) 
+    {
         YY_ungetc(ch, yy);
         return(0);
     }
 
     if(ch == '<') 
-        sign = -1;			   	// JMP 21-05-2012
+        sign = -1;
     else          
         sign = 1;
+    
     shiftval = COL_read_long_per(yy);
     if(shiftval < 0) 
         return(-1);
 
-    /*
-    if(YY_lex(yy) != YY_LONG) return(-1);
-    */
-    if(shiftval == 0) {
+    if(shiftval == 0) 
+    {
         if(sign > 0) 
             per->step = get_nb_periods_per_year(per->periodicity);
         else         
             per->step = 1;
     }
-    else {
+    else 
+    {
         Period pertmp = per->shift(sign * shiftval);
         per->year = pertmp.year;
         per->periodicity = pertmp.periodicity;
@@ -636,20 +680,24 @@ static COLS *COL_read_y(YYFILE* yy)
     COLS    *cls;
     int     op;
 
-    if(COL_read_per(yy, &per)) return((COLS *)0);
-    cls = COL_add_col((COLS *)0);
+    if(COL_read_per(yy, &per)) 
+        return((COLS *) 0);
+    
+    cls = COL_add_col((COLS *) 0);
     cls->cl_cols[0].cl_opy = COL_NOP;
     memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(Period));
 
     op = YY_lex(yy);
-    if(op <= COL_NOP || op >= COL_LAST_OP) {
+    if(op <= COL_NOP || op >= COL_LAST_OP) 
+    {
         YY_unread(yy);
         return(cls);
     }
 
     cls->cl_cols[0].cl_opy = op;
 
-    if(COL_read_per(yy, &per)) {
+    if(COL_read_per(yy, &per)) 
+    {
         COL_free_cols(cls);
         return((COLS *)0);
     }
@@ -673,14 +721,16 @@ static int COL_calc_subper()
 
     per = &(global_ws_var->sample->start_period);
 
-    switch(per->periodicity) {
+    switch(per->periodicity) 
+    {
         case 'M' :
             return((SCR_current_date() / 100) % 100);
         case 'Q' :
             return(1 + ((SCR_current_date() / 100) % 100 - 1) / 3);
         case 'W' :
             p = DT_week_number(SCR_current_date());
-            if(p == 0) p = 53;
+            if(p == 0) 
+                p = 53;
             return(p);
         case 'Y' :
         default :
@@ -703,7 +753,7 @@ static int COL_calc_subper()
  
 static int COL_read_rep(YYFILE* yy, REP* rep)
 {
-    int	sign = 1; // JMP 21-05-2012
+    int	sign = 1;
     int	keyw;
 
     rep->r_incr = 1;
@@ -711,10 +761,12 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
     // Syntax : [:n[*[-]incr]]
     // 1. partie (optionnelle) n
     rep->r_nb = COL_read_long_per(yy);
-    if(rep->r_nb < 0) return(-1);
+    if(rep->r_nb < 0) 
+        return(-1);
 
     // 2. partie optionnelle :[-]incr
-    if(YY_lex(yy) != COL_DOT) {
+    if(YY_lex(yy) != COL_DOT) 
+    {
         YY_unread(yy);
         return(0);
     }
@@ -727,9 +779,10 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
         YY_unread(yy);
 
     rep->r_incr = COL_read_long_per(yy);
-    if(rep->r_incr < 0) return(-1);
+    if(rep->r_incr < 0) 
+        return(-1);
+    
     rep->r_incr *= sign;
-
     return(0);
 }
 
@@ -757,17 +810,25 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
 
     fil->fl_op = COL_NOP;
     fil->fl_2  = 0;
-    if(YY_lex(yy) != YY_LONG) return(-1);
-    if(yy->yy_long < 1 || yy->yy_long > 10) return(-1);
-    fil->fl_1 = (short)yy->yy_long;
+    if(YY_lex(yy) != YY_LONG) 
+        return(-1);
+
+    if(yy->yy_long < 1 || yy->yy_long > 10) 
+        return(-1);
+    
+    fil->fl_1 = (short) yy->yy_long;
     op = YY_lex(yy);
     /*GB    if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN) { */
-    if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN && op != COL_BASE) {
+    if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN && op != COL_BASE) 
+    {
         YY_unread(yy);
         return(0);
     }
+
     fil->fl_op = op;
-    if(YY_lex(yy) != YY_LONG) return(-1);
+    if(YY_lex(yy) != YY_LONG) 
+        return(-1);
+    
     fil->fl_2 = (short)yy->yy_long;
     return(0);
 }
@@ -796,10 +857,14 @@ static FILS *COL_read_f(YYFILE* yy)
 {
     FILS    *fils = 0;
 
-    while(1) {
+    while(1) 
+    {
         fils = (FILS *)COL_add_fil(fils);
-        if(COL_read_1f(yy, fils->fl_fils + fils->fl_nb - 1)) goto err;
-        switch(YY_lex(yy)) {
+        if(COL_read_1f(yy, fils->fl_fils + fils->fl_nb - 1)) 
+            goto err;
+        
+        switch(YY_lex(yy)) 
+        {
             case COL_COMMA :
                 break;
             case COL_CBRACK :
@@ -811,7 +876,7 @@ static FILS *COL_read_f(YYFILE* yy)
 
 err:
     COL_free_fils(fils);
-    return((FILS *)0);
+    return((FILS *) 0);
 }
 
 
@@ -838,20 +903,24 @@ static void COL_shift(COLS *cls, int key, int nb)
     COL   	*cl;
     Period  per;
 
-    for(int i = 0; i < cls->cl_nb; i++) {
+    for(int i = 0; i < cls->cl_nb; i++) 
+    {
         cl = cls->cl_cols + i;
-        if(nb == 0) {
+        if(nb == 0) 
+        {
             if(key == COL_SHIFTR)
                 cl->cl_per[0].step = cl->cl_per[1].step = get_nb_periods_per_year(cl->cl_per[0].periodicity);
             else
                 cl->cl_per[0].step = cl->cl_per[1].step = 1;
         }
-        else {
+        else 
+        {
             if(key == COL_SHIFTL) 
                 nb = -nb;
             per = cl->cl_per->shift(nb);
             cl->cl_per[0] = per;
-            if(cl->cl_opy != COL_NOP) {
+            if(cl->cl_opy != COL_NOP) 
+            {
                 per = cl->cl_per[1].shift(nb);
                 cl->cl_per[1] = per;
             }
@@ -893,10 +962,13 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
     COL     *cl, *tmp;
     Period  per;
 
-    if(fils == 0) fils = &COL_FILS; // if no fils, use a default  value
+    // if no fils, use a default  value
+    if(fils == 0) 
+        fils = &COL_FILS;
     nbfils = fils->fl_nb;
 
-    if(rep->r_nb == 0) {
+    if(rep->r_nb == 0) 
+    {
         rep->r_nb   = 1;
         rep->r_incr = 1;
     }
@@ -905,9 +977,12 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
     tmp   = cltmp->cl_cols;
 
     // Repetitions
-    for(i = 0 ; i < rep->r_nb ; i++) {
-        for(j = 0 ; j < nbtmp ; j++) {
-            for(k = 0 ; k < nbfils ; k++) {
+    for(i = 0 ; i < rep->r_nb ; i++) 
+    {
+        for(j = 0 ; j < nbtmp ; j++) 
+        {
+            for(k = 0 ; k < nbfils ; k++) 
+            {
                 cls = COL_add_col(cls);
                 cl = cls->cl_cols + cls->cl_nb - 1;
                 memcpy(cl, tmp + j, sizeof(COL));
@@ -923,8 +998,10 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
     }
 
     // Shift
-    if(shiftdir) {
-        for(i = 0; i < cls->cl_nb; i++) {
+    if(shiftdir) 
+    {
+        for(i = 0; i < cls->cl_nb; i++) 
+        {
             cl = cls->cl_cols + i;
             if(shiftval == 0) {
                 if(shiftdir == COL_SHIFTR)
@@ -932,12 +1009,14 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
                 else
                     cl->cl_per[0].step = cl->cl_per[1].step = 1;
             }
-            else {
+            else 
+            {
                 if(shiftdir == COL_SHIFTL) 
                     shiftval = -shiftval;
                 per = cl->cl_per[0].shift(shiftval);
                 cl->cl_per[0] = per;
-                if(cl->cl_opy != COL_NOP) {
+                if(cl->cl_opy != COL_NOP) 
+                {
                     per = cl->cl_per[1].shift(shiftval);
                     cl->cl_per[1] = per;
                 }
@@ -1007,9 +1086,11 @@ static COLS *COL_read_cols(YYFILE* yy)
     rep.r_nb = 0;
     fils = 0;
 
-    while(1) {
+    while(1) 
+    {
         key = YY_lex(yy);
-        switch(key) {
+        switch(key) 
+        {
             case YY_LONG :
             case COL_EOS:   // JMP 21-05-2012
             case COL_BOS:   // JMP 21-05-2012
@@ -1017,35 +1098,46 @@ static COLS *COL_read_cols(YYFILE* yy)
             case COL_EOS1:   // JMP 21-05-2012
             case COL_BOS1:   // JMP 21-05-2012
             case COL_NOW1:   // JMP 22-05-2012
-                if(cltmp != 0) goto err;
+                if(cltmp != 0) 
+                    goto err;
                 YY_unread(yy);
                 cltmp = COL_read_y(yy);
-                if(cltmp == 0) goto err;
+                if(cltmp == 0) 
+                    goto err;
                 break;
 
             case COL_OPAR :
-                if(cltmp != 0) goto err;
+                if(cltmp != 0) 
+                    goto err;
                 cltmp = COL_read_cols(yy);
-                if(cltmp == 0) goto err;
+                if(cltmp == 0) 
+                    goto err;
                 break;
 
             case COL_COLON :
-                if(cltmp == 0) goto err;
-                if(rep.r_nb > 0) goto err;
-                if(COL_read_rep(yy, &rep)) goto err;
+                if(cltmp == 0) 
+                    goto err;
+                if(rep.r_nb > 0) 
+                    goto err;
+                if(COL_read_rep(yy, &rep)) 
+                    goto err;
                 break;
 
             case COL_OBRACK :
-                if(cltmp == 0) goto err;
-                if(fils != 0) goto err;
+                if(cltmp == 0) 
+                    goto err;
+                if(fils != 0) 
+                    goto err;
                 fils = COL_read_f(yy);
-                if(fils == 0) goto err;
+                if(fils == 0) 
+                    goto err;
                 break;
 
             case COL_COMMA :
             case COL_CPAR :
             case YY_EOF :
-                if(cltmp == 0) goto err;
+                if(cltmp == 0) 
+                    goto err;
                 //cls = COL_construct(cls, cltmp, fils, &rep, shiftdir, shiftval);
                 cls = COL_construct(cls, cltmp, fils, &rep, 0, 0);
                 COL_free_fils(fils);
@@ -1054,14 +1146,17 @@ static COLS *COL_read_cols(YYFILE* yy)
                 rep.r_nb = 0;
                 cltmp = 0;
                 shiftdir = 0;
-                if(key != COL_COMMA) return(cls);
+                if(key != COL_COMMA) 
+                    return(cls);
                 break;
 
             case COL_SHIFTL:
             case COL_SHIFTR:
-                if(cltmp == 0) goto err;
+                if(cltmp == 0) 
+                    goto err;
                 shiftval = COL_read_long_per(yy);
-                if(shiftval < 0) goto err;
+                if(shiftval < 0) 
+                    goto err;
                 shiftdir = key;
                 COL_shift(cltmp, shiftdir, shiftval);
                 break;
@@ -1096,24 +1191,31 @@ COLS *COL_cc(char* gsample)
     int     i;
 
     YY_CASE_SENSITIVE = 1;
-    if(sorted == 0) {
+    if(sorted == 0) 
+    {
         qsort(COL_KEYWS, sizeof(COL_KEYWS) / sizeof(YYKEYS), sizeof(YYKEYS), col_compare);
         sorted = 1;
     }
     yy = YY_open(gsample, COL_KEYWS,
                  sizeof(COL_KEYWS) / sizeof(YYKEYS), YY_MEM);
-    if(yy == 0) return((COLS *)0);
+    if(yy == 0) 
+        return((COLS *) 0);
+    
     cls = COL_read_cols(yy);
     YY_close(yy);
     
     // When no file is specified in a COL, force file nb 1 (i.e. workspace) and no operation on files
     if(cls != 0)
-        for(i = 0, cl = cls->cl_cols ; i < cls->cl_nb ; i++, cl++) {
-            if(cl->cl_fnb[0] != 0) continue;
+    {
+        for(i = 0, cl = cls->cl_cols ; i < cls->cl_nb ; i++, cl++) 
+        {
+            if(cl->cl_fnb[0] != 0) 
+                continue;
             cl->cl_fnb[0] = 1;
             cl->cl_fnb[1] = 0;
             cl->cl_opf = COL_NOP;
         }
+    }
 
     return(cls);
 }
@@ -1129,8 +1231,11 @@ COLS *COL_cc(char* gsample)
  
 int COL_free_cols(COLS* cls)
 {
-    if(cls == 0) return(0);
-    if(cls->cl_nb != 0) SW_nfree(cls->cl_cols);
+    if(cls == 0) 
+        return(0);
+    
+    if(cls->cl_nb != 0) 
+        SW_nfree(cls->cl_cols);
     SW_nfree(cls);
     return(0);
 }
@@ -1160,19 +1265,27 @@ int COL_find_mode(COLS* cls, int* mode, int type)
     int    i, nb = 0;
 
     memset(mode, 0,  MAX_MODE * sizeof(int));
-    for(i = 0; i < cls->cl_nb; i++) {
+    for(i = 0; i < cls->cl_nb; i++) 
+    {
         cl = cls->cl_cols + i;
-        if(type % 2 == 0) { /* 0 ou 2 ==> years */
+
+        /* 0 ou 2 ==> years */
+        if(type % 2 == 0) 
+        {
             if(cl->cl_opy >= COL_DIFF && cl->cl_opy <= COL_BASE)
                 mode[cl->cl_opy - COL_DIFF] = 1;
             nb = 1;
         }
 
-        if(type > 0) { /* 1 ou 2 ==> files */
+        /* 1 ou 2 ==> files */
+        if(type > 0) 
+        {
             if(cl->cl_opf >= COL_DIFF && cl->cl_opf <= COL_BASE)
                 mode[cl->cl_opf - COL_DIFF] = 1;
             nb = 1;
         }
     }
-    return(nb); /* nb = 0 : pas d'opération, = 1 : ops */
+
+    /* nb = 0 : pas d'opération, = 1 : ops */
+    return(nb);
 }
