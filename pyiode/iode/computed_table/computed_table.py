@@ -86,6 +86,19 @@ class ComputedTable:
     Intensité de capital             |     0.39 |     0.38 |     0.38 |     0.37 |     0.37 |     0.36 |     0.36 |     0.36 |     0.36 |     0.35  
     Productivité totale des facteurs |     1.10 |     1.08 |     1.11 |     1.09 |     1.12 |     1.10 |     1.13 |     1.11 |     1.14 |     1.12  
     <BLANKLINE>
+
+    >>> # multiple patterns (current workspace + 1 extra file) - 6 observations - 2 decimals (default)
+    >>> extra_files = f"{SAMPLE_DATA_DIR}/ref.av"
+    >>> generalized_sample = "2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2]"
+    >>> computed_table = tables["C8_1"].compute(generalized_sample, extra_files)
+    >>> computed_table              # doctest: +NORMALIZE_WHITESPACE
+        line title \ period[file]     |  00[1]  |  02[1]  | 04//03[1] |  06[1]  |  06[2]  | 08[1+2]  | 10/09[1^2]
+    -------------------------------------------------------------------------------------------------------------
+    Output potentiel                 | 5495.21 | 5748.78 |      1.85 | 6275.47 | 6149.96 | 13177.88 |       1.74
+    Stock de capital                 | 8083.55 | 8647.94 |      2.98 | 9822.45 | 9626.00 | 21009.68 |       2.82
+    Intensité de capital             |    0.50 |    0.48 |     -3.07 |    0.42 |    0.41 |     0.80 |      -2.17
+    Productivité totale des facteurs |    0.99 |    1.01 |      1.00 |    1.05 |    1.03 |     2.13 |       1.00
+    <BLANKLINE>
     """
     def __init__(self):
         raise TypeError("This class cannot be instantiated directly.")
