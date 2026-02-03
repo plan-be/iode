@@ -16,6 +16,8 @@ Fixed Bugs
 
 - IODE COMMAND: Fixed the IODE command `$PrintTbl` not printing IODE tables to files 
   (closes :issue:`1127`).
+- PYTHON: Fixed computing of IODE tables when the sample contains the periods operator `//` 
+  (closes :issue:`1130`)
 - PYTHON: Fixed a bug in the Python API when printing computed IODE table to A2M files 
   where titles containing the character `#` (closes :issue:`1131`).
 - GUI: Fixed a bug in the Equation Editor where saving a new equation did always save it 
