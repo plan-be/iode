@@ -1,0 +1,11 @@
+.topic 3 0 D‚terminants de l'output potentiel
+.gb 16.00 10.00
+.ggrid TMM
+.galign L
+.gbox 0 b 0
+.gtitle D‚terminants de l'output potentiel
+.gty L "Output potentiel" 2000Y1  5495.2128  5627.8589  5748.7804  5857.9529  5966.1999 
+.gty L "Stock de capital" 2000Y1  8083.5517  8359.8908  8647.9354  8910.3393  9175.8106 
+.gty L "Intensit‚ de capital" 2000Y1  0.50316589  0.48960767  0.47583221  0.46226773  0.44807694 
+.gty L "Productivit‚ totale des facteurs" 2000Y1  0.9937733  1.003711  1.0137481  1.0238856  1.0341245 
+.ge
