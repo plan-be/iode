@@ -130,7 +130,9 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
     TableLine   *line;
     Sample  smpl;
     double  step, *x, *y;
-    TableCell   *cells;   
+    TableCell   *cells; 
+    
+    bool to_utf8 = false;
 
 //    KT_attr = 4;
     if(tbl->nb_columns != 2) 
@@ -162,7 +164,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
     //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
     //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
     if(mode != 0) 
-        W_print_rtf_topic((char*) T_get_title(tbl)); // JMP 01-07-2022
+        W_print_rtf_topic((char*) T_get_title(tbl, to_utf8)); // JMP 01-07-2022
     
     w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
                     (int) tbl->get_gridx(), (int) tbl->get_gridy(),
@@ -182,12 +184,12 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) 
+                if(T_GraphLine(tbl, i, cls, &smpl, x, y, fcls, to_utf8)) 
                     w = -1;
                 break;
 
             case TABLE_LINE_TITLE :
-                content = cells[0].get_content();
+                content = cells[0].get_content(false, to_utf8);
                 T_GraphTitle((char*) content.c_str());
                 break;
 
@@ -253,12 +255,12 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
  *  @param [in] int    i        nb of the GSample column to use for generating the legend
  *  @return 
  */
-static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i) 
+static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i, bool to_utf8) 
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
     TableCell   *cell = &(line->cells[0]);
-    std::string content = cell->get_content();
+    std::string content = cell->get_content(false, to_utf8);
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
         fileop = COL_ctoa(cl, 'f', 0, 2);
@@ -354,7 +356,8 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  @return 
  *  
  */
-int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
+int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, 
+    COLS *fcls, bool to_utf8)
 {
     int     j, dt, k;
     TableLine   *line = &tbl->lines[i];
@@ -366,7 +369,7 @@ int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y
 
     for(k = 0 ; k < fcls->cl_nb ; k++) 
     {
-        T_GraphLineTitle(line, fcls, k);
+        T_GraphLineTitle(line, fcls, k, to_utf8);
 
         for(j = 0 ; j < smpl->nb_periods ; j++) 
             y[j] = IODE_NAN;
