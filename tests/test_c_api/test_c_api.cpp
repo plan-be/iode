@@ -1247,7 +1247,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in K_RWS[VARIABLES][2]
-    sprintf(fullfilename,  "%s%s", input_test_dir, "fun.av");
+    sprintf(fullfilename, "%s%s", input_test_dir, "fun.av");
     rc = K_load_RWS(2, fullfilename);
     EXPECT_EQ(rc, 0);
 
@@ -1272,15 +1272,36 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     delete tbl;
 
     // Print vars as graphs
-    varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", (U_ch*)",;");
+    varlist = (char**) SCR_vtoms((U_ch*) "ACAF,ACAG,ACAF+ACAG", (U_ch*) ",;");
     smpl = new Sample("1990Y1", "2010Y1");
     rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
     EXPECT_EQ(rc, 0);
-    SCR_free_tbl((U_ch**)varlist);
+    SCR_free_tbl((U_ch**) varlist);
     delete smpl;
 
     // Close the output file
     W_close();
+
+    // Test $PrintTbl gsample table
+    memset(fullfilename, 0, sizeof(fullfilename));
+    sprintf(fullfilename, "%s%s", output_test_dir, "printtbl_C8_1.a2m");
+    W_dest(fullfilename, W_A2M);
+    B_PrintNbDec("2");
+    rc = B_PrintTbl("2000:5 C8_1");
+    EXPECT_EQ(rc, 0);
+    W_close();
+
+    compare_files(output_test_dir, "printtbl_C8_1.a2m", output_test_dir, "printtbl_C8_1.ref.a2m");
+
+    // Test $PrintGr gsample table
+    memset(fullfilename, 0, sizeof(fullfilename));
+    sprintf(fullfilename, "%s%s", output_test_dir, "printgr_C8_1.a2m");
+    W_dest(fullfilename, W_A2M);
+    rc = B_PrintGr("2000:5 C8_1");
+    EXPECT_EQ(rc, 0);
+    W_close();
+
+    compare_files(output_test_dir, "printgr_C8_1.a2m", output_test_dir, "printgr_C8_1.ref.a2m");
 
     // Cleanup the 2d VAR ws
     K_load_RWS(2, NULL);
