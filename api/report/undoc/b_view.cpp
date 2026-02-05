@@ -8,18 +8,18 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_ViewVar(char* arg, int unused)                            | Display a list of variables in the form of tables of max 50 variables.
- *      int B_PrintVar(char* arg, int unused)                           | Print a list of variables in the form of tables of max 50 variables.
+ *      int B_ViewVar(char* arg, int unused)                | Display a list of variables in the form of tables of max 50 variables.
+ *      int B_PrintVar(char* arg, int unused)               | Print a list of variables in the form of tables of max 50 variables.
  *      int B_ViewPrintVar(char* arg, int mode)             | Print or display (according to the mode parameter) variables in the form of tables. 
- *      int B_ViewByTbl(char* arg, int unused)                          | $ViewTbl sample table [list of tables]
- *      int B_ViewTbl(char* arg, int unused)                            | Alias of B_ViewByTbl()
- *      int B_PrintTbl(char* arg, int unused)                           | $PrintTbl gsample table1 [table2...]
- *      int B_ViewGr(char* arg, int unused)                             | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
- *      int B_PrintGr(char* arg, int unused)                            | $PrintGr gsample table1 [table2...]
+ *      int B_ViewByTbl(char* arg, int unused)              | $ViewTbl sample table [list of tables]
+ *      int B_ViewTbl(char* arg, int unused)                | Alias of B_ViewByTbl()
+ *      int B_PrintTbl(char* arg, int unused)               | $PrintTbl gsample table1 [table2...]
+ *      int B_ViewGr(char* arg, int unused)                 | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
+ *      int B_PrintGr(char* arg, int unused)                | $PrintGr gsample table1 [table2...]
  *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSample.
  *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on Table definition(s).
  *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE Tables either in the form of graphs or in the form of text (SCROLLs).
- *      int B_ViewTblFile(char* arg, int unused)                        | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
+ *      int B_ViewTblFile(char* arg, int unused)            | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
 #include "scr4/s_args.h"
@@ -259,7 +259,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
 
 int wrapper_B_ViewPrintGr_1(char* names, void* gsmpl)
 {
-    return B_ViewPrintTbl_1(names, (char*) gsmpl);
+    return B_ViewPrintGr_1(names, (char*) gsmpl);
 }
 
 int wrapper_B_ViewPrintTbl_1(char* names, void* gsmpl)
