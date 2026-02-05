@@ -262,7 +262,7 @@ static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i)
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
         fileop = COL_ctoa(cl, 'f', 0, 2);
-    T_GraphLegend(line->right_axis, "LLBL"[(int) line->get_graph_type()], 
+    T_GraphLegend(line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                  (char*) content.c_str(), fileop);
     return(0);
 }
@@ -517,7 +517,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         for(t = 0; t < nt; t++) 
             y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
 
-        T_GraphLegend(0, "LLBL"[type], vars[i], NULL);
+        T_GraphLegend(0, "LSBL"[type], vars[i], NULL);
         T_GraphTimeData(smpl, y);
     }
 
@@ -780,7 +780,7 @@ int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i)
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
         fileop = COL_ctoa(cl, 'f', 0, 2);
-    APIGraphLegendTitle(hdl, line->right_axis, "LLBL"[(int) line->get_graph_type()], 
+    APIGraphLegendTitle(hdl, line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                        (char*) content.c_str(), fileop);
     return(0);
 }
