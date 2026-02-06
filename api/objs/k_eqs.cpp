@@ -228,49 +228,6 @@ bool Equation::print_definition() const
     return success;
 }
 
-
-Equation* KDBEquations::get_obj(const SWHDL handle) const
-{    
-    std::string name;
-    for(const auto& [_name_, _handle_] : k_objs) 
-    {
-        if(_handle_ == handle) 
-        {
-            name = _name_;
-            break;
-        }
-    }
-
-    return get_obj(name);
-}
-
-Equation* KDBEquations::get_obj(const std::string& name) const
-{
-    std::string key = to_key(name);
-    SWHDL handle = this->get_handle(key);
-    if(handle == 0)  
-        throw std::invalid_argument("Equation with name '" + name + "' not found.");
-    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_eunpack(ptr, (char*) key.c_str());
-}
-
-bool KDBEquations::set_obj(const std::string& name, const Equation* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_epack(&pack, (char*) value, (char*) key.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set equation object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
 std::string KDBEquations::get_lec(const std::string& name) const
 {
     Equation* c_eq = this->get_obj(name);
@@ -347,9 +304,12 @@ void KDBEquations::update(const std::string& name, const std::string& lec)
     this->update(name, eq);
 }
 
-bool KDBEquations::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool unpack_obj(const std::string& name, const char* packed_obj);
+
+char* pack_obj(const std::string& name);
+
+bool KDBEquations::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     Equation* eq = this->get_obj(name);

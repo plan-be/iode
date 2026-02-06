@@ -64,21 +64,20 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
         delete kdb->sample;
     kdb->sample = new Sample(*new_sample);
 
-    char* ptr;
-    SWHDL new_handle;
+    Variable* var_ptr;
+    Variable* new_var_ptr;
+    // use iterator to allow modifying k_objs while looping on it
     for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
     {
-        new_handle = (SWHDL) KV_alloc_var(kdb->sample->nb_periods);
-        ptr = SW_getptr(new_handle);
-        if(it->second != 0) 
+        var_ptr = it->second;
+        new_var_ptr = new Variables(kdb->sample->nb_periods, IODE_NAN);
+        if(var_ptr) 
         {
-            if(smpl.nb_periods > 0)
-                memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
-                       kdb->get_var_ptr(it->first, start1),
-                       sizeof(double) * smpl.nb_periods);
-            SW_free(it->second);
+            for(int t = 0; t < smpl.nb_periods; t++)
+                (*new_var_ptr)[start2 + t] = (*var_ptr)[start1 + t];
+            delete var_ptr;
         }
-        it->second = new_handle;
+        it->second = new_var_ptr;
     }
 
     return 0;
@@ -144,10 +143,9 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
     }
 
     bool found;
-    SWHDL handle_2 = 0;
     nb1 = kdb1->sample->nb_periods;
     size_t size = sizeof(double) * smpl.nb_periods;
-    for(const auto& [name, handle] : kdb2->k_objs) 
+    for(const auto& [name, var] : kdb2->k_objs) 
     {
         found = kdb1->contains(name);
 
@@ -156,7 +154,7 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
             continue;
         
         if(!found)
-            kdb1->set_obj(name, (double*) NULL);
+            kdb1->set_obj(name, Variable());
 
         if(!kdb1->contains(name))
         {
@@ -164,10 +162,11 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
             return -1;
         }
 
-        handle_2 = kdb2->get_handle(name);
-        if(handle_2 > 0)
-            memcpy((double *) kdb1->get_var_ptr(name, start1),
-                   (double *) kdb2->get_var_ptr(name, start2), size);
+        if(kdb2->contains(name))
+        {
+            Variable var_2 = kdb2->get_obj(name);
+            kdb1->set_obj(name, var_2);
+        }
     }
 
     return 0;
@@ -529,7 +528,6 @@ int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
 KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
-    double* eval = NULL, *nval;
     Sample* smpl;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
@@ -557,7 +555,6 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
 
     smpl = edbv->sample;
     nb_per = edbv->sample->nb_periods;
-    eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = new KDBVariables(false);
@@ -566,7 +563,7 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
     
     ndbv->sample = new Sample(*edbv->sample);
 
-    for(const auto& [ename, handle] : edbv->k_objs) 
+    for(const auto& [ename, var] : edbv->k_objs) 
     {
         res = K_aggr(pattern, (char*) ename.c_str(), c_nname);
         if(res < 0) 
@@ -596,7 +593,7 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
         if(npos < 0) 
             goto done;
 
-        memcpy(eval, edbv->get_var_ptr(ename), nb_per * sizeof(double));
+        Variable eval = var;
         nval = ndbv->get_var_ptr(nname);
         for(int t = 0; t < smpl->nb_periods; t++) 
         {
@@ -627,12 +624,11 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
 
     if(method == 2) 
     {
-        for(const auto& [name, handle] : ndbv->k_objs) 
+        for(auto& [name, var] : ndbv->k_objs) 
         {
-            nval = ndbv->get_var_ptr(name);
             for(int t = 0; t < smpl->nb_periods; t++)
-                if(IODE_IS_A_NUMBER(nval[t])) 
-                    nval[t] /= times[npos];
+                if(IODE_IS_A_NUMBER(var[t])) 
+                    var[t] /= times[npos];
         }
     }
 
@@ -829,26 +825,8 @@ int KV_set_at_aper(char*varname, char* aper, double val)
     return(KV_set_at_t(varname, t, val));
 }
 
-
-double* KDBVariables::get_obj(const SWHDL handle) const
-{    
-    return (double*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-double* KDBVariables::get_obj(const std::string& name) const
+void KDBVariables::set_obj(const std::string& name, const Variable* value)
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("IODE Variable with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBVariables::set_obj(const std::string& name, const double* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-
     if(!this->sample || this->sample->nb_periods == 0)
     {
         std::string error_msg = "Cannot set variable object '" + key + "' because ";
@@ -856,20 +834,7 @@ bool KDBVariables::set_obj(const std::string& name, const double* value)
         throw std::runtime_error(error_msg);
     }
 
-    int nb_obs = this->sample->nb_periods;
-    K_vpack(&pack, (double*) value, (int*) &nb_obs);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set variable object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-bool KDBVariables::set_obj(const std::string& name, const Variable& value)
-{
-    return set_obj(name, value.data());
+    KDBTemplate::set_obj(name, value);
 }
 
 Variable KDBVariables::get(const std::string& name) const
@@ -1490,9 +1455,12 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 	}
 }
 
-bool KDBVariables::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool unpack_obj(const std::string& name, const char* packed_obj);
+
+char* pack_obj(const std::string& name);
+
+bool KDBVariables::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     return false;
 }

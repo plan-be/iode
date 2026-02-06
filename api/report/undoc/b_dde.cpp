@@ -476,16 +476,18 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         if(!kdb.contains(name)) 
             return((char *) 0);
     
+        std::string obj;
         switch(type) 
         {
             case EQUATIONS :
             case IDENTITIES :
             case TABLES :
-                return((char *)0);
+                return (char*) 0;
     
             case COMMENTS :
             case LISTS :
-                res = (char*) SCR_stracpy((unsigned char*) kdb.get_ptr_obj(name));
+                obj = kdb.get(name);
+                res = (char*) SCR_stracpy((unsigned char*) obj.c_str());
                 SCR_replace((unsigned char*) res, (unsigned char*) "\t", (unsigned char*) " ");
                 SCR_replace((unsigned char*) res, (unsigned char*) "\n", (unsigned char*) " ");
                 return(res);

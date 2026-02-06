@@ -54,42 +54,6 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     return vars;
 }
 
-
-Identity* KDBIdentities::get_obj(const SWHDL handle) const
-{    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_iunpack(ptr);
-}
-
-Identity* KDBIdentities::get_obj(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("Identity with name '" + name + "' not found.");
-    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_iunpack(ptr);
-}
-
-bool KDBIdentities::set_obj(const std::string& name, const Identity* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    std::string lec = value->get_lec();
-    K_ipack(&pack, (char*) lec.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set identity object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
 Identity* KDBIdentities::get(const std::string& name) const
 {
     Identity* idt = this->get_obj(name);
@@ -194,9 +158,12 @@ bool KDBIdentities::execute_identities(const std::string& from, const std::strin
     return execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
 }
 
-bool KDBIdentities::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool unpack_obj(const std::string& name, const char* packed_obj);
+
+char* pack_obj(const std::string& name);
+
+bool KDBIdentities::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(forms)

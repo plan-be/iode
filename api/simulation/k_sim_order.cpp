@@ -199,9 +199,9 @@ int CSimulation::KE_preorder(KDBEquations* dbe, int** predecessors, int** succes
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
     int i = 0;
-    for(const auto& [name, handle] : dbe->k_objs) 
+    for(const auto& [name, eq] : dbe->k_objs) 
     {
-        clec = KECLEC(dbe, name);
+        clec = eq->get_compiled_lec();
         predecessors[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long
 
         /* LOG ALL NB AND POS OF ENDO VARS */

@@ -109,17 +109,15 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  */
 char* ExportObjsCSV::extract_comment(KDBComments* dbc, char* name, char**cmt)
 {
-    U_ch* ccmt;
-
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
+    if(!dbc->contains(name)) 
+        return write_separator("", cmt);
+    else
     {
-        ccmt = (unsigned char*) dbc->get_obj(handle);
-        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");
-        return(write_separator((char*) ccmt, cmt));
+        Comment comment = dbc->get_obj(name);
+        U_ch* c_cmt = (unsigned char*) comment.c_str();
+        SCR_replace(c_cmt, (unsigned char*) "\n", (unsigned char*) "");
+        return write_separator((char*) c_cmt, cmt);
     }
-    else 
-        return(write_separator("", cmt));
 }
 
 /**

@@ -63,14 +63,17 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
 
 char* ExportObjsWKS::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
-        wks_string(dbc->get_obj(handle), WKS_COL, WKS_ROW);
+    if(dbc->contains(name))
+    {
+        Comment comment = dbc->get_obj(name);
+        wks_string((char*) comment.c_str(), WKS_COL, WKS_ROW);
+    }
     else 
         wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;
 
-    return(*cmt = NULL);
+    *cmt = NULL
+    return *cmt;
 }
 
 char* ExportObjsWKS::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)

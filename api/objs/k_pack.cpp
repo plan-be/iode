@@ -25,14 +25,14 @@
  *      int K_lpack(char** pack, char* a1)                  Packs an IODE LST object 
  *      int K_spack(char **pack, char *a1)                  Packs an IODE Scalar object 
  *      int K_tpack(char** pack, char* a1)                  Packs an IODE Table object 
- *      int K_vpack(char **pack, double *a1, int *a2)    Packs an IODE VAR object. 
+ *      int K_vpack(char **pack, double *a1, int *a2)       Packs an IODE VAR object. 
  *      int K_opack(char** pack, char* a1, int* a2)         Reserved for future new objects
  * 
  * Unpacking functions
  * -------------------- 
- *      Table* K_tunpack(char *pack)                   Creates a Table struct from a packed Table 
- *      Equation*  K_eunpack(char *pack, char *name)       Creates an EQ struct from a packed EQ
- *      Identity* K_iunpack(char *pack)                   Creates an IDT struct from a packed IDT
+ *      Table* K_tunpack(char *pack)                        Creates a Table struct from a packed Table 
+ *      Equation* K_eunpack(char *pack, char *name)         Creates an EQ struct from a packed EQ
+ *      Identity* K_iunpack(char *pack)                     Creates an IDT struct from a packed IDT
  * 
  * Allocation functions (VAR & Scalar only)
  * -------------------------------------

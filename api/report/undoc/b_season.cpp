@@ -83,13 +83,13 @@ int B_season(char* arg)
     for(int i = 0; i < nb; i++) 
         c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var] : from->k_objs) 
     {
         beg = 0;   /* GB 23/07/98 */
         dim = nb;  /* GB 23/07/98 */
         for(int j = 0; j < nb; j++) 
             c_vec[j] = i_vec[j] = IODE_NAN;
-        memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
+        memcpy(t_vec, from_var.data() + shift, nb * sizeof(double));
 
         res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
         if(!res) 

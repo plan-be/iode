@@ -208,10 +208,8 @@ int KE_compile(KDBEquations* dbe)
         return -1;
     }
 
-    Equation* eq;
-    for(const auto& [name, handle] : dbe->k_objs) 
+    for(const auto& [name, eq] : dbe->k_objs) 
     {
-        eq = dbe->get_obj(name);
         K_upd_eqs((char*) name.c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
         delete eq;
         eq = nullptr;

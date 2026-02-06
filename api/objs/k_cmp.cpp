@@ -229,19 +229,17 @@ int K_cmp(char* name, KDB* kdb1, KDB* kdb2)
     if(kdb1->k_type != kdb2->k_type) 
         return -1;
 
-    SWHDL handle_1 = kdb1->get_handle(name);
-    SWHDL handle_2 = kdb2->get_handle(name);
+    bool found_in_kdb1 = kdb1->contains(name);
+    bool found_in_kdb2 = kdb2->contains(name);
 
-    if(handle_1 == 0) 
-    {
-        if(handle_2 == 0) 
-            return(0);          /* not kdb1 and not kdb2 */
-        else 
-            return(2);          /* not kdb1 but in kdb2 */
-    }
+    if(!found_in_kdb1 && !found_in_kdb2) 
+        return 0;
 
-    if(handle_2 == 0) 
-        return(1);              /* in kdb1 but not in kdb2 */
+    if(found_in_kdb1 && !found_in_kdb2) 
+        return 1;
+
+    if(!found_in_kdb1 && found_in_kdb2) 
+        return 2;
 
     // ---- name in both kdb1 and kdb2 ----
     // res = 0 -> IODE object in kdb1 == IODE object in kdb2

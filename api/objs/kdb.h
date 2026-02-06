@@ -1,6 +1,5 @@
 #pragma once
 
-#include "scr4/s_swap.h"        // SWHDL
 #include "api/constants.h"
 #include "api/b_args.h"         // B_ainit_chk
 #include "api/b_errors.h"       // error_manager
@@ -20,11 +19,8 @@
     #include "gtest/gtest.h"
 #endif
 
-
-inline int K_WARN_DUP = 0;      // If null, adding an existing object name in a KDB  
-                                // does not trigger an error (used in KDB::add_entry())
 inline int K_SECRETSEP = '#';   // pour les macros pushed A#n in reports
-inline int B_TABLE_TITLE;       // Specify how to print a TABLE 
+inline int B_TABLE_TITLE = 0;   // Specify how to print a TABLE 
                                 //      0 : print table full definitions
                                 //      1 : print only table titles
 
@@ -207,11 +203,11 @@ public:
 struct KDB: public KDBInfo 
 {
 protected:
-    SWHDL kdb_set_packed_object(const std::string& name, char* pack);
+    virtual bool unpack_obj(const std::string& name, const char* packed_obj) = 0;
+    virtual char* pack_obj(const std::string& name) = 0;
 
-    virtual bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const = 0;
+    virtual bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const = 0;
 
     virtual char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) = 0;
 
@@ -413,16 +409,11 @@ public:
         return names; 
     }
 
-    virtual SWHDL get_handle(const std::string& name) const = 0;
-    virtual void set_handle(const std::string& name, const SWHDL handle) = 0;
-    virtual char* get_ptr_obj(const std::string& name) const = 0;
-
     virtual bool rename(const std::string& old_name, const std::string& new_name, 
         const bool overwrite = false) = 0;
-    virtual bool add_entry(const std::string& name) = 0;
     virtual bool remove(const std::string& name) = 0;
-    
-    bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name);
+    virtual bool duplicate(const KDB& other, const std::string& old_name, 
+        const std::string& new_name) = 0;
 
     // other methods
 
@@ -432,7 +423,7 @@ public:
     virtual bool print_obj_def(const std::string& name) = 0;
     char* dde_create_obj(int objnb, int* nc, int* nl);
 
-    void merge(KDB& other, const bool overwrite=true, const bool clear_source=false);
+    virtual void merge(KDB& other, const bool overwrite=true, const bool clear_source=false) = 0;
 
     // TODO JMP: please provide input values to test B_WsMerge()
     virtual void merge_from(const std::string& input_file) {};
@@ -488,8 +479,7 @@ template<class T> struct KDBTemplate: public KDB
 public:
     // NOTE: if an IODE object is added/removed/updated from the current database, 
     //       it must also done in all subset instances ('shallow copies')
-    // map <object name, position in the SCR memory>
-    std::map<std::string, SWHDL> k_objs;
+    std::map<std::string, T*> k_objs;
 
 private:
     // only used by subsets ('shallow copies')
@@ -498,14 +488,36 @@ private:
     std::set<KDBTemplate*> children_db;
 
 private:
+    void delete_objs()
+    {
+        for(auto& [name, obj] : k_objs) 
+            delete obj;
+        k_objs.clear();
+    }
+
+    void copy_obj_to(KDBTemplate& dest, const std::string& source_key, 
+        const std::string& dest_key) const
+    {
+        T obj = this->get_obj(source_key);
+        T obj_copy = this->copy_obj(obj);
+        dest.k_objs[dest_key] = obj_copy;
+    }
+
+    void copy_obj_from(KDBTemplate& other, const std::string& source_key, 
+        const std::string& dest_key) const
+    {
+        T obj = other.get_obj(source_key);
+        T obj_copy = other.copy_obj(obj);
+        dest.k_objs[dest_key] = obj_copy;
+    }
+
     bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
     {
-        SWHDL handle;
+        T obj;
         bool success = true;
         for(const std::string& name : subset_keys) 
         {
-            handle = other.get_handle(name);
-            if(handle == 0)  
+            if(!other.contains(name))  
             {
                 std::string error_msg = v_iode_types[this->k_type];
                 error_msg += " with '" + name + "' not found in the source database";
@@ -513,12 +525,13 @@ private:
                 success = false;
                 continue;
             }
-
-            this->k_objs[name] = handle;
+            
+            obj = other.get_obj(name);
+            this->k_objs[name] = obj;
         }
 
         if(!success)
-            this->k_objs.clear();
+            this->delete_objs();
 
         return success;
     }
@@ -529,48 +542,22 @@ private:
         bool success = true;
         for(const std::string& name : subset_keys) 
         {
-            ok = duplicate(other, name, name);
-            if(!ok)
+            if(!other.contains(name))  
             {
                 std::string error_msg = v_iode_types[this->k_type];
-                error_msg += " with '" + name + "' could not be copied ";
-                error_msg += "from the source database";
+                error_msg += " with '" + name + "' not found in the source database";
                 kwarning(error_msg.c_str());
                 success = false;
                 continue;
             }
+
+            this->copy_obj_from(other, name, name);
         }
 
         if(!success)
-        {
-            if(this->size() > 0)
-            {
-                for(auto& [this_name, this_handle] : k_objs) 
-                    SW_free(this_handle);
-                k_objs.clear();
-            }
-        }
+            this->delete_objs(true);
 
         return success;
-    }
-
-protected:
-    bool set_packed_object(const std::string& name, char* pack)
-    {
-        SWHDL handle = kdb_set_packed_object(name, pack);
-        if(handle == 0)
-            return false;
-
-        // store handle in top-level database
-        KDBTemplate* top_db = get_top_level_db();
-        top_db->k_objs[name] = handle;
-    
-        // store handle in all subset instances (including 'this' if 'this' is a subset)
-        for(KDBTemplate* subset : get_children_db())
-            if(subset->contains(name))
-                subset->k_objs[name] = handle;
-        
-        return true;
     }
 
 public:
@@ -579,7 +566,7 @@ public:
 
     // subset (shallow or deep copy) 
     KDBTemplate(KDBTemplate* db_parent, const std::string& pattern, const bool copy) 
-        : KDB(db_parent, copy) 
+        : KDB(db_parent, copy)
     {
         std::string error_msg;
         if(!db_parent)
@@ -672,14 +659,9 @@ public:
                 child_db->k_objs.clear();
                 child_db->db_parent = nullptr;
             }
-            
-            for(auto& [name, handle] : k_objs) 
-                SW_free(handle);
-            
             children_db.clear();
+            this->delete_objs();
         }
-        
-        k_objs.clear();
 
         if(db_parent)
         {
@@ -702,12 +684,9 @@ public:
         }
         
         if(delete_objs && k_db_type != DB_SHALLOW_COPY)
-        {
-            for(auto& [name, handle] : k_objs) 
-                SW_free(handle);
-        }
-        
-        k_objs.clear();
+            this->delete_objs();
+        else
+            this->k_objs.clear();
 
         KDBInfo::clear();
     }
@@ -806,32 +785,6 @@ public:
         return names;
     }
 
-    SWHDL get_handle(const std::string& name) const override
-    {
-        std::string key = to_key(name);
-        auto it = k_objs.find(key);
-        if (it != k_objs.end()) 
-            return it->second;
-        else
-            return 0;
-    }
-
-    void set_handle(const std::string& name, const SWHDL handle) override
-    {
-        std::string key = to_key(name);
-        this->k_objs[key] = handle;
-    }
-
-    char* get_ptr_obj(const std::string& name) const override
-    {
-        std::string key = to_key(name);
-        auto it = k_objs.find(key);
-        if (it != k_objs.end()) 
-            return SW_getptr(it->second);
-        else
-            return NULL;
-    }
-
     bool rename(const std::string& old_name, const std::string& new_name, 
         const bool overwrite = false) override
     {
@@ -856,11 +809,9 @@ public:
 
         // rename in top-level database
         KDBTemplate* top_db = get_top_level_db();        
-        auto it = top_db->k_objs.find(old_key);
         if(!overwrite)
         {
-            auto it_new = top_db->k_objs.find(new_key);
-            if (it_new != top_db->k_objs.end())
+            if(top_db->contains(new_key))
             {
                 std::string msg = "Cannot rename object: an object named '" + new_key + 
                                   "' already exists in the database.";
@@ -868,9 +819,9 @@ public:
             }
         }
 
-        SWHDL handle = it->second;
-        top_db->k_objs.erase(it);
-        top_db->k_objs[new_key] = handle;
+        T obj = top_db->get_obj(old_key);
+        top_db->k_objs.erase(old_key);
+        top_db->k_objs[new_key] = obj;
 
         // rename in all subset instances (including 'this' if 'this' is a subset)
         for(KDBTemplate* subset : get_children_db())
@@ -881,29 +832,6 @@ public:
             subset->k_objs[new_key] = handle;
         }
 
-        return true;
-    }
-
-    bool add_entry(const std::string& name) override
-    {
-        std::string key = to_key(name);
-        check_name(key, this->k_type);
-        
-        // add in top-level database
-        KDBTemplate* top_db = get_top_level_db();
-        bool found = top_db->contains(key);
-        if(found) 
-        {
-            if(K_WARN_DUP)
-            {
-                kerror(0, "%s already defined", (char*) key.c_str());
-                return false;
-            }
-        }
-        else
-            top_db->k_objs[key] = 0;
-
-        k_objs[key] = 0;
         return true;
     }
 
@@ -932,14 +860,101 @@ public:
         return true;
     }
 
+    virtual T copy_obj(const T obj) const = 0;
+
+    bool duplicate(const KDB& other, const std::string& old_name, const std::string& new_name) override
+    {
+        std::string error_msg = "Cannot duplicate object '" + old_name + "' as '" + new_name + "': ";
+        if(this == &other && old_name == new_name)
+        {
+            error_msg += "source and destination are identical.";
+            kwarning(error_msg.c_str());
+            return false;
+        } 
+    
+        if(!other.contains(old_name))
+        {
+            error_msg += "object '" + old_name + "' does not exist in the source database";
+            kwarning(error_msg.c_str());
+            return false;
+        }
+    
+        std::string old_key = to_key(old_name);
+        std::string new_key = to_key(new_name);
+        if(this->contains(new_name))
+        {
+            delete this->k_objs[new_key];
+            this->k_objs.erase(new_key);
+        }
+        
+        if(!other.contains(old_name))
+        {
+            error_msg += "Could not retrieve the " + v_iode_types[other.k_type];
+            error_msg += " named '" + old_key + "' in the source database.";
+            kwarning(error_msg.c_str());
+            return false;
+        } 
+    
+        this->copy_obj_from(other, old_key, new_key);
+    
+        return true;
+    }
+
+    void merge(KDB& other, const bool overwrite, const bool clear_source) override
+    {
+        if(other.size() == 0) 
+            return;
+    
+        bool found = false;
+        for(const std::string& name : other.get_names()) 
+        {
+            if(!other.contains(name)) 
+                continue;
+    
+            found = this->contains(name);
+            if(found)
+            {
+                // existing elements in this are not overwritten.
+                if(!overwrite) 
+                    continue;
+                
+                // delete elements from this
+                delete this->k_objs[name];
+                this->k_objs.erase(name);
+            }
+            
+            this->copy_obj_from(other, name, name);
+        }
+    
+        if(clear_source)
+            other.clear(false);
+    }
+
     // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
     //       k_objs will be changed to std::map<std::string, T>
     //       T& operator[](const std::string& name)
+    T* get_obj(const std::string& name) const
+    {    
+        try
+        {
+            return k_obj.at(key);
+        }
+        catch(const std::out_of_range& e)
+        {
+            std::string error_msg = v_iode_types[this->k_type] + " with name '" + name + "' ";
+            error_msg += "not found in the database";
+            throw std::invalid_argument(error_msg);
+        }
+    }
 
-    virtual T* get_obj(const SWHDL handle) const = 0;
-    virtual T* get_obj(const std::string& name) const = 0;
-
-    virtual bool set_obj(const std::string& name, const T* value) = 0;
+    virtual void set_obj(const std::string& name, const T* value)
+    {
+        std::string key = to_key(name);
+        if(k_objs.contains(key))
+            delete k_objs[key];
+        k_objs[key] = value;
+        return true;
+    }
 };
 
 /*----------------------- GLOBALS ----------------------------*/
@@ -1000,12 +1015,3 @@ inline bool wrap_grep_gnl(const std::string& pattern, const std::string& text,
 /* k_kdb.c */
 bool dump_string(char* head, char* txt);
 bool print_definition_generic(const std::string& name, char* text);
-
-/* k_val.c */
-char *K_oval(KDB *,int ,int );
-char *K_oval0(KDB *,int );
-char *K_oval1(KDB *,int );
-
-char *K_optr(KDB *,char* ,int );
-char *K_optr0(KDB *,char* );
-char *K_optr1(KDB *,char* );

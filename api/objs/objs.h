@@ -14,11 +14,6 @@ inline char K_LABELD[] = "KOBJS 504d\032";  // Version 2
 inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3 
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
-/* k_objs.c */
-int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, 
-              char* instr, char* blk, float* tests, int date);
-int K_upd_tbl(char* name, char* arg);
-
 /* k_objvers.c */
 int K_calcvers(char *);
 

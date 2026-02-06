@@ -11,7 +11,6 @@
 /*----------------------- TYPEDEF ----------------------------*/
 
 // using is the C++11 version of typedef
-using VAR = double*;
 using Variable = std::vector<double>;
 
 /*----------------------- DEFINE ----------------------------*/
@@ -62,7 +61,7 @@ enum IodeLowToHigh
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBVariables : public KDBTemplate<double>
+struct KDBVariables : public KDBTemplate<Variable>
 {
     /**
      *  Parameters specific to csv output files. 
@@ -110,12 +109,11 @@ public:
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
+    Variable* copy_obj(const Variable obj) const override
+    {
+        return new Variable(obj.begin(), obj.end());
+    }
 
-    double* get_obj(const SWHDL handle) const override;
-    double* get_obj(const std::string& name) const override;
     double get_value(const std::string& name, const int t) const
     {
         double* var = this->get_obj(name);
@@ -128,8 +126,7 @@ public:
         return var + t;
     }
 
-    bool set_obj(const std::string& name, const double* value) override;
-    bool set_obj(const std::string& name, const Variable& value);
+    void set_obj(const std::string& name, const Variable* value) override;
     
     Variable get(const std::string& name) const;
     bool add(const std::string& name, const Variable& obj);
@@ -264,9 +261,11 @@ public:
         const std::string& to, const std::string& objects_names);
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool unpack_obj(const std::string& name, const char* packed_obj) override;
+    char* pack_obj(const std::string& name) override;
+    
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -295,14 +294,13 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     if(nb_periods == 0)
         return 0;
 
-    double* var;
+    Variable var;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, var] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);
-        var = cpp_kdb.get_obj(name);
-		for(int t=0; t < nb_periods; t++)
-        	hash_combine<double>(seed, var[t]);
+		for(const double &value : var)
+            hash_combine<double>(seed, value);
     }
     
     return seed;

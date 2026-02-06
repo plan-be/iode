@@ -2,42 +2,9 @@
 #include "api/objs/comments.h"
 
 
-char* KDBComments::get_obj(const SWHDL handle) const
-{    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-char* KDBComments::get_obj(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("comment with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBComments::set_obj(const std::string& name, const char* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_cpack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set comment object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-bool KDBComments::set_obj(const std::string& name, const std::string& value)
-{
-    return set_obj(name, value.c_str());
-}
-
 Comment KDBComments::get(const std::string& name) const
 {
-    std::string oem_comment = std::string(this->get_obj(name));
+    std::string oem_comment = *(this->get_obj(name));
     return oem_to_utf8(oem_comment);
 }
 
@@ -74,9 +41,27 @@ void KDBComments::update(const std::string& name, const Comment& comment)
     this->set_obj(name, oem_comment);
 }
 
-bool KDBComments::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBComments::unpack_obj(const std::string& name, const char* packed_obj)
+{
+    std::string* comment = new std::string(packed_obj);
+    if(comment->empty())
+    {
+        delete comment;
+        return false;
+    }
+
+    this->k_objs[name] = comment;
+    return true;
+}
+
+char* KDBComments::pack_obj(const std::string& name)
+{
+    std::string* comment = this->k_objs[name];
+    return comment->c_str();
+}
+
+bool KDBComments::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(texts) 

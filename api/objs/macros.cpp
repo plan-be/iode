@@ -6,21 +6,16 @@
 #include "api/objs/macros.h"
 
 
-char* KDBMacros::get_macro(const SWHDL handle) const
-{    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-char* KDBMacros::get_macro(const std::string& name) const
+std::string KDBMacros::get_macro(const std::string& name) const
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("comment with name '" + name + "' not found.");
+    std::string key = to_key(name);
+    if(!this->contains(key))  
+        throw std::invalid_argument("macro with name '" + name + "' not found.");
     
-    return get_macro(handle);
+    return *(this->k_objs[key]);
 }
 
-bool KDBMacros::set_macro(const std::string& name, char* value, const int length)
+bool KDBMacros::set_macro(const std::string& name, std::string& macro)
 {
     if(this->k_type != OBJECTS)
     {
@@ -28,15 +23,16 @@ bool KDBMacros::set_macro(const std::string& name, char* value, const int length
         return false;
     }
 
-    char* pack = NULL;
-    K_opack(&pack, value, (int*) &length);
-    bool success = set_packed_object(name, pack);
-    return success;
+    std::string key = to_key(name);
+    std::string* macro_copy = new std::string(macro);
+    if(this->contains(key))
+        delete this->k_objs[key];
+    this->k_objs[key] = macro_copy;
+    return true;
 }
 
-bool KDBMacros::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBMacros::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(texts) 

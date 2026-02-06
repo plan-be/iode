@@ -22,7 +22,6 @@ from pyiode.objects.table cimport CTable
 
 
 cdef extern from "api/all.h":
-    ctypedef unsigned long SWHDL
     ctypedef char OFNAME[64]
     ctypedef char FNAME[512]
     ctypedef char ONAME[21]
@@ -57,7 +56,6 @@ cdef extern from "api/all.h":
     int B_DataPattern(char* arg, int iode_type)
 
     cdef cppclass KDB:
-        map[string, SWHDL]  k_objs
         short               k_type
         short               k_mode
         string              k_arch
@@ -173,6 +171,8 @@ cdef extern from "api/b_errors.h":
 
 cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
+        map[string, string*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBComments(KDBComments* db_parent, string pattern, bool copy) 
@@ -191,6 +191,8 @@ cdef extern from "api/objs/comments.h":
 
 cdef extern from "api/objs/equations.h":
     cdef cppclass KDBEquations(KDB):
+        map[string, CEquation*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBEquations(KDBEquations* db_parent, string pattern, bool copy) 
@@ -214,6 +216,8 @@ cdef extern from "api/objs/equations.h":
 
 cdef extern from "api/objs/identities.h":
     cdef cppclass KDBIdentities(KDB):
+        map[string, CIdentity*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBIdentities(KDBIdentities* db_parent, string pattern, bool copy) 
@@ -239,6 +243,8 @@ cdef extern from "api/objs/identities.h":
 
 cdef extern from "api/objs/lists.h":
     cdef cppclass KDBLists(KDB):
+        map[string, string*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBLists(KDBLists* db_parent, string pattern, bool copy) 
@@ -257,6 +263,8 @@ cdef extern from "api/objs/lists.h":
 
 cdef extern from "api/objs/scalars.h":
     cdef cppclass KDBScalars(KDB):
+        map[string, CScalar*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBScalars(KDBScalars* db_parent, string pattern, bool copy) 
@@ -275,6 +283,8 @@ cdef extern from "api/objs/scalars.h":
 
 cdef extern from "api/objs/tables.h":
     cdef cppclass KDBTables(KDB):
+        map[string, CTable*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBTables(KDBTables* db_parent, string pattern, bool copy) 
@@ -303,6 +313,8 @@ cdef extern from "api/objs/tables.h":
 
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
+        map[string, vector[double]*] k_objs
+
         # Constructor
         # subset (shallow or deep copy) 
         KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 

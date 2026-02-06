@@ -750,28 +750,26 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    int i;
     KDBComments* kdb = global_ws_cmt.get();
 
     if(!kdb) 
         return(res);
 
-    SWHDL handle;
     std::string name;
-    for(i = 0 ; args[i] ; i++) 
+    for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
-        handle = kdb->get_handle(name);
-        if(handle == 0) 
+        if(!kdb->contains(name)) 
         {
-            sprintf((char*) buf, "Cmt %s not found", args[i]);
+            sprintf((char*) buf, "Cmt '%s' not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(handle));
+            Comment comment = kdb->get(name);
+            res = SCR_strafcat(res, (unsigned char*) comment.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }

@@ -20,6 +20,7 @@
 #include <io.h>
 #endif
 
+#include "scr4/s_swap.h"        // SWHDL
 #include "scr4/s_prodir.h"
 
 #include "api/constants.h"
@@ -45,8 +46,8 @@
 // required to read old binary files
 struct KOBJ 
 {
-    SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
+    SWHDL o_val;    // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
+    ONAME o_name;   // name of the object
 };
 
 

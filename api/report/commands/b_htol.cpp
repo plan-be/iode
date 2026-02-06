@@ -106,10 +106,11 @@ static int HTOL_smpl(Sample *f_smpl, Sample *ws_smpl, Sample **t_smpl, int* skip
 
 static int B_htol(int method, char* arg)
 {
-    int     res, rc = 0, f, t, shift, skip;
+    int res, rc = 0, f, t, shift, skip;
     char    file[K_MAX_FILE + 1];
-    double  *t_vec = NULL, *f_vec = NULL;
-    int     file_type;
+    int file_type;
+    Variable t_vec;
+    Variable f_vec;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariables* to = nullptr;
@@ -151,13 +152,10 @@ static int B_htol(int method, char* arg)
 
     to = new KDBVariables(false);
     to->sample = new Sample(*t_smpl);
-    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
-
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var] : from->k_objs) 
     {
-        memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
-        memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
+        f_vec = from_var;
+        t_vec = Variable((1 + t_smpl->nb_periods), 0);
 
         for(f = 0, t = 0; f < skip; f++) 
         {
@@ -224,9 +222,10 @@ done:
 // !!! NOT TESTED !!!
 KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
 {
-    int      nb, rc = 0, f, t, shift, skip;
-    double   *t_vec = NULL, *f_vec = NULL;
-    Sample*  t_smpl = nullptr;
+    int nb, rc = 0, f, t, shift, skip;
+    Variable t_vec; 
+    Varaible f_vec;
+    Sample* t_smpl = nullptr;
     KDBVariables* kdb_to = nullptr;
 
     int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
@@ -244,14 +243,10 @@ KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
 
     kdb_to = new KDBVariables(false);
     kdb_to->sample = new Sample(*t_smpl);
-    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + kdb_from->sample->nb_periods) * sizeof(double));
-
-    for(const auto& [from_name, handle] : kdb_from->k_objs) 
+    for(const auto& [from_name, from_var] : kdb_from->k_objs) 
     {
-        memcpy(f_vec, kdb_from->get_var_ptr(from_name), kdb_from->sample->nb_periods * sizeof(double));
-        memset(t_vec, 0, t_smpl->nb_periods * sizeof(double));
-
+        f_vec = from_var;
+        t_vec = Variable((1 + t_smpl->nb_periods), 0);
         for(f = 0, t = 0; f < skip; f++) 
         {
             if(f != 0 && f % shift == 0) 

@@ -218,7 +218,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     std::string pattern_1 = "B*;*_";
     std::set<std::string> names_1 = subset_0->filter_names(pattern_1);
     std::set<std::string> expected_names_1;
-    for(const auto& [name, handle] : subset_0->k_objs) 
+    for(const auto& [name, _] : subset_0->k_objs) 
         if(name.front() == 'B' || name.back() == '_')
             expected_names_1.insert(name);
 
@@ -238,7 +238,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     std::string pattern_2 = "B*;C*";
     std::set<std::string> names_2 = subset_1->filter_names(pattern_2);
     std::set<std::string> expected_names_2;
-    for(const auto& [name, handle] : subset_1->k_objs) 
+    for(const auto& [name, _] : subset_1->k_objs) 
         if(name.front() == 'B' || name.front() == 'C')
             expected_names_2.insert(name);
 

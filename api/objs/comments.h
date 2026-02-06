@@ -7,12 +7,11 @@
 /*----------------------- TYPEDEF ----------------------------*/
 
 // using is the C++11 version of typedef
-using CMT = char*;
 using Comment = std::string;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBComments : public KDBTemplate<char>
+struct KDBComments : public KDBTemplate<Comment>
 {
     // global or standalone database
     KDBComments(const bool is_global) : KDBTemplate(COMMENTS, is_global) {}
@@ -24,15 +23,10 @@ struct KDBComments : public KDBTemplate<char>
     // copy constructor
     KDBComments(const KDBComments& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    char* get_obj(const SWHDL handle) const override;
-    char* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const char* value) override;
-    bool set_obj(const std::string& name, const std::string& value);
+    Comment* copy_obj(const Comment obj) const override
+    {
+        return new Comment(obj);
+    }
 
     Comment get(const std::string& name) const;
     bool add(const std::string& name, const Comment& comment);
@@ -59,9 +53,11 @@ struct KDBComments : public KDBTemplate<char>
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool unpack_obj(const std::string& name, const char* packed_obj) override;
+    char* pack_obj(const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -81,10 +77,9 @@ inline std::size_t hash_value(KDBComments const& cpp_kdb)
 
     std::string cmt;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, cmt] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name); 
-        cmt = cpp_kdb.get(name);
         hash_combine<std::string>(seed, cmt);
     }
     

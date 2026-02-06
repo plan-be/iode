@@ -208,11 +208,10 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
     std::string title;
-    SWHDL handle = global_ws_cmt->get_handle(def);
-    if(handle == 0)
-        title = def;
-    else
+    if(global_ws_cmt->contains(def))
         title = std::string(global_ws_cmt->get_obj(handle));
+    else
+        title = def;
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -277,8 +276,8 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    SWHDL handle;
     std::string lec;
+    std::string comment;
     std::string line_name;
     std::vector<std::string> v_vars = expand_lecs(vars);
     for(const std::string& var: v_vars) 
@@ -287,15 +286,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = global_ws_cmt->get_handle(var);
-        if(handle == 0)
-            line_name = var;
-        else
+        if(global_ws_cmt->contains(var))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(var);
             line_name = trim(comment);
         }
+        else
+            line_name = var;
 
         line.cells[0].set_text(line_name);
 
@@ -344,21 +341,20 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         throw std::invalid_argument(error_msg);
     }
 
-    SWHDL handle;
+    std::string comment;
     for(int i = 0; i < (int) titles.size(); i++)
     {
         append_line(TABLE_LINE_CELL);
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        line_name = titles[i];
-        handle = global_ws_cmt->get_handle(line_name);
-        if(handle > 0)
+        if(global_ws_cmt->contains(line_name))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(line_name);
             line_name = trim(comment);
         }
+        else
+            line_name = titles[i];
 
         line.cells[0].set_text(line_name);
 
@@ -396,7 +392,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    SWHDL handle;
+    std::string comment;
     std::string line_name;
     std::vector<std::string> v_lecs = expand_lecs(lecs);
     for(const std::string& lec: v_lecs) 
@@ -405,15 +401,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = global_ws_cmt->get_handle(lec);
-        if(handle == 0)
-            line_name = lec;
-        else
+        if(global_ws_cmt->contains(lec))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(lec);
             line_name = trim(comment);
         }
+        else
+            line_name = lec;
 
         line.cells[0].set_text(line_name);
 
@@ -530,49 +524,6 @@ std::size_t hash_value(const Table& table)
     return tbl_hash(table);
 }
 
-
-Table* KDBTables::get_obj(const SWHDL handle) const
-{    
-    std::string name;
-    for(const auto& [_name_, _handle_] : k_objs) 
-    {
-        if(_handle_ == handle) 
-        {
-            name = _name_;
-            break;
-        }
-    }
-
-    return get_obj(name);
-}
-
-Table* KDBTables::get_obj(const std::string& name) const
-{
-    std::string key = to_key(name);
-    SWHDL handle = this->get_handle(key);
-    if(handle == 0)  
-        throw std::invalid_argument("Table with name '" + key + "' not found.");
-    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return (Table*) K_tunpack(ptr, (char*) key.c_str());
-}
-
-bool KDBTables::set_obj(const std::string& name, const Table* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_tpack(&pack, (char*) value, (char*) key.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set table object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
 Table* KDBTables::get(const std::string& name) const
 {
 	Table* table = this->get_obj(name);
@@ -672,9 +623,12 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 	ComputedTable::finalize_printing();
 }
 
-bool KDBTables::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool unpack_obj(const std::string& name, const char* packed_obj);
+
+char* pack_obj(const std::string& name);
+
+bool KDBTables::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     std::string text;

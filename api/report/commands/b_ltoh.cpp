@@ -323,10 +323,11 @@ static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip
 
 static int B_ltoh(int type, char* arg)
 {
-    int     res, rc = 0, shift, skip;
-    char    method[81], file[K_MAX_FILE + 1];
-    double  *t_vec = NULL, *f_vec = NULL;
-    int     file_type;
+    int res, rc = 0, shift, skip;
+    char method[81], file[K_MAX_FILE + 1];
+    int file_type;
+    Variable t_vec; 
+    Variable f_vec;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariables* to = nullptr;
@@ -371,12 +372,10 @@ static int B_ltoh(int type, char* arg)
 
     to = new KDBVariables(false);
     to->sample = new Sample(*t_smpl);
-    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
-
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var] : from->k_objs) 
     {
-        memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
+        f_vec = from_var;
+        t_vec = Variable((1 + t_smpl->nb_periods), 0);
         switch(method[0]) 
         {
             case LTOH_CS :

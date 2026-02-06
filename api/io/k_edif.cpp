@@ -95,11 +95,13 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
 
 char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)
-        return(write_pre_post("1,0\n\"", "\"\n", dbc->get_obj(handle), cmt));
+    if(dbc->contains(name))
+    {
+        Comment comment = dbc->get_obj(name);
+        return write_pre_post("1,0\n\"", "\"\n", (char*) comment.c_str(), cmt);
+    }
     else
-        return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
+        return write_pre_post("1,0\n\"", "\"\n", "", cmt);
 }
 
 char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)

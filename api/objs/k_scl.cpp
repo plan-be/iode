@@ -21,38 +21,6 @@ std::size_t hash_value(const Scalar& scalar)
     return scl_hash(scalar);
 }
 
-
-Scalar* KDBScalars::get_obj(const SWHDL handle) const
-{    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return (Scalar*) P_get_ptr(ptr, 0);
-}
-
-Scalar* KDBScalars::get_obj(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("Scalar with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBScalars::set_obj(const std::string& name, const Scalar* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_spack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set scalar object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
 Scalar* KDBScalars::get(const std::string& name) const
 {
 	Scalar* scalar = this->get_obj(name);
@@ -92,9 +60,12 @@ void KDBScalars::update(const std::string& name, const Scalar& obj)
 	this->set_obj(name, &scalar);
 }
 
-bool KDBScalars::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool unpack_obj(const std::string& name, const char* packed_obj);
+
+char* pack_obj(const std::string& name);
+
+bool KDBScalars::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     return false;
 }

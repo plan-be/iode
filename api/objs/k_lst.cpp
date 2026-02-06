@@ -123,7 +123,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
         {
             if(kdb != nullptr && kdb->contains(name)) 
                 continue;
-            exo->add_entry(name);
+            exo->k_objs[name] = nullptr;
         }
     }
 }
@@ -347,44 +347,9 @@ unsigned char **KL_expand(char *str)
     return(tbl);
 }
 
-
-char* KDBLists::get_obj(const SWHDL handle) const
-{    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-char* KDBLists::get_obj(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("IODE list with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBLists::set_obj(const std::string& name, const char* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_lpack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set list object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-bool KDBLists::set_obj(const std::string& name, const std::string& value)
-{
-    return set_obj(name, value.c_str());
-}
-
 List KDBLists::get(const std::string& name) const
 {
-	List list = std::string(this->get_obj(name));
-	return list;
+	return *(this->get_obj(name));
 }
 
 bool KDBLists::add(const std::string& name, const List& list)
@@ -418,9 +383,27 @@ void KDBLists::update(const std::string& name, const List& list)
 	this->set_obj(name, list);
 }
 
-bool KDBLists::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBLists::unpack_obj(const std::string& name, const char* packed_obj)
+{
+    std::string* list = new std::string(packed_obj);
+    if(list->empty())
+    {
+        delete list;
+        return false;
+    }
+
+    this->k_objs[name] = list;
+    return true;
+}
+
+char* KDBLists::pack_obj(const std::string& name)
+{
+    std::string* list = this->k_objs[name];
+    return list->c_str();
+}
+
+bool KDBLists::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(texts) 

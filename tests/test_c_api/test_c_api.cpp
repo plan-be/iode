@@ -1445,7 +1445,8 @@ TEST_F(LegacyAPITest, Tests_W_printf)
 
 TEST_F(LegacyAPITest, Tests_SWAP)
 {
-    SWHDL   item, item2;
+    SWHDL item; 
+    SWHDL item2;
 
     U_test_print_title("Tests SWAP");
 
@@ -1472,18 +1473,8 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
-    SWHDL       handle;
 
     U_test_print_title("Tests B_DATA");
-
-    KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
-    kdb_cmt->set_obj("AAA", "This is a test comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* value = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(value), "This is a test comment");
-    delete kdb_cmt;
-    kdb_cmt = nullptr;
 
     kdb_cmt = global_ws_cmt.get();
     KDB* kdb_eqs = global_ws_eqs.get();
@@ -1534,10 +1525,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         EXPECT_TRUE(found);
         pos = kdb.index_of(x_name);
         EXPECT_TRUE(pos >= 0);
-        handle = kdb.get_handle(x_name);
-        EXPECT_TRUE(handle > 0);
-        ptr_obj = kdb.get_ptr_obj(x_name);
-        EXPECT_STRNE(ptr_obj, "");
 
         // Equations cannot be renamed or duplicated
         if(i != EQUATIONS) 
@@ -1550,10 +1537,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
             EXPECT_TRUE(found);
             pos = kdb.index_of(y_name);
             EXPECT_TRUE(pos >= 0);
-            handle = kdb.get_handle(y_name);
-            EXPECT_TRUE(handle > 0);
-            ptr_obj = kdb.get_ptr_obj(y_name);
-            EXPECT_STRNE(ptr_obj, "");
 
             char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
             char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
@@ -1568,18 +1551,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         found = kdb.contains(x_name);
         EXPECT_TRUE(!found);
     }
-
-    kdb_cmt->set_obj("AAA", "This is a comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* comment = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
-    kdb_cmt->clear();
-    global_ws_cmt->set_obj("AAA", "This is a comment");
-    handle = global_ws_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    comment = global_ws_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
 
     // B_DataListSort()
     success = global_ws_lst->set_obj("LIST1", "A;C;B");
@@ -2337,8 +2308,8 @@ TEST_F(LegacyAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(const auto& [name, handle] : global_ws_eqs->k_objs)
-        ASSERT_EQ(global_ws_eqs->get_obj(name)->endo, name) ;
+    for(const auto& [name, eq] : global_ws_eqs->k_objs)
+        ASSERT_EQ(eq->endo, name) ;
 
     U_test_reset_kmsg_msgs();
 }

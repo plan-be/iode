@@ -559,17 +559,13 @@ struct KDBEquations : public KDBTemplate<Equation>
     // copy constructor
     KDBEquations(const KDBEquations& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    Equation* get_obj(const SWHDL handle) const override;
-    Equation* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const Equation* value) override;
-
     std::string get_lec(const std::string& name) const;
     
+    Equation* copy_obj(const Equation* obj) const override
+    {
+        return new Equation(obj);
+    }
+
     Equation* get(const std::string& name) const;
     bool add(const std::string& name, const Equation& obj);
     void update(const std::string& name, const Equation& obj);
@@ -598,9 +594,11 @@ struct KDBEquations : public KDBTemplate<Equation>
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool unpack_obj(const std::string& name, const char* packed_obj) override;
+    char* pack_obj(const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -622,10 +620,9 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 
     Equation* eq;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, eq] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);
-        eq = cpp_kdb.get(name);
         hash_combine<Equation>(seed, *eq);
     }
 

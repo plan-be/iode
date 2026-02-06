@@ -91,9 +91,11 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
 
 char* ExportObjsTSP::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
-        *cmt = (char*) SCR_stracpy((unsigned char*) dbc->get_obj(handle));
+    if(dbc->contains(name))
+    {
+        Comment comment = dbc->get(name);
+        *cmt = (char*) SCR_stracpy((unsigned char*) comment.c_str());
+    }  
     else 
         *cmt = (char*) SCR_stracpy((unsigned char*) " ");
     
