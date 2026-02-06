@@ -32,7 +32,7 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_COMPARE_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
 from pyiode.iode_database.cpp_api_database cimport KDBVariables
-from pyiode.iode_database.cpp_api_database cimport KDBVariables as CppKDBVariables
+from pyiode.iode_database.cpp_api_database cimport KDBVariables
 from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
@@ -52,7 +52,7 @@ class BinaryOperation(IntEnum):
 
 cdef class Variables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CppKDBVariables* database_ptr
+    cdef KDBVariables* database_ptr
     cdef IodeVarMode mode_
     cdef Period first_period_subset
     cdef Period last_period_subset
@@ -71,7 +71,7 @@ cdef class Variables(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Variables _from_ptr(CppKDBVariables* database_ptr = NULL, bint owner=False):
+    cdef Variables _from_ptr(KDBVariables* database_ptr = NULL, bint owner=False):
         cdef CSample* c_sample
         # call to __new__() that bypasses the __init__() constructor.
         cdef Variables wrapper = Variables.__new__(Variables)
@@ -112,7 +112,7 @@ cdef class Variables(CythonIodeDatabase):
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
         cdef CSample* c_sample
         
-        subset.database_ptr = new CppKDBVariables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.database_ptr = new KDBVariables(self.database_ptr, pattern.encode(), <bint>copy)
         subset.abstract_db_ptr = subset.database_ptr
         subset.ptr_owner = True
 
@@ -303,7 +303,7 @@ cdef class Variables(CythonIodeDatabase):
     def binary_op_scalar(self, other: float, op: BinaryOperation, copy_self: bool) -> Variables:
         cdef int i_op = int(op)
         cdef double c_value = other
-        cdef CppKDBVariables* cpp_self_db = self.database_ptr
+        cdef KDBVariables* cpp_self_db = self.database_ptr
 
         t_first, t_last = self._get_periods_bounds()
         _c_operation_scalar(i_op, cpp_self_db, t_first, t_last, c_value)
@@ -313,7 +313,7 @@ cdef class Variables(CythonIodeDatabase):
         cdef int i, t_first, t_last
         cdef int i_op = int(op)
         cdef double c_value
-        cdef CppKDBVariables* c_database = NULL
+        cdef KDBVariables* c_database = NULL
         cdef double[::1] numpy_data_memview
 
         t_first, t_last = self._get_periods_bounds()
@@ -335,8 +335,8 @@ cdef class Variables(CythonIodeDatabase):
 
     def binary_op_variables(self, cython_other: Variables, op: BinaryOperation, names: List[str], copy_self: bool) -> Variables:
         cdef int i_op = int(op)
-        cdef CppKDBVariables* cpp_self_db = self.database_ptr
-        cdef CppKDBVariables* cpp_other_db = cython_other.database_ptr
+        cdef KDBVariables* cpp_self_db = self.database_ptr
+        cdef KDBVariables* cpp_other_db = cython_other.database_ptr
 
         t_first, t_last = self._get_periods_bounds()
         if len(names) == 1:
@@ -546,6 +546,10 @@ cdef class Variables(CythonIodeDatabase):
         cdef string s_to_period = to_period.encode('utf-8')
         cdef string s_names = names.encode('utf-8')
         self.database_ptr.copy_from(s_input_files, s_from_period, s_to_period, s_names)
+
+    def merge(self, other: Variables, overwrite: bool=True):        
+        cdef KDBVariables* other_db_ptr = other.database_ptr
+        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     def low_to_high(self, type_of_series: int, method: str, filepath: str, var_list: str):
         cpp_low_to_high(<IodeLowToHigh>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())

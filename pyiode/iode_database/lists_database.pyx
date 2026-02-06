@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBLists as CppKDBLists
+from pyiode.iode_database.cpp_api_database cimport KDBLists
 from pyiode.iode_database.cpp_api_database cimport global_ws_lst as cpp_global_lists
 
 import pandas as pd
@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Lists(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CppKDBLists* database_ptr
+    cdef KDBLists* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Lists:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Lists _from_ptr(CppKDBLists* database_ptr = NULL, bint owner=False):
+    cdef Lists _from_ptr(KDBLists* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
         if database_ptr is not NULL:
@@ -43,7 +43,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, subset: Lists, pattern: str, copy: bool) -> Lists:
-        subset.database_ptr = new CppKDBLists(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.database_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
         subset.abstract_db_ptr = subset.database_ptr
         subset.ptr_owner = True
         return subset
@@ -54,13 +54,14 @@ cdef class Lists(CythonIodeDatabase):
 
     def _set_object(self, name: str, value: str):
         name = name.strip()
-        if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), <string>(value.encode()))
-        else:
-            self.database_ptr.add(name.encode(), value.encode())
+        self.database_ptr.set(name.encode(), <string>(value.encode()))
 
     def copy_from(self, input_files: str, names: str='*'):     
         self.database_ptr.copy_from(input_files.encode(), names.encode())
+
+    def merge(self, other: Lists, overwrite: bool=True):        
+        cdef KDBLists* other_db_ptr = other.database_ptr
+        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database_ptr))

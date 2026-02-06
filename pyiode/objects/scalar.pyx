@@ -36,6 +36,14 @@ cdef class Scalar:
         wrapper.ptr_owner = owner
         return wrapper
 
+    # for debug purpose only
+    def is_pointer_null(self) -> bool:
+        return self.c_scalar is NULL
+
+    # for debug purpose only
+    def is_own_owner(self) -> bool:
+        return self.ptr_owner
+
     def get_value(self) -> float:
         return self.c_scalar.value if IODE_IS_A_NUMBER(self.c_scalar.value) else np.nan
 

@@ -264,7 +264,7 @@ class Tables(IodeDatabase):
             else:
                 raise TypeError(f"New table '{name}': Expected input to be of type int or tuple or list or "
                                 f"dict or Table. Got value of type {type(value).__name__} instead")
-        
+
         self._cython_instance._set_object(name, table._cython_instance)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
@@ -1249,16 +1249,14 @@ class Tables(IodeDatabase):
         >>> tbl = tables["ANAKNFF"]
         >>> original_title = str(tbl[0])
         >>> tbl[0] = "New title"
-        >>> tables["ANAKNFF"] = tbl
         >>> original_hash == hash(tables)
         False
-        >>> tbl[0] = original_title  # revert the change
-        >>> tables["ANAKNFF"] = tbl
+        >>> tbl[0] = original_title         # revert the change
         >>> original_hash == hash(tables)
         True
 
         >>> # delete a table
-        >>> original_table = tables["ANAKNFF"]
+        >>> original_table = tables["ANAKNFF"].copy()
         >>> del tables["ANAKNFF"]
         >>> original_hash == hash(tables)
         False
