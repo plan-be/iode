@@ -438,11 +438,12 @@ class Equations(IodeDatabase):
         >>> (equations["ACAF"].block, equations["ACAG"].block, equations["AOUC"].block)
         ('ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC', 'ACAF; ACAG; AOUC')
         >>> # update lec, method, sample and block
-        >>> equations["ACAF"].lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
-        >>> equations["ACAF"].method = EqMethod.MAX_LIKELIHOOD
-        >>> # new equation sample is from 1990Y1 to 2015Y1
-        >>> equations["ACAF"].sample = "1990Y1:2015Y1"
-        >>> equations["ACAF"].block = "ACAF"
+        >>> eq = equations["ACAF"]
+        >>> eq.lec = "(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+        >>> eq.method = EqMethod.MAX_LIKELIHOOD
+        >>> eq.sample = "1990Y1:2015Y1"
+        >>> eq.block = "ACAF"
+        >>> equations["ACAF"] = eq
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                  lec = '(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
@@ -504,9 +505,10 @@ class Equations(IodeDatabase):
         
         >>> # 3) using another Equations database (subset)
         >>> equations_subset = equations["ACAF, ACAG, AOUC"].copy()
-        >>> equations_subset["ACAF"].method = EqMethod.MAX_LIKELIHOOD
-        >>> equations_subset["ACAG"].method = EqMethod.MAX_LIKELIHOOD
-        >>> equations_subset["AOUC"].method = EqMethod.MAX_LIKELIHOOD
+        >>> for eq_name in equations_subset.names:
+        ...     eq = equations_subset[eq_name]
+        ...     eq.method = EqMethod.MAX_LIKELIHOOD
+        ...     equations_subset[eq_name] = eq
         >>> equations["ACAF, ACAG, AOUC"] = equations_subset
         >>> equations["ACAF, ACAG, AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Equations
@@ -2131,20 +2133,20 @@ class Equations(IodeDatabase):
         >>> # modify one equation
         >>> eq = equations["ACAF"]
         >>> original_lec = eq.lec
-        >>> eq.lec = "ACAF := 1"
-        >>> equations["ACAF"] = eq
+        >>> equations["ACAF"] = "ACAF := 1"
         >>> original_hash == hash(equations)
         False
-        >>> eq.lec = original_lec  # revert the change
-        >>> equations["ACAF"] = eq
+        >>> # revert the change
+        >>> equations["ACAF"] = original_lec
         >>> original_hash == hash(equations)
         True
 
         >>> # delete a equation
-        >>> original_eq = equations["ACAF"]
+        >>> original_eq = equations["ACAF"].copy()
         >>> del equations["ACAF"]
         >>> original_hash == hash(equations)
         False
+        >>> # revert the change
         >>> equations["ACAF"] = original_eq
         >>> original_hash == hash(equations)
         True

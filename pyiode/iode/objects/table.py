@@ -1061,9 +1061,6 @@ class Table:
         instance._cython_instance = CythonTable.__new__(CythonTable)
         return instance
 
-    def update_owner_database(self):
-        self._cython_instance.update_owner_database()
-
     @property
     def nb_lines(self) -> int:
         return self._cython_instance.get_nb_lines()
@@ -1412,7 +1409,8 @@ class Table:
         >>> tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.tbl
         46 objects loaded
-        >>> tables["YDH"]           # doctest: +NORMALIZE_WHITESPACE
+        >>> table = tables["YDH"]
+        >>> table                                           # doctest: +NORMALIZE_WHITESPACE
         DIVIS |                                                          1 |                                    PC_*40.34
         TITLE |                        "Tableau B-3. Revenu disponible des ménages à prix constant"
         ----- | ---------------------------------------------------------------------------------------------------------
@@ -1443,11 +1441,11 @@ class Table:
         graph_alignment: 'LEFT'
         <BLANKLINE>
 
-        >>> tables["YDH"].divider
+        >>> table.divider
         ('1', 'PC_*40.34')
 
-        >>> tables["YDH"].divider = ["1", "40.34"]
-        >>> tables["YDH"].divider
+        >>> table.divider = ["1", "40.34"]
+        >>> table.divider
         ('1', '40.34')
         """
         div_line = TableLine.get_instance()
@@ -1922,7 +1920,8 @@ class Table:
         graph_alignment: 'LEFT'
         <BLANKLINE>
 
-        >>> ax = tables["C8_1"].plot()                          # doctest: +SKIP
+        >>> table = tables["C8_1"]
+        >>> ax = table.plot()                           # doctest: +SKIP
         """
         from iode import variables
         try:

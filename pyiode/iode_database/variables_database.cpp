@@ -59,21 +59,24 @@ void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDB
     // sanity checks
     if(!dest)
         throw std::invalid_argument("C API: Destination Variables database is empty");
+    
     int nb_periods = dest->get_nb_periods();
     _c_sanity_checks(dest, 0, nb_periods - 1, source, source_t_first, source_t_last);
 
-    // check that the source variable exists in the source database
+    // check that the variable exists in the source database
     // NOTE: this can happen if the source or the destination is shallow copy of the global database 
     //       and the variable has been removed from the global database
-    // TODO: find a way to delete also the variable from the shallow copies
     std::string source_var_name = source->get_name(0);
-    double* source_var_ptr = source->get_var_ptr(source_var_name);
-    if(source_var_ptr == NULL)
+    if(!source->contains(source_var_name))
         throw std::invalid_argument("C API: Variable named '" + source_var_name + "' seems to not exist in the source database");
-
+    double* source_values = source->get_var_ptr(source_var_name, source_t_first);
+        
     // add the variable to the destination database
-    source_var_ptr += source_t_first;
-    dest->set_obj_ptr(dest_name, source_var_ptr);
+    Variable* var_ptr = new Variable(nb_periods, IODE_NAN);
+    double* dest_values = var_ptr->data();
+    for(int t = 0; t < nb_periods; t++)
+        dest_values[t] = source_values[t];
+    dest->set_obj_ptr(dest_name, var_ptr);
 }
 
 void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
@@ -94,23 +97,19 @@ void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const
     bool found = dest->contains(dest_name);
     if(!found)
         throw std::invalid_argument("C API: Variable named '" + dest_name + "' seems to not exist in the destination database");
-    double* dest_var_ptr = dest->get_var_ptr(dest_name);
-    if(dest_var_ptr == NULL)
-        throw std::runtime_error("C API: Could not get the values of the Variable named '" + dest_name + "'");
-    dest_var_ptr += dest_t_first;
 
     // check that the source variable exists in the source database
     found = source->contains(source_name);
     if(!found)
         throw std::invalid_argument("C API: Variable named '" + source_name + "' seems to not exist in the source database");
-    double* source_var_ptr = source->get_var_ptr(source_name);
-    if(source_var_ptr == NULL)
-        throw std::runtime_error("C API: Could not get the values of the Variable named '" + source_name + "'");
-    source_var_ptr += source_t_first;
+    
+    double* dest_values = dest->get_var_ptr(dest_name, dest_t_first);
+    double* source_values = source->get_var_ptr(source_name, source_t_first);
 
     // copy the data
     int nb_periods = dest_t_last - dest_t_first + 1;
-    memcpy(dest_var_ptr, source_var_ptr, nb_periods * sizeof(double));
+    for(int t = 0; t < nb_periods; t++)
+        dest_values[t] = source_values[t];
 }
 
 enum BinaryOperation 
@@ -137,44 +136,43 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
         throw std::invalid_argument("C API: t_last exceeds the number of periods in the database");
 
     // perform the operation
-    double* var_ptr;
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             for(int t = t_first; t <= t_last; t++)
-                var[t] += value;
+                (*var_ptr)[t] += value;
         }
         break;
     case OP_SUB:  
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             for(int t = t_first; t <= t_last; t++)
-                var[t] -= value;
+                (*var_ptr)[t] -= value;
         }
         break;
     case OP_MUL: 
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             for(int t = t_first; t <= t_last; t++)
-                var[t] *= value;
+                (*var_ptr)[t] *= value;
         }
         break;
     case OP_DIV:
         if(value == 0)
             throw std::invalid_argument("C API: Division by zero");
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             for(int t = t_first; t <= t_last; t++)
-                var[t] /= value;
+                (*var_ptr)[t] /= value;
         }
         break;
     case OP_POW: 
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             for(int t = t_first; t <= t_last; t++)
-                var[t] = pow(var_ptr[t], value);
+                (*var_ptr)[t] = pow((*var_ptr)[t], value);
         }
         break;
     }
@@ -199,29 +197,29 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     switch(op)
     {
     case OP_ADD:
-        for(auto& [name, var] : database->k_objs)
-            database->get_var_ptr(name)[t] += values[i++];
+        for(auto& [name, var_ptr] : database->k_objs)
+            (*var_ptr)[t] += values[i++];
         break;
     case OP_SUB: 
-        for(auto& [name, var] : database->k_objs) 
-            database->get_var_ptr(name)[t] -= values[i++];
+        for(auto& [name, var_ptr] : database->k_objs) 
+            (*var_ptr)[t] -= values[i++];
         break;
     case OP_MUL: 
-        for(auto& [name, var] : database->k_objs) 
-            database->get_var_ptr(name)[t] *= values[i++];
+        for(auto& [name, var_ptr] : database->k_objs) 
+            (*var_ptr)[t] *= values[i++];
         break;
     case OP_DIV:
-        for(auto& [name, var] : database->k_objs)
+        for(auto& [name, var_ptr] : database->k_objs)
         {
             value = values[i++];
             if(value == 0)
                 throw std::invalid_argument("C API: Division by zero");
-            database->get_var_ptr(name)[t] /= value;
+            (*var_ptr)[t] /= value;
         }
         break;
     case OP_POW: 
-        for(auto& [name, var] : database->k_objs)
-            database->get_var_ptr(name)[t] = pow(database->get_value(name, t), values[i++]);
+        for(auto& [name, var_ptr] : database->k_objs)
+            (*var_ptr)[t] = pow(database->get_value(name, t), values[i++]);
         break;
     }
 }
@@ -250,20 +248,20 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     if(!found)
         throw std::invalid_argument("C API: Variable named '" + name + "' seems to not exist in the database");
     
-    double* var_ptr = database->get_var_ptr(name);
+    double* d_var_ptr = database->get_var_ptr(name);
     switch(op)
     {
     case OP_ADD:
         for(int t = t_first; t <= t_last; t++)
-            var_ptr[t] += values[t - t_first];
+            d_var_ptr[t] += values[t - t_first];
         break;
     case OP_SUB: 
         for(int t = t_first; t <= t_last; t++) 
-            var_ptr[t] -= values[t - t_first];
+            d_var_ptr[t] -= values[t - t_first];
         break;
     case OP_MUL: 
         for(int t = t_first; t <= t_last; t++) 
-            var_ptr[t] *= values[t - t_first];
+            d_var_ptr[t] *= values[t - t_first];
         break;
     case OP_DIV:
         for(int t = t_first; t <= t_last; t++)
@@ -271,12 +269,12 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
             value = values[t - t_first];
             if(value == 0)
                 throw std::invalid_argument("C API: Division by zero");
-            var_ptr[t] /= value;
+            d_var_ptr[t] /= value;
         }
         break;
     case OP_POW: 
         for(int t = t_first; t <= t_last; t++)
-            var_ptr[t] = pow(var_ptr[t], values[t - t_first]);
+            d_var_ptr[t] = pow(d_var_ptr[t], values[t - t_first]);
         break;
     }
 }
@@ -299,10 +297,7 @@ void _c_operation_between_two_vars(const int op, KDBVariables* database, const s
     bool found = other->contains(other_name);
     if(!found)
         throw std::invalid_argument("C API: Variable named '" + other_name + "' seems to not exist in the source database");
-    double* other_var_ptr = other->get_var_ptr(other_name);
-    if(other_var_ptr == NULL)
-        throw std::runtime_error("C API: Could not get the values of the Variable named '" + other_name + "'");
-    other_var_ptr += other_t_first;
-
+    
+    double* other_var_ptr = other->get_var_ptr(other_name, other_t_first);
     _c_operation_one_var(op, database, name, t_first, t_last, other_var_ptr);
 }
