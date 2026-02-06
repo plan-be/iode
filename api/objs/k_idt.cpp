@@ -16,10 +16,9 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
     {
         for(const std::string& coeff_name: coeffs)
         {
-            // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars Database
-            // see add() and K_spack()
+            // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars database
             if (!global_ws_scl->contains(coeff_name)) 
-                global_ws_scl->set_obj(coeff_name, nullptr);
+                global_ws_scl->set_obj_ptr(coeff_name, new Scalar(0.9, 1.0, IODE_NAN));
         }
     }
 
@@ -44,87 +43,34 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
         int nb_obs = sample->nb_periods;
         for(const std::string& var_name: vars)
         {
-            // adds a new variable with nb_obs IODE_NAN values to the Variables Database
-            // see add() and K_vpack()
+            // adds a new variable with nb_obs IODE_NAN values to the Variables database
             if (!global_ws_var->contains(var_name))
-                global_ws_var->set_obj(var_name, (double*) NULL);
+                global_ws_var->set_obj_ptr(var_name, new Variable(nb_obs, IODE_NAN));
         }
     }
 
     return vars;
 }
 
-
-Identity* KDBIdentities::get_obj(const SWHDL handle) const
-{    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_iunpack(ptr);
-}
-
-Identity* KDBIdentities::get_obj(const std::string& name) const
+bool Identity::to_binary(char** pack) const
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("Identity with name '" + name + "' not found.");
+    std::string lec = this->get_lec();
+    char* c_lec = (char*) lec.c_str();
+
+    *pack = 0;
+    if(lec.empty()) 
+        return false;
+
+    CLEC* clec = L_cc(c_lec);
+    if(clec == NULL)  
+        return false;
     
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_iunpack(ptr);
-}
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, c_lec, (int) strlen(c_lec) + 1);
+    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
 
-bool KDBIdentities::set_obj(const std::string& name, const Identity* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    std::string lec = value->get_lec();
-    K_ipack(&pack, (char*) lec.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set identity object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-Identity* KDBIdentities::get(const std::string& name) const
-{
-    Identity* idt = this->get_obj(name);
-    return idt;
-}
-
-bool KDBIdentities::add(const std::string& name, const Identity& obj)
-{
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add identity: an identity named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add identity: an identity named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
-    return this->set_obj(name, (Identity*) &obj);
-}
-
-void KDBIdentities::update(const std::string& name, const Identity& obj)
-{
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update identity: no identity named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    this->set_obj(name, (Identity*) &obj);
+    SW_nfree(clec);
+    return true;
 }
 
 std::string KDBIdentities::get_lec(const std::string& name) const
@@ -134,7 +80,7 @@ std::string KDBIdentities::get_lec(const std::string& name) const
         throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
                                     "' in the database of '" + get_iode_type_str() + "'.\n" +  
                                     "The identity with name '" + name + "' does not exist.");
-    Identity* idt = this->get_obj(name);
+    Identity* idt = this->get_obj_ptr(name);
     std::string lec = idt->get_lec();
     return lec;
 }
@@ -142,13 +88,13 @@ std::string KDBIdentities::get_lec(const std::string& name) const
 bool KDBIdentities::add(const std::string& name, const std::string& lec)
 {
     Identity idt(lec);
-    return this->add(name, idt);
+    return KDBTemplate::add(name, idt);
 }
 
 void KDBIdentities::update(const std::string& name, const std::string& lec)
 {
     Identity idt(lec);
-    this->update(name, idt);
+    KDBTemplate::update(name, idt);
 }
 
 bool KDBIdentities::execute_identities(const Period& from, const Period& to, const std::string& identities_list, 
@@ -194,14 +140,47 @@ bool KDBIdentities::execute_identities(const std::string& from, const std::strin
     return execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
 }
 
-bool KDBIdentities::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
+{
+    size_t len = (size_t) P_get_len(pack, 0);
+    char* c_lec = new char[len];
+    strncpy(c_lec, (char*) P_get_ptr(pack, 0), len);
+
+    Identity* idt = new Identity(std::string(c_lec));
+    this->k_objs[name] = idt;
+    return true;
+}
+
+/**
+ * Serializes an identity. 
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @param [in]  name    string      identity name
+ * @return                          true if the serialization succeeded, false otherwise if ok, -1 if a1 is NULL or the comp
+ */
+bool KDBIdentities::obj_to_binary(char** pack, const std::string& name)
+{
+    Identity* idt = this->get_obj_ptr(name);
+    if(!idt)
+    {
+        std::string error_msg = "Cannot serialize identity with name '" + name + 
+                                "': no identity with this name exists in the database of '" + get_iode_type_str() + "'.";
+        kwarning(error_msg.c_str());
+        return false;
+    }
+    
+    bool success = idt->to_binary(pack);
+    return success;
+}
+
+bool KDBIdentities::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(forms)
     {
-        std::string lec = const_cast<KDBIdentities*>(this)->get_obj(handle)->get_lec();
+        Identity* idt = this->get_obj_ptr(name);
+        std::string lec = idt->get_lec();
         found = wrap_grep_gnl(pattern, lec, ecase, all);
     } 
     return found;
@@ -209,7 +188,7 @@ bool KDBIdentities::grep_obj(const std::string& name, const SWHDL handle,
 
 char* KDBIdentities::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    std::string lec = this->get_obj(name)->get_lec();
+    std::string lec = this->get_obj_ptr(name)->get_lec();
     char* obj = new char[lec.size() + 1];
     strncpy(obj, lec.c_str(), lec.size() + 1);
     return obj;
@@ -220,9 +199,9 @@ bool KDBIdentities::print_obj_def(const std::string& name)
     if(!this->contains(name)) 
         return false;
     
-    std::string lec = this->get_obj(name)->get_lec();
+    std::string lec = this->get_obj_ptr(name)->get_lec();
     std::string tmp = name + " : " + lec;
-    CLEC* clec = this->get_obj(name)->get_compiled_lec();
+    CLEC* clec = this->get_obj_ptr(name)->get_compiled_lec();
 
     W_printf((char*) ".par1 enum_1\n");
     print_lec_definition(name, tmp, clec, B_EQS_LEC);

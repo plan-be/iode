@@ -52,6 +52,8 @@ public:
 
     bool print_definition() const;
 
+    bool to_binary(char** pack) const;    
+
     bool operator==(const Scalar& other) const
     {
         bool eq = this->value == other.value;
@@ -92,19 +94,6 @@ struct KDBScalars : public KDBTemplate<Scalar>
     // copy constructor
     KDBScalars(const KDBScalars& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    Scalar* get_obj(const SWHDL handle) const override;
-    Scalar* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const Scalar* value) override;
-
-    Scalar* get(const std::string& name) const;
-    bool add(const std::string& name, const Scalar& obj);
-    void update(const std::string& name, const Scalar& obj);
-
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
 
@@ -115,20 +104,22 @@ struct KDBScalars : public KDBTemplate<Scalar>
     void merge_from(const std::string& input_file) override
     {
         KDBScalars from(false);  
-        KDB::merge_from(from, input_file);
+        KDBTemplate::merge_from(from, input_file);
     }
 
     bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {
         KDBScalars from(false);
-        return KDB::copy_from_file(from, file, objs_names, v_found);
+        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool obj_to_binary(char** pack, const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -148,13 +139,11 @@ inline std::size_t hash_value(KDBScalars const& cpp_kdb)
     if(cpp_kdb.size() == 0)
         return 0;
 
-    Scalar* scalar;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, scl_ptr] : cpp_kdb.k_objs)
     {
-        hash_combine<std::string>(seed, name); 
-        scalar = cpp_kdb.get(name);
-        hash_combine<Scalar>(seed, *scalar);
+        hash_combine<std::string>(seed, name);
+        hash_combine<Scalar>(seed, *scl_ptr);
     }
     
     return seed;

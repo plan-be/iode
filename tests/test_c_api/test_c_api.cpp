@@ -21,7 +21,7 @@
 //extern "C"
 //{
 //#endif
-//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return(0); }
+//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return 0; }
 //#ifdef __cplusplus
 //}
 //#endif
@@ -38,12 +38,12 @@
 //    extern char    SCR_NAME_ERR[255 + 1];
 //    int     A2M_SEPCH;
 //
-//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
-//    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
-//    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
-//    //int B_PrintRtfTopic(char* x) { return(0); }
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
-//    //int W_printf(char*fmt, ...) {return(0);}
+//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return 0;}
+//    //int B_A2mSetRtfTitle(U_ch* title) {return 0;}
+//    //int B_A2mSetRtfCopy(U_ch* copyr) {return 0;}
+//    //int B_PrintRtfTopic(char* x) { return 0; }
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return 0;}
+//    //int W_printf(char*fmt, ...) {return 0;}
 //    //void K_load_iode_ini() {}
 //    //void K_save_iode_ini() {}
 //
@@ -87,10 +87,10 @@ public:
 	
 	    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) "|");
 	    if(tbl1 == NULL) {
-	        if(tbl2 == NULL) return(-1);
+	        if(tbl2 == NULL) return -1;
 	        goto fin;
 	    }
-	    if(tbl2 == NULL) return(0);
+	    if(tbl2 == NULL) return 0;
 	    if(SCR_tbl_size((unsigned char**) tbl1) != SCR_tbl_size((unsigned char**) tbl2)) goto fin;
 	    for(i = 0 ;  tbl1[i] ; i++)
 	        if(strcmp(tbl1[i], tbl2[i])) goto fin;
@@ -98,7 +98,7 @@ public:
 	
 	fin:
 	    SCR_free_tbl((unsigned char**) tbl2);
-	    return(rc);
+	    return rc;
 	
 	}
 
@@ -155,25 +155,21 @@ public:
 
 	void U_test_CreateObjects()
 	{
-        bool        success;
-	    char*       lst;
         double*     values;
 	    Sample*     smpl;
+	    std::string lst;
+	    static int  done = 0;
+
         KDBLists*     kdb_lst = global_ws_lst.get();
         KDBVariables* kdb_var = global_ws_var.get();
-	    static int  done = 0;
 	
 	    // Create lists
-	    success = kdb_lst->set_obj("LST1", "A,B");
-        EXPECT_TRUE(success);
-	    lst = kdb_lst->get_obj("LST1");
-        EXPECT_NE(lst, nullptr);
-        EXPECT_STREQ(lst, "A,B");
-	    success = kdb_lst->set_obj("LST2", "A,B,A");
-        EXPECT_TRUE(success);
-        lst = kdb_lst->get_obj("LST2");
-        EXPECT_NE(lst, nullptr);
-        EXPECT_STREQ(lst, "A,B,A");
+	    kdb_lst->add("LST1", "A,B");
+	    lst = kdb_lst->get("LST1");
+        EXPECT_EQ(lst, "A,B");
+	    kdb_lst->add("LST2", "A,B,A");
+        lst = kdb_lst->get("LST2");
+        EXPECT_EQ(lst, "A,B,A");
 
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
@@ -181,45 +177,34 @@ public:
 	    EXPECT_TRUE(kdb_var->sample != nullptr);
 	
 	    // Creates new vars
+        Variable A;
+        Variable B;
 	    int nb = smpl->nb_periods;
-        double* A = new double[nb];
-        double* B = new double[nb];
 	    for(int i = 0; i < nb; i++) 
         {
-	       A[i] = i;
-	       B[i] = i*2;
+	       A.push_back(i);
+	       B.push_back(i*2);
 	    }
 	
-	    success = kdb_var->set_obj("A", A);
-        EXPECT_TRUE(success);
+	    kdb_var->add("A", A);
         values = kdb_var->get_var_ptr("A");
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("A", 0), A[0]);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("A", nb-1), A[nb-1]);
 	    
-        success = kdb_var->set_obj("B", B);
-        EXPECT_TRUE(success);
+        kdb_var->add("B", B);
         values = kdb_var->get_var_ptr("B");
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("B", 0), B[0]);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("B", nb-1), B[nb-1]);
 
-        delete[] A;
-        delete[] B;
-
 	    // For B_DataPattern()
-	    success = kdb_lst->set_obj("AB", "A,B");
-        EXPECT_TRUE(success);
-	    success = kdb_lst->set_obj("BC", "B,C");
-        EXPECT_TRUE(success);
-	    success = kdb_var->set_obj("AB", B);
-        EXPECT_TRUE(success);
-	    success = kdb_var->set_obj("AC", B);
-	    EXPECT_TRUE(success);
-        success = kdb_var->set_obj("BB", B);
-        EXPECT_TRUE(success);
-        success = kdb_var->set_obj("BC", B);
-        EXPECT_TRUE(success);
+	    kdb_lst->add("AB", "A,B");
+	    kdb_lst->add("BC", "B,C");
+	    kdb_var->add("AB", B);
+	    kdb_var->add("AC", B);
+        kdb_var->add("BB", B);
+        kdb_var->add("BC", B);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
@@ -249,7 +234,7 @@ public:
 	    if(L_link(global_ws_var.get(), global_ws_scl.get(), clec)) return(IODE_NAN);
 	    res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
 	    SCR_free(clec);
-	    return(res);
+	    return res;
 	}
 
 	void U_test_load(int type, char* filename)
@@ -474,7 +459,6 @@ public:
 
 	bool U_test_B_WsCopyVar()
 	{
-        bool    success;
 	    char    arg[256];
 	    int     rc, nb;
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
@@ -502,8 +486,7 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+	    global_ws_var->add("ACAF", Variable(ACAF, ACAF + nb));
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
 	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", input_test_dir);
@@ -554,7 +537,6 @@ public:
 
 	bool U_test_B_WsMergeVar()
 	{
-        bool     success;
 	    int      rc, nb;
 	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
@@ -576,8 +558,8 @@ public:
 	    // Create ACAF = 0 1 2...
 	    nb = 21;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+	    global_ws_var->add("ACAF", Variable(ACAF, ACAF + nb));
+        
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
@@ -609,7 +591,6 @@ public:
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
 	{
-        bool      success;
 	    double    *ACAF, ACAF2002;
 	    char      arg[512];
 	    int       rc, nb;
@@ -621,8 +602,7 @@ public:
 	    nb = 11;
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
 	    ACAF[7] = IODE_NAN;
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+	    global_ws_var->add("ACAF", Variable(ACAF, ACAF + nb));
 	
 	    // $WsExtrapolate [method] from to [variable list]
 	    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
@@ -643,7 +623,7 @@ public:
         
 	    nb = global_ws_var->sample->nb_periods;
 	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
-	    global_ws_var->set_obj(name, A);
+	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
 	    return true;
 	}
@@ -784,7 +764,7 @@ TEST_F(LegacyAPITest, Tests_BUF)
 TEST_F(LegacyAPITest, Tests_OBJECTS)
 {
     bool        found;
-    char*       lst;
+    std::string lst;
     static int  done = 0;
 
     U_test_print_title("Tests OBJECTS");
@@ -793,8 +773,8 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
     // Create lists
     found = global_ws_lst->contains("LST1");
     EXPECT_TRUE(found);
-    lst = global_ws_lst->get_obj("LST1");
-    EXPECT_EQ(strcmp(lst, "A,B"), 0);
+    lst = global_ws_lst->get("LST1");
+    EXPECT_EQ(lst, "A,B");
 
     found = global_ws_var->contains("A");
     EXPECT_TRUE(found);
@@ -831,7 +811,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     bool files = true;
     bool date = true;
 
-    U_test_print_title("Tests Table: Table(...) constructor vs get_obj()");
+    U_test_print_title("Tests Table: Table(...) constructor vs get_obj_ptr()");
 
     // --- create an instance of Table;
     tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
@@ -899,10 +879,10 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
 
     // --- add the table to the Tables KDB
     char* name = "TABLE";
-    global_ws_tbl->set_obj(name, tbl);
+    global_ws_tbl->set_obj_ptr(name, tbl);
 
     // --- extract the table from the Table KDB
-    extracted_tbl = global_ws_tbl->get_obj(name);
+    extracted_tbl = global_ws_tbl->get_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -1000,10 +980,10 @@ TEST_F(LegacyAPITest, Tests_LEC)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
-    char* lst = global_ws_lst->get_obj("LST1");
-    EXPECT_STREQ(lst, "A,B");
-    lst = global_ws_lst->get_obj("LST2");
-    EXPECT_STREQ(lst, "A,B,A");
+    std::string lst = global_ws_lst->get("LST1");
+    EXPECT_EQ(lst, "A,B");
+    lst = global_ws_lst->get("LST2");
+    EXPECT_EQ(lst, "A,B,A");
 
     // Using macros in LEC
     CLEC* clec = L_cc("1 + vmax($LST1)");
@@ -1022,19 +1002,6 @@ TEST_F(LegacyAPITest, Tests_LEC)
 
     U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
     U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);
-}
-
-
-TEST_F(LegacyAPITest, Tests_EQS)
-{
-//    Equation*     eq;
-//    char    lec[521];
-//
-//    K_upd_eqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
-//    eq = KEPTR("A");
-//    strcpy(lec, eq->lec);
-//    S4ASSERT(strcmp(eq->lec, "ln A := B + t") == 0, "EQ %s = %s", "A", lec);
-//
 }
 
 
@@ -1136,7 +1103,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     char*   filename = "fun";
     U_ch**  endo_exo;
     int     rc;
-    LIS     lst, expected_lst;
+    List    lst, expected_lst;
     void    (*kmsg_super_ptr)(const char*);
     double  XNATY_2000Y1;
 
@@ -1179,17 +1146,15 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Check _PRE list after simulation (prolog)
     EXPECT_TRUE(global_ws_lst->contains("_PRE"));
-    lst = global_ws_lst->get_obj("_PRE");
+    lst = global_ws_lst->get("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    EXPECT_EQ(std::string(lst), std::string(expected_lst));
+    EXPECT_EQ(lst, expected_lst);
 
     // Check _DIVER 
     EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
-    lst = global_ws_lst->get_obj("_DIVER");
-    //printf("'%s'\n", lst);
+    lst = global_ws_lst->get("_DIVER");
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_EQ(std::string(lst), std::string(expected_lst));
+    EXPECT_EQ(lst, expected_lst);
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;
@@ -1253,7 +1218,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = global_ws_tbl->get_obj("C8_1");
+    tbl = global_ws_tbl->get_obj_ptr("C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
@@ -1355,32 +1320,32 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1445,7 +1410,8 @@ TEST_F(LegacyAPITest, Tests_W_printf)
 
 TEST_F(LegacyAPITest, Tests_SWAP)
 {
-    SWHDL   item, item2;
+    SWHDL item; 
+    SWHDL item2;
 
     U_test_print_title("Tests SWAP");
 
@@ -1465,27 +1431,16 @@ TEST_F(LegacyAPITest, Tests_SWAP)
 
 TEST_F(LegacyAPITest, Tests_B_DATA)
 {
-    bool        success;
     bool        found;
-    char        *lst, buf[512];
+    char        buf[512];
     int         rc, i;
     double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
-    SWHDL       handle;
 
     U_test_print_title("Tests B_DATA");
 
-    KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
-    kdb_cmt->set_obj("AAA", "This is a test comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* value = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(value), "This is a test comment");
-    delete kdb_cmt;
-    kdb_cmt = nullptr;
-
-    kdb_cmt = global_ws_cmt.get();
+    KDB* kdb_cmt = global_ws_cmt.get();
     KDB* kdb_eqs = global_ws_eqs.get();
     KDB* kdb_idt = global_ws_idt.get();
     KDB* kdb_lst = global_ws_lst.get();
@@ -1507,8 +1462,8 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = global_ws_lst->get_obj("RC");
-    EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
+    std::string lst = global_ws_lst->get("RC");
+    EXPECT_EQ(lst, "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
@@ -1523,7 +1478,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataRename(char* arg, int type)
     // B_DataDelete(char* arg, int type)
     int pos;
-    char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
         KDB& kdb = get_global_db(i);
@@ -1534,10 +1488,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         EXPECT_TRUE(found);
         pos = kdb.index_of(x_name);
         EXPECT_TRUE(pos >= 0);
-        handle = kdb.get_handle(x_name);
-        EXPECT_TRUE(handle > 0);
-        ptr_obj = kdb.get_ptr_obj(x_name);
-        EXPECT_STRNE(ptr_obj, "");
 
         // Equations cannot be renamed or duplicated
         if(i != EQUATIONS) 
@@ -1550,10 +1500,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
             EXPECT_TRUE(found);
             pos = kdb.index_of(y_name);
             EXPECT_TRUE(pos >= 0);
-            handle = kdb.get_handle(y_name);
-            EXPECT_TRUE(handle > 0);
-            ptr_obj = kdb.get_ptr_obj(y_name);
-            EXPECT_STRNE(ptr_obj, "");
 
             char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
             char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
@@ -1569,56 +1515,43 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         EXPECT_TRUE(!found);
     }
 
-    kdb_cmt->set_obj("AAA", "This is a comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* comment = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
-    kdb_cmt->clear();
-    global_ws_cmt->set_obj("AAA", "This is a comment");
-    handle = global_ws_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    comment = global_ws_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
-
     // B_DataListSort()
-    success = global_ws_lst->set_obj("LIST1", "A;C;B");
-    EXPECT_TRUE(success);
+    global_ws_lst->add("LIST1", "A;C;B");
     found = global_ws_lst->contains("LIST1");
     EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
     EXPECT_EQ(rc, 0);
-    lst = global_ws_lst->get_obj("LIST2");
-    EXPECT_EQ(std::string(lst), "A;B;C");
+    lst = global_ws_lst->get("LIST2");
+    EXPECT_EQ(lst, "A;B;C");
 
     // B_DataListSort() Example 2
-    global_ws_lst->set_obj("L1", "C;B;$L2;$L3");
-    global_ws_lst->set_obj("L2", "X Z Y");
-    global_ws_lst->set_obj("L3", "A B D");
+    global_ws_lst->add("L1", "C;B;$L2;$L3");
+    global_ws_lst->add("L2", "X Z Y");
+    global_ws_lst->add("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
-    lst = global_ws_lst->get_obj("RES");
-    EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
+    lst = global_ws_lst->get("RES");
+    EXPECT_EQ(lst, "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U");
+    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_idt->get_obj("U")->get_lec(), "2 * A");
+    EXPECT_EQ(global_ws_idt->get_obj_ptr("U")->get_lec(), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("U")), "A,B,C");
+    EXPECT_EQ(global_ws_lst->get("U"), "A,B,C");
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
-    val = global_ws_scl->get_obj("u")->value;
+    val = global_ws_scl->get_obj_ptr("u")->value;
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
@@ -1630,12 +1563,12 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("NEWLIST")), "U");
+    EXPECT_EQ(global_ws_lst->get("NEWLIST"), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2");
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1644,17 +1577,17 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U - More comment on U");
+    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", global_ws_lst->get_obj("LC"));
+    EXPECT_EQ(global_ws_lst->get("LC"), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", (char*) global_ws_lst->get("LC").c_str());
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1662,19 +1595,19 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B;C;D;E");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "C");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
     std::string expected_list;
@@ -1684,20 +1617,20 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // names only in current WS
     EXPECT_TRUE(global_ws_lst->contains("WS_ONLY"));
     expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("WS_ONLY")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("WS_ONLY"), expected_list);
     // names only in file
     EXPECT_TRUE(global_ws_lst->contains("FILE_ONLY"));
     expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
     expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("FILE_ONLY")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("FILE_ONLY"), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
     EXPECT_TRUE(global_ws_lst->contains("BOTH_EQ"));
     expected_list = "";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_EQ")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("BOTH_EQ"), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
     EXPECT_TRUE(global_ws_lst->contains("BOTH_DIFF"));
     expected_list = "_SCAL";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_DIFF")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("BOTH_DIFF"), expected_list);
 
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
@@ -1730,7 +1663,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
 
     // B_EqsSetSample()
     rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    Sample smpl = global_ws_eqs->get_obj("ACAF")->sample;
+    Sample smpl = global_ws_eqs->get_obj_ptr("ACAF")->sample;
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
 
@@ -1892,8 +1825,8 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     global_ws_tbl->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    global_ws_idt->set_obj("C", new Identity("D*2+ACAF"));
-    global_ws_idt->set_obj("D", new Identity("A+B"));
+    global_ws_idt->set_obj_ptr("C", new Identity("D*2+ACAF"));
+    global_ws_idt->set_obj_ptr("D", new Identity("A+B"));
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -2032,7 +1965,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
         EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
         EXPECT_TRUE(global_ws_cmt != nullptr);
-        EXPECT_EQ(std::string(global_ws_cmt->get_obj("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(global_ws_cmt->get("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
@@ -2270,7 +2203,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
     expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
     expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_PRE2")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("_PRE2"), expected_list);
 
     // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
     //  1. Annuler Exchange
@@ -2337,8 +2270,8 @@ TEST_F(LegacyAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(const auto& [name, handle] : global_ws_eqs->k_objs)
-        ASSERT_EQ(global_ws_eqs->get_obj(name)->endo, name) ;
+    for(const auto& [name, eq] : global_ws_eqs->k_objs)
+        ASSERT_EQ(eq->endo, name) ;
 
     U_test_reset_kmsg_msgs();
 }
@@ -3029,8 +2962,8 @@ TEST_F(LegacyAPITest, Tests_RAS_EXECUTE)
     global_ws_var->get_var_ptr("RTCT")[0] = 90.0;
     global_ws_var->get_var_ptr("RTCT", 1)[0] = 90.0;
 
-    global_ws_lst->set_obj("X", "R1,R2,R3,R4,RT");
-    global_ws_lst->set_obj("Y", "C1,C2,C3,C4,CT");
+    global_ws_lst->add("X", "R1,R2,R3,R4,RT");
+    global_ws_lst->add("Y", "C1,C2,C3,C4,CT");
 
     bool found = global_ws_lst->contains("X");
     EXPECT_TRUE(found);

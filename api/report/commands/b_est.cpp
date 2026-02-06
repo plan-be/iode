@@ -27,6 +27,7 @@
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
+#include "api/objs/comments.h"
 #include "api/estimation/estimation.h"
 #include "api/report/commands/commands.h"
 
@@ -120,7 +121,7 @@ int B_EqsEstimate(char* arg, int unused)
     if(smpl != NULL) 
         rc = B_EqsEstimateEqs(smpl, (char*) pattern.c_str());
     SCR_free(smpl);
-    return(rc);
+    return rc;
 }
 
 
@@ -143,20 +144,29 @@ int B_EqsSetSample(char* arg, int unused)
     Sample  *smpl;
 
     std::string pattern = B_EqsSplitSmplName(arg, &smpl);
-    if(smpl == NULL)
+    if(!smpl)
         return -1;
     
     char** eqs = B_ainit_chk((char*) pattern.c_str(), NULL, 0);
     int nb_eqs = SCR_tbl_size((unsigned char**) eqs);
+
+    std::string eq_name;
+    Equation* eq;
     for(int i = 0; i < nb_eqs; i++) 
     {
-        rc = K_upd_eqs(eqs[i], 0L, 0L, -1, smpl, 0L, 0L, 0L, 0);
-        if(rc) break;
+        eq_name = eqs[i];
+        eq = global_ws_eqs->get_obj_ptr(eq_name);
+        if(eq == nullptr)
+        {
+            rc = -1;
+            break;
+        }
+        eq->sample = *smpl;
     }
 
     SCR_free((unsigned char**) eqs);
-    SCR_free(smpl);
-    return(rc);
+    delete smpl;
+    return rc;
 }
 
 
@@ -180,19 +190,29 @@ int B_EqsSetSample(char* arg, int unused)
  */
 int B_EqsSetMethod(char* arg, int unused)
 {
-    int     lg1, meth, rc = 0, i;
+    int     lg1, meth, rc = 0;
     char    tmeth[16], **eqs = 0;
 
     lg1 = B_get_arg0(tmeth, arg, 15);
     meth = atoi(tmeth);
     eqs = B_ainit_chk(arg + lg1, NULL, 0);
-    for(i = 0 ; eqs[i] ; i++) {
-        rc = K_upd_eqs(eqs[i], 0L, 0L, meth, 0L, 0L, 0L, 0L, 0);
-        if(rc) break;
+
+    Equation* eq;
+    std::string eq_name;
+    for(int i = 0 ; eqs[i] ; i++) 
+    {
+        eq_name = eqs[i];
+        eq = global_ws_eqs->get_obj_ptr(eq_name);
+        if(!eq)
+        {
+            rc = -1;
+            break;
+        }
+        eq->method = (char) meth;
     }
 
     SCR_free_tbl((unsigned char**) eqs);
-    return(rc);
+    return rc;
 }
 
 
@@ -209,19 +229,29 @@ int B_EqsSetMethod(char* arg, int unused)
  */
 int B_EqsSetBloc(char* arg, int unused)
 {
-    int     rc = 0, i;
+    int     rc = 0;
     char    **eqs = 0, *bloc;
 
     eqs = B_ainit_chk(arg, NULL, 0);
     bloc = (char*) SCR_mtov((unsigned char**) eqs, (int) ';');
-    for(i = 0 ; eqs[i] ; i++) {
-        rc = K_upd_eqs(eqs[i], 0L, 0L, -1, 0L, 0L, bloc, 0L, 0);
-        if(rc) break;
+
+    Equation* eq;
+    std::string eq_name;
+    for(int i = 0 ; eqs[i] ; i++) 
+    {
+        eq_name = eqs[i];
+        eq = global_ws_eqs->get_obj_ptr(eq_name);
+        if(!eq)
+        {
+            rc = -1;
+            break;
+        }
+        eq->block = std::string(bloc);
     }
 
     SCR_free_tbl((unsigned char**) eqs);
     SCR_free(bloc);
-    return(rc);
+    return rc;
 }
 
 
@@ -239,12 +269,18 @@ int B_EqsSetBloc(char* arg, int unused)
  */
 int B_EqsSetCmt(char* arg, int unused)
 {
-    int     lg1, rc = 0;
+    int     lg1;
     char    name[16];
 
     lg1 = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    rc = K_upd_eqs(name, 0L, arg + lg1 + 1, -1, 0L, 0L, 0L, 0L, 0);
-    return(rc);
+    Comment cmt(arg + lg1 + 1);
+
+    std::string eq_name(name);
+    Equation* eq = global_ws_eqs->get_obj_ptr(eq_name);
+    if(!eq)
+        return -1;
+    eq->comment = cmt;
+    return 0;
 }
 
 
@@ -262,10 +298,16 @@ int B_EqsSetCmt(char* arg, int unused)
  */
 int B_EqsSetInstrs(char* arg, int unused)
 {
-    int     lg1, rc = 0;
+    int     lg1;
     char    name[16];
 
     lg1 = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    rc = K_upd_eqs(name, 0L, 0L, -1, 0L, arg + lg1 + 1, 0L, 0L, 0);
-    return(rc);
+    std::string instrs(arg + lg1 + 1);
+
+    std::string eq_name(name);
+    Equation* eq = global_ws_eqs->get_obj_ptr(eq_name);
+    if(!eq)
+        return -1;
+    eq->instruments = instrs;
+    return 0;
 }

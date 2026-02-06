@@ -300,7 +300,7 @@ public:
 
     Equation* current_equation() 
     {
-        return kdb_eqs->get(*current_eq);
+        return kdb_eqs->get_obj_ptr(*current_eq);
     }
 
     Equation* next_equation()
@@ -310,7 +310,7 @@ public:
         if(current_eq == v_equations.end()) 
             current_eq = v_equations.begin();
 
-        return kdb_eqs->get(*current_eq);
+        return kdb_eqs->get_obj_ptr(*current_eq);
     }
 
     CorrelationMatrix* get_correlation_matrix() 

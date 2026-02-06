@@ -62,7 +62,7 @@ int B_FileImportCmt(char* arg, int unused)
 
 fin:
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -112,5 +112,5 @@ int B_FileImportVar(char* arg, int unused)
 
 fin:
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }

@@ -94,8 +94,8 @@ int L_open_all(char* filename, int type)
     }
 
     L_YY = YY_open(filename, L_TABLE, sizeof(L_TABLE) / sizeof(YYKEYS), type);
-    if(L_YY == 0) return(-1);
-    return(0);
+    if(L_YY == 0) return -1;
+    return 0;
 }
 
 
@@ -185,7 +185,7 @@ static int L_macro()
     YY_record(L_YY, (unsigned char*) ptr);
     /*    YY_record(L_YY, "("); */  /* JMP 25-09-98 */
 
-    return(0);
+    return 0;
 }
 
 
@@ -307,7 +307,7 @@ static int L_string()
     SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ",");
     YY_record(L_YY, (unsigned char*) ptr);
     SCR_free(ptr);
-    return(0);
+    return 0;
 }
 
 
@@ -411,7 +411,7 @@ char    *a, *b;
     for(; *a; a++) {
         for(i = 0 ; b[i] ; i++)
             if(*a == b[i]) break;
-        if(b[i] == 0) return(0);
+        if(b[i] == 0) return 0;
     }
     return(1);
 }
@@ -427,7 +427,7 @@ static int L_get_period(YYFILE* yy, Period* per)
 
     if(YY_lex(yy) != YY_LONG) {
         YY_unread(yy);
-        return(-1);
+        return -1;
     }
     l = yy->yy_long;
     if(l < 50) l+= 2000;
@@ -437,16 +437,16 @@ static int L_get_period(YYFILE* yy, Period* per)
     if(nb_per < 0) {
         YY_ungetc(ch, yy);
         YY_unread(yy);
-        return(-1);
+        return -1;
     }
     if(YY_lex(yy) != YY_LONG || L_Period_NB[nb_per] < yy->yy_long) {
         YY_unread(yy);
-        return(-1);
+        return -1;
     }
     per->year = l;
     per->periodicity = toupper(ch);
     per->step = yy->yy_long;
 
-    return(0);
+    return 0;
 }
 */

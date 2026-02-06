@@ -19,8 +19,6 @@
 
 /*----------------------- DEFINE ----------------------------*/
 
-#define EQS_NBTESTS     20
-
 inline int B_EQS_INFOS;    // Information detail to print (for equations)
                            //    0: equation only 
                            //    1: equation + comment
@@ -428,7 +426,7 @@ public:
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } 
                 // to the Scalars Database
                 if (!global_ws_scl->contains(coeff_name)) 
-                    global_ws_scl->set_obj(coeff_name, new Scalar(0.9, 1.0));
+                    global_ws_scl->set_obj_ptr(coeff_name, new Scalar(0.9, 1.0));
             }
         }
 
@@ -447,12 +445,13 @@ public:
                 throw std::runtime_error("Cannot return the list of variables.\nThe global sample is not yet defined.");
 
             int nb_obs = sample->nb_periods;
+            Variable* var_ptr = new Variable(nb_obs, IODE_NAN);
             for(const std::string& var_name: vars)
             {
-                // adds a new variable with nb_obs IODE_NAN values to the Variables Database
-                // see add() and K_vpack()
+                // adds a new variable with nb_obs IODE_NAN values to the 
+                // Variables database
                 if (!global_ws_var->contains(var_name)) 
-                    global_ws_var->set_obj(var_name, (double*) NULL);
+                    global_ws_var->set_obj_ptr(var_name, var_ptr);
             }
         }
 
@@ -487,6 +486,7 @@ public:
 
     bool print_definition() const;
 
+    bool to_binary(char** pack) const;
 
     // -- operators --
 
@@ -517,6 +517,8 @@ public:
         return true;
     }
 };
+
+Equation* binary_to_eqs(char* pack, const std::string& name);
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
@@ -559,20 +561,17 @@ struct KDBEquations : public KDBTemplate<Equation>
     // copy constructor
     KDBEquations(const KDBEquations& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    Equation* get_obj(const SWHDL handle) const override;
-    Equation* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const Equation* value) override;
-
     std::string get_lec(const std::string& name) const;
-    
-    Equation* get(const std::string& name) const;
-    bool add(const std::string& name, const Equation& obj);
-    void update(const std::string& name, const Equation& obj);
+
+    bool add(const std::string& name, const Equation& eq) override 
+    { 
+        return KDBTemplate::add(name, eq); 
+    }
+
+    void update(const std::string& name, const Equation& eq) override
+    {
+        KDBTemplate::update(name, eq);
+    }
 
     bool add(const std::string& name, const std::string& lec);
     void update(const std::string& name, const std::string& lec);
@@ -587,20 +586,22 @@ struct KDBEquations : public KDBTemplate<Equation>
     void merge_from(const std::string& input_file) override
     {
         KDBEquations from(false);
-        KDB::merge_from(from, input_file);
+        KDBTemplate::merge_from(from, input_file);
     }
 
     bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {
         KDBEquations from(false);
-        return KDB::copy_from_file(from, file, objs_names, v_found);
+        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool obj_to_binary(char** pack, const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -613,20 +614,16 @@ inline std::array<KDBEquations*, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-Equation*  K_eptr(KDBEquations* kdb, char* name);
-
 inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 {
     if(cpp_kdb.size() == 0)
         return 0;
 
-    Equation* eq;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, eq_ptr] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);
-        eq = cpp_kdb.get(name);
-        hash_combine<Equation>(seed, *eq);
+        hash_combine<Equation>(seed, *eq_ptr);
     }
 
     return seed;
@@ -652,14 +649,6 @@ double K_e_loglik(KDBEquations* kdb, char*name);
 /*----------------------- FUNCS ----------------------------*/
 
 int K_epack(char **,char *,char *);
-Equation* K_eunpack(char *, char *);
 
 /* lec/l_link.c */
 void L_link_endos(KDBEquations* dbe, CLEC *cl);
-
-
-// TODO : remove KECLEC when k_objs will be changed to std::map<std::string, Equation*>
-inline CLEC* KECLEC(KDBEquations* kdb, const std::string& name) 
-{    
-    return ((CLEC *) K_optr1(kdb, (char*) name.c_str()));
-}

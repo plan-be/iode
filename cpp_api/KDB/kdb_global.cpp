@@ -10,7 +10,7 @@ bool is_global_database_loaded(const IodeType iodeType)
         if(kdb.size() == 0) 
             return false;
     }
-    catch(const std::exception& e)
+    catch(const std::exception&)
     {
         return false;
     }
@@ -147,14 +147,10 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     if(!debug_file.empty()) 
     {
         std::string debug_file_ = check_filepath(debug_file, FILE_LOG, caller_name, false);
-        K_WARN_DUP = 0;
         W_dest(to_char_array(debug_file_), W_A2M);
     }
     else 
-    {
-        K_WARN_DUP = 1;
         IMP_trace = 0;
-    }
 
     ExportToFile* expdef = export_handlers[format].get();
 
@@ -169,8 +165,6 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     if(dbv) delete dbv;
     if(dbc) delete dbc;
-
-    K_WARN_DUP = 0;
 
     if(res != 0)
     {

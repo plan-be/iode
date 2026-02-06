@@ -23,11 +23,11 @@ TEST_F(ScalarTest, Equivalence_C_CPP)
 
     // test if a Scalar object can be added to the Scalars KDB via add()
     Scalar scalar(val, relax, std);
-    global_ws_scl->set_obj(name, &scalar);
+    global_ws_scl->set_obj_ptr(name, &scalar);
     bool found = global_ws_scl->contains(name);
     ASSERT_TRUE(found);
 
-    Scalar* scl = global_ws_scl->get_obj(name);
+    Scalar* scl = global_ws_scl->get_obj_ptr(name);
     ASSERT_EQ(scl->value, val);
     ASSERT_EQ(scl->relax, relax);
     ASSERT_EQ(scl->std, std);
@@ -54,30 +54,30 @@ TEST_F(ScalarTest, Hash)
     std::size_t hash_before;
     std::size_t hash_after;
 
-    Scalar* scalar = global_ws_scl->get("acaf1");
-    hash_before = scalar_hasher(*scalar);
+    Scalar scalar = global_ws_scl->get("acaf1");
+    hash_before = scalar_hasher(scalar);
 
     // same scalar
-    Scalar* same_scalar = global_ws_scl->get("acaf1");
+    Scalar same_scalar = global_ws_scl->get("acaf1");
     EXPECT_EQ(scalar, same_scalar);
-    hash_after = scalar_hasher(*same_scalar);
+    hash_after = scalar_hasher(same_scalar);
     EXPECT_EQ(hash_before, hash_after);
 
     // different value
     hash_before = hash_after;
-    scalar->value += 0.1;
-    hash_after = scalar_hasher(*scalar);
+    scalar.value += 0.1;
+    hash_after = scalar_hasher(scalar);
     EXPECT_NE(hash_before, hash_after);
 
     // different relax
     hash_before = hash_after;
-    scalar->relax += 0.1;
-    hash_after = scalar_hasher(*scalar);
+    scalar.relax += 0.1;
+    hash_after = scalar_hasher(scalar);
     EXPECT_NE(hash_before, hash_after);
 
     // different std
     hash_before = hash_after;
-    scalar->std += 0.1;
-    hash_after = scalar_hasher(*scalar);
+    scalar.std += 0.1;
+    hash_after = scalar_hasher(scalar);
     EXPECT_NE(hash_before, hash_after);
 }

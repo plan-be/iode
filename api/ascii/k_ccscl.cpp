@@ -30,9 +30,8 @@
  */
 static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
 {
-    bool     success;
-    int      keyw;
-    Scalar   scl;
+    int keyw;
+    Scalar scl;
 
     /* READ AT MOST 3 REALS */
     scl.value = K_read_real(yy);
@@ -52,14 +51,17 @@ static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set_obj(name, &scl);
-    if(!success) 
+    try
+    {
+        kdb->set_obj_ptr(name, &scl);
+    }
+    catch(const std::exception&) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -178,34 +180,45 @@ static void print_scl(FILE* fd, Scalar* scl)
  */
 bool KDBScalars::save_asc(const std::string& filename)
 {
-    FILE*    fd;
-    Scalar*  scl;
+    FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         } 
     }
 
-    for(auto& [name, handle] : k_objs) 
+    Scalar* scl;
+    bool success = true;
+    for(auto& [name, _] : k_objs) 
     {
-        fprintf(fd, "%s ", (char*) name.c_str());
-        scl = this->get_obj(handle);
-        print_scl(fd, scl);
-        fprintf(fd, "\n");
+        try
+        {
+            fprintf(fd, "%s ", (char*) name.c_str());
+            scl = this->get_obj_ptr(name);
+            print_scl(fd, scl);
+            fprintf(fd, "\n");
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }

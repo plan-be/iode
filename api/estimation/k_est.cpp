@@ -49,7 +49,7 @@ void Estimation::E_savescl(double val, int eqnb, char*txt)
 
     scl.value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
-    global_ws_scl->set_obj(buf, &scl);
+    global_ws_scl->set_obj_ptr(buf, &scl);
 }
 
 /**
@@ -156,7 +156,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     }
     else
     {
-        eq = E_DBE->get_obj(name);
+        eq = E_DBE->get_obj_ptr(name);
         eq->sample = (smpl != nullptr) ? *smpl : Sample();
         eq->set_lec(lec);
         eq->set_method(method);
@@ -165,16 +165,21 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
 
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
 
-    bool success = E_DBE->set_obj(name, eq);
-    delete eq;
-    eq = nullptr;
-    if(!success) 
+    int res = 0;
+    try
+    {
+        E_DBE->set_obj_ptr(name, eq);
+    }
+    catch(const std::exception&)
     {
         error_manager.append_error(std::string(L_error()));
-        return -1;
+        res = -1;
     }
 
-    return 0;
+    delete eq;
+    eq = nullptr;
+
+    return res;
 }
 
 /**
@@ -222,7 +227,7 @@ int Estimation::KE_est_s(Sample* smpl)
             goto err;
         }
 
-        eq = E_DBE->get_obj(endo);
+        eq = E_DBE->get_obj_ptr(endo);
 
         if(est_method < 0) 
             E_MET = eq->method;
@@ -280,7 +285,7 @@ int Estimation::KE_est_s(Sample* smpl)
                     goto err;
                 }
 
-                _lec = global_ws_eqs->get_obj(eq_name)->lec;
+                _lec = global_ws_eqs->get_obj_ptr(eq_name)->lec;
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
             }
@@ -315,7 +320,7 @@ int Estimation::KE_est_s(Sample* smpl)
                 eq_name = std::string((char*) endos[j]);
                 KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
-                eq = E_DBE->get_obj(eq_name);
+                eq = E_DBE->get_obj_ptr(eq_name);
                 E_tests2scl(eq, j, E_T, E_NCE);
                 if(eq) delete eq;
                 eq = nullptr;
@@ -335,15 +340,15 @@ int Estimation::KE_est_s(Sample* smpl)
         estimated_eqs.clear();
 
         if(error != 0) 
-            return(-1);
+            return -1;
     }
 
-    return(0);
+    return 0;
 
 err :
     SCR_free_tbl(blk);
     lecs = endos = instrs = blk = NULL;
     nbl = nbe = 0;
     estimated_eqs.clear();
-    return(-1);
+    return -1;
 }

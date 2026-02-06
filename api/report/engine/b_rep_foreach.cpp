@@ -89,7 +89,7 @@ static int RP_foreach_next_index(char *name)
         RP_undef_1((char*) buf);  // Needed ?
         RP_define_restore(name);
         RP_define_restore((char*) buf);
-        return(-1);
+        return -1;
     }
     // Place le premier élément dans l'index de la boucle
     sprintf((char*) buf, "$define %s @vtake(1,%%FOREACH__%s%%)", name, name);
@@ -115,7 +115,7 @@ int RP_foreach(char* arg, int unused)
     int             rc = 0;
 
     // Crée l'index (name) et la liste de valeurs à traiter (list)
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
     
     // Sauve la valeur avant la boucle de l'index de la boucle (name)
     RP_define_save((char*) name);
@@ -140,7 +140,7 @@ int RP_foreach(char* arg, int unused)
         RP_goto_label("next", (char*) name);    // move to the line "$next <name>"
     }    
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -152,7 +152,7 @@ int RP_foreach(char* arg, int unused)
  */
 int RP_foreach_break(char *name)
 {
-    return(0);
+    return 0;
 }
 
 
@@ -208,7 +208,7 @@ static int RP_foreach_goto_next(char* label)
 done:
     SW_nfree(line);
     line = 0;
-    return(rc);
+    return rc;
 }
 
 
@@ -242,7 +242,7 @@ int RP_foreach_next(char* arg, int unused)
         CUR_REPFILE->curline = curline;
         rc = 0;
     }
-    return(rc);
+    return rc;
 }
 
 
