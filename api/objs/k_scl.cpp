@@ -15,86 +15,49 @@ bool Scalar::print_definition() const
     return true;        
 }
 
+bool Scalar::to_binary(char** pack) const
+{
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, (char*) this, sizeof(Scalar));
+    return true;
+}
+
 std::size_t hash_value(const Scalar& scalar)
 {
     std::hash<Scalar> scl_hash;
     return scl_hash(scalar);
 }
 
+bool KDBScalars::binary_to_obj(const std::string& name, char* pack)
+{
+    Scalar* scl_ptr = (Scalar*) P_get_ptr(pack, 0);
+    if(!scl_ptr) 
+        return false;
 
-Scalar* KDBScalars::get_obj(const SWHDL handle) const
-{    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return (Scalar*) P_get_ptr(ptr, 0);
+    Scalar* scl = new Scalar(*scl_ptr);
+    this->k_objs[name] = scl;
+    return true;
 }
 
-Scalar* KDBScalars::get_obj(const std::string& name) const
+/**
+ * Serializes a Scalar object. 
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @param [in]  name    string      scalar name
+ * @return                          true if the serialization succeeded, false otherwise 
+ */
+bool KDBScalars::obj_to_binary(char** pack, const std::string& name)
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("Scalar with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
+    Scalar* scl = this->get_obj_ptr(name);
+    if(!scl) 
+        return false;
 
-bool KDBScalars::set_obj(const std::string& name, const Scalar* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_spack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set scalar object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
+    bool success = scl->to_binary(pack);
     return success;
 }
 
-Scalar* KDBScalars::get(const std::string& name) const
-{
-	Scalar* scalar = this->get_obj(name);
-	return scalar;
-}
-
-bool KDBScalars::add(const std::string& name, const Scalar& obj)
-{
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add scalar: a scalar named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add scalar: a scalar named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
-	Scalar scalar(obj);
-	return this->set_obj(name, &scalar);
-}
-
-void KDBScalars::update(const std::string& name, const Scalar& obj)
-{
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update scalar: no scalar named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-	Scalar scalar(obj);
-	this->set_obj(name, &scalar);
-}
-
-bool KDBScalars::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBScalars::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     return false;
 }
@@ -109,7 +72,7 @@ bool KDBScalars::print_obj_def(const std::string& name)
 {
     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 1, name.c_str());
 
-    Scalar* scl = this->get_obj(name);
+    Scalar* scl = this->get_obj_ptr(name);
     if(!scl) 
     {
         W_printf((char*) "?\n");

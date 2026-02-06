@@ -37,10 +37,10 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
     int     done = 0, nbtoc = 0;
     Sample  *rsmpl;
 
-    if(YY_lex(yy) != ASC_SMPL)  return(-1);
+    if(YY_lex(yy) != ASC_SMPL)  return -1;
 
     rsmpl = K_read_smpl(yy);
-    if(rsmpl == NULL) return(-1);
+    if(rsmpl == NULL) return -1;
     memcpy(smpl, rsmpl, sizeof(Sample));
 
     while(!done) {
@@ -48,7 +48,7 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
             case YY_EOF :
                 SCR_free_tbl((unsigned char**) RASC_toc);
                 RASC_toc = 0;
-                return(-1);
+                return -1;
             case YY_WORD :
                 SCR_add_ptr((unsigned char***) &RASC_toc, &nbtoc, yy->yy_text);
                 break;
@@ -61,7 +61,7 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
     }
 
     SW_nfree(rsmpl);
-    return(0);
+    return 0;
 }
 
 /**
@@ -79,7 +79,7 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
  */
 int ImportObjsRevertASCII::read_numerical_value(YYFILE* yy, char* name, int* shift, double* value)
 {
-    if(YY_lex(yy) == YY_EOF) return(-1);
+    if(YY_lex(yy) == YY_EOF) return -1;
     else YY_unread(yy);
 
     if(RASC_cv >= SCR_tbl_size((unsigned char**) RASC_toc)) {
@@ -91,7 +91,7 @@ int ImportObjsRevertASCII::read_numerical_value(YYFILE* yy, char* name, int* shi
     *value = K_read_real(yy);
     RASC_cv ++;
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -105,5 +105,5 @@ int ImportObjsRevertASCII::close()
     SCR_free_tbl((unsigned char**) RASC_toc);
     RASC_toc = 0;
     RASC_cv = RASC_cy = 0;
-    return(0);
+    return 0;
 }

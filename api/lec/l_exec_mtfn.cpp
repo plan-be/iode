@@ -429,8 +429,8 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
     }
 
     /* if NO value after AND before t, return IODE_NAN */
-    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(-1);
-    if(IODE_IS_A_NUMBER(vy[0]) && IODE_IS_A_NUMBER(vy[1])) return(0);
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return -1;
+    if(IODE_IS_A_NUMBER(vy[0]) && IODE_IS_A_NUMBER(vy[1])) return 0;
 
     /* if no value after, calc before t0 */
     if(!IODE_IS_A_NUMBER(vy[1])) {
@@ -454,7 +454,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
         }
     }
 
-    return(0);
+    return 0;
 }
 
 /**

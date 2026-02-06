@@ -169,7 +169,7 @@ U_ch *RPF_take(U_ch** args)
     U_ch    *res = 0;
     int     n, lg;
 
-    if(SCR_tbl_size(args) != 2) return(res);
+    if(SCR_tbl_size(args) != 2) return res;
     n = atol((char*) args[0]);
     lg = (int)strlen((char*) args[1]);
     if(n > 0) {
@@ -178,12 +178,12 @@ U_ch *RPF_take(U_ch** args)
             strcpy((char*) res, (char*) args[1]);
             memset(res + lg, ' ', n - lg);
             res[n] = 0;
-            return(res);
+            return res;
         }
         else {
             memcpy(res, args[1], n);
             res[n] = 0;
-            return(res);
+            return res;
         }
     }
     else {
@@ -192,12 +192,12 @@ U_ch *RPF_take(U_ch** args)
         if(n >= lg) {
             memset(res, ' ', n - lg);
             strcpy(((char*) res) + n - lg, (char*) args[1]);
-            return(res);
+            return res;
         }
         else {
             memcpy(res, args[1] + lg - n, n);
             res[n] = 0;
-            return(res);
+            return res;
         }
     }
 }
@@ -229,23 +229,23 @@ U_ch *RPF_drop(U_ch** args)
     U_ch    *res = 0;
     int     n, lg;
 
-    if(SCR_tbl_size(args) != 2) return(res);
+    if(SCR_tbl_size(args) != 2) return res;
     n = atol((char*) args[0]);
     lg = (int)strlen((char*) args[1]);
-    if(lg == 0) return(res);
+    if(lg == 0) return res;
 
     if(n > 0) {
         if(n >= lg) return((unsigned char*) SCR_malloc(1));
         res = (unsigned char*) SCR_malloc(lg - n + 1);
         strcpy((char*) res, (char*) args[1] + n);
-        return(res);
+        return res;
     }
     else {
         n = -n;
         if(n >= lg) return((unsigned char*) SCR_malloc(1));
         res = (unsigned char*) SCR_malloc(lg - n + 1);
         SCR_strlcpy(res, args[1], lg - n);
-        return(res);
+        return res;
     }
 }
 
@@ -269,9 +269,9 @@ U_ch *RPF_replace(U_ch** args)
 {
     U_ch    *res = 0;
 
-    if(SCR_tbl_size(args) != 3) return(res);
+    if(SCR_tbl_size(args) != 3) return res;
     res = SCR_areplace(args[0], args[1], args[2]);
-    return(res);
+    return res;
 }
 
 
@@ -299,7 +299,7 @@ U_ch *RPF_equal(U_ch** args)
         else
             res = SCR_stracpy((unsigned char*) "1");
     }
-    return(res);
+    return res;
 }
 
 
@@ -318,7 +318,7 @@ U_ch *RPF_upper(U_ch** args)
     U_ch    *res = SCR_mtov(args, ' ');
 
     SCR_upper(res);
-    return(res);
+    return res;
 }
 
 
@@ -338,7 +338,7 @@ U_ch *RPF_lower(U_ch** args)
     U_ch    *res = SCR_mtov(args, ' ');
 
     SCR_lower(res);
-    return(res);
+    return res;
 }
 
 
@@ -358,7 +358,7 @@ U_ch *RPF_sqz(U_ch** args)
     U_ch    *res = SCR_mtov(args, ' ');
 
     SCR_sqz(res);
-    return(res);
+    return res;
 }
 
 
@@ -378,7 +378,7 @@ U_ch *RPF_strip(U_ch** args)
     U_ch    *res = SCR_mtov(args, ' ');
 
     SCR_strip(res);
-    return(res);
+    return res;
 }
 
 
@@ -450,7 +450,7 @@ U_ch *RPF_count(U_ch** args)
     res = (unsigned char*) SCR_malloc(20);
     n = SCR_tbl_size(args);
     sprintf((char*) res, "%d", n);
-    return(res);
+    return res;
 }
 
 
@@ -519,7 +519,7 @@ U_ch *RPF_date(U_ch** args)
     if(args[0]) fmt = args[0];
     else        fmt = (unsigned char*) "dd-mm-yyyy";
     SCR_long_to_fdate(SCR_current_date(), (char*) res, (char*) fmt);
-    return(res);
+    return res;
 }
 
 
@@ -543,7 +543,7 @@ U_ch *RPF_time(U_ch** args)
     if(args[0]) fmt = args[0];
     else        fmt = (unsigned char*) "hh:mm:ss";
     SCR_long_to_ftime(SCR_current_time(), (char*) res, (char*) fmt);
-    return(res);
+    return res;
 }
 
 
@@ -651,7 +651,7 @@ U_ch *RPF_sstderr(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = global_ws_scl->get_obj(name);
+            scl = global_ws_scl->get_obj_ptr(name);
             if(IODE_IS_A_NUMBER(scl->std))
                 sprintf((char*) buf, "%lf", (double) scl->std);
             else
@@ -659,7 +659,7 @@ U_ch *RPF_sstderr(U_ch** args)
         }
         res = SCR_strafcat(res, buf);
     }
-    return(res);
+    return res;
 }
 
 /**
@@ -686,7 +686,7 @@ U_ch *RPF_srelax(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = global_ws_scl->get_obj(name);
+            scl = global_ws_scl->get_obj_ptr(name);
             if(IODE_IS_A_NUMBER(scl->relax))
                 sprintf((char*) buf, "%lf", (double) scl->relax);
             else
@@ -694,7 +694,7 @@ U_ch *RPF_srelax(U_ch** args)
         }
         res = SCR_strafcat(res, buf);
     }
-    return(res);
+    return res;
 }
 
 /**
@@ -726,10 +726,8 @@ U_ch *RPF_ttitle(U_ch** args)
         }
         else 
         {
-            tbl = global_ws_tbl->get_obj(name);
+            tbl = global_ws_tbl->get_obj_ptr(name);
             res = SCR_strafcat(res, T_get_title(tbl, false));
-            delete tbl;
-            tbl = nullptr;
         }
     }
 
@@ -750,32 +748,30 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    int i;
     KDBComments* kdb = global_ws_cmt.get();
 
     if(!kdb) 
-        return(res);
+        return res;
 
-    SWHDL handle;
     std::string name;
-    for(i = 0 ; args[i] ; i++) 
+    for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
-        handle = kdb->get_handle(name);
-        if(handle == 0) 
+        if(!kdb->contains(name)) 
         {
             sprintf((char*) buf, "Cmt %s not found", args[i]);
             res = SCR_strafcat(res, buf);
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(handle));
+            Comment comment = kdb->get(name);
+            res = SCR_strafcat(res, (unsigned char*) comment.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
-    return(res);
+    return res;
 }
 
 
@@ -796,7 +792,7 @@ U_ch *RPF_vvalue(U_ch** args)
     KDBVariables* kdb = global_ws_var.get();
 
     if(!kdb) 
-        return(res);
+        return res;
 
     if(kdb->sample == nullptr || kdb->sample->nb_periods == 0) 
         return (U_ch*) "";
@@ -823,7 +819,7 @@ U_ch *RPF_vvalue(U_ch** args)
             }
         }
     }
-    return(res);
+    return res;
 }
 
 /**
@@ -845,7 +841,7 @@ U_ch *RPF_lvalue(U_ch** args)
     KDBLists* kdb = global_ws_lst.get();
 
     if(!kdb) 
-        return(res);
+        return res;
 
     std::string name;
     for(int i = 0 ; args[i] ; i++) 
@@ -860,11 +856,12 @@ U_ch *RPF_lvalue(U_ch** args)
         }
         else 
         {
-            res = SCR_strafcat(res, (unsigned char*) kdb->get_obj(name));
+            List lst = kdb->get(name);
+            res = SCR_strafcat(res, (unsigned char*) lst.c_str());
             res = SCR_replace(res, (unsigned char*) ";", (unsigned char*) ",");
         }
     }
-    return(res);
+    return res;
 }
 
 
@@ -887,7 +884,7 @@ U_ch *RPF_ivalue(U_ch** args)
     KDBIdentities* kdb = global_ws_idt.get();
 
     if(!kdb) 
-        return(res);
+        return res;
 
     std::string name;
     for(int i = 0 ; args[i] ; i++) 
@@ -902,12 +899,12 @@ U_ch *RPF_ivalue(U_ch** args)
         }
         else 
         {
-            std::string lec = kdb->get_obj(name)->get_lec();
+            std::string lec = kdb->get_obj_ptr(name)->get_lec();
             res = SCR_strafcat(res, (unsigned char*) lec.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
-    return(res);
+    return res;
 }
 
 
@@ -932,7 +929,7 @@ U_ch *RPF_evalue(U_ch** args)
     KDBEquations* kdb = global_ws_eqs.get();
 
     if(!kdb) 
-        return(res);
+        return res;
 
     std::string name;
     for(int i = 0 ; args[i] ; i++) 
@@ -948,12 +945,12 @@ U_ch *RPF_evalue(U_ch** args)
         }
         else 
         {
-            std::string lec = kdb->get_obj(name)->lec;
+            std::string lec = kdb->get_obj_ptr(name)->lec;
             res = SCR_strafcat(res, (unsigned char*) lec.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
     }
-    return(res);
+    return res;
 }
 
 
@@ -974,11 +971,11 @@ U_ch *RPF_eqsample(U_ch** args)
 
     // Equation WS  empty
     if(!kdb) 
-        return(res);
+        return res;
     
     // 1! eq
     if(SCR_tbl_size(args) != 1) 
-        return(res);
+        return res;
 
     res = (unsigned char*) SCR_malloc(80);
 
@@ -987,13 +984,12 @@ U_ch *RPF_eqsample(U_ch** args)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else
     {
-        Equation* eq = kdb->get_obj(name);
+        Equation* eq = kdb->get_obj_ptr(name);
         std::string str_smpl = eq->sample.to_string();
         sprintf((char*) res, (char*) str_smpl.c_str());
-        delete eq;
     }       
 
-    return(res);
+    return res;
 }
 
 
@@ -1013,11 +1009,11 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
 
     // Equation WS  empty
     if(!kdb) 
-        return(res);
+        return res;
 
     // 1! eq
     if(SCR_tbl_size(args) != 1) 
-        return(res);
+        return res;
 
     res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
 
@@ -1026,19 +1022,18 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else 
     {
-        Equation* eq = kdb->get_obj(name);
+        Equation* eq = kdb->get_obj_ptr(name);
         Sample smpl = eq->sample;
         if(fromto == 0) 
             sprintf((char*) res, (char*) smpl.start_period.to_string().c_str());
         else            
             sprintf((char*) res, (char*) smpl.end_period.to_string().c_str());
-        delete eq;
     }
 
     if(res[0] == 0) 
         strcpy((char*) res, " ");   // pour éviter de quitter le rapport si sample vide
 
-    return(res);
+    return res;
 }
 
 
@@ -1101,7 +1096,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
     }
     else 
     {
-        std::string lec = kdb->get_obj(name)->lec;
+        std::string lec = kdb->get_obj_ptr(name)->lec;
         eq = SCR_stracpy((unsigned char*) lec.c_str());
         poscolon = L_split_eq((char*) eq);
         if(poscolon > 0) 
@@ -1174,7 +1169,7 @@ U_ch *RPF_sample(U_ch** args)
 
     smpl = kdb->sample;
     if(!smpl || smpl->nb_periods == 0) 
-        return(res);
+        return res;
 
     if(args[0]) 
         what = args[0][0];
@@ -1196,7 +1191,7 @@ U_ch *RPF_sample(U_ch** args)
     }
 
     res = SCR_strafcat(res, buf);
-    return(res);
+    return res;
 }
 
 
@@ -1221,7 +1216,7 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
         if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, (unsigned char*) cl->lnames[j].name);
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -1247,11 +1242,8 @@ U_ch *RPF_vsliste(U_ch** args, int type)
         name = std::string((char*) args[i]);
         if(!global_ws_eqs->contains(name)) 
             continue;
-        eq = global_ws_eqs->get_obj(name) ;
+        eq = global_ws_eqs->get_obj_ptr(name) ;
         RPF_vsliste1(eq->clec, &tbl, &nb, type);
-        if(eq) 
-            delete eq;
-        eq = nullptr;
     }
 
     SCR_add_ptr(&tbl, &nb, 0L);
@@ -1343,7 +1335,7 @@ U_ch *RPF_expand(U_ch** args, int type)
     res = SCR_mtov(tbl2, ';');
     SCR_free_tbl(tbl2);
     if(res == 0) res = SCR_stracpy((unsigned char*) ""); // JMP 04/11/2022 
-    return(res);
+    return res;
 }
 
 
@@ -1473,20 +1465,20 @@ int RPF_CalcPeriod(U_ch** args)
 {
     // Check args
     if(SCR_tbl_size(args) == 0) 
-        return(-1); // Erreur, arg required
+        return -1; // Erreur, arg required
     
     Period per(std::string((char*) args[0]));
     if(per.year == 0) 
-        return(-1); // Error
+        return -1; // Error
 
     // Calc diff bw per and WS sample
     int t = per.difference(global_ws_var->sample->start_period);
     if(t < 0)  
-        return(-1);
+        return -1;
 
     int at = per.difference(global_ws_var->sample->end_period);
     if(at > 0)
-        return(-1);
+        return -1;
 
     return(t);
 }
@@ -1644,10 +1636,10 @@ int RPF_SimNIterInt(U_ch** args)
     int		t;
 
     t = RPF_CalcPeriod(args);
-    if(t < 0) return(-1);
+    if(t < 0) return -1;
 
     // Check si déjà simulation
-    if(CSimulation::KSIM_NITERS == 0) return(-1); // Pas encore de simulation
+    if(CSimulation::KSIM_NITERS == 0) return -1; // Pas encore de simulation
 
     // Return norme t
     return(CSimulation::KSIM_NITERS[t]);
@@ -1688,10 +1680,10 @@ int RPF_SimCpuInt(U_ch** args)
     int		t;
 
     t = RPF_CalcPeriod(args);
-    if(t < 0) return(-1);
+    if(t < 0) return -1;
 
     // Check si déjà simulation
-    if(CSimulation::KSIM_CPUS == 0) return(-1); // Pas encore de simulation
+    if(CSimulation::KSIM_CPUS == 0) return -1; // Pas encore de simulation
 
     // Return norme t
     return(CSimulation::KSIM_CPUS[t]);
@@ -1801,7 +1793,7 @@ U_ch *RPF_vtake(U_ch** args)
         res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
     }
     SCR_free_tbl(args);
-    return(res);
+    return res;
 }
 
 
@@ -1849,7 +1841,7 @@ U_ch *RPF_vdrop(U_ch** args)
         res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
     }
     SCR_free_tbl(args);
-    return(res);
+    return res;
 }
 
 
@@ -1931,7 +1923,7 @@ U_ch *RPF_memory(U_ch** args)
             
 
     res = SCR_strafcat(res, buf);
-    return(res);
+    return res;
 }
 
 /*--------------------------- CHRONO ------------------------------- */

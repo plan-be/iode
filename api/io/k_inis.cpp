@@ -21,7 +21,7 @@
 
 int ImportObjsNIS::read_header(YYFILE* yy, Sample* smpl)
 {
-    return(0);
+    return 0;
 }
 
 int ImportObjsNIS::read_variable(YYFILE* yy, char* name, int dim, double* vector)
@@ -30,7 +30,7 @@ int ImportObjsNIS::read_variable(YYFILE* yy, char* name, int dim, double* vector
     int     i, lg, nb;
 
     nb = std::min(6, dim);
-    if(YY_read_to_char(yy, '\n') == YY_EOF) return(-1);
+    if(YY_read_to_char(yy, '\n') == YY_EOF) return -1;
 
     lg = (int)strlen((char*) yy->yy_text);
 
@@ -56,5 +56,5 @@ int ImportObjsNIS::read_variable(YYFILE* yy, char* name, int dim, double* vector
         i++;
     }
 
-    return(0);
+    return 0;
 }

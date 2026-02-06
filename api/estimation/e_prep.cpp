@@ -61,9 +61,9 @@ int Estimation::E_prep_alloc()
     if(M_errno)
     {
         error_manager.append_error("Estimation : Memory Error");
-        return(-1);
+        return -1;
     } 
-    return(0);
+    return 0;
 }
 
 
@@ -95,21 +95,21 @@ int Estimation::E_prep_lecs(char** lecs)
     if(E_NEQ < 1)
     {
         error_manager.append_error("Estimation: No equation");
-        return(-1);
+        return -1;
     }
 
     E_LHS = M_alloc(E_NEQ, E_T);
     if(E_LHS == 0)
     {
         error_manager.append_error("Estimation: Memory Error");
-        return(-1);
+        return -1;
     }
 
     E_CRHS = (CLEC **) SW_nalloc(E_NEQ * sizeof(CLEC *));
     if(E_CRHS == 0)
     {
         error_manager.append_error("Estimation: Memory Error");
-        return(-1);
+        return -1;
     }
 
     for(i = 0 ; i < E_NEQ ; i++) {
@@ -117,7 +117,7 @@ int Estimation::E_prep_lecs(char** lecs)
         if(pos < 0)
         {
             error_manager.append_error("Estimation: Syntax Error");
-            return(-1);
+            return -1;
         } 
 
         lecs[i][pos] = 0;
@@ -125,20 +125,20 @@ int Estimation::E_prep_lecs(char** lecs)
         if(clec == 0)
         {
             error_manager.append_error("Estimation: Syntax Error");
-            return(-1);
+            return -1;
         }
 
         if(E_add_scls(clec, E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
-            return(-1); // JMP 13/11/2012
+            return -1; // JMP 13/11/2012
         }
 
         if(L_link(E_DBV, E_DBS, clec) != 0) 
         {
             SW_nfree(clec); // GB 14/11/2012
             error_manager.append_error("Estimation: Link Error");
-            return(-1);
+            return -1;
         }
 
         for(t = 0 ; t < E_T ; t++) {
@@ -147,7 +147,7 @@ int Estimation::E_prep_lecs(char** lecs)
             {
                 SW_nfree(clec); // GB 14/11/2012
                 error_manager.append_error("Estimation: NaN Generated");
-                return(-1);
+                return -1;
             }
             MATE(E_LHS, i, t) = x;
         }
@@ -158,23 +158,23 @@ int Estimation::E_prep_lecs(char** lecs)
         if(E_CRHS[i] == 0)
         {
             error_manager.append_error("Estimation: Syntax Error");
-            return(-1);
+            return -1;
         } 
 
         if(E_add_scls(E_CRHS[i], E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
-            return(-1); // JMP 13/11/2012
+            return -1; // JMP 13/11/2012
         } 
 
         if(L_link(E_DBV, E_DBS, E_CRHS[i]) != 0)
         {
             error_manager.append_error("Estimation: Link Error");
-            return(-1);
+            return -1;
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -183,7 +183,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  
  *  @param [in] CLEC*   clec    Compiled LEC equation
  *  @param [in] KDB*    dbs     KDB of scalar
- *  @return     int             0 (TODO: check the add() return value)        
+ *  @return     int             0        
  *  
  */
 int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
@@ -195,10 +195,10 @@ int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            dbs->set_obj(name, nullptr);
+            dbs->set_obj_ptr(name, new Scalar());
     }
     
-    return(0);
+    return 0;
 }
 
 
@@ -220,10 +220,10 @@ int Estimation::E_prep_instrs(char** instrs)
 
     // Check if there are instruments. If not, return 0
     if(E_MET != 2 && E_MET != 3) 
-        return(0);
+        return 0;
     E_NINSTR = SCR_tbl_size((unsigned char**) instrs);
     if(E_NINSTR < 1) 
-        return(0);
+        return 0;
 
     // Alloc local MAT
     minstr  = M_alloc(E_T, E_NINSTR + 1);
@@ -273,7 +273,7 @@ int Estimation::E_prep_instrs(char** instrs)
     M_trans(mip, minstr);
     M_prod(mipiipi, minstr, miipi);
     M_prod(E_D, mipiipi, mip);
-    return(0);
+    return 0;
 
 fin:
     M_free(minstr);
@@ -281,7 +281,7 @@ fin:
     M_free(miip);
     M_free(miipi);
     M_free(mipiipi);
-    return(-1);
+    return -1;
 }
 
 
@@ -318,7 +318,7 @@ int Estimation::E_prep_coefs()
     if(E_C_NBS == 0) 
     {
         error_manager.append_error("Estimation : Memory Error");
-        return(-1);
+        return -1;
     }
     
     // Loop on equations and names in each equations (linked before with E_BDS)
@@ -340,10 +340,10 @@ int Estimation::E_prep_coefs()
                 if(k == E_NC) 
                 {
                     E_C_NBS[E_NC++] = pos;                  // Add a coefficient in E_C_NBS
-                    if(E_DBS->get_obj(scl_name)->relax > 0) 
+                    if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
                         E_NCE++;
                 }
-                if(E_DBS->get_obj(scl_name)->relax > 0) 
+                if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
                     MATE(E_NBCE, 0, i)++;                   // relax > 0 => estimation coef
             }
         }
@@ -354,14 +354,14 @@ int Estimation::E_prep_coefs()
         std::string error_msg = "No scalars to estimate in your block of equations";
         error_manager.append_error(error_msg);
         error_manager.append_error("Estimation: No current estimation");
-        return(-1);
+        return -1;
     }
 
     E_C   = M_alloc(E_NC, 1);
     E_SMO = M_alloc(E_NC, 1);
     E_get_SMO();
     E_get_C();
-    return(0);
+    return 0;
 }
 
 
@@ -383,11 +383,11 @@ void Estimation::E_get_C()
     for(int i = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        c = E_DBS->get_obj(scl_name)->value;
-        if(E_DBS->get_obj(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
+        c = E_DBS->get_obj_ptr(scl_name)->value;
+        if(E_DBS->get_obj_ptr(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
         {
             c = 0.1;
-            E_DBS->get_obj(scl_name)->value = c; // GB 24/01/2013
+            E_DBS->get_obj_ptr(scl_name)->value = c; // GB 24/01/2013
         }
         MATE(E_C, i, 0) = c;
     }
@@ -407,7 +407,7 @@ void Estimation::E_put_C()
     for(int i = 0 ; i < E_NC ; i++)
     {
         name = E_DBS->get_name(E_C_NBS[i]);
-        E_DBS->get_obj(name)->value = MATE(E_C, i, 0);
+        E_DBS->get_obj_ptr(name)->value = MATE(E_C, i, 0);
     }
 }
 
@@ -426,7 +426,7 @@ void Estimation::E_get_SMO()
     for(int i = 0 ; i < E_NC ; i++)
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        MATE(E_SMO, i, 0) = E_DBS->get_obj(scl_name)->relax;
+        MATE(E_SMO, i, 0) = E_DBS->get_obj_ptr(scl_name)->relax;
     }
 }
 
@@ -559,12 +559,12 @@ int Estimation::E_prep(char** lecs, char** instrs)
 {
     E_prep_reset();
     if(E_prep_lecs(lecs)) 
-        return(-1);
+        return -1;
     if(E_prep_instrs(instrs)) 
-        return(-1);
+        return -1;
     if(E_prep_coefs()) 
-        return(-1);
+        return -1;
     if(E_prep_alloc()) 
-        return(-1);
-    return(0);
+        return -1;
+    return 0;
 }

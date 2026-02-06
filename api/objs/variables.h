@@ -11,7 +11,6 @@
 /*----------------------- TYPEDEF ----------------------------*/
 
 // using is the C++11 version of typedef
-using VAR = double*;
 using Variable = std::vector<double>;
 
 /*----------------------- DEFINE ----------------------------*/
@@ -62,7 +61,7 @@ enum IodeLowToHigh
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBVariables : public KDBTemplate<double>
+struct KDBVariables : public KDBTemplate<Variable>
 {
     /**
      *  Parameters specific to csv output files. 
@@ -110,30 +109,40 @@ public:
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    double* get_obj(const SWHDL handle) const override;
-    double* get_obj(const std::string& name) const override;
     double get_value(const std::string& name, const int t) const
     {
-        double* var = this->get_obj(name);
-        return *(var + t);
+        Variable* var_ptr = this->get_obj_ptr(name);
+        int nb_periods = this->get_nb_periods();
+        if(t < 0 || t >= nb_periods)
+        {
+            std::string error_msg = "Cannot get variable value: invalid period index " + std::to_string(t) + ".\n";
+            error_msg += "The variable '" + name + "' has " + std::to_string(nb_periods) + " periods.";
+            throw std::out_of_range(error_msg);
+        }
+
+        return (*var_ptr)[t];
     }
 
     double* get_var_ptr(const std::string& name, const int t = 0)
     {
-        double* var = this->get_obj(name);
-        return var + t;
+        Variable* var = this->get_obj_ptr(name);
+        int nb_periods = this->get_nb_periods();
+        if(t < 0 || t >= nb_periods)
+        {
+            std::string error_msg = "Cannot get variable value: invalid period index " + std::to_string(t) + ".\n";
+            error_msg += "The variable '" + name + "' has " + std::to_string(nb_periods) + " periods.";
+            throw std::out_of_range(error_msg);
+        }
+
+        double* var_ptr = var->data() + t;
+        return var_ptr;
     }
 
-    bool set_obj(const std::string& name, const double* value) override;
-    bool set_obj(const std::string& name, const Variable& value);
+    Variable* set_obj_ptr(const std::string& name, Variable* var_ptr) override;
     
-    Variable get(const std::string& name) const;
-    bool add(const std::string& name, const Variable& obj);
-    void update(const std::string& name, const Variable& obj);
+    Variable get(const std::string& name) const override;
+    bool add(const std::string& name, const Variable& obj) override;
+    void update(const std::string& name, const Variable& obj) override;
 
     double get_var(const std::string& name, const int t, const IodeVarMode mode = VAR_MODE_LEVEL) const;
     double get_var(const std::string& name, const std::string& period, const IodeVarMode mode = VAR_MODE_LEVEL) const;
@@ -248,11 +257,7 @@ public:
 
     bool print_obj_def(const std::string& name) override;
 
-    void merge_from(const std::string& input_file) override
-    {
-        KDBVariables from(false);
-        KDB::merge_from(from, input_file);
-    }
+    void merge_from(const std::string& input_file) override;
 
     bool copy_from(const std::vector<std::string>& input_files, const std::string& from, 
         const std::string& to, const std::string& objects_names);
@@ -264,9 +269,11 @@ public:
         const std::string& to, const std::string& objects_names);
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool obj_to_binary(char** pack, const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -278,9 +285,6 @@ inline std::unique_ptr<KDBVariables> global_ws_var = std::make_unique<KDBVariabl
 inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
-
-double *K_vval(KDB *, int, int);
-double *K_vptr(KDB *, char*, int); 
 
 inline std::size_t hash_value(KDBVariables const& cpp_kdb)
 {
@@ -295,17 +299,23 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     if(nb_periods == 0)
         return 0;
 
-    double* var;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, var_ptr] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);
-        var = cpp_kdb.get_obj(name);
-		for(int t=0; t < nb_periods; t++)
-        	hash_combine<double>(seed, var[t]);
+		for(const double &value : *var_ptr)
+            hash_combine<double>(seed, value);
     }
     
     return seed;
+}
+
+inline bool var_to_binary(char** pack, const Variable& var)
+{
+    *pack = (char*) P_create();
+    int nb_values = (int) var.size();
+    *pack = (char*) P_add(*pack, (char*) var.data(), sizeof(double) * nb_values);
+    return true;
 }
 
 /* k_wsvar.c */

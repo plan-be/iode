@@ -14,7 +14,10 @@ protected:
         global_ws_var->load(str_input_test_dir + "fun.av");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_var->clear();
+    }
 };
 
 class KDBVariablesEmptyTest : public TestAbstract, public ::testing::Test
@@ -46,7 +49,7 @@ TEST_F(KDBVariablesTest, Subset)
     // DEEP COPY SUBSET
     KDBVariables* kdb_subset_deep_copy = new KDBVariables(global_ws_var.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", lec);
     EXPECT_EQ(global_ws_var->get("ACAF"), var);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
@@ -54,7 +57,7 @@ TEST_F(KDBVariablesTest, Subset)
     // SHALLOW COPY SUBSET
     KDBVariables* kdb_subset_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", lec);
     EXPECT_EQ(global_ws_var->get("ACAF"), new_var);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), new_var);
@@ -601,7 +604,7 @@ TEST_F(KDBVariablesTest, Merge)
     kdb_to_merge->update(name, lec);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_var);
@@ -609,7 +612,7 @@ TEST_F(KDBVariablesTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_var); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_var);
 }

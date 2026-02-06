@@ -139,7 +139,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
         L_free(EXPR[0]);
         return(L_errno);
     }
-    return(0);
+    return 0;
 }
 
 
@@ -268,7 +268,7 @@ static int L_invert(char* eq, char* endo, int *dupendo)
         APP_OP(L_EOE);
         L_free(EXPR[0]);
         L_free(EXPR[1]);
-        return(0);
+        return 0;
     }
     if(count0 == 0) {
         // If endo not present in LHS, set mbr to 1 and nmbr to 0
@@ -463,7 +463,7 @@ int L_split_eq(char* eq)
     for(i = 0 ; eq[i] != 0 ; i++)
         if(eq[i] == ':' && eq[i + 1] == '=') return(i);
 
-    return(-1);
+    return -1;
 }
 
 
@@ -556,7 +556,7 @@ ag:
         MBR = 1 ;
         NMBR = 0;
     }
-    return(0);
+    return 0;
 }
 
 

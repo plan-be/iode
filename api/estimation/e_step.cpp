@@ -51,7 +51,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
         for(int j = 0 ; j < clec->nb_names ; j++) 
         {
             name = std::string(clec->lnames[j].name);
-            if(is_coefficient(name) && global_ws_scl->get_obj(name)->relax != 0)
+            if(is_coefficient(name) && global_ws_scl->get_obj_ptr(name)->relax != 0)
                 SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) name.c_str());
         }
     }
@@ -69,7 +69,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
  */
 static void E_SetScl(int relax, char* name)                                             
 {
-    Scalar* scl = global_ws_scl->get_obj(name);
+    Scalar* scl = global_ws_scl->get_obj_ptr(name);
     if(relax == 1) 
     {
         scl->value = 0.9;
@@ -169,7 +169,7 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
         etest[0]=0;
         strcat(etest, "e0_");
         strcat(etest, test);
-        res = global_ws_scl->get_obj(etest)->value;
+        res = global_ws_scl->get_obj_ptr(etest)->value;
         kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);
         L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);
     }
@@ -251,14 +251,9 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = global_ws_eqs->get_obj(name) ;               
+    eq = global_ws_eqs->get_obj_ptr(name);               
     cl = eq->clec;
     nbscl = E_GetScls(cl, &scl);
-    if(eq)
-    {
-        delete eq;
-        eq = nullptr;
-    } 
 
     // Effectue les estimations pour toutes les combi
     nbcom = (int) pow(2.0, nbscl);

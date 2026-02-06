@@ -64,21 +64,20 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
         delete kdb->sample;
     kdb->sample = new Sample(*new_sample);
 
-    char* ptr;
-    SWHDL new_handle;
+    Variable* var_ptr;
+    Variable* new_var_ptr;
+    // use iterator to allow modifying k_objs while looping on it
     for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
     {
-        new_handle = (SWHDL) KV_alloc_var(kdb->sample->nb_periods);
-        ptr = SW_getptr(new_handle);
-        if(it->second != 0) 
+        var_ptr = it->second;
+        new_var_ptr = new Variable(kdb->sample->nb_periods, IODE_NAN);
+        if(var_ptr) 
         {
-            if(smpl.nb_periods > 0)
-                memcpy((double *)(P_get_ptr(ptr, 0)) + start2,
-                       kdb->get_var_ptr(it->first, start1),
-                       sizeof(double) * smpl.nb_periods);
-            SW_free(it->second);
+            for(int t = 0; t < smpl.nb_periods; t++)
+                (*new_var_ptr)[start2 + t] = (*var_ptr)[start1 + t];
+            delete var_ptr;
         }
-        it->second = new_handle;
+        it->second = new_var_ptr;
     }
 
     return 0;
@@ -99,8 +98,6 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
  */
 int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
 {
-    int start1, start2, nb1;
-
     if(!kdb1)
     {
         kwarning("Cannot merge into a NULL database");
@@ -136,6 +133,7 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         }
     }
 
+    int start1, start2;
     Sample smpl = kdb1->sample->intersection(*kdb2->sample);
     if(smpl.nb_periods > 0) 
     {
@@ -144,10 +142,10 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
     }
 
     bool found;
-    SWHDL handle_2 = 0;
-    nb1 = kdb1->sample->nb_periods;
-    size_t size = sizeof(double) * smpl.nb_periods;
-    for(const auto& [name, handle] : kdb2->k_objs) 
+    int nb_periods_1 = kdb1->get_nb_periods();
+    int nb_periods_to_copy = smpl.nb_periods;
+    // copy variables from kdb2 to kdb1 (kdb1 <- kdb2)
+    for(const auto& [name, var_ptr] : kdb2->k_objs) 
     {
         found = kdb1->contains(name);
 
@@ -155,19 +153,25 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         if(found && replace == 0)
             continue;
         
+        // if the variable does not exist in kdb1, create it with NaN values
         if(!found)
-            kdb1->set_obj(name, (double*) NULL);
+            kdb1->set_obj_ptr(name, new Variable(nb_periods_1, IODE_NAN));
 
+        // should not happen because we called kdb1->set_obj_ptr() if not found above, 
+        // but we put this check just in case to avoid a crash 
         if(!kdb1->contains(name))
         {
-            kerror(0, "Cannot merge variable %s from the second database into the first one", name.c_str());
+            std::string error_msg = "Cannot merge variable '" + name + "' ";
+            error_msg += "from the second Variables database into the first one.\n";
+            error_manager.append_error(error_msg);
             return -1;
         }
 
-        handle_2 = kdb2->get_handle(name);
-        if(handle_2 > 0)
-            memcpy((double *) kdb1->get_var_ptr(name, start1),
-                   (double *) kdb2->get_var_ptr(name, start2), size);
+        // copy values from kdb2 to kdb1 inside the intersection of the samples
+        Variable* var_ptr_1 = kdb1->get_obj_ptr(name);
+        Variable* var_ptr_2 = kdb2->get_obj_ptr(name);
+        for(int t = 0; t < nb_periods_to_copy; t++)
+            (*var_ptr_1)[start1 + t] = (*var_ptr_2)[start2 + t];
     }
 
     return 0;
@@ -240,8 +244,7 @@ void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
  */
 int KV_add(KDBVariables* kdb, char* varname)
 {
-    int      t, nobs;
-    double   *vptr;
+    int t, nobs;
 
     if(!kdb)
     {
@@ -261,12 +264,12 @@ int KV_add(KDBVariables* kdb, char* varname)
     {
         nobs = kdb->sample->nb_periods;
         // Set IODE_NAN if the new var
-        kdb->set_obj(varname, (double*) NULL);
+        kdb->set_obj_ptr(varname, new Variable(nobs, IODE_NAN));
     }
     else 
     { 
         // Replaces all values by IODE_NAN 
-        vptr = K_vptr(kdb, varname, 0);
+        double* vptr = kdb->get_var_ptr(varname);
         if(vptr == NULL) 
             return -1;
         
@@ -529,7 +532,6 @@ int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
 KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
-    double* eval = NULL, *nval;
     Sample* smpl;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
@@ -557,7 +559,6 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
 
     smpl = edbv->sample;
     nb_per = edbv->sample->nb_periods;
-    eval = (double*) SCR_malloc(nb_per * sizeof(double));
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = new KDBVariables(false);
@@ -566,7 +567,7 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
     
     ndbv->sample = new Sample(*edbv->sample);
 
-    for(const auto& [ename, handle] : edbv->k_objs) 
+    for(const auto& [ename, var_ptr] : edbv->k_objs) 
     {
         res = K_aggr(pattern, (char*) ename.c_str(), c_nname);
         if(res < 0) 
@@ -577,7 +578,7 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            ndbv->set_obj(c_nname, (double*) NULL);
+            ndbv->set_obj_ptr(c_nname, new Variable(nb_per, IODE_NAN));
             npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {
@@ -596,8 +597,8 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
         if(npos < 0) 
             goto done;
 
-        memcpy(eval, edbv->get_var_ptr(ename), nb_per * sizeof(double));
-        nval = ndbv->get_var_ptr(nname);
+        Variable eval = *var_ptr;
+        double* nval = ndbv->get_var_ptr(nname);
         for(int t = 0; t < smpl->nb_periods; t++) 
         {
             if(added) 
@@ -627,12 +628,13 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
 
     if(method == 2) 
     {
-        for(const auto& [name, handle] : ndbv->k_objs) 
+        double* values;
+        for(auto& [name, var_ptr] : ndbv->k_objs) 
         {
-            nval = ndbv->get_var_ptr(name);
+            values = var_ptr->data();
             for(int t = 0; t < smpl->nb_periods; t++)
-                if(IODE_IS_A_NUMBER(nval[t])) 
-                    nval[t] /= times[npos];
+                if(IODE_IS_A_NUMBER(values[t])) 
+                values[t] /= times[npos];
         }
     }
 
@@ -642,7 +644,6 @@ done:
         delete edbv;
         edbv = nullptr;
     }
-    SCR_free(eval);
     SCR_free(times);
     return ndbv;
 }
@@ -659,7 +660,7 @@ done:
 int KV_per_pos(Period* per2)
 {   
     if(!global_ws_var.get()) 
-        return(-1);
+        return -1;
     
     Sample* smpl = global_ws_var->sample;
     int diff = per2->difference(smpl->start_period);
@@ -781,13 +782,13 @@ int KV_set_at_t(char*varname, int t, double val)
 {
     double* var_ptr = global_ws_var->get_var_ptr(varname);
     if(var_ptr == NULL) 
-        return(-1);
+        return -1;
 
     if(t < 0 || global_ws_var->sample->nb_periods < t) 
-        return(-1);
+        return -1;
     
     var_ptr[t] = val;
-    return(0);
+    return 0;
 }
 
 /**
@@ -829,47 +830,22 @@ int KV_set_at_aper(char*varname, char* aper, double val)
     return(KV_set_at_t(varname, t, val));
 }
 
-
-double* KDBVariables::get_obj(const SWHDL handle) const
-{    
-    return (double*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-double* KDBVariables::get_obj(const std::string& name) const
+Variable* KDBVariables::set_obj_ptr(const std::string& name, Variable* var_ptr)
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("IODE Variable with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBVariables::set_obj(const std::string& name, const double* value)
-{
-    char* pack = NULL;
     std::string key = to_key(name);
 
-    if(!this->sample || this->sample->nb_periods == 0)
+    int nb_periods = get_nb_periods();
+    if(var_ptr->size() != nb_periods)
     {
         std::string error_msg = "Cannot set variable object '" + key + "' because ";
-        error_msg += "the variable database has no sample defined";
+        error_msg += "the variable size (" + std::to_string(var_ptr->size()) + ") ";
+        error_msg += "is different from the number of periods in the sample ";
+        error_msg += "(" + std::to_string(nb_periods) + " periods)";
         throw std::runtime_error(error_msg);
     }
 
-    int nb_obs = this->sample->nb_periods;
-    K_vpack(&pack, (double*) value, (int*) &nb_obs);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set variable object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-bool KDBVariables::set_obj(const std::string& name, const Variable& value)
-{
-    return set_obj(name, value.data());
+    Variable* new_var_ptr = KDBTemplate::set_obj_ptr(key, var_ptr);
+    return new_var_ptr;
 }
 
 Variable KDBVariables::get(const std::string& name) const
@@ -894,49 +870,19 @@ Variable KDBVariables::get(const std::string& name) const
 
 bool KDBVariables::add(const std::string& name, const Variable& variable)
 {
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add variable: a variable named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add variable: a variable named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
 	if(!check_sample())
 		throw std::runtime_error("Cannot add Variable '" + name + "'.\nSample is empty");
 
 	check_var_size("add", name, variable);
 
-	int var_size = (int) variable.size();
-	return this->set_obj(name, variable);
+	bool success = KDBTemplate::add(name, variable);
+    return success;
 }
 
 void KDBVariables::update(const std::string& name, const Variable& variable)
 {
-    if(!this->contains(name))
-    {
-        std::string error_msg = "Cannot update Variable '" + name + "'.\n";
-        error_msg += "The Variable does not exist in the database.";
-        throw std::invalid_argument(error_msg);
-    }
-
-	if(!check_sample())
-    {
-        std::string error_msg = "Cannot update Variable '" + name + "'.\n";
-        error_msg += "Sample is empty.";
-		throw std::runtime_error(error_msg);
-    }
-
 	check_var_size("update", name, variable);
-
-	int var_size = (int) variable.size();
-	this->set_obj(name, variable);
+    KDBTemplate::update(name, variable);
 }
 
 double KDBVariables::get_var(const std::string& name, const int t, const IodeVarMode mode) const
@@ -973,7 +919,10 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 
 bool KDBVariables::set_var(const std::string& name, const double* value)
 {
-    return set_obj(name, value);
+    int nb_periods = get_nb_periods();
+    Variable* var_ptr = new Variable(value, value + nb_periods);
+    this->set_obj_ptr(name, var_ptr);
+    return true;
 }
 
 void KDBVariables::set_var(const std::string& name, const int t, const double value, const IodeVarMode mode)
@@ -1210,7 +1159,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	//                the global database is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
 	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling global_ws_var[var_name, 2001] is still 
 	//                possible but will return garbage.
-	if(this->is_shallow_copy_database())
+	if(this->is_subset_database())
 		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
 
 	int res = KV_sample(this, &new_sample);
@@ -1281,6 +1230,26 @@ std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& fr
 		std::string to_ = to.empty() ? sample->end_period.to_string() : to;
 		return Sample(from_, to_).get_list_periods_as_float();
 	}
+}
+
+void KDBVariables::merge_from(const std::string& input_file)
+{
+    // throw an error if the passed filepath is not valid
+    IodeFileType file_type = (IodeFileType) this->k_type;
+    std::string _input_file_ = check_filepath(input_file, file_type, "merge_from", true);
+    
+    KDBVariables from(false);
+    bool success = from.load(_input_file_);
+    if(!success)
+        return;
+
+    if(this->size() == 0) 
+    {
+        this->description = from.description;
+        this->filepath = from.filepath;
+    }
+
+    KV_merge_del(this, &from, 1);
 }
 
 bool KDBVariables::copy_from_file(const std::string& file, const std::string& objs_names, 
@@ -1490,9 +1459,34 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 	}
 }
 
-bool KDBVariables::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBVariables::binary_to_obj(const std::string& name, char* pack)
+{
+    double* values = (double*) P_get_ptr(pack, 0);
+    if(values == NULL) 
+        return false;
+
+    int nb_periods = this->get_nb_periods();
+    Variable* var = new Variable(values, values + nb_periods);
+    this->k_objs[name] = var;
+    return true;
+}
+
+/**
+ * Serializes a Variable object. 
+ * 
+ * @param [out] pack    (char **)   placeholder for the pointer to the packed Variable
+ * @param [in]  name    string      variable name
+ * @return                          true if the serialization succeeded, false otherwise 
+*/
+bool KDBVariables::obj_to_binary(char** pack, const std::string& name)
+{
+    Variable var = this->get(name);
+    bool success = var_to_binary(pack, var);
+    return success;
+}
+
+bool KDBVariables::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     return false;
 }

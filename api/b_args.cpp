@@ -134,10 +134,10 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
             rc = (*fn)(argv[i], client);
         
         if(rc) 
-            return(rc);
+            return rc;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -157,10 +157,10 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
     char    **argv;
     int     rc;
 
-    if((argv = B_ainit_chk(arg, 0L, 0)) == 0) return(-1);
+    if((argv = B_ainit_chk(arg, 0L, 0)) == 0) return -1;
     rc = B_loop(argv, fn, client);
     A_free((unsigned char**) argv);
-    return(rc);
+    return rc;
 }
 
 

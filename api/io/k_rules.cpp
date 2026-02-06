@@ -90,7 +90,7 @@ done:
     if(fd) fclose(fd);
     SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, NULL);
     SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, NULL);
-    return(0);
+    return 0;
 }
 
 /**
@@ -112,7 +112,7 @@ static int IMP_grep(char** rule, char* in)
         rc = SCR_grep(rule[i], in, 0);
         if(rc == 0) return(i);
     }
-    return(-1);
+    return -1;
 }
 
 
@@ -140,7 +140,7 @@ int IMP_change(char** rule, char** pat, char* in, char* out)
         r, i, o, rlen, ilen, idone = 0;
 
     rc = IMP_grep(pat, in);
-    if(rc < 0) return(-1);
+    if(rc < 0) return -1;
 
     rlen = (int)strlen(rule[rc]);
     ilen = (int)strlen(in);
@@ -170,6 +170,6 @@ int IMP_change(char** rule, char** pat, char* in, char* out)
     if(IMP_trace)
         W_printf((char*) "%s -> %s\t(Rule %s)\n", in, out, rule[rc]);
 
-    return(0);
+    return 0;
 }
 

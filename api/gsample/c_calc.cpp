@@ -78,7 +78,7 @@ static int COL_link(int i, CLEC* clec)
     if(!kdbv) 
     {
         kmsg("File [%d] not present", i);
-        return(-1);
+        return -1;
     }
 
     int res = L_link(kdbv, global_ws_scl.get(), clec);
@@ -119,7 +119,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
             goto err;                 
         
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
-            return(-1);
+            return -1;
         
         kdb = (KDBVariables*) global_ref_var[cl->cl_fnb[i] - 1];
 
@@ -245,10 +245,10 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
             goto err;
     }
 
-    return(0);
+    return 0;
 err:
     cl->cl_res = IODE_NAN;
-    return(0);
+    return 0;
 }
 
 
@@ -351,7 +351,7 @@ int COL_exec(Table* tbl, int i, COLS* cls)
         {
             cl = cls->cl_cols + d + (j * T_NC(tbl));
             if(COL_calc(cl, aclec, adclec) < 0) 
-                return(-1);
+                return -1;
             debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 
                              aclec, adclec, i, d, j);
         }
@@ -359,6 +359,6 @@ int COL_exec(Table* tbl, int i, COLS* cls)
         SW_nfree(aclec);
         SW_nfree(adclec);
     }
-    return(0);
+    return 0;
 }
 

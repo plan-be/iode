@@ -5,6 +5,7 @@
 #include "api/k_super.h"
 #include "api/objs/kdb.h"           // KDB
 #include "api/objs/pack.h"
+#include "api/objs/structs_32.h"
 #include "api/objs/identities.h"    // Identity
 #include "api/objs/grep.h"
 
@@ -353,6 +354,19 @@ public:
 
     bool print_definition(int nb_columns) const;
 
+    // legacy method to convert a TableCell object to a TableCell32 object 
+    // to be used when writing to binary files. 
+    TableCell32 convert_64_to_32bits();
+
+    // legacy method to convert a TableCell32 object to a TableCell object 
+    // to be used when loading from binary files. 
+    bool convert_32_to_64bits(const TableCell32& cell32);
+
+    char* to_binary(char *pack, int& p, int i, int j);
+    bool from_binary(char *pack, int& p, int i, int j);
+
+    void sanitize_div(int j);
+
 	bool operator==(const TableCell& other) const
     {	
         if (type != other.type) 
@@ -464,6 +478,14 @@ public:
     {
         this->graph_type = graph_type;
     }
+
+    // legacy method to convert a TableLine object to a TableLine32 object 
+    // to be used when writing to binary files. 
+    TableLine32 convert_64_to_32bits();
+
+    // legacy method to convert a TableLine32 object to a TableLine object 
+    // to be used when loading from binary files. 
+    bool convert_32_to_64bits(const TableLine32& line32); 
 
     bool operator==(const TableLine& other) const
     {
@@ -795,6 +817,14 @@ public:
         return true;
     }
 
+    // legacy method to convert a Table object to a Table32 object 
+    // to be used when writing to binary files. 
+    Table32 convert_64_to_32bits(); 
+
+    // legacy method to convert a Table32 object to a Table object 
+    // to be used when loading from binary files. 
+    bool convert_32_to_64bits(const Table32& table32); 
+
     // -------- EQUAL --------
 
     bool operator==(const Table& other) const
@@ -864,6 +894,8 @@ public:
     }
 };
 
+Table* binary_to_tbl(char* pack);
+
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
 struct std::hash<Table>
@@ -890,20 +922,17 @@ struct KDBTables : public KDBTemplate<Table>
     // copy constructor
     KDBTables(const KDBTables& other): KDBTemplate(other) {}
 
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    Table* get_obj(const SWHDL handle) const override;
-    Table* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const Table* value) override;
-
-    Table* get(const std::string& name) const;
-    bool add(const std::string& name, const Table& obj);
-    void update(const std::string& name, const Table& obj);
-
     std::string get_title(const std::string& name) const;
+
+    bool add(const std::string& name, const Table& tbl) override 
+    { 
+        return KDBTemplate::add(name, tbl); 
+    }
+
+    void update(const std::string& name, const Table& tbl) override
+    {
+        KDBTemplate::update(name, tbl);
+    }
 
     bool add(const std::string& name, const int nb_columns);
 
@@ -949,20 +978,22 @@ struct KDBTables : public KDBTemplate<Table>
     void merge_from(const std::string& input_file) override
     {
         KDBTables from(false);
-        KDB::merge_from(from, input_file);
+        KDBTemplate::merge_from(from, input_file);
     }
 
     bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {
         KDBTables from(false);
-        return KDB::copy_from_file(from, file, objs_names, v_found);
+        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool obj_to_binary(char** pack, const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -975,21 +1006,16 @@ inline std::array<KDBTables*, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-Table* K_tunpack(char*, char* name = NULL);
-Table* K_tptr(KDB* kdb, char* name);
-
 inline std::size_t hash_value(KDBTables const& cpp_kdb)
 {
     if(cpp_kdb.size() == 0)
         return 0;
 
-    Table* table;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, tbl_ptr] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);
-        table = cpp_kdb.get(name);
-        hash_combine<Table>(seed, *table);
+        hash_combine<Table>(seed, *tbl_ptr);
     }
 
     return seed;

@@ -99,11 +99,11 @@ ag:
                 goto ag;
             }
             YY_unread(yy);
-            return(0);
+            return 0;
 
         default :
             YY_unread(yy);
-            return(0);
+            return 0;
     }
 
     return(val);
@@ -203,14 +203,14 @@ int K_read_align(YYFILE* yy)
     keyw = YY_lex(yy);
     switch(keyw) {
         case TABLE_CELL_LEFT :
-            return(0);
+            return 0;
         case TABLE_CELL_CENTER:
             return(1);
         case TABLE_CELL_RIGHT :
             return(2);
         default       :
             YY_unread(yy);
-            return(0);
+            return 0;
     }
 }
 
@@ -250,10 +250,10 @@ int K_wrdef(FILE* fd, YYKEYS* table, int def)
     for(yk = table ; yk->yk_word != 0 ; yk++)
         if(yk->yk_def == def) {
             fprintf(fd, "%s ", yk->yk_word);
-            return(0);
+            return 0;
         }
     fprintf(fd, "/* UNDEFINED */ ");
-    return(0);
+    return 0;
 }
 
 /**

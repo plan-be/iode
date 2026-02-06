@@ -83,7 +83,7 @@ int RP_vseps(char* seps, int unused)
     if(seps == 0 || strlen(seps) == 0) seps = ";, ";
     SCR_free(RP_VSEPS);
     RP_VSEPS = (char*) SCR_stracpy((unsigned char*) seps);
-    return(0);
+    return 0;
 }
 
 
@@ -94,7 +94,7 @@ int RP_repeatstring(char* buf, int unused)   /* JMP 06-06-99 */
     if(strlen(buf) == 0) buf = "_";
     SCR_free(RP_RPTSTR);
     RP_RPTSTR = (char*) SCR_stracpy((unsigned char*) buf);
-    return(0);
+    return 0;
 }
 
 // $repeat <command>
@@ -106,12 +106,12 @@ int RP_repeat(char* buf, int unused)
     int     rc, i, pos1, pos2, maxlg = 0, lg;
 
     rc = RP_expand((char**) &line, buf);
-    if(rc) return(rc);
+    if(rc) return rc;
 
     pos1 = U_pos('"', line); // Position du premier " dans line
     if(pos1 < 0) {
         SCR_free(line);
-        return(-1);
+        return -1;
     }
     pos2 = pos1 + 1 + U_pos('"', line + pos1 + 1); // Position du second " dans line
     line[pos2] = 0; // line + pos1  devient la commande ($repeat "$DatadeleteVar _ _" donne dans line + pos 1 = [$DataDeleteVar _ _] par exemple)
@@ -119,7 +119,7 @@ int RP_repeat(char* buf, int unused)
 
     if(args == NULL) {
         SCR_free(line);
-        return(-1);
+        return -1;
     }
 
     if(RP_RPTSTR == 0) RP_repeatstring("_");
@@ -144,7 +144,7 @@ int RP_repeat(char* buf, int unused)
     RP_free((char*) cmd);
     SCR_free(line); //GB 20/08/2012 solved memory leak
     SCR_free_tbl(args);
-    return(0);
+    return 0;
 }
 
 /** Sub function of RP_onerror() which assigns the 2 global variables RP_RT and RP_PRINT.
@@ -163,7 +163,7 @@ int RP_onerror_1(char* arg)
     else    if(strcmp(arg, "DISPLAY") == 0) RP_PRINT = 2;
     else    if(strcmp(arg, "PRINT")   == 0) RP_PRINT = 1;
     else    if(strcmp(arg, "NOPRINT") == 0) RP_PRINT = 0;
-    return(0);
+    return 0;
 }
 
 int wrapper_RP_onerror_1(char* arg, void* unused)
@@ -212,7 +212,7 @@ int RP_return(char* arg, int unused)
 // Note that there is no action associated with $label: it is only a marker used by $goto.
 int RP_label(char* arg, int unused)
 {
-    return(0);
+    return 0;
 }
 
 
@@ -269,7 +269,7 @@ int RP_goto_label(char *command, char *parm)
 done:
     SW_nfree(line);
     line = 0;
-    return(rc);
+    return rc;
 }
 
 
@@ -307,7 +307,7 @@ int RP_goto(char* arg, int unused)
     }
 
     SCR_free_tbl(args);
-    return(rc);
+    return rc;
 }
 
 
@@ -319,25 +319,25 @@ int RP_message(char* arg, int unused)
 {
     char    fmt[2048];
 
-    if(arg == NULL || arg[0] == 0) return(0);
+    if(arg == NULL || arg[0] == 0) return 0;
 
     //kmsg("%.80s", arg);
 
     sprintf(fmt, "%%.%ds", SCR_PAGE_SIZE[1]-20);   /* JMP 17-03-11 */
     kmsg(fmt, arg); // JMP 4/02/09                 /* JMP 17-03-11 */
     /*    SCR_beep();    /* JMP 17-12-93 */
-    return(0);
+    return 0;
 }
 
 
 // $msg text
 int RP_warning(char* arg, int unused)            
 {
-    if(arg == NULL || arg[0] == 0) return(0); /* JMP 11-07-96 */
+    if(arg == NULL || arg[0] == 0) return 0; /* JMP 11-07-96 */
 
     if(strlen(arg) > 512) arg[512] = 0;
     kwarning("%s", arg); 
-    return(0);
+    return 0;
 }
 
 // $silent {0|1|n|N|Y|y}
@@ -357,14 +357,14 @@ int RP_silent(char* arg, int unused)
             kmsg_toggle(0);
             break;
     }
-    return(0);
+    return 0;
 }
 
 // $beep
 int RP_beep(char* arg, int unused)
 {
     kbeep();
-    return(0);
+    return 0;
 }
 
 // $ask <label> <question>
@@ -374,11 +374,11 @@ int RP_ask(char* arg, int unused)
     U_ch    name[31];
 
     lg = B_get_arg0((char*) name, arg, 30);
-    //if(SCR_confirme(arg + lg + 1) != 0) return(0); /* rep. NON -> ligne suivante */
-    if(kconfirm(arg + lg + 1) != 0) return(0);       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
+    //if(SCR_confirme(arg + lg + 1) != 0) return 0; /* rep. NON -> ligne suivante */
+    if(kconfirm(arg + lg + 1) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
     if(RP_goto_label("label", (char*) name) != 0) return(-3);
-    return(0);
+    return 0;
 }
 
 // #prompt <macro_name> <question>
@@ -415,7 +415,7 @@ int RP_setdebug(char* arg, int unused)
             RP_DEBUG = 1;
             break;
     }
-    return(0);
+    return 0;
 }
 
 // $indent {0|n|N|1}
@@ -435,7 +435,7 @@ int RP_setindent(char* arg, int unused)
             RP_ALLOW_INDENT = 1;
             break;
     }
-    return(0);
+    return 0;
 }
 
 // $multiline {0|n|N|1} 
@@ -455,7 +455,7 @@ int RP_setmultiline(char* arg, int unused)
             RP_ALLOW_MULTILINE = 1;
             break;
     }
-    return(0);
+    return 0;
 }
 
 // $noparsing [0|n|N|1]
@@ -476,7 +476,7 @@ int RP_noparsing(char* arg, int unused)
             break;
     }
 
-    return(0);
+    return 0;
 }
 
 // Report argument management
@@ -493,7 +493,7 @@ int RP_shift_args(char* arg, int unused)
     if(arg[0]) incr = atoi(arg);
 
     RP_ARG0 += incr;
-    return(0);
+    return 0;
 }
 
 
@@ -513,7 +513,7 @@ int RP_chdir(char* arg, int unused)
 
     //ODE_settitle();
     ksettitle();     // JMP 10/12/2021
-    return(rc);
+    return rc;
 }
 
 // $rmdir <dirname>
@@ -545,7 +545,7 @@ int RP_settime(char* arg, int unused)
     {
         std::string error_msg = "SetTime " + std::string(arg) + ": invalid syntax";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     RP_PER = *rp_per;
@@ -564,7 +564,7 @@ int RP_incrtime(char* arg, int unused)
 
     Period per = RP_PER.shift(incr);
     RP_PER = per;
-    return(0);
+    return 0;
 }
 
 
@@ -588,7 +588,7 @@ int B_Sleep(char* arg, int unused)
 {
     int ms = atoi(arg);
     SCR_sleep(ms);
-    return(0);
+    return 0;
 }
 
 // $graphdefault {l|L|s|S|b|B} 
@@ -613,7 +613,7 @@ int B_GraphDefault(char* type, int unused)
             break;
         default  :
             error_manager.append_error("Invalid GraphDefault option (Line, Scatter, Bar)");
-            return(-1);
+            return -1;
     }
-    return(0);
+    return 0;
 }

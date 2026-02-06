@@ -2,97 +2,78 @@
 #include "api/objs/comments.h"
 
 
-char* KDBComments::get_obj(const SWHDL handle) const
-{    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-char* KDBComments::get_obj(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("comment with name '" + name + "' not found.");
-    
-    return get_obj(handle);
-}
-
-bool KDBComments::set_obj(const std::string& name, const char* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_cpack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set comment object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-bool KDBComments::set_obj(const std::string& name, const std::string& value)
-{
-    return set_obj(name, value.c_str());
-}
-
 Comment KDBComments::get(const std::string& name) const
 {
-    std::string oem_comment = std::string(this->get_obj(name));
+    std::string oem_comment = KDBTemplate::get(name);
     return oem_to_utf8(oem_comment);
 }
 
 bool KDBComments::add(const std::string& name, const Comment& comment)
 {
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add comment: a comment named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add comment: a comment named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
     std::string oem_comment = utf8_to_oem(comment);
-    return this->set_obj(name, oem_comment);
+    KDBTemplate::add(name, oem_comment);
+    return true;
 }
 
 void KDBComments::update(const std::string& name, const Comment& comment)
 {
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update comment: no comment named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-    
-    std::string oem_comment = utf8_to_oem(comment);
-    this->set_obj(name, oem_comment);
+    Comment oem_comment = utf8_to_oem(comment);
+    KDBTemplate::update(name, oem_comment);
 }
 
-bool KDBComments::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBComments::binary_to_obj(const std::string& name, char* pack)
+{
+    size_t len = (size_t) P_get_len(pack, 0);
+    char* value = new char[len];
+    strncpy(value, (char*) P_get_ptr(pack, 0), len);
+
+    Comment* comment = new Comment(value);
+    this->k_objs[name] = comment;
+    return true;
+}
+
+/**
+ * Serializes a comment object. 
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @param [in]  a1      string      comment name
+ * @return                          true if the serialization succeeded, false otherwise
+ */
+bool KDBComments::obj_to_binary(char** pack, const std::string& name)
+{
+    Comment* comment = this->get_obj_ptr(name);
+    char* c_cmt = (char*) comment->c_str();
+
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, c_cmt, (int) strlen(c_cmt) + 1);
+
+    return true;
+}
+
+bool KDBComments::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
-    if(texts) 
-        found = wrap_grep_gnl(pattern, this->get_obj(handle), ecase, all);
+    if(texts)
+    {
+        Comment* comment = this->get_obj_ptr(name);
+        found = wrap_grep_gnl(pattern, *comment, ecase, all);
+    }
     return found;
 }
 
 char* KDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = this->get_obj(name);
-    return obj;
+    Comment* comment = this->get_obj_ptr(name);
+    char* c_cmt = (char*) comment->c_str();
+    return c_cmt;
 }
 
 bool KDBComments::print_obj_def(const std::string& name)
 {
-    bool success = print_definition_generic(name, this->get_obj(name));
+    Comment* comment = this->get_obj_ptr(name);
+    char* c_cmt = (char*) comment->c_str();
+    bool success = print_definition_generic(name, c_cmt);
     return success;
 }
 

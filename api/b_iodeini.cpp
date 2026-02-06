@@ -88,7 +88,7 @@ int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft)
                         (unsigned char*) parm, (unsigned char*) res, maxlen);
     if(rc < 0) 
         strcpy(res, dft);
-    return(rc);
+    return rc;
 }
 
 

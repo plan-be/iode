@@ -29,9 +29,8 @@
  */
 static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
 {
-    int     keyw;
-    char    *cmt;
-    bool    success;
+    int keyw;
+    char* cmt;
 
     /* READ A STRING */
     keyw = YY_lex(yy);
@@ -52,16 +51,20 @@ static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set_obj(name, cmt);
-    if(!success) 
+    try
+    {
+        Comment* cmt_obj = new Comment(cmt);
+        kdb->set_obj_ptr(name, cmt_obj);
+    }
+    catch(const std::exception&)
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(cmt);
-        return(-1);
+        return -1;
     }
 
     SW_nfree(cmt);
-    return(0);
+    return 0;
 }
 
 /**
@@ -158,35 +161,46 @@ bool KDBComments::load_asc(const std::string& filename)
  */
 bool KDBComments::save_asc(const std::string& filename)
 {
-    FILE    *fd;
-    CMT     cmt;
+    FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         }
     }
 
-    for(auto& [name, handle] : k_objs) 
+    Comment cmt;
+    bool success = true;
+    for(auto& [name, cmt_ptr] : k_objs) 
     {
-        fprintf(fd, "%s ", (char*) name.c_str());
-        cmt = this->get_obj(handle);
-        SCR_replace((unsigned char*) cmt, (unsigned char*) "\n", (unsigned char*) " ");  /* JMP 31-10-96 */
-        SCR_fprintf_esc(fd, cmt, 1);
-        fprintf(fd, "\n");
+        try
+        {
+            fprintf(fd, "%s ", (char*) name.c_str());
+            cmt = Comment(*cmt_ptr);
+            std::replace(cmt.begin(), cmt.end(), '\n', ' ');
+            SCR_fprintf_esc(fd, (char*) cmt.c_str(), 1);
+            fprintf(fd, "\n");
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }

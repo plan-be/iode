@@ -29,7 +29,7 @@ from pyiode.iode_database.cpp_api_database cimport BinaryOperation as CBinaryOpe
 from pyiode.iode_database.cpp_api_database cimport _c_operation_scalar, _c_operation_one_var, _c_operation_one_period
 from pyiode.iode_database.cpp_api_database cimport _c_operation_between_two_vars
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport K_CMP_EPS
+from pyiode.iode_database.cpp_api_database cimport K_COMPARE_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
 from pyiode.iode_database.cpp_api_database cimport KDBVariables
 from pyiode.iode_database.cpp_api_database cimport KDBVariables as CppKDBVariables
@@ -525,7 +525,7 @@ cdef class Variables(CythonIodeDatabase):
             cpp_global_variables.get().set_sample(from_period.encode(), to_period.encode())
 
     def get_threshold(self) -> float:
-        return K_CMP_EPS
+        return K_COMPARE_EPS
 
     def set_threshold(self, value: float) -> bool:
         res = B_DataCompareEps(str(value).encode())

@@ -83,33 +83,38 @@ int B_season(char* arg)
     for(int i = 0; i < nb; i++) 
         c_vec[i] = i_vec[i] = IODE_NAN;
 
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
-        beg = 0;   /* GB 23/07/98 */
-        dim = nb;  /* GB 23/07/98 */
+        beg = 0;
+        dim = nb;
         for(int j = 0; j < nb; j++) 
             c_vec[j] = i_vec[j] = IODE_NAN;
-        memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
+        memcpy(t_vec, from_var_ptr->data() + shift, nb * sizeof(double));
 
         res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
         if(!res) 
         {
+            Variable* var_ptr = new Variable(t_vec, t_vec + nb);
             memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
-            to->set_obj(from_name, t_vec);
+            to->set_obj_ptr(from_name, var_ptr);
             continue;
         }
 
         DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        to->set_obj(from_name, t_vec);
+        Variable* var_ptr = new Variable(t_vec, t_vec + nb);
+        to->set_obj_ptr(from_name, var_ptr);
 
+        Variable* c_var_ptr = new Variable(c_vec, c_vec + nb);
         sprintf(name, "_C%s", from_name.c_str());
-        to->set_obj(name, c_vec);
+        to->set_obj_ptr(name, c_var_ptr);
 
+        Variable* i_var_ptr = new Variable(i_vec, i_vec + nb);
         sprintf(name, "_I%s", from_name.c_str());
-        to->set_obj(name, i_vec);
+        to->set_obj_ptr(name, i_var_ptr);
     }
+    
     KV_merge(global_ws_var.get(), to, 1);
     rc = 0;
 
@@ -130,9 +135,9 @@ done:
     SW_nfree(i_vec);
 
     if(rc < 0) 
-        return(-1);
+        return -1;
     else 
-        return(0);
+        return 0;
 }
 
 
@@ -178,7 +183,7 @@ int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift)
     }
 
     if(fabs(maxti - minti) > SEASON_EPS) rc = 1; /* seasonal */
-    return(rc);
+    return rc;
 }
 
 int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbper, double shift)
@@ -432,7 +437,7 @@ int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbpe
     SW_nfree(ma);
     SW_nfree(ma7);
 
-    return(0);
+    return 0;
 }
 
 int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
@@ -447,12 +452,12 @@ int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
     if(nbper <= 0) 
     {
         error_manager.append_error("Set periodicity first");
-        return(-1);
+        return -1;
     }
 
     if(nbper != 12 && nbper !=4) {
         error_manager.append_error("Only Monthly and Quarterly series can be seasonally adjusted");
-        return(-1);
+        return -1;
     }
 
     try
@@ -479,7 +484,7 @@ int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
     catch(const std::exception& e)
     {
         error_manager.append_error(e.what());
-        return(-1);
+        return -1;
     }
 
     return(nbper);
@@ -496,6 +501,6 @@ int DS_extr(double* vec, int dim, int nbper, double* bi, double shift)
         vec[i]= 100.0 * vec[i]/bi[m];
         vec[i] -= shift;
     }
-    return(0);
+    return 0;
 }
 

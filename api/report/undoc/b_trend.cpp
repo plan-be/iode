@@ -107,12 +107,12 @@ static int B_WsTrendAll(char* arg, int std)
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
-        memcpy(f_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
+        memcpy(f_vec, from_var_ptr->data() + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
-        HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std); //  JMP 12/4/2019
-        to->set_obj(from_name, t_vec);
+        HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std);
+        to->set_obj_ptr(from_name, new Variable(t_vec, t_vec + nb));
     }
 
     KV_merge(global_ws_var.get(), to, 1);
@@ -133,9 +133,9 @@ done:
     SW_nfree(f_vec);
 
     if(rc < 0) 
-        return(-1);
+        return -1;
     else 
-        return(0);
+        return 0;
 }
 
 

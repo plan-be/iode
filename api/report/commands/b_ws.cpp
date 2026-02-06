@@ -334,7 +334,7 @@ int B_WsClearAll(char* arg, int unused)
     int i;
 
     for(i = COMMENTS; i <= VARIABLES; i++) B_WsClear("", i);
-    return(0);
+    return 0;
 }
 
 
@@ -609,7 +609,7 @@ int B_WsAggr(int method, char* arg)
 done:
     SCR_free(pattern);
     SCR_free_tbl((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -621,7 +621,7 @@ int B_WsAggrChar(char* arg, int unused)
 {
     if(arg == NULL || arg[0] == 0) K_AggrChar = ' ';
     else K_AggrChar = arg[0];
-    return(0);
+    return 0;
 }
 
 
@@ -724,7 +724,7 @@ int B_StatUnitRoot(char* arg, int unused)
     if(df) rc = 0;
 
     SCR_free(df);
-    return(rc);
+    return rc;
 }
 
 
@@ -829,9 +829,9 @@ int B_CsvNbDec(char *nbdec, int unused)
     if(KDBVariables::CSV_NBDEC > 99 || (KDBVariables::CSV_NBDEC < 0 && KDBVariables::CSV_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
         KDBVariables::CSV_NBDEC = 10;
-        return(-1);
+        return -1;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -844,7 +844,7 @@ int B_CsvSep(char *sep, int unused)
 {
     SCR_free(KDBVariables::CSV_SEP);
     KDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
-    return(0);
+    return 0;
 }
 
 
@@ -857,7 +857,7 @@ int B_CsvNaN(char *nan, int unused)
 {
     SCR_free(KDBVariables::CSV_NAN);
     KDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
-    return(0);
+    return 0;
 }
 
 /**
@@ -871,7 +871,7 @@ int B_CsvAxes(char *var, int unused)
 {
     SCR_free(KDBVariables::CSV_AXES);
     KDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
-    return(0);
+    return 0;
 }
 
 /**
@@ -885,7 +885,7 @@ int B_CsvDec(char *dec, int unused)
 {
     SCR_free(KDBVariables::CSV_DEC);
     KDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
-    return(0);
+    return 0;
 }
 
 /* =========== Fin CSV ============= */

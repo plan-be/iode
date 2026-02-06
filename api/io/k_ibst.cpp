@@ -38,21 +38,21 @@ int ImportObjsBST::read_header(YYFILE* yy, Sample* smpl)
     if(BST_nbper < 0) 
     {
         kerror(0, "Please specify FROM and TO period");
-        return(-1);
+        return -1;
     }
 
-    if(YY_lex(yy) != DIF_TABLE) return(-1);
+    if(YY_lex(yy) != DIF_TABLE) return -1;
 
-    if(dif_skip_to(yy, DIF_VECTORS) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_VECTORS) < 0) return -1;
     if(dif_read_cell(yy, NULL, &value) < 0) return(-1) ;
 
-    if(dif_skip_to(yy, DIF_TUPLES) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_TUPLES) < 0) return -1;
     if(dif_read_cell(yy, NULL, &value) < 0)  return(-1) ;
 
-    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_BOT) < 0) return -1;
 
     memcpy(&BST_smpl, smpl, sizeof(Sample));
-    return(0);
+    return 0;
 }
 
 int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, double* vector)
@@ -62,10 +62,10 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     double  value, status;
 
     while(1) {
-        if(dif_read_cell(yy, &str, NULL) < 0) return(-1);
+        if(dif_read_cell(yy, &str, NULL) < 0) return -1;
         SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
 
-        if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
+        if(dif_read_cell(yy, NULL, &value) < 0) return -1;
         nbper = (long)floor(value);
         if(nbper != BST_nbper) {
             dif_skip_to(yy, DIF_BOT);
@@ -74,9 +74,9 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
         else break;
     }
 
-    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return -1;
     y = (long) floor(value);
-    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return -1;
     s = (long)floor(value);
     sprintf(buf, "%ld%c%ld", y, BST_freq, s);
     Period* per = new Period(std::string(buf));
@@ -84,13 +84,13 @@ int ImportObjsBST::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     delete per;
     per = nullptr;
 
-    if(dif_read_cell(yy, NULL, &value) < 0) return(-1);
-    if(dif_read_cell(yy, NULL, &status) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &value) < 0) return -1;
+    if(dif_read_cell(yy, NULL, &status) < 0) return -1;
     if(status < 2) *vector = IODE_NAN;
     else *vector = value;
 
     dif_skip_to(yy, DIF_BOT);
-    return(0);
+    return 0;
 }
 
 /* Cmt */
@@ -161,13 +161,13 @@ int ImportCommentsBST::sub_read_header(int lang)
     int     lrub;
 
     if(dif_skip_to(SYY, DIF_BOT) < 0) 
-        return(-1);
+        return -1;
 
     if(dif_skip_to(FYY, DIF_BOT) < 0) 
-        return(-1);
+        return -1;
 
     if(dif_skip_to(RYY, DIF_BOT) < 0) 
-        return(-1);
+        return -1;
 
     KDBComments* c_kdb = global_ws_cmt.get();
 
@@ -200,7 +200,7 @@ int ImportCommentsBST::sub_read_header(int lang)
                 sprintf(name, "C%ld_%ld", rub, niv);
                 break;
             default :
-                return(-1);
+                return -1;
         }
 
         switch(lang) 
@@ -218,8 +218,25 @@ int ImportCommentsBST::sub_read_header(int lang)
 
         if(ftr) cmt = add_ftr(cmt, rub, lang);
 
-        if(cmt && !c_kdb->set_obj(name, cmt)) 
-            return(-1);
+        if(cmt)
+        {
+            try
+            {
+                Comment* cmt_ptr = new Comment(cmt);
+                c_kdb->set_obj_ptr(name, cmt_ptr);
+            }
+            catch(const std::exception& e)
+            {
+                std::string error_msg = "Unable to read comment with name ";
+                error_msg += "'" + std::string(name) + "'\n" + std::string(e.what());
+                kwarning(error_msg.c_str());
+
+                SW_nfree(fc);
+                SW_nfree(nc);
+                SW_nfree(cmt);
+                return -1;
+            }
+        }
 
         SW_nfree(fc);
         SW_nfree(nc);
@@ -227,7 +244,7 @@ int ImportCommentsBST::sub_read_header(int lang)
     }
 
     YY_close(RYY);
-    return(0);
+    return 0;
 }
 
 int ImportCommentsBST::read_header(ImportCmtFromFile* impdef, char* file, int lang)
@@ -239,25 +256,25 @@ int ImportCommentsBST::read_header(ImportCmtFromFile* impdef, char* file, int la
 
     if(FYY == 0 || RYY == 0 || SYY == 0) {
         kerror(0,"Cannot open '%s'", file);
-        return(-1);
+        return -1;
     }
 
     if(sub_read_header(lang) < 0) {
         close();
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int ImportCommentsBST::DIF_long(YYFILE* yy, long* l_val)
 {
     double  d_val;
 
-    if(dif_read_cell(yy, NULL, &d_val) < 0) return(-1);
+    if(dif_read_cell(yy, NULL, &d_val) < 0) return -1;
 
     *l_val = (long)floor(d_val);
-    return(0);
+    return 0;
 }
 
 int ImportCommentsBST::read_comment(char* name, char** cmt)
@@ -272,12 +289,12 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
     name[0] = '0';
     while(name[0] == '0') 
     {
-        if(DIF_long(SYY, &dom) < 0) return(-1);
-        if(DIF_long(SYY, &tbl) < 0) return(-1);
-        if(DIF_long(SYY, &as1) < 0) return(-1);
-        if(DIF_long(SYY, &as2) < 0) return(-1);
+        if(DIF_long(SYY, &dom) < 0) return -1;
+        if(DIF_long(SYY, &tbl) < 0) return -1;
+        if(DIF_long(SYY, &as1) < 0) return -1;
+        if(DIF_long(SYY, &as2) < 0) return -1;
 
-        if(dif_read_cell(SYY, &str, NULL) < 0) return(-1);
+        if(dif_read_cell(SYY, &str, NULL) < 0) return -1;
         strcpy(name, str);
         SW_nfree(str);
         dif_skip_to(SYY, DIF_BOT);
@@ -287,7 +304,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
     char* name1 = (char*) C_kdb->get_name(as1).c_str();
     niv = get_niv(name1);
     if(niv < 1 || niv > 9) 
-        return(-1);
+        return -1;
 
     shift = niv;
     while(niv > 0 && as1 >= 0) 
@@ -295,7 +312,8 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         r_niv = get_niv(name1);
         if(niv == r_niv) 
         {
-            str = K_optr0(C_kdb, name);
+            Comment* cmt_ptr = C_kdb->get_obj_ptr(name);
+            str = (char*) cmt_ptr->c_str();
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
             niv --;
@@ -312,7 +330,8 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
             r_niv = get_niv(name2);
             if(niv == r_niv) 
             {
-                str = K_optr0(C_kdb, name2);
+                Comment* cmt_ptr = C_kdb->get_obj_ptr(name2);
+                str = (char*) cmt_ptr->c_str();
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;
             }
@@ -328,7 +347,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         p_cmt[i] = NULL;
     }
 
-    return(0);
+    return 0;
 }
 
 int ImportCommentsBST::get_niv(char* name)
@@ -350,5 +369,5 @@ int ImportCommentsBST::close()
     delete C_kdb;
     YY_close(SYY);
     YY_close(FYY);
-    return(0);
+    return 0;
 }

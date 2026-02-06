@@ -82,7 +82,7 @@ static int L_bracket(double* x1, double* x2, int t)
     int     i;
     double  f1, f2, ox1 = *x1, ox2 = *x2;
 
-    if(*x1 == *x2) return(-1);
+    if(*x1 == *x2) return -1;
 
     *x1 = ox1 * 0.5;
     *x2 = ox1 * 1.5;
@@ -91,7 +91,7 @@ static int L_bracket(double* x1, double* x2, int t)
     f2 = L_fx(*x2, t);
 
     for(i = 0; i < LN_MAXIT; i++) {
-        if(f1 * f2 < 0.0) return(0);
+        if(f1 * f2 < 0.0) return 0;
 
         if(fabs(f1) < fabs(f2))
             f1 = L_fx(*x1 += LN_FACTOR*(*x1 - *x2), t);
@@ -99,7 +99,7 @@ static int L_bracket(double* x1, double* x2, int t)
             f2 = L_fx(*x2 += LN_FACTOR*(*x2 - *x1), t);
     }
 
-    return(-1);
+    return -1;
 }
 
 

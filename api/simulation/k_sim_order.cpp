@@ -51,7 +51,7 @@ int CSimulation::KE_add_post(int** successors, int i, int pos)
     successors[pos][0]  = nb;
     successors[pos][nb] = i;
 
-    return(0);
+    return 0;
 }
 
 
@@ -161,7 +161,7 @@ int CSimulation::KE_postorder(KDBEquations* dbe, int** predecessors, int** succe
     SW_nfree(successors);
     SW_nfree(KSIM_ORDERED);
 
-    return(0);
+    return 0;
 }
 
 
@@ -199,9 +199,9 @@ int CSimulation::KE_preorder(KDBEquations* dbe, int** predecessors, int** succes
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
     int i = 0;
-    for(const auto& [name, handle] : dbe->k_objs) 
+    for(const auto& [name, eq] : dbe->k_objs) 
     {
-        clec = KECLEC(dbe, name);
+        clec = eq->clec;
         predecessors[i] = (int *) SW_nalloc(sizeof(int) * (clec->nb_names + 1)); // alloue (nb names + 1) long
 
         /* LOG ALL NB AND POS OF ENDO VARS */
@@ -227,7 +227,7 @@ int CSimulation::KE_preorder(KDBEquations* dbe, int** predecessors, int** succes
         i++;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -347,7 +347,7 @@ void CSimulation::KE_order(KDBEquations* dbe, char** eqs)
  */
 int CSimulation::KE_poseq(int posendo)
 {
-    if(posendo < 0) return(-1);
+    if(posendo < 0) return -1;
     if(posendo < KSIM_MAXDEPTH && KSIM_POSXK[posendo] == posendo) return(posendo);
 
     // Recherche l'eq avec pour endogène posendo ie i tq posendo = KSIM_POSXK[i]
@@ -373,7 +373,7 @@ int CSimulation::KE_tri_begin(KDBEquations* dbe)
     for(i = 0 ; i < KSIM_INTER ; i++)
         KSIM_PERM[KSIM_ORDER[KSIM_PRE + i]] = i;
 
-    return(0);
+    return 0;
 }
 
 
@@ -394,7 +394,7 @@ int CSimulation::KE_tri_end(KDBEquations* dbe)
             KSIM_ORDER[KSIM_PRE + KSIM_PERM[i]] = i;
 
     SW_nfree(KSIM_PERM);
-    return(0);
+    return 0;
 }
 
 

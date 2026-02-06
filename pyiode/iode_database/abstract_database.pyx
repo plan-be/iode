@@ -36,7 +36,7 @@ cdef class CythonIodeDatabase:
         return self.abstract_db_ptr.is_global_database()
 
     def get_is_detached(self) -> bool:
-        return self.abstract_db_ptr.is_local_database()
+        return self.abstract_db_ptr.is_detached_database()
 
     def get_iode_type(self) -> IodeType:
         int_iode_type: int = self.abstract_db_ptr.get_iode_type()

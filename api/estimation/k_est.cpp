@@ -45,11 +45,11 @@
 void Estimation::E_savescl(double val, int eqnb, char*txt)  
 {
     char buf[40];
-    Scalar scl(0.9, 1.0, IODE_NAN);
+    Scalar* scl = new Scalar(0.9, 1.0, IODE_NAN);
 
-    scl.value = val;
+    scl->value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
-    global_ws_scl->set_obj(buf, &scl);
+    global_ws_scl->set_obj_ptr(buf, scl);
 }
 
 /**
@@ -143,38 +143,40 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     if (i_method >= 0 && i_method < IODE_NB_EQ_METHODS)
         method = (IodeEquationMethod) i_method;
 
-    Equation* eq;
-    if(!E_DBE->contains(name)) 
+    try
     {
-        std::string comment = "";
-        std::string instruments = "";
-        std::string block = endo;
-        Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
-        Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
-        eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
-                          comment, instruments, block, true);
+        Equation* eq;
+        if(!E_DBE->contains(name)) 
+        {
+            std::string comment = "";
+            std::string instruments = "";
+            std::string block = endo;
+            Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
+            Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
+            eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+                              comment, instruments, block, true);
+            eq->update_date();
+            memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));
+            E_DBE->set_obj_ptr(name, eq);
+        }
+        else
+        {
+            eq = E_DBE->get_obj_ptr(name);
+            eq->sample = (smpl != nullptr) ? *smpl : Sample();
+            eq->set_lec(lec);
+            eq->set_method(method);
+            eq->update_date();
+            memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
+        }
+        return 0;
     }
-    else
+    catch(const std::exception& e)
     {
-        eq = E_DBE->get_obj(name);
-        eq->sample = (smpl != nullptr) ? *smpl : Sample();
-        eq->set_lec(lec);
-        eq->set_method(method);
-        eq->update_date();
-    }
-
-    memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
-
-    bool success = E_DBE->set_obj(name, eq);
-    delete eq;
-    eq = nullptr;
-    if(!success) 
-    {
-        error_manager.append_error(std::string(L_error()));
+        std::string error_msg = "Error while saving estimation results for equation ";
+        error_msg += "'" + endo + "':\n" + std::string(e.what());
+        error_manager.append_error(error_msg);
         return -1;
     }
-
-    return 0;
 }
 
 /**
@@ -222,7 +224,7 @@ int Estimation::KE_est_s(Sample* smpl)
             goto err;
         }
 
-        eq = E_DBE->get_obj(endo);
+        eq = E_DBE->get_obj_ptr(endo);
 
         if(est_method < 0) 
             E_MET = eq->method;
@@ -280,7 +282,7 @@ int Estimation::KE_est_s(Sample* smpl)
                     goto err;
                 }
 
-                _lec = global_ws_eqs->get_obj(eq_name)->lec;
+                _lec = global_ws_eqs->get_obj_ptr(eq_name)->lec;
                 SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
                 SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
             }
@@ -288,8 +290,6 @@ int Estimation::KE_est_s(Sample* smpl)
 
         SCR_add_ptr(&lecs, &nbl, 0L);
         SCR_add_ptr(&endos, &nbe, 0L);
-
-        if(eq) delete eq;
         eq = nullptr;
 
         error = E_est((char**) endos, (char**) lecs, (char**) instrs);
@@ -315,9 +315,8 @@ int Estimation::KE_est_s(Sample* smpl)
                 eq_name = std::string((char*) endos[j]);
                 KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
-                eq = E_DBE->get_obj(eq_name);
+                eq = E_DBE->get_obj_ptr(eq_name);
                 E_tests2scl(eq, j, E_T, E_NCE);
-                if(eq) delete eq;
                 eq = nullptr;
                 // create the Variables containing the fitted, observed and residual values
                 E_savevar("_YCALC", j, E_RHS);   /* JMP 27-09-96 */
@@ -335,15 +334,15 @@ int Estimation::KE_est_s(Sample* smpl)
         estimated_eqs.clear();
 
         if(error != 0) 
-            return(-1);
+            return -1;
     }
 
-    return(0);
+    return 0;
 
 err :
     SCR_free_tbl(blk);
     lecs = endos = instrs = blk = NULL;
     nbl = nbe = 0;
     estimated_eqs.clear();
-    return(-1);
+    return -1;
 }

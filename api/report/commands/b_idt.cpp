@@ -57,7 +57,7 @@ int B_IdtExecute(char* arg, int unused)
     {
         std::string error_msg = "IdtExecute: wrong sample\n" + std::string(e.what());
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     idts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
@@ -161,7 +161,7 @@ int B_IdtExecuteVarFiles(char* arg, int unused)
 {
     SCR_free_tbl((unsigned char**) KEXEC_VFILES);
     KEXEC_VFILES = B_ainit_chk(arg, NULL, 0);
-    return(0);
+    return 0;
 }
 
 
@@ -182,7 +182,7 @@ int B_IdtExecuteSclFiles(char* arg, int unused)
 {
     SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = B_ainit_chk(arg, NULL, 0);
-    return(0);
+    return 0;
 }
 
 
@@ -203,5 +203,5 @@ int B_IdtExecuteSclFiles(char* arg, int unused)
 int B_IdtExecuteTrace(char* arg, int unused)
 {
     KEXEC_TRACE = (SCR_upper_char(arg[0]) == 'Y') ? 1 : 0;  /* JMP 19-12-97 */
-    return(0);
+    return 0;
 }

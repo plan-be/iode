@@ -191,7 +191,7 @@ int W_dest(char *filename, int type)
 
     W_type = type;
     W_InitParms();
-    return(0);
+    return 0;
 }
 
 
@@ -253,7 +253,7 @@ static int W_InitParms()
         break;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -276,7 +276,7 @@ static int W_open()
     int ask;
 
     if(W_af) 
-        return(0);
+        return 0;
     
     if(W_filename[0] == 0 && W_type > 1 && W_type < W_DISP) 
         return(1);
@@ -312,10 +312,10 @@ static int W_open()
         if(W_type == W_GDI) 
             W_ResetPrinterSettings();
         W_cancel = 1;
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -340,7 +340,7 @@ int W_close()
     if(W_type == W_GDI) 
         W_ResetPrinterSettings();
     
-    return(0);
+    return 0;
 }
 
 
@@ -355,10 +355,10 @@ int W_close()
 int W_flush()
 {
     if(W_af == 0) 
-        return(-1);
+        return -1;
     
     A2mMemFlush(W_af);
-    return(0);
+    return 0;
 }
 
 
@@ -413,7 +413,7 @@ int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args)
     A2mMemRecord(W_af, (unsigned char*) buf);
 
 fin:
-    return(rc);
+    return rc;
 }
 
 
@@ -435,7 +435,7 @@ int W_printf(char* fmt, ...)
     rc = W_printfEx(0, 0, 0, fmt, myargs);
     va_end(myargs);
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -456,7 +456,7 @@ int W_printfDbl(char* fmt, ...)
     rc = W_printfEx(1, 0, 0, fmt, myargs);
     va_end(myargs);
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -477,7 +477,7 @@ int W_printfRepl(char* fmt, ...)
     rc = W_printfEx(0, '&', A2M_SEPCH, fmt, myargs);
     va_end(myargs);
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -498,7 +498,7 @@ int W_printfReplEsc(char* fmt, ...)
     rc = W_printfEx(0, '~', A2M_ESCCH, fmt, myargs);
     va_end(myargs);
 
-    return(rc);
+    return rc;
 }
 
 
@@ -528,7 +528,7 @@ static int W_isempty(char* buf)
 
     for(i = 0; buf[i]; i++) 
         if(!U_is_in(buf[i], " \t\n\r")) 
-            return(0);
+            return 0;
 
     return(1);
 }
@@ -544,17 +544,17 @@ static int W_isempty(char* buf)
 int W_record(char *str)
 {
     if(W_cancel) 
-        return(0);
+        return 0;
     
     if(W_cont == 0 && W_isempty(str)) 
-        return(0);
+        return 0;
     
     if(W_open()) 
-        return(-1);
+        return -1;
 
     W_cont = 1;
     A2mMemRecord(W_af, (unsigned char*) str);
-    return(0);
+    return 0;
 }
 
 
@@ -592,7 +592,7 @@ int W_InitDisplay()
     tpath[0] = 0; // !!!!!!!!!
     sprintf(buf, "%siode%ld", tpath, W_emfnb);
     W_dest(buf, W_DISP);
-    return(0);
+    return 0;
 }
 
 
@@ -622,7 +622,7 @@ int W_EndDisplay(char *title, int x, int y, int w, int h)
 
     W_close();
     if(W_type == A2M_DESTTCHRT) 
-        return(0); // TeeChart 
+        return 0; // TeeChart 
     
     // if(W_GetTempPath(80, tpath) == 0) tpath[0] = 0;
     // Normally never reached because W_DISP 
@@ -640,7 +640,7 @@ int W_EndDisplay(char *title, int x, int y, int w, int h)
     WscrEMFWMFCreateGnl(wmf, hWndDOS, buf, 0L, 1, x, y, w, h, title);      /* JMP 20-03-98 */
 #endif
 #endif // UNIX
-    return(0);
+    return 0;
 }
 
 
@@ -670,9 +670,9 @@ static int W_SavePrinterSettings()
 
     // W_DftPrinterOrient = WscrGetPrinterOrientation(W_DftPrinterName);
     // W_DftPrinterDuplex = WscrGetPrinterDuplex(W_DftPrinterName);
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 
@@ -690,19 +690,19 @@ static int W_ResetPrinterSettings()
     char    buf[80];
 
     if(WscrGetDefaultPrinter(buf) < 0) 
-        return(-1);
+        return -1;
 
     if(W_DftPrinterName[0] == 0) 
-        return(0);
+        return 0;
     
     if(strcmp(W_DftPrinterName, buf))
         WscrSetDefaultPrinter(W_DftPrinterName);
 
     // WscrSetPrinterOrientation(buf, W_DftPrinterOrient); // JMP 22/8/2016
     // WscrSetPrinterDuplex(buf, W_DftPrinterDuplex); // JMP 22/8/2016
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 
@@ -725,12 +725,12 @@ static int W_SetPrinterSettings()
         WscrSetDefaultPrinter(W_gdiprinter);
 
     if(WscrGetDefaultPrinter(buf) < 0) 
-        return(-1);
+        return -1;
     
     // WscrSetPrinterOrientation(buf, W_gdiorient); 
     // WscrSetPrinterDuplex(buf, W_gdiduplex);
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }

@@ -65,7 +65,7 @@ int RP_alloc_ptrs()
 
     // memset(RP_MEMBLKS + RP_NBMEMBLKS, 0, MEMBLK_BLK * sizeof(MEMBLK)); // JMP 26/8/2012
     RP_NBMEMBLKS += MEMBLK_BLK;
-    return(0);
+    return 0;
 }
 
 
@@ -137,7 +137,7 @@ char *RP_alloc(int size)
 //              return(i);
 //          }
 //      }
-//      return(-1);
+//      return -1;
 //  }
 
 
@@ -153,16 +153,16 @@ int RP_free(char *ptr)
 
     if(RP_STDALLOC) {
         if(ptr) SCR_free(ptr); // JMP 26/8/2012
-        return(0);
+        return 0;
     }
 
     for(i = 0 ; i < RP_NBMEMBLKS ; i++) {
         if(RP_MEMBLKS[i].ptr == ptr) {
             RP_MEMBLKS[i].used = 0;
-            return(0);
+            return 0;
         }
     }
-    return(-1);
+    return -1;
 }
 
 
@@ -291,12 +291,12 @@ int RP_free_tbl(unsigned char **tbl)
 {
     if(RP_STDALLOC) {
         SCR_free_tbl(tbl);
-        return(0);
+        return 0;
     }
 
     RP_free((char*) tbl[0]);
     RP_free((char*) tbl);
-    return(0);
+    return 0;
 }
 
 
@@ -310,7 +310,7 @@ int RP_tbl_size(unsigned char **tbl)
 {
     int i;
 
-    if(tbl == 0) return(0);
+    if(tbl == 0) return 0;
     for(i = 0 ; tbl[i] ; i++);
     return(i);
 }
@@ -327,7 +327,7 @@ int RP_tbl_size(unsigned char **tbl)
  */
 int RP_is_cmd(char *line)
 {
-    if(line == 0) return(0);
+    if(line == 0) return 0;
     if((line[0] == '#' || line[0] == '$') &&
             line[1] != line[0] &&
             line[1] != 0 &&
@@ -335,7 +335,7 @@ int RP_is_cmd(char *line)
       )
         return(1);
     else
-        return(0);
+        return 0;
 }
 
 

@@ -41,10 +41,10 @@ int dif_skip_to(YYFILE* yy, int skey)
 
     while(1) {
         rkey = YY_lex(yy);
-        if(rkey == YY_EOF || rkey == DIF_EOD) return(-1);
+        if(rkey == YY_EOF || rkey == DIF_EOD) return -1;
         if(rkey == skey) break;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -61,7 +61,7 @@ int dif_read_cell(YYFILE* yy, char** str, double* value)
     int     type, rtype;
 
     if(str == NULL) {
-        if(value == NULL) return(-1);
+        if(value == NULL) return -1;
         else type = 0;
     }
     else type = 1;
@@ -70,32 +70,32 @@ int dif_read_cell(YYFILE* yy, char** str, double* value)
 
     switch(rtype) {
         case 0  :
-            if(dif_skip_to(yy, DIF_COMMA) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_COMMA) < 0) return -1;
             if(rtype == type)
                 *value = (double) K_read_real(yy);
             else {
                 YY_lex(yy);
                 *str = (char*) SCR_stracpy(yy->yy_text);
-                if(*str == NULL) return(-1);
+                if(*str == NULL) return -1;
             }
             YY_lex(yy);
             break;
 
         case 1  :
-            if(dif_skip_to(yy, DIF_COMMA) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_COMMA) < 0) return -1;
             K_read_long(yy);
             *str = K_read_str(yy);
-            if(*str == NULL) return(-1);
+            if(*str == NULL) return -1;
             break;
 
         case -1 :
-            if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
+            if(dif_skip_to(yy, DIF_BOT) < 0) return -1;
             break;
         default :
-            return(-1);
+            return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -113,17 +113,17 @@ int ImportObjsDIF::read_header(YYFILE* yy, Sample* smpl)
     int     i;
     Period  per1, per2, *per;
 
-    if(YY_lex(yy) != DIF_TABLE) return(-1);
+    if(YY_lex(yy) != DIF_TABLE) return -1;
 
-    if(dif_skip_to(yy, DIF_VECTORS) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_VECTORS) < 0) return -1;
     if(dif_read_cell(yy, NULL, &value) < 0) return(-1) ;
     DIF_ny = (int)value - 1;
 
-    if(dif_skip_to(yy, DIF_TUPLES) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_TUPLES) < 0) return -1;
     if(dif_read_cell(yy, NULL, &value) < 0)  return(-1) ;
     DIF_nl = (int)value - 1;
 
-    if(dif_skip_to(yy, DIF_BOT) < 0) return(-1);
+    if(dif_skip_to(yy, DIF_BOT) < 0) return -1;
 
     dif_read_cell(yy, &str, NULL);
     SW_nfree(str);
@@ -146,7 +146,7 @@ int ImportObjsDIF::read_header(YYFILE* yy, Sample* smpl)
         if(per->periodicity= DIF_freq) 
         {
             delete per;
-            return(-1);
+            return -1;
         }
 
         if(per->difference(per1) < 0)
@@ -169,18 +169,18 @@ int ImportObjsDIF::read_header(YYFILE* yy, Sample* smpl)
         std::string error_msg = "Cannot read the header of the DIF file: invalid sample\n";
         error_msg += std::string(e.what());
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
 done :
 
     if(DIF_ny != smpl->nb_periods) 
-        return(-1);
+        return -1;
 
     if(dif_skip_to(yy, DIF_BOT) < 0) 
-        return(-1);
+        return -1;
     
-    return(0);
+    return 0;
 }
 
 
@@ -200,19 +200,19 @@ int ImportObjsDIF::read_variable(YYFILE* yy, char* name, int dim, double* vector
     double  value;
 
     rc = dif_read_cell(yy, &str, NULL);
-    if(rc < 0 || str == NULL) return(-1);
+    if(rc < 0 || str == NULL) return -1;
 
     SCR_strlcpy((unsigned char*) name, (unsigned char*) str, 79); /* JMP 13-02-2013 */
     SW_nfree(str);
 
     for(i = 0; i < dim; i++) {
         rc = dif_read_cell(yy, NULL, &value);
-        if(rc < 0) return(-1);
+        if(rc < 0) return -1;
         vector[i] = (double) value;
     }
 
     dif_skip_to(yy, DIF_BOT);
-    return(0);
+    return 0;
 }
 
 /**
@@ -224,5 +224,5 @@ int ImportObjsDIF::close()
 {
     SW_nfree(DIF_smpl);
     DIF_smpl = 0;
-    return(0);
+    return 0;
 }

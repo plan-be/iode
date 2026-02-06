@@ -78,14 +78,14 @@ int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
         Period per = dbv->sample->start_period.shift(i);
         expdef->file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
-    return(0);
+    return 0;
 }
 
 int ExportObjsDIF::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     expdef->file_descriptor <<  "-1,0\nEOD\n";
     expdef->file_descriptor.close();
-    return(0);
+    return 0;
 }
 
 char* ExportObjsDIF::write_object_name(char* name, char** code)
@@ -95,11 +95,13 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
 
 char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)
-        return(write_pre_post("1,0\n\"", "\"\n", dbc->get_obj(handle), cmt));
+    if(dbc->contains(name))
+    {
+        Comment* comment = dbc->get_obj_ptr(name);
+        return write_pre_post("1,0\n\"", "\"\n", (char*) comment->c_str(), cmt);
+    }
     else
-        return(write_pre_post("1,0\n\"", "\"\n", "", cmt));
+        return write_pre_post("1,0\n\"", "\"\n", "", cmt);
 }
 
 char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)
@@ -125,5 +127,5 @@ char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char**
 int ExportObjsDIF::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
 {
     expdef->file_descriptor << code << cmt << vec;
-    return(0);
+    return 0;
 }

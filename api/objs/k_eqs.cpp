@@ -96,7 +96,7 @@ int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)
 done :
     SCR_free(lhs);
     SCR_free(rhs);
-    return(rc);
+    return rc;
 }
 
 
@@ -125,7 +125,7 @@ int E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)
     SCR_strfacpy((unsigned char**) eqs, (unsigned char*) ae);
     SCR_free(ae);
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -207,7 +207,7 @@ bool Equation::print_definition() const
                 {
                     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
                     
-                    Scalar* scl = global_ws_scl->get_obj(sname);
+                    Scalar* scl = global_ws_scl->get_obj_ptr(sname);
                     if(!scl) 
                     {
                         W_printf((char*) "?\n");
@@ -228,94 +228,110 @@ bool Equation::print_definition() const
     return success;
 }
 
-
-Equation* KDBEquations::get_obj(const SWHDL handle) const
-{    
-    std::string name;
-    for(const auto& [_name_, _handle_] : k_objs) 
-    {
-        if(_handle_ == handle) 
-        {
-            name = _name_;
-            break;
-        }
-    }
-
-    return get_obj(name);
-}
-
-Equation* KDBEquations::get_obj(const std::string& name) const
+bool Equation::to_binary(char** pack) const
 {
-    std::string key = to_key(name);
-    SWHDL handle = this->get_handle(key);
-    if(handle == 0)  
-        throw std::invalid_argument("Equation with name '" + name + "' not found.");
+    if(this->lec.empty()) 
+        return false;
+
+    *pack = (char*) P_create();
     
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return K_eunpack(ptr, (char*) key.c_str());
+    char* c_lec = (char*) this->lec.c_str();
+    char* c_endo = (char*) this->endo.c_str();
+    CLEC* clec = L_solve(c_lec, c_endo);
+    if(clec == NULL)  
+        return false;
+
+    *pack = (char*) P_add(*pack, c_lec, (int) this->lec.size() + 1);
+    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
+    *pack = (char*) P_add(*pack, (char*) &(this->solved), 1);
+    *pack = (char*) P_add(*pack, (char*) &(this->method), 1);
+    *pack = (char*) P_add(*pack, (char*) &(this->sample), sizeof(Sample));
+
+    if(this->comment.empty()) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*) this->comment.c_str(), (int) this->comment.size() + 1);          /* cmt */
+
+    if(this->block.empty()) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*) this->block.c_str(), (int) this->block.size() + 1);              /* blk */
+
+    if(this->instruments.empty()) 
+        *pack = (char*) P_add(*pack, NULL, 1);
+    else 
+        *pack = (char*) P_add(*pack, (char*) this->instruments.c_str(), (int) this->instruments.size() + 1);  /* instr */
+
+    *pack = (char*) P_add(*pack, (char*)&(this->date), sizeof(long));                     /* date */
+    *pack = (char*) P_add(*pack, (char*)&(this->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
+
+    SW_nfree(clec);
+    return true;
 }
 
-bool KDBEquations::set_obj(const std::string& name, const Equation* value)
+Equation* binary_to_eqs(char* pack, const std::string& name)
 {
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_epack(&pack, (char*) value, (char*) key.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
+    size_t len;
+
+    std::string endo(name);
+
+    len = (size_t) P_get_len(pack, 0);
+    char* c_lec = new char[len];
+    strncpy(c_lec, (char*) P_get_ptr(pack, 0), len);
+    std::string lec(c_lec);
+
+    char char_method = *(char*)(P_get_ptr(pack, 3));
+    int i_method = (int) char_method;
+    IodeEquationMethod method = EQ_LSQ;
+    if(i_method >= 0 && i_method < IODE_NB_EQ_METHODS)
+        method = (IodeEquationMethod) i_method;
+
+    len = P_get_len(pack, 5);
+    char* c_cmt = new char[len];
+    strncpy(c_cmt, (char*) P_get_ptr(pack, 5), len);
+    std::string comment(c_cmt);
+
+    len = P_get_len(pack, 6);
+    char* c_block = new char[len];
+    strncpy(c_block, (char*) P_get_ptr(pack, 6), len);
+    std::string block(c_block);
+
+    len = P_get_len(pack, 7);
+    char* c_instr = new char[len];
+    strncpy(c_instr, (char*) P_get_ptr(pack, 7), len);
+    std::string instruments(c_instr);
+
+    Sample* smpl = nullptr;
+    char* c_smpl = (char*) P_get_ptr(pack, 4);
+    if(c_smpl != NULL && strlen(c_smpl) > 0)
     {
-        std::string error_msg = "Failed to set equation object '" + key + "'";
-        kwarning(error_msg.c_str());
+        smpl = new Sample();
+        memcpy(smpl, c_smpl, sizeof(Sample));
     }
-    return success;
+
+    Period from_period = (smpl != nullptr) ? smpl->start_period : Period();
+    Period to_period = (smpl != nullptr) ? smpl->end_period : Period();
+    if(smpl != nullptr)
+    {
+        delete smpl;
+        smpl = nullptr;
+    }
+
+    Equation* eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+                                comment, instruments, block, false);
+    eq->solved = *((char*) (P_get_ptr(pack, 2)));
+    eq->date = *((long*) (P_get_ptr(pack, 8)));    
+    memcpy(eq->tests.data(), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float));
+
+    return eq;
 }
+
 
 std::string KDBEquations::get_lec(const std::string& name) const
 {
-    Equation* c_eq = this->get_obj(name);
+    Equation* c_eq = this->get_obj_ptr(name);
     std::string lec = c_eq->lec;
     return lec; 
-}
-
-Equation* KDBEquations::get(const std::string& name) const
-{
-    Equation* c_eq = this->get_obj(name);
-    return c_eq;
-}
-
-bool KDBEquations::add(const std::string& name, const Equation& obj)
-{
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add equation: an equation named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add equation: an equation named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
-    Equation eq(obj);
-    bool success = this->set_obj(name, &eq);
-    return success;
-}
-
-void KDBEquations::update(const std::string& name, const Equation& obj)
-{
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update equation: no equation named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    Equation eq(obj);
-    this->set_obj(name, &eq);
 }
 
 bool KDBEquations::add(const std::string& name, const std::string& lec)
@@ -329,7 +345,7 @@ bool KDBEquations::add(const std::string& name, const std::string& lec)
     bool date = true;
     
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-    bool success = this->add(name, eq);
+    bool success = KDBTemplate::add(name, eq);
     return success;
 }
 
@@ -344,26 +360,56 @@ void KDBEquations::update(const std::string& name, const std::string& lec)
     bool date = true;
 
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
-    this->update(name, eq);
+    KDBTemplate::update(name, eq);
 }
 
-bool KDBEquations::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
+{
+    Equation* eq = binary_to_eqs(pack, name);
+    if(!eq) 
+        return false;
+    
+    this->k_objs[name] = eq;
+    return true;
+}
+
+/**
+ * Serializes an equation object.
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @param [in]  name    string      equation name
+ * @return                          true if the serialization succeeded, false otherwise
+ *                                  -> false if the equation does not contain a LEC formula 
+ *                                  -> false if the LEC formula cannot be compiled
+ *  
+ * @details - The endo is needed to "solve" the LEC equation. L_solve() try to analytically
+ *            solve the equation to obtain a formula in the form :
+ *                ENDO := f(x)
+ *          - If it is not possible, a Newton-Raphson like algorithm will be used to solve 
+ *            the equation for each iteration of the simulation process.
+ */
+bool KDBEquations::obj_to_binary(char** pack, const std::string& name)
+{
+    Equation* eq = this->get_obj_ptr(name);
+    bool success = eq->to_binary(pack);
+    return success;
+}
+
+bool KDBEquations::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
-    Equation* eq = this->get_obj(name);
+    Equation* eq = this->get_obj_ptr(name);
     if(forms) 
         found = wrap_grep_gnl(pattern, eq->lec, ecase, all);
     if(!found && texts)
         found = wrap_grep_gnl(pattern, eq->comment, ecase, all);
-    delete eq;
     return found;
 }
 
 char* KDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    std::string lec = this->get_obj(name)->lec;
+    std::string lec = this->get_obj_ptr(name)->lec;
     char* obj = new char[lec.size() + 1];
     strncpy(obj, lec.c_str(), lec.size() + 1);
     return obj;
@@ -371,14 +417,11 @@ char* KDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int
 
 bool KDBEquations::print_obj_def(const std::string& name)
 {
-    Equation* eq = this->get_obj(name);
+    Equation* eq = this->get_obj_ptr(name);
     if(!eq) 
         return false;
     
     bool success = eq->print_definition();
-
-    delete eq;
-    eq = nullptr;
     return success;
 }
 
@@ -404,7 +447,7 @@ double K_etest(KDBEquations* kdb, char* c_name, int test_nb)
     if(!kdb->contains(name)) 
         return(IODE_NAN);
     
-    std::array<float, EQS_NBTESTS> tests = kdb->get_obj(name)->tests;
+    std::array<float, EQS_NBTESTS> tests = kdb->get_obj_ptr(name)->tests;
     double value = (double) tests[test_nb];
     return value;
 }

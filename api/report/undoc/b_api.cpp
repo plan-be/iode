@@ -73,7 +73,7 @@ int IodeInit()
     // Assign default "super" function pointers
     IODE_assign_super_API(); // JMP 15/2/2023 
     
-    return(0);
+    return 0;
 }
 
 
@@ -97,7 +97,7 @@ int IodeEnd()
     SCR_free(ODE_INIFILE);     // JMP 30/10/2022
     ODE_INIFILE = 0;
     
-    return(0);
+    return 0;
 }
 
 

@@ -376,6 +376,6 @@ L_REAL L_div0(L_REAL *stack, int unused)
     double b = *stack;
 
     if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a)) return((L_REAL)IODE_NAN);
-    else if(b == 0) return(0);
+    else if(b == 0) return 0;
     return(a / b);
 }

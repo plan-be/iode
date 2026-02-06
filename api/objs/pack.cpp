@@ -206,15 +206,15 @@ OSIZE P_get_len(void *vptr, int i)
     OSIZE   len, *pos;
     char    *ptr = (char*) vptr;
 
-    if(ptr == 0) return(0);
+    if(ptr == 0) return 0;
     pos = (OSIZE *) ptr;
 
     /* GB 02/98 */
-    if(pos[0] <= 0) return(0);
+    if(pos[0] <= 0) return 0;
 
     if(i < 0) return(pos[0]); /* i == -1 returns full lg */
 
-    if(i > pos[1] - 1) return(-1);
+    if(i > pos[1] - 1) return -1;
     if(i == pos[1] - 1) len = pos[0] - pos[i + 2];
     else len = pos[i + 3] - pos[i + 2];
 
@@ -253,7 +253,7 @@ int P_nb(char *ptr)
 {
     OSIZE   *pos;
 
-    if(ptr == 0) return(0);          // JMP 6/10/2021
+    if(ptr == 0) return 0;          // JMP 6/10/2021
     pos = (OSIZE *) ptr;
     return(pos[1]);
 }
