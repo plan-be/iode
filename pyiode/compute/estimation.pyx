@@ -166,8 +166,7 @@ cdef class CythonEditAndEstimateEquations:
         cdef CEquation* c_current_eq = self.c_estimation_ptr.current_equation()
         if c_current_eq is NULL:
             return None
-        eq.ptr_owner = <bint>True
-        eq.c_database = self.c_estimation_ptr.get_equations()
+        eq.ptr_owner = <bint>False
         eq.c_equation = c_current_eq
         return eq
 
@@ -175,8 +174,7 @@ cdef class CythonEditAndEstimateEquations:
         cdef CEquation* c_next_eq = self.c_estimation_ptr.next_equation()
         if c_next_eq is NULL:
             return None
-        eq.ptr_owner = <bint>True
-        eq.c_database = self.c_estimation_ptr.get_equations()
+        eq.ptr_owner = <bint>False
         eq.c_equation = c_next_eq
         return eq
 

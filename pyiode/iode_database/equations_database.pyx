@@ -60,10 +60,8 @@ cdef class Equations(CythonIodeDatabase):
         cdef CEquation* c_eq
         name = name.strip()
         c_eq = self.database_ptr.get(name.encode())
-        
         eq.c_equation = c_eq
-        eq.c_database = self.database_ptr
-        eq.ptr_owner = <bint>True
+        eq.ptr_owner = <bint>False
         return eq
 
     def _set_object(self, name: str, eq: Equation):

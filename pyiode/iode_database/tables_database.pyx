@@ -59,16 +59,13 @@ cdef class Tables(CythonIodeDatabase):
         cdef CTable* c_table
         name = name.strip()
         c_table = self.database_ptr.get(name.encode())
-
         table.c_table_name = name.encode()
         table.c_table = c_table
-        table.c_database = self.database_ptr
-        table.ptr_owner = <bint>True
+        table.ptr_owner = <bint>False
         return table
 
     def _set_object(self, name: str, table: Table):
         cdef CTable* c_table
-
         c_table = table.c_table
         if self.database_ptr.contains(name.encode()):
             self.database_ptr.update(<string>name.encode(), dereference(c_table))
