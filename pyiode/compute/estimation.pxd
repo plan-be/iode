@@ -11,8 +11,8 @@ from libcpp.set cimport set
 from pyiode.common cimport IodeEquationMethod, IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as KDBEquations
-from pyiode.iode_database.cpp_api_database cimport KDBScalars as KDBScalars
+from pyiode.iode_database.cpp_api_database cimport KDBEquations
+from pyiode.iode_database.cpp_api_database cimport KDBScalars
 
 
 cdef extern from "cpp_api/compute/estimation.h":

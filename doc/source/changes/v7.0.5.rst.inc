@@ -29,3 +29,6 @@ Fixed Bugs
 Miscellaneous 
 -------------
 
+- The memory management of the IODE objects in the IODE workspaces the C/C++ API has been 
+  delegated to C++ std containers (in place of the SCR4 library previously). 
+  That should not impact the output of estimations or simulations. 

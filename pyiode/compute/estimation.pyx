@@ -4,8 +4,8 @@ from libcpp.vector cimport vector
 from pyiode.common cimport IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
 from pyiode.objects.equation cimport CEquation
-from pyiode.iode_database.cpp_api_database cimport KDBScalars as KDBScalars
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as KDBEquations
+from pyiode.iode_database.cpp_api_database cimport KDBScalars
+from pyiode.iode_database.cpp_api_database cimport KDBEquations
 from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.compute.estimation cimport dynamic_adjustment as cpp_dynamic_adjustment
 from pyiode.compute.estimation cimport dickey_fuller_test as cpp_dickey_fuller_test
@@ -166,8 +166,7 @@ cdef class CythonEditAndEstimateEquations:
         cdef CEquation* c_current_eq = self.c_estimation_ptr.current_equation()
         if c_current_eq is NULL:
             return None
-        eq.ptr_owner = <bint>True
-        eq.c_database = self.c_estimation_ptr.get_equations()
+        eq.ptr_owner = <bint>False
         eq.c_equation = c_current_eq
         return eq
 
@@ -175,8 +174,7 @@ cdef class CythonEditAndEstimateEquations:
         cdef CEquation* c_next_eq = self.c_estimation_ptr.next_equation()
         if c_next_eq is NULL:
             return None
-        eq.ptr_owner = <bint>True
-        eq.c_database = self.c_estimation_ptr.get_equations()
+        eq.ptr_owner = <bint>False
         eq.c_equation = c_next_eq
         return eq
 

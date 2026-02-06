@@ -5,7 +5,7 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.equation cimport CEquation
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBEquations as CppKDBEquations
+from pyiode.iode_database.cpp_api_database cimport KDBEquations
 from pyiode.iode_database.cpp_api_database cimport global_ws_eqs as cpp_global_equations
 from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport eqs_estimate as cpp_eqs_estimate
@@ -17,7 +17,7 @@ import pandas as pd
 
 cdef class Equations(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CppKDBEquations* database_ptr
+    cdef KDBEquations* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Equations:
         self.ptr_owner = False
@@ -30,7 +30,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Equations _from_ptr(CppKDBEquations* database_ptr = NULL, bint owner=False):
+    cdef Equations _from_ptr(KDBEquations* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Equations wrapper = Equations.__new__(Equations)
         if database_ptr is not NULL:
@@ -48,7 +48,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, subset: Equations, pattern: str, copy: bool) -> Equations:
-        subset.database_ptr = new CppKDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.database_ptr = new KDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
         subset.abstract_db_ptr = subset.database_ptr
         subset.ptr_owner = True
         return subset
@@ -59,22 +59,17 @@ cdef class Equations(CythonIodeDatabase):
     def _get_object(self, name: str, eq: Equation) -> Equation:
         cdef CEquation* c_eq
         name = name.strip()
-        c_eq = self.database_ptr.get(name.encode())
-        
+        c_eq = self.database_ptr.get_obj_ptr(name.encode())
         eq.c_equation = c_eq
-        eq.c_database = self.database_ptr
-        eq.ptr_owner = <bint>True
+        eq.ptr_owner = <bint>False
         return eq
 
     def _set_object(self, name: str, eq: Equation):
-        cdef CEquation* c_equation = eq.c_equation
-
-        # update existing equation
-        if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), dereference(c_equation))
-        # add a new equation
-        else:
-            self.database_ptr.add(name.encode(), dereference(c_equation))
+        cdef CEquation* equation_ptr = eq.c_equation
+        cdef CEquation* new_equation_ptr = NULL
+        new_equation_ptr = self.database_ptr.set_obj_ptr(name.encode(), equation_ptr)
+        eq.c_equation = new_equation_ptr
+        eq.ptr_owner = <bint>False
 
     def estimate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
                  list_eqs: Union[str, List[str]], maxit: int, epsilon: float) -> bool:
@@ -107,6 +102,10 @@ cdef class Equations(CythonIodeDatabase):
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
+
+    def merge(self, other: Equations, overwrite: bool=True):        
+        cdef KDBEquations* other_db_ptr = other.database_ptr
+        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     # Information detail to print (for equations)
     #    0: equation only 
