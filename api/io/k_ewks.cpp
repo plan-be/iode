@@ -44,13 +44,13 @@ int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*
     }
     WKS_ROW ++;
     WKS_COL = 1;
-    return(0);
+    return 0;
 }
 
 int ExportObjsWKS::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     wks_end();
-    return(0);
+    return 0;
 }
 
 char* ExportObjsWKS::write_object_name(char* name, char** code)
@@ -63,14 +63,17 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
 
 char* ExportObjsWKS::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
-        wks_string(dbc->get_obj(handle), WKS_COL, WKS_ROW);
+    if(dbc->contains(name))
+    {
+        Comment* comment = dbc->get_obj_ptr(name);
+        wks_string((char*) comment->c_str(), WKS_COL, WKS_ROW);
+    }
     else 
         wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;
 
-    return(*cmt = NULL);
+    *cmt = NULL;
+    return *cmt;
 }
 
 char* ExportObjsWKS::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)
@@ -90,5 +93,5 @@ int ExportObjsWKS::write_variable_and_comment(ExportToFile* expdef, char* code, 
     wks_name(code, 3, WKS_ROW, WKS_COL, WKS_ROW);
     WKS_ROW ++;
     WKS_COL = 1;
-    return(0);
+    return 0;
 }

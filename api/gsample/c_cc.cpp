@@ -248,11 +248,11 @@ char *COL_ctoa(COL* cl, int ch, int n, int nbf)
     if(U_is_in(ch, "yYpPrRnNmMoO")) 
     {
         if(cl->cl_opy == COL_NOP && n == 1) 
-            return(res);
+            return res;
         
         per = &(cl->cl_per[n]);
         if(U_is_in(ch, "PpMmRrNn") && per->periodicity == 'Y') 
-            return(res);
+            return res;
         
         switch(ch) 
         {
@@ -293,22 +293,22 @@ Num:
                 break;
             case 'o' :
                 if(cl->cl_opy == COL_NOP) 
-                    return(res);
+                    return res;
                 strcpy(res, COL_OPERS[cl->cl_opy - COL_NOP]);
                 break;
             case 'O' :
                 if(cl->cl_opy == COL_NOP) 
-                    return(res);
+                    return res;
                 strcpy(res, KLG_OPERS_TEXTS[cl->cl_opy - COL_NOP][K_LANG]);
                 break;
         }
-        return(res);
+        return res;
     }
 
     if(U_is_in(ch, "fF")) 
     {
         if(nbf < 2) 
-            return(res);
+            return res;
         
         if(cl->cl_opf == COL_NOP) 
             sprintf(res, "[%d]", cl->cl_fnb[0]);
@@ -317,9 +317,9 @@ Num:
                           COL_OPERS[cl->cl_opf - COL_NOP],
                           cl->cl_fnb[1]);
 
-        return(res);
+        return res;
     }
-    return(res);
+    return res;
 }
 
 /**
@@ -393,7 +393,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
         j = (int) strlen(res);
     }
 
-    return(res);
+    return res;
 }
 
 
@@ -528,7 +528,7 @@ static int COL_read_long_per(YYFILE *yy)
     else if(keyw == COL_SUBPER) 
         return(COL_calc_subper());
     else                        
-        return(-1);
+        return -1;
 }
 
 
@@ -597,7 +597,7 @@ static int COL_read_per(YYFILE* yy, Period* per)
             break;
 
         default :
-            return(-1);
+            return -1;
     }
 
     // 2. Pper
@@ -610,11 +610,11 @@ static int COL_read_per(YYFILE* yy, Period* per)
     {
         per->periodicity = ch1;
         if(YY_lex(yy) != YY_LONG) 
-            return(-1);
+            return -1;
         
         per->step = yy->yy_long;
         if(per->step < 1 || per->step > L_Period_NB[pos]) 
-            return(-1);
+            return -1;
         
         YY_skip_spaces(yy);
         ch = YY_getc(yy);       // read next char
@@ -625,7 +625,7 @@ nextshift:
     if(!U_is_in(ch, "<>")) 
     {
         YY_ungetc(ch, yy);
-        return(0);
+        return 0;
     }
 
     if(ch == '<') 
@@ -635,7 +635,7 @@ nextshift:
     
     shiftval = COL_read_long_per(yy);
     if(shiftval < 0) 
-        return(-1);
+        return -1;
 
     if(shiftval == 0) 
     {
@@ -657,7 +657,7 @@ nextshift:
     ch	= YY_getc(yy); // Lit la suite
     goto nextshift;
 
-    return(0);
+    return 0;
 }
 
 
@@ -769,13 +769,13 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
     // 1. partie (optionnelle) n
     rep->r_nb = COL_read_long_per(yy);
     if(rep->r_nb < 0) 
-        return(-1);
+        return -1;
 
     // 2. partie optionnelle :[-]incr
     if(YY_lex(yy) != COL_DOT) 
     {
         YY_unread(yy);
-        return(0);
+        return 0;
     }
 
     keyw = YY_lex(yy);
@@ -787,10 +787,10 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
 
     rep->r_incr = COL_read_long_per(yy);
     if(rep->r_incr < 0) 
-        return(-1);
+        return -1;
     
     rep->r_incr *= sign;
-    return(0);
+    return 0;
 }
 
 
@@ -818,10 +818,10 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
     fil->fl_op = COL_NOP;
     fil->fl_2  = 0;
     if(YY_lex(yy) != YY_LONG) 
-        return(-1);
+        return -1;
 
     if(yy->yy_long < 1 || yy->yy_long > 10) 
-        return(-1);
+        return -1;
     
     fil->fl_1 = (short) yy->yy_long;
     op = YY_lex(yy);
@@ -829,15 +829,15 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
     if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN && op != COL_BASE) 
     {
         YY_unread(yy);
-        return(0);
+        return 0;
     }
 
     fil->fl_op = op;
     if(YY_lex(yy) != YY_LONG) 
-        return(-1);
+        return -1;
     
     fil->fl_2 = (short)yy->yy_long;
-    return(0);
+    return 0;
 }
 
 
@@ -1248,12 +1248,12 @@ COLS *COL_cc(char* gsample)
 int COL_free_cols(COLS* cls)
 {
     if(cls == 0) 
-        return(0);
+        return 0;
     
     if(cls->cl_nb != 0) 
         SW_nfree(cls->cl_cols);
     SW_nfree(cls);
-    return(0);
+    return 0;
 }
 
 

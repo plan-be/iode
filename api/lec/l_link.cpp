@@ -47,7 +47,7 @@ static int L_link_names(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)
             return(L_errno = L_NOT_FOUND_ERR);
         }
     }
-    return(0);
+    return 0;
 }
 
 
@@ -160,10 +160,10 @@ static void L_link_sample(KDBVariables* dbv, CLEC* cl)
 */
 int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)
 {
-    if (cl == 0) return(0);
+    if (cl == 0) return 0;
     if (L_link_names(dbv, dbs, cl)) return(L_errno);
     L_link_sample(dbv, cl);
-    return(0);
+    return 0;
 }
 
 

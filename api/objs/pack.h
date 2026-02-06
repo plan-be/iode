@@ -11,15 +11,7 @@ OSIZE P_get_len(void *,int );
 void *P_alloc_get_ptr(void *, int );
 
 /* k_pack.c */
-int K_vpack(char **,double *,int *);
-int KV_alloc_var(int );
-int K_ipack(char **,char *);
-int K_tpack(char**, char*, char* name = NULL);
-int K_spack(char**, char*);
-int KS_alloc_scl(void);
-int K_cpack(char **,char *);
-int K_lpack(char **,char *);
-int K_opack(char **,char *,int *);
+bool K_opack(char **,char *,int *);
 
 extern bool debug_pack;
 extern bool debug_unpack;

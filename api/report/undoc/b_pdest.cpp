@@ -94,7 +94,7 @@ int A2M_GIF_TRCOLOR_NB;  // GIF transparent coor nb
 int B_PrintDestExt(char* file, int type)           
 {
     W_dest(file, type);
-    return(0);
+    return 0;
 }
 
 /**
@@ -183,9 +183,9 @@ int B_PrintNbDec(char* nbdec, int unused)
     if(K_NBDEC > 99 || (K_NBDEC < 0 && K_NBDEC != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
         K_NBDEC = 2;
-        return(-1);
+        return -1;
     }
-   return(0);
+   return 0;
 }
 
 // $PrintLang {English | French | Dutch}
@@ -211,9 +211,9 @@ int B_PrintLang(char* lang, int unused)
             break;
         default  :
             error_manager.append_error("Invalid language");
-            return(-1);
+            return -1;
     }
-    return(0);
+    return 0;
 }
 
 // $PrintMulti STACKMODE
@@ -236,9 +236,9 @@ int B_PrintMulti(char* multi, int unused)
             break;
         default  :
             error_manager.append_error("Invalid PrintMulti option (None, Stacked, Percent)");
-            return(-1);
+            return -1;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -256,7 +256,7 @@ int B_PrintA2mAppend(char* arg, int unused)
             break;
     }
     //BGUI_PrintA2mAppend();
-    return(0);
+    return 0;
 }
 
 
@@ -274,7 +274,7 @@ int B_PrintTBreak(char* arg, int unused)
             break;
     }
     //BGUI_PrintTBreak();
-    return(0);
+    return 0;
 }
 
 
@@ -292,7 +292,7 @@ int B_PrintTPage(char* arg, int unused)
             break;
     }
     // BGUI_PrintTPage();
-    return(0);
+    return 0;
 }
 
 
@@ -310,7 +310,7 @@ int B_PrintGPage(char* arg, int unused)
             break;
     }
     // BGUI_PrintGPage();
-    return(0);
+    return 0;
 }
 
 
@@ -328,7 +328,7 @@ int B_PrintParaNum(char* arg, int unused)
             break;
     }
     // BGUI_PrintParaNum();
-    return(0);
+    return 0;
 }
 
 
@@ -336,7 +336,7 @@ int B_PrintParaNum(char* arg, int unused)
 int B_PrintPageHeader(char* arg, int unused)
 {
     W_print_pg_header(arg);      // JMP 27/6/2022
-    return(0);
+    return 0;
 }
 
 
@@ -344,7 +344,7 @@ int B_PrintPageHeader(char* arg, int unused)
 int B_PrintPageFooter(char* arg, int unused)
 {
     W_print_pg_footer(arg);      // JMP 27/6/2022
-    return(0);
+    return 0;
 }
 
 
@@ -373,7 +373,7 @@ int B_PrintFont(char* arg, int unused)
     }
     SCR_free_tbl(tbl);
 
-    return(0);
+    return 0;
 }
 
 
@@ -395,7 +395,7 @@ int B_PrintTFont(char* arg, int unused)
         // BGUI_PrintTFont2();
     }
     SCR_free_tbl(tbl);
-    return(0);
+    return 0;
 }
 
 
@@ -412,7 +412,7 @@ int B_PrintTBox(char* arg, int unused)
     A2M_GDI_TBORDER = box;
 #endif
     // BGUI_PrintTBox();
-    return(0);
+    return 0;
 }
 
 
@@ -427,7 +427,7 @@ int B_PrintTColor(char* arg, int unused)
     A2M_RTF_TCOLOR = box;
     // BGUI_PrintTColor();
     /*    A2M_GDI_TCOLOR = box; */
-    return(0);
+    return 0;
 }
 
 
@@ -464,7 +464,7 @@ int B_PrintTWidth(char* arg, int unused)
     }
 
     SCR_free_tbl(tbl);
-    return(0);
+    return 0;
 }
 
 
@@ -496,7 +496,7 @@ int B_PrintGSize(char* arg, int unused)
     }
 
     SCR_free_tbl(tbl);
-    return(0);
+    return 0;
 }
 
 
@@ -507,7 +507,7 @@ int B_PrintGTheme(char* arg, int unused)
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
     ChrtThemeInit(arg);
 #endif    
-    return(0);
+    return 0;
 }
 
 
@@ -541,7 +541,7 @@ int B_PrintGBand(char* arg, int unused)
     ChrtColorBand(startvalue, endvalue);
     SCR_free_tbl(args);
 #endif    
-    return(0);
+    return 0;
 }
 
 
@@ -553,7 +553,7 @@ int B_PrintGBox(char* arg, int unused)
     if(box == 0 && SCR_upper_char(arg[0]) == 'Y') box = 1;
     A2M_BOXWIDTH = box;
     // BGUI_PrintGBox();
-    return(0);
+    return 0;
 }
 
 
@@ -565,7 +565,7 @@ int B_PrintGBrush(char* arg, int unused)
     if(box == 0 && SCR_upper_char(arg[0]) == 'Y') box = 50;
     A2M_BACKBRUSH = box;
     // BGUI_PrintGBrush();
-    return(0);
+    return 0;
 }
 
 
@@ -595,7 +595,7 @@ int B_PrintGColor(char* arg, int unused)
     col = B_GetColor(arg);
     if(col < 0) col = 0;
     // BGUI_PrintGColor(col);
-    return(0);
+    return 0;
 }
 
 
@@ -616,7 +616,7 @@ int B_PrintRtfHelp(char* arg, int unused)
     }
 
     // BGUI_PrintRtfHelp();
-    return(0);
+    return 0;
 }
 
 
@@ -635,7 +635,7 @@ int B_PrintHtmlHelp(char* arg, int unused)
     }
 
     /*    p_a2mrtf_HCW = W_rtfhelp; */
-    return(0);
+    return 0;
 }
 
 
@@ -644,7 +644,7 @@ int B_PrintRtfTitle(char* arg, int unused)
 {
     B_A2mSetRtfTitle((unsigned char*) arg);
     // BGUI_PrintRtfTitle(arg);
-    return(0);
+    return 0;
 }
 
 
@@ -653,7 +653,7 @@ int B_PrintRtfCopy(char* arg, int unused)
 {
     B_A2mSetRtfCopy((unsigned char*) arg);
     // BGUI_PrintRtfCopy(arg);
-    return(0);
+    return 0;
 }
 
 
@@ -668,7 +668,7 @@ int B_PrintRtfLevel(char* arg, int unused)
     }
     else KT_CUR_LEVEL = level;
     KT_CUR_LEVEL = std::max(0, KT_CUR_LEVEL);
-    return(0);
+    return 0;
 }
 
 
@@ -676,7 +676,7 @@ int B_PrintRtfLevel(char* arg, int unused)
 int B_PrintRtfTopic(char* arg, int unused)
 {   
     W_print_rtf_topic(arg);
-    return(0);
+    return 0;
 }
 
 
@@ -693,7 +693,7 @@ int B_PrintGdiOrient(char* arg, int unused)
     }
 
     // BGUI_PrintGdiOrient();
-    return(0);
+    return 0;
 }
 
 
@@ -716,7 +716,7 @@ int B_PrintGdiDuplex(char* arg, int unused)
     }
 
     // BGUI_PrintGdiDuplex();
-    return(0);
+    return 0;
 }
 
 
@@ -724,7 +724,7 @@ int B_PrintGdiDuplex(char* arg, int unused)
 int B_PrintGdiPrinter(char* arg, int unused)
 {
     SCR_strlcpy((unsigned char*) W_gdiprinter, (unsigned char*) arg, 70);
-    return(0);
+    return 0;
 }
 
 
@@ -740,7 +740,7 @@ int B_PrintGIFBackColor(char* arg, int unused)
     B_A2mSetCol(A2M_GIF_BGCOLOR, col);
     A2M_GIF_BGCOLOR_NB = col; // JMP 1/5/2022
 #endif    
-    return(0);
+    return 0;
 }
 
 
@@ -756,7 +756,7 @@ int B_PrintGIFTransColor(char* arg, int unused)
     B_A2mSetCol(A2M_GIF_TRCOLOR, col);
     A2M_GIF_TRCOLOR_NB = col; // JMP 1/5/2022
 #endif    
-    return(0);
+    return 0;
 }
 
 
@@ -776,7 +776,7 @@ int B_PrintGIFInterlaced(char* arg, int unused)
     }
 #endif
     // BGUI_PrintGIFInterlaced();
-    return(0);
+    return 0;
 }
 
 
@@ -797,7 +797,7 @@ int B_PrintGIFTransparent(char* arg, int unused)
 
 #endif
     // BGUI_PrintGIFTransparent();
-    return(0);
+    return 0;
 }
 
 
@@ -818,7 +818,7 @@ int B_PrintGIFFilled(char* arg, int unused)
 
 #endif
     // BGUI_PrintGIFFilled();
-    return(0);
+    return 0;
 }
 
 
@@ -834,7 +834,7 @@ int B_PrintGIFFont(char* arg, int unused)
     A2M_GIF_FONT = font + 1;
 
 #endif    
-    return(0);
+    return 0;
 }
 
 
@@ -852,7 +852,7 @@ int B_PrintHtmlStrip(char* arg, int unused)
             break;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -862,7 +862,7 @@ int B_PrintHtmlStrip(char* arg, int unused)
 int B_PrintHtmlStyle(char* arg, int unused) 
 {
     A2M_HTML_RELSTYLE = (char*) SCR_stracpy((unsigned char*) arg);
-    return(0);
+    return 0;
 }
 
 /**
@@ -880,7 +880,7 @@ int B_A2mToAll(char* arg, int type)
 
     tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
     ntbl = SCR_tbl_size(tbl);
-    if(ntbl == 0) return(-1);
+    if(ntbl == 0) return -1;
     SCR_cat_ext((char*) ibuf, (char*) tbl[0], (char*) "a2m");
     switch(type) {
         case A2M_DESTFRM :
@@ -916,10 +916,10 @@ int B_A2mToAll(char* arg, int type)
 #ifdef WIN32
             return(A2mToGdiPrinter(0L, 1, (unsigned char*) "Iode", ibuf));
 #else
-            return(-1); // Not supported on non-Windows platforms
+            return -1; // Not supported on non-Windows platforms
 #endif
         default : 
-            return(-1);
+            return -1;
     }
 }
 
@@ -984,7 +984,7 @@ int B_A2mSetCol(int *dest, int col)
     dest[0]= B_GIFCOLS[col][0];
     dest[1]= B_GIFCOLS[col][1];
     dest[2]= B_GIFCOLS[col][2];
-    return(0);
+    return 0;
 }
 
 
@@ -994,7 +994,7 @@ int B_PrintHtmlTableClass(char *table_class, int unused)
 {
     SCR_free(A2M_HTML_TABLECLASS);
     A2M_HTML_TABLECLASS = (char*) SCR_stracpy((unsigned char*) table_class);
-    return(0);
+    return 0;
 }
 
 // $PrintHtmlTRClass class_name
@@ -1003,7 +1003,7 @@ int B_PrintHtmlTRClass(char *tr_class, int unused)
 {
     SCR_free(A2M_HTML_TRCLASS);
     A2M_HTML_TRCLASS = (char*) SCR_stracpy((unsigned char*) tr_class);
-    return(0);
+    return 0;
 }
 
 
@@ -1013,7 +1013,7 @@ int B_PrintHtmlTHClass(char *th_class, int unused)
 {
     SCR_free(A2M_HTML_THCLASS);
     A2M_HTML_THCLASS = (char*) SCR_stracpy((unsigned char*) th_class);
-    return(0);
+    return 0;
 }
 
 
@@ -1023,5 +1023,5 @@ int B_PrintHtmlTDClass(char *td_class, int unused)
 {
     SCR_free(A2M_HTML_TDCLASS);
     A2M_HTML_TDCLASS = (char*) SCR_stracpy((unsigned char*) td_class);
-    return(0);
+    return 0;
 }

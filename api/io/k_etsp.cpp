@@ -75,13 +75,13 @@ int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
     }
 
     expdef->file_descriptor << "FREQ " + str_periodicity + ";\nSMPL " << str_sample << " ;\n";
-    return(0);
+    return 0;
 }
 
 int ExportObjsTSP::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     expdef->file_descriptor.close();
-    return(0);
+    return 0;
 }
 
 char* ExportObjsTSP::write_object_name(char* name, char** code)
@@ -91,9 +91,11 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
 
 char* ExportObjsTSP::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
-        *cmt = (char*) SCR_stracpy((unsigned char*) dbc->get_obj(handle));
+    if(dbc->contains(name))
+    {
+        Comment comment = dbc->get(name);
+        *cmt = (char*) SCR_stracpy((unsigned char*) comment.c_str());
+    }  
     else 
         *cmt = (char*) SCR_stracpy((unsigned char*) " ");
     
@@ -141,5 +143,5 @@ int ExportObjsTSP::write_variable_and_comment(ExportToFile* expdef, char* code, 
         expdef->file_descriptor << text[i] << "\n";
     expdef->file_descriptor <<  " ;\n";
     SCR_free_tbl((unsigned char**) text);
-    return(0);
+    return 0;
 }

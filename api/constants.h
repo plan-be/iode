@@ -215,6 +215,8 @@ const static int IODE_NB_FILE_EXT = 31;
 
 /*-------------------- GLOBALS ------------------------*/
 
+constexpr int EQS_NBTESTS = 20;
+
 inline char    *BUF_DATA = NULL;
 inline char    B_SEPS[] = " ,\n\t";     // Accepted separators for fn arguments (in report, DOS GUI..)
                                         // !! Semi-colon not accepted !!

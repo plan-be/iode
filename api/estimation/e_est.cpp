@@ -44,7 +44,7 @@ int Estimation::E_c_gmg()
         M_prod(E_VCCTMP, E_MTMPP, E_MTMP);                  /* VCCTMP = M.MTMP */
         M_calc(E_VCC, E_VCCTMP, E_VCC, '+');                /* VCC=VCCTMP+VCC */
     }
-    return(0);
+    return 0;
 }
 
 
@@ -81,12 +81,12 @@ int Estimation::E_c_rhs()
             if(IODE_IS_A_NUMBER(x)) MATE(E_RHS, i, t) = x;
             else  {
                 error_manager.append_error("Estimation: NaN Generated");
-                return(-1);
+                return -1;
             }
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -98,9 +98,9 @@ int Estimation::E_c_rhs()
 int Estimation::E_residuals()
 {
     /* COMPUTE RHS */
-    if(E_c_rhs() != 0) return(-1);
+    if(E_c_rhs() != 0) return -1;
     M_calc(E_U, E_LHS, E_RHS, '-');
-    return(0);
+    return 0;
 }
 
 
@@ -116,9 +116,9 @@ int Estimation::E_deltac()
     if(M_errno)
     {
         error_manager.append_error("Estimation: Singular Matrix (VCC)");
-        return(-1);
+        return -1;
     } 
-    return(0);
+    return 0;
 }
 
 
@@ -158,7 +158,7 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
                         (x - MATE(E_RHS, i, j)) / h;
                 else  {
                     error_manager.append_error("Estimation: NaN Generated");
-                    return(-1);
+                    return -1;
                 }
             }
         }
@@ -167,7 +167,7 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
             for(j = 0 ; j < E_T ; j++) MATE(E_G, est_coef_nb, i * E_T + j) = 0;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -193,24 +193,24 @@ int Estimation::E_jacobian()
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
         // Uniquement pour les coef estimés (relax <> 0)
-        if(E_DBS->get_obj(scl_name)->relax != 0) 
+        if(E_DBS->get_obj_ptr(scl_name)->relax != 0) 
         {      
-            oldc = E_DBS->get_obj(scl_name)->value;                   // Stocke l'ancienne valeur du coef
+            oldc = E_DBS->get_obj_ptr(scl_name)->value;                   // Stocke l'ancienne valeur du coef
             if(fabs(oldc) < 1e-15)                                  // ou 0.1 si coef proche de nul
                 oldc = 0.1;                      
-            E_DBS->get_obj(scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
+            E_DBS->get_obj_ptr(scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
             if(0 != E_mod_residuals(i, j, oldc * h)) 
             {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                E_DBS->get_obj(scl_name)->value = oldc;               /* reset coef */
+                E_DBS->get_obj_ptr(scl_name)->value = oldc;               /* reset coef */
                 return -1;
             }
-            E_DBS->get_obj(scl_name)->value = oldc;                   /* reset coef */
+            E_DBS->get_obj_ptr(scl_name)->value = oldc;                   /* reset coef */
             j++;
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -231,7 +231,7 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
                 E_C_NBS[coef_nb] == clec->lnames[j].pos) 
                     return(1);
 
-    return(0);
+    return 0;
 }
 
 
@@ -264,7 +264,7 @@ int Estimation::E_c_gmu()
         M_prod(E_GMUTMP, E_MTMPP, E_UMTMP);                 /* UVCCTMP = M.UMTMP */
         M_calc(E_GMU, E_GMUTMP, E_GMU, '+');                /* GMU=UVCCTMP+GMU */
     }
-    return(0);
+    return 0;
 }
 
 
@@ -320,7 +320,7 @@ int Estimation::E_adaptcoef()
         j++;
     }
     E_put_C();
-    return(0);
+    return 0;
 }
 
 
@@ -335,7 +335,7 @@ int Estimation::E_c_vcu()
 {
     M_xxprim(E_VCU, E_U);
     M_scale(E_VCU, E_VCU, 1.0 / E_T);
-    return(0);
+    return 0;
 }
 
 
@@ -352,9 +352,9 @@ int Estimation::E_c_ivcu()
     if(M_errno)
     {
         error_manager.append_error("Estimation : Singular Matrix (VCU)");
-        return(-1);
+        return -1;
     } 
-    return(0);
+    return 0;
 }
 
 
@@ -379,7 +379,7 @@ int Estimation::E_c_mcu()
                 MATE(E_MCU, i, j) = MATE(E_MCU, j, i) = MATE(E_VCU, i, j) / x;
         }
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -395,10 +395,10 @@ int Estimation::E_c_ivcc()
     if(M_errno)
     {
         error_manager.append_error("Estimation: Singular Matrix (VCC)");
-        return(-1);
+        return -1;
     }
     M_copy(E_VCC, E_VCCTMP);
-    return(0);
+    return 0;
 }
 
 /**
@@ -412,9 +412,9 @@ int Estimation::E_c_vcc()
     E_c_ivcu();
     E_c_gmg();
     if(E_c_ivcc()) 
-        return(-1);
+        return -1;
     E_c_vcu();
-    return(0);
+    return 0;
 }
 
 /**
@@ -481,7 +481,7 @@ again: /* first step of all methods and second step for Zellner and 3 stages met
 
 err :
     error_manager.print_last_error();
-    return(-1);
+    return -1;
 }
 
 
@@ -539,5 +539,5 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     if(rc_prep == 0 && rc_est == 0) 
         rc = E_output();
     
-    return(rc);
+    return rc;
 }

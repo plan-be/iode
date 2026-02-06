@@ -20,6 +20,8 @@
  *  
  *     int K_calcvers(char* label): returns the current object version (0-2) from an IODE file header. 
  */
+#include "scr4/s_swap.h"        // SWHDL
+
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
@@ -42,52 +44,14 @@
  *                                  2 for format of IODE 5.04d
  *                                  -1 if not recognized
  */
- 
  int K_calcvers(char* label)
 {
-    if(memcmp(label, K_LABEL, strlen(K_LABEL)) == 0) return(0);     // Current version (5.64)
+    if(memcmp(label, K_LABEL, strlen(K_LABEL)) == 0) return 0;     // Current version (5.64)
     if(memcmp(label, K_LABELS, strlen(K_LABELS)) == 0) return(1);
     if(memcmp(label, K_LABELD, strlen(K_LABELD)) == 0) return(2);
-//      if(memcmp(label, K_LABELX, strlen(K_LABELX)) == 0) return(3);
-    return(-1);
+    return -1;
 }
 
-/**
- *  Adds bytes to a packed object to comply with the current version of IODE objects where
- *  short integers become long integers.
- *  The object content is replaced by a new allocated one in the swap memory.
- *  
- *  @param [in, out]    kdb     KDB*    KDB containing object to modify
- *  @param [in]         index   int     position of the object to modify in kdb
- *  @return                     void
- *  
- *  @details Called by convert_obj_version() only for IODE object version 1 and 2.
- */
-static void K_repack(KDB* kdb, int index)
-{
-    U_sh*  old_ptr;
-    int    nlg, add, lendata, i;
-
-    std::string name = kdb->get_name(index);
-    SWHDL old_handle = kdb->get_handle(name);
-    old_ptr = (U_sh *) SW_getptr(old_handle);
-    add = (old_ptr[1] + 2 + old_ptr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
-    nlg = old_ptr[0] + add;
-    SWHDL handle = SW_alloc(nlg);
-    old_ptr = (U_sh *) SW_getptr(old_handle);
-    OSIZE* ptr = (OSIZE *) SW_getptr(handle);
-    ptr[0] = nlg;
-    ptr[1] = old_ptr[1];
-    for(i = 2 ; i < old_ptr[1] + 2 ; i++)
-        ptr[i] = old_ptr[i] + add;
-
-    lendata = nlg - (ptr[1] + 2 + old_ptr[1] % 2) * sizeof(OSIZE);
-    memcpy(((char *) ptr) + (ptr[1]  + 2 + ptr[1] % 2) * sizeof(OSIZE),
-           ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(U_sh),
-           lendata);
-    SW_free(old_handle);
-    kdb->set_handle(name, handle);
-}
 
 /**
  *  Transforms a packed object from 16 bits integers to 32 bits integers. 
@@ -119,31 +83,52 @@ static char *Pack16To32(char* opack)
     return((char *)ptr);
 }
 
+static bool K_lec_pack(char** pack, char* lec)
+{
+    CLEC* clec;
+
+    *pack = 0;
+    if(lec == NULL) 
+        return false;
+    
+    clec = L_cc(lec);
+    if(clec == 0)  
+        return false;
+    
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, lec, (int) strlen(lec) + 1);
+    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
+    SW_nfree(clec);
+
+    return true;
+}
 
 /**
  *  Transforms a TableCell from 16 bits integers to 32 bits integers and appends the result
  *  to a pack which accumulates the TableCells of a Table (see K_repack_tbl()).
  *  
- *  @param [in]    pack    char*    NULL or pointer to a partial packed Table 
+ *  @param [in]    pack    char*        NULL or pointer to a partial packed Table 
  *  @param [in]    cell    TableCell*   16 bits integer packed object
- *  @return                char*    pointer to pack with the cell appended
+ *  @return                char*        pointer to pack with the cell appended
  *  
  */
-
 static char *T_cell_repack(char* pack, TableCell* cell)
 {
-    char *npack, *ipack, *opack, *c_lec;
-    
+    char* ipack = NULL;
+    char* opack = NULL;
+   
     if(cell->get_type() == TABLE_CELL_LEC) 
     {
         if(cell->is_null()) 
             return(pack);
         std::string lec = cell->get_content();
-        c_lec = (char*) lec.c_str();
-        K_ipack(&opack, c_lec);
-        npack = Pack16To32(opack);
-        ipack = 0;
-        K_ipack(&ipack, (char*) P_get_ptr(npack, 0));
+        char* c_lec = (char*) lec.c_str();
+
+        K_lec_pack(&opack, c_lec);
+        char* npack = Pack16To32(opack);
+        c_lec = (char*) P_get_ptr(npack, 0);
+        K_lec_pack(&ipack, c_lec);
+
         pack = (char*) P_add(pack, ipack, P_len(ipack));
         SW_nfree(npack);
     }
@@ -213,124 +198,95 @@ static char *K_repack_tbl(Table *tbl)
 /**
  *  Converts an IODE object from IODE objects version 1 or 2 to the current version (0 or 3).
  * 
- *  @param [in]         i       int     position of the object on kdb
+ *  @param [in]         opack   char*   packed IODE object in version 1 or 2
  *  @param [in]         vers    int     IODE objects version to convert to
- *  @return                     void
+ *  @return                     char*   packed IODE object in version 0 or 3 (current version)
  */
-void KDB::convert_obj_version(const int i, const int vers)
-{
-    float*    f;
-    double*   d;
-    int       j, nb, lg;
-    char      *ptr, *old_ptr, *pack;
-    SWHDL     handle, old_handle;
-    char      buf[512];
-    Equation* eq;
-    Table*    tbl;
-    
+char* convert_obj_version(const std::string& name, const int type, char* opack, const int vers, 
+    const Sample* sample)
+{    
+    // nothing to do
     if(vers == 0 || vers == 3) 
-    return;
-    
-    std::string name = this->get_name(i);
-    K_repack(this, i);
-    switch(this->k_type) 
+        return opack;
+
+    char *pack = 0;
+    char buf[512];
+    char* npack = Pack16To32(opack);
+    switch(type) 
     {
         case VARIABLES :
+        {
             if(vers == 2) 
-                return;
-            old_handle = this->get_handle(name);
-            nb = this->sample->nb_periods;
-            handle = KV_alloc_var(nb);
-            ptr = SW_getptr(handle);
-            d = (double *)P_get_ptr(ptr, 0);
-            old_ptr = SW_getptr(old_handle);
-            f = (float *)P_get_ptr(old_ptr, 0);
-            for(j = 0 ; j < nb ; j++) 
+                return npack;
+            
+            Variable var;
+            int nb = sample->nb_periods;
+            float* f = (float*) P_get_ptr(npack, 0);
+
+            double value;
+            for(int j = 0 ; j < nb ; j++) 
             {
                 sprintf(buf, "%.8g", f[j]);
-                d[j] = atof(buf);
-                if(IODE_IS_0(d[j])) 
-                    d[j] = 0.0;
+                value = atof(buf);
+                if(IODE_IS_0(value)) 
+                    value = 0.0;
+                var.push_back(value);
             }
-            SW_free(old_handle);
-            this->set_handle(name, handle);
+            var_to_binary(&pack, var);
             break;
-
+        }
         case SCALARS :
+        {
             if(vers == 2) 
-                return;
-            nb = 3;
-            /* Do New allocation & get dbl ptr*/
-            handle = KS_alloc_scl();
-            ptr = SW_getptr(handle);
-            d = (double *)P_get_ptr(ptr, 0);
+                return npack;
+            
+            Scalar scl;
+            int nb = 3;
+            float* f = (float*) P_get_ptr(npack, 0);
 
-            /* Get old allocation and get float ptr */
-            old_handle = this->get_handle(name);
-            old_ptr = SW_getptr(old_handle);
-            f = (float *)P_get_ptr(old_ptr, 0);
-
-            /* Convert */
-            for(j = 0 ; j < 3 ; j++) 
+            double value;
+            for(int j = 0 ; j < 3 ; j++) 
             {
-                d[j] = (double)f[j];
-                //Debug("%.8lg", d[j]);
-                sprintf(buf, "%.8lg", d[j]);
-                d[j] = atof(buf);
-                if(IODE_IS_0(d[j])) 
-                    d[j] = 0.0; /* JMP 30-10-98 */
+                value = (double) f[j];
+                sprintf(buf, "%.8lg", value);
+                value = atof(buf);
+                if(IODE_IS_0(value)) 
+                    value = 0.0;
+                
+                if(j == 0) 
+                    scl.value = value;
+                else if(j == 1) 
+                    scl.relax = value;
+                else if(j == 2) 
+                    scl.std = value;
             }
-
-            SW_free(old_handle);
-            this->set_handle(name, handle);
+            scl.to_binary(&pack);
             break;
-
+        }
         case IDENTITIES :
-            old_handle = this->get_handle(name);
-            old_ptr = SW_getptr(old_handle);
-            K_ipack(&pack, (char*) P_get_ptr(old_ptr, 0));
-            SW_free(old_handle);
-            lg = P_get_len(pack, -1);
-            handle = SW_alloc(lg);
-            memcpy(SW_getptr(handle), pack, lg);
-            SW_nfree(pack);
-            this->set_handle(name, handle);
+        {
+            char* lec = (char*) P_get_ptr(npack, 0);
+            K_lec_pack(&pack, lec);
             break;
-
+        }
         case EQUATIONS :
-            old_handle = this->get_handle(name);
-            old_ptr = SW_getptr(old_handle);
-            eq = K_eunpack(old_ptr, (char*) name.c_str());
-            SW_free(old_handle);
-            K_epack(&pack, (char*) eq, (char*) name.c_str());
+        {
+            Equation* eq = binary_to_eqs(npack, name);
+            eq->to_binary(&pack);
             delete eq;
-            eq = nullptr;
-            lg = P_get_len(pack, -1);
-            handle = SW_alloc(lg);
-            memcpy(SW_getptr(handle), pack, lg);
-            SW_nfree(pack);
-            this->set_handle(name, handle);
             break;
-
+        }
         case TABLES :
-            old_handle = this->get_handle(name);
-            old_ptr = SW_getptr(old_handle);
-            tbl = K_tunpack(old_ptr, (char*) name.c_str());
-            SW_free(old_handle);
+        {
+            Table* tbl = binary_to_tbl(npack);
             pack = K_repack_tbl(tbl);
             delete tbl;
-            tbl = nullptr;
-            lg = P_get_len(pack, -1);
-            handle = SW_alloc(lg);
-            memcpy(SW_getptr(handle), pack, lg);
-            SW_nfree(pack);
-            this->set_handle(name, handle);
             break;
-
+        }
         default :
             break;
     }
 
-    return;
+    return pack;
 }
 

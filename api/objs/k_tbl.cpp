@@ -19,6 +19,8 @@
 #include "api/report/undoc/undoc.h"
 #include "cpp_api/computed_table/computed_table.h"
 
+bool debug_unpack = false;
+bool debug_pack = false;
 
 // ========================= TableCell methods ========================= //
 
@@ -154,6 +156,120 @@ bool TableCell::print_definition(int nb_columns) const
     return true;
 }
 
+TableCell32 TableCell::convert_64_to_32bits()
+{
+    TableCell32 tc32;
+
+    TableCellType type64 = this->get_type();
+    if(type64 == TABLE_CELL_STRING)
+    {
+        // NOTE: always set content to 1, even if the string is empty.
+        tc32.content = 1; 
+        tc32.type = (char) type64;
+        tc32.attribute = this->get_attribute();
+    }
+    else
+    {
+        tc32.content = this->is_null() ? 0 : 1;
+        tc32.type = (char) type64;
+        tc32.attribute = this->get_attribute();
+    }
+    memset(tc32.pad, '\0', 2);
+
+    return tc32;
+}
+
+bool TableCell::convert_32_to_64bits(const TableCell32& cell32)
+{
+    if(cell32.type == TABLE_CELL_STRING)
+        this->set_text("");
+    // NOTE: if cell32.type == 0, assume it is a LEC cell with content = ""
+    //       This can happen when reading binary formatted files
+    else if(cell32.content != 0)
+        this->set_lec("1");
+    else
+        this->set_lec("");
+
+    return true;
+}
+
+/**
+ *  Serializes a Table cell
+ *  
+ *  @param [in, out]    pointer to the pack before adding the cell
+ *  @return             pointer to the new pack
+ */
+char* TableCell::to_binary(char *pack, int& p, int i, int j)
+{
+    int len;
+    if(this->get_type() == TABLE_CELL_LEC)
+    {
+        std::string lec = this->get_content();
+        if(lec.empty())
+            return pack;
+
+        char* pack_idt = NULL;
+        Identity idt(lec);
+        idt.to_binary(&pack_idt);
+        len = P_len(pack_idt);
+        pack = (char*) P_add(pack, pack_idt, len);
+        p++;
+
+        debug_packing("cell", "LEC  ", p, i, j, lec, len);
+    }
+    else
+    {
+        std::string text = this->get_content(false, false);
+        char* c_text = (char*) text.c_str();
+        len = (int) strlen(c_text) + 1;
+        pack = (char*) P_add(pack, c_text, len);
+        p++;
+
+        debug_packing("cell", "STR  ", p, i, j, text, len);
+    }
+
+    return pack;
+}
+
+bool TableCell::from_binary(char *pack, int& p, int i, int j)
+{
+    char* value = (char*) P_get_ptr(pack, p);
+
+    if(this->get_type() == TABLE_CELL_STRING)
+    {
+        std::string content = (value == NULL) ? "" : std::string(value);
+        debug_unpacking("cell", "STR  ", p, i, j, content);
+        this->set_text(content, false);
+        p++;
+        return true;
+    }
+    else
+    {   
+        // NOTE: 'value' is a serialized Identity
+        char* c_lec = (char*) P_get_ptr(value, 0);
+        std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
+        debug_unpacking("cell", "LEC  ", p, i, j, lec);
+        this->set_lec(lec);
+        p++;
+        return true;
+    }
+}
+
+// see the constructor Table(nb_columns) for the initialization of 
+// the special 'div' line
+void TableCell::sanitize_div(int j)
+{
+    // recompile the LEC expression
+    if(this->get_type() == TABLE_CELL_STRING)
+    {
+        std::string lec = this->get_content();
+        this->set_lec(lec);
+    }
+
+    if(j == 0 && this->is_null())
+        this->set_lec("1");
+}
+
 std::size_t hash_value(const TableCell& cell)
 {
     std::hash<TableCell> cell_hash;
@@ -162,11 +278,31 @@ std::size_t hash_value(const TableCell& cell)
 
 // ========================= TableLine methods ========================= //
 
+TableLine32 TableLine::convert_64_to_32bits()
+{
+    TableLine32 tl32;
+
+    tl32.type = (char) this->get_type();
+    tl32.graph_type = (char) this->get_graph_type();
+    tl32.right_axis = this->right_axis ? 1 : 0;
+    tl32.pad[0] = '\0';
+
+    return tl32;
+}
+
+bool TableLine::convert_32_to_64bits(const TableLine32& line32)
+{
+    this->set_graph_type((TableGraphType) line32.graph_type);
+    this->right_axis = (bool) line32.right_axis;
+    return true;
+}
+
 std::size_t hash_value(const TableLine& line)
 {
     std::hash<TableLine> line_hash;
     return line_hash(line);
 }
+
 
 // ========================= Table methods ========================= //
 
@@ -208,11 +344,10 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 static void T_initialize_title(TableLine& title_line, const std::string& def)
 {
     std::string title;
-    SWHDL handle = global_ws_cmt->get_handle(def);
-    if(handle == 0)
-        title = def;
+    if(global_ws_cmt->contains(def))
+        title = global_ws_cmt->get(def);
     else
-        title = std::string(global_ws_cmt->get_obj(handle));
+        title = def;
     title = trim(title);
     title_line.cells[0].set_text(title);
 }
@@ -265,8 +400,6 @@ Table::Table(const int nb_columns): nb_columns(nb_columns)
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
 	bool mode, bool files, bool date): nb_columns(nb_columns)
 {
-    std::string comment;
-
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
@@ -277,8 +410,8 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    SWHDL handle;
     std::string lec;
+    Comment comment;
     std::string line_name;
     std::vector<std::string> v_vars = expand_lecs(vars);
     for(const std::string& var: v_vars) 
@@ -287,15 +420,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = global_ws_cmt->get_handle(var);
-        if(handle == 0)
-            line_name = var;
-        else
+        if(global_ws_cmt->contains(var))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(var);
             line_name = trim(comment);
         }
+        else
+            line_name = var;
 
         line.cells[0].set_text(line_name);
 
@@ -322,8 +453,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 	const std::vector<std::string>& lecs, bool mode, bool files, bool date)
     : nb_columns(nb_columns)
 {
-    std::string comment;
-
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
@@ -344,21 +473,20 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         throw std::invalid_argument(error_msg);
     }
 
-    SWHDL handle;
+    std::string comment;
     for(int i = 0; i < (int) titles.size(); i++)
     {
         append_line(TABLE_LINE_CELL);
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        line_name = titles[i];
-        handle = global_ws_cmt->get_handle(line_name);
-        if(handle > 0)
+        if(global_ws_cmt->contains(line_name))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(line_name);
             line_name = trim(comment);
         }
+        else
+            line_name = titles[i];
 
         line.cells[0].set_text(line_name);
 
@@ -384,8 +512,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
 	bool mode, bool files, bool date): nb_columns(nb_columns)
 {
-    std::string comment;
-
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
@@ -396,7 +522,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    SWHDL handle;
+    std::string comment;
     std::string line_name;
     std::vector<std::string> v_lecs = expand_lecs(lecs);
     for(const std::string& lec: v_lecs) 
@@ -405,15 +531,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        handle = global_ws_cmt->get_handle(lec);
-        if(handle == 0)
-            line_name = lec;
-        else
+        if(global_ws_cmt->contains(lec))
         {
-            comment = std::string(global_ws_cmt->get_obj(handle));
-            comment = oem_to_utf8(comment);
+            comment = global_ws_cmt->get(lec);
             line_name = trim(comment);
         }
+        else
+            line_name = lec;
 
         line.cells[0].set_text(line_name);
 
@@ -523,6 +647,188 @@ void Table::remove_line(const int row)
     lines.erase(lines.begin() + row);
 }
 
+// -------- OTHER METHODS --------
+
+Table32 Table::convert_64_to_32bits()
+{
+    Table32 tbl32;
+
+    tbl32.language = (short) this->get_language();
+    tbl32.repeat_columns = this->repeat_columns;
+    tbl32.nb_columns = this->nb_columns;
+    tbl32.nb_lines = (int) this->lines.size();
+
+    tbl32.divider_line = this->divider_line.convert_64_to_32bits();
+
+    tbl32.z_min = this->z_min;
+    tbl32.z_max = this->z_max;
+    tbl32.y_min = this->y_min;
+    tbl32.y_max = this->y_max;
+    tbl32.attribute = this->attribute;
+    tbl32.chart_box = this->chart_box;
+    tbl32.chart_shadow = this->chart_shadow;
+    tbl32.chart_gridx = (char) this->get_gridx();
+    tbl32.chart_gridy = (char) this->get_gridy();
+    tbl32.chart_axis_type = (char) this->get_graph_axis();
+    tbl32.text_alignment = (char) this->get_text_alignment();
+    memset(tbl32.pad, '\0', sizeof(tbl32.pad));
+
+    return tbl32;
+}
+
+bool Table::convert_32_to_64bits(const Table32& table32)
+{
+    this->set_language((TableLang) table32.language);
+    this->repeat_columns = table32.repeat_columns;
+    this->nb_columns = table32.nb_columns;
+
+    this->divider_line.convert_32_to_64bits(table32.divider_line);
+
+    this->z_min = table32.z_min;
+    this->z_max = table32.z_max;
+    this->y_min = table32.y_min;
+    this->y_max = table32.y_max;
+    this->attribute = table32.attribute;
+    this->chart_box = table32.chart_box;
+    this->chart_shadow = table32.chart_shadow;
+    this->set_gridx((TableGraphGrid) table32.chart_gridx);
+    this->set_gridy((TableGraphGrid) table32.chart_gridy);
+    this->set_graph_axis((TableGraphAxis) table32.chart_axis_type);
+    this->set_text_alignment((TableTextAlign) table32.text_alignment);
+
+    return true;
+}
+
+Table* binary_to_tbl(char* pack)
+{
+    int p = 0;
+
+    /* table header */
+    Table32* tbl32 = (Table32*) P_get_ptr(pack, 0);
+    Table* tbl = new Table(tbl32->nb_columns);
+    tbl->convert_32_to_64bits(*tbl32);
+    debug_unpacking("Table    ", "", 0);
+
+    /* divider line */
+    TableCell32* cells32 = (TableCell32*) P_get_ptr(pack, 1);
+    debug_unpacking("line", "DIV  ", 1);
+
+    // NOTE: new Table(tbl32->nb_columns) above creates a table with a 'divider' line 
+    //       with nb_columns cells of type TABLE_CELL_LEC and content = ""
+    p = 2;
+    int k = 0;
+    for(TableCell& cell : tbl->divider_line.cells) 
+    {
+        TableCell32* cell32 = cells32 + k;
+        cell.convert_32_to_64bits(*cell32);
+        debug_unpacking("cell", "DIV  ", p, 0, k, (cell32->content == 0) ? " NO" : " YES");
+        if(cell32->content != 0)
+            cell.from_binary(pack, p, 0, k);
+        cell.set_attribute(cell32->attribute);
+        cell.sanitize_div(k);
+        k++;
+    }
+    
+    /* lines */
+    TableLine32* lines32 = (TableLine32*) P_get_ptr(pack, p);
+    debug_unpacking("LINES    ", "", p);
+    p++;
+
+    TableCell* cell = nullptr;
+    TableLine32* line32 = nullptr;
+    TableCell32* cell32 = nullptr;
+    for(int i = 0; i < tbl32->nb_lines; i++) 
+    {
+        line32 = lines32 + i;
+        switch(line32->type) 
+        {
+            case TABLE_LINE_CELL:
+            {
+                TableLine line(TableLineType::TABLE_LINE_CELL);
+                line.convert_32_to_64bits(*line32);
+
+                cells32 = (TableCell32*) P_get_ptr(pack, p);
+                debug_unpacking("line", "CELL ", p, i);
+                p++;
+
+                for(int j = 0; j < tbl->nb_columns; j++) 
+                {
+                    cell32 = cells32 + j;
+                    // if cell type not properly set, assume it is a LEC cell
+                    // -> may happen when reading binary formatted files <-
+                    if(!(cell32->type == TABLE_CELL_STRING || cell32->type == TABLE_CELL_LEC))
+                        cell32->type = TABLE_CELL_LEC;
+                    if(cell32->type == TABLE_CELL_STRING)
+                        cell = new TableCell(TABLE_CELL_STRING);
+                    else
+                        cell = new TableCell(TABLE_CELL_LEC, "", j);
+                    cell->convert_32_to_64bits(*cell32);
+                    if(cell32->content != 0) 
+                        cell->from_binary(pack, p, i, j);
+                    cell->set_attribute(cell32->attribute);
+                    line.cells.push_back(*cell);
+                }
+
+                tbl->lines.push_back(line);
+                break;
+            }
+            case TABLE_LINE_TITLE:
+            {
+                TableLine line(TableLineType::TABLE_LINE_TITLE);
+                line.convert_32_to_64bits(*line32);
+
+                cell32 = (TableCell32*) P_get_ptr(pack, p);
+                debug_unpacking("line", "TITLE", p, i);
+                p++;
+
+                cell = new TableCell(TABLE_CELL_STRING);
+                cell->convert_32_to_64bits(*cell32);
+                if(cell32->content != 0) 
+                    cell->from_binary(pack, p, i, 0);
+                cell->set_attribute(cell32->attribute);
+                line.cells.push_back(*cell);
+
+                tbl->lines.push_back(line);
+                break;
+            }
+            case TABLE_LINE_SEP:
+            {
+                TableLine line(TableLineType::TABLE_LINE_SEP);
+                debug_unpacking("line", "SEP  ", p, i);
+                tbl->lines.push_back(line);
+                break;
+            }
+            case TABLE_LINE_MODE:
+            {
+                TableLine line(TableLineType::TABLE_LINE_MODE);
+                debug_unpacking("line", "MODE ", p, i);
+                tbl->lines.push_back(line);
+                break;
+            }
+            case TABLE_LINE_FILES:
+            {
+                TableLine line(TableLineType::TABLE_LINE_FILES);
+                debug_unpacking("line", "FILES", p, i);
+                tbl->lines.push_back(line);
+                break;
+            }
+            case TABLE_LINE_DATE:
+            {
+                TableLine line(TableLineType::TABLE_LINE_DATE);
+                debug_unpacking("line", "DATE ", p, i);
+                tbl->lines.push_back(line);
+                break;
+            }
+            default:
+                std::string msg = "Unpacking table line: invalid line type " + std::to_string(line32->type); 
+                msg += " at line " + std::to_string(i);
+                kwarning(msg.c_str());
+                break;
+        }
+    }
+
+    return tbl;
+}
 
 std::size_t hash_value(const Table& table)
 {
@@ -530,87 +836,7 @@ std::size_t hash_value(const Table& table)
     return tbl_hash(table);
 }
 
-
-Table* KDBTables::get_obj(const SWHDL handle) const
-{    
-    std::string name;
-    for(const auto& [_name_, _handle_] : k_objs) 
-    {
-        if(_handle_ == handle) 
-        {
-            name = _name_;
-            break;
-        }
-    }
-
-    return get_obj(name);
-}
-
-Table* KDBTables::get_obj(const std::string& name) const
-{
-    std::string key = to_key(name);
-    SWHDL handle = this->get_handle(key);
-    if(handle == 0)  
-        throw std::invalid_argument("Table with name '" + key + "' not found.");
-    
-    char* ptr = SW_getptr(handle);
-    if(ptr == nullptr)  
-        return nullptr;
-    return (Table*) K_tunpack(ptr, (char*) key.c_str());
-}
-
-bool KDBTables::set_obj(const std::string& name, const Table* value)
-{
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_tpack(&pack, (char*) value, (char*) key.c_str());
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set table object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
-}
-
-Table* KDBTables::get(const std::string& name) const
-{
-	Table* table = this->get_obj(name);
-	return table;
-}
-
-bool KDBTables::add(const std::string& name, const Table& obj)
-{
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add table: a table named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add table: a table named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
-	Table table(obj);
-	return this->set_obj(name, &table);
-}
-
-void KDBTables::update(const std::string& name, const Table& obj)
-{
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update table: no table named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-	Table table(obj);
-	this->set_obj(name, &table);
-}
+// ========================= KDBTables methods ========================= //
 
 std::string KDBTables::get_title(const std::string& name) const
 {
@@ -618,23 +844,22 @@ std::string KDBTables::get_title(const std::string& name) const
 	if(!this->contains(name))
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
-    Table* table = this->get_obj(name);
+    Table* table = this->get_obj_ptr(name);
     std::string title = std::string((char*) T_get_title(table));
-    delete table;
     return title;
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns)
 {
 	Table table(nbColumns);
-	return this->add(name, table);
+	return KDBTemplate::add(name, table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::vector<std::string>& vars, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, vars, mode, files, date);
-	return this->add(name, table);
+	return KDBTemplate::add(name, table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
@@ -642,14 +867,14 @@ bool KDBTables::add(const std::string& name, const int nbColumns, const std::str
 	bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, titles, lecs, mode, files, date);
-	return this->add(name, table);
+	return KDBTemplate::add(name, table);
 }
 
 bool KDBTables::add(const std::string& name, const int nbColumns, const std::string& def, 
 	const std::string& lecs, bool mode, bool files, bool date)
 {
 	Table table(nbColumns, def, lecs, mode, files, date);
-	return this->add(name, table);
+	return KDBTemplate::add(name, table);
 }
 
 void KDBTables::print_to_file(const std::string& destination_file, const std::string& gsample, 
@@ -662,24 +887,187 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 	std::set<std::string> v_names = filter_names(names);
 	for(const std::string& name : v_names)
 	{
-		table = get(name);
+		table = this->get_obj_ptr(name);
 		computed_table = new ComputedTable(table, gsample, nb_decimals);
 		computed_table->print_to_file();
 		delete computed_table;
-		delete table;
 	}
 
 	ComputedTable::finalize_printing();
 }
 
-bool KDBTables::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBTables::binary_to_obj(const std::string& name, char* pack)
+{
+    debug_unpacking("table " + name, "--------------------------------", -1);
+    Table* tbl = binary_to_tbl(pack);
+    if(!tbl)
+        return false;
+
+    this->k_objs[name] = tbl;
+    return true;
+}
+
+/**
+ * Serializes a Table object. 
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the packed Table
+ * @param [in]  name    string      table name
+ * @return                          true if the serialization succeeded, false otherwise 
+*/
+bool KDBTables::obj_to_binary(char** pack, const std::string& name)
+{
+    debug_packing("table " + std::string(name), "--------------------------------", -1);
+    
+    *pack = NULL;
+    Table* tbl = this->get_obj_ptr(name);
+    if(!tbl)
+        return false;
+
+    int p = -1;
+    *pack = (char*) P_create();
+
+    /* table header */
+
+    Table32 tbl32 = tbl->convert_64_to_32bits();
+    *pack = (char*) P_add(*pack, (char*) &tbl32, sizeof(Table32));
+    p++;
+    debug_packing("Table      ", "", p);
+
+    /* divider line */
+
+    // a) serialize cells except their content
+    std::vector<TableCell32> cells32; 
+    cells32.reserve(tbl->nb_columns);
+    for(TableCell& cell : tbl->divider_line.cells)
+    {
+        TableCell32 cell32 = cell.convert_64_to_32bits();
+        cells32.push_back(cell32);
+    }
+    int nb_cells = (int) cells32.size();
+    *pack = (char*) P_add(*pack, (char*) cells32.data(), sizeof(TableCell32) * nb_cells);
+    p++;
+
+    debug_packing("line", "DIV  ", p);
+
+    int k = 0;
+    for(TableCell32& cell32 : cells32)
+    {
+        debug_packing("cell", "DIV  ", p+k+1, 0, k, (cell32.content == 1) ? "YES" : "NO");
+        k++;
+    }
+
+    cells32.clear();
+
+    // b) serialize cells content
+    k = 0;
+    for(TableCell& cell : tbl->divider_line.cells)
+    {
+        *pack = cell.to_binary(*pack,  p, 0, k);
+        k++;
+    }
+
+    /* lines */
+
+    // a) serialize lines except their cells
+    std::vector<TableLine32> lines32;
+    int nb_lines = (int) tbl->lines.size();
+    lines32.reserve(nb_lines);
+    for(TableLine& line : tbl->lines)
+    {
+        TableLine32 line32 = line.convert_64_to_32bits();
+        lines32.push_back(line32);
+    }
+    *pack = (char*) P_add(*pack, (char*) lines32.data(), sizeof(TableLine32) * nb_lines);
+    p++;
+
+    debug_packing("LINES    ", "", p);
+
+    lines32.clear();
+
+    // b) serialize cells of lines
+    int i = 0;
+    for(TableLine& line: tbl->lines) 
+    {
+        switch(line.get_type()) 
+        {
+            case TABLE_LINE_CELL:
+            {
+                // a) serialize cells except their content
+                cells32.reserve(tbl->nb_columns);
+                for(TableCell& cell : line.cells) 
+                {
+                    TableCell32 cell32 = cell.convert_64_to_32bits();
+                    cells32.push_back(cell32);
+                }
+                *pack = (char*) P_add(*pack, (char*) cells32.data(), sizeof(TableCell32) * tbl->nb_columns);
+                p++;
+
+                debug_packing("line", "CELL ", p, i);
+
+                int j = 0;
+                for(TableCell32& cell32 : cells32)
+                {
+                    debug_packing("content? ", "", p+j+1, i, j, (cell32.content == 1) ? "YES" : "NO");
+                    j++;
+                }
+                
+                cells32.clear();
+
+                // b) serialize cells content
+                j = 0;
+                for(TableCell& cell : line.cells)
+                {
+                    *pack = cell.to_binary(*pack, p, i, j);
+                    j++;
+                } 
+                break;
+            }
+            case TABLE_LINE_TITLE:
+            {
+                TableCell cell = line.cells[0];
+                // a) serialize cell except its content
+                TableCell32 cell32 = cell.convert_64_to_32bits();
+                *pack = (char*) P_add(*pack, (char*) &cell32, sizeof(TableCell32));
+                p++;
+
+                debug_packing("line", "TITLE", p, i);
+                debug_packing("content? ", "", p+1, i, 0, (cell32.content == 1) ? "YES" : "NO");
+
+                // b) serialize cell content
+                *pack = cell.to_binary(*pack, p, i, 0);
+                break;
+            }
+            case TABLE_LINE_SEP:
+                debug_packing("line", "SEP  ", p, i);
+                break;
+            case TABLE_ASCII_LINE_MODE:
+                debug_packing("line", "MODE ", p, i);
+                break;
+            case TABLE_LINE_FILES:
+                debug_packing("line", "FILES", p, i);
+                break;
+            case TABLE_LINE_DATE:
+                debug_packing("line", "DATE ", p, i);
+                break;
+            default:
+                std::string msg = "Packing table line: invalid line type " + std::to_string(line.get_type()); 
+                msg += " at line " + std::to_string(i);
+                kwarning(msg.c_str());
+                break;
+        }
+        i++;
+    }
+
+    return true;
+}
+
+bool KDBTables::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     std::string text;
 
-    Table* tbl = const_cast<KDBTables*>(this)->get_obj(name);
+    Table* tbl = const_cast<KDBTables*>(this)->get_obj_ptr(name);
     for(const TableLine& tline : tbl->lines) 
     {
         if(found) 
@@ -722,7 +1110,6 @@ bool KDBTables::grep_obj(const std::string& name, const SWHDL handle,
         }
     }
     
-    delete tbl;
     return found;
 }
 
@@ -736,7 +1123,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     char    gsmpl[128], **l = NULL, *buf, *res = NULL;
     COLS    *cls;
 
-    Table* tbl = global_ws_tbl->get_obj(name);
+    Table* tbl = global_ws_tbl->get_obj_ptr(name);
     Sample* smpl = global_ws_var->sample;
 
     /* date */
@@ -837,7 +1224,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     KT_names = NULL;
     KT_nbnames = 0;
 
-    return(res);
+    return res;
 }
 
 char* KDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
@@ -858,7 +1245,7 @@ char* KDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* n
  */
 bool KDBTables::print_obj_def(const std::string& name)
 {
-    Table* tbl = this->get_obj(name);
+    Table* tbl = this->get_obj_ptr(name);
     if(!tbl) 
         return false;
     
@@ -868,9 +1255,6 @@ bool KDBTables::print_obj_def(const std::string& name)
             W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), T_get_title(tbl, false));
         else 
             W_printf((char*) "\n%s\n", T_get_title(tbl, false));
-        
-        delete tbl;
-        tbl = nullptr;
         return true;
     }
 
@@ -880,9 +1264,6 @@ bool KDBTables::print_obj_def(const std::string& name)
     W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, name.c_str(), A2M_ESCCH);
     bool success = tbl->print_definition();
     W_printf((char*) ".te\n");
-
-    delete tbl;
-    tbl = nullptr;
     return success;
 }
 

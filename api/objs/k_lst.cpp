@@ -110,7 +110,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
 {
     if(cl == NULL) 
         return;
-    
+
     char* c_name;
     std::string name;
     for(int j = 0 ; j < cl->nb_names ; j++) 
@@ -118,12 +118,16 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
         c_name = cl->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name))
-            scal->set_obj(name, nullptr);
+            // add dummy value for the scalar. The value is not relevant 
+            // as only the name will be used in the list of scalars.
+            scal->set_obj_ptr(name, new Scalar());
         else 
         {
             if(kdb != nullptr && kdb->contains(name)) 
                 continue;
-            exo->add_entry(name);
+            // add dummy value for the variable. The value is not relevant 
+            // as only the name will be used in the list of variables.
+            exo->set_obj_ptr(name, new Variable());
         }
     }
 }
@@ -143,11 +147,9 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
 void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbe->get_name(i);
-    Equation* eq = dbe->get_obj(name);
+    Equation* eq = dbe->get_obj_ptr(name);
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
-    delete eq;
-    eq = nullptr;
 }
 
 
@@ -166,7 +168,7 @@ void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
 void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbi->get_name(i);
-    CLEC* cl_idt = dbi->get_obj(name)->get_compiled_lec();
+    CLEC* cl_idt = dbi->get_obj_ptr(name)->get_compiled_lec();
 
     int lg = cl_idt->tot_lg;
     CLEC* cl = (CLEC *) SW_nalloc(lg);
@@ -192,7 +194,7 @@ void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
 void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbt->get_name(i);
-    Table* tbl = dbt->get_obj(name);
+    Table* tbl = dbt->get_obj_ptr(name);
 
     CLEC* clec = NULL;
     for(int k = 0; k < T_NL(tbl); k++)   
@@ -209,9 +211,6 @@ void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
             K_clecscan(nullptr, clec, exo, scal);
         }
     }
-
-    delete tbl;
-    tbl = nullptr;
 }
 
 
@@ -242,18 +241,32 @@ int KL_lst(char* name, char** lst, int chunck)
     nb = SCR_tbl_size((unsigned char**) lst);
     if(nb == 0) 
     {
-        if(!global_ws_lst->set_obj(name, ""))    
+        try
+        {
+            global_ws_lst->set_obj_ptr(name, new List(""));    
+        }
+        catch(const std::exception& e)
+        {
+            kwarning(e.what());
             rc = -1;
+        }
         goto done;
     }
 
     if(nb < chunck || chunck < 0) 
     {
-        str = (char*) SCR_mtov((unsigned char**) lst, (int) ';'); /* JMP 09-03-95 */
-        if(!global_ws_lst->set_obj(name, str))  
+        str = (char*) SCR_mtov((unsigned char**) lst, (int) ';');
+        try
+        {
+            global_ws_lst->set_obj_ptr(name, new List(str)); 
+        }
+        catch(const std::exception& e)
+        {
+            kwarning(e.what());
             rc = -1;
+        }
         SCR_free(str);
-        return(rc);
+        return rc;
     }
 
     for(i = 0, j = 0; i < nb && !rc; i+= chunck, j++) 
@@ -267,8 +280,15 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
         sprintf(buf, "%s%d", name, j);
         buf[K_MAX_NAME] = 0;
-        if(!global_ws_lst->set_obj(buf, str))  
+        try
+        {
+            global_ws_lst->set_obj_ptr(buf, new List(str));
+        }
+        catch(const std::exception& e)
+        {
+            kwarning(e.what());
             rc = -1;
+        }
         SCR_free(str);
 
         if(i + chunck < nb)  
@@ -285,12 +305,21 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         strcat(str, buf);
     }
-    if(!global_ws_lst->set_obj(name, str)) 
+
+    try
+    {
+        global_ws_lst->set_obj_ptr(name, new List(str));
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
         rc = -1;
+    }
+
     SW_nfree(str);
 
 done:
-    return(rc);
+    return rc;
 }
 
 
@@ -323,6 +352,8 @@ unsigned char **KL_expand(char *str)
         return(tbl);
     
     std::string list_name;
+    List* list_ptr = nullptr;
+    char* c_list = NULL;
     for(i = 0 ; tbl[i] ; i++) 
     {
         if(tbl[i][0] == '$') 
@@ -331,7 +362,9 @@ unsigned char **KL_expand(char *str)
             if(global_ws_lst->contains(list_name))
             {
                 SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                tbl2 = KL_expand(global_ws_lst->get_obj(list_name));
+                list_ptr = global_ws_lst->get_obj_ptr(list_name);
+                c_list = (char*) list_ptr->c_str();
+                tbl2 = KL_expand(c_list);
                 nb2 = SCR_tbl_size(tbl2);
                 // Insertion dans tbl de la liste à la place de tbl[i]
                 tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);
@@ -347,96 +380,58 @@ unsigned char **KL_expand(char *str)
     return(tbl);
 }
 
-
-char* KDBLists::get_obj(const SWHDL handle) const
-{    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
-}
-
-char* KDBLists::get_obj(const std::string& name) const
+bool KDBLists::binary_to_obj(const std::string& name, char* pack)
 {
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("IODE list with name '" + name + "' not found.");
-    
-    return get_obj(handle);
+    size_t len = (size_t) P_get_len(pack, 0);
+    char* value = new char[len];
+    strncpy(value, (char*) P_get_ptr(pack, 0), len);
+
+    List* list = new List(value);
+    this->k_objs[name] = list;
+    return true;
 }
 
-bool KDBLists::set_obj(const std::string& name, const char* value)
+/**
+ * Serializes a list object. 
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @param [in]  name    string      list name
+ * @return                          true if the serialization succeeded, false otherwise 
+ */
+bool KDBLists::obj_to_binary(char** pack, const std::string& name)
 {
-    char* pack = NULL;
-    std::string key = to_key(name);
-    K_lpack(&pack, (char*) value);
-    bool success = set_packed_object(key, pack);
-    if(!success)
-    {
-        std::string error_msg = "Failed to set list object '" + key + "'";
-        kwarning(error_msg.c_str());
-    }
-    return success;
+    List* list = this->get_obj_ptr(name);
+    char* c_list = (char*) list->c_str();
+
+    *pack = (char*) P_create();
+    *pack = (char*) P_add(*pack, c_list, (int) strlen(c_list) + 1);
+    return true;
 }
 
-bool KDBLists::set_obj(const std::string& name, const std::string& value)
-{
-    return set_obj(name, value.c_str());
-}
-
-List KDBLists::get(const std::string& name) const
-{
-	List list = std::string(this->get_obj(name));
-	return list;
-}
-
-bool KDBLists::add(const std::string& name, const List& list)
-{
-    if(this->contains(name))
-    {
-        std::string msg = "Cannot add list: a list named '" + name + 
-                          "' already exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-    if(this->parent_contains(name))
-    {
-        std::string msg = "Cannot add list: a list named '" + name + 
-                          "' exists in the parent database of the present subset";
-        throw std::invalid_argument(msg);
-    }
-
-	return this->set_obj(name, list);
-}
-
-void KDBLists::update(const std::string& name, const List& list)
-{
-    if(!this->contains(name))
-    {
-        std::string msg = "Cannot update list: no list named '" + name + 
-                          "' exists in the database.";
-        throw std::invalid_argument(msg);
-    }
-
-	this->set_obj(name, list);
-}
-
-bool KDBLists::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBLists::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
-    if(texts) 
-        found = wrap_grep_gnl(pattern, this->get_obj(handle), ecase, all);
+    if(texts)
+    {
+        List* list = this->get_obj_ptr(name);
+        found = wrap_grep_gnl(pattern, *list, ecase, all);
+    }
     return found;
 }
 
 char* KDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = (char*) this->get_obj(name);
+    List* list = this->get_obj_ptr(name);
+    char* obj = (char*) list->c_str();
     return obj;
 }
 
 bool KDBLists::print_obj_def(const std::string& name)
 {
-    print_definition_generic(name, this->get_obj(name));
+    List* list = this->get_obj_ptr(name);
+    char* c_list = (char*) list->c_str();
+    print_definition_generic(name, c_list);
     return true;
 }
 

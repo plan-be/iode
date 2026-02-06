@@ -96,7 +96,7 @@ int T_GraphInit(double w, double h,
     if(IODE_IS_A_NUMBER(ymax)) W_printf((char*) ".gyMax %lg\n", ymax);
     if(IODE_IS_A_NUMBER(zmin)) W_printf((char*) ".gzMin %lg\n", zmin);
     if(IODE_IS_A_NUMBER(zmax)) W_printf((char*) ".gzMax %lg\n", zmax);
-    return(0);
+    return 0;
 }
 
 
@@ -110,7 +110,7 @@ int T_GraphEnd()
     W_printf((char*) ".ge\n");
     W_flush();
 
-    return(0);
+    return 0;
 }
 
 
@@ -141,17 +141,17 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     dim = T_prep_cls(tbl, gsmpl, &cls);
     if(dim < 0) 
-        return(-1);
+        return -1;
 
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
     if(files == 0) 
-        return(-1); /* JMP 11-06-99 */
+        return -1; /* JMP 11-06-99 */
 
     x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
@@ -222,7 +222,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
 int T_GraphTitle(char *txt)
 {
     W_printf((char*) ".gtitle %s\n", txt);
-    return(0);
+    return 0;
 }
 
 
@@ -245,7 +245,7 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
     if(fileop != NULL && fileop[0] != 0) W_printf((char*) " %s", fileop);
 
     W_printf((char*) "\" "); /* GB 25/11/98 */
-    return(0);
+    return 0;
 }
 
 
@@ -268,7 +268,7 @@ static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i, bool to_utf8)
         fileop = COL_ctoa(cl, 'f', 0, 2);
     T_GraphLegend(line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                  (char*) content.c_str(), fileop);
-    return(0);
+    return 0;
 }
 
 
@@ -289,7 +289,7 @@ int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
     if(fileop != NULL && fileop[0] != 0) W_printf((char*) " %s", fileop);
 
     W_printf((char*) "\" ");
-    return(0);
+    return 0;
 }
 
 
@@ -313,7 +313,7 @@ int T_GraphTimeData(Sample *smpl, double *y)
         W_printf((char*) " %s ", buf);
     }
     W_printf((char*) "\n");
-    return(0);
+    return 0;
 }
 
 /**
@@ -336,7 +336,7 @@ int T_GraphXYData(int nb, double *x, double *y)
         W_printf((char*) " %s %s ", bufx, bufy);
     }
     W_printf((char*) "\n");
-    return(0);
+    return 0;
 }
 
 
@@ -367,7 +367,7 @@ int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y
 
     COL_clear(cls);
     if(COL_exec(tbl, i, cls) < 0) 
-        return(-1);
+        return -1;
 
     for(k = 0 ; k < fcls->cl_nb ; k++) 
     {
@@ -388,7 +388,7 @@ int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y
         T_GraphTimeData(smpl, y);
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -404,7 +404,7 @@ int T_find_opf(COLS *fcls, COL *cl)
     int     i;
     COL     *fcl;
 
-    if(fcls == 0) return(-1);
+    if(fcls == 0) return -1;
     for(i = 0; i < fcls->cl_nb; i++) {
         fcl = fcls->cl_cols + i;
         if(fcl->cl_opf    == cl->cl_opf &&
@@ -412,7 +412,7 @@ int T_find_opf(COLS *fcls, COL *cl)
                 fcl->cl_fnb[1] == cl->cl_fnb[1])
             return(i);
     }
-    return(-1);
+    return -1;
 }
 
 
@@ -450,7 +450,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
             smpl->end_period = cl->cl_per[0];
     }
     smpl->nb_periods = 1 + smpl->end_period.difference(smpl->start_period);
-    return(0);
+    return 0;
 }
 
 
@@ -492,7 +492,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
     {
         std::string err_msg = "No variable defined";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     y = (double *) SW_nalloc(sizeof(double) * nt);
@@ -531,7 +531,7 @@ fin:
 
     SW_nfree(y);
     SCR_free_tbl((unsigned char**) vars);
-    return(rc);
+    return rc;
 }
 
 
@@ -554,14 +554,14 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
     {
         std::string err_msg = "DataDisplayGraph : empty variable list";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     if(!smpl) 
     {
         std::string err_msg = "DataDisplayGraph : No graph sample defined";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     Sample* smpl_kdb = kdb->sample;
@@ -579,7 +579,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
         std::string err_msg = "DataDisplayGraph : Graph sample '" + smpl->to_string() + "' ";
         err_msg += "starts before the Variables workspace sample '" + smpl_kdb->to_string() + "'";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     if(smpl->end_period.difference(smpl_kdb->end_period) > 0) 
@@ -587,7 +587,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
         std::string err_msg = "DataDisplayGraph : Graph sample '" + smpl->to_string() + "' ";
         err_msg += "ends after the Variables workspace sample '" + smpl_kdb->to_string() + "'";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
 
     for(i = 0; i < ng; i++) 
@@ -598,7 +598,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
     }
 
     W_close();
-    return(0); /* JMP38 01-10-92 */
+    return 0; /* JMP38 01-10-92 */
 }
 
 
@@ -633,7 +633,7 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis,
     rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var.get(), names, mode); // JMP 8/8//2022
 
     //global_VM = old_mode;
-    return(rc);
+    return rc;
 }
 
 
@@ -684,7 +684,7 @@ int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x,
     APICHRT    *Chrt = API_CHARTS[hdl];
 
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) return(-1);
+    if(COL_exec(tbl, i, cls) < 0) return -1;
     for(k = 0 ; k < fcls->cl_nb ; k++) {
         APIGraphLineTitle(hdl, line, fcls, k);
         for(j = 0 ; j < smpl->nb_periods ; j++) y[j] = IODE_NAN;
@@ -697,7 +697,7 @@ int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x,
         APIGraphTimeData(hdl, smpl, y);
         Chrt->ChrtI++;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -714,7 +714,7 @@ int APIGraphTimeData(int hdl, Sample *smpl, double *y)
     APICHRT    *Chrt = API_CHARTS[hdl];
     Chrt->ChrtData[Chrt->ChrtI] = (double *)SW_nalloc(sizeof(double) * nb);
     memcpy(Chrt->ChrtData[Chrt->ChrtI], y, sizeof(double) * nb);
-    return(0);
+    return 0;
 }
 
 
@@ -738,7 +738,7 @@ int APIGraphTitle(int hdl, char *txt, double *x, int nb)
     Chrt->ChrtData[Chrt->ChrtI] = (double *) SW_nalloc(sizeof(double) * nb);
     memcpy(Chrt->ChrtData[Chrt->ChrtI], x, sizeof(double) * nb);
     Chrt->ChrtI++;
-    return(0);
+    return 0;
 }
 
 
@@ -762,7 +762,7 @@ int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
         Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_strafcat((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI], (unsigned char*) fileop);
     SCR_OemToAnsi((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI],
                   (unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI]);
-    return(0);
+    return 0;
 }
 
 
@@ -787,7 +787,7 @@ int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i)
         fileop = COL_ctoa(cl, 'f', 0, 2);
     APIGraphLegendTitle(hdl, line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                        (char*) content.c_str(), fileop);
-    return(0);
+    return 0;
 }
 
 
@@ -830,7 +830,7 @@ int APIChartEnd(APICHRT *Chrt)
     SW_nfree(Chrt->ChrtType);
     SW_nfree(Chrt->ChrtAxis);
     SW_nfree(Chrt);
-    return(0);
+    return 0;
     
 }
 
@@ -850,18 +850,18 @@ int APIChartAlloc(int nl)
 
 int APIChartFree(int hdl)
 {
-    if(API_NBCHARTS == 0) return(-1);
-    if(API_CHARTS[hdl] == 0) return(-1);
+    if(API_NBCHARTS == 0) return -1;
+    if(API_CHARTS[hdl] == 0) return -1;
     APIChartEnd(API_CHARTS[hdl]);
     API_CHARTS[hdl] = 0;
-    return(0);
+    return 0;
 }
 
 
 int APIChartNl(int hdl)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtI);
 }
@@ -870,7 +870,7 @@ int APIChartNl(int hdl)
 int APIChartNc(int hdl)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtNb);
 }
@@ -879,7 +879,7 @@ int APIChartNc(int hdl)
 int APIChartType(int hdl, int i)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtType[i]);
 }
@@ -888,7 +888,7 @@ int APIChartType(int hdl, int i)
 int APIChartAxis(int hdl, int i)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtAxis[i]);
 }
@@ -897,7 +897,7 @@ int APIChartAxis(int hdl, int i)
 char *APIChartTitle(int hdl, int i)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtTitle[i]);
 }
@@ -906,7 +906,7 @@ char *APIChartTitle(int hdl, int i)
 double  *APIChartData(int hdl, int i)
 {
     APICHRT    *Chrt;
-    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return(0);
+    if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
     return(Chrt->ChrtData[i]);
 }
@@ -925,17 +925,17 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
-        return(-1);
+        return -1;
     }
     
     dim = T_prep_cls(tbl, gsmpl, &cls);
     if(dim < 0) 
-        return(-1);
+        return -1;
     
     T_prep_smpl(cls, &fcls, &smpl);
     files = T_find_files(cls);
     if(files == 0) 
-        return(-1); /* JMP 11-06-99 */
+        return -1; /* JMP 11-06-99 */
     
     x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
     step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);

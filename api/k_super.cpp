@@ -370,7 +370,7 @@ int Wprintf(char* fmt, ...)
     else 
         printf("%s\n", buf);
     
-    return(0);
+    return 0;
 }
 
 
@@ -418,7 +418,7 @@ int ktermvkey(const int vkey)
     if(ktermvkey_super) 
         return((*ktermvkey_super)(vkey));
     
-    return(0);
+    return 0;
 }
 
 
@@ -434,7 +434,7 @@ int khitkey()
     if(khitkey_super) 
         return((*khitkey_super)());
     
-    return(0);
+    return 0;
 }
 
 
@@ -450,7 +450,7 @@ int kgetkey()
     if(kgetkey_super) 
         return((*kgetkey_super)());
     
-    return(0);
+    return 0;
 }
 
 
@@ -507,7 +507,7 @@ int kexecsystem(const char *arg)
 
     // Default implementation
 	rc = system(arg); 
-    return(rc);
+    return rc;
 }
 
 
@@ -542,7 +542,7 @@ int kshellexec(const char *arg)
 //    sei.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
 
     ShellExecuteExW(&sei);
-    return(res);
+    return res;
 #else
     if(kshellexec_super) 
         return((*kshellexec_super)(arg));
@@ -566,7 +566,10 @@ char* A_expand_super_API(char* name)
     if(!global_ws_lst->contains(name)) 
         return NULL;
     
-    return global_ws_lst->get_obj(name);
+    List* lst = global_ws_lst->get_obj_ptr(name);
+    if(!lst) 
+        return NULL;
+    return (char*) lst->c_str();
 }
 
 

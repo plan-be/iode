@@ -81,7 +81,7 @@ TEST_F(ReportTest, REPORT_LINE)
         filepath_cpp = output_dir / filename_cpp;
         if(std::filesystem::exists(filepath_cpp))
             std::filesystem::remove(filepath_cpp);
-        tbl = subset_tbl->get(name);
+        tbl = subset_tbl->get_obj_ptr(name);
         ComputedTable computed_tbl(tbl, generalized_sample, nb_dec);
         computed_tbl.print_to_file(filepath_cpp.string(), 'C');
         EXPECT_TRUE(std::filesystem::exists(filepath_cpp));

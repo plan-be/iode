@@ -105,7 +105,7 @@ static int RP_proc_find(char *name)
     for(i = 0 ; i < REP_NB_PROCS ; i++)
         if(REP_PROCS[i] && strcmp(REP_PROCS[i]->proc_name, name) == 0) return(i);
 
-    return(-1);
+    return -1;
 }
 
 
@@ -126,7 +126,7 @@ static int RP_proc_is_procend(char *line)
     SCR_sqz((unsigned char*) buf);       // JMP 05/11/2022
     SCR_lower((unsigned char*) buf);     // JMP 23/5/2019
     if(strcmp(buf, "$procend") == 0) return(1);
-    return(0);
+    return 0;
 }
 
 
@@ -209,7 +209,7 @@ int RP_procdef(char* arg, int unused)
     unsigned char   name[128], buf[1024], *list, **lines; // JMP 23/5/2019
     int             proc_nb, nblines = 0, line1, i;
 
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
 
     // Creates the REP_PROC object
     // if a proc with the same name already exists, first deletes the existing one
@@ -244,10 +244,10 @@ int RP_procdef(char* arg, int unused)
         std::string error_msg = "Procedure '" + std::string((char*) name) + "': missing $procend statement";
         error_manager.append_error(error_msg);
         //TODO: delete the REP_PROCS[proc_nb]
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -269,19 +269,19 @@ int RP_procexec(char* arg, int unused)
     int             rc = 0, i, nformal, nactual, proc_nb;
     REP_PROC        *proc;
 
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return(-1);
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
 
     // Searches the proc definition
     proc_nb = RP_proc_find((char*) name);
     if(proc_nb < 0) {
         error_manager.append_error("Procedure '" + std::string((char*) name) + "': not defined");
-        return(-1);
+        return -1;
     }
     proc = REP_PROCS[proc_nb];
 
     // Saves (temporarily pushes) the defines with the same names as the formal parameters
     rc = RP_define_save_list(proc->proc_parms);
-    if(rc < 0) return(rc);
+    if(rc < 0) return rc;
 
     // Creates macros with the actual parameters
     aparms = SCR_vtomsq((char*) list, B_SEPS, '"');
@@ -294,7 +294,7 @@ int RP_procexec(char* arg, int unused)
     if(nformal >= nactual) {
         for(i = 0 ; i < nactual; i++) {
             rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
-            if(rc < 0) return(rc);
+            if(rc < 0) return rc;
         }
     }
     // If there are more actual parms than formal parms, the last $define (formal parm)
@@ -302,12 +302,12 @@ int RP_procexec(char* arg, int unused)
     else {
         for(i = 0 ; i < nformal - 1; i++) {
             rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
-            if(rc < 0) return(rc);
+            if(rc < 0) return rc;
         }
         lastparms = SCR_mtov(aparms + nformal - 1, ' ');
         rc = RP_define_1(proc->proc_parms[nformal - 1], (char*) lastparms);
         SCR_free(lastparms);
-        if(rc < 0) return(rc);
+        if(rc < 0) return rc;
     }
 
     SCR_free_tbl(aparms);
@@ -319,5 +319,5 @@ int RP_procexec(char* arg, int unused)
     // Restores (pops) the defines with the same name as the formal parameters
     RP_define_restore_list(proc->proc_parms);
 
-    return(rc);
+    return rc;
 }

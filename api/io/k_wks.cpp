@@ -55,7 +55,7 @@ int wks_init(char* file, int c, int r)
     short     i = c - 1, j = r - 1;
 
     WKS_FD = fopen(file, "wb+");
-    if(WKS_FD == NULL) return(-1);
+    if(WKS_FD == NULL) return -1;
 
     fwrite(WKS_BOF, sizeof(WKS_BOF), 1, WKS_FD);
     if(c != 0 && r != 0) {
@@ -64,9 +64,9 @@ int wks_init(char* file, int c, int r)
         XDR_wshort(WKS_FD, &j, 1);
     }
 
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 
@@ -80,9 +80,9 @@ int wks_cwidth(int c, int w)
     XDR_wshort(WKS_FD, &i, 1);
     fwrite(&width, sizeof(char), 1, WKS_FD);
 
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 
@@ -91,9 +91,9 @@ int wks_end()
 #ifndef __GNUC__
     fwrite(WKS_EOF, sizeof(WKS_EOF), 1, WKS_FD);
     fclose(WKS_FD);
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 

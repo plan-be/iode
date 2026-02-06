@@ -65,7 +65,7 @@ int B_DSLog(char *log)
     B_DSCode(log);
     Debug(log);
     Debug("\n");
-    return(0);
+    return 0;
 }
 
 int B_DSTimedOut(char *name)
@@ -75,7 +75,7 @@ int B_DSTimedOut(char *name)
 
     sprintf(buf, "_DSTIMEO %s", name);
     B_DataAppend(buf, LISTS);
-    return(0);
+    return 0;
 }
 
 long B_DSa2y(char* year)
@@ -111,7 +111,7 @@ int B_DSDate2Period(Period *per, char *date, char freq)
                 break;
         }
         SCR_free_tbl((unsigned char**) tbl);
-        return(0);
+        return 0;
     }
 
     if(U_is_in('Q', date)) {    /* "Q1 70" */
@@ -128,11 +128,11 @@ int B_DSDate2Period(Period *per, char *date, char freq)
                 break;
         }
         SCR_free_tbl((unsigned char**) tbl);
-        return(0);
+        return 0;
     }
 
     per->year = B_DSa2y(date);
-    return(0);
+    return 0;
 }
 
 int B_DSCode(char *name)
@@ -148,7 +148,7 @@ int B_DSCode(char *name)
 
     for(i = 1 ; name[i] ; i++)
         if(!SCR_is_anum(name[i])) name[i] = '_';
-    return(0);
+    return 0;
 }
 
 int B_DSUpdateCmt(char *name, char *val)
@@ -162,7 +162,7 @@ int B_DSUpdateCmt(char *name, char *val)
         rc = B_DataUpdate(update, COMMENTS);
         SCR_free(update);
     }
-    return(rc);
+    return rc;
 }
 
 int B_DSUpdateVar(char *name, Period *per, char *val)
@@ -179,7 +179,7 @@ int B_DSUpdateVar(char *name, Period *per, char *val)
         rc = B_DataUpdate(update, VARIABLES);
         SCR_free(update);
     }
-    return(rc);
+    return rc;
 }
 
 int B_DSInterpret(char *code, char freq, char *contents)
@@ -222,7 +222,7 @@ int B_DSInterpret(char *code, char freq, char *contents)
     SCR_free_tbl((unsigned char**) tbl);
 
     if(rc < 0) B_DSLog(contents);
-    return(rc);
+    return rc;
 }
 
 /* DATA stream interface */
@@ -250,9 +250,9 @@ int B_DSImportDb_1(char *arg, Sample *smpl)
     }
     else B_DSTimedOut(arg);
 
-    return(0);
+    return 0;
 #else
-    return(-1);
+    return -1;
 #endif
 }
 
@@ -267,12 +267,12 @@ int B_DSImportDb(char *arg, int unused)
     Sample  *smpl;
 
     if(global_ws_var->sample->nb_periods == 0) 
-        return(-1);
+        return -1;
 
     WscrDdeSetTimeOut(10000, 3);
     smpl = global_ws_var->sample;
     return(B_ainit_loop(arg, wrapper_B_DSImportDb_1, (char *) smpl));
 #else
-    return(-1);
+    return -1;
 #endif
 }

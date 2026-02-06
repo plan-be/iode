@@ -56,7 +56,7 @@ int B_PrintVal(double val)
     K_NBDEC = -1;
     T_print_val(val);
     K_NBDEC = nbdec;
-    return(0);
+    return 0;
 }
 
 
@@ -73,13 +73,13 @@ int B_replesc(unsigned char* out, unsigned char* in)
 {
     int     i;
 
-    if(in == 0 || out == 0) return(0); /* JMP 29-09-2015 */
+    if(in == 0 || out == 0) return 0; /* JMP 29-09-2015 */
     for(i = 0 ; in[i] ; i++) {
         out[i] = in[i];
         if(out[i] == '\\') out[i] = '/';
     }
     out[i] = 0;
-    return(0);
+    return 0;
 }
 
 
@@ -91,9 +91,9 @@ int B_replesc(unsigned char* out, unsigned char* in)
  */
 int B_isdef(char* txt)
 {
-    if(txt == NULL || txt[0] == 0) return(0);
+    if(txt == NULL || txt[0] == 0) return 0;
     for(; *txt ; txt++) if(!isspace(*txt)) return(1);
-    return(0);
+    return 0;
 }
 
 /* ============================ PRINT ==================================== */
@@ -139,11 +139,11 @@ int B_ScrollSet(char* arg, long *plong, int inf, int sup)
     int     n;
 
     n = B_get1int(arg);
-    if(n <= -100) return(-1);
+    if(n <= -100) return -1;
     n = std::max(inf, n);
     n = std::min(sup, n);
     *plong = n;
-    return(0);
+    return 0;
 }
 
 
@@ -156,9 +156,9 @@ int B_PrintObjTblTitle(char* arg, int unused)
     int     rc;
 
     rc  = B_ScrollSet(arg, &l, 0, 2);
-    if(rc) return(rc);
+    if(rc) return rc;
     B_TABLE_TITLE = l;
-    return(0);
+    return 0;
 }
 
 
@@ -172,9 +172,9 @@ int B_PrintObjLec(char* arg, int unused)
     int     rc;
 
     rc  = B_ScrollSet(arg, &l, 0, 2);
-    if(rc) return(rc);
+    if(rc) return rc;
     B_EQS_LEC = l;
-    return(0);
+    return 0;
 }
 
 
@@ -188,9 +188,9 @@ int B_PrintObjEqsInfos(char* arg, int unused)
     int     rc;
 
     rc  = B_ScrollSet(arg, &l, 0, 2);
-    if(rc) return(rc);
+    if(rc) return rc;
     B_EQS_INFOS = l;
-    return(0);
+    return 0;
 }
 
 static int     BEG = 0;     // Nb of the current printed variable (to limit each group of variable to 47)
@@ -329,5 +329,5 @@ int B_PrintObjDefArgs(char* arg, int type)
 
     W_flush();
     kmsg("Print done");
-    return(rc);
+    return rc;
 }

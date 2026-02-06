@@ -130,7 +130,7 @@ static int L_save_var()
     }
 
     L_NB_EXPR++;
-    return(0);
+    return 0;
 }
 
 
@@ -145,11 +145,11 @@ static int L_save_var()
  */
 static int L_priority_sup(int op)
 {
-    if(L_NB_OPS <= 0) return(0);
-    if(last_op == L_OPENP) return(0);
+    if(L_NB_OPS <= 0) return 0;
+    if(last_op == L_OPENP) return 0;
     if(!is_op(last_op)) return(1);
     if(L_PRIOR[op - L_OP] <= L_PRIOR[last_op - L_OP]) return(1);
-    return(0);
+    return 0;
 }
 
 
@@ -196,7 +196,7 @@ static int L_save_op()
     al->al_val.v_nb_args = last_ls.ls_nb_args;
     L_NB_EXPR ++;
     L_NB_OPS--;
-    return(0);
+    return 0;
 }
 
 
@@ -257,13 +257,13 @@ static int L_add_stack(int op_group)
         case L_OCPAR :
             if(L_NB_OPS <= 0 || !is_fn(last_op)) return(L_errno = L_SYNTAX_ERR);
             last_ls.ls_nb_args = 0;
-            return(0);
+            return 0;
         default :
             break;
     }
 
     L_NB_OPS++;
-    return(0);
+    return 0;
 }
 
 
@@ -280,7 +280,7 @@ static int L_empty_ops_stack()
         if(L_save_op() != 0) return(L_errno);
     L_alloc_expr(L_NB_EXPR + 1);
     L_EXPR[L_NB_EXPR++].al_type = L_EOE;
-    return(0);
+    return 0;
 }
 
 
@@ -309,7 +309,7 @@ static int L_lag_expr(int lag)
         if(al->al_val.v_var.per.step != 0) continue;
         al->al_val.v_var.lag += lag;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -337,7 +337,7 @@ static int L_time_expr()
         if(al->al_val.v_var.per.step != 0) continue;
         memcpy(&(al->al_val.v_var.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
-    return(0);
+    return 0;
 }
 
 
@@ -381,7 +381,7 @@ static int L_anal_lag()
     }
 
     if(L_errno != 0) return(L_errno);
-    if(L_get_token() == L_CLOSEB) return(0);
+    if(L_get_token() == L_CLOSEB) return 0;
 
 err:
     L_errno = L_LAG_ERR;
@@ -559,5 +559,5 @@ int L_sub_expr(ALEC* al, int i)
     }
 
     L_errno = L_LAG_ERR;
-    return(-1);
+    return -1;
 }

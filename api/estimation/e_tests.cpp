@@ -34,7 +34,7 @@ double Estimation::M_c_line(MAT* m1, int line, int oper)
     double  res = 0.0;
     int     i;
 
-    if(line > M_NL(m1)) return(res);
+    if(line > M_NL(m1)) return res;
     for(i = 0; i < M_NC(m1); i++) {
         switch(oper) {
             case '+' :
@@ -47,10 +47,10 @@ double Estimation::M_c_line(MAT* m1, int line, int oper)
                 res *= MATE1(line, i);
                 break;
             default  :
-                return(res);
+                return res;
         }
     }
-    return(res);
+    return res;
 }
 
 
@@ -96,7 +96,7 @@ void Estimation::E_deg_freed()
     for(cf = 0, j = 0; cf < E_NC; cf++) 
     {
         coef_name = E_DBS->get_name(E_C_NBS[cf]);
-        if(E_DBS->get_obj(coef_name)->relax == 0) 
+        if(E_DBS->get_obj_ptr(coef_name)->relax == 0) 
             continue;
         nbr = 0;
         for(eq = 0; eq < E_NEQ; eq++) 
@@ -170,7 +170,7 @@ int Estimation::E_c_loglik()
             break;
     }
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -195,7 +195,7 @@ int Estimation::E_c_mcorr()
                 MATE(E_MCORR, i, j) = MATE(E_MCORR, j, i) = 0.0;
         }
     }
-    return(0);
+    return 0;
 }
 
 
@@ -218,7 +218,7 @@ int Estimation::E_c_mcorru()
                                        E_div_0(vij, E_sqrt(vii * vjj));  /* JMP 05-10-00 */
         }
     }
-    return(0);
+    return 0;
 }
 
 
@@ -237,7 +237,7 @@ int Estimation::E_c_ttests()
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
         coef_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = E_DBS->get_obj(coef_name);
+        scl = E_DBS->get_obj_ptr(coef_name);
         scl->std = 0.0;
         if(scl->relax == 0) 
             continue;
@@ -248,7 +248,7 @@ int Estimation::E_c_ttests()
         j++;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -279,11 +279,11 @@ int Estimation::E_output()
 
     /* 1. OUTPUT BY COEFFICIENT */
     E_deg_freed();
-    if(E_c_mcorr()) return(-1);
-    if(E_c_ttests()) return(-1);
+    if(E_c_mcorr()) return -1;
+    if(E_c_ttests()) return -1;
 
     /* 2. OUTPUT BY EQUATION */
-    if(E_c_mcorru()) return(-1);
+    if(E_c_mcorru()) return -1;
     for(i = 0 ; i < E_NEQ ; i++) {
         MATE(E_SSRES, 0, i)  = MATE(E_VCU, i, i) * E_T;
         MATE(E_STDERR, 0, i) =
@@ -333,5 +333,5 @@ int Estimation::E_output()
     /* LOGLIK */
     E_c_loglik();
 
-    return(0);
+    return 0;
 }
