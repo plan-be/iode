@@ -34,8 +34,8 @@ TEST_F(SubsetsTest, Subset)
     // GLOBAL KDB
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
     ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
-    std::string cmt_ACAF = std::string(global_ws_cmt->get_obj("ACAF"));
-    std::string cmt_ACAG = std::string(global_ws_cmt->get_obj("ACAG"));
+    std::string cmt_ACAF = global_ws_cmt->get("ACAF");
+    std::string cmt_ACAG = global_ws_cmt->get("ACAG");
 
     EXPECT_EQ(global_ws_cmt->size(), 317);
     EXPECT_TRUE(global_ws_cmt->is_global_database());
@@ -64,27 +64,27 @@ TEST_F(SubsetsTest, Subset)
 
     // ---- add in deep copy subset only ----
     std::string new_comment = "new comment";
-    subset_deep_copy->set_obj("NEW_COMMENT", new_comment);
+    subset_deep_copy->add("NEW_COMMENT", new_comment);
     EXPECT_TRUE(subset_deep_copy->contains("NEW_COMMENT"));
-    EXPECT_EQ(subset_deep_copy->get_obj("NEW_COMMENT"), new_comment);
+    EXPECT_EQ(subset_deep_copy->get("NEW_COMMENT"), new_comment);
     EXPECT_FALSE(global_ws_cmt->contains("NEW_COMMENT"));
 
     // ---- add in global KDB only ----
     new_comment = "new comment global";
-    global_ws_cmt->set_obj("NEW_COMMENT_GLOBAL", new_comment);
+    global_ws_cmt->add("NEW_COMMENT_GLOBAL", new_comment);
     EXPECT_TRUE(global_ws_cmt->contains("NEW_COMMENT_GLOBAL"));
-    EXPECT_EQ(global_ws_cmt->get_obj("NEW_COMMENT_GLOBAL"), new_comment);
+    EXPECT_EQ(global_ws_cmt->get("NEW_COMMENT_GLOBAL"), new_comment);
     EXPECT_FALSE(subset_deep_copy->contains("NEW_COMMENT_GLOBAL"));
 
     // ---- modify in deep copy subset only ----
-    subset_deep_copy->set_obj("ACAF", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("ACAF"), cmt_ACAF);
-    EXPECT_EQ(subset_deep_copy->get_obj("ACAF"), modified);
+    subset_deep_copy->update("ACAF", modified);
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), cmt_ACAF);
+    EXPECT_EQ(subset_deep_copy->get("ACAF"), modified);
 
     // ---- modify in global KDB only ----
-    global_ws_cmt->set_obj("ACAG", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("ACAG"), modified);
-    EXPECT_EQ(subset_deep_copy->get_obj("ACAG"), cmt_ACAG);
+    global_ws_cmt->update("ACAG", modified);
+    EXPECT_EQ(global_ws_cmt->get("ACAG"), modified);
+    EXPECT_EQ(subset_deep_copy->get("ACAG"), cmt_ACAG);
 
     // ---- rename in deep copy subset only ----
     subset_deep_copy->rename("ACAF", "ACAF_RENAMED");
@@ -131,28 +131,28 @@ TEST_F(SubsetsTest, Subset)
 
     // ---- add in shallow copy subset ----
     new_comment = "new comment";
-    subset_shallow_copy->set_obj("NEW_COMMENT_2", new_comment);
+    subset_shallow_copy->add("NEW_COMMENT_2", new_comment);
     EXPECT_TRUE(global_ws_cmt->contains("NEW_COMMENT_2"));
-    EXPECT_EQ(global_ws_cmt->get_obj("NEW_COMMENT_2"), new_comment);
+    EXPECT_EQ(global_ws_cmt->get("NEW_COMMENT_2"), new_comment);
     EXPECT_TRUE(subset_shallow_copy->contains("NEW_COMMENT_2"));
-    EXPECT_EQ(subset_shallow_copy->get_obj("NEW_COMMENT_2"), new_comment);
+    EXPECT_EQ(subset_shallow_copy->get("NEW_COMMENT_2"), new_comment);
 
     // ---- add in global KDB ----
     new_comment = "another new comment global";
-    global_ws_cmt->set_obj("NEW_COMMENT_GLOBAL_2", new_comment);
+    global_ws_cmt->add("NEW_COMMENT_GLOBAL_2", new_comment);
     EXPECT_TRUE(global_ws_cmt->contains("NEW_COMMENT_GLOBAL_2"));
-    EXPECT_EQ(global_ws_cmt->get_obj("NEW_COMMENT_GLOBAL_2"), new_comment);
+    EXPECT_EQ(global_ws_cmt->get("NEW_COMMENT_GLOBAL_2"), new_comment);
     EXPECT_FALSE(subset_shallow_copy->contains("NEW_COMMENT_GLOBAL_2"));
 
     // ---- modify in shallow copy subset ----
-    subset_shallow_copy->set_obj("ACAF", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("ACAF"), modified);
-    EXPECT_EQ(subset_shallow_copy->get_obj("ACAF"), modified);
+    subset_shallow_copy->update("ACAF", modified);
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), modified);
+    EXPECT_EQ(subset_shallow_copy->get("ACAF"), modified);
 
     // ---- modify in global KDB ----
-    global_ws_cmt->set_obj("ACAG", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("ACAG"), modified);
-    EXPECT_EQ(subset_shallow_copy->get_obj("ACAG"), modified);
+    global_ws_cmt->update("ACAG", modified);
+    EXPECT_EQ(global_ws_cmt->get("ACAG"), modified);
+    EXPECT_EQ(subset_shallow_copy->get("ACAG"), modified);
 
     // ---- rename in shallow copy subset ----
     subset_shallow_copy->rename("ACAF", "ACAF_RENAMED_2");
@@ -193,7 +193,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
     ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
     global_ws_cmt->description = description;
-    std::string cmt_BENEF = std::string(global_ws_cmt->get_obj("BENEF"));
+    std::string cmt_BENEF = global_ws_cmt->get("BENEF");
 
     // ==== subset of global KDB ====
     std::string pattern_0 = "A*;B*;*_";
@@ -218,7 +218,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     std::string pattern_1 = "B*;*_";
     std::set<std::string> names_1 = subset_0->filter_names(pattern_1);
     std::set<std::string> expected_names_1;
-    for(const auto& [name, handle] : subset_0->k_objs) 
+    for(const auto& [name, _] : subset_0->k_objs) 
         if(name.front() == 'B' || name.back() == '_')
             expected_names_1.insert(name);
 
@@ -238,7 +238,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     std::string pattern_2 = "B*;C*";
     std::set<std::string> names_2 = subset_1->filter_names(pattern_2);
     std::set<std::string> expected_names_2;
-    for(const auto& [name, handle] : subset_1->k_objs) 
+    for(const auto& [name, _] : subset_1->k_objs) 
         if(name.front() == 'B' || name.front() == 'C')
             expected_names_2.insert(name);
 
@@ -258,36 +258,36 @@ TEST_F(SubsetsTest, MultiSubsets)
     // ==== add, modify, rename, remove ====
     // ---- add in subset ----
     std::string new_comment = "new comment";
-    subset_1->set_obj("BENEF_NEW", new_comment);
+    subset_1->add("BENEF_NEW", new_comment);
     EXPECT_TRUE(global_ws_cmt->contains("BENEF_NEW"));
-    EXPECT_EQ(global_ws_cmt->get_obj("BENEF_NEW"), new_comment);
+    EXPECT_EQ(global_ws_cmt->get("BENEF_NEW"), new_comment);
     EXPECT_TRUE(subset_1->contains("BENEF_NEW"));
-    EXPECT_EQ(subset_1->get_obj("BENEF_NEW"), new_comment);
+    EXPECT_EQ(subset_1->get("BENEF_NEW"), new_comment);
     EXPECT_FALSE(subset_0->contains("BENEF_NEW"));
     EXPECT_FALSE(subset_2->contains("BENEF_NEW"));
 
     // ---- add in global KDB ----
     new_comment = "new comment global";
-    global_ws_cmt->set_obj("BQY_NEW", new_comment);
+    global_ws_cmt->add("BQY_NEW", new_comment);
     EXPECT_TRUE(global_ws_cmt->contains("BQY_NEW"));
-    EXPECT_EQ(global_ws_cmt->get_obj("BQY_NEW"), new_comment);
+    EXPECT_EQ(global_ws_cmt->get("BQY_NEW"), new_comment);
     EXPECT_FALSE(subset_0->contains("BQY_NEW"));
     EXPECT_FALSE(subset_1->contains("BQY_NEW"));
     EXPECT_FALSE(subset_2->contains("BQY_NEW"));
 
     // ---- modify in subset ----
-    subset_1->set_obj("BENEF", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("BENEF"), modified);
-    EXPECT_EQ(subset_0->get_obj("BENEF"), modified);
-    EXPECT_EQ(subset_1->get_obj("BENEF"), modified);
-    EXPECT_EQ(subset_2->get_obj("BENEF"), modified);
+    subset_1->update("BENEF", modified);
+    EXPECT_EQ(global_ws_cmt->get("BENEF"), modified);
+    EXPECT_EQ(subset_0->get("BENEF"), modified);
+    EXPECT_EQ(subset_1->get("BENEF"), modified);
+    EXPECT_EQ(subset_2->get("BENEF"), modified);
 
     // ---- modify in global KDB ----
-    global_ws_cmt->set_obj("BQY", modified);
-    EXPECT_EQ(global_ws_cmt->get_obj("BQY"), modified);
-    EXPECT_EQ(subset_0->get_obj("BQY"), modified);
-    EXPECT_EQ(subset_1->get_obj("BQY"), modified);
-    EXPECT_EQ(subset_2->get_obj("BQY"), modified);
+    global_ws_cmt->update("BQY", modified);
+    EXPECT_EQ(global_ws_cmt->get("BQY"), modified);
+    EXPECT_EQ(subset_0->get("BQY"), modified);
+    EXPECT_EQ(subset_1->get("BQY"), modified);
+    EXPECT_EQ(subset_2->get("BQY"), modified);
 
     // ---- rename in subset ----
     subset_1->rename("BENEF", "BENEF_RENAMED");

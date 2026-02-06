@@ -2,18 +2,18 @@
 
 #include "api/constants.h"
 #include "api/objs/kdb.h"
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
+#include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 
-// Threshold for VAR comparisons 
-inline double K_CMP_EPS = 1e-7;            // Threshold for VAR comparisons 
+// Threshold for Variables comparison
+inline double K_COMPARE_EPS = 1e-7;
 
 /* k_cmp.c */
-int K_cmp(char*, KDB*, KDB*);
-int K_cmp_eqs(Equation* eq1, Equation* eq2, char* name);
-int K_cmp_scl(Scalar* scl1, Scalar* scl2);
-int K_cmp_tbl(Table* tbl1, Table* tbl2);
-int K_cmp_var(VAR var1, VAR var2);
+bool K_compare_var(const Variable& var1, const Variable& var2);
+// TODO : make a method of KDBTemplate class
+int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2);

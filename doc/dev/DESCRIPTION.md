@@ -332,15 +332,6 @@ Functions acting on workspaces of variables.
 - k\_cmp.c: function to compare two IODE objects.
 - k\_grep.c: functions to search strings in KDB objects.
 
-### k\_objs.c {#T26}
-
-Functions to manipulate IODE objects.
-
-|Syntax|Description|
-|:---|:---|
-|`int K_upd_eqs(char* name, char* lec, char* cmt, int method, Sample* smpl, char* instr, char* blk, float* tests, int date)`|Updates equation field(s). Creates the equation if it doesn't exist.|
-|`int K_upd_tbl(char* name, char* arg)`|Creates a basic table with an optional TITLE and optional variable names and/or lec formulas separated by semi\-colons.|
-
 ### k\_objvers.c {#T27}
 
 Functions to detect IODE object file version and to convert an object to the current IODE version.\_
@@ -357,31 +348,7 @@ Functions for "packing" and "unpacking" IODE objects.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_cpack(char **pack, char *a1)`|Packs an IODE CMT object|
-|`int K_epack(char **pack, char *a1, char *a2)`|Packs an IODE EQ object|
-|`int K_ipack(char **pack, char *a1)`|Packs an IODE IDT object|
-|`int K_lpack(char** pack, char* a1)`|Packs an IODE LST object|
-|`int K_spack(char **pack, char *a1)`|Packs an IODE Scalar object|
-|`int K_tpack(char** pack, char* a1)`|Packs an IODE Table object|
-|`int K_vpack(char **pack, double *a1, int *a2)`|Packs an IODE VAR object.|
-|`int K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
-
-#### Unpacking functions (for Table and EQ only ?) {#T30}
-
-|Syntax|Description|
-|:---|:---|
-|`Table* K_tunpack(char *pack)`|Creates a Table struct from a packed Table|
-|`Equation* K_eunpack(char *pack, char *name)`|Creates an EQ struct from a packed EQ|
-|`Identity* K_iunpack(char *pack)`|Creates an IDT struct from a packed IDT|
-
-s
-
-#### Allocation functions (Scalar & VAR only) {#T31}
-
-|Syntax|Description|
-|:---|:---|
-|`int KS_alloc_scl()`|Allocates space for a new Scalar (0.9, 1.0, NaN) in the the "swap area". Returns the "swap" handle.|
-|`int KV_alloc_var(int nb)`|Allocates space for a new VAR of length nb in the swap area, initialises it to L\_NAN and returns the "swap" handle.|
+|`bool K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
 
 ### k\_val.c {#T32}
 
@@ -391,16 +358,6 @@ List of functions
 
 |Syntax|Meaning|
 |:---|:---|
-|`char *K_oval(KDB* kdb, int pos, int n)`| kdb\[pos\]\[n\]|
-|`char* K_optr(KDB *kdb, char* name, int n)`| kdb\[name\]\[n\]|
-|`char *K_oval0(KDB* kdb, int pos)`| kdb\[pos\]\[0\]|
-|`char* K_optr0(KDB *kdb, char* name)`| kdb\[name\]\[0\]|
-|`char *K_oval1(KDB* kdb, int pos)`| kdb\[pos\]\[1\]|
-|`char* K_optr1(KDB *kdb, char* name)`| kdb\[name\]\[1\]|
-|`double *K_vval(KDB* kdb, int pos, int t)`| kdb\[pos\]\[t\]|
-|`double *K_vptr(KDB* kdb, char* name, int t)`| kdb\[name\]\[t\]|
-|`Equation* K_eptr(KDB* kdb, char* name)`| kdb\[name\]|
-|`Table* K_tptr(KDB* kdb, char* name)`| kdb\[name\]|
 |**Equation tests**||
 |`double K_etest(KDB* kdb, char*name, int test_nb)`|Retrieves a statistical test stored the equation whose endo is name.|
 |`double K_e_stdev (KDB* kdb, char*name)`|Returns stdev calculated during the last estimation of equation name|
@@ -446,7 +403,7 @@ Function to compare two IODE objects.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_cmp(char* name, KDB* kdb1, KDB* kdb2)`|Compares IODE objects having the same name in two KDB.|
+|`int K_compare(char* name, KDB* kdb1, KDB* kdb2)`|Compares IODE objects having the same name in two KDB.|
 
 ### k\_grep.c {#T37}
 

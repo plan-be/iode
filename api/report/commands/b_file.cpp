@@ -77,7 +77,7 @@ fin:
         if(type <= VARIABLES) K_setname(buf_to, buf_to);  // JMP 27/10/2021
     }
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -120,7 +120,7 @@ fin:
     if(rc < 0) 
         error_manager.append_error("Failed to rename file '" + std::string(buf_from) + "'");
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -139,7 +139,7 @@ static int B_unlink_1(char* arg, int *type)
     K_set_ext(buf, arg, *type);
     W_close();                      /* JMP 11-07-96 */
     _unlink(buf);
-    return(0);
+    return 0;
 }
 
 static int wrapper_B_unlink_1(char* arg, void *type)

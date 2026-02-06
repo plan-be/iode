@@ -41,14 +41,14 @@ int ImportObjsASCII::read_header(YYFILE* yy, Sample* smpl)
 {
     Sample  *rsmpl;
 
-    if(YY_lex(yy) != ASC_SMPL)  return(-1);
+    if(YY_lex(yy) != ASC_SMPL)  return -1;
 
     rsmpl = K_read_smpl(yy);
-    if(rsmpl == NULL) return(-1);
+    if(rsmpl == NULL) return -1;
 
     memcpy(smpl, rsmpl, sizeof(Sample));
     SW_nfree(rsmpl);
-    return(0);
+    return 0;
 }
 
 /**
@@ -69,14 +69,14 @@ int ImportObjsASCII::read_variable(YYFILE* yy, char* name, int dim, double* vect
     while(1) {
         switch(YY_lex(yy))  {
             case YY_EOF :
-                return(-1);
+                return -1;
             case YY_WORD :
                 if(strcmp((char*) yy->yy_text, "na") == 0) continue;
 
                 SCR_strlcpy((unsigned char*) name, yy->yy_text, 79); /* JMP 13-02-2013 */
                 name[80] = '\0';
                 for(i = 0; i < dim; i++) vector[i] = K_read_real(yy);
-                return(0);
+                return 0;
         }
     }
 } 
@@ -100,10 +100,10 @@ int ImportCommentsASCII::read_header(ImportCmtFromFile* impdef, char* file, int 
 
     if(AYY == 0) {
         kerror(0,"Cannot open '%s'", file);
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 /**
@@ -129,14 +129,14 @@ int ImportCommentsASCII::read_comment(char* name, char** cmt)
     else goto err;
 
     key = YY_lex(yy);
-    if(key == YY_EOF) return(-1);
+    if(key == YY_EOF) return -1;
 
     if(key == YY_WORD || key == YY_STRING)
         *cmt = (char*) SCR_stracpy(yy->yy_text);
     else goto err;
 
-    return(0);
+    return 0;
 
 err :
-    return(-1);
+    return -1;
 }

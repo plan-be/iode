@@ -113,16 +113,15 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     SCR_add_ptr((unsigned char***) &eqs, &neqs, (unsigned char*) "_DF");
     SCR_add_ptr((unsigned char***) &eqs, &neqs, NULL);
 
-    rc = K_upd_eqs("_DF", buf, 0L, 0, 0L, 0L, 0L, 0L, 0);
-    if(rc) 
-        return(rc);
+    Equation* eq = new Equation("_DF", std::string(buf), EQ_LSQ, "", "", "", "", "", false);
+    global_ws_eqs->set_obj_ptr("_DF", eq);
     
     Estimation est(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
     rc = est.estimate();
 
     global_ws_eqs->remove("_DF");
     SCR_free_tbl((unsigned char**) eqs);
-    return(rc);
+    return rc;
 }
 
 
@@ -153,7 +152,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     // Computes the lec formula and stores the result in the VAR _DF
     vec = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
     if(vec == NULL) 
-        return(NULL);
+        return NULL;
     strcpy(varname, "_DF");
     Sample* var_sample = global_ws_var->sample;
     if(!var_sample) 
@@ -162,7 +161,8 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         return NULL;
     }
     int nb_periods = var_sample->nb_periods;
-    global_ws_var->set_obj(varname, vec);
+    Variable* var_ptr = new Variable(vec, vec + nb_periods);
+    global_ws_var->set_obj_ptr(varname, var_ptr);
     SW_nfree(vec);
     
     // Checks that the sample is large enough for the estimation 
@@ -176,26 +176,26 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     }
 
     /* Dickey Fuller */
-    // Construction de l'équation à estimer, partie par partie selon les parms
+    // build the equation to estimate, step by step according to the parameters
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    global_ws_scl->set_obj("df_", NULL);
+    global_ws_scl->set_obj_ptr("df_", new Scalar());
     
     if(drift) 
     {
         sprintf(buf + strlen(buf), "+ df_d");
-        global_ws_scl->set_obj("df_d", NULL);
+        global_ws_scl->set_obj_ptr("df_d", new Scalar());
     }
 
     if(trend) 
     {
         sprintf(buf + strlen(buf), "+ df_t*t");
-        global_ws_scl->set_obj("df_t", NULL);
+        global_ws_scl->set_obj_ptr("df_t", new Scalar());
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
         sprintf(scl, "df%d", i);
-        global_ws_scl->set_obj(scl, NULL);
+        global_ws_scl->set_obj_ptr(scl, new Scalar());
     }
 
     if(order) 
@@ -243,7 +243,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
 cleanup:
     // Deletes the tmp var _DF
     global_ws_var->remove("_DF");
-    return(res);
+    return res;
 }
 
 
@@ -259,7 +259,7 @@ void E_SclToReal(char* name, double* res)
     if(!global_ws_scl->contains(name))
         return;
 
-    Scalar* scl = global_ws_scl->get_obj(name);
+    Scalar* scl = global_ws_scl->get_obj_ptr(name);
     res[0] = scl->value;
     res[1] = scl->std;
     if(!IODE_IS_0(scl->std)) 

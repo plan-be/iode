@@ -74,7 +74,6 @@ static int compare(const void *a, const void *b)
  */
 KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
-    bool    success;
     bool    found;
     int     i, nb, size, shift = 0, cmpt = 0, rc;
     char    iname[256];
@@ -132,8 +131,16 @@ KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
             kmsg("Reading object %d : %s", ++cmpt, oname);
-            if(!kdb->set_obj(oname, vector))
-                kerror(0, "Unable to create '%s'", oname);
+            try
+            {
+                var_name = std::string(oname);
+                Variable* var_ptr = new Variable(vector, vector + nb);
+                kdb->set_obj_ptr(var_name, var_ptr);
+            }
+            catch(const std::exception&)
+            {
+                throw std::runtime_error("Unable to create '" + var_name + "'");
+            }
         }
     }
     else 
@@ -149,20 +156,24 @@ KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* 
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0)     
                 continue;
-    
-            if(SW_BLKS[7].blk_space > 100000L) 
-                Debug("%s\n", oname);
               
             var_name = std::string(oname);
             found = kdb->contains(var_name);
             if(found) 
             {
                 kmsg("Reading object %d : %s", ++cmpt, oname);
-                success = kdb->set_obj(oname, (double*) NULL);
-                if(!success) 
+                try
                 {
-                    kerror(0, "Unable to create '%s'", oname);
-                    goto err;
+                    Variable* var_ptr = new Variable(nb, IODE_NAN);
+                    kdb->set_obj_ptr(var_name, var_ptr);
+                }
+                catch(const std::exception& e) 
+                {
+                    delete kdb;
+                    YY_close(yy);
+                    SW_nfree(vector);
+                    throw std::runtime_error("Unable to create '" + var_name + "':\n" + 
+                          std::string(e.what()));
                 }
             }
 
@@ -205,6 +216,7 @@ KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* c
     int          size, cmpt = 0, rc;
     char         iname[256], *cmt = NULL;
     ONAME        oname;
+    std::string  cmt_name;
 
     if(IMP_readrule(rulefile) < 0) 
         return nullptr;
@@ -236,20 +248,30 @@ KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* c
             continue;
         }
 
-        if(SW_BLKS[7].blk_space > 100000L) 
-            Debug((char*) "CMT:%s\n", oname);
         kmsg("Reading object %d : %s", ++cmpt, oname);
         SCR_strip((unsigned char*) cmt);
-        if(!kdb->set_obj(oname, cmt))
-            kerror(0, "Unable to create '%s'", oname);
-        SW_nfree(cmt);
+
+        try
+        {
+            cmt_name = std::string(oname);
+            Comment* cmt_ptr = new Comment(cmt);
+            kdb->set_obj_ptr(cmt_name, cmt_ptr);
+            SW_nfree(cmt);
+        }
+        catch(const std::exception& e)
+        {
+            SW_nfree(cmt);
+            delete kdb;
+            throw std::runtime_error("Unable to create '" + cmt_name + "':\n" + 
+                  std::string(e.what()));
+        }
     }
 
     rc = impdef->close();
     if(rc < 0) 
         goto err;
 
-    return(kdb);
+    return kdb;
 
 err:
     delete kdb;
@@ -280,14 +302,10 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     if(trace[0] != 0) 
     {
         IMP_trace = 1;
-        K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
     else 
-    {
         IMP_trace = 0;
-        K_WARN_DUP = 1;
-    }
    
     impdef = import_comments[fmt].get();
 
@@ -340,14 +358,10 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     if(trace[0] != 0) 
     {
         IMP_trace = 1;
-        K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
     else 
-    {
         IMP_trace = 0;
-        K_WARN_DUP = 1;
-    }
 
     impdef = import_variables[fmt].get();
 
@@ -415,6 +429,5 @@ int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char
             break;
     }
 
-    K_WARN_DUP = 0;
-    return(rc);
+    return rc;
 }

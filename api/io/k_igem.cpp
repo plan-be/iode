@@ -43,10 +43,10 @@ int ImportObjsGEM::read_header(YYFILE* yy, Sample* smpl)
     if(GEM_nbper < 0) 
     {
         kerror(0, "Please specify FROM and TO period");
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 double ImportObjsGEM::GEM_read_real(YYFILE* yy)
@@ -97,7 +97,7 @@ int ImportObjsGEM::read_variable(YYFILE* yy, char* name, int dim, double* vector
         GEM_nobs = K_read_long(yy);
         GEM_nser = K_read_long(yy);
 
-        if(GEM_nser * GEM_nobs == 0)  return(-1);
+        if(GEM_nser * GEM_nobs == 0)  return -1;
 
         if(GEM_mat) SCR_free(GEM_mat);
         GEM_mat = (double *) SCR_malloc(GEM_nser * GEM_nobs * sizeof(double));
@@ -117,24 +117,24 @@ int ImportObjsGEM::read_variable(YYFILE* yy, char* name, int dim, double* vector
 
     GEM_cser++;
 
-    return(0);
+    return 0;
 }
 
 int ImportObjsGEM::close()
 {
-    return(0);
+    return 0;
 }
 
 int ImportObjsGEM::GEM_readrubr(YYFILE* yy)
 {
     YY_lex(yy);
     strcpy(GEM_rubr, (char*) yy->yy_text);
-    return(0);
+    return 0;
 }
 
 int ImportObjsGEM::GEM_name(char* name)
 {
     if(GEM_cser < 9) sprintf(name, "%s_0%d", GEM_rubr, GEM_cser + 1);
     else             sprintf(name, "%s_%d", GEM_rubr, GEM_cser + 1);
-    return(0);
+    return 0;
 }

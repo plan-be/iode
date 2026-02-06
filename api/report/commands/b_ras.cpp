@@ -29,11 +29,11 @@ static int RasSetVar(char* c_name, int t, double var)
     {
         std::string error_msg = "RAS: Variable '" + name + "' not found";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }         
     
     global_ws_var->get_var_ptr(name)[t] = var;
-    return(0);
+    return 0;
 }
 
 static double RasGetVar(char* c_name, int t)
@@ -74,7 +74,7 @@ static int RasCalc(MAT *A, double *row, double *col, int maxiter, double eps)
         std::string error_msg = "RAS : sum of rows (" + std::to_string(rsum);
         error_msg += ") != sum of cols (" + std::to_string(csum) + ")";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     iter = 0;
@@ -130,7 +130,7 @@ top:
         rc = 0;
     }
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -178,7 +178,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         if(nrows == 0 || ncols == 0) goto cleanup;
 
         A = M_alloc(nrows, ncols);
-        if(A == NULL) return(-1);
+        if(A == NULL) return -1;
         row = (double *) SCR_malloc(sizeof(double) * nrows);
         col = (double *) SCR_malloc(sizeof(double) * ncols);
 
@@ -249,5 +249,5 @@ cleanup:
     if(A != NULL) M_free(A);
     if(row != NULL) SCR_free((unsigned char**) row);
     if(col != NULL) SCR_free((unsigned char**) col);
-    return(rc);
+    return rc;
 }

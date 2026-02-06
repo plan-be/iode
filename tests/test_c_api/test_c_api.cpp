@@ -21,7 +21,7 @@
 //extern "C"
 //{
 //#endif
-//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return(0); }
+//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return 0; }
 //#ifdef __cplusplus
 //}
 //#endif
@@ -38,12 +38,12 @@
 //    extern char    SCR_NAME_ERR[255 + 1];
 //    int     A2M_SEPCH;
 //
-//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return(0);}
-//    //int B_A2mSetRtfTitle(U_ch* title) {return(0);}
-//    //int B_A2mSetRtfCopy(U_ch* copyr) {return(0);}
-//    //int B_PrintRtfTopic(char* x) { return(0); }
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return(0);}
-//    //int W_printf(char*fmt, ...) {return(0);}
+//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return 0;}
+//    //int B_A2mSetRtfTitle(U_ch* title) {return 0;}
+//    //int B_A2mSetRtfCopy(U_ch* copyr) {return 0;}
+//    //int B_PrintRtfTopic(char* x) { return 0; }
+int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return 0;}
+//    //int W_printf(char*fmt, ...) {return 0;}
 //    //void K_load_iode_ini() {}
 //    //void K_save_iode_ini() {}
 //
@@ -70,13 +70,21 @@ public:
         output_test_dir = (char*) str_output_test_dir.c_str();
         report_test_dir = (char*) str_report_test_dir.c_str();
         
-	    K_init_ws(0);               // Initialises 7 empty WS
+	    error_manager.clear();
 	    B_A2mGetAllParms();
     }
 
     void TearDown() override 
     {
-        K_end_ws(0);                // Deletes the 7 WS
+		// clear global workspaces
+		global_ws_cmt->clear();
+		global_ws_eqs->clear();
+		global_ws_idt->clear();
+		global_ws_lst->clear();
+		global_ws_scl->clear();
+		global_ws_tbl->clear();
+		global_ws_var->clear();
+
         error_manager.clear();
     }
 
@@ -87,10 +95,10 @@ public:
 	
 	    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) "|");
 	    if(tbl1 == NULL) {
-	        if(tbl2 == NULL) return(-1);
+	        if(tbl2 == NULL) return -1;
 	        goto fin;
 	    }
-	    if(tbl2 == NULL) return(0);
+	    if(tbl2 == NULL) return 0;
 	    if(SCR_tbl_size((unsigned char**) tbl1) != SCR_tbl_size((unsigned char**) tbl2)) goto fin;
 	    for(i = 0 ;  tbl1[i] ; i++)
 	        if(strcmp(tbl1[i], tbl2[i])) goto fin;
@@ -98,7 +106,7 @@ public:
 	
 	fin:
 	    SCR_free_tbl((unsigned char**) tbl2);
-	    return(rc);
+	    return rc;
 	
 	}
 
@@ -155,71 +163,92 @@ public:
 
 	void U_test_CreateObjects()
 	{
-        bool        success;
-	    char*       lst;
         double*     values;
 	    Sample*     smpl;
+	    std::string lst;
+	    static int  done = 0;
+
         KDBLists*     kdb_lst = global_ws_lst.get();
         KDBVariables* kdb_var = global_ws_var.get();
-	    static int  done = 0;
 	
-	    // Create lists
-	    success = kdb_lst->set_obj("LST1", "A,B");
-        EXPECT_TRUE(success);
-	    lst = kdb_lst->get_obj("LST1");
-        EXPECT_NE(lst, nullptr);
-        EXPECT_STREQ(lst, "A,B");
-	    success = kdb_lst->set_obj("LST2", "A,B,A");
-        EXPECT_TRUE(success);
-        lst = kdb_lst->get_obj("LST2");
-        EXPECT_NE(lst, nullptr);
-        EXPECT_STREQ(lst, "A,B,A");
+	    // Create or update lists
+        if(kdb_lst->contains("LST1"))
+	        kdb_lst->update("LST1", "A,B");
+        else
+            kdb_lst->add("LST1", "A,B");
+	    lst = kdb_lst->get("LST1");
+        EXPECT_EQ(lst, "A,B");
+
+        if(kdb_lst->contains("LST2"))
+            kdb_lst->update("LST2", "A,B,A");
+        else
+	        kdb_lst->add("LST2", "A,B,A");
+        lst = kdb_lst->get("LST2");
+        EXPECT_EQ(lst, "A,B,A");
 
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
 	    KV_sample(kdb_var, smpl);
 	    EXPECT_TRUE(kdb_var->sample != nullptr);
 	
-	    // Creates new vars
+	    // Creates or update new vars
+        Variable A;
+        Variable B;
 	    int nb = smpl->nb_periods;
-        double* A = new double[nb];
-        double* B = new double[nb];
 	    for(int i = 0; i < nb; i++) 
         {
-	       A[i] = i;
-	       B[i] = i*2;
+	       A.push_back(i);
+	       B.push_back(i*2);
 	    }
 	
-	    success = kdb_var->set_obj("A", A);
-        EXPECT_TRUE(success);
+        if(kdb_var->contains("A"))
+            kdb_var->update("A", A);
+        else
+	        kdb_var->add("A", A);
         values = kdb_var->get_var_ptr("A");
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("A", 0), A[0]);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("A", nb-1), A[nb-1]);
 	    
-        success = kdb_var->set_obj("B", B);
-        EXPECT_TRUE(success);
+        if(kdb_var->contains("B"))
+            kdb_var->update("B", B);
+        else
+            kdb_var->add("B", B);
         values = kdb_var->get_var_ptr("B");
         EXPECT_NE(values, nullptr);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("B", 0), B[0]);
         EXPECT_DOUBLE_EQ(kdb_var->get_value("B", nb-1), B[nb-1]);
 
-        delete[] A;
-        delete[] B;
-
 	    // For B_DataPattern()
-	    success = kdb_lst->set_obj("AB", "A,B");
-        EXPECT_TRUE(success);
-	    success = kdb_lst->set_obj("BC", "B,C");
-        EXPECT_TRUE(success);
-	    success = kdb_var->set_obj("AB", B);
-        EXPECT_TRUE(success);
-	    success = kdb_var->set_obj("AC", B);
-	    EXPECT_TRUE(success);
-        success = kdb_var->set_obj("BB", B);
-        EXPECT_TRUE(success);
-        success = kdb_var->set_obj("BC", B);
-        EXPECT_TRUE(success);
+        if(kdb_lst->contains("AB"))
+            kdb_lst->update("AB", "A,B");
+        else
+	        kdb_lst->add("AB", "A,B");
+
+        if(kdb_lst->contains("BC"))
+            kdb_lst->update("BC", "B,C");
+        else
+	        kdb_lst->add("BC", "B,C");
+
+        if(kdb_var->contains("AB"))
+	        kdb_var->update("AB", B);
+        else
+	        kdb_var->add("AB", B);
+
+        if(kdb_var->contains("AC"))
+	        kdb_var->update("AC", B);
+        else
+	        kdb_var->add("AC", B);
+        
+        if(kdb_var->contains("BB"))
+            kdb_var->update("BB", B);
+        else
+            kdb_var->add("BB", B);
+        
+        if(kdb_var->contains("BC"))
+            kdb_var->update("BC", B);
+        else
+            kdb_var->add("BC", B);
 	}
 
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
@@ -249,7 +278,7 @@ public:
 	    if(L_link(global_ws_var.get(), global_ws_scl.get(), clec)) return(IODE_NAN);
 	    res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
 	    SCR_free(clec);
-	    return(res);
+	    return res;
 	}
 
 	void U_test_load(int type, char* filename)
@@ -356,57 +385,6 @@ public:
 	    return rc != 0;
 	}
 
-	bool U_test_B_WsLoad(char*filename, int type, int expected_nb_objects)
-	{
-	    char    fullfilename[256];
-	    int     rc;
-	
-	    sprintf(fullfilename,  "%s%s", input_test_dir, filename);
-	    rc = B_WsLoad(fullfilename, type);
-        EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
-	}
-
-	bool U_test_B_WsSave(char* source_file, char* out_file, int type, int expected_nb_objects)
-	{
-	    char    fullfilename[256];
-	    int     rc;
-	
-	    _unlink(out_file);
-	    sprintf(fullfilename,  "%s%s", input_test_dir, source_file);
-	    rc = B_WsLoad(fullfilename, type);
-	    EXPECT_EQ(rc, 0);
-	    rc = B_WsSave(out_file, type);
-	    EXPECT_EQ(rc, 0);
-	    B_WsClear("", type);
-	    rc = B_WsLoad(out_file, type);
-        EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
-	}
-
-	bool U_test_B_WsSaveCmp(char* source_file, char* out_file, int type, int expected_nb_objects)
-	{
-	    char    fullfilename[256];
-	    char    out_fullfilename[256];
-	    int     rc;
-	
-	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
-	    sprintf(out_fullfilename, "%s%s", output_test_dir, out_file);
-
-	    _unlink(out_file);
-	    rc = B_WsLoad(fullfilename, type);
-	    EXPECT_EQ(rc, 0);
-	    rc = B_WsSaveCmp(out_fullfilename, type);
-	    EXPECT_EQ(rc, 0);
-	    B_WsClear("", type);
-	    rc = B_WsLoad(out_fullfilename, type);
-	    EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
-	}
-
 	bool U_test_B_WsExport(char* source_file, char* out_file, int type)
 	{
 	    char    full_source_file[256];
@@ -474,9 +452,8 @@ public:
 
 	bool U_test_B_WsCopyVar()
 	{
-        bool    success;
 	    char    arg[256];
-	    int     rc, nb;
+	    int     rc;
 	    double *ACAF, ACAF91, ACAF92, ACAG90, ACAG92;
 	
 	    B_WsClearAll("");
@@ -499,11 +476,13 @@ public:
 	    // 2.1 Set Sample + create ACAF
 	    B_WsClearAll("");
 	    B_WsSample("1990Y1 2000Y1");
+        int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
-	    nb = 11;
+        Variable var(nb_periods, IODE_NAN);
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+        for(int t = 0; t < 11; t++)
+            var[t] = ACAF[t];
+        global_ws_var->add("ACAF", var);
 	
 	    // 2.2 Copy ACAF and ACAG on 1992 & 1993 (does not replace 1991 for example)
 	    sprintf(arg,  "%sfun.av 1992Y1 1993Y1 ACAF ACAG", input_test_dir);
@@ -554,8 +533,7 @@ public:
 
 	bool U_test_B_WsMergeVar()
 	{
-        bool     success;
-	    int      rc, nb;
+	    int      rc;
 	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
         KDB*     kdb_var = global_ws_var.get();
@@ -573,11 +551,14 @@ public:
 	    // 2. Merge into an existing WS inb a different Sample
 	    B_WsClearAll("");
 	    B_WsSample("2000Y1 2020Y1");
+        int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
-	    nb = 21;
+        Variable var(nb_periods, IODE_NAN);
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+        for(int t = 0; t < 21; t++)
+            var[t] = ACAF[t];
+        global_ws_var->add("ACAF", var);
+        
 	    // Merge
 	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
@@ -609,24 +590,25 @@ public:
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
 	{
-        bool      success;
 	    double    *ACAF, ACAF2002;
 	    char      arg[512];
-	    int       rc, nb;
 	
 	    B_WsClearAll("");
 	    B_WsSample("1995Y1 2020Y1");
+        int nb_periods = global_ws_var->get_nb_periods();
+        EXPECT_EQ(nb_periods, 26);
 	
 	    // Create ACAF = 0 1 IODE_NAN...
-	    nb = 11;
+        Variable var(nb_periods, IODE_NAN);
 	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
-	    ACAF[7] = IODE_NAN;
-	    success = global_ws_var->set_obj("ACAF", ACAF);
-        EXPECT_TRUE(success);
+        for(int t = 0; t < 11; t++)
+            var[t] = ACAF[t];
+        var[7] = IODE_NAN;
+	    global_ws_var->add("ACAF", var);
 	
 	    // $WsExtrapolate [method] from to [variable list]
 	    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
-	    rc = B_WsExtrapolate(arg);
+	    int rc = B_WsExtrapolate(arg);
 	    ACAF2002 = U_test_calc_lec("ACAF[2002Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF2002, expected_value);
@@ -643,7 +625,7 @@ public:
         
 	    nb = global_ws_var->sample->nb_periods;
 	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
-	    global_ws_var->set_obj(name, A);
+	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
 	    return true;
 	}
@@ -784,7 +766,7 @@ TEST_F(LegacyAPITest, Tests_BUF)
 TEST_F(LegacyAPITest, Tests_OBJECTS)
 {
     bool        found;
-    char*       lst;
+    std::string lst;
     static int  done = 0;
 
     U_test_print_title("Tests OBJECTS");
@@ -793,8 +775,8 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
     // Create lists
     found = global_ws_lst->contains("LST1");
     EXPECT_TRUE(found);
-    lst = global_ws_lst->get_obj("LST1");
-    EXPECT_EQ(strcmp(lst, "A,B"), 0);
+    lst = global_ws_lst->get("LST1");
+    EXPECT_EQ(lst, "A,B");
 
     found = global_ws_var->contains("A");
     EXPECT_TRUE(found);
@@ -831,7 +813,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     bool files = true;
     bool date = true;
 
-    U_test_print_title("Tests Table: Table(...) constructor vs get_obj()");
+    U_test_print_title("Tests Table: Table(...) constructor vs get_obj_ptr()");
 
     // --- create an instance of Table;
     tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
@@ -899,10 +881,10 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
 
     // --- add the table to the Tables KDB
     char* name = "TABLE";
-    global_ws_tbl->set_obj(name, tbl);
+    global_ws_tbl->set_obj_ptr(name, tbl);
 
     // --- extract the table from the Table KDB
-    extracted_tbl = global_ws_tbl->get_obj(name);
+    extracted_tbl = global_ws_tbl->get_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -972,23 +954,19 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
         cells_restored.clear();
     }
 
-    // --- free memory
-    delete tbl;
-    delete extracted_tbl;
+    global_ws_tbl->remove(name);
 }
 
 
 TEST_F(LegacyAPITest, Tests_LEC)
 {
-    double *A, *B;
-
     U_test_print_title("Tests LEC");
 
     // Create objects
     U_test_CreateObjects();
 
-    A = (double*) global_ws_var->get_var_ptr("A");
-    B = (double*) global_ws_var->get_var_ptr("B");
+    Variable A = global_ws_var->get("A");
+    Variable B = global_ws_var->get("B");
 
     // Tests LEC
     U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
@@ -1000,10 +978,10 @@ TEST_F(LegacyAPITest, Tests_LEC)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
 
-    char* lst = global_ws_lst->get_obj("LST1");
-    EXPECT_STREQ(lst, "A,B");
-    lst = global_ws_lst->get_obj("LST2");
-    EXPECT_STREQ(lst, "A,B,A");
+    std::string lst = global_ws_lst->get("LST1");
+    EXPECT_EQ(lst, "A,B");
+    lst = global_ws_lst->get("LST2");
+    EXPECT_EQ(lst, "A,B,A");
 
     // Using macros in LEC
     CLEC* clec = L_cc("1 + vmax($LST1)");
@@ -1022,19 +1000,6 @@ TEST_F(LegacyAPITest, Tests_LEC)
 
     U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
     U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);
-}
-
-
-TEST_F(LegacyAPITest, Tests_EQS)
-{
-//    Equation*     eq;
-//    char    lec[521];
-//
-//    K_upd_eqs("A", "ln A := B + t", NULL, 'L', NULL, NULL, NULL, NULL, NULL);
-//    eq = KEPTR("A");
-//    strcpy(lec, eq->lec);
-//    S4ASSERT(strcmp(eq->lec, "ln A := B + t") == 0, "EQ %s = %s", "A", lec);
-//
 }
 
 
@@ -1098,7 +1063,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 
     // load (binary files)
     // load all objects
-    kdb_var = new KDBVariables(DB_GLOBAL);
+    kdb_var = new KDBVariables(true);
     kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1115,7 +1080,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
         v_objs.push_back(std::string(objs[i]));
     SCR_free_tbl((unsigned char**) objs);
 
-    kdb_var = new KDBVariables(DB_GLOBAL);
+    kdb_var = new KDBVariables(true);
     kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1136,7 +1101,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     char*   filename = "fun";
     U_ch**  endo_exo;
     int     rc;
-    LIS     lst, expected_lst;
+    List    lst, expected_lst;
     void    (*kmsg_super_ptr)(const char*);
     double  XNATY_2000Y1;
 
@@ -1179,17 +1144,15 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Check _PRE list after simulation (prolog)
     EXPECT_TRUE(global_ws_lst->contains("_PRE"));
-    lst = global_ws_lst->get_obj("_PRE");
+    lst = global_ws_lst->get("_PRE");
     expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    //printf("     '%s'(%d)\n", expected_lst, strlen(expected_lst));
-    EXPECT_EQ(std::string(lst), std::string(expected_lst));
+    EXPECT_EQ(lst, expected_lst);
 
     // Check _DIVER 
     EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
-    lst = global_ws_lst->get_obj("_DIVER");
-    //printf("'%s'\n", lst);
+    lst = global_ws_lst->get("_DIVER");
     expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_EQ(std::string(lst), std::string(expected_lst));
+    EXPECT_EQ(lst, expected_lst);
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;
@@ -1253,7 +1216,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    tbl = global_ws_tbl->get_obj("C8_1");
+    tbl = global_ws_tbl->get_obj_ptr("C8_1");
     EXPECT_NE(tbl, nullptr);
 
     // Select Print destination
@@ -1268,9 +1231,6 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     // Print tbl as a graph
     rc = T_graph_tbl_1(tbl, "2000/1999:15[1;2]", 1);
     EXPECT_EQ(rc, 0);
-
-    // deletes tbl
-    delete tbl;
 
     // Print vars as graphs
     varlist = (char**) SCR_vtoms((U_ch*) "ACAF,ACAG,ACAF+ACAG", (U_ch*) ",;");
@@ -1306,6 +1266,9 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Cleanup the 2d VAR ws
     K_load_RWS(2, NULL);
+
+    // reset default value for the number of decimals to print
+    B_PrintNbDec("-1");
 
     // Reset A2M messages
     U_test_reset_a2m_msgs();
@@ -1355,32 +1318,32 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj(name)->value = 0.9;
-        global_ws_scl->get_obj(name)->relax = 1.0;
+        global_ws_scl->get_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1445,7 +1408,8 @@ TEST_F(LegacyAPITest, Tests_W_printf)
 
 TEST_F(LegacyAPITest, Tests_SWAP)
 {
-    SWHDL   item, item2;
+    SWHDL item; 
+    SWHDL item2;
 
     U_test_print_title("Tests SWAP");
 
@@ -1465,27 +1429,16 @@ TEST_F(LegacyAPITest, Tests_SWAP)
 
 TEST_F(LegacyAPITest, Tests_B_DATA)
 {
-    bool        success;
     bool        found;
-    char        *lst, buf[512];
+    char        buf[512];
     int         rc, i;
     double      *A1, val;
     Sample      *smpl;
     char        *filename = "fun";
-    SWHDL       handle;
 
     U_test_print_title("Tests B_DATA");
 
-    KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
-    kdb_cmt->set_obj("AAA", "This is a test comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* value = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(value), "This is a test comment");
-    delete kdb_cmt;
-    kdb_cmt = nullptr;
-
-    kdb_cmt = global_ws_cmt.get();
+    KDB* kdb_cmt = global_ws_cmt.get();
     KDB* kdb_eqs = global_ws_eqs.get();
     KDB* kdb_idt = global_ws_idt.get();
     KDB* kdb_lst = global_ws_lst.get();
@@ -1507,8 +1460,8 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
     B_DataPattern("RC xy $AB $BC", VARIABLES);
-    lst = global_ws_lst->get_obj("RC");
-    EXPECT_EQ(std::string(lst), "AB,AC,BB,BC");
+    std::string lst = global_ws_lst->get("RC");
+    EXPECT_EQ(lst, "AB,AC,BB,BC");
 
     // B_DataCalcVar()
     rc = B_DataCalcVar("A1 2 * B");
@@ -1523,7 +1476,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataRename(char* arg, int type)
     // B_DataDelete(char* arg, int type)
     int pos;
-    char* ptr_obj;
     for(i = 0; i < 7 ; i++) 
     {
         KDB& kdb = get_global_db(i);
@@ -1534,10 +1486,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         EXPECT_TRUE(found);
         pos = kdb.index_of(x_name);
         EXPECT_TRUE(pos >= 0);
-        handle = kdb.get_handle(x_name);
-        EXPECT_TRUE(handle > 0);
-        ptr_obj = kdb.get_ptr_obj(x_name);
-        EXPECT_STRNE(ptr_obj, "");
 
         // Equations cannot be renamed or duplicated
         if(i != EQUATIONS) 
@@ -1550,10 +1498,6 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
             EXPECT_TRUE(found);
             pos = kdb.index_of(y_name);
             EXPECT_TRUE(pos >= 0);
-            handle = kdb.get_handle(y_name);
-            EXPECT_TRUE(handle > 0);
-            ptr_obj = kdb.get_ptr_obj(y_name);
-            EXPECT_STRNE(ptr_obj, "");
 
             char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
             char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
@@ -1569,56 +1513,43 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
         EXPECT_TRUE(!found);
     }
 
-    kdb_cmt->set_obj("AAA", "This is a comment");
-    handle = kdb_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    char* comment = (char*) kdb_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
-    kdb_cmt->clear();
-    global_ws_cmt->set_obj("AAA", "This is a comment");
-    handle = global_ws_cmt->get_handle("AAA");
-    EXPECT_TRUE(handle > 0);
-    comment = global_ws_cmt->get_obj(handle);
-    EXPECT_EQ(std::string(comment), "This is a comment");
-
     // B_DataListSort()
-    success = global_ws_lst->set_obj("LIST1", "A;C;B");
-    EXPECT_TRUE(success);
+    global_ws_lst->add("LIST1", "A;C;B");
     found = global_ws_lst->contains("LIST1");
     EXPECT_TRUE(found);
     rc = B_DataListSort("LIST1 LIST2");
     EXPECT_EQ(rc, 0);
-    lst = global_ws_lst->get_obj("LIST2");
-    EXPECT_EQ(std::string(lst), "A;B;C");
+    lst = global_ws_lst->get("LIST2");
+    EXPECT_EQ(lst, "A;B;C");
 
     // B_DataListSort() Example 2
-    global_ws_lst->set_obj("L1", "C;B;$L2;$L3");
-    global_ws_lst->set_obj("L2", "X Z Y");
-    global_ws_lst->set_obj("L3", "A B D");
+    global_ws_lst->add("L1", "C;B;$L2;$L3");
+    global_ws_lst->add("L2", "X Z Y");
+    global_ws_lst->add("L3", "A B D");
     rc = B_DataListSort("L1 RES");
     EXPECT_EQ(rc, 0);
-    lst = global_ws_lst->get_obj("RES");
-    EXPECT_EQ(std::string(lst), "A;B;B;C;D;X;Y;Z");
+    lst = global_ws_lst->get("RES");
+    EXPECT_EQ(lst, "A;B;B;C;D;X;Y;Z");
 
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U");
+    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_idt->get_obj("U")->get_lec(), "2 * A");
+    EXPECT_EQ(global_ws_idt->get_obj_ptr("U")->get_lec(), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("U")), "A,B,C");
+    EXPECT_EQ(global_ws_lst->get("U"), "A,B,C");
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
-    val = global_ws_scl->get_obj("u")->value;
+    val = global_ws_scl->get_obj_ptr("u")->value;
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
@@ -1630,12 +1561,12 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataSearch(char* arg, int type)
     rc = B_DataSearch("of 0 0 1 0 1 NEWLIST", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("NEWLIST")), "U");
+    EXPECT_EQ(global_ws_lst->get("NEWLIST"), "U");
 
     // B_DataScan(char* arg, int type)
     rc = B_DataScan("U", EQUATIONS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2");
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), "c1;c2");
 
     // B_DataExist(char* arg, int type)
     rc = B_DataExist("_SCAL", LISTS);
@@ -1644,17 +1575,17 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataAppend(char* arg, int type)
     rc = B_DataAppend("_SCAL XXX,YYY", LISTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_SCAL")), "c1;c2,XXX,YYY");
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), "c1;c2,XXX,YYY");
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_cmt->get_obj("U")), "Comment of U - More comment on U");
+    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("LC")), "acaf1;acaf2;acaf3;acaf4");
-    printf("LC = \"%s\"\n", global_ws_lst->get_obj("LC"));
+    EXPECT_EQ(global_ws_lst->get("LC"), "acaf1;acaf2;acaf3;acaf4");
+    printf("LC = \"%s\"\n", (char*) global_ws_lst->get("LC").c_str());
 
     // B_DataCalcLst(char* arg, int unused)
     B_DataUpdate("LST1 A,B,C", LISTS);
@@ -1662,19 +1593,19 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataCalcLst("_RES LST1 + LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B;C;D;E");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "A;B;C;D;E");
 
     rc = B_DataCalcLst("_RES LST1 * LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "C");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "C");
 
     rc = B_DataCalcLst("_RES LST1 - LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "A;B");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "A;B");
 
     rc = B_DataCalcLst("_RES LST1 x LST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_RES")), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
+    EXPECT_EQ(global_ws_lst->get("_RES"), "AC;AD;AE;BC;BD;BE;CC;CD;CE");
 
     // B_DataCompare(char* arg, int type)
     std::string expected_list;
@@ -1684,20 +1615,20 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // names only in current WS
     EXPECT_TRUE(global_ws_lst->contains("WS_ONLY"));
     expected_list = "AB;BC;L1;L2;L3;LC;LIST1;LIST2;LST1;LST2;NEWLIST;RC;RES;U;ZZZ;_EXO;_RES";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("WS_ONLY")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("WS_ONLY"), expected_list);
     // names only in file
     EXPECT_TRUE(global_ws_lst->contains("FILE_ONLY"));
     expected_list = "COPY;COPY0;COPY1;ENDO;ENDO0;ENDO1;ENVI;IDT;MAINEQ;MYLIST;TOTAL;TOTAL0;";
     expected_list += "TOTAL1;XENVI;XSCENARIO;_SEARCH";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("FILE_ONLY")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("FILE_ONLY"), expected_list);
     // names in both current WS and file and IODE obj in WS == IODE obj in file
     EXPECT_TRUE(global_ws_lst->contains("BOTH_EQ"));
     expected_list = "";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_EQ")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("BOTH_EQ"), expected_list);
     // names in both current WS and file but IODE obj in WS != IODE obj in file
     EXPECT_TRUE(global_ws_lst->contains("BOTH_DIFF"));
     expected_list = "_SCAL";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("BOTH_DIFF")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("BOTH_DIFF"), expected_list);
 
     rc = B_DataPrintGraph("Grt Line No No Level -- -- 2000Y1 2015Y1 ACAF ACAG ACAF+ACAG");
     EXPECT_EQ(rc, 0);
@@ -1710,10 +1641,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
 TEST_F(LegacyAPITest, Tests_B_EQS)
 {
-    int     rc;
-    char    cmd_B_EqsEstimate[] = "1980Y1 1996Y1 ACAF";
-    char    cmd_B_EqsSetSample[] = "1981Y1 1995Y1 ACAF";
-    KDB*    kdb_eqs = global_ws_eqs.get();
+    int rc;
 
     U_test_print_title("Tests B_EQS");
     U_test_suppress_kmsg_msgs();
@@ -1721,16 +1649,24 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
 
+    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    Equation* eqs = kdb_eqs->get_obj_ptr("ACAF");
+    eqs->reset_tests();
+    EXPECT_DOUBLE_EQ(eqs->get_test_r2(), 0.0);
+    EXPECT_DOUBLE_EQ(eqs->get_test_fstat(), 0.0);
+
     // B_EqsEstimate()
-    rc = B_EqsEstimate(cmd_B_EqsEstimate);
+    rc = B_EqsEstimate("1980Y1 1996Y1 ACAF");
     EXPECT_EQ(rc, 0);
 
-    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs.get(), "ACAF") * 1e8) / 1e8, 0.82181543);
-    EXPECT_DOUBLE_EQ(round(K_e_fstat(global_ws_eqs.get(), "ACAF") * 1e8) / 1e8, 32.28510666);
+    eqs = kdb_eqs->get_obj_ptr("ACAF");
+    EXPECT_DOUBLE_EQ(round(eqs->get_test_r2() * 1e8) / 1e8, 0.82181543);
+    EXPECT_DOUBLE_EQ(round(eqs->get_test_fstat() * 1e8) / 1e8, 32.28510666);
 
     // B_EqsSetSample()
-    rc = B_EqsSetSample(cmd_B_EqsSetSample);
-    Sample smpl = global_ws_eqs->get_obj("ACAF")->sample;
+    rc = B_EqsSetSample("1981Y1 1995Y1 ACAF");
+    eqs = kdb_eqs->get_obj_ptr("ACAF");
+    Sample smpl = eqs->sample;
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
 
@@ -1892,8 +1828,8 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     global_ws_tbl->clear();
 
     U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    global_ws_idt->set_obj("C", new Identity("D*2+ACAF"));
-    global_ws_idt->set_obj("D", new Identity("A+B"));
+    global_ws_idt->set_obj_ptr("C", new Identity("D*2+ACAF"));
+    global_ws_idt->set_obj_ptr("D", new Identity("A+B"));
 
     // Trace the execution
     W_dest("test_idt", W_HTML);
@@ -2012,7 +1948,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(DB_GLOBAL);
+    KDBVariables* kdb_var = new KDBVariables(true);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2027,19 +1963,19 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDBComments* kdb_cmt = new KDBComments(DB_GLOBAL);
+        KDBComments* kdb_cmt = new KDBComments(true);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
         EXPECT_TRUE(global_ws_cmt != nullptr);
-        EXPECT_EQ(std::string(global_ws_cmt->get_obj("KK_AF")), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(global_ws_cmt->get("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 
     U_test_reset_kmsg_msgs();
 }
 
 
-TEST_F(LegacyAPITest, Tests_B_XODE)
+TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
 {
     char    outfile[256];
     char    reffile[256];
@@ -2059,7 +1995,7 @@ TEST_F(LegacyAPITest, Tests_B_XODE)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(DB_GLOBAL);
+    KDBVariables* kdb_var = new KDBVariables(true);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2270,7 +2206,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
     expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
     expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(std::string(global_ws_lst->get_obj("_PRE2")), expected_list);
+    EXPECT_EQ(global_ws_lst->get("_PRE2"), expected_list);
 
     // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
     //  1. Annuler Exchange
@@ -2301,18 +2237,348 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
 
 TEST_F(LegacyAPITest, Tests_B_WsLoad)
 {
+    int rc;
+    std::string filepath;
+    
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
 
-    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
-    U_test_B_WsLoad("fun", COMMENTS, 317);
-    U_test_B_WsLoad("fun", EQUATIONS, 274);
-    U_test_B_WsLoad("fun", IDENTITIES, 48);
-    U_test_B_WsLoad("fun", LISTS, 17);
-    U_test_B_WsLoad("fun", SCALARS, 161);
-    U_test_B_WsLoad("fun", TABLES, 46);
-    U_test_B_WsLoad("fun", VARIABLES, 394);
+    int t;
+    Sample* var_sample;
+    Equation* eq;
+    Identity* idt;
+    Scalar* scl;
+    Table* tbl;
+    Variable first_var;
+    Variable last_var;
+
+    std::string expected_cmt;
+    std::string expected_lec;
+    std::string expected_lst;
+
+    // ---- binary files ----
+    global_ws_cmt->clear();
+    global_ws_eqs->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_scl->clear();
+    global_ws_tbl->clear();
+    global_ws_var->clear();
+
+    U_test_print_title("B_WsLoad() -> binary files");
+
+    filepath = str_input_test_dir + "fun.cmt";
+    rc = B_WsLoad((char*) filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_cmt->size(), 317);
+    expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
+    expected_cmt += "(gemiddelde 1954-94).";
+    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+
+    filepath = str_input_test_dir + "fun.eqs";
+    rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_eqs->size(), 274);
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq->endo, "ACAF");
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_DOUBLE_EQ(round(eq->get_test_r2adj() * 1e3) / 1e3, 0.796);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_fstat() * 1e3) / 1e3, 32.273);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_dw() * 1e3) / 1e3, 2.329);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_loglik() * 1e3) / 1e3, 83.808);
+    eq = global_ws_eqs->get_obj_ptr("ZZF_");
+    EXPECT_EQ(eq->endo, "ZZF_");
+    EXPECT_EQ(eq->lec, "ZZF_ := ZZF_[-1]");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_DOUBLE_EQ(eq->get_test_r2adj(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_fstat(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_dw(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_loglik(), 0.0);
+
+    filepath = str_input_test_dir + "fun.idt";
+    rc = B_WsLoad((char*) filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_idt->size(), 48);
+    idt = global_ws_idt->get_obj_ptr("AOUC");
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
+    expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+    idt = global_ws_idt->get_obj_ptr("YSFICR");
+    expected_lec = "YSFIC/(TWGP*ZJ)";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+
+    filepath = str_input_test_dir + "fun.lst";
+    rc = B_WsLoad((char*) filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    expected_lst = "$COPY0;$COPY1;";
+    EXPECT_EQ(global_ws_lst->get("COPY"), expected_lst); 
+    expected_lst = "acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;";   
+    expected_lst += "ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;knf3;knff0;";
+    expected_lst += "knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;";
+    expected_lst += "pc5;pc6;pif_1;pif_2;pif_3;pmab0;pmab1;pmab4;pmab6;pms0;pms1;";
+    expected_lst += "pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;";
+    expected_lst += "qc5_;qi5_1;qi5_2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;";
+    expected_lst += "qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1;";
+    expected_lst += "qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;";
+    expected_lst += "qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l_1;vah_1;vah_2;";
+    expected_lst += "vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;";
+    expected_lst += "vs2_;vs3_;vxn_1;vxn_2;vxn_3;zkf1;zkf2;zkf3";
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), expected_lst); 
+
+    filepath = str_input_test_dir + "fun.scl";
+    rc = B_WsLoad((char*) filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_scl->size(), 161);
+    scl = global_ws_scl->get_obj_ptr("acaf1");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, 0.015768);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 0.001369);
+    scl = global_ws_scl->get_obj_ptr("zkf3");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, -7.271244);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 2.676398);
+
+    filepath = str_input_test_dir + "fun.tbl";
+    rc = B_WsLoad((char*) filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_tbl->size(), 46);
+    // **** Check table ANAKNFF ****
+    tbl = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 8);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#s");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl->lines[4].cells[1].get_content(), "dln KNFF");
+    EXPECT_EQ(tbl->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
+    EXPECT_EQ(tbl->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
+    EXPECT_EQ(tbl->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
+    // **** Check table YDH ****
+    tbl = global_ws_tbl->get_obj_ptr("YDH");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 19);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "PC_*40.34");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#S");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
+    EXPECT_EQ(tbl->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
+    EXPECT_EQ(tbl->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
+    EXPECT_EQ(tbl->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[18].get_type(), TableLineType::TABLE_LINE_DATE);
+
+    filepath = str_input_test_dir + "fun.var";
+    rc = B_WsLoad((char*) filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_var->size(), 394);
+    var_sample = global_ws_var->get_sample();
+    EXPECT_EQ(var_sample->to_string(), "1960Y1:2015Y1");
+    first_var = global_ws_var->get("ACAF");
+    last_var = global_ws_var->get("ZZF_");
+    t = var_sample->get_period_position("1960Y1");
+    EXPECT_EQ(t, 0);
+    EXPECT_DOUBLE_EQ(first_var[0], IODE_NAN);
+    EXPECT_DOUBLE_EQ(round(last_var[0] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("1990Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 23.771);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2000Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 10.047);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2015Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+
+    // ---- ascii files ----
+    global_ws_cmt->clear();
+    global_ws_eqs->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_scl->clear();
+    global_ws_tbl->clear();
+    global_ws_var->clear();
+    
+    U_test_print_title("B_WsLoad() -> ascii files");
+
+    filepath = str_input_test_dir + "fun.ac";
+    rc = B_WsLoad((char*) filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_cmt->size(), 317);
+    expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote \n";
+    expected_cmt += "(gemiddelde 1954-94).";
+    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+
+    filepath = str_input_test_dir + "fun.ae";
+    rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_eqs->size(), 274);
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq->endo, "ACAF");
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_DOUBLE_EQ(round(eq->get_test_r2adj() * 1e3) / 1e3, 0.796);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_fstat() * 1e3) / 1e3, 32.273);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_dw() * 1e3) / 1e3, 2.329);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_loglik() * 1e3) / 1e3, 83.808);
+    eq = global_ws_eqs->get_obj_ptr("ZZF_");
+    EXPECT_EQ(eq->endo, "ZZF_");
+    EXPECT_EQ(eq->lec, "ZZF_ := ZZF_[-1]");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_DOUBLE_EQ(eq->get_test_r2adj(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_fstat(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_dw(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_loglik(), 0.0);
+
+    filepath = str_input_test_dir + "fun.ai";
+    rc = B_WsLoad((char*) filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_idt->size(), 48);
+    idt = global_ws_idt->get_obj_ptr("AOUC");
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
+    expected_lec += "(VM+VAFF))[-1]";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+    idt = global_ws_idt->get_obj_ptr("YSFICR");
+    expected_lec = "YSFIC/(TWGP*ZJ)";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+
+    filepath = str_input_test_dir + "fun.al";
+    rc = B_WsLoad((char*) filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    expected_lst = "$COPY0;$COPY1;";
+    EXPECT_EQ(global_ws_lst->get("COPY"), expected_lst); 
+    expected_lst = "acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;\n";
+    expected_lst += "ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;knf3;knff0;\n";
+    expected_lst += "knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;\n";
+    expected_lst += "pc5;pc6;pif_1;pif_2;pif_3;pmab0;pmab1;pmab4;pmab6;pms0;pms1;\n";
+    expected_lst += "pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;\n";
+    expected_lst += "qc5_;qi5_1;qi5_2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;\n";
+    expected_lst += "qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1;\n";
+    expected_lst += "qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;\n";
+    expected_lst += "qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l_1;vah_1;vah_2;\n";
+    expected_lst += "vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;\n";
+    expected_lst += "vs2_;vs3_;vxn_1;vxn_2;vxn_3;zkf1;zkf2;zkf3";
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), expected_lst); 
+
+    filepath = str_input_test_dir + "fun.as";
+    rc = B_WsLoad((char*) filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_scl->size(), 161);
+    scl = global_ws_scl->get_obj_ptr("acaf1");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, 0.015768);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 0.001369);
+    scl = global_ws_scl->get_obj_ptr("zkf3");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, -7.271244);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 2.676398);
+
+    filepath = str_input_test_dir + "fun.at";
+    rc = B_WsLoad((char*) filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_tbl->size(), 46);
+    // **** Check table ANAKNFF ****
+    tbl = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 8);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#s");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl->lines[4].cells[1].get_content(), "dln KNFF");
+    EXPECT_EQ(tbl->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
+    EXPECT_EQ(tbl->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
+    EXPECT_EQ(tbl->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
+    // **** Check table YDH ****
+    tbl = global_ws_tbl->get_obj_ptr("YDH");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 19);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "PC_*40.34");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#S");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
+    EXPECT_EQ(tbl->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
+    EXPECT_EQ(tbl->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
+    EXPECT_EQ(tbl->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[18].get_type(), TableLineType::TABLE_LINE_DATE);
+
+    filepath = str_input_test_dir + "fun.av";
+    rc = B_WsLoad((char*) filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_var->size(), 394);
+    var_sample = global_ws_var->get_sample();
+    EXPECT_EQ(var_sample->to_string(), "1960Y1:2015Y1");
+    first_var = global_ws_var->get("ACAF");
+    last_var = global_ws_var->get("ZZF_");
+    t = var_sample->get_period_position("1960Y1");
+    EXPECT_EQ(t, 0);
+    EXPECT_DOUBLE_EQ(first_var[0], IODE_NAN);
+    EXPECT_DOUBLE_EQ(round(last_var[0] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("1990Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 23.771);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2000Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 10.047);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2015Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2337,39 +2603,442 @@ TEST_F(LegacyAPITest, Tests_KEVAL)
     B_WsLoad(fullfilename, VARIABLES);
 
     // check equation->endo == equation name
-    for(const auto& [name, handle] : global_ws_eqs->k_objs)
-        ASSERT_EQ(global_ws_eqs->get_obj(name)->endo, name) ;
+    for(const auto& [name, eq] : global_ws_eqs->k_objs)
+        ASSERT_EQ(eq->endo, name) ;
 
     U_test_reset_kmsg_msgs();
 }
 
 TEST_F(LegacyAPITest, Tests_B_WsSave)
 {
-	char fullfilename[256];
-	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
-
+    int rc;
+    std::string in_filepath;
+    std::string out_filepath;
+    
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
 
-    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
-    B_WsLoad(fullfilename, COMMENTS);
-    B_WsLoad(fullfilename, EQUATIONS);
-    B_WsLoad(fullfilename, IDENTITIES);
-    B_WsLoad(fullfilename, LISTS);
-    B_WsLoad(fullfilename, SCALARS);
-    B_WsLoad(fullfilename, TABLES);
-    B_WsLoad(fullfilename, VARIABLES);
+    int t;
+    Sample* var_sample;
+    Equation* eq;
+    Identity* idt;
+    Scalar* scl;
+    Table* tbl;
+    Variable first_var;
+    Variable last_var;
 
-    // int B_WsSave(char* arg, int type)                 $WsSave<type> filename
-    U_test_print_title("B_WsSave()");
-    U_test_B_WsSave("fun", "fun2", COMMENTS, 317);
-    U_test_B_WsSave("fun", "fun2", EQUATIONS, 274);
-    U_test_B_WsSave("fun", "fun2", IDENTITIES, 48);
-    U_test_B_WsSave("fun", "fun2", LISTS, 17);
-    U_test_B_WsSave("fun", "fun2", SCALARS, 161);
-    U_test_B_WsSave("fun", "fun2", TABLES, 46);
-    U_test_B_WsSave("fun", "fun2", VARIABLES, 394);
+    std::string expected_cmt;
+    std::string expected_lec;
+    std::string expected_lst;
+
+    // ---- binary files ----
+    global_ws_cmt->clear();
+    global_ws_eqs->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_scl->clear();
+    global_ws_tbl->clear();
+    global_ws_var->clear();
+
+    U_test_print_title("B_WsSave() -> binary files");
+
+    in_filepath = str_input_test_dir + "fun.cmt";
+    B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
+    out_filepath = str_output_test_dir + "fun2.cmt";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", COMMENTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_cmt->size(), 317);
+    expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
+    expected_cmt += "(gemiddelde 1954-94).";
+    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+
+    in_filepath = str_input_test_dir + "fun.eqs";
+    B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
+    out_filepath = str_output_test_dir + "fun2.eqs";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", EQUATIONS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_eqs->size(), 274);
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq->endo, "ACAF");
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_DOUBLE_EQ(round(eq->get_test_r2adj() * 1e3) / 1e3, 0.796);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_fstat() * 1e3) / 1e3, 32.273);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_dw() * 1e3) / 1e3, 2.329);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_loglik() * 1e3) / 1e3, 83.808);
+    eq = global_ws_eqs->get_obj_ptr("ZZF_");
+    EXPECT_EQ(eq->endo, "ZZF_");
+    EXPECT_EQ(eq->lec, "ZZF_ := ZZF_[-1]");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_DOUBLE_EQ(eq->get_test_r2adj(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_fstat(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_dw(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_loglik(), 0.0);
+
+    in_filepath = str_input_test_dir + "fun.idt";
+    B_WsLoad((char*) in_filepath.c_str(), IDENTITIES);
+    out_filepath = str_output_test_dir + "fun2.idt";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", IDENTITIES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_idt->size(), 48);
+    idt = global_ws_idt->get_obj_ptr("AOUC");
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
+    expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+    idt = global_ws_idt->get_obj_ptr("YSFICR");
+    expected_lec = "YSFIC/(TWGP*ZJ)";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+
+    in_filepath = str_input_test_dir + "fun.lst";
+    B_WsLoad((char*) in_filepath.c_str(), LISTS);
+    out_filepath = str_output_test_dir + "fun2.lst";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", LISTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    expected_lst = "$COPY0;$COPY1;";
+    EXPECT_EQ(global_ws_lst->get("COPY"), expected_lst); 
+    expected_lst = "acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;";   
+    expected_lst += "ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;knf3;knff0;";
+    expected_lst += "knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;";
+    expected_lst += "pc5;pc6;pif_1;pif_2;pif_3;pmab0;pmab1;pmab4;pmab6;pms0;pms1;";
+    expected_lst += "pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;";
+    expected_lst += "qc5_;qi5_1;qi5_2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;";
+    expected_lst += "qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1;";
+    expected_lst += "qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;";
+    expected_lst += "qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l_1;vah_1;vah_2;";
+    expected_lst += "vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;";
+    expected_lst += "vs2_;vs3_;vxn_1;vxn_2;vxn_3;zkf1;zkf2;zkf3";
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), expected_lst); 
+
+    in_filepath = str_input_test_dir + "fun.scl";
+    B_WsLoad((char*) in_filepath.c_str(), SCALARS);
+    out_filepath = str_output_test_dir + "fun2.scl";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", SCALARS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_scl->size(), 161);
+    scl = global_ws_scl->get_obj_ptr("acaf1");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, 0.015768);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 0.001369);
+    scl = global_ws_scl->get_obj_ptr("zkf3");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, -7.271244);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 2.676398);
+
+    in_filepath = str_input_test_dir + "fun.tbl";
+    B_WsLoad((char*) in_filepath.c_str(), TABLES);
+    out_filepath = str_output_test_dir + "fun2.tbl";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", TABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_tbl->size(), 46);
+    // **** Check table ANAKNFF ****
+    tbl = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 8);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#s");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl->lines[4].cells[1].get_content(), "dln KNFF");
+    EXPECT_EQ(tbl->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
+    EXPECT_EQ(tbl->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
+    EXPECT_EQ(tbl->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
+    // **** Check table YDH ****
+    tbl = global_ws_tbl->get_obj_ptr("YDH");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 19);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "PC_*40.34");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#S");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
+    EXPECT_EQ(tbl->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
+    EXPECT_EQ(tbl->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
+    EXPECT_EQ(tbl->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[18].get_type(), TableLineType::TABLE_LINE_DATE);
+
+    in_filepath = str_input_test_dir + "fun.var";
+    B_WsLoad((char*) in_filepath.c_str(), VARIABLES);
+    out_filepath = str_output_test_dir + "fun2.var";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", VARIABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_var->size(), 394);
+    var_sample = global_ws_var->get_sample();
+    EXPECT_EQ(var_sample->to_string(), "1960Y1:2015Y1");
+    first_var = global_ws_var->get("ACAF");
+    last_var = global_ws_var->get("ZZF_");
+    t = var_sample->get_period_position("1960Y1");
+    EXPECT_EQ(t, 0);
+    EXPECT_DOUBLE_EQ(first_var[0], IODE_NAN);
+    EXPECT_DOUBLE_EQ(round(last_var[0] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("1990Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 23.771);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2000Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 10.047);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2015Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+
+    // ---- ascii files ----
+    global_ws_cmt->clear();
+    global_ws_eqs->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_scl->clear();
+    global_ws_tbl->clear();
+    global_ws_var->clear();
+    
+    U_test_print_title("B_WsSave() -> ascii files");
+
+    in_filepath = str_input_test_dir + "fun.ac";
+    B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
+    out_filepath = str_output_test_dir + "fun2.ac";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", COMMENTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_cmt->size(), 317);
+    expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote  \n";
+    expected_cmt += "(gemiddelde 1954-94).";
+    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+
+    in_filepath = str_input_test_dir + "fun.ae";
+    B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
+    out_filepath = str_output_test_dir + "fun2.ae";
+    _unlink((char*) out_filepath.c_str());
+    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    rc = B_WsSave((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", EQUATIONS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_eqs->size(), 274);
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq->endo, "ACAF");
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_DOUBLE_EQ(round(eq->get_test_r2adj() * 1e3) / 1e3, 0.796);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_fstat() * 1e3) / 1e3, 32.273);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_dw() * 1e3) / 1e3, 2.329);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_loglik() * 1e3) / 1e3, 83.808);
+    eq = global_ws_eqs->get_obj_ptr("ZZF_");
+    EXPECT_EQ(eq->endo, "ZZF_");
+    EXPECT_EQ(eq->lec, "ZZF_ := ZZF_[-1]");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_DOUBLE_EQ(eq->get_test_r2adj(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_fstat(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_dw(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_loglik(), 0.0);
+
+    in_filepath = str_input_test_dir + "fun.ai";
+    B_WsLoad((char*) in_filepath.c_str(), IDENTITIES);
+    out_filepath = str_output_test_dir + "fun2.ai";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", IDENTITIES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_idt->size(), 48);
+    idt = global_ws_idt->get_obj_ptr("AOUC");
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
+    expected_lec += "(VM+VAFF))[-1]";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+    idt = global_ws_idt->get_obj_ptr("YSFICR");
+    expected_lec = "YSFIC/(TWGP*ZJ)";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+
+    in_filepath = str_input_test_dir + "fun.al";
+    B_WsLoad((char*) in_filepath.c_str(), LISTS);
+    out_filepath = str_output_test_dir + "fun2.al";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", LISTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    expected_lst = "$COPY0;$COPY1;";
+    EXPECT_EQ(global_ws_lst->get("COPY"), expected_lst); 
+    expected_lst = "acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;\n";
+    expected_lst += "ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;knf3;knff0;\n";
+    expected_lst += "knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;\n";
+    expected_lst += "pc5;pc6;pif_1;pif_2;pif_3;pmab0;pmab1;pmab4;pmab6;pms0;pms1;\n";
+    expected_lst += "pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;\n";
+    expected_lst += "qc5_;qi5_1;qi5_2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;\n";
+    expected_lst += "qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1;\n";
+    expected_lst += "qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;\n";
+    expected_lst += "qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l_1;vah_1;vah_2;\n";
+    expected_lst += "vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;\n";
+    expected_lst += "vs2_;vs3_;vxn_1;vxn_2;vxn_3;zkf1;zkf2;zkf3";
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), expected_lst); 
+
+    in_filepath = str_input_test_dir + "fun.as";
+    B_WsLoad((char*) in_filepath.c_str(), SCALARS);
+    out_filepath = str_output_test_dir + "fun2.as";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", SCALARS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_scl->size(), 161);
+    scl = global_ws_scl->get_obj_ptr("acaf1");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, 0.015768);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 0.001369);
+    scl = global_ws_scl->get_obj_ptr("zkf3");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, -7.271244);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 2.676398);
+
+    in_filepath = str_input_test_dir + "fun.at";
+    B_WsLoad((char*) in_filepath.c_str(), TABLES);
+    out_filepath = str_output_test_dir + "fun2.at";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", TABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_tbl->size(), 46);
+    // **** Check table ANAKNFF ****
+    tbl = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 8);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#s");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl->lines[4].cells[1].get_content(), "dln KNFF");
+    EXPECT_EQ(tbl->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
+    EXPECT_EQ(tbl->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
+    EXPECT_EQ(tbl->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
+    // **** Check table YDH ****
+    tbl = global_ws_tbl->get_obj_ptr("YDH");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 19);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "PC_*40.34");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#S");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
+    EXPECT_EQ(tbl->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
+    EXPECT_EQ(tbl->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
+    EXPECT_EQ(tbl->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[18].get_type(), TableLineType::TABLE_LINE_DATE);
+
+    in_filepath = str_input_test_dir + "fun.av";
+    B_WsLoad((char*) in_filepath.c_str(), VARIABLES);
+    out_filepath = str_output_test_dir + "fun2.av";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSave((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", VARIABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_var->size(), 394);
+    var_sample = global_ws_var->get_sample();
+    EXPECT_EQ(var_sample->to_string(), "1960Y1:2015Y1");
+    first_var = global_ws_var->get("ACAF");
+    last_var = global_ws_var->get("ZZF_");
+    t = var_sample->get_period_position("1960Y1");
+    EXPECT_EQ(t, 0);
+    EXPECT_DOUBLE_EQ(first_var[0], IODE_NAN);
+    EXPECT_DOUBLE_EQ(round(last_var[0] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("1990Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 23.771);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2000Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 10.047);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2015Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
 
     U_test_reset_kmsg_msgs();
 }
@@ -2377,31 +3046,228 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
 
 TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
 {
-	char fullfilename[256];
-	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
-
+    int rc;
+    std::string in_filepath;
+    std::string out_filepath;
+    
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
     U_test_suppress_kmsg_msgs();
 
-    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
-    B_WsLoad(fullfilename, COMMENTS);
-    B_WsLoad(fullfilename, EQUATIONS);
-    B_WsLoad(fullfilename, IDENTITIES);
-    B_WsLoad(fullfilename, LISTS);
-    B_WsLoad(fullfilename, SCALARS);
-    B_WsLoad(fullfilename, TABLES);
-    B_WsLoad(fullfilename, VARIABLES);
+    int t;
+    Sample* var_sample;
+    Equation* eq;
+    Identity* idt;
+    Scalar* scl;
+    Table* tbl;
+    Variable first_var;
+    Variable last_var;
 
-    // int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
-    U_test_print_title("B_WsSaveCmp()");
-    U_test_B_WsSaveCmp("fun", "fun2cmp", COMMENTS, 317);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", EQUATIONS, 274);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", IDENTITIES, 48);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", LISTS, 17);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", SCALARS, 161);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", TABLES, 46);
-    U_test_B_WsSaveCmp("fun", "fun2cmp", VARIABLES, 394);
+    std::string expected_cmt;
+    std::string expected_lec;
+    std::string expected_lst;
+
+    global_ws_cmt->clear();
+    global_ws_eqs->clear();
+    global_ws_idt->clear();
+    global_ws_lst->clear();
+    global_ws_scl->clear();
+    global_ws_tbl->clear();
+    global_ws_var->clear();
+
+    U_test_print_title("B_WsSaveCmp() -> compressed binary files");
+
+    in_filepath = str_input_test_dir + "fun.cmt";
+    B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
+    out_filepath = str_output_test_dir + "fun2cmp.cmt";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", COMMENTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), COMMENTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_cmt->size(), 317);
+    expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
+    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
+    expected_cmt += "(gemiddelde 1954-94).";
+    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+
+    in_filepath = str_input_test_dir + "fun.eqs";
+    B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
+    out_filepath = str_output_test_dir + "fun2cmp.eqs";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", EQUATIONS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_eqs->size(), 274);
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq->endo, "ACAF");
+    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_DOUBLE_EQ(round(eq->get_test_r2adj() * 1e3) / 1e3, 0.796);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_fstat() * 1e3) / 1e3, 32.273);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_dw() * 1e3) / 1e3, 2.329);
+    EXPECT_DOUBLE_EQ(round(eq->get_test_loglik() * 1e3) / 1e3, 83.808);
+    eq = global_ws_eqs->get_obj_ptr("ZZF_");
+    EXPECT_EQ(eq->endo, "ZZF_");
+    EXPECT_EQ(eq->lec, "ZZF_ := ZZF_[-1]");
+    EXPECT_EQ(eq->sample.to_string(), ":");
+    EXPECT_DOUBLE_EQ(eq->get_test_r2adj(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_fstat(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_dw(), 0.0);
+    EXPECT_DOUBLE_EQ(eq->get_test_loglik(), 0.0);
+
+    in_filepath = str_input_test_dir + "fun.idt";
+    B_WsLoad((char*) in_filepath.c_str(), IDENTITIES);
+    out_filepath = str_output_test_dir + "fun2cmp.idt";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", IDENTITIES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_idt->size(), 48);
+    idt = global_ws_idt->get_obj_ptr("AOUC");
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
+    expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+    idt = global_ws_idt->get_obj_ptr("YSFICR");
+    expected_lec = "YSFIC/(TWGP*ZJ)";
+    EXPECT_EQ(idt->get_lec(), expected_lec);
+
+    in_filepath = str_input_test_dir + "fun.lst";
+    B_WsLoad((char*) in_filepath.c_str(), LISTS);
+    out_filepath = str_output_test_dir + "fun2cmp.lst";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", LISTS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), LISTS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_lst->size(), 17);
+    expected_lst = "$COPY0;$COPY1;";
+    EXPECT_EQ(global_ws_lst->get("COPY"), expected_lst); 
+    expected_lst = "acaf1;acaf2;acaf3;dlnpaf;dpuh_1;dpuh_2;dtf0;dtf1;ifu_1;";   
+    expected_lst += "ifu_2;kl1;kl10;kl11;kl12;kl13;kl14;kl2;knf2;knf3;knff0;";
+    expected_lst += "knff1;nfyh1;nfyh10;nfyh11;nfyh2;nfyh3;nfyh4;pc0;pc1;pc2;pc4;";
+    expected_lst += "pc5;pc6;pif_1;pif_2;pif_3;pmab0;pmab1;pmab4;pmab6;pms0;pms1;";
+    expected_lst += "pms3;pxab1;pxs1;pxs2;pxs3;pxs4;qc0_;qc1_;qc2_;qc3_;qc4_;";
+    expected_lst += "qc5_;qi5_1;qi5_2;qi5_3;qi5_4;qi5_5;qmab_1;qmab_10;qmab_2;";
+    expected_lst += "qmab_4;qmab_5;qme_1;qme_2;qme_3;qms1;qms2;qms3;qms4;qmt_1;";
+    expected_lst += "qmt_2;qmt_3;qxab0;qxab1;qxab2;qxab3;qxs0;qxs1;qxs2;qxs3;";
+    expected_lst += "qxs4;qxs5;qxt0;qxt1;qxt2;qxt3;sbf3l_0;sbf3l_1;vah_1;vah_2;";
+    expected_lst += "vah_3;vai1_;vai2_;vai3_;vai4_;vmn_1;vmn_2;vmn_3;vs0_;vs1_;";
+    expected_lst += "vs2_;vs3_;vxn_1;vxn_2;vxn_3;zkf1;zkf2;zkf3";
+    EXPECT_EQ(global_ws_lst->get("_SCAL"), expected_lst); 
+
+    in_filepath = str_input_test_dir + "fun.scl";
+    B_WsLoad((char*) in_filepath.c_str(), SCALARS);
+    out_filepath = str_output_test_dir + "fun2cmp.scl";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", SCALARS);
+    rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_scl->size(), 161);
+    scl = global_ws_scl->get_obj_ptr("acaf1");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, 0.015768);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 0.001369);
+    scl = global_ws_scl->get_obj_ptr("zkf3");
+    EXPECT_DOUBLE_EQ(round(scl->value * 1e6) / 1e6, -7.271244);
+    EXPECT_DOUBLE_EQ(round(scl->relax * 1e6) / 1e6, 1.0);
+    EXPECT_DOUBLE_EQ(round(scl->std * 1e6) / 1e6, 2.676398);
+
+    in_filepath = str_input_test_dir + "fun.tbl";
+    B_WsLoad((char*) in_filepath.c_str(), TABLES);
+    out_filepath = str_output_test_dir + "fun2cmp.tbl";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", TABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), TABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_tbl->size(), 46);
+    // **** Check table ANAKNFF ****
+    tbl = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 8);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#s");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl->lines[4].cells[1].get_content(), "dln KNFF");
+    EXPECT_EQ(tbl->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
+    EXPECT_EQ(tbl->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
+    EXPECT_EQ(tbl->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
+    // **** Check table YDH ****
+    tbl = global_ws_tbl->get_obj_ptr("YDH");
+    EXPECT_EQ(tbl->nb_columns, 2);
+    EXPECT_EQ(tbl->lines.size(), 19);
+    EXPECT_EQ(tbl->divider_line.cells[0].get_content(), "1");
+    EXPECT_EQ(tbl->divider_line.cells[1].get_content(), "PC_*40.34");
+    EXPECT_EQ(tbl->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
+    EXPECT_EQ(tbl->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[2].cells[0].get_content(), "");
+    EXPECT_EQ(tbl->lines[2].cells[1].get_content(), "#S");
+    EXPECT_EQ(tbl->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
+    EXPECT_EQ(tbl->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
+    EXPECT_EQ(tbl->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
+    EXPECT_EQ(tbl->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
+    EXPECT_EQ(tbl->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
+    EXPECT_EQ(tbl->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
+    EXPECT_EQ(tbl->lines[18].get_type(), TableLineType::TABLE_LINE_DATE);
+
+    in_filepath = str_input_test_dir + "fun.var";
+    B_WsLoad((char*) in_filepath.c_str(), VARIABLES);
+    out_filepath = str_output_test_dir + "fun2cmp.var";
+    _unlink((char*) out_filepath.c_str());
+    rc = B_WsSaveCmp((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    B_WsClear("", VARIABLES);
+    rc = B_WsLoad((char*) out_filepath.c_str(), VARIABLES);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_ws_var->size(), 394);
+    var_sample = global_ws_var->get_sample();
+    EXPECT_EQ(var_sample->to_string(), "1960Y1:2015Y1");
+    first_var = global_ws_var->get("ACAF");
+    last_var = global_ws_var->get("ZZF_");
+    t = var_sample->get_period_position("1960Y1");
+    EXPECT_EQ(t, 0);
+    EXPECT_DOUBLE_EQ(first_var[0], IODE_NAN);
+    EXPECT_DOUBLE_EQ(round(last_var[0] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("1990Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 23.771);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2000Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, 10.047);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
+    t = var_sample->get_period_position("2015Y1");
+    EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
+    EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
 
     U_test_reset_kmsg_msgs();
 }
@@ -3029,8 +3895,8 @@ TEST_F(LegacyAPITest, Tests_RAS_EXECUTE)
     global_ws_var->get_var_ptr("RTCT")[0] = 90.0;
     global_ws_var->get_var_ptr("RTCT", 1)[0] = 90.0;
 
-    global_ws_lst->set_obj("X", "R1,R2,R3,R4,RT");
-    global_ws_lst->set_obj("Y", "C1,C2,C3,C4,CT");
+    global_ws_lst->add("X", "R1,R2,R3,R4,RT");
+    global_ws_lst->add("Y", "C1,C2,C3,C4,CT");
 
     bool found = global_ws_lst->contains("X");
     EXPECT_TRUE(found);

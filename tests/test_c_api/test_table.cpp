@@ -9,18 +9,19 @@ protected:
     void SetUp() override
     {
         global_ws_tbl->load(str_input_test_dir + "fun.at");
-        table = global_ws_tbl->get("GFRPC");
+        table = global_ws_tbl->get_obj_ptr("GFRPC");
     }
 
     void TearDown() override 
     {
-        delete table;
+        global_ws_tbl->clear();
+        table = nullptr;
     }
 };
 
 
 // Test that a Table* 'tbl' object added to global_ws_tbl using add() and a Table* 'extracted_tbl' object 
-// extracted using get_obj() are exactly the same
+// extracted using get_obj_ptr() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
@@ -102,10 +103,10 @@ TEST_F(TablesTest, AddGetTable)
 
     // --- add the table to the Tables KDB
     std::string name = "C_TABLE";
-    global_ws_tbl->set_obj(name, tbl);
+    global_ws_tbl->set_obj_ptr(name, tbl);
 
     // --- extract the table from the Table KDB
-    Table* extracted_tbl = global_ws_tbl->get_obj(name);
+    Table* extracted_tbl = global_ws_tbl->get_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
@@ -182,9 +183,7 @@ TEST_F(TablesTest, AddGetTable)
         }
     }
 
-    // --- free memory
-    delete tbl;
-    delete extracted_tbl;
+    global_ws_tbl->remove(name);
 }
 
 TEST_F(TablesTest, Equivalence_C_CPP)
@@ -203,26 +202,26 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     bool date = true;
 
     // test if a Table object can be added to the Tables KDB via add()
-    Table table(nb_columns, def, vars, mode, files, date);
+    Table cpp_table(nb_columns, def, vars, mode, files, date);
 
     // test if the Table object has been correctly initialized
     // --- divider line ---
-    cell = &(table.divider_line.cells[0]);
+    cell = &(cpp_table.divider_line.cells[0]);
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     ASSERT_EQ(cell->get_content(), "1");
-    cell = &(table.divider_line.cells[1]);
+    cell = &(cpp_table.divider_line.cells[1]);
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     // --- title line ---
     int i = 0;
-    line = &table.lines[i++];
+    line = &cpp_table.lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_TITLE);
     cell = &(line->cells[0]);
     ASSERT_EQ(cell->get_content(), "A title");
     // --- separator line ---
-    line = &table.lines[i++];
+    line = &cpp_table.lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
     // --- first line ---
-    line = &table.lines[i++];
+    line = &cpp_table.lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_CELL);
     cell = &(line->cells[0]);
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
@@ -230,13 +229,13 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
     ASSERT_EQ(cell->get_content(), "#S");
     // --- separator line ---
-    line = &table.lines[i++];
+    line = &cpp_table.lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
     // --- variables lines ---
     for(int v = 0; v < vars.size(); v++)
     {
         // std::cout << "testing line " << i << ", var = " << vars[v] << std::endl;
-        line = &table.lines[i++];
+        line = &cpp_table.lines[i++];
         ASSERT_EQ(line->get_type(), TABLE_LINE_CELL);
         for(int j = 0; j < nb_columns; j++)
         {
@@ -254,18 +253,18 @@ TEST_F(TablesTest, Equivalence_C_CPP)
         }
     }
     // --- separator line ---
-    line = &table.lines[i++];
+    line = &cpp_table.lines[i++];
     ASSERT_EQ(line->get_type(), TABLE_LINE_SEP);
     // --- mode/files/date lines ---
-    ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_MODE);
-    ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_FILES);
-    ASSERT_EQ(table.lines[i++].get_type(), TABLE_LINE_DATE);
+    ASSERT_EQ(cpp_table.lines[i++].get_type(), TABLE_LINE_MODE);
+    ASSERT_EQ(cpp_table.lines[i++].get_type(), TABLE_LINE_FILES);
+    ASSERT_EQ(cpp_table.lines[i++].get_type(), TABLE_LINE_DATE);
 
-    global_ws_tbl->set_obj(name, &table);
+    global_ws_tbl->add(name, cpp_table);
     bool found = global_ws_tbl->contains(name);
     ASSERT_TRUE(found);
 
-    Table* tbl = global_ws_tbl->get_obj(name);
+    Table* tbl = global_ws_tbl->get_obj_ptr(name);
     // test if the restored Table object is the same as the original one
     // --- divider line ---
     cell = &(tbl->divider_line.cells[0]);
@@ -320,7 +319,7 @@ TEST_F(TablesTest, Equivalence_C_CPP)
     // test if a Table object can be passed to the hash function for the objects of type Table.
     std::hash<Table> tbl_hasher;
     std::size_t c_hash = tbl_hasher(*tbl);
-    std::size_t cpp_hash = tbl_hasher(static_cast<Table>(table));
+    std::size_t cpp_hash = tbl_hasher(static_cast<Table>(cpp_table));
     ASSERT_EQ(c_hash, cpp_hash);
 }
 
@@ -759,8 +758,8 @@ TEST_F(TablesTest, LineDate)
 
 TEST_F(TablesTest, ListCoefficients)
 {
-    Table* table = global_ws_tbl->get("ANAKNFF");    
-    TableLine& line_5 = table->lines[5];
+    Table table1 = global_ws_tbl->get("ANAKNFF");    
+    TableLine& line_5 = table1.lines[5];
     EXPECT_EQ(line_5.get_type(), TABLE_LINE_CELL);
     TableCell& first_cell = line_5.cells[0];
     EXPECT_EQ(first_cell.get_content(false), "Output gap ");
@@ -774,8 +773,8 @@ TEST_F(TablesTest, ListCoefficients)
 
 TEST_F(TablesTest, ListVariables)
 {
-    Table* table = global_ws_tbl->get("ANAKNFF");    
-    TableLine& line_5 = table->lines[5];
+    Table table1 = global_ws_tbl->get("ANAKNFF");    
+    TableLine& line_5 = table1.lines[5];
     EXPECT_EQ(line_5.get_type(), TABLE_LINE_CELL);
     TableCell& first_cell = line_5.cells[0];
     EXPECT_EQ(first_cell.get_content(false), "Output gap ");
@@ -798,18 +797,20 @@ TEST_F(TablesTest, Hash)
     hash_original = hash_before;
 
     // same table
-    Table* same_table = global_ws_tbl->get("GFRPC");
-    EXPECT_EQ(*table, *same_table);
-    hash_after = table_hasher(*same_table);
+    Table same_table = global_ws_tbl->get("GFRPC");
+    EXPECT_EQ(*table, same_table);
+    hash_after = table_hasher(same_table);
     EXPECT_EQ(hash_before, hash_after);
 
     // C++ table vs C table
-    Table* c_table = global_ws_tbl->get_obj("GFRPC");
+    Table* c_table = global_ws_tbl->get_obj_ptr("GFRPC");
     std::size_t c_hash = table_hasher(*c_table);
     EXPECT_EQ(hash_original, c_hash);
 
+    Table* table_before = nullptr;
+
     // different title
-    Table* table_before = new Table(*table);
+    table_before = new Table(*table);
     std::string title = table->get_title(0);
     std::string new_title = "New Title";
     table->set_title(0, new_title);
@@ -843,7 +844,7 @@ TEST_F(TablesTest, Hash)
     table->set_title(0, title);
     line.cells[0].set_text(cell_content);
     line.cells[1].set_lec(lec_content);
-    EXPECT_EQ(*table, *same_table);
+    EXPECT_EQ(*table, same_table);
     hash_after = table_hasher(*table);
     EXPECT_EQ(hash_original, hash_after);
 }

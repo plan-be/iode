@@ -9,7 +9,10 @@ protected:
         global_ws_lst->load(str_input_test_dir + "fun.al");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_lst->clear();
+    }
 };
 
 
@@ -257,7 +260,7 @@ TEST_F(KDBListsTest, Merge)
 
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_list);
@@ -265,7 +268,7 @@ TEST_F(KDBListsTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_list); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_list);
 }

@@ -67,7 +67,7 @@ int ImportObjsPRN::read_variable(YYFILE* yy, char* name, int dim, double* vector
         key = YY_lex(yy);
         switch(key)  {
             case YY_EOF :
-                return(-1);
+                return -1;
             case YY_WORD :
             case YY_STRING :
                 if(strcmp((char*) yy->yy_text, "na") == 0) continue;
@@ -77,7 +77,7 @@ int ImportObjsPRN::read_variable(YYFILE* yy, char* name, int dim, double* vector
                 if(key == YY_STRING) SCR_asqz((unsigned char*) name, (unsigned char*) "_");
 
                 for(i = 0; i < dim; i++) vector[i] = read_real(yy);
-                return(0);
+                return 0;
         }
     }
 }
@@ -91,10 +91,10 @@ int ImportCommentsPRN::read_header(ImportCmtFromFile* impdef, char* file, int la
 
     if(PYY == 0) {
         kerror(0,"Cannot open '%s'", file);
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 int ImportCommentsPRN::read_comment(char* name, char** cmt)
@@ -112,15 +112,15 @@ int ImportCommentsPRN::read_comment(char* name, char** cmt)
     else goto err;
 
     key = YY_lex(yy);
-    if(key == YY_EOF) return(-1);
+    if(key == YY_EOF) return -1;
 
     if(key == YY_WORD || key == YY_STRING)
         *cmt = (char*) SCR_stracpy(yy->yy_text);
     else goto err;
 
-    return(0);
+    return 0;
 
 err :
-    return(-1);
+    return -1;
 
 }

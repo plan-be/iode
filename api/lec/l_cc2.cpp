@@ -44,7 +44,7 @@ static int L_calc_len(ALEC* expr, int from, int to)
     int     lg = 0, i;
     ALEC    *al;
 
-    if(expr == 0) return(0);
+    if(expr == 0) return 0;
     for(al = expr + from, i = from ; i < to ; al++, i++) {
         lg ++;
         switch(al->al_type) {

@@ -6,53 +6,46 @@
 #include "api/objs/macros.h"
 
 
-char* KDBMacros::get_macro(const SWHDL handle) const
+std::string KDBMacros::get_macro(const std::string& name) const
 {    
-    return (char*) P_get_ptr(SW_getptr(handle), 0);
+    std::string* macro_ptr = this->get_obj_ptr(name);
+    return *macro_ptr;
 }
 
-char* KDBMacros::get_macro(const std::string& name) const
-{
-    SWHDL handle = this->get_handle(name);
-    if(handle == 0)  
-        throw std::invalid_argument("comment with name '" + name + "' not found.");
-    
-    return get_macro(handle);
-}
-
-bool KDBMacros::set_macro(const std::string& name, char* value, const int length)
+bool KDBMacros::set_macro(const std::string& name, std::string& macro)
 {
     if(this->k_type != OBJECTS)
     {
-        kerror(0, "Invalid database type for adding an Object");
+        kwarning("Invalid database type for adding an Object");
         return false;
     }
 
-    char* pack = NULL;
-    K_opack(&pack, value, (int*) &length);
-    bool success = set_packed_object(name, pack);
-    return success;
+    std::string* macro_ptr = new std::string(macro);
+    this->set_obj_ptr(name, macro_ptr);
+    return true;
 }
 
-bool KDBMacros::grep_obj(const std::string& name, const SWHDL handle, 
-    const std::string& pattern, const bool ecase, const bool forms, const bool texts, 
-    const char all) const
+bool KDBMacros::grep_obj(const std::string& name, const std::string& pattern, 
+    const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
     if(texts) 
-        found = wrap_grep_gnl(pattern, this->get_macro(handle), ecase, all);
+        found = wrap_grep_gnl(pattern, this->get_macro(name), ecase, all);
     return found;
 }
 
 char* KDBMacros::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    char* obj = this->get_macro(name);
+    std::string macro = this->get_macro(name);
+    char* obj = new char[macro.size() + 1];
+    strcpy(obj, macro.c_str());
     return obj;
 }
 
 bool KDBMacros::print_obj_def(const std::string& name)
 {
-    bool success = print_definition_generic(name, this->get_macro(name));
+    std::string macro = this->get_macro(name);
+    bool success = print_definition_generic(name, (char*) macro.c_str());
     return success;
 }
 

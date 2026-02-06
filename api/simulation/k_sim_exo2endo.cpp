@@ -81,18 +81,20 @@
  */
 int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
 {
-    int         j, poseq, posseq, posvar, rc = -1;
-    CLEC        *clec = NULL, *eclec;
+    int j, poseq, posseq, posvar, rc = -1;
 
     if(posexo < 0 || *depth > KSIM_MAXDEPTH) 
         return -1;
+
+    Equation* eq = nullptr;
 
     // Endo and exo are in same equation 
     // => replace the endo var position in KSIM_POSXK by the exo var position 
     std::string coef_name, eq_name;
     poseq = KE_poseq(posendo);
-    eq_name = KSIM_DBV->get_name(posendo); 
-    clec = KECLEC(KSIM_DBE, eq_name);
+    eq_name = KSIM_DBV->get_name(posendo);
+    eq = KSIM_DBE->get_obj_ptr(eq_name);
+    CLEC* clec = eq->clec;
     for(j = 0; j < clec->nb_names; j++) 
     {
         coef_name = std::string(clec->lnames[j].name);
@@ -108,10 +110,12 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
 
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
+    CLEC* eclec = nullptr;
     for(j = 0; j < clec->nb_names; j++) 
     {
         eq_name = KSIM_DBE->get_name(poseq);
-        eclec = KECLEC(KSIM_DBE, eq_name);            
+        eq = KSIM_DBE->get_obj_ptr(eq_name);
+        eclec = eq->clec;            
         clec = (CLEC *)SW_nalloc(eclec->tot_lg);
         memcpy(clec, eclec, eclec->tot_lg);
         coef_name = std::string(clec->lnames[j].name);
@@ -151,11 +155,11 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
         // Free the current clec
         SW_nfree(clec);
         
-        return(rc);
+        return rc;
     }
 
     SW_nfree(clec);
-    return(-1);
+    return -1;
 }
 
 /**
@@ -188,7 +192,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         error_msg += std::string(KSIM_DBV->get_name(posendo));
         error_msg += " : no such equation in the Equations workspace";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     exo = KE_poseq(posexo);
@@ -198,7 +202,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " already endogeneous";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     /* check if exo in equation */
@@ -211,8 +215,8 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         error_msg += std::string(KSIM_DBV->get_name(posexo));
         error_msg += " no exchange possible";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }

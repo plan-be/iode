@@ -35,11 +35,11 @@ int ImportObjsTXT::read_header(YYFILE* yy, Sample* smpl)
     if(TXT_nbper < 0) 
     {
         kerror(0, "Please specify FROM and TO period");
-        return(-1);
+        return -1;
     }
 
     TXT_fd = yy->yy_fd;
-    return(0);
+    return 0;
 }
 
 int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
@@ -75,7 +75,7 @@ int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
 
     *dval= atof(tval);
     
-    return(0);
+    return 0;
 }
 
 int ImportObjsTXT::read_numerical_value(YYFILE* yy, char* name, int* shift, double* vector)
@@ -84,7 +84,7 @@ int ImportObjsTXT::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     long    nbper;
 
     while(1) {
-        if(fgets(buf, 256, TXT_fd) == NULL)  return(-1);
+        if(fgets(buf, 256, TXT_fd) == NULL)  return -1;
         tbl = (char**) SCR_vtoms((unsigned char*) buf, (unsigned char*) "; ");
         if(SCR_tbl_size((unsigned char**) tbl) != 6) {
             SCR_free_tbl((unsigned char**) tbl);
@@ -102,7 +102,7 @@ int ImportObjsTXT::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
     SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[1], 79); /* JMP 13-02-2013 */
     read_value(tbl[3], shift, tbl[4], vector);
     SCR_free_tbl((unsigned char**) tbl);
-    return(0);
+    return 0;
 }
 
 
@@ -113,7 +113,7 @@ int ImportCommentsTXT::read_header(ImportCmtFromFile* impdef, char* file, int la
 {
     SCR_strip((unsigned char*) file);
     TXT_fd = fopen(file, "r");
-    if(TXT_fd == NULL) return(-1);
+    if(TXT_fd == NULL) return -1;
 
 //  switch(lang) {
 //      case 0 : TXT_lang = 4; break; /* English */
@@ -122,7 +122,7 @@ int ImportCommentsTXT::read_header(ImportCmtFromFile* impdef, char* file, int la
 //  }
     TXT_lang = 4 - lang;
 
-    return(0);
+    return 0;
 }
 
 int ImportCommentsTXT::read_comment(char* name, char** cmt)
@@ -130,11 +130,11 @@ int ImportCommentsTXT::read_comment(char* name, char** cmt)
     char    buf[1025], **tbl;
     int     len;
 
-    if(fgets(buf, 1024, TXT_fd) == NULL)  return(-1);
+    if(fgets(buf, 1024, TXT_fd) == NULL)  return -1;
     tbl = (char**) SCR_vtom((unsigned char*) buf, (int) ';');
     if(SCR_tbl_size((unsigned char**) tbl) < 7) {
         SCR_free_tbl((unsigned char**) tbl);
-        return(-1);
+        return -1;
     }
 
     SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[0], 79);              /* JMP 13-02-2013 */
@@ -147,12 +147,12 @@ int ImportCommentsTXT::read_comment(char* name, char** cmt)
     sprintf(*cmt, "%s (%s, %s)",tbl[TXT_lang], tbl[5], tbl[6]);
 
     SCR_free_tbl((unsigned char**) tbl);
-    return(0);
+    return 0;
 }
 
 int ImportCommentsTXT::close()
 {
     fclose(TXT_fd);
     TXT_fd = NULL;
-    return(0);
+    return 0;
 }

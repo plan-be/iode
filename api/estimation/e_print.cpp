@@ -92,7 +92,7 @@ void Estimation::E_print_coefs()
     for(int i = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = E_DBS->get_obj(scl_name);
+        scl = E_DBS->get_obj_ptr(scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
                  scl_name.c_str(),
@@ -261,7 +261,7 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
     if(!global_ws_eqs->contains(name)) 
         return -1;
     
-    std::string lec = global_ws_eqs->get_obj(name)->lec;
+    std::string lec = global_ws_eqs->get_obj_ptr(name)->lec;
     char* c_lec = (char*) lec.c_str();
     int i = L_split_eq(c_lec);
     if(i < 0) 
@@ -345,7 +345,7 @@ int Estimation::E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int v
 
 
     SW_nfree(y);
-    return(0);
+    return 0;
 }
 
 
@@ -371,7 +371,7 @@ int Estimation::E_print_results(int corr, int corru, int obs, int grobs, int grr
 
     if(E_CONV == 0) {
         W_printf((char*) ".par1 parb\nTHE PROCESS DOES NOT CONVERGE\n");
-        return(0);
+        return 0;
     }
 
     E_print_coefs();
@@ -382,5 +382,5 @@ int Estimation::E_print_results(int corr, int corru, int obs, int grobs, int grr
     if(grres) E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 1);  /* JMP 23-03-98 */
 
     W_flush();
-    return(0);
+    return 0;
 }

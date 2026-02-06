@@ -209,7 +209,7 @@ struct ALEC
 };
 
 struct CVAR {
-    short   pos,  // SWHDL ?? NON
+    short   pos,
             lag,
             ref,
             pad;
@@ -235,7 +235,7 @@ struct LSTACK
 struct LNAME {
     ONAME   name;   // scalar or variable name
     char    pad[3];
-    long    pos;    // SWHDL 
+    long    pos;
 };
 
 struct CLEC {

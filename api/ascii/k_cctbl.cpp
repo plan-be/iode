@@ -177,7 +177,7 @@ static int read_line(Table* tbl, YYFILE* yy)
         {
             case YY_EOF    :
                 YY_unread(yy);
-                return(0);
+                return 0;
             case TABLE_CELL_RIGHT  :
             case TABLE_CELL_LEFT   :
             case TABLE_CELL_CENTER :
@@ -196,7 +196,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 if(line) 
                 {
                     YY_unread(yy);
-                    return(0);
+                    return 0;
                 }
                 tbl->lines.push_back(TableLine((TableLineType) keyw));
                 line = &(tbl->lines.back());
@@ -206,7 +206,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 if(line) 
                 {
                     YY_unread(yy);
-                    return(0);
+                    return 0;
                 }
                 tbl->lines.push_back(TableLine((TableLineType) keyw));
                 line = &(tbl->lines.back());
@@ -218,7 +218,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 if(line) 
                 {
                     YY_unread(yy);
-                    return(0);
+                    return 0;
                 }
                 // empty string
                 tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_TITLE));
@@ -226,7 +226,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 cell = new TableCell(TABLE_CELL_STRING);
                 line->cells.push_back(*cell);
                 YY_unread(yy);
-                return(0);
+                return 0;
             case TABLE_ASCII_LEFT_AXIS :
                 line->right_axis = false;
                 break;
@@ -247,7 +247,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 if(line) 
                 {
                     YY_unread(yy);
-                    return(0);
+                    return 0;
                 }
                 YY_unread(yy);
                 // Assume it is a line of type CELL
@@ -354,8 +354,7 @@ static Table* read_tbl(YYFILE* yy)
                 if(read_line(tbl, yy) < 0) 
                 {
                     delete tbl;
-                    tbl = nullptr;
-                    return tbl;
+                    return nullptr;
                 }
                 break;
             default :
@@ -365,8 +364,7 @@ static Table* read_tbl(YYFILE* yy)
     }
 
     delete tbl;
-    tbl = nullptr;
-    return tbl;
+    return nullptr;
 }
 
 /**
@@ -441,11 +439,19 @@ bool KDBTables::load_asc(const std::string& filename)
                     kwarning("%s : table defined", YY_error(yy));
                     goto err;
                 }
-                if(!this->set_obj(name, tbl))  
+                try
+                {
+                    this->set_obj_ptr(name, tbl); 
+                    cmpt++;
+                    kmsg("Reading object %d : %s", cmpt, name);
+                }
+                catch(const std::exception& e)
+                {
+                    delete tbl;
+                    tbl = nullptr;
+                    kwarning(e.what());
                     goto err;
-                kmsg("Reading object %d : %s", ++cmpt, name);
-                delete tbl;
-                tbl = nullptr;
+                }
                 break;
 
             default :
@@ -658,36 +664,43 @@ static void print_tbl(FILE* fd, Table* tbl)
  */
 bool KDBTables::save_asc(const std::string& filename)
 {
-    FILE*  fd;
-    Table* tbl;
+    FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         }
     }
 
-    for(auto& [name, _] : k_objs) 
+    bool success = true;
+    for(auto& [name, tbl_ptr] : k_objs) 
     {
-        fprintf(fd, "%s {", (char*) name.c_str());
-        tbl = this->get_obj(name);
-        print_tbl(fd, tbl);
-        fprintf(fd, "}\n");
-        delete tbl;
-        tbl = nullptr;
+        try
+        {
+            fprintf(fd, "%s {", (char*) name.c_str());
+            print_tbl(fd, tbl_ptr);
+            fprintf(fd, "}\n");
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }

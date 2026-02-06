@@ -40,7 +40,7 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
     // nb must be ge 4 (0 <= nb - 1 - j avec j = 3) // JMP 5/7/2017
     if(nb < 4) {
         for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN;
-        return(-1);
+        return -1;
     }
     // JMP 5/7/2017
 
@@ -93,14 +93,14 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
     M_free(yt);
     M_free(gt);
     M_free(a);
-    return(0);
+    return 0;
 
 err:
     M_free(yt);
     M_free(gt);
     M_free(a);
     for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN; /* JMP 26-07-11 */
-    return(-1);
+    return -1;
 }
 
 

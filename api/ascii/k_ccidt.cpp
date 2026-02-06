@@ -89,8 +89,19 @@ bool KDBIdentities::load_asc(const std::string& filename)
                     break;
                 }
                 lec = K_wrap((char*) yy->yy_text, 60);
-                if(this->set_obj(name, new Identity(lec))) 
+                try
+                {
+                    Identity* idt = new Identity(lec);
+                    this->set_obj_ptr(name, idt);
                     cmpt++;
+                }
+                catch(const std::exception& e) 
+                {
+                    SW_nfree(lec);
+                    error_manager.append_error(std::string(e.what()));
+                    return false;
+                }
+
                 SW_nfree(lec);
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
@@ -118,32 +129,43 @@ bool KDBIdentities::load_asc(const std::string& filename)
 bool KDBIdentities::save_asc(const std::string& filename)
 {
     FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         }
     }
 
     std::string lec;
-    for(auto& [name, handle] : k_objs) 
+    bool success = true;
+    for(auto& [name, idt_ptr] : k_objs) 
     {
-        fprintf(fd, "%s ", (char*) name.c_str());
-        lec = this->get_obj(handle)->get_lec();
-        fprintf(fd, "\"%s\"\n", (char*) lec.c_str());
+        try
+        {
+            fprintf(fd, "%s ", (char*) name.c_str());
+            lec = idt_ptr->get_lec();
+            fprintf(fd, "\"%s\"\n", (char*) lec.c_str());
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }
