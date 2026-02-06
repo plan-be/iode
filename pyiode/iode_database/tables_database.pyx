@@ -6,14 +6,14 @@ cimport cython
 from cython.operator cimport dereference
 from pyiode.objects.table cimport CTable
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBTables as CppKDBTables
+from pyiode.iode_database.cpp_api_database cimport KDBTables
 from pyiode.iode_database.cpp_api_database cimport global_ws_tbl as cpp_global_tables
 from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblTitle
 
 
 cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CppKDBTables* database_ptr
+    cdef KDBTables* database_ptr
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
@@ -28,7 +28,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Tables _from_ptr(CppKDBTables* database_ptr = NULL, bint owner=False):
+    cdef Tables _from_ptr(KDBTables* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
         if database_ptr is not NULL:
@@ -47,7 +47,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, subset: Tables, pattern: str, copy: bool) -> Tables:
-        subset.database_ptr = new CppKDBTables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.database_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
         subset.abstract_db_ptr = subset.database_ptr
         subset.ptr_owner = True
         return subset
@@ -56,27 +56,24 @@ cdef class Tables(CythonIodeDatabase):
         return self.database_ptr.get_title(name.encode()).decode()
 
     def _get_object(self, name: str, table: Table) -> Table:
-        cdef CTable* c_table
+        cdef CTable c_table
         name = name.strip()
         c_table = self.database_ptr.get(name.encode())
-
         table.c_table_name = name.encode()
-        table.c_table = c_table
-        table.c_database = self.database_ptr
+        table.c_table = new CTable(c_table)
         table.ptr_owner = <bint>True
         return table
 
     def _set_object(self, name: str, table: Table):
-        cdef CTable* c_table
-
-        c_table = table.c_table
-        if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(<string>name.encode(), dereference(c_table))
-        else:
-            self.database_ptr.add(<string>(name.encode()), dereference(c_table))
+        cdef CTable* table_ptr = table.c_table
+        self.database_ptr.set_obj_ptr(name.encode(), table_ptr)
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
+
+    def merge(self, other: Tables, overwrite: bool=True):        
+        cdef KDBTables* other_db_ptr = other.database_ptr
+        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     # Specify how to print a TABLE 
     #      0 : print table full definitions

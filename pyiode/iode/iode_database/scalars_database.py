@@ -889,22 +889,22 @@ class Scalars(IodeDatabase):
         True
 
         >>> # modify one scalar
-        >>> saved_scalar = scalars["acaf1"].copy()
         >>> scalars["acaf1"]
         Scalar(0.0157684, 1, 0.00136871)
-        >>> scalars["acaf1"] = 0.02
+        >>> saved_value = scalars["acaf1"].value
+        >>> scalars["acaf1"].value = 0.02
         >>> scalars["acaf1"]
-        Scalar(0.02, 1, na)
-        >>> original_hash == hash(scalars)      # modified scalar
+        Scalar(0.02, 1, 0.00136871)
+        >>> original_hash == hash(scalars)          # modified scalar
         False
-        >>> scalars["acaf1"] = saved_scalar     # revert the change
+        >>> scalars["acaf1"].value = saved_value    # revert the change
         >>> scalars["acaf1"] 
         Scalar(0.0157684, 1, 0.00136871)
         >>> original_hash == hash(scalars)
         True
 
         >>> # delete a scalar
-        >>> saved_scalar = scalars["acaf1"]
+        >>> saved_scalar = scalars["acaf1"].copy()
         >>> del scalars["acaf1"]
         >>> original_hash == hash(scalars)      # deleted scalar
         False

@@ -1061,9 +1061,6 @@ class Table:
         instance._cython_instance = CythonTable.__new__(CythonTable)
         return instance
 
-    def update_owner_database(self):
-        self._cython_instance.update_owner_database()
-
     @property
     def nb_lines(self) -> int:
         return self._cython_instance.get_nb_lines()

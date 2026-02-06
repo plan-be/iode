@@ -33,6 +33,14 @@ cdef class Identity:
         wrapper.ptr_owner = owner
         return wrapper
 
+    # for debug purpose only
+    def is_pointer_null(self) -> bool:
+        return self.c_identity is NULL
+
+    # for debug purpose only
+    def is_own_owner(self) -> bool:
+        return self.ptr_owner
+
     def get_lec(self) -> str:
         return self.c_identity.get_lec().decode()
 

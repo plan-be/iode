@@ -107,10 +107,6 @@ cdef class CythonIodeDatabase:
         if res != 0:
             error_manager.display_last_error()
 
-    def merge(self, cython_other: CythonIodeDatabase, overwrite: bool=True):        
-        cdef CppDatabase* other_db_ptr = cython_other.abstract_db_ptr
-        self.abstract_db_ptr.merge(dereference(other_db_ptr), <bint>overwrite)
-
     def merge_from(self, input_file: str):
         self.abstract_db_ptr.merge_from(input_file.encode())
 

@@ -2132,16 +2132,14 @@ class Equations(IodeDatabase):
         >>> eq = equations["ACAF"]
         >>> original_lec = eq.lec
         >>> eq.lec = "ACAF := 1"
-        >>> equations["ACAF"] = eq
         >>> original_hash == hash(equations)
         False
-        >>> eq.lec = original_lec  # revert the change
-        >>> equations["ACAF"] = eq
+        >>> eq.lec = original_lec       # revert the change
         >>> original_hash == hash(equations)
         True
 
         >>> # delete a equation
-        >>> original_eq = equations["ACAF"]
+        >>> original_eq = equations["ACAF"].copy()
         >>> del equations["ACAF"]
         >>> original_hash == hash(equations)
         False
