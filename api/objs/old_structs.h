@@ -51,9 +51,9 @@ struct OLNAME
 
 struct OCLEC 
 {
-    short   tot_lg,         /* SWHDL */
-	    exec_lg,
-	    nb_names;
+    short   tot_lg,     // SWHDL
+	        exec_lg,
+	        nb_names;
     char    dupendo;
     char    pad;
     OLNAME  lnames[1];

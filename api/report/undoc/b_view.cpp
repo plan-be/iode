@@ -183,10 +183,10 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     if(!global_ws_tbl->contains(name)) 
     {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
-        return(-1);
+        return -1;
     }
 
-    Table* tbl = global_ws_tbl->get_obj(name);
+    Table* tbl = global_ws_tbl->get_obj_ptr(name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
     else
@@ -195,8 +195,6 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     if(rc < 0) 
         error_manager.append_error("Table '" + name + "' not printed");
 
-    delete tbl;
-    tbl = nullptr;
     return rc;
 }
 
@@ -220,7 +218,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     if(ng == 0) 
     {
         error_manager.append_error("No tables defined");
-        return(-1);
+        return -1;
     }
 
     std::string name;
@@ -237,14 +235,12 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             break;
         }
 
-        tbl = global_ws_tbl->get_obj(name);
+        tbl = global_ws_tbl->get_obj_ptr(name);
         hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
 
         if(view) 
             W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
 
-        delete tbl;
-        tbl = nullptr;
         if(hg < 0) 
         {
             rc = -1;
@@ -253,7 +249,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     }
 
     SCR_free_tbl((unsigned char**) tbls);
-    return(rc);
+    return rc;
 }
 
 
@@ -290,7 +286,7 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     if(arg == NULL || arg[0] == 0) 
     {
         kwarning("No argument passed");
-        return(-1);
+        return -1;
     }
     else 
     {
@@ -299,7 +295,7 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
         {
             std::string error_msg = "Invalid argument '" + std::string(arg) + "'";
             kwarning(error_msg.c_str());
-            return(-1);
+            return -1;
         }
 
         smpl = (char*) SCR_stracpy(args[0]);
@@ -336,7 +332,7 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
             kwarning(error_msg.c_str());
     }
 
-    return(rc);
+    return rc;
 }
 
 
@@ -351,7 +347,7 @@ int B_ViewTblFile(char* arg, int unused)
     if(arg == 0 || arg[0] == 0) 
     {
         error_manager.append_error("Invalid argument");
-        return(-1);
+        return -1;
     }
     else 
     {
@@ -391,7 +387,7 @@ int B_ViewTblFile(char* arg, int unused)
 
 err:
     SCR_free_tbl(args);
-    return(rc);
+    return rc;
 }
 
 
@@ -407,5 +403,5 @@ int B_ViewTblEnd()
     
     ODE_VIEW = 0;
     ODE_SMPL[0] = '\0';
-    return(0);
+    return 0;
 }

@@ -36,25 +36,23 @@ int   KDBVariables::CSV_NBDEC = 15;
  */
 static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
 {
-    bool    success;
-    int     i, keyw;
-    double  *vec;
-    Sample  *smpl;
-
-    smpl = kdb->sample;
+    Sample* smpl = kdb->sample;
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
-        return(-1);
+        return -1;
     }
+    int nb_periods = smpl->nb_periods;
 
-    vec = (double *) SW_nalloc(smpl->nb_periods * sizeof(double));
-
+    Variable* var = new Variable();
+    
     /* READ AT MOST nobs OBSERVATIONS */
-    for(i = 0; i < smpl->nb_periods; i++)  
-        vec[i] = K_read_real(yy);
+    var->reserve(nb_periods);
+    for(int t = 0; t < nb_periods; t++)  
+        var->push_back(K_read_real(yy));
 
     /* CONTINUE READING UNTIL END OF VALUES */
+    int keyw;
     while(1) 
     {
         keyw = YY_lex(yy);
@@ -63,16 +61,17 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
-    success = kdb->set_obj(name, vec);
-    if(!success) 
+    try
+    {
+        kdb->set_obj_ptr(name, var);
+    }
+    catch(const std::exception&) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        SW_nfree(vec);
-        return(-1);
+        return -1;
     }
 
-    SW_nfree(vec);
-    return(0);
+    return 0;
 }
 
 /**
@@ -267,27 +266,25 @@ static void print_val(FILE* fd, double val)
  */
 bool KDBVariables::save_asc(const std::string& filename)
 {
-    FILE    *fd;
-    int     j;
-    double  *val;
-    Sample  *smpl;
+    FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         }
     }
 
-    smpl = this->sample;
+    Sample* smpl = this->sample;
     if(!smpl) 
     {
         kwarning("Cannot save the Variables to an ascii file -> sample is empty");
@@ -298,19 +295,28 @@ bool KDBVariables::save_asc(const std::string& filename)
     fprintf(fd, "sample %s ", (char*) smpl->start_period.to_string().c_str());
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
-    for(auto& [name, _] : k_objs) 
+    bool success = true;
+    for(auto& [name, var_ptr] : k_objs) 
     {
-        fprintf(fd, "%s ", name.c_str());
-        val = this->get_var_ptr(name);
-        for(j = 0 ; j < smpl->nb_periods; j++, val++) 
-            print_val(fd, *val);
-        fprintf(fd, "\n");
+        try
+        {
+            fprintf(fd, "%s ", name.c_str());
+            for(const double& value: *var_ptr) 
+                print_val(fd, value);
+            fprintf(fd, "\n");
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }
 
 /* --------------- CSV Files -------------------- */

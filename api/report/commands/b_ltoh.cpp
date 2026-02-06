@@ -47,7 +47,7 @@ static double LTOH_ylin(double* y, double x)
     if(IODE_IS_A_NUMBER(y[lo]) && IODE_IS_A_NUMBER(y[hi]))
         res = a*y[lo] + b*y[hi];
     else res = IODE_NAN;
-    return(res);
+    return res;
 }
 
 
@@ -58,9 +58,9 @@ static double LTOH_ylin(double* y, double x)
  *  If the series is a "stock", the result is a linear interpolation of the 2 surrounding source values.
  *  
  *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
- *  @param [in]  double*  f_vec  source vector
+ *  @param [in]  double*     f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
- *  @param [out] double*  t_vec  destination vector 
+ *  @param [out] double*     t_vec  destination vector 
  *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
@@ -99,7 +99,7 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
         beg = dim + 1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -110,9 +110,9 @@ static int LTOH_lin(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, 
  *  If the series is a "stock", the result has the same value as the source
  *  
  *  @param [in]  int         type   of series: LTOH_FLOW or LTOH_STOCK
- *  @param [in]  double*  f_vec  source vector
+ *  @param [in]  double*     f_vec  source vector
  *  @param [in]  int         f_nb   nb of values in the source vector
- *  @param [out] double*  t_vec  destination vector 
+ *  @param [out] double*     t_vec  destination vector 
  *  @param [in]  int         t_nb   nb of values in the destination vector
  *  @param [in]  int         shift  nb of sub periods in the destination sample
  *  @return      int         0 always       
@@ -148,7 +148,7 @@ static int LTOH_step(int type, double* f_vec, int f_nb, double* t_vec, int t_nb,
         beg = dim + 1;
     }
 
-    return(0);
+    return 0;
 }
 
 // Cubic Spline sub-functions 
@@ -199,7 +199,7 @@ static double LTOH_ycs(double* y, double* y2, double x)
         res = a*y[lo] + b*y[hi] +
               ((a*a*a - a)*y2[lo] + (b*b*b - b)*y2[hi])/6.0;
     else res = IODE_NAN;
-    return(res);
+    return res;
 }
 
 
@@ -247,7 +247,7 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
         }
         beg += dim + 1;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -272,12 +272,12 @@ static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip
 
     if(ws_nbper <= 0) {
         error_manager.append_error("Set the periodicity first");
-        return(-1);
+        return -1;
     }
 
     if(ws_nbper <= f_nbper) {
         error_manager.append_error("File has more observations than the current workspace");
-        return(-1);
+        return -1;
     }
 
     p1 = f_smpl->start_period;
@@ -306,10 +306,10 @@ static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip
         *t_smpl = nullptr;
         std::string error_msg = "Low to High: invalid sample\n" + std::string(e.what());
         error_manager.append_error(e.what());
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -323,10 +323,9 @@ static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip
 
 static int B_ltoh(int type, char* arg)
 {
-    int     res, rc = 0, shift, skip;
-    char    method[81], file[K_MAX_FILE + 1];
-    double  *t_vec = NULL, *f_vec = NULL;
-    int     file_type;
+    int res, rc = 0, shift, skip;
+    char method[81], file[K_MAX_FILE + 1];
+    int file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariables* to = nullptr;
@@ -371,39 +370,37 @@ static int B_ltoh(int type, char* arg)
 
     to = new KDBVariables(false);
     to->sample = new Sample(*t_smpl);
-    t_vec = (double *) SW_nalloc((1 + t_smpl->nb_periods) * sizeof(double));
-    f_vec = (double *) SW_nalloc((1 + from->sample->nb_periods) * sizeof(double));
-
-    for(const auto& [from_name, handle] : from->k_objs) 
+    for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
-        memcpy(f_vec, from->get_var_ptr(from_name), from->sample->nb_periods * sizeof(double));
+        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
         switch(method[0]) 
         {
             case LTOH_CS :
                 LTOH_cs(type,
-                        f_vec, (int) from->sample->nb_periods,
-                        t_vec, (int) t_smpl->nb_periods,
+                        from_var_ptr->data(), (int) from->sample->nb_periods,
+                        to_var_ptr->data(), (int) t_smpl->nb_periods,
                         shift);
                 break;
 
             case LTOH_STEP:
                 LTOH_step(type,
-                          f_vec, (int) from->sample->nb_periods,
-                          t_vec, (int) t_smpl->nb_periods,
+                          from_var_ptr->data(), (int) from->sample->nb_periods,
+                          to_var_ptr->data(), (int) t_smpl->nb_periods,
                           shift);
                 break;
 
             default       :
             case LTOH_LIN :
                 LTOH_lin(type,
-                         f_vec, (int) from->sample->nb_periods,
-                         t_vec, (int) t_smpl->nb_periods,
+                         from_var_ptr->data(), (int) from->sample->nb_periods,
+                         to_var_ptr->data(), (int) t_smpl->nb_periods,
                          shift);
                 break;
         }
-        nb = t_smpl->nb_periods;
-        to->set_obj(from_name, t_vec);
+
+        to->set_obj_ptr(from_name, to_var_ptr);
     }
+
     KV_merge(global_ws_var.get(), to, 1);
 
 done:
@@ -418,13 +415,11 @@ done:
     t_smpl = nullptr;
 
     SCR_free_tbl((unsigned char**) data);
-    SW_nfree(t_vec);
-    SW_nfree(f_vec);
 
     if(rc < 0) 
-        return(-1);
+        return -1;
     else 
-        return(0);
+        return 0;
 }
 
 

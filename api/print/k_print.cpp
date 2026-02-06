@@ -53,7 +53,7 @@ int T_prep_cls(Table* tbl, char* smpl, COLS** cls)
     if(*cls == NULL) {
         std::string error_msg = "Illegal sample '" + std::string(smpl) + "': syntax error";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     dim = COL_resize(tbl, *cls);
@@ -246,7 +246,7 @@ int T_print_line(Table* tbl, int i, COLS* cls)
 {
     COL_clear(cls);
     if(COL_exec(tbl, i, cls) < 0)   
-        return(-1);
+        return -1;
 
     int     d;
     COL*    cl;
@@ -267,7 +267,7 @@ int T_print_line(Table* tbl, int i, COLS* cls)
     }
     W_printf((char*) "\n");
 
-    return(0);
+    return 0;
 }
 
 
@@ -398,7 +398,7 @@ int T_begin_tbl(int dim, COLS* cls)
 {
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) return(-1); /* JMP 11-06-99 */
+    if(KT_nbnames == 0) return -1; /* JMP 11-06-99 */
     COL_find_mode(cls, KT_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
@@ -407,7 +407,7 @@ int T_begin_tbl(int dim, COLS* cls)
     if(A2M_SEPCH == '\t') W_printf((char*) ".sep TAB\n");
     else W_printf((char*) ".sep %c\n", A2M_SEPCH);
     
-    return(0);
+    return 0;
 }
 
 
@@ -473,7 +473,7 @@ int T_print_tbl(Table* tbl, char* smpl)
 
     dim = T_prep_cls(tbl, smpl, &cls);
     if(dim < 0) 
-        return(-1);
+        return -1;
 
     // Anciennement
     // B_PrintRtfTopic(T_get_title(tbl));
@@ -482,7 +482,7 @@ int T_print_tbl(Table* tbl, char* smpl)
     //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
     
     if(T_begin_tbl(dim, cls)) 
-        return(-1);
+        return -1;
     
     W_printf((char*) ".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
     
@@ -526,5 +526,5 @@ int T_print_tbl(Table* tbl, char* smpl)
     T_end_tbl();
 
     COL_free_cols(cls);
-    return(rc);
+    return rc;
 }

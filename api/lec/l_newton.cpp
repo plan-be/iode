@@ -293,10 +293,10 @@ function value and the first derivative of the function.
 
 SolveIsError(double val)
 {
-    if(IODE_IS_A_NUMBER(val)) return(0);
+    if(IODE_IS_A_NUMBER(val)) return 0;
     return(1);
 //    if(val < SOLVE_ERROR2 && val > SOLVE_ERROR1) return(1);
-//    return(0);
+//    return 0;
 
 }
 
@@ -307,7 +307,7 @@ SolveNewtonSecantfn(double (*fn)(double), double x, double *fx, double *fpx)
     h = 0.00000001;
     *fx = fn(x);
     *fpx = (fn(x + h) - *fx) / h;
-    return(0);
+    return 0;
 }
 
 double SolveNewtonSecant(double (*fn)(double), double x1, double x2, double feps, int maxit)
@@ -409,12 +409,12 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
     int     i, k;
 
     *x1 = SolveFindBracket(fn, x0, sign);
-    if(!SolveIsError(*x1)) return(0);
+    if(!SolveIsError(*x1)) return 0;
 
     vals[0] = SolveFindBracket(fn, x0, -sign);
-    if(SolveIsError(vals[0])) return(-1);
+    if(SolveIsError(vals[0])) return -1;
     vals[1] = SolveFindBracket(fn, vals[0] * 1.0001, -sign);
-    if(SolveIsError(vals[1])) return(-1);
+    if(SolveIsError(vals[1])) return -1;
     fvals[0] = fn(vals[0]);
     fvals[1] = fn(vals[1]);
 
@@ -433,7 +433,7 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
 	xt = vals[0] - fvals[0] * (vals[1] - vals[0]) / (fvals[1] - fvals[0]);
 	fxt = fn(xt);
 	if(!SolveIsError(fxt)) {
-	    if(sign * fxt >= 0) {*x1 = xt; return(0);}
+	    if(sign * fxt >= 0) {*x1 = xt; return 0;}
 	    if(SolveIsError(fxts)) {xts = xt; fxts = fxt;}
 	    else {
 		if(fabs(fxt) < fabs(fxts)) {xts = xt; fxts = fxt;}
@@ -446,7 +446,7 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
 	    xt = vals[0] - step * fvals[0] * (vals[1] - vals[0]) / (fvals[1] - fvals[0]);
 	    fxt = fn(xt);
 	    if(!SolveIsError(fxt)) {
-		if(sign * fxt >= 0) {*x1 = xt; return(0);}
+		if(sign * fxt >= 0) {*x1 = xt; return 0;}
 		if(SolveIsError(fxts)) {xts = xt; fxts = fxt;}
 		else {
 		    if(fabs(fxt) < fabs(fxts)) {xts = xt; fxts = fxt;}
@@ -460,7 +460,7 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
 	    xt = vals[0] - step * fvals[0] * (vals[1] - vals[0]) / (fvals[1] - fvals[0]);
 	    fxt = fn(xt);
 	    if(!SolveIsError(fxt)) {
-		if(sign * fxt >= 0) {*x1 = xt; return(0);}
+		if(sign * fxt >= 0) {*x1 = xt; return 0;}
 		if(SolveIsError(fxts)) {xts = xt; fxts = fxt;}
 		else {
 		    if(fabs(fxt) < fabs(fxts)) {xts = xt; fxts = fxt;}
@@ -468,7 +468,7 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
 		}
 	    }
 
-	if(SolveIsError(fxts)) return(-1);
+	if(SolveIsError(fxts)) return -1;
 
 	fvals[1] = fvals[0];
 	vals[1] = vals[0];
@@ -479,14 +479,14 @@ SolveFindPoint2(double (*fn)(double), double x0, double *x1, int sign)
     // dernier essai
 
 
-    return(-1);
+    return -1;
 }
 
 SolveFindBrackets(double (*fn)(double), double x0, double *x1, double *x2)
 {
-    if(SolveFindPoint2(fn, x0, x1, -1.0) < 0) return(-1);
-    if(SolveFindPoint2(fn, x0, x2, 1.0) < 0) return(-1);
-    return(0);
+    if(SolveFindPoint2(fn, x0, x1, -1.0) < 0) return -1;
+    if(SolveFindPoint2(fn, x0, x2, 1.0) < 0) return -1;
+    return 0;
 }
 
 

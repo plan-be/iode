@@ -9,7 +9,10 @@ protected:
         global_ws_cmt->load(str_input_test_dir + "fun.ac");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_cmt->clear();
+    }
 };
 
 
@@ -34,7 +37,7 @@ TEST_F(KDBCommentsTest, Subset)
     // DEEP COPY SUBSET
     KDBComments* kdb_subset_deep_copy = new KDBComments(global_ws_cmt.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", modified);
     EXPECT_EQ(global_ws_cmt->get("ACAF"), comment);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), modified);
@@ -42,7 +45,7 @@ TEST_F(KDBCommentsTest, Subset)
     // SHALLOW COPY SUBSET
     KDBComments* kdb_subset_shallow_copy = new KDBComments(global_ws_cmt.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", modified);
     EXPECT_EQ(global_ws_cmt->get("ACAF"), modified);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), modified);
@@ -406,7 +409,7 @@ TEST_F(KDBCommentsTest, Merge)
     kdb_to_merge->update(name, modified_comment);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_comment);
@@ -414,7 +417,7 @@ TEST_F(KDBCommentsTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_comment); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_comment);
 }

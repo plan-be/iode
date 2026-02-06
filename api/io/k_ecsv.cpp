@@ -57,7 +57,7 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
     {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     expdef->file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
@@ -70,7 +70,7 @@ int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* 
         expdef->file_descriptor << str_period << EXP_SEP;
     }
     expdef->file_descriptor << "\n";
-    return(0);
+    return 0;
 }
 
 /**
@@ -85,7 +85,7 @@ int ExportObjsCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile
 {
     // No footer needed for CSV output
     expdef->file_descriptor.close();
-    return(0);
+    return 0;
 }
 
 /**
@@ -109,17 +109,15 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  */
 char* ExportObjsCSV::extract_comment(KDBComments* dbc, char* name, char**cmt)
 {
-    U_ch* ccmt;
-
-    SWHDL handle = dbc->get_handle(name);
-    if(handle > 0)  
+    if(!dbc->contains(name)) 
+        return write_separator("", cmt);
+    else
     {
-        ccmt = (unsigned char*) dbc->get_obj(handle);
-        SCR_replace(ccmt, (unsigned char*) "\n", (unsigned char*) "");
-        return(write_separator((char*) ccmt, cmt));
+        Comment* comment = dbc->get_obj_ptr(name);
+        U_ch* c_cmt = (unsigned char*) comment->c_str();
+        SCR_replace(c_cmt, (unsigned char*) "\n", (unsigned char*) "");
+        return write_separator((char*) c_cmt, cmt);
     }
-    else 
-        return(write_separator("", cmt));
 }
 
 /**
@@ -166,7 +164,7 @@ int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, 
 {
     expdef->file_descriptor << (code == NULL ? "" : code) << " " << (cmt == NULL  ? "" : cmt)
                             << " " << (vec == NULL  ? "" : vec) << "\n";
-    return(0);        
+    return 0;        
 }
 
 
@@ -181,9 +179,9 @@ int ExportObjsRevertCSV::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, 
     {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
-    return(0);
+    return 0;
 }
 
 char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
@@ -210,15 +208,15 @@ int ExportObjsRevertCSV::write_variable_and_comment(ExportToFile* expdef, char* 
     if(code == 0) 
     {
         expdef->file_descriptor << "\n";
-        return(0);
+        return 0;
     }
     expdef->file_descriptor << code << " ";
-    return(0);
+    return 0;
 }
 
 int ExportObjsRevertCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
     expdef->file_descriptor.close();
-    return(0);
+    return 0;
 }

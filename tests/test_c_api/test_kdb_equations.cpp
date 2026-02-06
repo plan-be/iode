@@ -12,7 +12,10 @@ protected:
         global_ws_eqs->load(str_input_test_dir + "fun.ae");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_eqs->clear();
+    }
 };
 
 
@@ -37,7 +40,7 @@ TEST_F(KDBEquationsTest, Subset)
     // DEEP COPY SUBSET
     KDBEquations* kdb_subset_deep_copy = new KDBEquations(global_ws_eqs.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
     EXPECT_EQ(global_ws_eqs->get_lec("ACAF"), lec);
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("ACAF"), new_lec);
@@ -45,7 +48,7 @@ TEST_F(KDBEquationsTest, Subset)
     // SHALLOW COPY SUBSET
     KDBEquations* kdb_subset_shallow_copy = new KDBEquations(global_ws_eqs.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", new_lec);
     EXPECT_EQ(global_ws_eqs->get_lec("ACAF"), new_lec);
     EXPECT_EQ(kdb_subset_shallow_copy->get_lec("ACAF"), new_lec);
@@ -71,21 +74,19 @@ TEST_F(KDBEquationsTest, Get)
     Equation* eq = nullptr;
     std::string expected_lec;
 
-    eq = global_ws_eqs->get("ACAF");
+    eq = global_ws_eqs->get_obj_ptr("ACAF");
     EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
     EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
     EXPECT_EQ(eq->get_method(), "LSQ");
-    delete eq;
 
-    eq = global_ws_eqs->get("BVY");
+    eq = global_ws_eqs->get_obj_ptr("BVY");
     EXPECT_EQ(eq->lec, "BVY:=YN+YK");
     EXPECT_EQ(eq->get_date_as_string(), "");
     EXPECT_EQ(eq->sample.to_string(), ":");
     EXPECT_EQ(eq->get_method(), "LSQ");
-    delete eq;
 
-    eq = global_ws_eqs->get("W");
+    eq = global_ws_eqs->get_obj_ptr("W");
     expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
     expected_lec += "+gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)\n";
     expected_lec += "+gamma5*ln PROD[-1])+(XW)+XWC";
@@ -96,10 +97,9 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq->instruments, "");
     EXPECT_EQ(eq->block, "W");
     EXPECT_EQ(eq->get_date_as_string(), "");
-    delete eq;
 
     // other
-    eq = global_ws_eqs->get("DTH1");
+    eq = global_ws_eqs->get_obj_ptr("DTH1");
     EXPECT_EQ(eq->endo, "DTH1");
     EXPECT_EQ(eq->lec, "DTH1:=DTH1C");
     EXPECT_EQ(eq->solved, 0);
@@ -108,7 +108,6 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq->comment, "");
     EXPECT_EQ(eq->block, "DTH1");
     EXPECT_EQ(eq->instruments, "");
-    delete eq;
 }
 
 TEST_F(KDBEquationsTest, GetNames)
@@ -330,7 +329,7 @@ TEST_F(KDBEquationsTest, Merge)
     kdb_to_merge->update(name, modified_lec);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get_lec(new_name), new_lec);
@@ -338,7 +337,7 @@ TEST_F(KDBEquationsTest, Merge)
     EXPECT_EQ(kdb0->get_lec(name), modified_lec); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
 }
@@ -384,36 +383,32 @@ TEST_F(KDBEquationsTest, Search)
 
 TEST_F(KDBEquationsTest, Hash)
 {
-    Equation* eq = nullptr;
     std::size_t hash_val = hash_value(*global_ws_eqs);
 
     // modify an entry
-    eq = global_ws_eqs->get("ACAF");
-    std::string lec = eq->lec;
-    eq->set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    global_ws_eqs->update("ACAF", *eq);
+    Equation eq = global_ws_eqs->get("ACAF");
+    std::string lec = eq.lec;
+    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    global_ws_eqs->update("ACAF", eq);
     std::size_t hash_val_modified = hash_value(*global_ws_eqs);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    eq->set_lec(lec);
-    global_ws_eqs->update("ACAF", *eq);
-    Equation* eq_restored = global_ws_eqs->get("ACAF");
-    EXPECT_EQ(*eq_restored, *eq);
+    eq.set_lec(lec);
+    global_ws_eqs->update("ACAF", eq);
+    Equation eq_restored = global_ws_eqs->get("ACAF");
+    EXPECT_EQ(eq_restored, eq);
     std::size_t hash_val_restored = hash_value(*global_ws_eqs);
     EXPECT_EQ(hash_val, hash_val_restored);
-    delete eq;
-    delete eq_restored;
 
     // remove an entry
-    eq = global_ws_eqs->get("ACAG");
+    Equation eq_removed = global_ws_eqs->get("ACAG");
     global_ws_eqs->remove("ACAG");
     hash_val_modified = hash_value(*global_ws_eqs);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    global_ws_eqs->add("ACAG", *eq);
+    global_ws_eqs->add("ACAG", eq_removed);
     hash_val_restored = hash_value(*global_ws_eqs);
     EXPECT_EQ(hash_val, hash_val_restored);
-    delete eq;
 
     // add an entry
     lec = "TEST := 0";

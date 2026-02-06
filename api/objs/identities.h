@@ -57,6 +57,8 @@ public:
         return this->clec;
     }
 
+    bool to_binary(char** pack) const;
+
     // required to be used in std::map
     Identity& operator=(const Identity& other)
     {
@@ -72,8 +74,13 @@ public:
         CLEC* cl1 = L_cc((char*) this->lec.c_str());
         CLEC* cl2 = L_cc((char*) other.lec.c_str());
 
-        if(cl1 == NULL || cl2 == NULL || cl1->tot_lg != cl2->tot_lg || memcmp(cl1, cl2, cl1->tot_lg) != 0)
+        if(cl1 == NULL || cl2 == NULL)
             return false;
+        if(cl1->tot_lg != cl2->tot_lg)
+            return false;
+        if(memcmp(cl1, cl2, cl1->tot_lg) != 0) 
+            return false;
+        
         return true;
     }
 
@@ -85,9 +92,6 @@ public:
 
 struct KDBIdentities : public KDBTemplate<Identity>
 {
-private:
-    int set(const std::string& name, const std::string& lec);
-
 public:
     // global or standalone database
     KDBIdentities(const bool is_global) : KDBTemplate(IDENTITIES, is_global) {}
@@ -98,20 +102,17 @@ public:
 
     // copy constructor
     KDBIdentities(const KDBIdentities& other): KDBTemplate(other) {}
-
-    // NOTE: get_obj() and set_obj() methods to be replaced by operator[] when 
-    //       k_objs will be changed to std::map<std::string, T>
-    //       T& operator[](const std::string& name)
-
-    Identity* get_obj(const SWHDL handle) const override;
-    Identity* get_obj(const std::string& name) const override;
-
-    bool set_obj(const std::string& name, const Identity* value) override;
-
-    Identity* get(const std::string& name) const;
-    bool add(const std::string& name, const Identity& obj);
-    void update(const std::string& name, const Identity& obj);
     
+    bool add(const std::string& name, const Identity& idt) override 
+    { 
+        return KDBTemplate::add(name, idt); 
+    }
+
+    void update(const std::string& name, const Identity& idt) override
+    {
+        KDBTemplate::update(name, idt);
+    }
+
     bool add(const std::string& name, const std::string& lec);
     void update(const std::string& name, const std::string& lec);
 
@@ -133,20 +134,22 @@ public:
     void merge_from(const std::string& input_file) override
     {
         KDBIdentities from(false);
-        KDB::merge_from(from, input_file);
+        KDBTemplate::merge_from(from, input_file);
     }
 
     bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {
         KDBIdentities from(false);
-        return KDB::copy_from_file(from, file, objs_names, v_found);
+        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
     }
 
 private:
-    bool grep_obj(const std::string& name, const SWHDL handle, 
-        const std::string& pattern, const bool ecase, const bool forms, 
-        const bool texts, const char all) const override;
+    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool obj_to_binary(char** pack, const std::string& name) override;
+
+    bool grep_obj(const std::string& name, const std::string& pattern, 
+        const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
 };
@@ -159,8 +162,6 @@ inline std::array<KDBIdentities*, 5> global_ref_idt = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
-Identity* K_iunpack(char *);
-
 inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
 {
     if(cpp_kdb.size() == 0)
@@ -168,11 +169,11 @@ inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
 
     std::string lec;
     std::size_t seed = 0;
-    for(const auto& [name, handle] : cpp_kdb.k_objs)
+    for(const auto& [name, idt_ptr] : cpp_kdb.k_objs)
     {
         hash_combine<std::string>(seed, name);  
-        lec = cpp_kdb.get_lec(name);
-        hash_combine<std::string>(seed, std::string(lec));
+        lec = idt_ptr->get_lec();
+        hash_combine<std::string>(seed, lec);
     }
     return seed;
 }

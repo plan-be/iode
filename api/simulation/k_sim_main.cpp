@@ -181,7 +181,7 @@ int CSimulation::K_prolog(int t)
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_SET_VAL(KSIM_ORDER[i], t, x);
     }
-    return(0);
+    return 0;
 }
 
 
@@ -217,7 +217,7 @@ int CSimulation::K_interdep_1(int t)
         /* execute lec */
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
         if(!IODE_IS_A_NUMBER(x)) 
-            return(-1);
+            return -1;
 
         /* Check convergence */
         if(IODE_IS_A_NUMBER(KSIM_XK[j])) 
@@ -242,7 +242,7 @@ int CSimulation::K_interdep_1(int t)
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -274,7 +274,7 @@ int CSimulation::K_interdep_2(int t)
         KSIM_XK1[j] = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(KSIM_XK1[j])) 
-            return(-1);
+            return -1;
     }
 
     // Stage 2
@@ -309,7 +309,7 @@ int CSimulation::K_interdep_2(int t)
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -335,7 +335,7 @@ int CSimulation::K_interdep(int t)
     else                rc = K_interdep_2(t);
 
     KSIM_RELAX = relax;
-    return(rc);
+    return rc;
 }
 
 
@@ -357,7 +357,7 @@ int CSimulation::K_epilog(int t)
         KSIM_SET_VAL(KSIM_ORDER[i], t, x);  
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -375,16 +375,15 @@ int CSimulation::K_epilog(int t)
  *      replace B_ fns by K_ fns (see comments)
  *  
  */
-int CSimulation::K_diverge(int t, char* lst, double eps)
+int CSimulation::K_diverge(int t, char* c_name, double eps)
 {
-    //char        buf[81];
     char        *diverg = NULL;
     int         i, j;
     double      x;
     double      d, pd;
 
-    // Delete lst 
-    std::string name = std::string(lst);
+    // Delete name 
+    std::string name(c_name);
     if(global_ws_lst->contains(name))
         global_ws_lst->remove(name);
     
@@ -395,7 +394,7 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
 
         /* execute lec */
         x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
-        if(!IODE_IS_A_NUMBER(x)) return(-1); // TODO: Add to _DIVER instead ?
+        if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
         if(IODE_IS_A_NUMBER(KSIM_XK[j])) {
@@ -418,9 +417,13 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
         }
     }
     
-    if(diverg) 
-        global_ws_lst->set_obj(lst, diverg);
-    return(0);
+    if(diverg)
+    {
+        List* lst_ptr = new List(diverg);
+        global_ws_lst->set_obj_ptr(name, lst_ptr);
+    }
+    
+    return 0;
 }
 
 
@@ -439,8 +442,6 @@ int CSimulation::K_diverge(int t, char* lst, double eps)
  *  @param [in] int     t   index of the period to simulated
  *  @return     int         0 no success, 
  *                          -1 on error (the algorithm does not reach a solution or a NaN value is generated).
- *  
- *  @see K_simul() for the global input and output globlals.
  */
 int CSimulation::K_simul_1(int t)
 {
@@ -453,7 +454,7 @@ int CSimulation::K_simul_1(int t)
     KSIM_NORMS[t] = 0;  
     KSIM_CPUS[t] = 0;  
     if(K_prolog(t)) 
-        return(-1);
+        return -1;
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
     while(conv == 0 && it++ < KSIM_MAXIT) 
@@ -465,7 +466,7 @@ int CSimulation::K_simul_1(int t)
         if(rc) 
         {
             ktermvkey(ovtime);  // Resets the interval between 2 keyboard readings
-            return(-1);
+            return -1;
         }
         Period period = KSIM_DBV->sample->start_period.shift(t);
         sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
@@ -480,7 +481,7 @@ int CSimulation::K_simul_1(int t)
             {  
                 K_restore_XK(t);
                 ktermvkey(ovtime); 
-                return(-1);
+                return -1;
             }
         }
     }
@@ -490,8 +491,8 @@ int CSimulation::K_simul_1(int t)
     {
         K_restore_XK(t);
         if(K_epilog(t)) 
-            return(-1);
-        return(0);
+            return -1;
+        return 0;
     }
     else 
     {
@@ -503,7 +504,7 @@ int CSimulation::K_simul_1(int t)
         K_diverge(t, "_DIVER", KSIM_EPS); // Saves the list of non convergent eqs in the list _DIVER
     }
 
-    return(-1);
+    return -1;
 }
 
 
@@ -550,14 +551,14 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
             rc = -1,
             cpu_iter;
     char    **var = NULL;
-    double    *x;
+    double  *x;
     std::string var_name, var_exo;
 
     if(dbe->size() == 0) 
     {
         std::string err_msg = "Empty set of equations";
         error_manager.append_error(err_msg);
-        return(rc);
+        return rc;
     }
 
     // Assign static global variables to avoid passing to many parameters to sub functions
@@ -574,7 +575,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
     {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
-        return(rc);
+        return rc;
     }
     t = at; // t = index of the first period to simulate
 
@@ -597,6 +598,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
     kmsg("Linking equations ....");
     
     std::string eq_name;
+    Equation *eq = nullptr;
     for(i = 0 ; i < dbe->size(); i++) 
     {
         eq_name = dbe->get_name(i);   
@@ -611,8 +613,9 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
         }
         KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
         
-        CLEC* clec = KECLEC(dbe, eq_name);
-        rc = L_link(dbv, dbs, clec);
+        eq = dbe->get_obj_ptr(eq_name);
+        eq->compile();
+        rc = L_link(dbv, dbs, eq->clec);
         if(rc) 
         {
             std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
@@ -712,7 +715,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
 fin:
     SCR_free_tbl((unsigned char**) var);
     K_simul_free();
-    return(rc);
+    return rc;
 }
 
  
@@ -741,7 +744,8 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     double x;
 
     std::string eq_name = KSIM_DBE->get_name(eqnb);
-    CLEC* eq_clec = KECLEC(KSIM_DBE, eq_name);
+    Equation* eq = KSIM_DBE->get_obj_ptr(eq_name);
+    CLEC* eq_clec = eq->clec;
     int lg = eq_clec->tot_lg;
     CLEC* clec = (CLEC*) SW_nalloc(lg);
     memcpy(clec, eq_clec, lg);

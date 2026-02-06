@@ -123,7 +123,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
     lec[0] = endo[0] = 0;
     strcpy(scl, "c");
     yy = YY_open(eveq, 0L, 0, 1);
-    if(yy == 0) return(-1);
+    if(yy == 0) return -1;
 
     // Skip spaces
     while(1) {
@@ -159,12 +159,12 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                 // C(123) -> c_123
                 else if(strcmp((char*) yy->yy_text, "C") == 0) {
                     YY_skip_spaces(yy);
-                    if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != '(') return(-1); // Erreur de syntaxe
+                    if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != '(') return -1; // Erreur de syntaxe
                     YY_skip_spaces(yy);
-                    if(YY_read(yy) != YY_LONG) return(-1); // Erreur de syntaxe
+                    if(YY_read(yy) != YY_LONG) return -1; // Erreur de syntaxe
                     YY_skip_spaces(yy);
                     sprintf(lec + strlen(lec), "%s_%d", scl, yy->yy_long);
-                    if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return(-1); // Erreur de syntaxe
+                    if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return -1; // Erreur de syntaxe
                     var = 0;
                 }
 
@@ -185,19 +185,19 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                                 sprintf(lec + strlen(lec), "%s", SCR_lower((unsigned char*) word));                  // JMP 2017-02-05
 
                             YY_skip_spaces(yy);
-                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return(-1); // Syntax
+                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return -1; // Syntax
                         }
                         else if(U_is_in(yy->yy_text[0], "-+")) {
                             // NAME(+ ou NAME[-
                             ch = yy->yy_text[0];
                             YY_skip_spaces(yy);
-                            if(YY_read(yy) != YY_LONG) return(-1); // Syntax
+                            if(YY_read(yy) != YY_LONG) return -1; // Syntax
                             lag = yy->yy_long;
                             sprintf(lec + strlen(lec), "%s[%c%d]", word, ch, lag);
                             YY_skip_spaces(yy);
-                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return(-1);
+                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return -1;
                         }
-                        else return(-1); // syntax
+                        else return -1; // syntax
                     }
                     else {
                         YY_unread(yy);
@@ -219,14 +219,14 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                     if(var == 1) {
                         // (-n)  => [-n]
                         YY_skip_spaces(yy);
-                        if(YY_read(yy) != YY_SPECIAL) return(-1);
+                        if(YY_read(yy) != YY_SPECIAL) return -1;
                         ch = yy->yy_text[0];
                         if(U_is_in(ch, "-+")) {
                             YY_skip_spaces(yy);
-                            if(YY_read(yy) != YY_LONG) return(-1);
+                            if(YY_read(yy) != YY_LONG) return -1;
                             lag = yy->yy_long;
                             YY_skip_spaces(yy);
-                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return(-1);
+                            if(YY_read(yy) != YY_SPECIAL || yy->yy_text[0] != ')') return -1;
                             sprintf(lec + strlen(lec), "[%c%d]", ch, lag);
                         }
                         var = 1;
@@ -246,7 +246,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
 
                 // @PCH -> grt @TREND -> t
                 else if(ch == '@') {
-                    if(YY_read(yy) != YY_WORD) return(-1);
+                    if(YY_read(yy) != YY_WORD) return -1;
                     if(strcmp((char*) yy->yy_text, "PCH") == 0) {
                         sprintf(lec + strlen(lec), " 0.01 * grt"); // JMP 19/2/2013
                         var = 0;
@@ -256,7 +256,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
                         var = 1;
                     }
                     else {
-                        return(-1);
+                        return -1;
                     }
                 }
 
@@ -298,7 +298,7 @@ int EV_cc_eq(char *eveq, char *endo, char *lec)
 
 fin:
     YY_close(yy);
-    return(0);
+    return 0;
 }
 
 
@@ -328,7 +328,7 @@ int EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
 
         // Calc index  in C vector
         idx = atoi(lasteq + pos1 + 2);
-        if(idx > 100) return(-1);
+        if(idx > 100) return -1;
 
         // Check if op before C(...) == '-' => csign = -1
         csign = 1;
@@ -367,7 +367,7 @@ int EV_cc_coefs(char *lasteq, char *lastsubeq, double *coefs)
         // lasteq -> after C(...)
         lasteq += pos1 + 2;
         pos1 = U_pos(')', (unsigned char*) lasteq);
-        if(pos1 < 0) return(-1);
+        if(pos1 < 0) return -1;
         lasteq += pos1 + 1; // après C(...)
     }
 
@@ -401,13 +401,13 @@ int EV_read_line(char *buf)
 {
     int		n;
 
-    if(EV_FD == 0) return(-1);
+    if(EV_FD == 0) return -1;
     EV_LINENB++;
     n = SCR_read_line(EV_FD, (unsigned char*) buf, EV_MAXBUF - 1);
     if(n < 0) {
         fclose(EV_FD);
         EV_FD = 0;
-        return(-1);
+        return -1;
     }
     // Skip end of line from '
     for(n = 0; buf[n] && buf[n] != '\''; n++);
@@ -436,46 +436,70 @@ int EV_cc_file(char *filename)
 
     EV_INIDENTITIES = 0;
     EV_FD = fopen(filename, "r");
-    if(EV_FD == 0) return(-1); // Cannot open file
+    if(EV_FD == 0) return -1; // Cannot open file
 
-    while(1) {
-        if(EV_read_line(buf) < 0) {
+    while(1) 
+    {
+        if(EV_read_line(buf) < 0) 
+        {
             rc = 0;
             break;
         }
 
         // Empty and comment lines
-        if(buf[0] == 0 || buf[0] == '\'') continue;
+        if(buf[0] == 0 || buf[0] == '\'') 
+            continue;
 
         // Line "Estimation Command:" -> skip next 2 lines
         // Line "Forecasting Equation:" -> skip next 2 lines
         if(memcmp(buf, EV_ESTCOMMAND, strlen(EV_ESTCOMMAND)) == 0 ||
-                memcmp(buf, EV_ESTFOREQ,      strlen(EV_ESTFOREQ)) == 0) {
+                memcmp(buf, EV_ESTFOREQ,      strlen(EV_ESTFOREQ)) == 0) 
+        {
             if(EV_read_line(buf) < 0) break; // ===
             if(EV_read_line(buf) < 0) break; // list of endog : not used
             continue;
         }
 
         // Line "Estimation equation:" -> skip 1 line and save next
-        if(memcmp(buf, EV_ESTEQ, strlen(EV_ESTEQ)) == 0) {
+        if(memcmp(buf, EV_ESTEQ, strlen(EV_ESTEQ)) == 0) 
+        {
             if(EV_read_line(buf) < 0) break; // ===
             if(EV_read_line(lasteq) < 0) break; // EQ with C(1) ...
             continue;
         }
 
         // Line "Substituted Coefficients:" -> skip 1 line and save next
-        if(memcmp(buf, EV_ESTSUBCOEFS, strlen(EV_ESTSUBCOEFS)) == 0) {
+        if(memcmp(buf, EV_ESTSUBCOEFS, strlen(EV_ESTSUBCOEFS)) == 0) 
+        {
             if(EV_read_line(buf) < 0) break; // ===
             if(EV_read_line(lastsubeq) < 0) break; // EQ with C(1) ...
             if(EV_cc_eq(lasteq, endo, lec)) break;
-            memset(coefs, 0, sizeof(coefs)); // JMP 8/2/2018
+            memset(coefs, 0, sizeof(coefs));
             nbcoefs = EV_cc_coefs(lasteq, lastsubeq, coefs);
             if(nbcoefs < 0) break;
+            
             // Save in WS
-            if(K_upd_eqs(endo, lec, lasteq, 0, 0L, 0L, 0L, 0L, 0)) break;
-            for(i = 0 ; i < nbcoefs ; i++) {
+            Equation* eq = global_ws_eqs->get_obj_ptr(endo);
+            if(!eq)
+                break;
+            
+            try
+            {
+                eq->set_lec(lec);
+            }
+            catch(std::exception&)
+            {
+                if(RP_DEBUG) kmsg("File '%s'[%d] : cannot compile LEC => '%s'", filename, EV_LINENB, lec);
+                break;
+            }
+
+            eq->comment = std::string(lasteq);
+            
+            for(i = 0 ; i < nbcoefs ; i++) 
+            {
                 sprintf(buf, "%s_%d %lf 1", SCR_lower((unsigned char*) endo), i + 1, coefs[i + 1]);
-                if(B_DataUpdate(buf, SCALARS)) goto err;
+                if(B_DataUpdate(buf, SCALARS)) 
+                    goto err;
             }
             continue;
         }
@@ -485,39 +509,57 @@ int EV_cc_file(char *filename)
             continue;
 
         // Line "Identities:" -> skip 1 line
-        if(memcmp(buf, EV_IDENTITIESSTART, strlen(EV_IDENTITIESSTART)) == 0) {
+        if(memcmp(buf, EV_IDENTITIESSTART, strlen(EV_IDENTITIESSTART)) == 0) 
+        {
             EV_INIDENTITIES = 1;
             if(EV_read_line(buf) < 0) break; // ===
             continue;
         }
 
         // Line "Keep Coefs"
-        if(memcmp(buf, EV_KEEPCOEFS, strlen(EV_KEEPCOEFS)) == 0) {
+        if(memcmp(buf, EV_KEEPCOEFS, strlen(EV_KEEPCOEFS)) == 0) 
+        {
             EV_ISKEEPCOEFS = 1;
             continue;
         }
 
         // Line "Drop Coefs"
-        if(memcmp(buf, EV_DROPCOEFS, strlen(EV_DROPCOEFS)) == 0) {
+        if(memcmp(buf, EV_DROPCOEFS, strlen(EV_DROPCOEFS)) == 0) 
+        {
             EV_ISKEEPCOEFS = 0;
             continue;
         }
 
         // Default ou Line "@IDENTITY" ou eq -> save eq
-        if(EV_INIDENTITIES || memcmp(buf, EV_IDENTITY, strlen(EV_IDENTITY)) == 0) {
-            if(memcmp(buf, EV_IDENTITY, strlen(EV_IDENTITY)) == 0) {
+        if(EV_INIDENTITIES || memcmp(buf, EV_IDENTITY, strlen(EV_IDENTITY)) == 0) 
+        {
+            if(memcmp(buf, EV_IDENTITY, strlen(EV_IDENTITY)) == 0) 
+            {
                 strcpy(buf, buf + strlen(EV_IDENTITY)); // Skip @IDENTITTY
                 EV_INIDENTITIES = 1;
             }
-            if(EV_cc_idt(buf, endo, lec)) {
+            if(EV_cc_idt(buf, endo, lec)) 
+            {
                 if(RP_DEBUG) kmsg("File '%s'[%d] : cannot translate Eviews into LEC => Eviews => '%s', Endo => '%s', LEC => '%s'", filename, EV_LINENB, buf, endo, lec);
                 break;
             }
+            
             // Save in WS
-            if(K_upd_eqs(endo, lec, buf, 0, 0L, 0L, 0L, 0L, 0)) {
+            Equation* eq = global_ws_eqs->get_obj_ptr(endo);
+            if(!eq)
+                break;
+            
+            try
+            {
+                eq->set_lec(lec);
+            }
+            catch(std::exception&)
+            {
                 if(RP_DEBUG) kmsg("File '%s'[%d] : cannot compile LEC => '%s'", filename, EV_LINENB, lec);
                 break;
             }
+
+            eq->comment = std::string(buf);
         }
 
         if(RP_DEBUG) kmsg("File '%s'[%d] : ok. LEC  => '%s'", filename, EV_LINENB, lec);
@@ -527,7 +569,7 @@ int EV_cc_file(char *filename)
 err:
     if(EV_FD) fclose(EV_FD);
     EV_FD = 0;
-    return(rc);
+    return rc;
 }
 
 

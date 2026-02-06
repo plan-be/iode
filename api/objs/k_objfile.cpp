@@ -20,6 +20,7 @@
 #include <io.h>
 #endif
 
+#include "scr4/s_swap.h"        // SWHDL
 #include "scr4/s_prodir.h"
 
 #include "api/constants.h"
@@ -45,8 +46,8 @@
 // required to read old binary files
 struct KOBJ 
 {
-    SWHDL       o_val;          // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
-    ONAME       o_name;         // name of the object
+    SWHDL o_val;    // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
+    ONAME o_name;   // name of the object
 };
 
 
@@ -88,7 +89,7 @@ int K_get_ext(char* filename, char* ext, int max_ext_len)
 {
     int     i, len;
 
-    if(filename == 0) return(0);
+    if(filename == 0) return 0;
 
     len = (int)strlen(filename);
     for(i = len - 1 ; i >= 0 ; i--) {
@@ -105,7 +106,7 @@ int K_get_ext(char* filename, char* ext, int max_ext_len)
         return(len - i - 1);
     }
     else 
-        return(0);
+        return 0;
 }
 
 
@@ -125,14 +126,14 @@ int K_has_ext(char* filename)
 {
     int     i;
 
-    if(filename == 0) return(0);
+    if(filename == 0) return 0;
     for(i = (int)strlen(filename) - 1 ; i >= 0 ; i--) {
         if(filename[i] == ':' || filename[i] == '!' ||        /* JMP 23-06-02 */
            filename[i] == '.' || filename[i] == '\\' ||
            filename[i] == '/') break;
     }
     if(i >= 0 && filename[i] == '.') return(1);
-    else return(0);
+    else return 0;
 }
 
 
@@ -440,7 +441,6 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     KDB*    tkdb = nullptr;
     FNAME   file;
     FILE*   fd;
-    SWHDL   handle;
     int     nb_objs;
     int     k_objs_size;
     KOBJ*   k_objs = NULL;
@@ -476,6 +476,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     }
 
     // CHECK OBJS LABEL 
+    memset(label, 0, 512);
     success = kread(label, strlen(K_LABEL), 1, fd);
     if(!success)
     {
@@ -508,6 +509,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     }
 
     // Set filename in this->filepath
+    memset(fullpath, 0, 1024);
     if(strncmp(file, "ws.", 3)) 
     {
         ptr = SCR_fullpath(file, fullpath);
@@ -566,6 +568,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
         // compression
         else 
         {
+            // get the size (length) of the object in the file (compressed or not)
             if(K_read_len(fd, vers, &len))
             {
                 fclose(fd);
@@ -615,6 +618,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             name = v_names[i];
             error_msg = prefix_error_msg + "Could not read object '" + name + "'";
 
+            // get the size (length) of the object in the file (compressed or not)
             if(K_read_len(fd, vers, &len)) 
                 goto error;
 
@@ -631,9 +635,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                     goto error;
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
-                handle = SW_alloc(len);
-                this->set_handle(name, handle);
-                ptr = SW_getptr(handle);
+                ptr = SW_nalloc(len);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
                 SCR_free(aptr);
@@ -641,23 +643,15 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             else 
             {
                 // Si len >= 0 => version non zippée (dft)
-                handle = SW_alloc(len);
-                this->set_handle(name, handle);
-                ptr = SW_getptr(handle);
-                if(ptr == 0) 
-                {
-                    error_msg += ".\nMemory full when allocating object '" + name + "':\n";
-                    error_msg += "o_val = " + std::to_string(handle);
-                    error_msg += ", block: " + std::to_string(SW_get_blk(handle));
-                    goto error;
-                }
-
+                ptr = SW_nalloc(len);
                 success = kread(ptr, len, 1, fd);
                 if(!success) 
                     goto error;
             }
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            this->convert_obj_version(i, vers);
+            ptr = convert_obj_version(name, (int) this->k_type, ptr, vers, this->sample);
+            this->binary_to_obj(name, ptr);
+            SW_nfree(ptr);
         }
     }
     // load only the objects in the list objs
@@ -723,23 +717,16 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             }
 
             // read next object
+
+            // get the size (length) of the object in the file (compressed or not)
             if(K_read_len(fd, vers, &len)) 
                 goto error;
+            
             // zipped file
             if(len < 0) 
                 len = -len + sizeof(OSIZE);
 
             name = std::string(c_name);
-            handle = SW_alloc(len);
-            this->set_handle(name, handle);
-            ptr = SW_getptr(handle);
-            if(ptr == 0) 
-            {
-                error_msg += ".\nMemory full when allocating object '" + name + "':\n";
-                error_msg += "o_val = " + std::to_string(handle);
-                error_msg += ", block: " + std::to_string(SW_get_blk(handle));
-                goto error;
-            }
 
             if(len < 0) 
             {
@@ -753,19 +740,24 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                     goto error;
                 //LzhDecodeStr(cptr, clen, &aptr, &len);
                 GzipDecodeStr((unsigned char*) cptr, clen, (unsigned char**) &aptr, (unsigned long*) &len);
+                ptr = SW_nalloc(len);
                 memcpy(ptr, aptr, len);
                 SW_nfree(cptr);
                 SCR_free(aptr);
             }
             else
             {
+                ptr = SW_nalloc(len);
                 success = kread(ptr, len, 1, fd);
                 if(!success) 
                     goto error;
             }
 
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            this->convert_obj_version(i, vers);
+            ptr = convert_obj_version(name, (int) this->k_type, ptr, vers, this->sample);
+            this->binary_to_obj(name, ptr);
+            SW_nfree(ptr);
+
             lpos = pos + 1;
         }
     }
@@ -819,7 +811,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
     if (nobjs) *nobjs = 0;
     if (smpl) memset(smpl, 0, sizeof(Sample));
     if (filename == 0 || filename[0] == 0 || filename[0] == '-') 
-        return(-1);
+        return -1;
 
     strcpy(file, filename);
     K_strip(file);
@@ -832,7 +824,7 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
     if (vers < 0 || vers > 3) 
     {
         fclose(fd);
-        return(-1);
+        return -1;
     }
 
     KDBInfo* kdb_info = new KDBInfo(OBJECTS, false);
@@ -930,7 +922,7 @@ bool KDB::load(const std::string& filename)
     char  ext[10];
     bool  success = false;
 
-    if(this->k_db_type == DB_SHALLOW_COPY)
+    if(this->k_db_type == DB_SUBSET)
     {
         kwarning("Cannot load file into a shallow copy of a database");
         return false;
@@ -1157,7 +1149,7 @@ int K_backup(char* filename)
 {
     FNAME   backname;
 
-    if(_access(filename, 0)) return(0);     
+    if(_access(filename, 0)) return 0;     
     strcpy(backname, filename);
     backname[strlen(backname) - 1] = '$';
     _unlink(backname);                      // JMP 15/5/2022 => Posix
@@ -1337,7 +1329,8 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
 
     // prepare KOBJ table
     i = 0;
-    k_objs = new KOBJ[this->size()];
+    int nb_objs = (int) this->size();
+    k_objs = new KOBJ[nb_objs];
     for(const std::string& name : this->get_names())
     {
         strcpy(k_objs[i].o_name, name.c_str());
@@ -1346,7 +1339,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     }
 
     // dump KOBJ table -> dump pairs of (name, handle)
-    res = K_cwrite(this->k_compressed, (char*) k_objs, sizeof(KOBJ), this->size(), fd, -1);
+    res = K_cwrite(this->k_compressed, (char*) k_objs, sizeof(KOBJ), nb_objs, fd, -1);
     if(res < 0) 
     {
         error_msg += ":\nCannot write object data";
@@ -1358,11 +1351,17 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     delete[] k_objs;
 
     // dump object values as packed objects
-    SWHDL handle = 0;
     for(const std::string& name : this->get_names())
     {
-        handle = this->get_handle(name);
-        ptr = SW_getptr(handle);
+        success = this->obj_to_binary(&ptr, name);
+        if(!success) 
+        {
+            error_msg += ":\nCannot write object '" + name + "'";
+            kwarning(error_msg.c_str());
+            fclose(fd);
+            return false;
+        }
+
         len = P_len(ptr);
         K_xdrobj[this->k_type]((unsigned char*) ptr, (unsigned char**) &xdr_ptr);
         res = K_cwrite(this->k_compressed, xdr_ptr, len, 1, fd, 20);

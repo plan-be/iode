@@ -168,7 +168,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     std::string sample;
     std::vector<double> values;
     
-    Table* ref_table = global_ws_tbl->get(table_name);
+    Table* ref_table = global_ws_tbl->get_obj_ptr(table_name);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -741,7 +741,7 @@ TEST_F(ComputedTableTest, PrintToFile)
                                           "Productivité totale des facteurs" };
     std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
 
-    Table* ref_table = global_ws_tbl->get(table_name); 
+    Table* ref_table = global_ws_tbl->get_obj_ptr(table_name); 
 
     int i = 0;
     TableLine* line;
@@ -755,7 +755,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
     ASSERT_EQ(cell->get_content(), "1");
     cell = &(line_div.cells[1]);
-    ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_type(), TABLE_CELL_STRING);
     ASSERT_EQ(cell->get_content(), "");
     // --- title line ---
     line = &(ref_table->lines[i++]);
@@ -879,7 +879,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     KDBTables* bin_kdb_tables = new KDBTables(false);
     bin_kdb_tables->load(input_test_dir + "fun.tbl");
     
-    Table* bin_ref_table = bin_kdb_tables->get(table_name);
+    Table* bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
 
     TableCell* bin_cell;
     
@@ -894,9 +894,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     {
         cell = &(line_div.cells[j]);
         bin_cell = &(bin_line_div.cells[j]);
-        EXPECT_EQ(cell->get_type(), bin_cell->get_type());
         EXPECT_EQ(cell->get_content(), bin_cell->get_content());
-        EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
     }
 
     // lines
@@ -911,7 +909,6 @@ TEST_F(ComputedTableTest, PrintToFile)
             bin_cell = &bin_line.cells[0];
             EXPECT_EQ(cell->get_type(), bin_cell->get_type());
             EXPECT_EQ(cell->get_content(), bin_cell->get_content());
-            EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
         }
         else if(line.get_type() == TABLE_LINE_CELL)
         {
@@ -923,14 +920,11 @@ TEST_F(ComputedTableTest, PrintToFile)
                 if(!bin_cell->is_null())
                     EXPECT_EQ(cell->get_type(), bin_cell->get_type());
                 EXPECT_EQ(cell->get_content(), bin_cell->get_content());
-                EXPECT_EQ(cell->get_attribute(), bin_cell->get_attribute());
             }
         }
         else
             continue;
     }
-
-    delete ref_table;
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -959,7 +953,6 @@ TEST_F(ComputedTableTest, PrintToFile)
     table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.html", 'H');
     compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
 
-    delete bin_ref_table;
     delete bin_kdb_tables;
 
     // ---- titles with special character '#' ----

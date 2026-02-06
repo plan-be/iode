@@ -157,7 +157,7 @@ int B_ModelSimulateParms(char* arg, int unused)
 
 fin :
     SCR_free_tbl((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -187,7 +187,7 @@ int B_ModelExchange(char* const_arg, int unused)
         CSimulation::KSIM_EXO = B_ainit_chk(arg, NULL, 0);
     
     SCR_free(arg);
-    return(0);
+    return 0;
 }
 
 
@@ -198,24 +198,18 @@ int B_ModelExchange(char* const_arg, int unused)
  *  
  *  @param [in, out] KDB*   dbe     KDB of equations to recompile
  *  @return          int            0 on success, -1 of dbe is null or empty
- *  
- *  TODO: return -1 if K_upd_eqs() fails ?
  */
 int KE_compile(KDBEquations* dbe)
 {
-    if(dbe == NULL || dbe->size() == 0) {
+    if(dbe == nullptr || dbe->size() == 0) 
+    {
         error_manager.append_error("Empty set of equations");
         return -1;
     }
 
-    Equation* eq;
-    for(const auto& [name, handle] : dbe->k_objs) 
-    {
-        eq = dbe->get_obj(name);
-        K_upd_eqs((char*) name.c_str(), (char*) eq->lec.c_str(), NULL, 0, NULL, NULL, NULL, NULL, 0);
-        delete eq;
-        eq = nullptr;
-    }
+    // recompile all CLEC of the equations in the KDB
+    for(const auto& [name, eq] : dbe->k_objs)
+        eq->set_lec(eq->lec);
     
     return 0;
 }
@@ -351,9 +345,15 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
-    char** pre   = (char**) KL_expand(global_ws_lst->get_obj(lsts[0]));
-    char** inter = (char**) KL_expand(global_ws_lst->get_obj(lsts[1]));
-    char** post  = (char**) KL_expand(global_ws_lst->get_obj(lsts[2]));
+    List* pre_lst = global_ws_lst->get_obj_ptr(lsts[0]);
+    char** pre = (char**) KL_expand((char*) pre_lst->c_str());
+
+    List* inter_lst = global_ws_lst->get_obj_ptr(lsts[1]);
+    char** inter = (char**) KL_expand((char*) inter_lst->c_str());
+
+    List* post_lst = global_ws_lst->get_obj_ptr(lsts[2]);
+    char** post = (char**) KL_expand((char*) post_lst->c_str());
+
     SCR_free_tbl((unsigned char**) lsts);
 
     // Regroupe les listes dans une seule avant de faire K_quick_refer
@@ -398,7 +398,7 @@ static int B_CreateEmptyVar(char *name)
     SCR_sqz(SCR_upper((unsigned char*) uname));
     sprintf(buf, "%s 1/0", uname);
     B_DataCalcVar(buf);
-    return(0);
+    return 0;
 }
 
 

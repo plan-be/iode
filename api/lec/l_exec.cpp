@@ -94,7 +94,7 @@ int L_stackna(L_REAL** p_stack, int nargs)
             **p_stack = IODE_NAN;
             return(1);
         }
-    return(0);
+    return 0;
 }
 
 

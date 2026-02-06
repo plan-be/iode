@@ -4,8 +4,6 @@
 class IdentityTest : public TestAbstract, public ::testing::Test
 {
 protected:
-    Identity* idt_coeffs;
-    Identity* idt_vars;
     std::string name_idt_coeffs = "NAWRU";
     std::string name_idt_vars = "AOUC";
 
@@ -15,7 +13,11 @@ protected:
         global_ws_idt->load(str_input_test_dir + "fun.ai");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_eqs->clear();
+        global_ws_idt->clear();
+    }
 };
 
 
@@ -31,10 +33,10 @@ TEST_F(IdentityTest, CreateAndCopy)
 
 TEST_F(IdentityTest, GetCoefficients)
 {
-    Identity* idt_coeffs = global_ws_idt->get(name_idt_coeffs);
+    Identity idt_coeffs = global_ws_idt->get(name_idt_coeffs);
 
     std::vector<std::string> expected_coefs_list = {"gamma2", "gamma3", "gamma4", "gamma_"};
-    std::vector<std::string> coefs_list = idt_coeffs->get_coefficients_list();
+    std::vector<std::string> coefs_list = idt_coeffs.get_coefficients_list();
     EXPECT_EQ(coefs_list, expected_coefs_list);
 
     // check that coeffs have been created
@@ -43,20 +45,18 @@ TEST_F(IdentityTest, GetCoefficients)
     EXPECT_TRUE(global_ws_scl->contains("gamma3"));
     EXPECT_TRUE(global_ws_scl->contains("gamma4"));
     EXPECT_TRUE(global_ws_scl->contains("gamma_"));
-
-    delete idt_coeffs; // clean up
 }
 
 TEST_F(IdentityTest, GetVariables)
 {
-    Identity* idt_vars = global_ws_idt->get(name_idt_vars);
+    Identity idt_vars = global_ws_idt->get(name_idt_vars);
 
-    Equation* eq = global_ws_eqs->get("ACAF");
-    Sample eq_sample = eq->sample;
+    Equation eq = global_ws_eqs->get("ACAF");
+    Sample eq_sample = eq.sample;
     global_ws_var->set_sample(eq_sample.start_period, eq_sample.end_period);
 
     std::vector<std::string> expected_vars_list = {"WCRH", "QL", "VAFF", "VM", "PM"};
-    std::vector<std::string> vars_list = idt_vars->get_variables_list();
+    std::vector<std::string> vars_list = idt_vars.get_variables_list();
     EXPECT_EQ(vars_list, expected_vars_list);
 
     // check that variables have been created
@@ -66,6 +66,4 @@ TEST_F(IdentityTest, GetVariables)
     EXPECT_TRUE(global_ws_var->contains("VAFF"));
     EXPECT_TRUE(global_ws_var->contains("VM"));
     EXPECT_TRUE(global_ws_var->contains("WCRH"));
-
-    delete idt_vars; // clean up
 }
