@@ -902,7 +902,8 @@ class Identities(IodeDatabase):
         >>> identities.rename("FLGR", "FLGR_")
         >>> original_hash == hash(identities)
         False
-        >>> identities.rename("FLGR_", "FLGR")  # revert the change
+        >>> # revert the change
+        >>> identities.rename("FLGR_", "FLGR")
         >>> original_hash == hash(identities)
         True
 
@@ -911,7 +912,8 @@ class Identities(IodeDatabase):
         >>> identities["FLGR"] = "1"
         >>> original_hash == hash(identities)
         False
-        >>> identities["FLGR"] = original_lec  # revert the change
+        >>> # revert the change
+        >>> identities["FLGR"] = original_lec
         >>> original_hash == hash(identities)
         True
 

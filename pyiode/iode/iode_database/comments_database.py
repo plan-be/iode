@@ -817,7 +817,8 @@ class Comments(IodeDatabase):
         >>> comments.rename("ACAF", "ACAF_")
         >>> original_hash == hash(comments)
         False
-        >>> comments.rename("ACAF_", "ACAF")  # revert the change
+        >>> # revert the change
+        >>> comments.rename("ACAF_", "ACAF")
         >>> original_hash == hash(comments)
         True
 
@@ -826,7 +827,8 @@ class Comments(IodeDatabase):
         >>> comments["ACAF"] = "modified comment"
         >>> original_hash == hash(comments)
         False
-        >>> comments["ACAF"] = original_comment  # revert the change
+        >>> # revert the change
+        >>> comments["ACAF"] = original_comment
         >>> original_hash == hash(comments)
         True
 

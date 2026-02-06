@@ -264,7 +264,7 @@ class Tables(IodeDatabase):
             else:
                 raise TypeError(f"New table '{name}': Expected input to be of type int or tuple or list or "
                                 f"dict or Table. Got value of type {type(value).__name__} instead")
-        
+
         self._cython_instance._set_object(name, table._cython_instance)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
@@ -484,7 +484,8 @@ class Tables(IodeDatabase):
         <BLANKLINE>
 
         >>> # b) -------- update table --------
-        >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
+        >>> table = tables["TABLE_CELL_LECS"]
+        >>> table                                   # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1              |
         TITLE |         "New Table"
         ----- | ----------------------------
@@ -513,44 +514,45 @@ class Tables(IodeDatabase):
         <BLANKLINE>
 
         >>> # set graph axis type
-        >>> tables["TABLE_CELL_LECS"].graph_axis = TableGraphAxis.SEMILOG
+        >>> table.graph_axis = TableGraphAxis.SEMILOG
         >>> # print first line
-        >>> tables["TABLE_CELL_LECS"][0]
+        >>> table[0]
         New Table
         >>> # print last line
-        >>> tables["TABLE_CELL_LECS"][-1]
+        >>> table[-1]
         <DATE>
         >>> # delete last line
-        >>> del tables["TABLE_CELL_LECS"][-1]
+        >>> del table[-1]
         >>> # get index of line containing YSSG+COTRES
-        >>> index = tables["TABLE_CELL_LECS"].index("YSSG+COTRES")
+        >>> index = table.index("YSSG+COTRES")
         >>> index
         9
-        >>> tables["TABLE_CELL_LECS"][index]
+        >>> table[index]
         ('"YSSG+COTRES:"', 'YSSG+COTRES')
         >>> # get line type
-        >>> tables["TABLE_CELL_LECS"][index].line_type
+        >>> table[index].line_type
         'CELL'
         >>> # get line graph type
-        >>> tables["TABLE_CELL_LECS"][index].graph_type
+        >>> table[index].graph_type
         'LINE'
         >>> # know if axis is left
-        >>> tables["TABLE_CELL_LECS"][index].axis_left
+        >>> table[index].axis_left
         True
         >>> # update cells
         >>> # double quotes "    -> STRING cell
         >>> # no double quotes   -> LEC cell
-        >>> tables["TABLE_CELL_LECS"][index] = ('"YSSG:"', 'YSSG')
-        >>> tables["TABLE_CELL_LECS"][index]
+        >>> table[index] = ('"YSSG:"', 'YSSG')
+        >>> table[index]
         ('"YSSG:"', 'YSSG')
         >>> # insert a new title line surrounded by two separator lines
-        >>> tables["TABLE_CELL_LECS"].insert(index + 1, '-')
-        >>> tables["TABLE_CELL_LECS"].insert(index + 2, "New Title")
-        >>> tables["TABLE_CELL_LECS"].insert(index + 3, '-')
+        >>> table.insert(index + 1, '-')
+        >>> table.insert(index + 2, "New Title")
+        >>> table.insert(index + 3, '-')
         >>> # append a new sepatator line
-        >>> tables["TABLE_CELL_LECS"] += '-'
+        >>> table += '-'
 
-        >>> tables["TABLE_CELL_LECS"]                # doctest: +NORMALIZE_WHITESPACE
+        >>> tables["TABLE_CELL_LECS"] = table
+        >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1       |
         TITLE |  "New Table"
         ----- | --------------
@@ -643,6 +645,7 @@ class Tables(IodeDatabase):
         >>> table_x_grt = tables_subset["X_GRT"]
         >>> index = table_x_grt.index("XPWXAB")
         >>> table_x_grt.insert(index + 1, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
+        >>> tables_subset["X_GRT"] = table_x_grt
         >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1                                                       |
         TITLE |                           "Croissance"
@@ -716,9 +719,10 @@ class Tables(IodeDatabase):
 
         >>> # 2) using another Tables database (subset)
         >>> tables_subset = tables["C8_1, C8_2, C8_3"].copy()
-        >>> tables_subset["C8_1"].title = tables_subset["C8_1"].title.replace("(copy)", "(detached subset)")
-        >>> tables_subset["C8_2"].title = tables_subset["C8_2"].title.replace("(copy)", "(detached subset)")
-        >>> tables_subset["C8_3"].title = tables_subset["C8_3"].title.replace("(copy)", "(detached subset)")
+        >>> for tbl_name in tables_subset.names:
+        ...     table = tables_subset[tbl_name]
+        ...     table.title = table.title.replace("(copy)", "(detached subset)")
+        ...     tables_subset[tbl_name] = table
         >>> tables["C8_1, C8_2, C8_3"] = tables_subset
         >>> tables["C8_1, C8_2, C8_3"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Tables
@@ -1241,7 +1245,8 @@ class Tables(IodeDatabase):
         >>> tables.rename("ANAKNFF", "ANAKNFF_")
         >>> original_hash == hash(tables)
         False
-        >>> tables.rename("ANAKNFF_", "ANAKNFF")  # revert the change
+        >>> # revert the change
+        >>> tables.rename("ANAKNFF_", "ANAKNFF")
         >>> original_hash == hash(tables)
         True
 
@@ -1252,13 +1257,14 @@ class Tables(IodeDatabase):
         >>> tables["ANAKNFF"] = tbl
         >>> original_hash == hash(tables)
         False
-        >>> tbl[0] = original_title  # revert the change
+        >>> # revert the change
+        >>> tbl[0] = original_title
         >>> tables["ANAKNFF"] = tbl
         >>> original_hash == hash(tables)
         True
 
         >>> # delete a table
-        >>> original_table = tables["ANAKNFF"]
+        >>> original_table = tables["ANAKNFF"].copy()
         >>> del tables["ANAKNFF"]
         >>> original_hash == hash(tables)
         False

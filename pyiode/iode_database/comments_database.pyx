@@ -4,7 +4,7 @@ from typing import Union, Tuple, List, Optional, Any
 cimport cython
 from cython.operator cimport dereference
 from pyiode.iode_database.cpp_api_database cimport hash_value
-from pyiode.iode_database.cpp_api_database cimport KDBComments as CppKDBComments
+from pyiode.iode_database.cpp_api_database cimport KDBComments
 from pyiode.iode_database.cpp_api_database cimport global_ws_cmt as cpp_global_comments
 from pyiode.iode_database.cpp_api_database cimport B_FileImportCmt
 
@@ -13,7 +13,7 @@ import pandas as pd
 
 cdef class Comments(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef CppKDBComments* database_ptr
+    cdef KDBComments* database_ptr
 
     def __cinit__(self, filepath: str=None) -> Comments:
         self.ptr_owner = False
@@ -26,7 +26,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Comments _from_ptr(CppKDBComments* database_ptr = NULL, bint owner=False):
+    cdef Comments _from_ptr(KDBComments* database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Comments wrapper = Comments.__new__(Comments)
         if database_ptr is not NULL:
@@ -44,7 +44,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, subset: Comments, pattern: str, copy: bool) -> Comments:
-        subset.database_ptr = new CppKDBComments(self.database_ptr, pattern.encode(), <bint>copy)
+        subset.database_ptr = new KDBComments(self.database_ptr, pattern.encode(), <bint>copy)
         subset.abstract_db_ptr = subset.database_ptr
         subset.ptr_owner = True
         return subset
@@ -55,13 +55,14 @@ cdef class Comments(CythonIodeDatabase):
 
     def _set_object(self, name: str, value: str):
         name = name.strip()
-        if self.database_ptr.contains(name.encode()):
-            self.database_ptr.update(name.encode(), <string>(value.encode()))
-        else:
-            self.database_ptr.add(name.encode(), value.encode())
+        self.database_ptr.set(name.encode(), <string>(value.encode()))
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
+
+    def merge(self, other: Comments, overwrite: bool=True):        
+        cdef KDBComments* other_db_ptr = other.database_ptr
+        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     @classmethod
     def convert_file(cls, args: str) -> int:

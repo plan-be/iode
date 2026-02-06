@@ -22,6 +22,7 @@ from pyiode.objects.table cimport CTable
 
 
 cdef extern from "api/all.h":
+    ctypedef unsigned long SWHDL
     ctypedef char OFNAME[64]
     ctypedef char FNAME[512]
     ctypedef char ONAME[21]
@@ -56,6 +57,7 @@ cdef extern from "api/all.h":
     int B_DataPattern(char* arg, int iode_type)
 
     cdef cppclass KDB:
+        map[string, SWHDL]  k_objs
         short               k_type
         short               k_mode
         string              k_arch
@@ -93,7 +95,7 @@ cdef extern from "api/all.h":
         void remove(const string& name) except +
 
         # Other methods
-        void merge(const KDB& other, const bool overwrite) except +
+        void merge(const KDB& other, const bool overwrite, const bool clear_source) except +
         void copy_from(const string& input_files, const string objects_names) except +
         void merge_from(const string& input_file) except +
         vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
@@ -171,16 +173,13 @@ cdef extern from "api/b_errors.h":
 
 cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
-        map[string, string*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBComments(KDBComments* db_parent, string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
-        bool add(string& name, string& comment) except +
-        void update(string& name, string& comment) except +
+        void set(string& name, string& value) except +
 
     size_t hash_value(KDBComments&) except +
 
@@ -191,17 +190,20 @@ cdef extern from "api/objs/comments.h":
 
 cdef extern from "api/objs/equations.h":
     cdef cppclass KDBEquations(KDB):
-        map[string, CEquation*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBEquations(KDBEquations* db_parent, string pattern, bool copy) 
 
         # Public methods
-        CEquation* get(string& name) except +
-        string get_lec(string& name) except +
-        bool add(string& name, CEquation& equation) except +
-        void update(string& name, CEquation& equation) except +
+        CEquation get(string& name) except +
+        # WARNING: do not delete the pointer returned by get_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CEquation* get_obj_ptr(string& name) except +
+        # WARNING: do not delete the pointer returned by set_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CEquation* set_obj_ptr(string& name, CEquation* eq) except +
 
         string get_lec(string& name) except +
         bool add(string& name, string& lec) except +
@@ -216,23 +218,27 @@ cdef extern from "api/objs/equations.h":
 
 cdef extern from "api/objs/identities.h":
     cdef cppclass KDBIdentities(KDB):
-        map[string, CIdentity*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBIdentities(KDBIdentities* db_parent, string pattern, bool copy) 
 
         # Public methods
-        CIdentity* get(string& name) except +
-        bool add(string& name, string& identity_lec) except +
-        void update(string& name, string& identity_lec) except +
+        CIdentity get(string& name) except +
+        # WARNING: do not delete the pointer returned by get_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CIdentity* get_obj_ptr(string& name) except +
+        # WARNING: do not delete the pointer returned by set_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CIdentity* set_obj_ptr(string& name, CIdentity* idt) except +
 
         string get_lec(string& name) except +
         bool add(string& name, string& lec) except +
         void update(string& name, string& lec) except +
 
         bool execute_identities(string& from_period, string& to, string& identities_list, 
-                                string& var_files, string& scalar_files, bint trace) except +
+                                string& var_files, string& scalar_files, bool trace) except +
 
     size_t hash_value(KDBIdentities&) except +
 
@@ -243,16 +249,13 @@ cdef extern from "api/objs/identities.h":
 
 cdef extern from "api/objs/lists.h":
     cdef cppclass KDBLists(KDB):
-        map[string, string*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBLists(KDBLists* db_parent, string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
-        bool add(string& name, string& list_) except +
-        void update(string& name, string& list_) except +
+        void set(string& name, string& value) except +
 
     size_t hash_value(KDBLists&) except +
 
@@ -263,16 +266,20 @@ cdef extern from "api/objs/lists.h":
 
 cdef extern from "api/objs/scalars.h":
     cdef cppclass KDBScalars(KDB):
-        map[string, CScalar*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBScalars(KDBScalars* db_parent, string pattern, bool copy) 
 
         # Public methods
-        CScalar* get(string& name) except +
-        bool add(string& name, CScalar& scalar) except +
-        void update(string& name, CScalar& scalar) except +
+        CScalar get(string& name) except +
+        # WARNING: do not delete the pointer returned by get_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CScalar* get_obj_ptr(string& name) except +
+        # WARNING: do not delete the pointer returned by set_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CScalar* set_obj_ptr(string& name, CScalar* scl) except +
 
     size_t hash_value(KDBScalars&) except +
 
@@ -283,16 +290,23 @@ cdef extern from "api/objs/scalars.h":
 
 cdef extern from "api/objs/tables.h":
     cdef cppclass KDBTables(KDB):
-        map[string, CTable*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBTables(KDBTables* db_parent, string pattern, bool copy) 
 
         # Public methods
-        CTable* get(string& name) except +
+        CTable get(string& name) except +
+        # WARNING: do not delete the pointer returned by get_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CTable* get_obj_ptr(string& name) except +
+        # WARNING: do not delete the pointer returned by set_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        CTable* set_obj_ptr(string& name, CTable* tbl) except +
+
         string get_title(string& name) except +
-        bool add(string name, CTable& table) except +
+
         bool add(string name, int nb_columns) except +
         bool add(string name, int nbColumns, string def_, vector[string] vars, 
                  bool mode=False, bool files=False, bool date=False) except +
@@ -300,7 +314,7 @@ cdef extern from "api/objs/tables.h":
                  vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
         bool add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
                  bool files=False, bool date=False) except +
-        void update(string& name, CTable& table) except +
+            
         void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
                            char format_) except +
 
@@ -313,20 +327,22 @@ cdef extern from "api/objs/tables.h":
 
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
-        map[string, vector[double]*] k_objs
-
         # Constructor
         # subset (shallow or deep copy) 
         KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 
 
         # Public methods
-        vector[double] get(string& name) except +
-        bool add(string& name, vector[double]& values) except +
+        # WARNING: do not delete the pointer returned by get_obj_ptr, 
+        #          it is owned by the C++ database and will be automatically  
+        #          deleted when the database is deleted
+        vector[double]* get_obj_ptr(string& name) except +
+        void set(string& name, vector[double]& values) except +
+
         bool add(string& name, string& lec) except +
-        void update(string& name, vector[double]& values) except +
-        void update(string& name, vector[double]& values, int t_first, int t_last) except +
+        bool add(string& name, vector[double]& values) except +
         void update(string& name, string& lec) except +
         void update(string& name, string& lec, int t_first, int t_last) except +
+        void update(string& name, vector[double]& values, int t_first, int t_last) except +
 
         double* get_var_ptr(string& name, int t) except +
         double get_var(string name, int t, IodeVarMode mode) except +

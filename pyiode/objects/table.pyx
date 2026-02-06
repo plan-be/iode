@@ -16,29 +16,25 @@ from pyiode.common cimport TableGraphGrid as CTableGraphGrid
 from pyiode.common cimport TableGraphType as CTableGraphType
 from pyiode.objects.table cimport CTableCell, CTableLine, CTable
 from pyiode.objects.table cimport hash_value as hash_value_tbl
-from pyiode.iode_database.cpp_api_database cimport KDBTables as KDBTables
 
 
 cdef class TableCell:
     cdef CTableCell* c_cell
-    cdef object py_parent_table
 
     def __cinit__(self):
         self.c_cell = NULL
-        self.py_parent_table = None
 
     def __dealloc__(self):
         pass
 
     @staticmethod
-    cdef TableCell from_ptr(CTableCell* c_cell_ptr, py_parent_table):
+    cdef TableCell from_ptr(CTableCell* c_cell_ptr):
         """
         Factory function to create TableCell objects from given CTableCell pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef TableCell wrapper = TableCell.__new__(TableCell)
         wrapper.c_cell = c_cell_ptr
-        wrapper.py_parent_table = py_parent_table
         return wrapper
 
     def get_cell_type(self) -> str:
@@ -53,7 +49,6 @@ cdef class TableCell:
             value = TableCellAlign[value]
         value = int(value)
         self.c_cell.set_align(<CTableCellAlign>value)
-        self.py_parent_table.update_owner_database()
 
     def get_bold(self) -> bool:
         return self.c_cell.is_bold() if self.c_cell is not NULL else None
@@ -61,7 +56,6 @@ cdef class TableCell:
     def set_bold(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_bold(<bint>value)
-            self.py_parent_table.update_owner_database()
 
     def get_italic(self) -> bool:
         return self.c_cell.is_italic() if self.c_cell is not NULL else None
@@ -69,7 +63,6 @@ cdef class TableCell:
     def set_italic(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_italic(<bint>value)
-            self.py_parent_table.update_owner_database()
 
     def get_underline(self) -> bool:
         return self.c_cell.is_underline() if self.c_cell is not NULL else None
@@ -77,7 +70,6 @@ cdef class TableCell:
     def set_underline(self, value: bool):
         if self.c_cell is not NULL:
             self.c_cell.set_underline(<bint>value)
-            self.py_parent_table.update_owner_database()
 
     def get_coefficients(self) -> List[str]:
         if self.c_cell is NULL:
@@ -101,18 +93,16 @@ cdef class TableCell:
 cdef class TableLine:
     cdef CTableLine* c_line
     cdef int nb_columns
-    cdef object py_parent_table
 
     def __cinit__(self):
         self.c_line = NULL
         self.nb_columns = 0
-        self.py_parent_table = None
 
     def __dealloc__(self):
         pass
 
     @staticmethod
-    cdef TableLine from_ptr(CTableLine* c_line_ptr, int nb_columns, py_parent_table):
+    cdef TableLine from_ptr(CTableLine* c_line_ptr, int nb_columns):
         """
         Factory function to create TableLine objects from given CTableLine pointer.
         """
@@ -120,7 +110,6 @@ cdef class TableLine:
         cdef TableLine wrapper = TableLine.__new__(TableLine)
         wrapper.c_line = c_line_ptr
         wrapper.nb_columns = nb_columns
-        wrapper.py_parent_table = py_parent_table
         return wrapper
 
     def get_type(self) -> str:
@@ -133,7 +122,6 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         self.c_line.set_graph_type(<CTableGraphType>value)
-        self.py_parent_table.update_owner_database()
 
     def get_axis_left(self) -> bool:
         return not self.c_line.right_axis if self.c_line is not NULL else None
@@ -142,7 +130,6 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         self.c_line.right_axis = <bint>(not value)
-        self.py_parent_table.update_owner_database()
 
     def size(self) -> int:
         if self.c_line is NULL:
@@ -158,23 +145,17 @@ cdef class TableLine:
 
     def _getitem_(self, col: int, cell: TableCell) -> TableCell:
         cdef CTableCell* c_cell
-
         if self.c_line is NULL:
             return
-        
         c_cell = &(self.c_line.cells[col])
-
         cell.c_cell = c_cell
-        cell.py_parent_table = self.py_parent_table
         return cell
 
     def _setitem_(self, col: int, value: str):
         if self.c_line is NULL:
             return
-        
         c_cell = &(self.c_line.cells[col])
         c_cell.set_content(value.encode())
-        self.py_parent_table.update_owner_database()
 
     def _str_(self) -> str:
         cdef CTableCell* c_cell
@@ -205,13 +186,11 @@ cdef class TableLine:
 
 cdef class Table:
     cdef bint ptr_owner
-    cdef KDBTables* c_database
     cdef string c_table_name
     cdef CTable* c_table
 
     def __cinit__(self):
         self.ptr_owner = False
-        self.c_database = NULL
         self.c_table_name = b''
         self.c_table = NULL
 
@@ -240,55 +219,43 @@ cdef class Table:
             self.c_table = new CTable(nb_columns, <string>table_title.encode(), cpp_lines_titles, cpp_lecs, <bint>mode, <bint>files, <bint>date)
         
         self.c_table_name = b''
-        self.c_database = NULL
         self.ptr_owner = <bint>True
 
     def __dealloc__(self):
         if self.ptr_owner and self.c_table is not NULL:
             del self.c_table
-            self.c_database = NULL
             self.c_table_name = b''
             self.c_table = NULL
 
-    cdef void extract_tbl_from_database(self):
-        # if c_table belongs to a database, we need to (re)extract it from the database every 
-        # time we need to access one of its attributes since working for example on the global 
-        # database may modify the table (which is not automatically reflected in c_table)
-        if self.c_database is not NULL:
-            if self.ptr_owner and self.c_table is not NULL:
-                del self.c_table
-            self.c_table = self.c_database.get(self.c_table_name)
-            self.ptr_owner = True
-
-    def update_owner_database(self):
-        if self.c_database is not NULL and self.c_table is not NULL:
-            self.c_database.update(self.c_table_name, dereference(self.c_table))
-
     @staticmethod
-    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b'', KDBTables* c_database_ptr=NULL):
+    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b''):
         """
         Factory function to create Table objects from a given CTable pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Table wrapper = Table.__new__(Table)
         wrapper.c_table = ptr
-        wrapper.c_database = c_database_ptr
         wrapper.c_table_name = b_table_name
         wrapper.ptr_owner = owner
         return wrapper
 
+    # for debug purpose only
+    def is_pointer_null(self) -> bool:
+        return self.c_table is NULL
+
+    # for debug purpose only
+    def is_own_owner(self) -> bool:
+        return self.ptr_owner
+
     def get_nb_lines(self) -> int:
-        self.extract_tbl_from_database()
         return <int>(self.c_table.lines.size()) if self.c_table is not NULL else 0
 
     def get_nb_columns(self) -> int:
-        self.extract_tbl_from_database()
         return <int>(self.c_table.nb_columns) if self.c_table is not NULL else 0
 
     def get_title(self) -> str:
         cdef string c_title
         cdef CTableLine* c_line
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
 
@@ -313,10 +280,8 @@ cdef class Table:
             if line_type == TableLineType.TITLE:
                 c_title = value.encode()
                 self.c_table.set_title(i, c_title)
-        self.update_owner_database()
 
     def get_language(self) -> str:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         return self.c_table.get_language_as_string().decode().upper()
@@ -332,10 +297,8 @@ cdef class Table:
             value = TableLang[upper_str]
         value = int(value)
         self.c_table.set_language(<CTableLang>value)
-        self.update_owner_database()
 
     def get_gridx(self) -> str:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         return TableGraphGrid(<int>(self.c_table.get_gridx())).name
@@ -348,10 +311,8 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridx(<CTableGraphGrid>value)
-        self.update_owner_database()
 
     def get_gridy(self) -> str:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         return TableGraphGrid(<int>(self.c_table.get_gridy())).name
@@ -364,10 +325,8 @@ cdef class Table:
             value = TableGraphGrid[value]
         value = int(value)
         self.c_table.set_gridy(<CTableGraphGrid>value)
-        self.update_owner_database()
 
     def get_graph_axis(self) -> str:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         return TableGraphAxis(self.c_table.get_graph_axis()).name
@@ -380,10 +339,8 @@ cdef class Table:
             value = TableGraphAxis[value]
         value = int(value)
         self.c_table.set_graph_axis(<CTableGraphAxis>value)
-        self.update_owner_database()
 
     def get_text_alignment(self) -> str:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         return TableTextAlign(<int>(self.c_table.get_text_alignment())).name
@@ -396,13 +353,10 @@ cdef class Table:
             value = TableTextAlign[value]
         value = int(value)
         self.c_table.set_text_alignment(<CTableTextAlign>value)
-        self.update_owner_database()
 
     def get_coefficients(self) -> List[str]:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
-        self.extract_tbl_from_database()
-
         if self.c_table is NULL:
             return []
 
@@ -431,8 +385,6 @@ cdef class Table:
     def get_variables(self) -> List[str]:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
-        self.extract_tbl_from_database()
-
         if self.c_table is NULL:
             return []
 
@@ -459,7 +411,6 @@ cdef class Table:
 
     def get_divider(self, divider: TableLine) -> TableLine:
         cdef CTableLine* c_line
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         
@@ -467,7 +418,6 @@ cdef class Table:
 
         divider.c_line = c_line
         divider.nb_columns = <int>(self.c_table.nb_columns)
-        divider.py_parent_table = self
         return divider
 
     def set_divider(self, value: Union[List[str], Tuple[str]]):
@@ -496,8 +446,6 @@ cdef class Table:
             c_cell = &c_line.cells[j]
             c_cell.set_content(cell_content.encode())
 
-        self.update_owner_database()
-
     def index(self, key: str) -> int:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
@@ -507,8 +455,6 @@ cdef class Table:
         if not isinstance(key, str):
             raise TypeError(f"Expected value of type str. Got value of type {type(key).__name__} instead.")
         key = key.replace('"', '').strip()
-
-        self.extract_tbl_from_database()
         
         nb_columns = self.c_table.nb_columns
         for i in range(self.c_table.lines.size()):
@@ -570,10 +516,8 @@ cdef class Table:
             else:
                 self.insert(row, line_type)
         
-        self.update_owner_database()
 
     def compute(self, generalized_sample: str, nb_decimals: int=2) -> ComputedTable:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         if not generalized_sample:
@@ -588,7 +532,6 @@ cdef class Table:
         c_line = &(self.c_table.lines[row])
         line.c_line = c_line
         line.nb_columns = <int>(self.c_table.nb_columns)
-        line.py_parent_table = self
         return line
 
     def _setitem_(self, row: int, value: Union[str, List[str], Tuple[str]]):
@@ -620,14 +563,11 @@ cdef class Table:
                 c_cell.set_content(cell_content.encode())
         else:
             warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
-    
-        self.update_owner_database()
 
     def _delitem_(self, row: int):
         if self.c_table is NULL:
             return 
         self.c_table.remove_line(row)
-        self.update_owner_database()
 
     def _iadd_(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Table:
         cdef CTableLine* c_line
@@ -667,24 +607,20 @@ cdef class Table:
             else:
                 self._iadd_(line_type)
 
-        self.update_owner_database()
         return self
 
     def _copy_(self, table: Table) -> Table:
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
         del table.c_table
         table.c_table = new CTable(dereference(self.c_table))
         table.ptr_owner = <bint>True
-        table.c_database = self.c_database
         table.c_table_name = self.c_table_name
         return table
 
     def _str_(self) -> str:
         cdef CTableLine* c_line
         cdef CTableCell* c_cell
-        self.extract_tbl_from_database()
         if self.c_table is NULL:
             return None
 

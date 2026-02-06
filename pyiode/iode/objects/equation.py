@@ -799,7 +799,7 @@ class Equation:
         >>> eq_ACAF.lec = "(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
         Traceback (most recent call last):
         ... 
-        ValueError: Cannot set LEC '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' to the equation named 'ACAF'
+        ValueError: Cannot compile the LEC expression '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' of the equation named 'ACAF'
         """
         return self._cython_instance.get_lec()
 

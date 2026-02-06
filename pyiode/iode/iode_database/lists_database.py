@@ -706,7 +706,8 @@ class Lists(IodeDatabase):
         >>> lists.rename("ENVI", "ENVI_")
         >>> original_hash == hash(lists)
         False
-        >>> lists.rename("ENVI_", "ENVI")  # revert the change
+        >>> # revert the change
+        >>> lists.rename("ENVI_", "ENVI")
         >>> original_hash == hash(lists)
         True
 
@@ -715,7 +716,8 @@ class Lists(IodeDatabase):
         >>> lists["ENVI"] = original_list[1:-1]
         >>> original_hash == hash(lists)
         False
-        >>> lists["ENVI"] = original_list  # revert the change
+        >>> # revert the change
+        >>> lists["ENVI"] = original_list
         >>> original_hash == hash(lists)
         True
 

@@ -8145,7 +8145,8 @@ class Variables(IodeDatabase):
         >>> variables.rename("ACAF", "ACAF_")
         >>> original_hash == hash(variables)
         False
-        >>> variables.rename("ACAF_", "ACAF")  # revert the change
+        >>> # revert the change
+        >>> variables.rename("ACAF_", "ACAF")
         >>> original_hash == hash(variables)
         True
 
@@ -8154,7 +8155,8 @@ class Variables(IodeDatabase):
         >>> variables["ACAF"] = 0.0
         >>> original_hash == hash(variables)
         False
-        >>> variables["ACAF"] = original_variable  # revert the change
+        >>> # revert the change
+        >>> variables["ACAF"] = original_variable
         >>> original_hash == hash(variables)
         True
 

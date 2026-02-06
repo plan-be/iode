@@ -17,7 +17,7 @@ cdef extern from "super.h":
                              const unsigned char** buts) noexcept
     cdef bint contain_table(string& name) except +
     cdef bint add_table(string& name, CTable* value) except +
-    cdef bint remove_table(string& name) except +
+    cdef void remove_table(string& name) except +
 
     cdef int c_PrintObjDef_super(char* arg, int unused) except? -1
     cdef int c_ViewPrintGr_super(char* arg, int unused) except? -1

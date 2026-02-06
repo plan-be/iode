@@ -12,6 +12,7 @@ cdef extern from "api/objs/identities.h":
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CIdentity "Identity":
         CIdentity(string&) except +
+        CIdentity(const CIdentity& other) except +
         
         string get_lec() except +
         void set_lec(string&) except +
