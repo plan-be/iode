@@ -62,12 +62,12 @@ static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 {
     int     len;
 
-    if(xdr_ptr == NULL) return(-1);
+    if(xdr_ptr == NULL) return -1;
 
     len = P_len(ptr);
     *xdr_ptr = (unsigned char*) SW_nalloc(len);
     memcpy(*xdr_ptr, ptr, len);
-    return(0);
+    return 0;
 }
 
 //// non-static functions ////
@@ -492,7 +492,7 @@ static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
         memcpy(*xdr_ptr, ptr, len);
         K_xdrPACK(*xdr_ptr, len);
     }
-    return(0);
+    return 0;
 }
 
 

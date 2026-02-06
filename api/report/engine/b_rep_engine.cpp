@@ -214,7 +214,7 @@ int RP_free_repfile(REPFILE *rf)
         SCR_free(rf->filename);
         SCR_free(rf);
     }
-    return(0);
+    return 0;
 }
 
 
@@ -342,7 +342,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
         *line = (char*) SCR_stracpy((unsigned char*) multi_line);
 
     SCR_free(multi_line);
-    if(rc) return(rc);
+    if(rc) return rc;
     
     // Shift text to the margin if $ or # and indent allowed
     if(*line && RP_ALLOW_INDENT) {
@@ -350,7 +350,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
         if(U_is_in((*line)[i], "$#")) U_ljust_text((unsigned char*) *line);
     }
     //rf->curline++;
-    return(rc);
+    return rc;
 }
 
 // OLD VERSION (no multiline)
@@ -362,7 +362,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
 //    
 //    if(mode) { // expand macros, {}, ...
 //        rc = RP_expand(line, rf->tbl[rf->curline]);
-//        if(rc) return(rc);
+//        if(rc) return rc;
 //    }
 //    else
 //        *line = SCR_stracpy(rf->tbl[rf->curline]);
@@ -373,7 +373,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
 //        if(U_is_in((*line)[i], "$#")) U_ljust_text(*line);
 //    }
 //    rf->curline++;
-//    return(rc);
+//    return rc;
 // }
 
 
@@ -389,7 +389,7 @@ int RP_readline(REPFILE* rf, char** line, int mode)
 int RP_chk_ignore(char* line)
 {
     if(line[1] == '-') return(1);
-    return(0);
+    return 0;
 }
 
 
@@ -511,7 +511,7 @@ int RP_exec_fn(char* name, char* arg, int fs)
 
     BFNS* fns = RP_find_fn(name, &parm, fs);
     if(!fns) 
-        return(-1);
+        return -1;
     
     if(fs == '#' && fns->sfn != 0)
         return((*fns->sfn)(arg, parm));
@@ -519,7 +519,7 @@ int RP_exec_fn(char* name, char* arg, int fs)
     if(fs == '$' && fns->fn != 0)
         return((*fns->fn)(arg, parm));
     
-    return(-1);
+    return -1;
 }
 
 
@@ -536,14 +536,14 @@ int RP_err_dump(char* name, char* arg)
     if(RP_PRINT == 1) {
         W_printf((char*) "Error : %s %s\n", name, arg);
         error_manager.print_last_error();
-        return(0);
+        return 0;
     }
 
     /* Display */
     std::string error_msg = "Error: " + std::string(name) + " " + std::string(arg);
     error_manager.append_error(error_msg);
     error_manager.display_last_error();
-    return(0);
+    return 0;
 }
 
 
@@ -575,7 +575,7 @@ char *RP_extract(char* buf, int* i, int ch)
     res = RP_alloc(pos + 1); // JMP 6/02/09
     for(j = 0; j < pos; j++, (*i)++) res[j] = buf[*i];
 
-    return(res);
+    return res;
 }
 
 
@@ -643,12 +643,13 @@ char *RP_gmacro(char* str)
                 SCR_free(tmp);
                 return(NULL);
             }
-            res = (char*) SCR_stracpy((unsigned char*) RP_MACRO->get_macro(tmp));
+            std::string macro = RP_MACRO->get_macro(tmp);
+            res = (char*) SCR_stracpy((unsigned char*) macro.c_str());
         }
     }
 
     SCR_free(tmp);
-    return(res);
+    return res;
 }
 
 
@@ -677,7 +678,7 @@ char *RP_gcmd(char* str)
 
     RP_eval(&res, tmp);
     SCR_free(tmp);              // JMP&GB 26/1/09
-    return(res);
+    return res;
 }
 
 
@@ -696,7 +697,7 @@ int RP_evaltime()
 {
     RP_T = 0;
     if(RP_PER.year == 0) 
-        return(0);
+        return 0;
     
     KDBVariables* kdb_var = global_ws_var.get();
     if(!kdb_var)
@@ -787,7 +788,7 @@ int RP_fmt(char* buf, char* format, double value)
         t = (int) value; /* JMP 24-05-00 */
         Period per = global_ws_var->sample->start_period.shift(t);
         strcpy(buf, (char*) per.to_string().c_str());
-        return(0);
+        return 0;
     }
 
     fmt = (char**) SCR_vtom((unsigned char*) format, (int) '.');
@@ -810,7 +811,7 @@ normal:
     if(value > 0) SCR_fmt_dbl((double) value, (unsigned char*) buf, lg, nbdec);
     else          SCR_fmt_dbl((double) value, (unsigned char*) buf, lg + 1, nbdec);
     SCR_sqz((unsigned char*) buf); /* JMP 01-10-96 */
-    return(0);
+    return 0;
 }
 
 
@@ -865,17 +866,17 @@ int RP_eval(char** res, char* farg)
         if(inv) rc = !rc;       // invert rc if $!name
 
         sprintf(*res, "%d", rc); // save in allocated *res (TODO: improve this!!!)
-        return(0);
+        return 0;
     }
 
     // farg = "=ExcelAddress" => Excel Get via DDE
     if(ch == '=') {
         SCR_free(*res);
         *res = B_ExcelGetItem(farg + 1);
-        if(*res == NULL) return(-1);
+        if(*res == NULL) return -1;
         SCR_replace((unsigned char*) *res, (unsigned char*) "\t", (unsigned char*) " ");
         SCR_replace((unsigned char*) *res, (unsigned char*) "\r\n", (unsigned char*) " ");
-        return(0);
+        return 0;
     }
 
     // farg = "lec_expression" or "lec_expression@format"
@@ -889,10 +890,10 @@ int RP_eval(char** res, char* farg)
 
     x = RP_evallec(lec);
     // TODO: reset farg[pos] = '@' ?
-    if(!IODE_IS_A_NUMBER(x)) return(-1);  // Empty string on error
+    if(!IODE_IS_A_NUMBER(x)) return -1;  // Empty string on error
     
     RP_fmt(*res, fmt, x);       // The formated value is returned
-    return(0);
+    return 0;
 }
 
 
@@ -911,7 +912,7 @@ int RP_add(char** line, int* lg, int* j, char* res)
 {
     int     i, add;
 
-    if(res == NULL) return(0);
+    if(res == NULL) return 0;
     add = (int)strlen(res);
     *line = (char*) SW_nrealloc(*line, *lg, *lg + add);
     if(*line == NULL) {
@@ -925,7 +926,7 @@ int RP_add(char** line, int* lg, int* j, char* res)
     }
 
     (*lg) += add;
-    return(0);
+    return 0;
 }
 
 
@@ -991,7 +992,7 @@ char *RP_extractpar(char* buf, int* i, char* brackets)
     memcpy(res, buf + *i, k);
     *i += k;
 
-    return(res);
+    return res;
 }
 
 
@@ -1056,7 +1057,7 @@ U_ch *RP_gfn(U_ch* str)
 
     RP_fneval((char**) &res, (char*) str);
     if(allc) SCR_free(str); // JMP 28/8/2012
-    return(res);
+    return res;
 }
 
 
@@ -1249,7 +1250,7 @@ done:
         SW_nfree(*line);
         *line = NULL;
     }
-    return(rc);
+    return rc;
 
 }
 
@@ -1419,13 +1420,13 @@ int RP_ReportExec_1(char* file)
     tbl = RP_read_file(filename);
     if(tbl == 0) {
         error_manager.append_error("Cannot open file '" + std::string(filename) + "'");
-        return(-1);
+        return -1;
     }
     rf = RP_create_repfile(filename, tbl);
     rc = RP_ReportExec_tbl(rf);
     RP_free_repfile(rf);
     CUR_REPFILE = 0;
-    return(rc);
+    return rc;
 }
 
 
@@ -1488,7 +1489,7 @@ done:
         W_close(); // TODO: check this !!
     }
 
-    return(rc);
+    return rc;
 }
 
 
@@ -1561,5 +1562,5 @@ done:
         RP_MACRO = nullptr;
     }
 
-    return(rc);
+    return rc;
 }

@@ -72,10 +72,7 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
             found = wrap_grep_gnl(pattern, name, ecase, all);
 
         if(!found)
-        {
-            SWHDL handle = this->get_handle(name);
-            found = this->grep_obj(name, handle, pattern, ecase, forms, texts, all);
-        }
+            found = this->grep_obj(name, pattern, ecase, forms, texts, all);
 
         if(found) 
         {
@@ -269,5 +266,5 @@ int K_aggr(char* pattern, char* ename, char* nname)
     SCR_sqz((unsigned char*) nname);
     rc = 0;
 done:
-    return(rc);
+    return rc;
 }

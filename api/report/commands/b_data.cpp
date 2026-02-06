@@ -180,7 +180,7 @@ cleanup:
     SCR_free_tbl((unsigned char**) args);
     SCR_free_tbl((unsigned char**) xvars);
     SCR_free_tbl((unsigned char**) yvars);
-    return(rc);
+    return rc;
 }
 
 
@@ -237,19 +237,30 @@ int B_DataRasVar(char* arg, int unused)
  */
 int B_DataCalcVar(char* arg, int unused)
 {
-    char    name[K_MAX_NAME + 1];
+    char name[K_MAX_NAME + 1];
     KDBVariables* kdb = global_ws_var.get();
+    int nb_periods = kdb->get_nb_periods();
 
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
 
     char* lec = arg + lg + 1;
     SCR_strip((unsigned char*) lec);
 
-    if(!kdb->contains(std::string(name)))
+    std::string var_name(name);
+    if(!kdb->contains(var_name))
     {
-        bool success = kdb->set_obj(name, (double*) NULL);
-        if(!success) 
-            return(-1);
+        try
+        {
+            Variable* var_ptr = new Variable(nb_periods, IODE_NAN);
+            kdb->set_obj_ptr(var_name, var_ptr);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::string error_msg = "Cannot create variable '" + var_name + "':\n";
+            error_msg += e.what();
+            kwarning(error_msg.c_str());
+            return -1;
+        }
     }
 
     if(lec[0]) 
@@ -267,14 +278,14 @@ int B_DataCalcVar(char* arg, int unused)
         }
         else 
         {
-            std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
-            error_manager.append_error(error_msg);
             SW_nfree(clec);
-            return(-1);
+            std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
+            kwarning(error_msg.c_str());
+            return -1;
         }
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -296,42 +307,59 @@ int B_DataCreate_1(char* arg, int* ptype)
         if(kdb.contains(name)) 
             return -1;
 
-        int res;
-        bool success = false;
-        char deflt[41];
         switch(*ptype) 
         {
             case COMMENTS :
-                success = global_ws_cmt->set_obj(arg, "");
+            {
+                Comment* cmt_ptr = new Comment("");
+                global_ws_cmt->set_obj_ptr(name, cmt_ptr);
                 break;
+            }
             case EQUATIONS :
+            {
+                char deflt[41];
                 sprintf(deflt, "%s := %s", arg, arg);
-                res = K_upd_eqs(arg, deflt, 0L, 0, 0L, 0L, 0L, 0L, 0);
-                return res; 
+                std::string lec = std::string(deflt);
+                Equation* eq = new Equation(name, lec, EQ_LSQ, "", "", "", "", "", false);
+                global_ws_eqs->set_obj_ptr(name, eq);
+                break;
+            }
             case IDENTITIES :
             {
-                Identity idt(name);
-                success = global_ws_idt->set_obj(arg, &idt);
+                Identity* idt_ptr = new Identity(name);
+                global_ws_idt->set_obj_ptr(name, idt_ptr);
                 break;  
             }
             case LISTS :
-                success = global_ws_lst->set_obj(arg, "");
+            {
+                List* lst_ptr = new List("");
+                global_ws_lst->set_obj_ptr(name, lst_ptr);
                 break;
+            }
             case SCALARS :
             {
-                Scalar scl;
-                success = global_ws_scl->set_obj(arg, &scl);
+                Scalar* scl_ptr = new Scalar();
+                global_ws_scl->set_obj_ptr(name, scl_ptr);
                 break;
             }
             case TABLES :
-                res = K_upd_tbl(arg, "TITLE;LEC");
-                return res;
-            case VARIABLES :
-                success = global_ws_var->set_obj(arg, (double*) NULL); 
+            {
+                Table* tbl_ptr = new Table(2, "TITLE", "LEC", false, false, false);
+                global_ws_tbl->set_obj_ptr(name, tbl_ptr);
                 break;
+            }
+            case VARIABLES :
+            {
+                Sample* sample = kdb.sample;
+                if(sample == nullptr) 
+                    throw std::runtime_error("No sample defined in the Variables database");
+                Variable* var_ptr = new Variable(sample->nb_periods, IODE_NAN);
+                global_ws_var->set_obj_ptr(name, var_ptr); 
+                break;
+            }
         }
 
-        return success ? 0 : -1;
+        return 0;
     } 
     catch (const std::runtime_error& e) 
     {
@@ -422,7 +450,7 @@ int B_DataDelete(char* arg, int type)
     lst = K_expand(type, NULL, arg, '*');
     rc = B_ainit_loop(lst, wrapper_B_DataDelete_1, (char*) &type);
     SCR_free(lst);
-    return(rc);
+    return rc;
 }
 
 
@@ -444,11 +472,11 @@ int B_DataRename(char* arg, int type)
     char    **args;
 
     if(type == EQUATIONS) 
-        return(-1); /* Rename of EQS has no sense */
+        return -1; /* Rename of EQS has no sense */
 
     args = B_ainit_chk(arg, NULL, 2);
     if(args == NULL) 
-        return(-1);
+        return -1;
 
     try
     {
@@ -468,7 +496,7 @@ int B_DataRename(char* arg, int type)
     }
 
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 
@@ -502,7 +530,7 @@ int B_DataRename(char* arg, int type)
     try
     {
         KDB& kdb = get_global_db(type);
-        bool success = kdb.duplicate(kdb, old_name, new_name);
+        bool success = kdb.duplicate(old_name, new_name);
         if(!success) 
         {
             std::string error_msg = "DataDuplicate '" + old_name + "' as '";
@@ -547,84 +575,95 @@ int B_DataRename(char* arg, int type)
 
 int B_DataUpdate(char* arg, int type)
 {
-    bool    success;
-    int     shift, rc,
-            nb_args, nb_upd, nb_p,
-            i, mode;
-    double  var;
-    Scalar  scl;
-    Period  *per = nullptr;
-    char    name[K_MAX_NAME + 1], **args = NULL;
-    std::string var_name;
-    
+    char name[K_MAX_NAME + 1];
+    char **args = NULL;
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
     
+    bool success = true;
     try
     {
         KDB& kdb = get_global_db(type);
         if(!kdb.contains(std::string(name))) 
         {
             if(B_DataCreate(name, type)) 
-            return -1;
+                return -1;
         }
         
-        char* value = arg + lg + 1;
+        success = true;
+        char* c_value = arg + lg + 1;
+        std::string value(c_value);
         switch(type) 
         {
         case COMMENTS :
-            success = global_ws_cmt->set_obj(name, value);
+        {
+            global_ws_cmt->update(name, value);
             break;
+        }
         case EQUATIONS :
-            rc = K_upd_eqs(name, value, NULL, -1, NULL, NULL, NULL, NULL, 0);
-            success = (rc == 0);
+        {
+            Equation* eq = global_ws_eqs->get_obj_ptr(name);
+            eq->set_lec(std::string(value));
             break;
+        }
         case IDENTITIES :
         {
             std::string lec = std::string(value);
-            Identity idt(lec);
-            success = global_ws_idt->set_obj(name, &idt);
+            Identity* idt = global_ws_idt->get_obj_ptr(name);
+            idt->set_lec(lec);
             break;
         }
         case LISTS :
-            success = global_ws_lst->set_obj(name, value);
+        {
+            global_ws_lst->update(name, value);
             break;
+        }
         case TABLES :
-            rc = K_upd_tbl(name, value);
-            success = (rc == 0);
+        {
+            Table* tbl = nullptr;
+            std::vector<std::string> v_args = split_multi(value, ";\n\t");
+            if(v_args.size() == 0)
+                tbl = new Table(2);
+            else
+            {
+                std::string title = v_args.front();
+                v_args.erase(v_args.begin());
+                tbl = new Table(2, title, v_args, false, false, false);
+            }
+            global_ws_tbl->update(name, *tbl);
+            delete tbl;
             break;
+        }
         case SCALARS :
+        {
             args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
-            nb_args = SCR_tbl_size((unsigned char**) args);
-            scl.value = 0.9;
-            scl.relax = 1.0;
-            scl.std = IODE_NAN;
+            int nb_args = SCR_tbl_size((unsigned char**) args);
 
-            success = true;
+            Scalar* scl = global_ws_scl->get_obj_ptr(name);
             switch(nb_args) 
             {
             case 2:
-                scl.value = (double) atof(args[1]);
+                scl->value = (double) atof(args[1]);
                 break;
             case 3:
-                scl.value = (double) atof(args[1]);
-                scl.relax = (double) atof(args[2]);
+                scl->value = (double) atof(args[1]);
+                scl->relax = (double) atof(args[2]);
                 break;
             default :
                 error_manager.append_error("DataUpdateScl : Invalid Argument");
                 success = false;
                 break;
             }
-
-            if(success) 
-                success = global_ws_scl->set_obj(std::string(args[0]), &scl);
             break;
-
-        case VARIABLES : /* Name [D|d|G|g|L|l] Period nVal */
+        }
+        case VARIABLES :
+        {
             args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
-            nb_args = SCR_tbl_size((unsigned char**) args);
+            int nb_args = SCR_tbl_size((unsigned char**) args);
+            /* Name [D|d|G|g|L|l] Period nVal */
             if(nb_args > 1) 
             {
-                nb_p = 1;
+                int nb_p = 1;
+                IodeVarMode mode;
                 switch(args[1][0]) 
                 {
                 case 'd' :
@@ -641,7 +680,6 @@ int B_DataUpdate(char* arg, int type)
                     if(U_is_in(args[1][1], "Yy")) 
                         mode = VAR_MODE_Y0Y_GROWTH_RATE;
                     break;
-
                 case 'l' :
                 case 'L' :
                     nb_p = 2;
@@ -649,9 +687,9 @@ int B_DataUpdate(char* arg, int type)
                     mode = VAR_MODE_LEVEL;
                     break;
                 }
-                nb_upd = nb_args - nb_p - 1;
+                int nb_upd = nb_args - nb_p - 1;
 
-                per = new Period(std::string(args[nb_p]));
+                Period* per = new Period(std::string(args[nb_p]));
                 if(per == 0) 
                 {
                     error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
@@ -660,14 +698,15 @@ int B_DataUpdate(char* arg, int type)
                 }
                 int nb_periods = global_ws_var->sample->end_period.difference(*per) + 1;
                 nb_upd = std::min(nb_upd, nb_periods);
-                shift = per->difference(global_ws_var->sample->start_period);
-                if(per == NULL || shift < 0)
+                int shift = per->difference(global_ws_var->sample->start_period);
+                if(per == nullptr || shift < 0)
                     success = false;
                 else 
                 {
-                    var_name = std::string(name);
                     nb_p++;
-                    for(i = 0; i < nb_upd; i++) 
+                    double var;
+                    std::string var_name(name);
+                    for(int i = 0; i < nb_upd; i++) 
                     {
                         var = (double) atof(args[i + nb_p]);
                         if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
@@ -676,6 +715,7 @@ int B_DataUpdate(char* arg, int type)
                     }
                     success = true;
                 }
+                if(per) delete per;
             }
             else 
                 success = false;
@@ -683,6 +723,7 @@ int B_DataUpdate(char* arg, int type)
             if(!success) 
                 error_manager.append_error("DataUpdateVar : '" + std::string(arg) + "' Invalid Argument");
             break;
+        }
         }
     }
     catch(const std::runtime_error& e)
@@ -692,10 +733,6 @@ int B_DataUpdate(char* arg, int type)
     }
 
     A_free((unsigned char**) args);
-    if(per) 
-        delete per;
-    per = nullptr;
-
     return success ? 0 : -1;
 }
 
@@ -774,7 +811,7 @@ int B_DataSearch(char* arg, int type)
 
     args = B_vtom_chk(arg, 7); /* pattern list */
     if(args == NULL) 
-        return(-1);
+        return -1;
     
     word  = atoi(args[1]);
     ecase = atoi(args[2]);
@@ -789,7 +826,7 @@ int B_DataSearch(char* arg, int type)
 
     A_free((unsigned char**) args);
 
-    return(rc);
+    return rc;
 }
 
 /**
@@ -801,7 +838,7 @@ int B_DataEditCnf(char* arg, int unused)
     char    **args = NULL;
 
     args = B_vtom_chk(arg, 2); // pattern list 
-    if(args == NULL) return(-1);
+    if(args == NULL) return -1;
 
     switch(toupper(args[0][0])) {
     case 'L' :
@@ -823,7 +860,7 @@ int B_DataEditCnf(char* arg, int unused)
     VN = std::min(6, VN);
     //BGUI_DataEditGlobal(VM, VN);  // JMP 2/8/2022 => no used 
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 /**
@@ -861,20 +898,21 @@ static int my_strcmp(const void *pa, const void *pb)
 
 int B_DataListSort(char* arg, int unused)
 {
-    int     rc = 0;
-    char    *in, *out, *lst,
-            **args = NULL, **lsti = NULL,
-            *old_A_SEPS;
+    int    rc = 0;
+    char   *in, *out;
+    char*  old_A_SEPS;
+    char** lsti;
 
-    args = B_vtom_chk(arg, 2);
+    char** args = B_vtom_chk(arg, 2);
     if(args == NULL) 
-        return(-1);
+        return -1;
     else 
     {
         in = args[0];
         out = args[1];
     }
 
+    char* lst;
     if(!global_ws_lst->contains(in)) 
     {
         error_manager.append_error("List '" + std::string(args[0]) + 
@@ -882,8 +920,11 @@ int B_DataListSort(char* arg, int unused)
         rc = -1;
         goto done;
     }
-    else 
-        lst = global_ws_lst->get_obj(in);
+    else
+    {
+        List* lst_ptr = global_ws_lst->get_obj_ptr(in);
+        lst = (char*) lst_ptr->c_str();
+    }
     
     if(lst == NULL) 
     {
@@ -905,11 +946,17 @@ int B_DataListSort(char* arg, int unused)
     }
 
     qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
-    lst = (char*) SCR_mtov((unsigned char**) lsti, ';');  /* JMP 09-03-95 */
+    lst = (char*) SCR_mtov((unsigned char**) lsti, ';');
 
-    if(!global_ws_lst->set_obj(out, lst)) 
+    try
     {
-        error_manager.append_error("Sorted List '" + std::string(out) + "' cannot be created");
+        List* sorted_lst = new List(lst);
+        global_ws_lst->set_obj_ptr(out, sorted_lst); 
+    }
+    catch (const std::runtime_error& e)
+    {
+        error_manager.append_error("Sorted List '" + std::string(out) + 
+                                   "' cannot be created:\n" + e.what());
         rc = -1;
     }
 
@@ -918,7 +965,7 @@ int B_DataListSort(char* arg, int unused)
 
 done:
     A_free((unsigned char**) args);
-    return(rc);
+    return rc;
 }
 
 template<typename T>
@@ -1083,11 +1130,7 @@ int B_DataExist(char* arg, int type)
  *                  -1 if type is incorrect or the object cannot be created / expanded 
  */
 int B_DataAppend(char* arg, int type)
-{
-    bool    success;
-    int     lg;
-    char    name[K_MAX_NAME + 1], *ptr, *nptr, *text;
-    
+{    
     switch(type) 
     {
     case COMMENTS :
@@ -1100,51 +1143,45 @@ int B_DataAppend(char* arg, int type)
     case TABLES :
     case VARIABLES :
         error_manager.append_error("DataAppend : only lists and comments");
-        return(-1);
+        return -1;
     }
 
-    lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
-    text = arg + lg + 1;
+    char name[K_MAX_NAME + 1];
+    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    std::string text_to_append = std::string(arg + lg + 1);
 
     try
-    {
-        KDB& kdb = get_global_db(type);
-        bool found = kdb.contains(std::string(name));
-        if(!found)
-            nptr = text;
-        else 
+    {    
+        if(type == COMMENTS)
         {
-            if(strlen(text) == 0) 
-                return(0);
-    
-            ptr = K_optr0(&kdb, name);
-            nptr = SW_nalloc((int)strlen(ptr) + (int)strlen(text) + 2);
-            if(type == COMMENTS)
-                sprintf(nptr, "%s %s", ptr, text);
+            if(!global_ws_cmt->contains(name))
+                global_ws_cmt->add(name, text_to_append);
             else
-                sprintf(nptr, "%s,%s", ptr, text);
+            {
+                Comment cmt = global_ws_cmt->get(name);
+                cmt += " " + text_to_append;
+                global_ws_cmt->update(name, cmt);
+            }
         }
-    
-        switch(type) 
+        else
         {
-        case COMMENTS :
-            success = global_ws_cmt->set_obj(name, nptr);
-            break;
-        case LISTS :
-            success = global_ws_lst->set_obj(name, nptr);
-            break;
+            if(!global_ws_lst->contains(name))
+                global_ws_lst->add(name, text_to_append);
+            else
+            {
+                List lst = global_ws_lst->get(name);
+                lst += "," + text_to_append;
+                global_ws_lst->update(name, lst);
+            }
         }
-    
-        if(nptr != text) 
-            SW_nfree(nptr);
-    
-        return success ? 0 : -1;
     }
     catch (const std::runtime_error& e) 
     {
         error_manager.append_error("DataAppend: " + std::string(e.what()));
         return -1;
     }
+
+    return 0;
 }
 
 template<typename T>
@@ -1303,7 +1340,7 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
 
     SCR_free(l3);
     SCR_add_ptr(&res, &nl, NULL);
-    return(res);
+    return res;
 }
 
 /**
@@ -1328,6 +1365,8 @@ int B_DataCalcLst(char* arg, int unused)
     int rc = 0;
     unsigned char **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
                   *res, *list1, *list2, *op;
+    List* list1_ptr = nullptr;
+    List* list2_ptr = nullptr;
 
     /* arg: res list1 op list2 */
     args = (unsigned char**) B_vtom_chk(arg, 4);
@@ -1357,8 +1396,12 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
-    l1 = (unsigned char**) B_ainit_chk(global_ws_lst->get_obj((char*) list1), NULL, 0);
-    l2 = (unsigned char**) B_ainit_chk(global_ws_lst->get_obj((char*) list2), NULL, 0);
+    list1_ptr = global_ws_lst->get_obj_ptr((char*) list1);
+    l1 = (unsigned char**) B_ainit_chk((char*) list1_ptr->c_str(), NULL, 0);
+
+    list2_ptr = global_ws_lst->get_obj_ptr((char*) list2);
+    l2 = (unsigned char**) B_ainit_chk((char*) list2_ptr->c_str(), NULL, 0);
+
     switch(op[0]) 
     {
     case '+' :
@@ -1385,7 +1428,7 @@ done :
     A_free((unsigned char**) l1);
     A_free((unsigned char**) l2);
     SCR_free_tbl(lst);
-    return(rc);
+    return rc;
 }
 
 /**
@@ -1396,7 +1439,8 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    char* lst = (char*) SCR_stracpy((unsigned char*) global_ws_lst->get_obj(name));
+    List* lst_ptr = global_ws_lst->get_obj_ptr(name);
+    char* lst = (char*) SCR_stracpy((unsigned char*) lst_ptr->c_str());
     if(lst == NULL) 
         return -1;
 
@@ -1423,10 +1467,10 @@ int B_DataListCount(char* name, int unused)
 int B_DataCompareEps(char* arg, int unused)
 {
     // Set Vars threshold
-    K_CMP_EPS = atof(arg);
-    if(K_CMP_EPS < 1e-15) K_CMP_EPS = 1e-15;
-    if(K_CMP_EPS > 1) K_CMP_EPS = 1;
-    return(0);
+    K_COMPARE_EPS = atof(arg);
+    if(K_COMPARE_EPS < 1e-15) K_COMPARE_EPS = 1e-15;
+    if(K_COMPARE_EPS > 1) K_COMPARE_EPS = 1;
+    return 0;
 }
 
 template<typename T>
@@ -1448,7 +1492,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         int type = (int) kdb2.k_type;
         KDB& kdb1 = get_global_db(type);
     
-        // K_cmp() return codes:
+        // K_compare() return codes:
         //      0 -> if name neither in global_db nor in file
         //      1 -> if name in global_db but not in file
         //      2 -> if name not in global_db but in file
@@ -1459,7 +1503,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         {
             name = kdb1.get_name(i);
             c_name = (char*) name.c_str();
-            rc = K_cmp(c_name, &kdb1, &kdb2);
+            rc = K_compare(c_name, &kdb1, &kdb2);
             switch(rc)
             {
             // name neither in global_db nor in file

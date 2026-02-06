@@ -277,7 +277,6 @@ static Equation* read_eq(YYFILE* yy, char* name)
  */
 bool KDBEquations::load_asc(const std::string& filename)
 {
-    bool       success;
     Equation*  eq = NULL;
     YYFILE*    yy;
     char       name[K_MAX_NAME + 1];
@@ -330,18 +329,20 @@ bool KDBEquations::load_asc(const std::string& filename)
                 if(eq->block.empty()) 
                     eq->block = std::string(name);
 
-                success = this->set_obj(name, eq);
-                if(!success)  
+                try
                 {
+                    this->set_obj_ptr(name, eq);
+                    cmpt++;
+                }
+                catch(const std::exception&)
+                {
+                    delete eq;
+                    eq = nullptr;
                     kwarning("%s : %s", name, L_error());
                     goto err;
-                }
-                else
-                    cmpt++;
+                }   
                 
                 kmsg("Reading object %d : %s", cmpt, name);
-                delete eq;
-                eq = nullptr;
                 break;
 
             default :
@@ -458,34 +459,41 @@ static void print_eq(FILE* fd, Equation* eq, char* name)
 bool KDBEquations::save_asc(const std::string& filename)
 {
     FILE* fd;
+    std::string error_msg;
 
     if(filename[0] == '-') 
         fd = stdout;
     else 
     {
         std::string trim_filename = trim(filename);
+        std::string error_msg = "Cannot create '" + trim_filename + "'"; 
         char* c_filename = (char*) trim_filename.c_str();
         fd = fopen(c_filename, "w+");
         if(fd == 0)
         {
-            std::string error_msg = "Cannot create '" + trim_filename + "'";
             kwarning(error_msg.c_str());
             return false;
         }
     }
 
-    Equation* eq;
-    for(auto& [name, _] : k_objs) 
+    bool success = true;
+    for(auto& [name, eq_ptr] : k_objs) 
     {
-        fprintf(fd, "%s ", name.c_str());
-        eq = this->get_obj(name);
-        print_eq(fd, eq, (char*) name.c_str());
-        delete eq;
-        eq = nullptr;
+        try
+        {
+            fprintf(fd, "%s ", name.c_str());
+            print_eq(fd, eq_ptr, (char*) name.c_str());
+        }
+        catch(const std::exception& e) 
+        {
+            error_msg += std::string(e.what());
+            kwarning(error_msg.c_str());
+            success = false;
+        }
     }
 
     if(filename[0] != '-') 
         fclose(fd);
 
-    return true;
+    return success;
 }

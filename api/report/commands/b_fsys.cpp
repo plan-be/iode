@@ -49,7 +49,7 @@ int B_SysRename(char* arg, int unused)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 
@@ -77,7 +77,7 @@ int B_SysCopy(char* arg, int unused)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 
@@ -105,7 +105,7 @@ int B_SysAppend(char* arg, int unused)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 
@@ -132,7 +132,7 @@ int B_SysDelete(char* arg, int unused)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 /**
@@ -171,7 +171,7 @@ static int B_SysOemAnsiToUTF8(char *arg, int isansi)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 /**
@@ -250,7 +250,7 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
 
 fin:
     SCR_free_tbl(tbl);
-    return(rc);
+    return rc;
 }
 
 /**

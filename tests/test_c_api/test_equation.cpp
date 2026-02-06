@@ -10,12 +10,13 @@ protected:
     void SetUp() override
     {
         global_ws_eqs->load(str_input_test_dir + "fun.ae");
-        equation = global_ws_eqs->get(name);
+        equation = global_ws_eqs->get_obj_ptr(name);
     }
 
-    void TearDown() override
+    void TearDown() override 
     {
-        delete equation;
+        global_ws_eqs->clear();
+        equation = nullptr;
     }
 };
 
@@ -192,11 +193,10 @@ TEST_F(EquationTest, Hash)
     hash_before = equation_hasher(*equation);
 
     // same equation
-    Equation* same_equation = global_ws_eqs->get(name);
-    EXPECT_EQ(*equation, *same_equation);
-    hash_after = equation_hasher(*same_equation);
+    Equation same_equation = global_ws_eqs->get(name);
+    EXPECT_EQ(*equation, same_equation);
+    hash_after = equation_hasher(same_equation);
     EXPECT_EQ(hash_before, hash_after);
-    delete same_equation;
 
     // different lec
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";

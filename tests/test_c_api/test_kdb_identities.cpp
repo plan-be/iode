@@ -9,7 +9,10 @@ protected:
         global_ws_idt->load(str_input_test_dir + "fun.ai");
     }
 
-    // void TearDown() override {}
+    void TearDown() override 
+    {
+        global_ws_idt->clear();
+    }
 };
 
 
@@ -34,7 +37,7 @@ TEST_F(KDBIdentitiesTest, Subset)
     // DEEP COPY SUBSET
     KDBIdentities* kdb_subset_deep_copy = new KDBIdentities(global_ws_idt.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_deep_copy->is_local_database());
+    EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
     EXPECT_EQ(global_ws_idt->get_lec("AOUC"), lec);
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("AOUC"), new_lec);
@@ -42,7 +45,7 @@ TEST_F(KDBIdentitiesTest, Subset)
     // SHALLOW COPY SUBSET
     KDBIdentities* kdb_subset_shallow_copy = new KDBIdentities(global_ws_idt.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
-    EXPECT_TRUE(kdb_subset_shallow_copy->is_shallow_copy_database());
+    EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("AOUC", new_lec);
     EXPECT_EQ(global_ws_idt->get_lec("AOUC"), new_lec);
     EXPECT_EQ(kdb_subset_shallow_copy->get_lec("AOUC"), new_lec);
@@ -82,13 +85,13 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     std::string name = "AOUC";
     CLEC* clec = NULL;
-    CLEC* expected_clec = global_ws_idt->get_obj(name)->get_compiled_lec();
+    CLEC* expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
 
     // by name
-    Identity* identity_name = global_ws_idt->get(name);
-    EXPECT_EQ(identity_name->get_lec(), expected_lec);
-    clec = identity_name->get_compiled_lec();
+    Identity identity_name = global_ws_idt->get(name);
+    EXPECT_EQ(identity_name.get_lec(), expected_lec);
+    clec = identity_name.get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -100,7 +103,6 @@ TEST_F(KDBIdentitiesTest, Get)
         EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
     }
     EXPECT_TRUE(clec_equal(clec, expected_clec));
-    delete identity_name;
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)
@@ -377,7 +379,7 @@ TEST_F(KDBIdentitiesTest, Merge)
     kdb_to_merge->update(name, modified_lec);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true);
+    kdb0->merge(*kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get_lec(new_name), new_lec);
@@ -385,7 +387,7 @@ TEST_F(KDBIdentitiesTest, Merge)
     EXPECT_EQ(kdb0->get_lec(name), modified_lec); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false);
+    kdb1->merge(*kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
 }

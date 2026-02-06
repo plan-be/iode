@@ -293,13 +293,13 @@ inline std::string trim(const std::string& str)
 inline int get_pos_in_char_array(char* str, int ch)
 {
     if(str == 0) 
-        return(-1);
+        return -1;
 
     for(int i = 0 ; str[i] != 0 ; i++)
         if(str[i] == ch) 
             return(i);
     
-    return(-1);
+    return -1;
 }
 
 /**

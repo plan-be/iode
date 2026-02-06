@@ -300,7 +300,9 @@ public:
 
     Equation* current_equation() 
     {
-        return kdb_eqs->get(*current_eq);
+        std::string eq_name = *current_eq;
+        Equation* eq = kdb_eqs->get_obj_ptr(eq_name);
+        return eq;
     }
 
     Equation* next_equation()
@@ -310,7 +312,9 @@ public:
         if(current_eq == v_equations.end()) 
             current_eq = v_equations.begin();
 
-        return kdb_eqs->get(*current_eq);
+        std::string eq_name = *current_eq;
+        Equation* eq = kdb_eqs->get_obj_ptr(eq_name);
+        return eq;
     }
 
     CorrelationMatrix* get_correlation_matrix() 

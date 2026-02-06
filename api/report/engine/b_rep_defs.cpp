@@ -39,7 +39,7 @@
 int RP_macro_createdb()
 {
     if(RP_MACRO) 
-        return(0);
+        return 0;
 
     RP_MACRO = new KDBMacros(true);
     if(!RP_MACRO) 
@@ -77,27 +77,26 @@ int RP_macro_deletedb()
  *                              -1 if add() fails
  *                              0 on success
  */
-int RP_define_1(char *name, char *macro)
+int RP_define_1(char* name, char* c_macro)
 {
-    int rc, lg;
-
-    rc = RP_macro_createdb();
+    int rc = RP_macro_createdb();
     if(rc) 
-        return(rc);
+        return rc;
 
-    if(macro == 0) 
-        macro = "";
-    lg = (int) strlen(macro) + 1;
-    bool success = RP_MACRO->set_macro(name, macro, lg);
+    if(c_macro == 0) 
+        c_macro = "";
+    
+    std::string macro(c_macro);
+    bool success = RP_MACRO->set_macro(name, macro);
     if(!success) 
     {
         std::string error_msg = "Report: Define of " + std::string(name);
-        error_msg += " (" + std::string(macro) + ") not possible";
+        error_msg += " (" + macro + ") not possible";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
-    return(0);
+    return 0;
 }
 
 
@@ -135,8 +134,8 @@ char* RP_get_macro_ptr(char* macro_name)
     if(!RP_MACRO->contains(macro_name)) 
         return NULL;
    
-    char* value = RP_MACRO->get_macro(macro_name);
-    return value;
+    std::string macro = RP_MACRO->get_macro(macro_name);
+    return (char*) macro.c_str();
 }
 
 /**
@@ -148,7 +147,7 @@ char* RP_get_macro_ptr(char* macro_name)
 int RP_undef_1(char *name)
 {
     if(!RP_MACRO) 
-        return(0);
+        return 0;
     
     bool success = RP_MACRO->remove(name);
     return (int) success;
@@ -175,7 +174,7 @@ int RP_undef(char *arg, int unused)
     //B_get_arg0(name, arg, K_MAX_NAME + 1);
     //RP_undef_1(name);
 
-    //return(0);
+    //return 0;
 }
 
 /** 
@@ -242,7 +241,7 @@ int RP_define_save(char *name)
     // Create the macro KDB if needed
     rc = RP_macro_createdb();
     if(rc) 
-        return(rc);
+        return rc;
 
     // if the macro "name" does not yet exist, no need to push its definition
     if(!RP_MACRO->contains(name)) 
@@ -253,9 +252,10 @@ int RP_define_save(char *name)
 
     // Create a copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth + 1);
-    rc = RP_define_1(buf, RP_MACRO->get_macro(name));
+    std::string macro = RP_MACRO->get_macro(name);
+    rc = RP_define_1(buf, (char*) macro.c_str());
 
-    return(rc);
+    return rc;
 }
 
 
@@ -276,7 +276,7 @@ int RP_define_restore(char *name)
 
     // Create the macro KDB if needed
     rc = RP_macro_createdb();
-    if(rc) return(rc);
+    if(rc) return rc;
 
     // Undefine the current
     RP_undef_1(name);
@@ -284,16 +284,17 @@ int RP_define_restore(char *name)
     // Try to find object name#* - Nothing to do if not found
     maxdepth = RP_define_calcdepth(name);
     if(maxdepth < 0) 
-        return(0);
+        return 0;
 
     // Restore the copy of existing name in name#(maxdepth+1)
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
-    rc = RP_define_1(name, RP_MACRO->get_macro(buf));
+    std::string macro = RP_MACRO->get_macro(buf);
+    rc = RP_define_1(name, (char*) macro.c_str());
 
     // Delete the copy
     RP_undef_1(buf);
 
-    return(rc);
+    return rc;
 }
 
 
@@ -309,12 +310,12 @@ int RP_define_save_list(char **list)
 {
     int i, rc;
 
-    if(list == 0) return(0);
+    if(list == 0) return 0;
     for(i = 0 ; list[i] ; i++) {
         rc = RP_define_save(list[i]);
-        if(rc) return(rc);
+        if(rc) return rc;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -330,10 +331,10 @@ int RP_define_restore_list(char **list)
 {
     int i, rc;
 
-    if(list == 0) return(0);
+    if(list == 0) return 0;
     for(i = 0 ; list[i] ; i++) {
         rc = RP_define_restore(list[i]);
-        if(rc) return(rc);
+        if(rc) return rc;
     }
-    return(0);
+    return 0;
 }

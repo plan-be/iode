@@ -255,10 +255,10 @@ int EXP_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* rule
     if(rc < 0) 
         goto err;
 
-    return(0);
+    return 0;
 
 err:
-    return(-1);
+    return -1;
 }
 
 
@@ -327,10 +327,10 @@ int EXP_Rev_Ws(ExportToFile* expdef, KDBVariables* dbv, KDBComments* dbc, char* 
     if (rc < 0) 
         goto err;
 
-    return(0);
+    return 0;
 
 err:
-    return(-1);
+    return -1;
 }
 
 /**
@@ -384,17 +384,13 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     if(trace[0] != 0) 
     {
         IMP_trace = 1;
-        K_WARN_DUP = 0;
         W_dest(trace, W_A2M);
     }
     else 
-    {
         IMP_trace = 0;
-        K_WARN_DUP = 1;
-    }
 
     if(fmt < 0 || fmt >= IODE_NB_EXPORT_FORMATS)
-        return(-1);
+        return -1;
 
     // Get the ExportToFile handler for the requested format
     expdef = export_handlers[fmt].get();
@@ -429,9 +425,8 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         dbc = nullptr;
     }
     
-    K_WARN_DUP = 0;
     if(rc)
         error_manager.display_last_error(); 
     
-    return(rc);
+    return rc;
 }

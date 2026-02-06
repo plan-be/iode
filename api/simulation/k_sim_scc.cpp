@@ -46,7 +46,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     KSIM_DBE = dbe;
@@ -70,15 +70,15 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     std::string eq_name;
-    CLEC* clec;
+    Equation* eq = nullptr;
     kmsg("Pseudo-linking equations ....");
     for(int i = 0 ; i < dbe->size(); i++) 
     {
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
-        clec = KECLEC(dbe, eq_name);
-        L_link_endos(dbe, clec);
+        eq = dbe->get_obj_ptr(eq_name); 
+        L_link_endos(dbe, eq->clec);
     }
 
     /* ORDERING EQUATIONS */
@@ -91,7 +91,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     KSIM_POSXK = KSIM_POSXK_REV = KSIM_ORDER = NULL;
     KSIM_PASSES = opasses;
     KSIM_SORT = osort;
-    return(0);
+    return 0;
 }
 
 
@@ -116,7 +116,7 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
     {
         std::string error_msg = "Empty set of equations";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     KSIM_DBV = dbv;
@@ -131,7 +131,7 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
     {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(error_msg);
-        return(-1);
+        return -1;
     }
 
     // KSIM_POSXK[i] = num dans dbv de la var endogène de l'équation i
@@ -148,7 +148,7 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     std::string eq_name;
-    CLEC* clec;
+    Equation* eq = nullptr;
     kmsg("Linking equations ....");
     for(i = 0 ; i < dbe->size(); i++) 
     {
@@ -163,8 +163,9 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
             goto fin;
         }
         
-        clec = KECLEC(dbe, eq_name);
-        rc = L_link(dbv, dbs, clec);
+        eq = dbe->get_obj_ptr(eq_name);
+        eq->compile();
+        rc = L_link(dbv, dbs, eq->clec);
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
@@ -176,12 +177,12 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
 
     KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
     KSIM_XK1 = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
-    return(0);
+    return 0;
 
 fin:
     SW_nfree(KSIM_POSXK);
     KSIM_POSXK = 0;
-    return(rc);
+    return rc;
 }
 
 
@@ -206,7 +207,7 @@ int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* d
     KSIM_INTER = SCR_tbl_size((unsigned char**) inter);
     KSIM_POST = SCR_tbl_size((unsigned char**) post);
 
-    if(K_simul_SCC_init(dbe, dbv, dbs, smpl)) return(-1);
+    if(K_simul_SCC_init(dbe, dbv, dbs, smpl)) return -1;
 
     // Fixe l'ordre d'exécution dans KSIM_ORDER
     KSIM_ORDER = (int *)  SW_nalloc(sizeof(int) * (KSIM_PRE + KSIM_INTER + KSIM_POST));
@@ -223,5 +224,5 @@ int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* d
 
 fin:
     K_simul_free();
-    return(rc);
+    return rc;
 }

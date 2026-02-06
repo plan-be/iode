@@ -171,10 +171,10 @@ static int RPS_GetFld(char* buf, char* ptr, int type)
 
         default :
             sprintf(buf, "Unknown type");
-            return(-1);
+            return -1;
             break;
     }
-    return(0);
+    return 0;
 }
 
 
@@ -193,7 +193,7 @@ U_ch  *RPS_Field(U_ch** args)
     ptr = OGetCol(ocsr, fldnb);
     RPS_GetFld(buf, ptr, ocsr->otbl->cols[fldnb].Ctype);
     res = SCR_stracpy(buf);
-    return(res);
+    return res;
 }
 
 
@@ -206,7 +206,7 @@ U_ch  *RPS_NbFlds(U_ch** args)
     fldnb = ocsr->otbl->ncols;
     sprintf(buf, "%d", fldnb);
     res = SCR_stracpy(buf);
-    return(res);
+    return res;
 }
 
 // @SqlRecord() : all fields 
@@ -241,7 +241,7 @@ U_ch  *RPS_Record(U_ch** args)
     SCR_add_ptr(&tbl, &ntbl, NULL);
     res = SCR_mtov(tbl, ' ');
     SCR_free_tbl(tbl);
-    return(res);
+    return res;
 }
 
 // @SqlQuery(sql_select)
