@@ -414,6 +414,11 @@ public:
         this->tests[t] = value;
     }
 
+    void reset_tests() 
+    { 
+        this->tests.fill(0.0f); 
+    }
+
     // -- misc --
 
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true)
