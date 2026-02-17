@@ -71,6 +71,7 @@ cdef extern from "api/objs/equations.h":
 
         map[string, float] get_tests_as_map()
         void set_test(const IodeEquationTest i, const float value) except +
+        void reset_tests() 
 
         vector[string] get_coefficients_list(const bool create_if_not_exit) except +
         vector[string] get_variables_list(const bool create_if_not_exit) except +
