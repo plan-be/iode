@@ -993,6 +993,29 @@ class Equation:
         """
         return self._cython_instance.get_tests()
 
+    def reset_tests(self):
+        r"""
+        Resets the estimation tests of the current equation.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> eq = equations["ACAF"]
+        >>> eq.tests                            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        {'corr': 1.0, 'dw': 2.329345941543579, 'fstat': 32.273193359375, 'loglik': 83.80752563476562, 
+        'meany': 0.008184665814042091, 'r2': 0.8217613697052002, 'r2adj': 0.7962986826896667, 
+        'ssres': 5.1994487876072526e-05, 'stderr': 0.0019271461060270667, 'stderrp': 23.545812606811523, 
+        'stdev': 0.004269900266081095}
+        >>> eq.reset_tests()
+        >>> eq.tests                            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        {'corr': 0.0, 'dw': 0.0, 'fstat': 0.0, 'loglik': 0.0, 'meany': 0.0, 'r2': 0.0, 'r2adj': 0.0, 
+        'ssres': 0.0, 'stderr': 0.0, 'stderrp': 0.0, 'stdev': 0.0}
+        """
+        self._cython_instance.reset_tests()
+
     @property
     def date(self) -> str:
         r"""

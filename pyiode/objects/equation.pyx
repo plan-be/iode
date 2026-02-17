@@ -223,6 +223,10 @@ cdef class Equation:
             self.c_equation.set_test(<IodeEquationTest>i, value)
         self.update_owner_database()
 
+    def reset_tests(self):
+        self.c_equation.reset_tests()
+        self.update_owner_database()
+
     def _set_date(self, value: str, format: str='dd-mm-yyyy'):
         if not value:
             self.c_equation.reset_date()
