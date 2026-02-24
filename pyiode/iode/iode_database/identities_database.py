@@ -234,6 +234,13 @@ class Identities(IodeDatabase):
         >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
         >>> identities["AOUC"]
         Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]')
+        >>> # --- or ---
+        >>> idt = identities["AOUC"]
+        >>> idt.lec
+        '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
+        >>> idt.lec = '((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]'
+        >>> identities["AOUC"]
+        Identity('((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]')
 
         >>> # c) add/update several identities at once
         >>> # 1) using a dict of values
@@ -341,7 +348,7 @@ class Identities(IodeDatabase):
         >>> identities.get_names("XP*")
         ['XPWMAB', 'XPWMS', 'XPWXAB']
 
-        >>> # delete one identity from a subset of the global database
+        >>> # d) delete one identity from a subset of the global database
         >>> identities_subset = identities["Y*"]
         >>> identities_subset.names
         ['Y', 'YSEFPR', 'YSFICR']
@@ -353,6 +360,15 @@ class Identities(IodeDatabase):
         False
         >>> identities.get_names("Y*")
         ['YSEFPR', 'YSFICR']
+
+        >>> # e) WARNING: deleting an identity from a database will affect any 
+        >>> #             Python variable referencing this identity
+        >>> idt = identities["YSEFPR"]
+        >>> idt
+        Identity('YSEFP/WBGP')
+        >>> del identities["YSEFPR"]
+        >>> idt
+        Identity('')
         """
         super().__delitem__(key)
 
@@ -907,20 +923,28 @@ class Identities(IodeDatabase):
         True
 
         >>> # modify one identity
-        >>> original_lec = identities["FLGR"]
+        >>> original_lec = str(identities["FLGR"])
+        >>> original_lec
+        'FLG/VBBP'
         >>> identities["FLGR"] = "1"
+        >>> identities["FLGR"]
+        Identity('1')
         >>> original_hash == hash(identities)
         False
         >>> identities["FLGR"] = original_lec  # revert the change
+        >>> identities["FLGR"]
+        Identity('FLG/VBBP')
         >>> original_hash == hash(identities)
         True
 
         >>> # delete a identity
-        >>> original_identity = identities["FLGR"]
+        >>> original_lec = str(identities["FLGR"])
+        >>> original_lec
+        'FLG/VBBP'
         >>> del identities["FLGR"]
         >>> original_hash == hash(identities)
         False
-        >>> identities["FLGR"] = original_identity
+        >>> identities["FLGR"] = original_lec  # revert the change
         >>> original_hash == hash(identities)
         True
 
