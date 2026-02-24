@@ -40,6 +40,35 @@ class Identity:
         return instance
 
     @property
+    def lec(self) -> str:
+        r"""
+        Return the *LEC* formula of the identity.
+
+        Returns
+        -------
+        str
+
+        Examples
+        --------
+        >>> from iode import Identity
+        >>> idt = Identity("FLG/VBBP")
+        >>> idt
+        Identity('FLG/VBBP')
+        >>> idt.lec
+        'FLG/VBBP'
+        >>> idt.lec = "1"
+        >>> idt
+        Identity('1')
+        >>> idt.lec
+        '1'
+        """
+        return self._cython_instance.get_lec()
+    
+    @lec.setter
+    def lec(self, value: str):
+        self._cython_instance.set_lec(value)
+
+    @property
     def coefficients(self) -> List[str]:
         r"""
         Return the list of coefficients present in the current identity.
