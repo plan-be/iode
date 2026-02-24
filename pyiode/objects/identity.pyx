@@ -33,6 +33,13 @@ cdef class Identity:
         wrapper.ptr_owner = owner
         return wrapper
 
+    def get_lec(self) -> str:
+        return self.c_identity.get_lec().decode()
+
+    def set_lec(self, value: str):
+        value = value.strip()
+        self.c_identity.set_lec(value.encode())
+
     def get_coefficients(self) -> List[str]:
         return [coeff.decode() for coeff in self.c_identity.get_coefficients_list(<bint>False)]
 
@@ -43,4 +50,4 @@ cdef class Identity:
         return self.c_identity == other.c_identity
 
     def _str_(self) -> str:
-        return self.c_identity.get_lec().decode("utf-8")
+        return self.c_identity.get_lec().decode()
