@@ -341,7 +341,7 @@ class Identities(IodeDatabase):
         >>> identities.get_names("XP*")
         ['XPWMAB', 'XPWMS', 'XPWXAB']
 
-        >>> # delete one identity from a subset of the global database
+        >>> # d) delete one identity from a subset of the global database
         >>> identities_subset = identities["Y*"]
         >>> identities_subset.names
         ['Y', 'YSEFPR', 'YSFICR']

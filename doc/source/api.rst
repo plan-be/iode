@@ -488,6 +488,7 @@ IDENTITY
 
    Identity
 
+   Identity.lec
    Identity.coefficients
    Identity.variables
    Identity.copy 
