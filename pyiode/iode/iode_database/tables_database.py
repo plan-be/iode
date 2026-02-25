@@ -770,7 +770,7 @@ class Tables(IodeDatabase):
         >>> tables.get_names("C8_?")
         ['C8_2', 'C8_4', 'C8_6', 'C8_8']
 
-        >>> # delete one table from a subset of the global database
+        >>> # d) delete one table from a subset of the global database
         >>> tables_subset = tables["M*"]
         >>> tables_subset.names
         ['MULT1FR', 'MULT1RESU', 'MULT2FR', 'MULT2RESU']
@@ -782,6 +782,67 @@ class Tables(IodeDatabase):
         False
         >>> tables.get_names("M*")
         ['MULT1FR', 'MULT1RESU', 'MULT2FR']
+
+        >>> # e) WARNING: deleting a table from a database will affect any 
+        >>> #             Python variable referencing this table
+        >>> tbl = tables["MULT1FR"]
+        >>> tbl                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        DIVIS | 1                                              |
+        TITLE |         "Principaux indicateurs : montants absolus"
+        ----- | -----------------------------------------------------------
+        CELL  | " "                                            | "#s"
+        ----- | -----------------------------------------------------------
+        CELL  | "1. Demande globale"                           |
+        CELL  | "       Consommation privée"                   |         QC
+        CELL  | "       Consommation publique"                 |         QG
+        CELL  | "       Formation brute de capital fixe"       |         QI
+        CELL  | "            - Entreprises"                    |        QIF
+        CELL  | "            - Etat"                           |        QIG
+        CELL  | "            - Logements"                      |        QI5
+        CELL  | "       Exportations de biens et services"     |         QX
+        CELL  | "       Importations de biens et services"     |         QM
+        CELL  | "       Produit Intérieur Brut"                |       QBBP
+        CELL  | "       Produit National Brut"                 |       QBNP
+        CELL  | "2. Marché du travail"                         |
+        CELL  | "       Emploi total"                          |    NATY-UY
+        CELL  | "         Entreprises"                         |    NFY+NIY
+        CELL  | "         Etat"                                |        NGY
+        CELL  | "3. Prix, salaires et revenus"                 |
+        CELL  | "       Salaire coût horaire"                  |       WCRH
+        CELL  | "       Salaire coût réel horaire"             |    WCRH/PC
+        CELL  | "       Déflateur de la consommation privée"   |         PC
+        CELL  | "       Coûts salariaux unitaires (apparents)" |  WCRH/PROD
+        CELL  | "       Coûts salariaux unitaires (techn.)"    |    WCRH/QL
+        CELL  | "       Prix des importations"                 |         PM
+        CELL  | "       Coûts totaux par unité produite "      |       AOUC
+        CELL  | "       Prix des exportations de biens"        |       PXAB
+        CELL  | "       Termes de l'échange (PX/PM)"           |      PX/PM
+        CELL  | "       Revenu disponible réel des ménages"    |     YDH/PC
+        CELL  | "4. Entreprises"                               |
+        CELL  | "       Valeur ajoutée (prix constants)"       |       QAF_
+        CELL  | "       Déflateur de la valeur ajoutée"        |       PAF_
+        CELL  | "       Valeur ajoutée potentielle"            |        Q_F
+        CELL  | "       Stock de capital"                      |       KNFY
+        CELL  | "5. Productivités du travail"                  |
+        CELL  | "       Productivité horaire apparente"        |       PROD
+        CELL  | "       Productivité horaire technique"        |         QL
+        CELL  | "       Productivité par tête "                | QAF_/(NFY)
+        ----- | -----------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 43
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> del tables["MULT1FR"]
+        >>> # tbl
+        ''
         """
         super().__delitem__(key)
 

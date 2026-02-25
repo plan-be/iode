@@ -445,7 +445,7 @@ class Scalars(IodeDatabase):
         >>> scalars.get_names("g*")
         ['gamma0', 'gamma1', 'gamma2', 'gamma4', 'gamma5']
 
-        >>> # delete one scalar from a subset of the global database
+        >>> # d) delete one scalar from a subset of the global database
         >>> scalars_subset = scalars["z*"]
         >>> scalars_subset.names
         ['zkf1', 'zkf2', 'zkf3']
@@ -457,6 +457,15 @@ class Scalars(IodeDatabase):
         False
         >>> scalars.get_names("z*")
         ['zkf1', 'zkf3']
+
+        >>> # e) WARNING: deleting a scalar from a database will affect any 
+        >>> #             Python variable referencing this scalar
+        >>> scl = scalars["zkf1"]
+        >>> scl
+        Scalar(0.201117, 1, 0.375671)
+        >>> del scalars["zkf1"]
+        >>> scl
+        Scalar(0.0, 0.0, 0.0)
         """
         super().__delitem__(key)
 

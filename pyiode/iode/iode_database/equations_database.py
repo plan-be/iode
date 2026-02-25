@@ -596,7 +596,7 @@ class Equations(IodeDatabase):
         >>> equations.get_names("B*")
         ['BRUGP', 'BVY']
 
-        >>> # delete one equation from a subset of the global database
+        >>> # d) delete one equation from a subset of the global database
         >>> equations_subset = equations["D*"]
         >>> equations_subset.names
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUGO', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
@@ -608,6 +608,21 @@ class Equations(IodeDatabase):
         False
         >>> equations.get_names("D*")
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
+
+        >>> # e) WARNING: deleting an equation from a database will affect any 
+        >>> #             Python variable referencing this equation
+        >>> eq = equations["DEBT"]
+        >>> eq                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'DEBT',
+                lec = 'd DEBT := OCP-FLG',
+                method = 'LSQ',
+                comment = ' ',
+                block = 'DEBT')
+        >>> del equations["DEBT"]
+        >>> eq                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = '',
+                lec = '',
+                method = 'LSQ')
         """
         super().__delitem__(key)
 

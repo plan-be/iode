@@ -430,7 +430,29 @@ private:
     // only used by global or standalone databases
     std::set<KDBTemplate*> children_db;
 
+    // TODO: delete after solving the issue #1140
+    // set of pointers to objects that are tracked for deletion 
+    // (to avoid deleting an object that is still referenced by a subset) 
+    std::set<T**> tracked_ptrs; 
+
 private:
+    // TODO: delete after solving the issue #1140
+    void delete_tracked_ptr(T* obj_ptr)
+    {
+        if(this->k_db_type == DB_SUBSET)
+            return;
+        
+        for(T** tracked_ptr : tracked_ptrs)
+        {
+            if(*tracked_ptr == obj_ptr)
+            {
+                *tracked_ptr = nullptr;
+                tracked_ptrs.erase(tracked_ptr);
+                break;
+            }
+        }
+    }
+
     void delete_objs()
     {
         for(auto& [name, obj_ptr] : k_objs)
@@ -438,7 +460,10 @@ private:
             // NOTE: it should not be necessary to check for nullptr before deleting, 
             //       but we do it just in case
             if(obj_ptr)
+            {
+                this->delete_tracked_ptr(obj_ptr);
                 delete obj_ptr;
+            }
         }
         k_objs.clear();
     }
@@ -592,6 +617,10 @@ public:
             }
             children_db.clear();
             this->delete_objs();
+
+            // TODO: delete after solving the issue #1140
+            for(T** tracked_ptr : tracked_ptrs)
+                *tracked_ptr = nullptr;
         }
 
         if(db_parent)
@@ -787,6 +816,8 @@ public:
         for(KDBTemplate* subset : get_children_db())
             subset->k_objs.erase(key);
         
+        this->delete_tracked_ptr(obj_ptr);
+
         delete obj_ptr;
         return true;
     }
@@ -983,6 +1014,13 @@ public:
             error_msg += "'" + name + "' not found in the database";
             throw std::invalid_argument(error_msg);
         }
+    }
+
+    // TODO: delete after solving the issue #1140
+    void add_tracked_ptr(T** obj_ptr)
+    {
+        if(this->k_db_type != DB_SUBSET && obj_ptr)
+            tracked_ptrs.insert(obj_ptr);
     }
 
     // virtual to be overridden in class KDBVariables

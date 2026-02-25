@@ -471,8 +471,8 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
 
     // ==== delete subset ====
-    scl_subset = subset->get_obj_ptr("scl_subset");
     delete subset;
+
     // deleting the subset only reset the k_objs map of the subset but
     // DO NOT DELETE the objects
     EXPECT_TRUE(scl_subset != nullptr);
@@ -500,7 +500,13 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
 
     // ==== delete global KDB ====
+    scl_global_ws = global_ws_scl->get_obj_ptr("scl_subset");
+    global_ws_scl->add_tracked_ptr(&scl_global_ws);
+
     global_ws_scl->clear();
+
+    EXPECT_TRUE(scl_global_ws == nullptr);
+
     // deleting the global KDB should delete all the objects in the global KDB
     EXPECT_EQ(global_ws_scl->size(), 0);
     // deleting the global KDB should not affect the standalone_db 
@@ -512,7 +518,12 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
 
     // ==== delete standalone_db ==== 
+    scl_standalone_db = standalone_db->get_obj_ptr("scl_standalone");
+    standalone_db->add_tracked_ptr(&scl_standalone_db);
+
     delete standalone_db;
+
+    EXPECT_TRUE(scl_standalone_db == nullptr);
 
     // **** changing order of deletion ****
 
@@ -537,7 +548,13 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));
     
     // ==== delete the standalone_db first ====
+    scl_standalone_db = standalone_db->get_obj_ptr("scl_standalone");
+    standalone_db->add_tracked_ptr(&scl_standalone_db);
+
     delete standalone_db;
+
+    EXPECT_TRUE(scl_standalone_db == nullptr);
+
     // deleting the standalone_db should not affect the global KDB and the subset 
     // since standalone_db represents a deep copy of the global KDB
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));
@@ -558,9 +575,15 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl->std, std);
 
     // ==== delete the global KDB before the subset ====
+    scl_global_ws = global_ws_scl->get_obj_ptr("scl_subset");
+    global_ws_scl->add_tracked_ptr(&scl_global_ws);
+
     global_ws_scl->clear();
     EXPECT_EQ(global_ws_scl->size(), 0);
     EXPECT_FALSE(global_ws_scl->contains("scl_global"));
+
+    EXPECT_TRUE(scl_global_ws == nullptr);
+
     // deleting the global KDB should delete all the objects in the global KDB 
     // AND clear the k_objs map of its subsets (if any)
     EXPECT_EQ(subset->size(), 0);
