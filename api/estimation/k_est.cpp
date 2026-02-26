@@ -225,6 +225,7 @@ int Estimation::KE_est_s(Sample* smpl)
         }
 
         eq = E_DBE->get_obj_ptr(endo);
+        eq->reset_tests();
 
         if(est_method < 0) 
             E_MET = eq->method;
@@ -319,11 +320,11 @@ int Estimation::KE_est_s(Sample* smpl)
                 E_tests2scl(eq, j, E_T, E_NCE);
                 eq = nullptr;
                 // create the Variables containing the fitted, observed and residual values
-                E_savevar("_YCALC", j, E_RHS);   /* JMP 27-09-96 */
-                E_savevar("_YOBS", j, E_LHS);    /* JMP 27-09-96 */
-                E_savevar("_YRES", j, E_U);      /* JMP 27-09-96 */
+                E_savevar("_YCALC", j, E_RHS);   
+                E_savevar("_YOBS", j, E_LHS);    
+                E_savevar("_YRES", j, E_U);      
 
-                estimated_eqs.insert(std::string((char*) endos[j]));    // mark the equation as estimated
+                estimated_eqs.insert(eq_name);    // mark the equation as estimated
             }
         }
 
@@ -331,7 +332,6 @@ int Estimation::KE_est_s(Sample* smpl)
         SCR_free_tbl(blk);
         lecs = endos = instrs = blk = NULL;
         nbl = nbe = 0;
-        estimated_eqs.clear();
 
         if(error != 0) 
             return -1;
@@ -343,6 +343,5 @@ err :
     SCR_free_tbl(blk);
     lecs = endos = instrs = blk = NULL;
     nbl = nbe = 0;
-    estimated_eqs.clear();
     return -1;
 }
