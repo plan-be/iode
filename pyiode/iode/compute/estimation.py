@@ -917,11 +917,8 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
 
         >>> corr_matrix = estimation.correlation_matrix
         >>> corr_matrix.names
@@ -966,25 +963,22 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
+        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
+        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
+        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
+        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
         observed_values = self._cython_instance.get_observed_values(name)
         if not observed_values:
@@ -1013,25 +1007,22 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
+        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
+        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
+        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
+        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
         fitted_values = self._cython_instance.get_fitted_values(name)
         if not fitted_values:
@@ -1060,25 +1051,22 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902573, 0.01249107519078254, ..., -0.0029850522299011313, 0.004490336374472825]
+        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.001150081936028266, 0.0035371269900280264, ..., -8.673617379884035e-19, 0.0024666316945563148]
+        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
         >>> estimation.get_fitted_values("DPUH")        # doctest: +ELLIPSIS
-        [0.07361898875461417, 0.0642394908832952, ..., 0.028792670295107632, 0.032048802201317866]
+        [0.07361898875462985, 0.06423949088326213, ..., 0.028792670295126173, 0.032048802201331064]
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
-        [-0.013173708952535501, 0.02345023294924109, ..., 0.013638637430584667, -0.025615152243387153]
+        [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
         residual_values = self._cython_instance.get_residual_values(name)
         if not residual_values:
@@ -1158,11 +1146,8 @@ class EditAndEstimateEquations:
         False
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         >>> estimation.is_done
         True
 
@@ -1418,11 +1403,8 @@ class EditAndEstimateEquations:
 
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 7.77305e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
 
         >>> scalars["acaf1"]
         Scalar(0.9, 1, na)
