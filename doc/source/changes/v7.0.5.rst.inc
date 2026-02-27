@@ -10,6 +10,7 @@ New Features
 Improvements 
 ------------
 
+- PYTHON: Provides an `iode` package for Python 3.13 (closes :issue:`1134`) 
 
 Fixed Bugs 
 ----------
