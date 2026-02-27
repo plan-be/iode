@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import Slot
+from qtpy.QtWidgets import QMessageBox
+from qtpy.QtCore import Slot
 
 from iode_gui.settings import MixinSettingsDialog
 from .ui_dyn_adjustment import Ui_DynAdjustmentDialog

@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QModelIndex, QAbstractItemModel
-from PySide6.QtWidgets import QStyledItemDelegate, QWidget, QStyleOptionViewItem, QLineEdit
+from qtpy.QtCore import Qt, QModelIndex, QAbstractItemModel
+from qtpy.QtWidgets import QStyledItemDelegate, QWidget, QStyleOptionViewItem, QLineEdit
 from .edit_table_model import EditTableModel
 
 from iode import TableLineType

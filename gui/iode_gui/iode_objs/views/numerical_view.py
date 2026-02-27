@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Slot, QModelIndex, QItemSelectionRange
-from PySide6.QtWidgets import QMenu, QApplication, QMessageBox, QDialog
-from PySide6.QtGui import (QKeySequence, QAction, QShortcut, QContextMenuEvent, 
+from qtpy.QtCore import Qt, Slot, QModelIndex, QItemSelectionRange
+from qtpy.QtWidgets import QMenu, QApplication, QMessageBox, QDialog
+from qtpy.QtGui import (QKeySequence, QAction, QShortcut, QContextMenuEvent, 
                            QClipboard, QGuiApplication)
 
 from iode_gui.utils import NAN_REP

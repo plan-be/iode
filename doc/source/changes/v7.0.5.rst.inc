@@ -11,6 +11,7 @@ Improvements
 ------------
 
 - PYTHON: Provides an `iode` package for Python 3.13 (closes :issue:`1134`) 
+- GUI: Support PyQt6 as well as PySide6 (closes :issue:`1084`)
 
 Fixed Bugs 
 ----------

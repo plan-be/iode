@@ -1,5 +1,5 @@
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QWidget, QGridLayout, QLayoutItem
+from qtpy.QtCore import Slot
+from qtpy.QtWidgets import QWidget, QGridLayout, QLayoutItem
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
@@ -36,6 +36,17 @@ class PrintFileDialog(MixinSettingsDialog):
 
         layout: QGridLayout = self.layout()
 
+        row, col = self._find_item_position(self.ui.lineEdit_generalized_sample)
+        self._horizontalSpacer_generalized_sample = layout.itemAtPosition(row, col + 1)
+        row, col = self._find_item_position(self.ui.spinBox_nb_decimals)
+        self._horizontalSpacer_nb_decimals = layout.itemAtPosition(row, col + 1)
+        row, col = self._find_item_position(self.ui.comboBox_print_eq_as)
+        self._horizontalSpacer_print_eq_as = layout.itemAtPosition(row, col + 1)
+        row, col = self._find_item_position(self.ui.comboBox_print_eq_lec_as)
+        self._horizontalSpacer_print_eq_lec_as = layout.itemAtPosition(row, col + 1)
+        row, col = self._find_item_position(self.ui.comboBox_print_table_as)
+        self._horizontalSpacer_print_table_as = layout.itemAtPosition(row, col + 1)
+
         self._hide_generalized_sample()
         if self.iode_type not in [IodeType.EQUATIONS, IodeType.SCALARS]:
             self._hide_nb_decimals()
@@ -49,11 +60,11 @@ class PrintFileDialog(MixinSettingsDialog):
         else:
             self.ui.label_print_eq_as.hide()
             self.ui.comboBox_print_eq_as.hide()
-            layout.removeItem(self.ui.horizontalSpacer_print_eq_as)
+            layout.removeItem(self._horizontalSpacer_print_eq_as)
 
             self.ui.label_print_eq_lec_as.hide()
             self.ui.comboBox_print_eq_lec_as.hide()
-            layout.removeItem(self.ui.horizontalSpacer_print_eq_lec_as)
+            layout.removeItem(self._horizontalSpacer_print_eq_lec_as)
 
         if self.iode_type == IodeType.TABLES:
             self.v_print_table_as = list(PrintTablesAs)
@@ -62,7 +73,7 @@ class PrintFileDialog(MixinSettingsDialog):
         else:
             self.ui.label_print_table_as.hide()
             self.ui.comboBox_print_table_as.hide()
-            layout.removeItem(self.ui.horizontalSpacer_print_table_as)
+            layout.removeItem(self._horizontalSpacer_print_table_as)
 
         self.ui.fileChooser_output_file.enum_file_type = IodeFileType.FILE_A2M
         self.ui.fileChooser_output_file.enum_file_mode = EnumFileMode.FILE_MAY_EXIST
@@ -187,7 +198,7 @@ class PrintFileDialog(MixinSettingsDialog):
         layout: QGridLayout = self.layout()
         self.ui.label_generalized_sample.hide()
         self.ui.lineEdit_generalized_sample.hide()
-        layout.removeItem(self.ui.horizontalSpacer_generalized_sample)
+        layout.removeItem(self._horizontalSpacer_generalized_sample)
 
     def _show_generalized_sample(self):
         layout: QGridLayout = self.layout()
@@ -195,13 +206,13 @@ class PrintFileDialog(MixinSettingsDialog):
         self.ui.lineEdit_generalized_sample.show()
         row, col = self._find_item_position(self.ui.lineEdit_generalized_sample)
         if row >= 0 and col >= 0:
-            layout.addItem(self.ui.horizontalSpacer_generalized_sample, row , col + 1)
+            layout.addItem(self._horizontalSpacer_generalized_sample, row , col + 1)
 
     def _hide_nb_decimals(self):
         layout: QGridLayout = self.layout()
         self.ui.label_nb_decimals.hide()
         self.ui.spinBox_nb_decimals.hide()
-        layout.removeItem(self.ui.horizontalSpacer_nb_decimals)
+        layout.removeItem(self._horizontalSpacer_nb_decimals)
  
     def _show_nb_decimals(self):
         layout: QGridLayout = self.layout()
@@ -209,7 +220,7 @@ class PrintFileDialog(MixinSettingsDialog):
         self.ui.spinBox_nb_decimals.show()
         row, col = self._find_item_position(self.ui.spinBox_nb_decimals)
         if row >= 0 and col >= 0:
-            layout.addItem(self.ui.horizontalSpacer_nb_decimals, row , col + 1)
+            layout.addItem(self._horizontalSpacer_nb_decimals, row , col + 1)
 
     @Slot(int)
     def show_options_for_computed_tables(self, index: int):

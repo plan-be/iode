@@ -1,5 +1,5 @@
-from PySide6.QtCore import Slot, Signal
-from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
+from qtpy.QtCore import Slot, Signal
+from qtpy.QtWidgets import QWidget, QMessageBox, QDialog
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter

@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>IODE</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>:/images/iode_icon.png</normaloff>:/images/iode_icon.png</iconset>
-  </property>
   <property name="statusTip">
    <string/>
   </property>

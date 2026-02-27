@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QPlainTextEdit, QMessageBox, QDialog
-from PySide6.QtGui import QShortcut, QKeySequence
+from qtpy.QtCore import Qt, Signal, Slot
+from qtpy.QtWidgets import QPlainTextEdit, QMessageBox, QDialog
+from qtpy.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.abstract_main_window import AbstractMainWindow

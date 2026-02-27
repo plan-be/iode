@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QDir, QFileInfo, QSettings
-from PySide6.QtWidgets import QTextEdit, QMessageBox
+from qtpy.QtCore import Qt, QDir, QFileInfo, QSettings
+from qtpy.QtWidgets import QTextEdit, QMessageBox
 
 from iode_gui.settings import get_settings, RUN_REPORTS_FROM_PROJECT_DIR
 from iode_gui.text_edit.highlighter import IodeHighlighter

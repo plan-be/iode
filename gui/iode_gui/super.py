@@ -4,7 +4,7 @@ from iode import (IodeType, comments, equations, identities, lists, scalars,
 from iode.util import register_super_function
 from iode.super import skip_pause, skip_msg_box
 
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from qtpy.QtWidgets import QMainWindow, QMessageBox
 
 from iode_gui.main_window import MainWindow
 from iode_gui.main_widgets.tab_widget.tab_widget import IodeTabWidget

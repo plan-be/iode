@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QWidget, QMessageBox, QSplitter
-from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
-from PySide6.QtCore import Slot
+from qtpy.QtWidgets import QWidget, QMessageBox, QSplitter
+from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
+from qtpy.QtCore import Slot
 
 from iode_gui.util.filepath import ask_filepath
 from iode_gui.abstract_main_window import AbstractMainWindow

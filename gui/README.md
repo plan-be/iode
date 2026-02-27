@@ -20,7 +20,7 @@ pip install iode-gui
   - `pandas`: A library for data manipulation and analysis in Python, which is used by `iode` for handling statistical series.
   - `matplotlib`: A library for creating static, animated, and interactive visualizations in Python, which is used by `iode` for plotting graphs and charts.
   - `iode`: The core package of IODE, which provides the underlying functionality for handling econometric models and statistical series.
-  - `pyside6`: A set of Python bindings for the Qt framework, which is used to create the graphical user interface of `iode-gui`.
+  - `pyqt` or `pyside6`: A set of Python bindings for the Qt framework, which is used to create the graphical user interface of `iode-gui`.
   - `qtconsole`: A rich Jupyter console widget that can be embedded in a Python Qt application, which is used to provide an interactive Python shell within `iode-gui`.
   - `ipython`: A powerful interactive shell for Python, which is used by `qtconsole` to provide the interactive Python shell within `iode-gui`.
 

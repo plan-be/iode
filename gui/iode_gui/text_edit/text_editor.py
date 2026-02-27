@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
+from qtpy.QtWidgets import QWidget
+from qtpy.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
                            QKeySequence, QTextBlock, QTextCursor)
-from PySide6.QtCore import Qt, QRect, QSize, QPoint, QSettings
+from qtpy.QtCore import Qt, QRect, QSize, QPoint, QSettings
 
 from .find_and_replace_dialog import FindAndReplaceDialog
 from .complete_text_edit import IodeAutoCompleteTextEdit

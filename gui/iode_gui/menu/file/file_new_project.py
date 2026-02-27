@@ -1,5 +1,5 @@
-from PySide6.QtCore import Slot, QSettings, QDir
-from PySide6.QtWidgets import QWidget, QMessageBox
+from qtpy.QtCore import Slot, QSettings, QDir
+from qtpy.QtWidgets import QWidget, QMessageBox
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode

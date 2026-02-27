@@ -1,5 +1,5 @@
-from PySide6.QtCore import QDir
-from PySide6.QtWidgets import QMessageBox, QFileDialog
+from qtpy.QtCore import QDir
+from qtpy.QtWidgets import QMessageBox, QFileDialog
 
 from pathlib import Path
 from typing import Union

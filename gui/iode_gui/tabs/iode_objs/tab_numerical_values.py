@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, QObject, QSize, QSettings
-from PySide6.QtGui import QKeySequence, QShortcut
-from PySide6.QtWidgets import QLabel, QSpinBox, QCheckBox, QHBoxLayout
+from qtpy.QtCore import Qt, QObject, QSize, QSettings
+from qtpy.QtGui import QKeySequence, QShortcut
+from qtpy.QtWidgets import QLabel, QSpinBox, QCheckBox, QHBoxLayout
 
 from iode_gui.utils import MAX_PRECISION_NUMBERS
 from iode_gui.iode_objs.models.table_model import ScalarsModel, VariablesModel

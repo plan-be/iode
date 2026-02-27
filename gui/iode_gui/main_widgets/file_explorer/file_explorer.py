@@ -3,11 +3,11 @@ import shutil
 from typing import List, Set, Tuple
 from pathlib import Path
 
-from PySide6.QtCore import (QModelIndex, QPersistentModelIndex, QDir, QFile, QFileInfo, 
+from qtpy.QtCore import (QModelIndex, QPersistentModelIndex, QDir, QFile, QFileInfo, 
                             QPoint, Qt, QProcess, QUrl, Signal, Slot)
-from PySide6.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices, 
+from qtpy.QtGui import (QAction, QKeySequence, QShortcut, QDesktopServices, 
                            QCloseEvent, QDragMoveEvent, QDropEvent)
-from PySide6.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
+from qtpy.QtWidgets import QTreeView, QMenu, QFileSystemModel, QMessageBox, QApplication
 
 from iode_gui.settings import get_settings
 from iode_gui.main_widgets.file_explorer.file_explorer_proxy import FileExplorerProxyModel

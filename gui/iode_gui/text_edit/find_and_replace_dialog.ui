@@ -83,10 +83,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/replace.ico</normaloff>:/icons/replace.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Return</string>
      </property>
@@ -120,10 +116,6 @@
      </property>
      <property name="text">
       <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/replace_all.ico</normaloff>:/icons/replace_all.ico</iconset>
      </property>
      <property name="shortcut">
       <string>Ctrl+Alt+Return</string>
@@ -184,10 +176,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/arrow_down.ico</normaloff>:/icons/arrow_down.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Return</string>
      </property>
@@ -246,10 +234,6 @@
      </property>
      <property name="text">
       <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/arrow_up.ico</normaloff>:/icons/arrow_up.ico</iconset>
      </property>
      <property name="shortcut">
       <string>Shift+Return</string>

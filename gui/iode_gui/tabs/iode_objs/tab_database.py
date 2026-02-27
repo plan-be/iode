@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Slot, QSettings
-from PySide6.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy, QDialog
-from PySide6.QtGui import QShortcut, QKeySequence
+from qtpy.QtCore import Qt, Slot, QSettings
+from qtpy.QtWidgets import QLabel, QComboBox, QLineEdit, QSpacerItem, QSizePolicy, QDialog
+from qtpy.QtGui import QShortcut, QKeySequence
 
 from iode_gui.settings import get_settings
 from iode_gui.main_widgets.tab_widget.abstract_tab_widget import AbstractIodeTabWidget

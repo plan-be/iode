@@ -1,5 +1,5 @@
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt, QDir, Signal, Slot
-from PySide6.QtWidgets import QMessageBox, QFileDialog
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt, QDir, Signal, Slot
+from qtpy.QtWidgets import QMessageBox, QFileDialog
 
 from iode_gui.util.filepath import ask_filepath
 

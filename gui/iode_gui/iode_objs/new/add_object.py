@@ -1,6 +1,6 @@
-from PySide6.QtCore import Signal, Slot, QLocale
-from PySide6.QtWidgets import QDialog, QMessageBox
-from PySide6.QtGui import QDesktopServices, QDoubleValidator
+from qtpy.QtCore import Signal, Slot, QLocale
+from qtpy.QtWidgets import QDialog, QMessageBox
+from qtpy.QtGui import QDesktopServices, QDoubleValidator
 
 from iode_gui.text_edit.completer import IodeCompleter
 from .ui_add_object import Ui_AddObjectDialog

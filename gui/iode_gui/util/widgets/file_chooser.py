@@ -1,5 +1,5 @@
-from PySide6.QtCore import QDir, QFileInfo, QSettings
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
+from qtpy.QtCore import QDir, QFileInfo, QSettings
+from qtpy.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
 
 from enum import Enum, auto
 from pathlib import Path

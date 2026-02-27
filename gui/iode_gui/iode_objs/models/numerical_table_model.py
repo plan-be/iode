@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal
+from qtpy.QtCore import QObject, Signal
 from iode_gui.utils import NAN_REP, MAX_PRECISION_NUMBERS
 
 from typing import List, Any
