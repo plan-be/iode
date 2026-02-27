@@ -58,7 +58,7 @@ iode-gui
 ~~~~~~~~
 
 - iode
-- pyside6 
+- pyqt or pyside6 
 - qtconsole
 - ipython
 

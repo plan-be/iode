@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, QModelIndex, QAbstractTableModel, QObject, Slot
-from PySide6.QtGui import QCloseEvent
-from PySide6.QtWidgets import QMessageBox
+from qtpy.QtCore import Qt, QModelIndex, QAbstractTableModel, QObject, Slot
+from qtpy.QtGui import QCloseEvent
+from qtpy.QtWidgets import QMessageBox
 
 from .numerical_table_model import IodeNumericalTableModel  
 from iode_gui.utils import NAN_REP  

@@ -33,7 +33,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0">
-    <widget class="QLineEdit" name="lineReplace">
+    <widget class="QLineEdit" name="line_replace">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -58,7 +58,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QPushButton" name="replaceButton">
+    <widget class="QPushButton" name="replace_button">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -83,10 +83,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/replace.ico</normaloff>:/icons/replace.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Return</string>
      </property>
@@ -96,7 +92,7 @@
     </widget>
    </item>
    <item row="2" column="2">
-    <widget class="QPushButton" name="replaceAllButton">
+    <widget class="QPushButton" name="replace_all_button">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -121,10 +117,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/replace_all.ico</normaloff>:/icons/replace_all.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Ctrl+Alt+Return</string>
      </property>
@@ -134,7 +126,7 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QLineEdit" name="lineSearch">
+    <widget class="QLineEdit" name="line_search">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -159,7 +151,7 @@
     </widget>
    </item>
    <item row="0" column="5">
-    <widget class="QPushButton" name="nextButton">
+    <widget class="QPushButton" name="next_button">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -184,10 +176,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/arrow_down.ico</normaloff>:/icons/arrow_down.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Return</string>
      </property>
@@ -197,7 +185,7 @@
     </widget>
    </item>
    <item row="0" column="1" colspan="2">
-    <widget class="QLabel" name="labelNbOccurrences">
+    <widget class="QLabel" name="label_nb_occurrences">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -222,7 +210,7 @@
     </widget>
    </item>
    <item row="0" column="3">
-    <widget class="QPushButton" name="previousButton">
+    <widget class="QPushButton" name="previous_button">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -247,10 +235,6 @@
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../iode_gui/iode_resource.qrc">
-       <normaloff>:/icons/arrow_up.ico</normaloff>:/icons/arrow_up.ico</iconset>
-     </property>
      <property name="shortcut">
       <string>Shift+Return</string>
      </property>
@@ -266,7 +250,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>previousButton</sender>
+   <sender>previous_button</sender>
    <signal>clicked()</signal>
    <receiver>FindAndReplaceDialog</receiver>
    <slot>previous()</slot>
@@ -282,7 +266,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>nextButton</sender>
+   <sender>next_button</sender>
    <signal>clicked()</signal>
    <receiver>FindAndReplaceDialog</receiver>
    <slot>next()</slot>
@@ -298,7 +282,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>replaceButton</sender>
+   <sender>replace_button</sender>
    <signal>clicked()</signal>
    <receiver>FindAndReplaceDialog</receiver>
    <slot>replace()</slot>
@@ -314,10 +298,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>replaceAllButton</sender>
+   <sender>replace_all_button</sender>
    <signal>clicked()</signal>
    <receiver>FindAndReplaceDialog</receiver>
-   <slot>replaceAll()</slot>
+   <slot>replace_all()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>200</x>
@@ -330,10 +314,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineSearch</sender>
+   <sender>line_search</sender>
    <signal>textChanged(QString)</signal>
    <receiver>FindAndReplaceDialog</receiver>
-   <slot>onSearchEdited(QString)</slot>
+   <slot>on_search_edited(QString)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>77</x>
@@ -350,9 +334,9 @@
   <slot>next()</slot>
   <slot>previous()</slot>
   <slot>replace()</slot>
-  <slot>replaceAll()</slot>
+  <slot>replace_all()</slot>
   <slot>findOnly(bool)</slot>
-  <slot>onSearchEdited(QString)</slot>
+  <slot>on_search_edited(QString)</slot>
   <slot>setTextToFind(QString)</slot>
  </slots>
 </ui>

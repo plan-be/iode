@@ -1,5 +1,5 @@
-from PySide6.QtCore import QObject, Qt, Slot
-from PySide6.QtWidgets import QMessageBox
+from qtpy.QtCore import QObject, Qt, Slot
+from qtpy.QtWidgets import QMessageBox
 from .abstract_table_model import IodeAbstractTableModel
 from .numerical_table_model import IodeNumericalTableModel
 from iode_gui.utils import MAX_PRECISION_NUMBERS, NAN_REP

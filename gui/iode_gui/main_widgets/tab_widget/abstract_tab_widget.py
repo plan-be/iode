@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTabWidget
+from qtpy.QtWidgets import QTabWidget
 
 from typing import List            
 from iode import IodeType

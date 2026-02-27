@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QSettings, Slot, Signal
-from PySide6.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
+from qtpy.QtCore import Qt, QSettings, Slot, Signal
+from qtpy.QtWidgets import QMainWindow, QTextEdit, QLineEdit, QDialog
 
 from iode_gui.plot.plot import PlotDialog
 from iode_gui.utils import DEFAULT_FONT_FAMILY

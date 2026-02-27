@@ -53,7 +53,8 @@ requirements:
     - pandas >=2.0
     - matplotlib-base
     - iode
-    - pyside6
+    - qtpy
+    - pyqt
     - qtconsole
     - ipython
 

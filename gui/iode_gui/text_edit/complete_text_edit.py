@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QPlainTextEdit
-from PySide6.QtGui import QKeyEvent, QTextCursor
+from qtpy.QtWidgets import QPlainTextEdit
+from qtpy.QtGui import QKeyEvent, QTextCursor
 
 from .completer import IodeWidgetWithCompleter
 

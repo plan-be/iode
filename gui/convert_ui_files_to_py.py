@@ -16,22 +16,15 @@ for ui_file in current_directory.glob("**/*.ui"):
     py_file = str(py_file.resolve())
 
     # Run the PyUIC6 command
-    command = ['pyside6-uic', '-o', py_file, ui_file, '--absolute-imports']
+    command = ['pyuic6', '-o', py_file, ui_file]
     print(' '.join(command))
     process = subprocess.run(command, shell=True, capture_output=True, check=True)
     process.check_returncode()
 
-# Run the PyRCC6 command
-resource_filename = "iode_resource"
-qrc_resource_file = current_directory / 'iode_gui' / 'resources' / f'{resource_filename}.qrc'
-if not qrc_resource_file.exists():
-    raise FileNotFoundError(f"Resource file not found: {qrc_resource_file}")
-qrc_resource_file = str(qrc_resource_file.resolve())
-
-py_resource_file = current_directory / 'iode_gui' / f'{resource_filename}_rc.py'
-py_resource_file = str(py_resource_file.resolve())
-
-command = ['pyside6-rcc', '-o', py_resource_file, qrc_resource_file]
-print(' '.join(command))
-process = subprocess.run(command, shell=True, capture_output=True, check=True)
-process.check_returncode()
+    # replace the line "from PyQt6(.xxx) import yyyy" with 
+    # "from qtpy(.xxx) import yyy" in the generated .py file
+    with open(py_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    content = content.replace("from PyQt6", "from qtpy")
+    with open(py_file, 'w', encoding='utf-8') as f:
+        f.write(content)

@@ -1,7 +1,7 @@
-from PySide6.QtCore import Slot, QSettings
-from PySide6.QtWidgets import QWidget, QMessageBox, QDialog
-from PySide6.QtGui import QCloseEvent, QTextDocument
-from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
+from qtpy.QtCore import Slot, QSettings
+from qtpy.QtWidgets import QWidget, QMessageBox, QDialog
+from qtpy.QtGui import QCloseEvent, QTextDocument
+from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.utils import TMP_FILENAME
 from iode_gui.settings import MixinSettingsDialog, get_settings, PRINT_TO_FILE

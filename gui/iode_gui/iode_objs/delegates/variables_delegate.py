@@ -1,8 +1,8 @@
 from .base_delegate import BaseDelegate
 from iode_gui.util.double_validator import IodeDoubleValidator
 
-from PySide6.QtCore import QModelIndex
-from PySide6.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
+from qtpy.QtCore import QModelIndex
+from qtpy.QtWidgets import QLineEdit, QWidget, QStyleOptionViewItem
 
 from iode import IodeType
 

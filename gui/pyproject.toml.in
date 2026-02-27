@@ -37,7 +37,12 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy", "pandas", "matplotlib", "iode", "pyside6>=6.5", "qtconsole", "ipython" ]
+dependencies = [ "numpy", "pandas", "matplotlib", "iode", "qtpy", "qtconsole", "ipython" ]
+
+[project.optional-dependencies]
+test = ["pytest"]
+pyside6 = ["pyside6"]
+pyqt = ["pyqt"]
 
 [project.gui-scripts]
 iode-gui = "iode_gui.main:start"
@@ -45,6 +50,8 @@ iode-gui = "iode_gui.main:start"
 [project.urls]
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
 
+[tool.setuptools.package-data]
+iode-gui = ["resources/*"]
 
 [tool.setuptools.packages]
 # Disable implicit namespaces -> This will prevent any folder without 

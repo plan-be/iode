@@ -1,4 +1,5 @@
 from pathlib import Path
+import qtpy
 from iode import comments, equations, identities, lists, scalars, tables, variables
 from iode import SAMPLE_DATA_DIR, view_workspace
 
@@ -34,6 +35,11 @@ def run_view_workspace():
 
 
 if __name__ == "__main__":
+    print("Starting IODE GUI...")
+    print("qtpy version:", qtpy.__version__)
+    print("Qt version:", qtpy.QT_VERSION)
+    print("Qt API name:", qtpy.API_NAME)
+
     run_view_workspace()
     
     print("global_list:", global_list)

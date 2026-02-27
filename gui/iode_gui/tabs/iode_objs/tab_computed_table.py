@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Slot, QSettings
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QCloseEvent, QShortcut, QKeySequence
+from qtpy.QtCore import Qt, Slot, QSettings
+from qtpy.QtWidgets import QDialog, QVBoxLayout, QSpacerItem, QSizePolicy
+from qtpy.QtGui import QCloseEvent, QShortcut, QKeySequence
 
 from iode_gui.settings import get_settings, class_name_to_settings_group_name
 from iode_gui.tabs.iode_objs.tab_numerical_values import NumericalWidget

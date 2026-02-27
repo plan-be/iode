@@ -1,6 +1,6 @@
-from PySide6.QtCore import Signal, Slot, QSettings
-from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
-from PySide6.QtPrintSupport import QPrintPreviewDialog
+from qtpy.QtCore import Signal, Slot, QSettings
+from qtpy.QtWidgets import QWidget, QSplitter, QMessageBox
+from qtpy.QtPrintSupport import QPrintPreviewDialog
 
 from typing import Optional
 from iode import IodeFileType, TableLang

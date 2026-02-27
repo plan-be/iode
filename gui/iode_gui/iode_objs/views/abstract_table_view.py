@@ -1,9 +1,9 @@
-from PySide6.QtCore import Qt, QRegularExpression, QModelIndex, QSettings, Signal, Slot
-from PySide6.QtGui import (QTextCursor, QTextCharFormat, QFont, QKeySequence, QKeyEvent, 
+from qtpy.QtCore import Qt, QRegularExpression, QModelIndex, QSettings, Signal, Slot
+from qtpy.QtGui import (QTextCursor, QTextCharFormat, QFont, QKeySequence, QKeyEvent, 
                            QTextDocument, QTextFrameFormat, QShortcut, QRegularExpressionValidator)
-from PySide6.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSizePolicy, 
+from qtpy.QtWidgets import (QTableView, QLineEdit, QMessageBox, QDialog, QSizePolicy, 
                                QAbstractScrollArea, QAbstractItemView)
-from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
+from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.color_theme import ColorTheme
