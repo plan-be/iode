@@ -17,19 +17,22 @@ jobs:
           matrix:
             include:
               - os: windows-latest
-                python-minor-version: "10"
+                python-minor-version: "3.10"
                 without-larray: false
               - os: windows-latest
-                python-minor-version: "11"
+                python-minor-version: "3.11"
                 without-larray: false
               - os: windows-latest
-                python-minor-version: "11"
+                python-minor-version: "3.12"
+                without-larray: false
+              - os: windows-latest
+                python-minor-version: "3.12"
                 without-larray: true
               - os: windows-latest
-                python-minor-version: "12"
+                python-minor-version: "3.13"
                 without-larray: false
               - os: ubuntu-latest
-                python-minor-version: "11"
+                python-minor-version: "3.12"
                 without-larray: false
     
         runs-on: ${{ matrix.os }}
@@ -82,7 +85,7 @@ jobs:
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           - name: Test the C and C++ APIs
-            if: runner.os == 'Windows' && matrix.python-minor-version == '12'
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.12'
             uses: ./.github/actions/test_api
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
@@ -90,7 +93,7 @@ jobs:
             uses: conda-incubator/setup-miniconda@v3
             with:
               # channels: conda-forge, defaults
-              python-version: "3.${{ matrix.python-minor-version }}"
+              python-version: "${{ matrix.python-minor-version }}"
               auto-update-conda: true
               auto-activate-base: true
               activate-environment: true
@@ -139,11 +142,11 @@ jobs:
               pip install $filename
           # requires Python + numpy, pandas and iode packages installed
           - name: Generate big.var and big.av test files
-            if: runner.os == 'Windows' && matrix.python-minor-version == '12'
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.12'
             shell:  bash -el {0}
             run: python tests/test_big_files/generate_big_vars_ws.py
           - name: Test loading and saving a big Variables database
-            if: runner.os == 'Windows' && matrix.python-minor-version == '12'
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.12'
             uses: ./.github/actions/test_big_files
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
