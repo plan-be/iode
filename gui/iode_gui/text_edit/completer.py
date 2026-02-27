@@ -1,6 +1,6 @@
-from PySide6.QtCore import QStringListModel, QKeyCombination, Qt, Slot
-from PySide6.QtWidgets import QCompleter, QLineEdit, QWidget
-from PySide6.QtGui import QKeyEvent
+from qtpy.QtCore import QStringListModel, QKeyCombination, Qt, Slot
+from qtpy.QtWidgets import QCompleter, QLineEdit, QWidget
+from qtpy.QtGui import QKeyEvent
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 

@@ -1,6 +1,6 @@
-from PySide6.QtCore import QModelIndex, Qt, Signal, QAbstractTableModel
-from PySide6.QtWidgets import QMessageBox, QWidget
-from PySide6.QtGui import QFont, QColor
+from qtpy.QtCore import QModelIndex, Qt, Signal, QAbstractTableModel
+from qtpy.QtWidgets import QMessageBox, QWidget
+from qtpy.QtGui import QFont, QColor
 
 from iode import Table, TableLineType, TableCellAlign, tables
 from iode.objects.table import TableCell, TableLine

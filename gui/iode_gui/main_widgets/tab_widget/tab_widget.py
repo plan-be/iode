@@ -1,8 +1,8 @@
-from PySide6.QtCore import (Qt, QDir, QFileInfo, QPoint, QCoreApplication, QFileSystemWatcher, 
+from qtpy.QtCore import (Qt, QDir, QFileInfo, QPoint, QCoreApplication, QFileSystemWatcher, 
                             QUrl, QProcess, Slot, Signal)
-from PySide6.QtWidgets import (QWidget, QTabWidget, QMessageBox, QProgressDialog, QTabBar, 
+from qtpy.QtWidgets import (QWidget, QTabWidget, QMessageBox, QProgressDialog, QTabBar, 
                                QMenu, QApplication, QGridLayout)
-from PySide6.QtGui import QAction, QKeySequence, QShortcut, QDesktopServices
+from qtpy.QtGui import QAction, QKeySequence, QShortcut, QDesktopServices
 
 import sys
 import shutil

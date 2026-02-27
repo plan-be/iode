@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QWidget, QPlainTextEdit, QMessageBox, QGridLayout, QFileDialog
-from PySide6.QtCore import Signal, Slot, Qt, QFileInfo, QTextStream
-from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
+from qtpy.QtWidgets import QWidget, QPlainTextEdit, QMessageBox, QGridLayout, QFileDialog
+from qtpy.QtCore import Signal, Slot, Qt, QFileInfo, QTextStream
+from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.tabs.tab_abstract import IodeAbstractWidget

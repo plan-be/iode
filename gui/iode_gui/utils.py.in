@@ -1,7 +1,6 @@
-from PySide6.QtCore import Qt, QUrl, QDir, QLocale
+from qtpy.QtCore import Qt, QUrl, QDir, QLocale
 
-import iode_gui.${PY_RESOURCE_FILENAME}
-from iode_gui import DOC_DIR as GUI_DOC_DIR
+from iode_gui import GUI_DOC_DIR, GUI_RESOURCES_DIR
 from iode import DOC_DIR
 
 IODE_VERSION = "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
@@ -25,8 +24,10 @@ URL_CHANGELOG = QUrl("${CHANGELOG_URL}")
 URL_PYTHON_API = QUrl("${PYTHON_API_URL}")
 
 URL_MANUAL = QUrl.fromLocalFile(DOC_DIR + "/iode.chm")
-URL_SHORTCUTS = QUrl.fromLocalFile(GUI_DOC_DIR + "/keyboard_shortcuts.pdf")
+URL_SHORTCUTS = QUrl.fromLocalFile(str(GUI_DOC_DIR / "keyboard_shortcuts.pdf"))
 
+QDir.addSearchPath('images', str(GUI_RESOURCES_DIR / 'images'))
+QDir.addSearchPath('icons', str(GUI_RESOURCES_DIR / 'icons'))
 
 class Context:
     """Context class to store the context of the application"""

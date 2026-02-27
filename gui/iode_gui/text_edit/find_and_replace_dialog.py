@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QDialog, QPlainTextEdit
-from PySide6.QtGui import (QTextCharFormat, QColor, QKeySequence, QShortcut, 
-                           QTextCursor, QTextDocument)
-from PySide6.QtCore import Qt
+from qtpy.QtWidgets import QDialog, QPlainTextEdit
+from qtpy.QtGui import (QTextCharFormat, QColor, QKeySequence, QShortcut, 
+                        QTextCursor, QTextDocument, QIcon)
+from qtpy.QtCore import Qt
 
 from .ui_find_and_replace_dialog import Ui_FindAndReplaceDialog
 
@@ -26,9 +26,14 @@ class FindAndReplaceDialog(QDialog):
         self.ui.previous = self.previous
         self.ui.next = self.next
         self.ui.replace = self.replace
-        self.ui.replaceAll = self.replaceAll
-        self.ui.onSearchEdited = self.onSearchEdited
+        self.ui.replace_all = self.replace_all
+        self.ui.on_search_edited = self.on_search_edited
         self.ui.setupUi(self)
+
+        self.ui.next_button.setIcon(QIcon("icons:arrow_down.png"))
+        self.ui.previous_button.setIcon(QIcon("icons:arrow_up.png"))
+        self.ui.replace_button.setIcon(QIcon("icons:replace.png"))
+        self.ui.replace_all_button.setIcon(QIcon("icons:replace_all.png"))
 
         self.editor = editor
         self.doc = editor.document()
@@ -50,9 +55,9 @@ class FindAndReplaceDialog(QDialog):
         self.exit_shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
         self.exit_shortcut.activated.connect(self.close)
 
-        self.replace_shortcut = QShortcut(QKeySequence(Qt.Key.Key_R | Qt.Modifier.CTRL), self)
+        self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_H), self)
         self.replace_shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
-        self.replace_shortcut.activated.connect(lambda: self.findAndReplace(False))
+        self.replace_shortcut.activated.connect(lambda: self.find_and_replace(False))
 
     def closeEvent(self, event):
         """
@@ -69,7 +74,7 @@ class FindAndReplaceDialog(QDialog):
 
         :param text: The text to find.
         """
-        self.ui.lineSearch.setText(text)
+        self.ui.line_search.setText(text)
 
     def clear(self):
         """
@@ -85,11 +90,11 @@ class FindAndReplaceDialog(QDialog):
 
     def set_label_nb_occurrences(self):
         """
-        Set the text of the labelNbOccurrences.
+        Set the text of the label_nb_occurrences.
         """
-        self.ui.labelNbOccurrences.setText(f"{self.nb_previous} of {self.nb_occurrences}")
+        self.ui.label_nb_occurrences.setText(f"{self.nb_previous} of {self.nb_occurrences}")
 
-    def onSearchEdited(self, text: str):
+    def on_search_edited(self, text: str):
         """
         Slot for when the search text is edited.
 
@@ -98,7 +103,7 @@ class FindAndReplaceDialog(QDialog):
         self.clear()
 
         if not text:
-            self.ui.labelNbOccurrences.setText("No Results")
+            self.ui.label_nb_occurrences.setText("No Results")
             return
 
         cursor = self.editor.textCursor()
@@ -132,7 +137,7 @@ class FindAndReplaceDialog(QDialog):
         if cursor.hasSelection():
             cursor.mergeCharFormat(self.all_occurrences_format)
 
-        newCursor = self.doc.find(self.ui.lineSearch.text(), cursor, QTextDocument.FindFlag.FindWholeWords | 
+        newCursor = self.doc.find(self.ui.line_search.text(), cursor, QTextDocument.FindFlag.FindWholeWords | 
                                   QTextDocument.FindFlag.FindCaseSensitively)
         if not newCursor.isNull():
             newCursor.mergeCharFormat(self.current_occurrence_format)
@@ -153,7 +158,7 @@ class FindAndReplaceDialog(QDialog):
         if cursor.hasSelection():
             cursor.mergeCharFormat(self.all_occurrences_format)
 
-        newCursor = self.doc.find(self.ui.lineSearch.text(), cursor, QTextDocument.FindFlag.FindWholeWords | 
+        newCursor = self.doc.find(self.ui.line_search.text(), cursor, QTextDocument.FindFlag.FindWholeWords | 
                                   QTextDocument.FindFlag.FindCaseSensitively | QTextDocument.FindFlag.FindBackward)
         if not newCursor.isNull():
             newCursor.mergeCharFormat(self.current_occurrence_format)
@@ -175,7 +180,7 @@ class FindAndReplaceDialog(QDialog):
         cursor = self.editor.textCursor()
         if cursor.hasSelection():
             cursor.removeSelectedText()
-            cursor.insertText(self.ui.lineReplace.text())
+            cursor.insertText(self.ui.line_replace.text())
             self.nb_occurrences -= 1
 
             if self.next():
@@ -187,11 +192,11 @@ class FindAndReplaceDialog(QDialog):
         else:
             return False
 
-    def replaceAll(self):
+    def replace_all(self):
         """
         Slot for replacing all occurrences.
         """
-        self.onSearchEdited(self.ui.lineSearch.text())
+        self.on_search_edited(self.ui.line_search.text())
         if not self.nb_occurrences:
             return
 
@@ -211,21 +216,21 @@ class FindAndReplaceDialog(QDialog):
         self.nb_occurrences = 0
         self.set_label_nb_occurrences()
 
-    def findAndReplace(self, find_only: bool):
+    def find_and_replace(self, find_only: bool):
         """
         Slot for finding and replacing text.
 
         :param find_only: Whether to find only.
         """
         if find_only:
-            self.ui.lineReplace.hide()
-            self.ui.replaceButton.hide()
-            self.ui.replaceAllButton.hide()
-            self.resize(self.width(), self.ui.lineSearch.height() + 20)
+            self.ui.line_replace.hide()
+            self.ui.replace_button.hide()
+            self.ui.replace_all_button.hide()
+            self.resize(self.width(), self.ui.line_search.height() + 20)
         else:
-            self.ui.lineReplace.setHidden(False)
-            self.ui.replaceButton.setHidden(False)
-            self.ui.replaceAllButton.setHidden(False)
+            self.ui.line_replace.setHidden(False)
+            self.ui.replace_button.setHidden(False)
+            self.ui.replace_all_button.setHidden(False)
             self.resize(self.width(), self.full_height)
 
-        self.ui.lineSearch.setFocus()
+        self.ui.line_search.setFocus()

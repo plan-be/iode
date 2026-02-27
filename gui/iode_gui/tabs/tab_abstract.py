@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QRect, Slot, Signal, QDir
-from PySide6.QtWidgets import QWidget, QSplitter, QMessageBox
+from qtpy.QtCore import Qt, QRect, Slot, Signal, QDir
+from qtpy.QtWidgets import QWidget, QSplitter, QMessageBox
 
 from iode_gui.utils import Context
 

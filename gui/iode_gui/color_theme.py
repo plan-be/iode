@@ -1,10 +1,10 @@
 import sys
 from typing import List
 
-from PySide6.QtCore import Qt, QSettings
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QMessageBox
-from PySide6 import __version__ as pyside_version
+from qtpy.QtCore import Qt, QSettings
+from qtpy.QtGui import QColor
+from qtpy.QtWidgets import QMessageBox
+from qtpy import __version__ as pyside_version
 v_major, v_minor, v_patch = map(int, pyside_version.split('.'))
 pyside6_68_or_higher = (v_major, v_minor) >= (6, 8)
 

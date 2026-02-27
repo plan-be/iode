@@ -1,6 +1,6 @@
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QDialog, QMessageBox
-from PySide6.QtGui import QDesktopServices
+from qtpy.QtCore import Slot
+from qtpy.QtWidgets import QDialog, QMessageBox
+from qtpy.QtGui import QDesktopServices
 
 from .ui_edit_vars_sample import Ui_EditIodeSampleDialog
 from iode_gui.utils import URL_MANUAL

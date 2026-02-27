@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QDialog, QPlainTextEdit, QMessageBox
-from PySide6.QtGui import QDesktopServices, QShortcut, QKeySequence
+from qtpy.QtCore import Qt, Signal, Slot
+from qtpy.QtWidgets import QDialog, QPlainTextEdit, QMessageBox
+from qtpy.QtGui import QDesktopServices, QShortcut, QKeySequence
 
 
 from iode_gui.utils import URL_MANUAL

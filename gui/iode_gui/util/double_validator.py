@@ -1,6 +1,6 @@
-from PySide6.QtCore import QLocale
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QValidator, QDoubleValidator
+from qtpy.QtCore import QLocale
+from qtpy.QtWidgets import QWidget
+from qtpy.QtGui import QValidator, QDoubleValidator
 
 from iode_gui.utils import NAN_REP
 from typing import overload

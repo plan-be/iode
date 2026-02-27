@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 from typing import List
 from iode import EqTest, EQ_TEST_NAMES, Equation

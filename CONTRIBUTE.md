@@ -22,7 +22,7 @@
    - cython == 3.1.4
    - mypy
    - scikit-build-core
-   - pyside6
+   - pyqt
    - qtconsole
    - ipython
    - pytest

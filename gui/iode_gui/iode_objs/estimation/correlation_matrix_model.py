@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 from iode.compute.estimation import CorrelationMatrix
 

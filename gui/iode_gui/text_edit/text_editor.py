@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
+from qtpy.QtWidgets import QWidget
+from qtpy.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
                            QKeySequence, QTextBlock, QTextCursor)
-from PySide6.QtCore import Qt, QRect, QSize, QPoint, QSettings
+from qtpy.QtCore import Qt, QRect, QSize, QPoint, QSettings
 
 from .find_and_replace_dialog import FindAndReplaceDialog
 from .complete_text_edit import IodeAutoCompleteTextEdit
@@ -47,7 +47,7 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         self.find_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.find_shortcut.activated.connect(self.open_find_box)
         
-        self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_R), self)
+        self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_H), self)
         self.replace_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.replace_shortcut.activated.connect(self.open_replace_box)
         
@@ -124,7 +124,7 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         cursor: QTextCursor = self.textCursor()
         self.find_replace_dialog.set_text_to_find(cursor.selectedText())
         # set if replace part is showed
-        self.find_replace_dialog.findAndReplace(find_only)
+        self.find_replace_dialog.find_and_replace(find_only)
         # show the find and replace box
         self.find_replace_dialog.setVisible(True)
 

@@ -1,9 +1,9 @@
 from typing import List
 from pathlib import Path
 
-from PySide6.QtWidgets import QWidget, QStyledItemDelegate, QLineEdit, QStyleOptionViewItem, QMessageBox
-from PySide6.QtCore import QModelIndex, Qt, QObject, QAbstractItemModel
-from PySide6.QtGui import QPainter, QPalette, QColor
+from qtpy.QtWidgets import QWidget, QStyledItemDelegate, QLineEdit, QStyleOptionViewItem, QMessageBox
+from qtpy.QtCore import QModelIndex, Qt, QObject, QAbstractItemModel
+from qtpy.QtGui import QPainter, QPalette, QColor
 
 
 class FileDelegate(QStyledItemDelegate):
