@@ -1,7 +1,7 @@
-from PySide6.QtCore import Qt, Slot, QSettings
-from PySide6.QtWidgets import QWidget, QApplication, QColorDialog, QMessageBox
-from PySide6.QtGui import QStyleHints, QColor
-from PySide6 import __version__ as pyside_version
+from qtpy.QtCore import Qt, Slot, QSettings
+from qtpy.QtWidgets import QWidget, QApplication, QColorDialog, QMessageBox
+from qtpy.QtGui import QStyleHints, QColor
+from qtpy import __version__ as pyside_version
 v_major, v_minor, v_patch = map(int, pyside_version.split('.'))
 pyside6_68_or_higher = (v_major, v_minor) >= (6, 8)
 

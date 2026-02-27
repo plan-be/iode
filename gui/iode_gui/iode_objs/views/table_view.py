@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Slot, Signal, QSettings
-from PySide6.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit, QMenu
-from PySide6.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
+from qtpy.QtCore import Qt, Slot, Signal, QSettings
+from qtpy.QtWidgets import QDialog, QMessageBox, QAbstractItemView, QLineEdit, QMenu
+from qtpy.QtGui import QShortcut, QKeySequence, QContextMenuEvent, QAction
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 

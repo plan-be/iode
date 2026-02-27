@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPersistentModelIndex, QSortFilterProxyModel, QModelIndex, QFileInfo
+from qtpy.QtCore import QPersistentModelIndex, QSortFilterProxyModel, QModelIndex, QFileInfo
 
 
 class FileExplorerProxyModel(QSortFilterProxyModel):

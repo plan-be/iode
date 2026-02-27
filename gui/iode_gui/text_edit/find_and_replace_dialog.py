@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QDialog, QPlainTextEdit
-from PySide6.QtGui import (QTextCharFormat, QColor, QKeySequence, QShortcut, 
-                           QTextCursor, QTextDocument)
-from PySide6.QtCore import Qt
+from qtpy.QtWidgets import QDialog, QPlainTextEdit
+from qtpy.QtGui import (QTextCharFormat, QColor, QKeySequence, QShortcut, 
+                        QTextCursor, QTextDocument, QIcon)
+from qtpy.QtCore import Qt
 
 from .ui_find_and_replace_dialog import Ui_FindAndReplaceDialog
 
@@ -29,6 +29,11 @@ class FindAndReplaceDialog(QDialog):
         self.ui.replaceAll = self.replaceAll
         self.ui.onSearchEdited = self.onSearchEdited
         self.ui.setupUi(self)
+
+        self.ui.nextButton.setIcon(QIcon("icons:arrow_down.png"))
+        self.ui.previousButton.setIcon(QIcon("icons:arrow_up.png"))
+        self.ui.replaceButton.setIcon(QIcon("icons:replace.png"))
+        self.ui.replaceAllButton.setIcon(QIcon("icons:replace_all.png"))
 
         self.editor = editor
         self.doc = editor.document()

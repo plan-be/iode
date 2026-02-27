@@ -1,9 +1,9 @@
-from PySide6.QtCore import Qt, Signal, Slot, QAbstractTableModel
-from PySide6.QtWidgets import QDialog, QMessageBox, QHeaderView
-from PySide6.QtGui import (QKeySequence, QShortcut, QTextCursor, QTextCharFormat, 
+from qtpy.QtCore import Qt, Signal, Slot, QAbstractTableModel
+from qtpy.QtWidgets import QDialog, QMessageBox, QHeaderView
+from qtpy.QtGui import (QKeySequence, QShortcut, QTextCursor, QTextCharFormat, 
                            QFont, QTextTableFormat, QTextFrameFormat, QTextDocument, 
                            QDesktopServices)
-from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
+from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.utils import URL_MANUAL

@@ -1,6 +1,6 @@
-from PySide6.QtCore import Slot, QLocale
-from PySide6.QtWidgets import QWidget, QMessageBox
-from PySide6.QtGui import QDoubleValidator
+from qtpy.QtCore import Slot, QLocale
+from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QDoubleValidator
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter

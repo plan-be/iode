@@ -1,8 +1,8 @@
-from PySide6.QtCore import Qt, QSettings, QDir, Slot
-from PySide6.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QCheckBox, 
+from qtpy.QtCore import Qt, QSettings, QDir, Slot
+from qtpy.QtWidgets import (QWidget, QDialog, QComboBox, QFontComboBox, QCheckBox, 
                                QRadioButton, QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, 
                                QPlainTextEdit)
-from PySide6.QtGui import QDesktopServices, QCloseEvent
+from qtpy.QtGui import QDesktopServices, QCloseEvent
 
 from iode_gui.utils import URL_MANUAL, Context
 from iode_gui.color_theme import ColorTheme

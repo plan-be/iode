@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QDialog
-from PySide6.QtGui import QKeySequence, QShortcut
+from qtpy.QtCore import Qt, Signal, Slot
+from qtpy.QtWidgets import QDialog
+from qtpy.QtGui import QKeySequence, QShortcut
 
 from iode_gui.color_theme import ColorTheme
 from iode_gui.settings import get_color_theme

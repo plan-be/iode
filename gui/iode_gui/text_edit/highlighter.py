@@ -1,6 +1,6 @@
-from PySide6.QtCore import QRegularExpression, QSettings
-from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
-from PySide6.QtWidgets import QTextEdit, QMessageBox
+from qtpy.QtCore import QRegularExpression, QSettings
+from qtpy.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
+from qtpy.QtWidgets import QTextEdit, QMessageBox
 
 from iode_gui.color_theme import ColorTheme
 from iode_gui.settings import get_color_theme

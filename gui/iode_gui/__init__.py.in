@@ -2,6 +2,8 @@ from pathlib import Path
 
 __version__ = "${CMAKE_PROJECT_VERSION}"
 
-DOC_DIR = str((Path(__file__).parent / "doc").resolve())
+INSTALL_DIR = Path(__file__).parent
+GUI_DOC_DIR = (INSTALL_DIR / "doc").resolve()
+GUI_RESOURCES_DIR = (INSTALL_DIR / "resources").resolve()
 
 from iode_gui.main import start, open_application

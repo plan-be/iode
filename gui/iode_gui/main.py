@@ -1,12 +1,26 @@
 import os
 import sys
 import inspect
-from PySide6.QtWidgets import QApplication, QSplashScreen, QMessageBox
-from PySide6.QtGui import QPixmap
+
+try:
+    import qtpy
+except ImportError:
+    raise ImportError("qtpy is not installed. Please install qtpy to run the IODE GUI")
+
+from qtpy.QtWidgets import QMessageBox
+
+if not qtpy.QT6:
+    QMessageBox.critical(None, "Error", "Qt6 is required to run the IODE GUI. "
+                         "Please install PyQt6 or PySide6")
+    exit(0)    
+
+from qtpy.QtWidgets import QApplication, QSplashScreen, QMessageBox
+from qtpy.QtGui import QPixmap
 
 from typing import Union, List, Optional
 from pathlib import Path
 
+from iode_gui import GUI_RESOURCES_DIR
 from iode_gui.utils import ORGANIZATION_NAME, Context
 from iode_gui.main_window import MainWindow
 from iode_gui.super import gui_assign_super
@@ -54,7 +68,7 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         app.setApplicationName("IODE")
         app.setStyle('Fusion')
 
-    pixmap = QPixmap(":/images/iode_splash_screen.png")
+    pixmap = QPixmap("images:iode_splash_screen.png")
     splash = QSplashScreen(pixmap)
     splash.show()
     app.processEvents()

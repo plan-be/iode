@@ -1,7 +1,7 @@
-from PySide6.QtCore import Qt, QDir, QSettings, QFileInfo, Slot
-from PySide6.QtGui import QAction, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
-from PySide6.QtWidgets import (QMainWindow, QMessageBox, QDialog, QLabel, QPlainTextEdit, 
-                               QGridLayout, QFileDialog, QTextEdit, QLineEdit)
+from qtpy.QtCore import Qt, QDir, QSettings, QFileInfo, Slot
+from qtpy.QtGui import QAction, QIcon, QShortcut, QKeySequence, QCloseEvent, QDesktopServices
+from qtpy.QtWidgets import (QMainWindow, QMessageBox, QDialog, QLabel, QPlainTextEdit, 
+                            QGridLayout, QFileDialog, QTextEdit, QLineEdit)
 
 try:
     from qtconsole.rich_jupyter_widget import RichJupyterWidget
@@ -114,6 +114,9 @@ class MainWindow(AbstractMainWindow):
             # Create an instance of the widgets defined in the .ui file
             self.ui = Ui_MainWindow()
             self.ui.setupUi(self)
+
+            # set the application icon
+            self.setWindowIcon(QIcon("images:iode_icon.png"))
 
             self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
             self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")

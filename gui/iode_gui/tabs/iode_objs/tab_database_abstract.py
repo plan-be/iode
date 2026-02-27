@@ -1,7 +1,7 @@
-from PySide6.QtCore import QDir, Qt, Signal, Slot
-from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter, QDialog, 
+from qtpy.QtCore import QDir, Qt, Signal, Slot
+from qtpy.QtWidgets import (QVBoxLayout, QHBoxLayout, QLineEdit, QSplitter, QDialog, 
                                QPushButton, QSpacerItem, QSizePolicy, QLabel)
-from PySide6.QtGui import QShortcut, QKeySequence
+from qtpy.QtGui import QShortcut, QKeySequence
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.tabs.tab_abstract import IodeAbstractWidget

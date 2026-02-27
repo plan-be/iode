@@ -1,6 +1,6 @@
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QTableView, QMenu
-from PySide6.QtGui import QContextMenuEvent
+from qtpy.QtCore import Slot
+from qtpy.QtWidgets import QTableView, QMenu
+from qtpy.QtGui import QContextMenuEvent
 
 from iode_gui.color_theme import ColorTheme
 from iode_gui.settings import get_color_theme

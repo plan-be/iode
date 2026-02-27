@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import (QStyledItemDelegate, QLineEdit, QPlainTextEdit, 
+from qtpy.QtWidgets import (QStyledItemDelegate, QLineEdit, QPlainTextEdit, 
                              QWidget, QStyleOptionViewItem)
-from PySide6.QtCore import Qt, QEvent, QObject, QModelIndex, QAbstractItemModel
-from PySide6.QtGui import QKeyEvent
+from qtpy.QtCore import Qt, QEvent, QObject, QModelIndex, QAbstractItemModel
+from qtpy.QtGui import QKeyEvent
 
 from iode import IodeType
 
