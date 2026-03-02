@@ -116,7 +116,7 @@ class MainWindow(AbstractMainWindow):
             self.ui.setupUi(self)
 
             # set the application icon
-            self.setWindowIcon(QIcon("images:iode_icon.png"))
+            self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
             self.ui.textEdit_output.setStyleSheet(f"font-family: {self.font_family}")
             self.ui.lineEdit_iode_command.setStyleSheet(f"font-family: {self.font_family}")
