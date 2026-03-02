@@ -1,6 +1,8 @@
 ﻿Change log
 ##########
 
+.. include:: ./changes/v7.0.6.rst.inc
+
 .. include:: ./changes/v7.0.5.rst.inc
 
 .. include:: ./changes/v7.0.4.rst.inc
