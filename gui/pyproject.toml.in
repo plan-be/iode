@@ -51,7 +51,7 @@ iode-gui = "iode_gui.main:start"
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
 
 [tool.setuptools.package-data]
-iode-gui = ["resources/*"]
+iode_gui = ["resources/*"]
 
 [tool.setuptools.packages]
 # Disable implicit namespaces -> This will prevent any folder without 
