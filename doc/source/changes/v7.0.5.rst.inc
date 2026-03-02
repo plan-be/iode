@@ -1,7 +1,7 @@
 Version 7.0.5
 =============
 
-In development
+Released on 02/03/2026
 
 New Features 
 ------------
@@ -11,7 +11,7 @@ Improvements
 ------------
 
 - PYTHON: Provides an `iode` package for Python 3.13 (closes :issue:`1134`) 
-- GUI: Support PyQt6 as well as PySide6 (closes :issue:`1084`)
+- GUI: Supports PyQt6 as well as PySide6 (closes :issue:`1084`)
 
 Fixed Bugs 
 ----------
