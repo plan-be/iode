@@ -111,6 +111,7 @@ message(STATUS "Full path to the top level directory: ${CMAKE_SOURCE_DIR}")
 # -- print global info --
 message(STATUS " ")
 message(STATUS "======== global info ========\n")
+message(STATUS "CMake version:      ${CMAKE_VERSION}")
 message(STATUS "IODE version:       ${PROJECT_VERSION}")
 message(STATUS "HOMEPAGE URL:       ${PROJECT_HOMEPAGE_URL}")
 message(STATUS "OS:                 ${CMAKE_SYSTEM_NAME}")
@@ -200,9 +201,21 @@ message(STATUS "=============================\n")
 message(STATUS "SEARCH FOR PACKAGES:\n")
 
 # -- find Python --
+# see https://cmake.org/cmake/help/latest/module/FindPython.html for more details about 
+# find_package(Python) 
 message(CHECK_START "Search for Python")
-find_package(Python COMPONENTS Interpreter Development.Module NumPy
-                    OPTIONAL_COMPONENTS Development.SABIModule)
+if(NOT SKBUILD)
+  # NOTE: set Numpy as optional (while it is actually required) for not breaking 
+  #       the build on ReadTheDocs where numpy is installed after the first call 
+  #       to cmake --preset linux-release 
+  find_package(Python COMPONENTS Interpreter Development.Module NumPy
+                      OPTIONAL_COMPONENTS Development.SABIModule)
+else()
+  message("SKBUILD_SABI_VERSION: ${SKBUILD_SABI_VERSION}")
+  message("SKBUILD_SABI_COMPONENT: ${SKBUILD_SABI_COMPONENT}")
+  find_package(Python ${SKBUILD_SABI_VERSION} REQUIRED COMPONENTS Interpreter 
+                      Development.Module NumPy ${SKBUILD_SABI_COMPONENT})
+endif()
 if(Python_FOUND)
   message(CHECK_PASS "found")
   cmake_print_variables(Python_VERSION)
