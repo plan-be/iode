@@ -3,7 +3,7 @@
 - Required tools:
   - **Windows**:
     - Compiler **MSVC 2022**.
-    - [CMake](https://cmake.org/download) (>= 3.20) (*) -> controls the software compilation process.
+    - [CMake](https://cmake.org/download) (>= 3.30) (*) -> controls the software compilation process.
     - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
     <br> Can be installed using [winget](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages#windows) on Windows:
       > winget install Ninja-build.Ninja
@@ -88,7 +88,6 @@ To prepare the building of Python IODE, please create the following conda enviro
 > conda create --name py310 python=3.10 numpy pandas larray cython==3.1.4 pytest scikit-build-core
 > conda create --name py311 python=3.11 numpy pandas larray cython==3.1.4 pytest scikit-build-core
 > conda create --name py312 python=3.12 numpy pandas larray cython==3.1.4 pytest scikit-build-core
-> conda create --name py313 python=3.13 numpy pandas larray cython==3.1.4 pytest scikit-build-core
 ```
 
 # Building Project
@@ -405,7 +404,7 @@ Push the tag to Github: git push origin <tag_name>.
 
 ## Buid the Python packages
 
-Build the *iode* (for all supported python versions) and *iode_gui* Python packages:
+Build the *iode* (for all supported python versions \*) and *iode_gui* Python packages:
 ```bash
 root_dir_iode> cd pyiode
 pyiode> del dist\*
@@ -417,6 +416,9 @@ root_dir_iode> cd gui
 gui> del dist\*
 gui> python -m build --sdist --wheel
 ```
+
+\* No need to build a specific version for Python 3.13 or later, since we use 
+*Stable ABI* for Python 3.12+
 
 ## Upload the Python packages to PyPI
 

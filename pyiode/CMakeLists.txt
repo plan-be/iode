@@ -103,9 +103,14 @@ if(Python_FOUND)
                       --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_cython
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
                       --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
-
-    python_add_library(iode_cython MODULE ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp WITH_SOABI)
-
+    
+    # see https://cmake.org/cmake/help/latest/module/FindPython.html#commands for python_add_library() 
+    if(SKBUILD AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.26" AND NOT "${SKBUILD_SABI_VERSION}" STREQUAL "")
+      python_add_library(iode_cython MODULE WITH_SOABI USE_SABI ${SKBUILD_SABI_VERSION} ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
+    else()
+      python_add_library(iode_cython MODULE WITH_SOABI ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
+    endif()
+    
     target_link_libraries(iode_cython PRIVATE iode_cpp_api Python::NumPy)
     target_include_directories(iode_cython PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
     target_compile_definitions(iode_cython PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
