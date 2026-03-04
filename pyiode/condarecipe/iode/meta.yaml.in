@@ -17,7 +17,12 @@ source:
 build:
   entry_points:
     - iodecmd = iode.cli:main
+  script_env:                                                                         # [win]
+    - DISTUTILS_USE_SDK=1                                                             # [win]
+    - CMAKE_GENERATOR=Visual Studio 17 2022                                           # [win]
+    - CMAKE_GENERATOR_PLATFORM=x64                                                    # [win]
   script:
+    - set "DISTUTILS_USE_SDK=1"                                                       # [win]
     - cmake --preset windows-release                                                  # [win]      
     - cmake --preset linux-release                                                    # [linux]      
     # if source is git_url -> current dir is root project dir -> need to move to pyiode 
@@ -44,8 +49,10 @@ requirements:
     - git
     - cmake 
     - ninja
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - vs2022_win-64                                                                 # [win]
+    - vc >=14.3                                                                     # [win]
+    - {{ compiler('c') }}                                                           # [not win]
+    - {{ compiler('cxx') }}                                                         # [not win]
 
   run:
     - python ={{ PY_VER }}
