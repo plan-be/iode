@@ -231,7 +231,7 @@ pyiode> pip install sdist/<iode-weel-file>.
 Then, run *pytest* from the root directory:
 ```bash
 pyiode> cd ..
-root_dir_iode> pytest
+root_dir_iode> python -m pytest --pyargs iode --doctest-modules --doctest-continue-on-failure --verbose
 ```
 
 ## Uploading the distribution archives to TestPyPI
@@ -270,6 +270,12 @@ Uploading example_package_YOUR_USERNAME_HERE-0.0.1.tar.gz
 You can use pip to install your package and verify that it works
 ```bash
 root_dir_iode> pip install --index-url https://test.pypi.org/simple/ --no-deps iode
+```
+
+To test the newly installed package, run *pytest* from the root directory:
+```bash
+pyiode> cd ..
+root_dir_iode> python -m pytest --pyargs iode --doctest-modules --doctest-continue-on-failure --verbose
 ```
 
 ## Uploading the distribution archives to PyPI
@@ -402,23 +408,66 @@ The change log files for each version are located in the directory doc/changes.
 
 Push the tag to Github: git push origin <tag_name>.
 
-## Buid the Python packages
+## Buid and Test the Python packages
 
-Build the *iode* (for all supported python versions \*) and *iode_gui* Python packages:
+### Cleanup
+
+Cleanup the pyiode/dist and gui/dist folder:
 ```bash
 root_dir_iode> cd pyiode
 pyiode> del dist\*
+pyiode> cd ..
+root_dir_iode> cd gui
+gui> del dist\*
+gui> cd ..
+```
+
+### Build
+
+Build the *iode* package (for all supported python versions \*):
+```bash
+root_dir_iode> cd pyiode
 pyiode> conda activate py3xx
 pyiode> python -m build --sdist --wheel
 ```
+and the *iode_gui* Python packages:
 ```bash
 root_dir_iode> cd gui
-gui> del dist\*
 gui> python -m build --sdist --wheel
 ```
 
 \* No need to build a specific version for Python 3.13 or later, since we use 
 *Stable ABI* for Python 3.12+
+
+### Test
+
+To test the new versions of *iode*, first reinstall it using the new Wheel files:
+```bash
+root_dir_iode> cd pyiode
+pyiode> conda activate py3xx
+pyiode> pip uninstall iode
+pyiode> pip install dist\iode-x.x.x-cp3xx-(...).whl
+```
+Then, test the installed package
+```bash
+pyiode> cd ..
+root_dir_iode> python -m pytest --pyargs iode --doctest-modules --doctest-continue-on-failure --verbose
+```
+
+To test the new version of *iode-gui*, first reinstall from the new Wheel file:
+```bash
+root_dir_iode> cd gui
+gui> conda activate py3xx
+gui> pip uninstall iode
+gui> pip install dist\iode_gui-x.x.x-(***).whl
+gui> cd ..
+```
+
+Then, test the command `iode-gui` from the terminal
+```bash
+root_dir_iode> iode-gui
+```
+The Graphical User Interface should show up.
 
 ## Upload the Python packages to PyPI
 
