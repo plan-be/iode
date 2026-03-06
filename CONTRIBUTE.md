@@ -85,8 +85,6 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py310 python=3.10 numpy pandas larray cython==3.1.4 pytest scikit-build-core
-> conda create --name py311 python=3.11 numpy pandas larray cython==3.1.4 pytest scikit-build-core
 > conda create --name py312 python=3.12 numpy pandas larray cython==3.1.4 pytest scikit-build-core
 ```
 

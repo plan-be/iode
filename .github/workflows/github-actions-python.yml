@@ -17,23 +17,17 @@ jobs:
           matrix:
             include:
               - os: windows-latest
-                python-minor-version: "3.10"
-                without-larray: false
-              - os: windows-latest
-                python-minor-version: "3.11"
-                without-larray: false
-              - os: windows-latest
                 python-minor-version: "3.12"
                 without-larray: false
-              - os: windows-latest
-                python-minor-version: "3.12"
-                without-larray: true
               - os: windows-latest
                 python-minor-version: "3.13"
                 without-larray: false
-              - os: ubuntu-latest
-                python-minor-version: "3.12"
+              - os: windows-latest
+                python-minor-version: "3.14"
                 without-larray: false
+              - os: windows-latest
+                python-minor-version: "3.14"
+                without-larray: true
     
         runs-on: ${{ matrix.os }}
 
