@@ -49,7 +49,7 @@ Required Dependencies
 iode
 ~~~~
 
-- Python 3.10, 3.11, 3.12 or 3.13
+- Python 3.12, 3.13 or 3.14
 - `numpy <http://www.numpy.org/>`__
 - `pandas <http://pandas.pydata.org/>`__
 - `matplotlib <http://matplotlib.org/>`__
