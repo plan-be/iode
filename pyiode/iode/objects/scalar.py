@@ -50,14 +50,18 @@ class Scalar:
     --------
     >>> import numpy as np
     >>> from iode import Scalar
-    >>> # default relax
-    >>> scalar = Scalar(0.9)
+    >>> # default value and relax
+    >>> scalar = Scalar()
     >>> scalar
     Scalar(0.9, 1, na)
-    >>> # specific value and relax
-    >>> scalar = Scalar(0.9, 0.8)
+    >>> # default relax
+    >>> scalar = Scalar(0.5)
     >>> scalar
-    Scalar(0.9, 0.8, na)
+    Scalar(0.5, 1, na)
+    >>> # specific value and relax
+    >>> scalar = Scalar(0.5, 0.8)
+    >>> scalar
+    Scalar(0.5, 0.8, na)
     >>> # Python nan are converted to IODE NA
     >>> scalar = Scalar(np.nan)
     >>> scalar
@@ -68,12 +72,12 @@ class Scalar:
     ...
     ValueError: Expected 'value' to be a finite number
     >>> # relax must be between 0.0 and 1.0
-    >>> scalar = Scalar(0.9, 1.1)
+    >>> scalar = Scalar(0.5, 1.1)
     Traceback (most recent call last):
     ...
     ValueError: Expected 'relax' value between 0.0 and 1.0
     """
-    def __init__(self, value: float, relax: float=1.0) -> Self:
+    def __init__(self, value: float=0.9, relax: float=1.0) -> Self:
         if relax < 0.0 or relax > 1.0:
             raise ValueError("Expected 'relax' value between 0.0 and 1.0")   
         if np.isinf(value):
