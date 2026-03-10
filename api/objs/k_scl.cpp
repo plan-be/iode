@@ -30,12 +30,11 @@ std::size_t hash_value(const Scalar& scalar)
 
 bool KDBScalars::binary_to_obj(const std::string& name, char* pack)
 {
-    Scalar* scl_ptr = (Scalar*) P_get_ptr(pack, 0);
-    if(!scl_ptr) 
+    Scalar* scl = (Scalar*) P_get_ptr(pack, 0);
+    if(!scl) 
         return false;
 
-    Scalar* scl = new Scalar(*scl_ptr);
-    this->k_objs[name] = scl;
+    this->k_objs[name] = std::make_shared<Scalar>(*scl);
     return true;
 }
 
@@ -48,7 +47,7 @@ bool KDBScalars::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBScalars::obj_to_binary(char** pack, const std::string& name)
 {
-    Scalar* scl = this->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl = this->get_obj_ptr(name);
     if(!scl) 
         return false;
 
@@ -72,7 +71,7 @@ bool KDBScalars::print_obj_def(const std::string& name)
 {
     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 1, name.c_str());
 
-    Scalar* scl = this->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl = this->get_obj_ptr(name);
     if(!scl) 
     {
         W_printf((char*) "?\n");

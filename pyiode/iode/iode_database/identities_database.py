@@ -13,6 +13,7 @@ from iode.time.period import Period
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.identity import Identity
 
+from iode.iode_cython import Identity as CythonIdentity
 from iode.iode_cython import Identities as CythonIdentities
 
 
@@ -67,19 +68,23 @@ class Identities(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonIdentities()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonIdentities()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonIdentities) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        instance = Identities.get_instance()
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy)
+        subset = Identities.from_cython_obj(cy_subset)
+        return subset
 
     @property
     def i(self) -> PositionalIndexer:
@@ -113,15 +118,18 @@ class Identities(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        identity = Identity.get_instance()
-        identity._cython_instance = self._cython_instance._get_object(name, identity._cython_instance)
+        cy_idt: CythonIdentity = self._cy_database._get_object(name)
+        identity = Identity.from_cython_obj(cy_idt)
         return identity
 
     def _set_object(self, key: Union[str, int], value: Union[str, Identity]):
         name = self._single_object_key_to_name(key)
-        if isinstance(value, Identity):
+        is_of_type_Identity = isinstance(value, Identity)
+        if is_of_type_Identity:
             value = str(value)
-        self._cython_instance._set_object(name, value)
+        cy_idt: CythonIdentity = self._cy_database._set_object(name, value)
+        if is_of_type_Identity:
+            value = Identity.from_cython_obj(cy_idt)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Identity, Self]:
         r"""
@@ -234,7 +242,12 @@ class Identities(IodeDatabase):
         >>> identities["AOUC"] = '(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]'
         >>> identities["AOUC"]
         Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1] + PM * (VM / (VM+VAFF))[-1]')
-
+        >>> # or equivalently
+        >>> idt = identities["AOUC"]
+        >>> idt.lec = "(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1]"
+        >>> identities["AOUC"]
+        Identity('(WCRH / WCRH[1990Y1]) * (VAFF / (VM+VAFF))[-1]')
+        
         >>> # c) add/update several identities at once
         >>> # 1) using a dict of values
         >>> values = {"GAP2": "0.9 * 100*(QAFF_/(Q_F+Q_I))", "GAP_": "0.9 * 100*((QAF_/Q_F)-1)", 
@@ -353,6 +366,22 @@ class Identities(IodeDatabase):
         False
         >>> identities.get_names("Y*")
         ['YSEFPR', 'YSFICR']
+
+        >>> # create a new identity and store it in a Python variable
+        >>> idt = Identity("YN - YK")
+        >>> idt
+        Identity('YN - YK')
+        >>> # add it to the database
+        >>> identities["NEW_IDT"] = idt
+        >>> identities["NEW_IDT"]
+        Identity('YN - YK')
+        >>> # then delete it from the database
+        >>> del identities["NEW_IDT"]
+        >>> "NEW_IDT" in identities
+        False
+        >>> # NOTE: the Python variable 'idt' still contains the identity object
+        >>> idt
+        Identity('YN - YK')
         """
         super().__delitem__(key)
 
@@ -404,7 +433,7 @@ class Identities(IodeDatabase):
             Defaults to load all identities from the input file(s). 
         """
         input_files, names = self._copy_from(input_files, names)
-        self._cython_instance.copy_from(input_files, names)
+        self._cy_database.copy_from(input_files, names)
 
     def execute(self, identities: Union[str, List[str]]=None, from_period: Union[str, Period]=None, 
                 to_period: Union[str, Period]=None, var_files: Union[str, List[str]]=None, 
@@ -642,7 +671,7 @@ class Identities(IodeDatabase):
         else:
             raise TypeError("'scalar_files': Expected value of type str or a list of str. "
                             f"Got value of type {type(scalar_files).__name__}")
-        success = self._cython_instance.execute(identities, str(from_period), str(to_period), var_files, scalar_files, trace)
+        success = self._cy_database.execute(identities, str(from_period), str(to_period), var_files, scalar_files, trace)
         return success
 
     def from_series(self, s: pd.Series):

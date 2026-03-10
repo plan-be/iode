@@ -25,18 +25,18 @@ TEST_F(ScalarTest, AddGetScalar)
     std::string name = "scalar";
 
     Scalar* scalar = new Scalar(val, relax, std);
-    global_ws_scl->set_obj_ptr(name, scalar);
+    global_ws_scl->add(name, *scalar);
     bool found = global_ws_scl->contains(name);
     ASSERT_TRUE(found);
 
-    Scalar* scl = global_ws_scl->get_obj_ptr(name);
-    ASSERT_EQ(scl->value, val);
-    ASSERT_EQ(scl->relax, relax);
-    ASSERT_EQ(scl->std, std);
+    std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+    ASSERT_EQ(scl_ptr->value, val);
+    ASSERT_EQ(scl_ptr->relax, relax);
+    ASSERT_EQ(scl_ptr->std, std);
 
     std::hash<Scalar> scl_hasher;
-    std::size_t c_hash = scl_hasher(*scl);
-    std::size_t cpp_hash = scl_hasher(*scalar);
+    std::size_t c_hash = scl_hasher(*scalar);
+    std::size_t cpp_hash = scl_hasher(*scl_ptr);
     ASSERT_EQ(c_hash, cpp_hash);
 }
 

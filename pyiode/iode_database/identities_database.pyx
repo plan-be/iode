@@ -42,27 +42,29 @@ cdef class Identities(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, subset: Identities, pattern: str, copy: bool) -> Identities:
-        subset.database_ptr = new KDBIdentities(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+    def initialize_subset(self, pattern: str, copy: bool) -> Identities:
+        cdef KDBIdentities* subset_db_ptr = new KDBIdentities(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Identities._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
-    def _get_object(self, name: str, identity: Identity) -> Identity:
-        cdef CIdentity c_identity
+    def _get_object(self, name: str) -> Identity:
+        cdef shared_ptr[CIdentity] idt_ptr
         name  = name.strip()
-        c_identity = self.database_ptr.get(name.encode())
-        
-        identity.c_identity = new CIdentity(c_identity)
-        identity.ptr_owner = <bint>True
+        idt_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        identity = Identity._from_ptr(idt_ptr)
         return identity
 
-    def _set_object(self, name: str, value: str):
-        cdef CIdentity* c_idt = NULL
+    def _set_object(self, name: str, value: str) -> Identity:
+        cdef shared_ptr[CIdentity] idt_ptr
         name = name.strip()
         value = value.strip()
-        c_idt = new CIdentity(value.encode())
-        self.database_ptr.set_obj_ptr(name.encode(), c_idt)
+        idt_ptr = make_shared[CIdentity](value.encode())
+        # NOTE: the C++ set_obj_ptr() method creates a copy of the object stored 
+        #       in the passed shared pointer to avoid that two entries (shared_ptr<T>) 
+        #       in the IODE database point to the same object in memory
+        idt_ptr = self.database_ptr.set_obj_ptr(name.encode(), idt_ptr)
+        identity = Identity._from_ptr(idt_ptr)
+        return identity
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

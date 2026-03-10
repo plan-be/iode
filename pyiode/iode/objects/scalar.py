@@ -84,12 +84,12 @@ class Scalar:
             raise ValueError("Expected 'value' to be a finite number")
         if np.isnan(value):
             value = NA
-        self._cython_instance = CythonScalar(value, relax)
+        self._cy_scalar = CythonScalar(value, relax)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonScalar) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonScalar.__new__(CythonScalar)
+        instance._cy_scalar = obj
         return instance
 
     @property
@@ -121,7 +121,7 @@ class Scalar:
         ...
         ValueError: Expected 'value' to be a finite number
         """
-        return self._cython_instance.get_value()
+        return self._cy_scalar.get_value()
 
     @value.setter
     def value(self, val: float):
@@ -129,24 +129,24 @@ class Scalar:
             raise ValueError("Expected 'value' to be a finite number")
         if np.isnan(val):
             val = NA
-        self._cython_instance.set_value(val)
+        self._cy_scalar.set_value(val)
 
     @property
     def relax(self) -> float:
-        return self._cython_instance.get_relax()
+        return self._cy_scalar.get_relax()
 
     @relax.setter
     def relax(self, value: float):
         if value < 0.0 or value > 1.0:
             raise ValueError("Expected relax value between 0.0 and 1.0")
-        self._cython_instance.set_relax(value)
+        self._cy_scalar.set_relax(value)
 
     @property
     def std(self) -> float:
-        return self._cython_instance.get_std()
+        return self._cy_scalar.get_std()
 
     def _set_std(self, value: float):
-        self._cython_instance._set_std(value)
+        self._cy_scalar._set_std(value)
 
     def _as_tuple(self) -> Tuple[float, float, float]:
         r"""
@@ -159,7 +159,7 @@ class Scalar:
         >>> scalar._as_tuple()
         (0.9, 0.8, nan)
         """
-        return self._cython_instance._as_tuple()
+        return self._cy_scalar._as_tuple()
 
     def copy(self) -> Self:
         r"""
@@ -180,7 +180,7 @@ class Scalar:
         return copy(self)
 
     def __eq__(self, other: Self) -> bool:
-        return self._cython_instance.equal(other)
+        return self._cy_scalar.equal(other._cy_scalar)
 
     def __copy__(self) -> Self:
         r"""
@@ -210,6 +210,6 @@ class Scalar:
         return str(self)
 
     def __hash__(self) -> int:
-        return self._cython_instance.__hash__()
+        return self._cy_scalar.__hash__()
 
 

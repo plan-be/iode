@@ -29,22 +29,21 @@
 
 
 // Function declarations
-static int E_GetScls(CLEC* clec, char*** scl);
-static void E_SetScl(int relax, char* name);
-static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, char** eqs, char* test);
+static std::vector<std::string> E_GetScls(CLEC* clec);
+static void E_SetScl(const bool relax, const std::string& name);
+static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, Sample* smpl, 
+                                   char** eqs, char* test);
 
 
 /**
  *  Retrieves (in a list of char*) the names of all scalars in a CLEC structure.
  *  
  *  @param [in] CLEC*   clec    compiled LEC expression
- *  @param [in] char*** scl     table of Scalar names found in clec
- *  @return     int             nb of scalars in clec
+ *  @return                     table of Scalar names found in clec
  */
-static int E_GetScls(CLEC* clec, char*** scl)                                            
+static std::vector<std::string> E_GetScls(CLEC* clec)                                            
 {
-    int nbscl = 0;
-
+    std::vector<std::string> v_scalar_names;
     std::string name;
     if(clec != 0) 
     {
@@ -52,11 +51,10 @@ static int E_GetScls(CLEC* clec, char*** scl)
         {
             name = std::string(clec->lnames[j].name);
             if(is_coefficient(name) && global_ws_scl->get_obj_ptr(name)->relax != 0)
-                SCR_add_ptr((unsigned char***) scl, &nbscl, (unsigned char*) name.c_str());
+                v_scalar_names.push_back(name);
         }
     }
-    SCR_add_ptr((unsigned char***) scl, &nbscl, NULL);
-    return(nbscl - 1);
+    return v_scalar_names;
 }
 
 
@@ -67,18 +65,18 @@ static int E_GetScls(CLEC* clec, char*** scl)
  *                              else, sets the scalar VALUE to 0.0 and its relax to 0.0
  *  @param [in] char*   name    name of the Scalar
  */
-static void E_SetScl(int relax, char* name)                                             
+static void E_SetScl(const bool relax, const std::string& name)                                             
 {
-    Scalar* scl = global_ws_scl->get_obj_ptr(name);
-    if(relax == 1) 
+    std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+    if(relax) 
     {
-        scl->value = 0.9;
-        scl->relax = 1.0;
+        scl_ptr->value = 0.9;
+        scl_ptr->relax = 1.0;
     }    
     else 
     { 
-        scl->value = 0.0;
-        scl->relax = 0.0;
+        scl_ptr->value = 0.0;
+        scl_ptr->relax = 0.0;
     }
 }
 
@@ -92,27 +90,28 @@ static void E_SetScl(int relax, char* name)
  */
 double C_evallec(char* lec, int t)
 {
-    CLEC        *clec;
-    double   x = IODE_NAN;
-    char        tmplec[4096];
+    double x = IODE_NAN;
+    char tmplec[4096];
 
     // For C++ when lec is a const string (in the DATA memory segment)
     SCR_strlcpy((unsigned char*) tmplec, (unsigned char*) lec, 4094);
 
     SCR_strip((unsigned char*) tmplec);
-    if(tmplec[0]) {
-        clec = L_cc(tmplec);
-        if(clec == NULL) {
+    if(tmplec[0]) 
+    {
+        CLEC* clec = L_cc(tmplec);
+        if(clec == NULL) 
+        {
             std::string error_msg = "Syntax error " + std::string(L_error());
             error_manager.append_error(error_msg);
-            return(x);
+            return x;
         }
         if(clec != 0 && !L_link(global_ws_var.get(), global_ws_scl.get(), clec))
             x = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
         SW_nfree(clec);
     }
 
-    return(x);
+    return x;
 }
 
 
@@ -124,57 +123,62 @@ double C_evallec(char* lec, int t)
  *  If a solution is reached for the combination of coefficients, returns the value of the statistical test ("r2" or "fstat") retrieved from
  *  the generated scalar e0_<test>.
  *  
- *  @param [in] int         i       current run number
- *  @param [in] int         nbscl   total number of coefficients in *eqs
- *  @param [in] char**      scl     list of scalar names
- *  @param [in] Sample*     smpl    estimation sample
- *  @param [in] char**      eqs     table of equation names (only eqs[0] is used)
- *  @param [in] char*       test    name of the statistical test to optimize: "fstat" or "r2"
- *  @return     double              value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
+ *  @param [in] int         i               current run number
+ *  @param [in]             v_scalar_names  list of scalar names
+ *  @param [in] Sample*     smpl            estimation sample
+ *  @param [in] char**      eqs             table of equation names (only eqs[0] is used)
+ *  @param [in] char*       test            name of the statistical test to optimize: "fstat" or "r2"
+ *  @return     double                      value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
-static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, char** eqs, char* test)   
+static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, 
+    Sample* smpl, char** eqs, char* test)   
 {
-    int         j, cscl, nscl;
-    char        buf[512];
-    double      res;
-    char        etest[20];
-    Estimation* est = NULL;
+    char buf[512];
+    memset(buf, 0, 512);
 
-    cscl = 1;
-    nscl = 0;
-    buf[0] = 0;
-    for(j = 0; j < nbscl; j++) {     /*Fixe les relax des scalaires*/
+    int cscl = 1;
+    int nscl = 0;
+    /*Fixe les relax des scalaires*/
+    for(const std::string& scl_name : v_scalar_names) 
+    {     
         // for the i-th run, the j-th scalar is "activated" is i & cscl
         
-        if(i & cscl) {                  // ! binary &, not logical && !
-            E_SetScl(1, scl[j]);
-            strcat(buf, scl[j]);
+        // ! binary &, not logical && !
+        if(i & cscl) 
+        {                  
+            E_SetScl(true, scl_name);
+            strcat(buf, scl_name.c_str());
             strcat(buf, " ");
             nscl++;
         }
         else
-            E_SetScl(0, scl[j]);
+            E_SetScl(false, scl_name);
         
         cscl = cscl * 2;               // 0001 -> 0010 -> 0100 -> 1000
     }
 
     /* Effectue l'estimation si plus d'un relax est != 0 */
+    double res = 0.0;
+    std::string scl_name;
+    std::shared_ptr<Scalar> scl_ptr;
     if(nscl > 1) 
     {                   
-        est = new Estimation(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
+        Estimation* est = new Estimation(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
         est->estimate();
         delete est;
-        est = nullptr;
 
-        etest[0]=0;
-        strcat(etest, "e0_");
-        strcat(etest, test);
-        res = global_ws_scl->get_obj_ptr(etest)->value;
+        scl_name = "e0_" + std::string(test);
+        scl_ptr = global_ws_scl->get_obj_ptr(scl_name);
+        if(!scl_ptr) 
+        {
+            std::string error_msg = "Error: scalar " + scl_name + " not found after estimation.";
+            error_manager.append_error(error_msg);
+            return 0.0;
+        }
+        res = scl_ptr->value;
         kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);
         L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);
     }
-    else 
-        res = 0.0;
     
     return res;
 }
@@ -234,46 +238,51 @@ static double estimate_step_wise_1(int i, int nbscl, char** scl, Sample* smpl, c
  */
 double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
 {
-    int         i, l=0,nbscl, nbcom;
-    int         lasti;
-    double      lnumtest, numtest;
-    Equation*   eq;
-    CLEC*       cl;
-    char        **scl = NULL, **eqs = NULL;
+    int     l=0;
 
-    // Crée le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
-    eqs = B_ainit_chk(eqname, NULL, 0);         
+    // Crée le tableau d'équations à partir de arg
+    char** eqs = B_ainit_chk(eqname, NULL, 0);         
     if(eqs == NULL) 
-        return(0.0);
+        return 0.0;
+
+    if(SCR_tbl_size((unsigned char **) eqs) > 1)
+    {
+        std::string msg = "Warning: more than one equation name found in argument eqname.";
+        msg += " Only one is expected.";
+        kwarning(msg.c_str());
+        SCR_free_tbl((unsigned char**) eqs);
+        return 0.0;
+    }
     
     std::string name = std::string(eqs[0]);
     if(!global_ws_eqs->contains(name)) 
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = global_ws_eqs->get_obj_ptr(name);               
-    cl = eq->clec;
-    nbscl = E_GetScls(cl, &scl);
+    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);               
+    CLEC* cl = eq_ptr->clec;
+    std::vector<std::string> v_scalar_names = E_GetScls(cl);
 
     // Effectue les estimations pour toutes les combi
-    nbcom = (int) pow(2.0, nbscl);
-    lnumtest = -999999999999.0;
-    lasti = 0;
-    for(i = 1; i < nbcom; i++) 
-    {                                                
-        numtest = estimate_step_wise_1(i, nbscl, scl, smpl, eqs, test);
-        /*print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);*/   /*Aide pour la programmation*/
-        /*Sauve la combi qui a le meilleur fstat*/
-        if(lnumtest < numtest && C_evallec(cond,0)!=0 && numtest!=0) 
-        {          
-            lasti = i;
-            lnumtest = numtest;
+    int nb_combinations = (int) pow(2.0, v_scalar_names.size());
+    int last_i = 0;
+    double last_numtest = -999999999999.0;
+    double numtest = 0.0;
+    for(int i = 1; i < nb_combinations; i++) 
+    {                                           
+        numtest = estimate_step_wise_1(i, v_scalar_names, smpl, eqs, test);
+        // print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);  Aide pour la programmation
+        // Sauve la combi qui a le meilleur fstat
+        if(last_numtest < numtest && C_evallec(cond, 0) != 0 && numtest != 0) 
+        {
+            last_i = i;
+            last_numtest = numtest;
         }
     }
 
     // Refait l'estimation pour la meilleure combi
-    numtest = estimate_step_wise_1(lasti, nbscl, scl, smpl, eqs,test);    
+    numtest = estimate_step_wise_1(last_i, v_scalar_names, smpl, eqs, test); 
+    
     SCR_free_tbl((unsigned char**) eqs);
-    SCR_free_tbl((unsigned char**) scl);
     return numtest;
 }

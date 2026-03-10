@@ -112,7 +112,8 @@ int Estimation::E_prep_lecs(char** lecs)
         return -1;
     }
 
-    for(i = 0 ; i < E_NEQ ; i++) {
+    for(i = 0 ; i < E_NEQ ; i++) 
+    {
         pos = L_split_eq(lecs[i]);
         if(pos < 0)
         {
@@ -141,7 +142,8 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1;
         }
 
-        for(t = 0 ; t < E_T ; t++) {
+        for(t = 0 ; t < E_T ; t++) 
+        {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
@@ -190,12 +192,13 @@ int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
 {
     char* c_name;
     std::string name;
+    Scalar scl(0.9, 1.0);
     for(int j = 0 ; j < clec->nb_names ; j++) 
     {
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            dbs->set_obj_ptr(name, new Scalar());
+            dbs->add(name, scl);
     }
     
     return 0;
@@ -221,6 +224,7 @@ int Estimation::E_prep_instrs(char** instrs)
     // Check if there are instruments. If not, return 0
     if(E_MET != 2 && E_MET != 3) 
         return 0;
+
     E_NINSTR = SCR_tbl_size((unsigned char**) instrs);
     if(E_NINSTR < 1) 
         return 0;
@@ -234,26 +238,36 @@ int Estimation::E_prep_instrs(char** instrs)
     E_D     = M_alloc(E_T, E_T);
 
     // Check allocation succeeded
-    if(minstr == 0 || mip == 0 || miip == 0 ||
-            miipi == 0 || mipiipi == 0 || E_D == 0) {
+    if(minstr == 0 || mip == 0 || miip == 0 || miipi == 0 || mipiipi == 0 || E_D == 0) 
+    {
         error_manager.append_error("Estimation: Memory Error");
         goto fin;
     }
-    for(i = 0 ; i < E_T ; i++) MATE(minstr, i, 0) = 1.0;
-    for(i = 0 ; i < E_NINSTR ; i++) {
+
+    for(i = 0 ; i < E_T ; i++) 
+        MATE(minstr, i, 0) = 1.0;
+    
+    for(i = 0 ; i < E_NINSTR ; i++) 
+    {
         clec = L_cc(instrs[i]);
-        if(clec == 0) {
+        if(clec == 0) 
+        {
             error_manager.append_error("Estimation: Syntax Error");
             goto fin;
         }
-        if(L_link(E_DBV, E_DBS, clec) != 0) {
+
+        if(L_link(E_DBV, E_DBS, clec) != 0) 
+        {
             SW_nfree(clec);
             error_manager.append_error("Estimation: Link Error");
             goto fin;
         }
-        for(t = 0 ; t < E_T ; t++) {
+
+        for(t = 0 ; t < E_T ; t++) 
+        {
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
-            if(!IODE_IS_A_NUMBER(x)) {
+            if(!IODE_IS_A_NUMBER(x)) 
+            {
                 SW_nfree(clec);
                 error_manager.append_error("Estimation: NaN Generated");
                 goto fin;
@@ -270,6 +284,7 @@ int Estimation::E_prep_instrs(char** instrs)
         error_manager.append_error("Estimation : Dreg Error");
         goto fin;
     }
+    
     M_trans(mip, minstr);
     M_prod(mipiipi, minstr, miipi);
     M_prod(E_D, mipiipi, mip);

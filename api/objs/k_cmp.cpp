@@ -104,8 +104,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBComments* kdb_cmt1 = dynamic_cast<KDBComments*>(kdb1);
         KDBComments* kdb_cmt2 = dynamic_cast<KDBComments*>(kdb2);
-        Comment* cmt1_ptr = kdb_cmt1->get_obj_ptr(name);
-        Comment* cmt2_ptr = kdb_cmt2->get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt1_ptr = kdb_cmt1->get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt2_ptr = kdb_cmt2->get_obj_ptr(name);
         success = *cmt1_ptr == *cmt2_ptr;
         break;
     }
@@ -113,8 +113,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBEquations* kdb_eqs1 = dynamic_cast<KDBEquations*>(kdb1);
         KDBEquations* kdb_eqs2 = dynamic_cast<KDBEquations*>(kdb2);
-        Equation* eqs1_ptr = kdb_eqs1->get_obj_ptr(name);
-        Equation* eqs2_ptr = kdb_eqs2->get_obj_ptr(name);
+        std::shared_ptr<Equation> eqs1_ptr = kdb_eqs1->get_obj_ptr(name);
+        std::shared_ptr<Equation> eqs2_ptr = kdb_eqs2->get_obj_ptr(name);
         success = *eqs1_ptr == *eqs2_ptr;
         break;
     }
@@ -122,8 +122,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBIdentities* kdb_idt1 = dynamic_cast<KDBIdentities*>(kdb1);
         KDBIdentities* kdb_idt2 = dynamic_cast<KDBIdentities*>(kdb2);
-        Identity* idt1_ptr = kdb_idt1->get_obj_ptr(name);
-        Identity* idt2_ptr = kdb_idt2->get_obj_ptr(name);
+        std::shared_ptr<Identity> idt1_ptr = kdb_idt1->get_obj_ptr(name);
+        std::shared_ptr<Identity> idt2_ptr = kdb_idt2->get_obj_ptr(name);
         success = *idt1_ptr == *idt2_ptr;
         break;
     }
@@ -131,8 +131,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBLists* kdb_lst1 = dynamic_cast<KDBLists*>(kdb1);
         KDBLists* kdb_lst2 = dynamic_cast<KDBLists*>(kdb2);
-        List* lst1_ptr = kdb_lst1->get_obj_ptr(name);
-        List* lst2_ptr = kdb_lst2->get_obj_ptr(name);
+        std::shared_ptr<List> lst1_ptr = kdb_lst1->get_obj_ptr(name);
+        std::shared_ptr<List> lst2_ptr = kdb_lst2->get_obj_ptr(name);
         success = *lst1_ptr == *lst2_ptr;
         break;
     }
@@ -140,8 +140,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBScalars* kdb_scl1 = dynamic_cast<KDBScalars*>(kdb1);
         KDBScalars* kdb_scl2 = dynamic_cast<KDBScalars*>(kdb2);
-        Scalar* scl1_ptr = kdb_scl1->get_obj_ptr(name);
-        Scalar* scl2_ptr = kdb_scl2->get_obj_ptr(name);
+        std::shared_ptr<Scalar> scl1_ptr = kdb_scl1->get_obj_ptr(name);
+        std::shared_ptr<Scalar> scl2_ptr = kdb_scl2->get_obj_ptr(name);
         success = *scl1_ptr == *scl2_ptr;
         break;
     }
@@ -149,8 +149,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBTables* kdb_tbl1 = dynamic_cast<KDBTables*>(kdb1);
         KDBTables* kdb_tbl2 = dynamic_cast<KDBTables*>(kdb2);
-        Table* tbl1_ptr = kdb_tbl1->get_obj_ptr(name);
-        Table* tbl2_ptr = kdb_tbl2->get_obj_ptr(name);
+        std::shared_ptr<Table> tbl1_ptr = kdb_tbl1->get_obj_ptr(name);
+        std::shared_ptr<Table> tbl2_ptr = kdb_tbl2->get_obj_ptr(name);
         success = *tbl1_ptr == *tbl2_ptr;
         break;
     }
@@ -158,8 +158,8 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     {
         KDBVariables* kdb_var1 = dynamic_cast<KDBVariables*>(kdb1);
         KDBVariables* kdb_var2 = dynamic_cast<KDBVariables*>(kdb2);
-        Variable* var1_ptr = kdb_var1->get_obj_ptr(name);
-        Variable* var2_ptr = kdb_var2->get_obj_ptr(name);
+        std::shared_ptr<Variable> var1_ptr = kdb_var1->get_obj_ptr(name);
+        std::shared_ptr<Variable> var2_ptr = kdb_var2->get_obj_ptr(name);
         success = K_compare_var(*var1_ptr, *var2_ptr);
         break;
     }

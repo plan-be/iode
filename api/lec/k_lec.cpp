@@ -45,7 +45,7 @@ double* L_getvar(KDBVariables* kdb, int pos)
 double L_getscl(KDBScalars* kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
-    Scalar* scl = kdb->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl = kdb->get_obj_ptr(name);
     return(scl->value);
 }
 
@@ -107,7 +107,7 @@ char* L_expand(char* list_name)
     {
         if(!global_ws_lst->contains(list_name)) 
             return NULL;
-        List* lst_ptr = global_ws_lst->get_obj_ptr(list_name);
+        std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(list_name);
         if(!lst_ptr) 
             return NULL;
         return (char*) lst_ptr->c_str();
@@ -143,7 +143,7 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec,
                     (unsigned char*) buf, (unsigned char*) "_\\");
     
     std::string sname;
-    Scalar* scl = nullptr;
+    std::shared_ptr<Scalar> scl = nullptr;
     char tcoef[128], ttest[128];
     for(int j = 0 ; j < clec->nb_names ; j++) 
     {

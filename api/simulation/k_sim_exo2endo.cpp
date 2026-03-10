@@ -86,15 +86,15 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     if(posexo < 0 || *depth > KSIM_MAXDEPTH) 
         return -1;
 
-    Equation* eq = nullptr;
+    std::shared_ptr<Equation> eq_ptr;
 
     // Endo and exo are in same equation 
     // => replace the endo var position in KSIM_POSXK by the exo var position 
     std::string coef_name, eq_name;
     poseq = KE_poseq(posendo);
     eq_name = KSIM_DBV->get_name(posendo);
-    eq = KSIM_DBE->get_obj_ptr(eq_name);
-    CLEC* clec = eq->clec;
+    eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
+    CLEC* clec = eq_ptr->clec;
     for(j = 0; j < clec->nb_names; j++) 
     {
         coef_name = std::string(clec->lnames[j].name);
@@ -114,8 +114,8 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     for(j = 0; j < clec->nb_names; j++) 
     {
         eq_name = KSIM_DBE->get_name(poseq);
-        eq = KSIM_DBE->get_obj_ptr(eq_name);
-        eclec = eq->clec;            
+        eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
+        eclec = eq_ptr->clec;            
         clec = (CLEC *)SW_nalloc(eclec->tot_lg);
         memcpy(clec, eclec, eclec->tot_lg);
         coef_name = std::string(clec->lnames[j].name);

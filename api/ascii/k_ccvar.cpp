@@ -44,12 +44,12 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
     }
     int nb_periods = smpl->nb_periods;
 
-    Variable* var = new Variable();
+    Variable var;
     
     /* READ AT MOST nobs OBSERVATIONS */
-    var->reserve(nb_periods);
+    var.reserve(nb_periods);
     for(int t = 0; t < nb_periods; t++)  
-        var->push_back(K_read_real(yy));
+        var.push_back(K_read_real(yy));
 
     /* CONTINUE READING UNTIL END OF VALUES */
     int keyw;
@@ -63,7 +63,7 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
 
     try
     {
-        kdb->set_obj_ptr(name, var);
+        kdb->set(name, var);
     }
     catch(const std::exception&) 
     {

@@ -68,6 +68,7 @@ static int B_WsTrendAll(char* arg, int std)
     std::vector<std::string> v_data;
     KDBVariables* to = nullptr;
     KDBVariables* from = new KDBVariables(false);
+    std::shared_ptr<Variable> var_ptr;
 
     int lg = B_get_arg0(file, arg, 80);
 
@@ -112,7 +113,8 @@ static int B_WsTrendAll(char* arg, int std)
         memcpy(f_vec, from_var_ptr->data() + shift, nb * sizeof(double));
         HP_test(f_vec, t_vec, nb, &beg, &dim);
         HP_calc(f_vec + beg, t_vec + beg, dim, lambda, std);
-        to->set_obj_ptr(from_name, new Variable(t_vec, t_vec + nb));
+        Variable var(t_vec, t_vec + nb);
+        to->set(from_name, var);
     }
 
     KV_merge(global_ws_var.get(), to, 1);

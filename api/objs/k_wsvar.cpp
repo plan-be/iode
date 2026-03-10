@@ -64,19 +64,19 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
         delete kdb->sample;
     kdb->sample = new Sample(*new_sample);
 
-    Variable* var_ptr;
-    Variable* new_var_ptr;
+    std::shared_ptr<Variable> var_ptr;
+    std::shared_ptr<Variable> new_var_ptr;
     // use iterator to allow modifying k_objs while looping on it
     for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
     {
         var_ptr = it->second;
-        new_var_ptr = new Variable(kdb->sample->nb_periods, IODE_NAN);
+        new_var_ptr = std::make_shared<Variable>(kdb->sample->nb_periods, IODE_NAN);
         if(var_ptr) 
         {
             for(int t = 0; t < smpl.nb_periods; t++)
                 (*new_var_ptr)[start2 + t] = (*var_ptr)[start1 + t];
-            delete var_ptr;
         }
+        it->second.reset();
         it->second = new_var_ptr;
     }
 
@@ -155,7 +155,7 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         
         // if the variable does not exist in kdb1, create it with NaN values
         if(!found)
-            kdb1->set_obj_ptr(name, new Variable(nb_periods_1, IODE_NAN));
+            kdb1->set(name, Variable(nb_periods_1, IODE_NAN));
 
         // should not happen because we called kdb1->set_obj_ptr() if not found above, 
         // but we put this check just in case to avoid a crash 
@@ -168,8 +168,8 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         }
 
         // copy values from kdb2 to kdb1 inside the intersection of the samples
-        Variable* var_ptr_1 = kdb1->get_obj_ptr(name);
-        Variable* var_ptr_2 = kdb2->get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr_1 = kdb1->get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr_2 = kdb2->get_obj_ptr(name);
         for(int t = 0; t < nb_periods_to_copy; t++)
             (*var_ptr_1)[start1 + t] = (*var_ptr_2)[start2 + t];
     }
@@ -223,13 +223,13 @@ void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
                 kdb1->sample = new Sample(*kdb2->sample);
         }
         kdb1->k_objs = kdb2->k_objs;
-        kdb2->clear(false);
+        kdb2->clear();
         kdb2 = nullptr;
         return;
     }
 
     KV_merge(kdb1, kdb2, replace);
-    kdb2->clear(false);
+    kdb2->clear();
     kdb2 = nullptr;
 }
 
@@ -264,7 +264,7 @@ int KV_add(KDBVariables* kdb, char* varname)
     {
         nobs = kdb->sample->nb_periods;
         // Set IODE_NAN if the new var
-        kdb->set_obj_ptr(varname, new Variable(nobs, IODE_NAN));
+        kdb->set(varname, Variable(nobs, IODE_NAN));
     }
     else 
     { 
@@ -578,7 +578,7 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
         npos = ndbv->index_of(nname);
         if(npos < 0) 
         {
-            ndbv->set_obj_ptr(c_nname, new Variable(nb_per, IODE_NAN));
+            ndbv->set(c_nname, Variable(nb_per, IODE_NAN));
             npos = ndbv->index_of(nname);
             if(npos > nbtimes - 1) 
             {
@@ -830,7 +830,7 @@ int KV_set_at_aper(char*varname, char* aper, double val)
     return(KV_set_at_t(varname, t, val));
 }
 
-Variable* KDBVariables::set_obj_ptr(const std::string& name, Variable* var_ptr)
+std::shared_ptr<Variable> KDBVariables::set_obj_ptr(const std::string& name, std::shared_ptr<Variable> var_ptr)
 {
     std::string key = to_key(name);
 
@@ -844,8 +844,8 @@ Variable* KDBVariables::set_obj_ptr(const std::string& name, Variable* var_ptr)
         throw std::runtime_error(error_msg);
     }
 
-    Variable* new_var_ptr = KDBTemplate::set_obj_ptr(key, var_ptr);
-    return new_var_ptr;
+    std::shared_ptr<Variable> updated_ptr = KDBTemplate::set_obj_ptr(key, var_ptr);
+    return updated_ptr;
 }
 
 Variable KDBVariables::get(const std::string& name) const
@@ -920,8 +920,8 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 bool KDBVariables::set_var(const std::string& name, const double* value)
 {
     int nb_periods = get_nb_periods();
-    Variable* var_ptr = new Variable(value, value + nb_periods);
-    this->set_obj_ptr(name, var_ptr);
+    Variable var(value, value + nb_periods);
+    this->set(name, var);
     return true;
 }
 
@@ -1466,8 +1466,8 @@ bool KDBVariables::binary_to_obj(const std::string& name, char* pack)
         return false;
 
     int nb_periods = this->get_nb_periods();
-    Variable* var = new Variable(values, values + nb_periods);
-    this->k_objs[name] = var;
+    Variable var(values, values + nb_periods);
+    this->k_objs[name] = std::make_shared<Variable>(var);
     return true;
 }
 

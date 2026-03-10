@@ -372,20 +372,20 @@ static int B_ltoh(int type, char* arg)
     to->sample = new Sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
+        Variable to_var(t_smpl->nb_periods, 0);
         switch(method[0]) 
         {
             case LTOH_CS :
                 LTOH_cs(type,
                         from_var_ptr->data(), (int) from->sample->nb_periods,
-                        to_var_ptr->data(), (int) t_smpl->nb_periods,
+                        to_var.data(), (int) t_smpl->nb_periods,
                         shift);
                 break;
 
             case LTOH_STEP:
                 LTOH_step(type,
                           from_var_ptr->data(), (int) from->sample->nb_periods,
-                          to_var_ptr->data(), (int) t_smpl->nb_periods,
+                          to_var.data(), (int) t_smpl->nb_periods,
                           shift);
                 break;
 
@@ -393,12 +393,12 @@ static int B_ltoh(int type, char* arg)
             case LTOH_LIN :
                 LTOH_lin(type,
                          from_var_ptr->data(), (int) from->sample->nb_periods,
-                         to_var_ptr->data(), (int) t_smpl->nb_periods,
+                         to_var.data(), (int) t_smpl->nb_periods,
                          shift);
                 break;
         }
 
-        to->set_obj_ptr(from_name, to_var_ptr);
+        to->set(from_name, to_var);
     }
 
     KV_merge(global_ws_var.get(), to, 1);

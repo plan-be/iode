@@ -70,7 +70,7 @@ bool add_table(const std::string& name, Table* value)
 {
 	if(!global_ws_tbl.get())
 		return false;
-	global_ws_tbl->set_obj_ptr(name, value);
+	global_ws_tbl->set(name, *value);
 	return true;
 }
 

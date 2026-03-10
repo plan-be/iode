@@ -11,6 +11,7 @@ from iode.common import PrintTablesAs
 from iode.util import JUSTIFY, table2str, join_lines
 from iode.objects.table import Table
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
+from iode.iode_cython import Table as CythonTable
 from iode.iode_cython import Tables as CythonTables
 
 
@@ -65,19 +66,23 @@ class Tables(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonTables()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonTables()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonTables) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        instance = Tables.get_instance()
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy)
+        subset = Tables.from_cython_obj(cy_subset)
+        return subset
 
     def get_title(self, key: Union[str, int]) -> str:
         r"""
@@ -106,7 +111,7 @@ class Tables(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if name not in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        return self._cython_instance.get_title(name)
+        return self._cy_database.get_title(name)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -238,8 +243,8 @@ class Tables(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        table = Table.get_instance()
-        table._cython_instance = self._cython_instance._get_object(name, table._cython_instance)
+        cy_table: CythonTable = self._cy_database._get_object(name)
+        table = Table.from_cython_obj(cy_table)
         return table
 
     def _set_object(self, key: Union[str, int], value):
@@ -265,7 +270,7 @@ class Tables(IodeDatabase):
                 raise TypeError(f"New table '{name}': Expected input to be of type int or tuple or list or "
                                 f"dict or Table. Got value of type {type(value).__name__} instead")
 
-        self._cython_instance._set_object(name, table._cython_instance)
+        table._cy_table =  self._cy_database._set_object(name, table._cy_table)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Table, Self]:
         r"""
@@ -551,7 +556,6 @@ class Tables(IodeDatabase):
         >>> # append a new sepatator line
         >>> table += '-'
 
-        >>> tables["TABLE_CELL_LECS"] = table
         >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
         DIVIS | 1       |
         TITLE |  "New Table"
@@ -720,9 +724,8 @@ class Tables(IodeDatabase):
         >>> # 2) using another Tables database (subset)
         >>> tables_subset = tables["C8_1, C8_2, C8_3"].copy()
         >>> for tbl_name in tables_subset.names:
-        ...     table = tables_subset[tbl_name]
-        ...     table.title = table.title.replace("(copy)", "(detached subset)")
-        ...     tables_subset[tbl_name] = table
+        ...     title = tables_subset[tbl_name].title
+        ...     tables_subset[tbl_name].title = title.replace("(copy)", "(detached subset)")
         >>> tables["C8_1, C8_2, C8_3"] = tables_subset
         >>> tables["C8_1, C8_2, C8_3"]      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Tables
@@ -786,6 +789,122 @@ class Tables(IodeDatabase):
         False
         >>> tables.get_names("M*")
         ['MULT1FR', 'MULT1RESU', 'MULT2FR']
+
+        >>> # store a table in a Python variable
+        >>> tbl = tables["MULT1FR"]
+        >>> tbl                                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        DIVIS | 1                                              |
+        TITLE |         "Principaux indicateurs : montants absolus"
+        ----- | -----------------------------------------------------------
+        CELL  | " "                                            | "#s"
+        ----- | -----------------------------------------------------------
+        CELL  | "1. Demande globale"                           |
+        CELL  | "       Consommation privée"                   |         QC
+        CELL  | "       Consommation publique"                 |         QG
+        CELL  | "       Formation brute de capital fixe"       |         QI
+        CELL  | "            - Entreprises"                    |        QIF
+        CELL  | "            - Etat"                           |        QIG
+        CELL  | "            - Logements"                      |        QI5
+        CELL  | "       Exportations de biens et services"     |         QX
+        CELL  | "       Importations de biens et services"     |         QM
+        CELL  | "       Produit Intérieur Brut"                |       QBBP
+        CELL  | "       Produit National Brut"                 |       QBNP
+        CELL  | "2. Marché du travail"                         |
+        CELL  | "       Emploi total"                          |    NATY-UY
+        CELL  | "         Entreprises"                         |    NFY+NIY
+        CELL  | "         Etat"                                |        NGY
+        CELL  | "3. Prix, salaires et revenus"                 |
+        CELL  | "       Salaire coût horaire"                  |       WCRH
+        CELL  | "       Salaire coût réel horaire"             |    WCRH/PC
+        CELL  | "       Déflateur de la consommation privée"   |         PC
+        CELL  | "       Coûts salariaux unitaires (apparents)" |  WCRH/PROD
+        CELL  | "       Coûts salariaux unitaires (techn.)"    |    WCRH/QL
+        CELL  | "       Prix des importations"                 |         PM
+        CELL  | "       Coûts totaux par unité produite "      |       AOUC
+        CELL  | "       Prix des exportations de biens"        |       PXAB
+        CELL  | "       Termes de l'échange (PX/PM)"           |      PX/PM
+        CELL  | "       Revenu disponible réel des ménages"    |     YDH/PC
+        CELL  | "4. Entreprises"                               |
+        CELL  | "       Valeur ajoutée (prix constants)"       |       QAF_
+        CELL  | "       Déflateur de la valeur ajoutée"        |       PAF_
+        CELL  | "       Valeur ajoutée potentielle"            |        Q_F
+        CELL  | "       Stock de capital"                      |       KNFY
+        CELL  | "5. Productivités du travail"                  |
+        CELL  | "       Productivité horaire apparente"        |       PROD
+        CELL  | "       Productivité horaire technique"        |         QL
+        CELL  | "       Productivité par tête "                | QAF_/(NFY)
+        ----- | -----------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 43
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
+        >>> # then delete it from the database
+        >>> del tables["MULT1FR"]
+        >>> "MULT1FR" in tables
+        False
+        >>> # NOTE: the Python variable 'tbl' still contains the table object
+        >>> tbl                                         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        DIVIS | 1                                              |
+        TITLE |         "Principaux indicateurs : montants absolus"
+        ----- | -----------------------------------------------------------
+        CELL  | " "                                            | "#s"
+        ----- | -----------------------------------------------------------
+        CELL  | "1. Demande globale"                           |
+        CELL  | "       Consommation privée"                   |         QC
+        CELL  | "       Consommation publique"                 |         QG
+        CELL  | "       Formation brute de capital fixe"       |         QI
+        CELL  | "            - Entreprises"                    |        QIF
+        CELL  | "            - Etat"                           |        QIG
+        CELL  | "            - Logements"                      |        QI5
+        CELL  | "       Exportations de biens et services"     |         QX
+        CELL  | "       Importations de biens et services"     |         QM
+        CELL  | "       Produit Intérieur Brut"                |       QBBP
+        CELL  | "       Produit National Brut"                 |       QBNP
+        CELL  | "2. Marché du travail"                         |
+        CELL  | "       Emploi total"                          |    NATY-UY
+        CELL  | "         Entreprises"                         |    NFY+NIY
+        CELL  | "         Etat"                                |        NGY
+        CELL  | "3. Prix, salaires et revenus"                 |
+        CELL  | "       Salaire coût horaire"                  |       WCRH
+        CELL  | "       Salaire coût réel horaire"             |    WCRH/PC
+        CELL  | "       Déflateur de la consommation privée"   |         PC
+        CELL  | "       Coûts salariaux unitaires (apparents)" |  WCRH/PROD
+        CELL  | "       Coûts salariaux unitaires (techn.)"    |    WCRH/QL
+        CELL  | "       Prix des importations"                 |         PM
+        CELL  | "       Coûts totaux par unité produite "      |       AOUC
+        CELL  | "       Prix des exportations de biens"        |       PXAB
+        CELL  | "       Termes de l'échange (PX/PM)"           |      PX/PM
+        CELL  | "       Revenu disponible réel des ménages"    |     YDH/PC
+        CELL  | "4. Entreprises"                               |
+        CELL  | "       Valeur ajoutée (prix constants)"       |       QAF_
+        CELL  | "       Déflateur de la valeur ajoutée"        |       PAF_
+        CELL  | "       Valeur ajoutée potentielle"            |        Q_F
+        CELL  | "       Stock de capital"                      |       KNFY
+        CELL  | "5. Productivités du travail"                  |
+        CELL  | "       Productivité horaire apparente"        |       PROD
+        CELL  | "       Productivité horaire technique"        |         QL
+        CELL  | "       Productivité par tête "                | QAF_/(NFY)
+        ----- | -----------------------------------------------------------
+        MODE  |
+        FILES |
+        DATE  |
+        <BLANKLINE>
+        nb lines: 43
+        nb columns: 2
+        language: 'ENGLISH'
+        gridx: 'MAJOR'
+        gridy: 'MAJOR'
+        graph_axis: 'VALUES'
+        graph_alignment: 'LEFT'
+        <BLANKLINE>
         """
         super().__delitem__(key)
 
@@ -837,7 +956,7 @@ class Tables(IodeDatabase):
             Defaults to load all tables from the input file(s). 
         """
         input_files, names = self._copy_from(input_files, names)
-        self._cython_instance.copy_from(input_files, names)
+        self._cy_database.copy_from(input_files, names)
 
     def _str_table(self, names: List[str]) -> str:
         titles = [join_lines(self.get_title(name)) for name in names]
@@ -892,7 +1011,7 @@ class Tables(IodeDatabase):
         >>> tables.print_tables_as
         <PrintTablesAs.COMPUTED: 2>
         """
-        i_value = self._cython_instance.get_print_tables_as()
+        i_value = self._cy_database.get_print_tables_as()
         return PrintTablesAs(i_value)
 
     @print_tables_as.setter
@@ -909,7 +1028,7 @@ class Tables(IodeDatabase):
                                  f"Expected one of {', '.join(PrintTablesAs.__members__.keys())}. ")
             value = PrintTablesAs[upper_str]
         value = int(value)
-        self._cython_instance.set_print_tables_as(value)
+        self._cy_database.set_print_tables_as(value)
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None, generalized_sample: str=None, nb_decimals: int=4):
         r'''
@@ -1225,7 +1344,7 @@ class Tables(IodeDatabase):
             if generalized_sample is None or not len(generalized_sample):
                 raise ValueError("'generalized_sample' must be a non-empty string.")
             
-            self._cython_instance.cpp_tables_print_to_file(filepath, names, format, generalized_sample, nb_decimals)
+            self._cy_database.cpp_tables_print_to_file(filepath, names, format, generalized_sample, nb_decimals)
 
     def __hash__(self) -> int:
         r"""

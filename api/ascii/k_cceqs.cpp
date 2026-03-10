@@ -331,7 +331,7 @@ bool KDBEquations::load_asc(const std::string& filename)
 
                 try
                 {
-                    this->set_obj_ptr(name, eq);
+                    this->set(name, *eq);
                     cmpt++;
                 }
                 catch(const std::exception&)
@@ -383,7 +383,7 @@ static void print_test(FILE* fd, char* txt, double val)
  *  @param [in]         name    char*       equation endo (i.e. equation name)
  *  
  */
-static void print_eq(FILE* fd, Equation* eq, char* name)
+static void print_eq(FILE* fd, std::shared_ptr<Equation> eq, const std::string& name)
 {
     fprintf(fd, "{\n\t\"%s\"\n", (char*) eq->lec.c_str());
 
@@ -482,7 +482,7 @@ bool KDBEquations::save_asc(const std::string& filename)
         try
         {
             fprintf(fd, "%s ", name.c_str());
-            print_eq(fd, eq_ptr, (char*) name.c_str());
+            print_eq(fd, eq_ptr, name);
         }
         catch(const std::exception& e) 
         {

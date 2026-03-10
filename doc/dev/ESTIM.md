@@ -82,7 +82,7 @@ After the estimation, if a solution is found, the results are stored in the work
 |`int KE_est_s(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** names)`|Estimates an equation or a block of equations|
 |`int KE_estim(char* veqs, char* afrom, char* ato)`|Estimates an equation or a block of equations on the specified sample. Simplified version of KE\_est\_s()|
 |**Utility function**||
-|`void E_tests2scl(Equation* eq, int j, int n, int k)`|Creates the scalars containing the results of an estimated equation|
+|`void E_tests2scl(const std::shared_ptr<Equation>& eq, const int j, const int n, const int k)`|Creates the scalars containing the results of an estimated equation|
 
 ### e\_estim.c {#T4}
 

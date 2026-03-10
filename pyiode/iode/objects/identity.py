@@ -31,12 +31,12 @@ class Identity:
     Identity('FLG/VBBP')
     """
     def __init__(self, lec: str) -> Self:
-        self._cython_instance = CythonIdentity(lec)
+        self._cy_identity = CythonIdentity(lec)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonIdentity) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonIdentity.__new__(CythonIdentity)
+        instance._cy_identity = obj
         return instance
 
     @property
@@ -62,11 +62,11 @@ class Identity:
         >>> idt.lec
         '1'
         """
-        return self._cython_instance.get_lec()
+        return self._cy_identity.get_lec()
     
     @lec.setter
     def lec(self, value: str):
-        self._cython_instance.set_lec(value)
+        self._cy_identity.set_lec(value)
 
     @property
     def coefficients(self) -> List[str]:
@@ -93,7 +93,7 @@ class Identity:
         >>> idt.coefficients
         ['gamma2', 'gamma3', 'gamma4', 'gamma_']
         """
-        return self._cython_instance.get_coefficients()
+        return self._cy_identity.get_coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -120,7 +120,7 @@ class Identity:
         >>> idt.variables
         ['W', 'ZJ', 'WMIN']
         """
-        return self._cython_instance.get_variables()
+        return self._cy_identity.get_variables()
 
     def copy(self) -> Self:
         r"""
@@ -139,7 +139,7 @@ class Identity:
         return copy(self)
 
     def __eq__(self, other: Self) -> bool:
-        return self._cython_instance.equal(other)
+        return self._cy_identity.equal(other._cy_identity)
 
     def __copy__(self) -> Self:
         r"""
@@ -159,7 +159,7 @@ class Identity:
         return Identity(str(self))
 
     def __str__(self) -> str:
-        return self._cython_instance._str_()
+        return self._cy_identity._str_()
 
     def __repr__(self) -> str:
         return f"Identity('{str(self)}')"

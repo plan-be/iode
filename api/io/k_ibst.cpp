@@ -222,8 +222,8 @@ int ImportCommentsBST::sub_read_header(int lang)
         {
             try
             {
-                Comment* cmt_ptr = new Comment(cmt);
-                c_kdb->set_obj_ptr(name, cmt_ptr);
+                Comment comment(cmt);
+                c_kdb->set(name, comment);
             }
             catch(const std::exception& e)
             {
@@ -254,12 +254,14 @@ int ImportCommentsBST::read_header(ImportCmtFromFile* impdef, char* file, int la
     RYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "rub.dif");
     SYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "ser.dif");
 
-    if(FYY == 0 || RYY == 0 || SYY == 0) {
+    if(FYY == 0 || RYY == 0 || SYY == 0) 
+    {
         kerror(0,"Cannot open '%s'", file);
         return -1;
     }
 
-    if(sub_read_header(lang) < 0) {
+    if(sub_read_header(lang) < 0) 
+    {
         close();
         return -1;
     }
@@ -271,9 +273,10 @@ int ImportCommentsBST::DIF_long(YYFILE* yy, long* l_val)
 {
     double  d_val;
 
-    if(dif_read_cell(yy, NULL, &d_val) < 0) return -1;
+    if(dif_read_cell(yy, NULL, &d_val) < 0) 
+        return -1;
 
-    *l_val = (long)floor(d_val);
+    *l_val = (long) floor(d_val);
     return 0;
 }
 
@@ -312,7 +315,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         r_niv = get_niv(name1);
         if(niv == r_niv) 
         {
-            Comment* cmt_ptr = C_kdb->get_obj_ptr(name);
+            std::shared_ptr<Comment> cmt_ptr = C_kdb->get_obj_ptr(name);
             str = (char*) cmt_ptr->c_str();
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
@@ -330,7 +333,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
             r_niv = get_niv(name2);
             if(niv == r_niv) 
             {
-                Comment* cmt_ptr = C_kdb->get_obj_ptr(name2);
+                std::shared_ptr<Comment> cmt_ptr = C_kdb->get_obj_ptr(name2);
                 str = (char*) cmt_ptr->c_str();
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;

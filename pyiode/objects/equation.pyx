@@ -5,6 +5,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp.map cimport map
 from libcpp.string cimport string
 from libc.string cimport memset
+from libcpp.memory cimport shared_ptr, make_shared
 from cython.operator cimport dereference
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
@@ -16,42 +17,37 @@ from pyiode.iode_database.cpp_api_database cimport global_ws_eqs as cpp_global_e
 
 
 cdef class Equation:
-    cdef bint ptr_owner
+    cdef shared_ptr[CEquation] eq_ptr
     cdef CEquation* c_equation
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_equation = NULL
 
     def __init__(self, endogenous: str, lec: str, from_period: str, to_period: str, comment: str, 
                  instruments: str, block: str) -> Equation:
-        self.ptr_owner = <bint>True
-        self.c_equation = new CEquation(endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
-                                        to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
+        self.eq_ptr = make_shared[CEquation](endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
+                                             to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
+        self.c_equation = self.eq_ptr.get()
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_equation is not NULL:
-            del self.c_equation
-            self.c_equation = NULL
+        self.eq_ptr.reset()
+        self.c_equation = NULL
+
+    cdef update_ptr(self, shared_ptr[CEquation] eq_ptr):
+        self.eq_ptr = eq_ptr
+        self.c_equation = self.eq_ptr.get()
 
     @staticmethod
-    cdef Equation _from_ptr(CEquation* ptr, bint owner=False):
+    cdef Equation _from_ptr(shared_ptr[CEquation] eq_ptr):
         """
         Factory function to create Equation objects from a given CEquation pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Equation wrapper = Equation.__new__(Equation)
-        wrapper.c_equation = ptr
-        wrapper.ptr_owner = owner
+        if eq_ptr.get() == NULL:
+            return None
+        wrapper.update_ptr(eq_ptr)
         return wrapper
-
-    # for debug purpose only
-    def is_pointer_null(self) -> bool:
-        return self.c_equation is NULL
-
-    # for debug purpose only
-    def is_own_owner(self) -> bool:
-        return self.ptr_owner
 
     def get_formated_date(self, format: str='dd-mm-yyyy') -> str:
         return self.c_equation.get_date_as_string(format.encode()).decode()
@@ -73,8 +69,9 @@ cdef class Equation:
         return lhs.decode(), rhs.decode() 
 
     def estimate(self, from_period: str, to_period: str, maxit: int, epsilon: float) -> bool:
-        cdef CEquation* c_eq = NULL
+        cdef shared_ptr[CEquation] eq_ptr
         cdef KDBEquations* eqs_db = NULL
+        cdef CEquation* c_eq = NULL
         cdef string eq_name = self.c_equation.endo
 
         if from_period is None or to_period is None:
@@ -90,7 +87,8 @@ cdef class Equation:
             
             # copy tests values and estimation date from the global equations workspace
             eqs_db = cpp_global_equations.get()
-            c_eq = eqs_db.get_obj_ptr(eq_name)
+            eq_ptr = eqs_db.get_obj_ptr(eq_name)
+            c_eq = eq_ptr.get()
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_eq.date
             memcpy(&self.c_equation.tests, &c_eq.tests, EQS_NBTESTS * sizeof(float))
@@ -104,7 +102,8 @@ cdef class Equation:
                            lec_condition: str, test: str) -> bool:
         cdef bytes b_arg
         cdef char* c_arg = NULL
-        cdef int res
+        cdef int res = -1
+        cdef shared_ptr[CEquation] eq_ptr
         cdef CEquation* c_eq = NULL
         cdef KDBEquations* eqs_db = NULL
         cdef string eq_name = self.c_equation.endo
@@ -119,13 +118,14 @@ cdef class Equation:
         arg: str = f'{from_period} {to_period} {self.get_endogenous()} "{lec_condition}" {test}'
         b_arg = arg.encode()
         c_arg = b_arg
-        
+
         res = B_EqsStepWise(c_arg)
 
         # copy tests values and estimation date from the global equations workspace
         if res == 0:
             eqs_db = cpp_global_equations.get()
-            c_eq = eqs_db.get_obj_ptr(eq_name)
+            eq_ptr = eqs_db.get_obj_ptr(eq_name)
+            c_eq = eq_ptr.get()
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_eq.date
             memcpy(&self.c_equation.tests, &c_eq.tests, EQS_NBTESTS * sizeof(float))
@@ -195,7 +195,7 @@ cdef class Equation:
             self.c_equation.set_date(value.encode(), format.encode())
 
     def equal(self, other: Equation) -> bool:
-        return self.c_equation == other.c_equation
+        return dereference(self.c_equation) == dereference(other.c_equation)
 
     def _str_(self) -> str:
         sample = self.get_sample()

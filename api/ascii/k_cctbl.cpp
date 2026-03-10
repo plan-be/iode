@@ -434,14 +434,15 @@ bool KDBTables::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if((tbl = read_tbl(yy)) == NULL) 
+                tbl = read_tbl(yy);
+                if(!tbl) 
                 {
                     kwarning("%s : table defined", YY_error(yy));
                     goto err;
                 }
                 try
                 {
-                    this->set_obj_ptr(name, tbl); 
+                    this->set(name, *tbl); 
                     cmpt++;
                     kmsg("Reading object %d : %s", cmpt, name);
                 }
@@ -595,11 +596,11 @@ static void print_cell(FILE *fd, const TableCell* cell)
  *  Prints a Table definition.
  *  
  *  @param [in] fd      FILE*     output stream
- *  @param [in] tbl     Table*      table to print
+ *  @param [in] tbl     Table*    table to print
  *  @return             void
  *  
  */
-static void print_tbl(FILE* fd, Table* tbl)
+static void print_tbl(FILE* fd, std::shared_ptr<Table> tbl)
 {
     /* tbl */
     fprintf(fd, "\nDIM %d\n", T_NC(tbl));

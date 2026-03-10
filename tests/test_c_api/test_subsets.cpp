@@ -384,103 +384,119 @@ TEST_F(SubsetsTest, AddDeletePtr)
 {
     double value = 0.5;
     double relax = 0.8;
-    Scalar* scl = new Scalar(value, relax);
-    double std = scl->std;
-
-    Scalar* scl_global_ws = nullptr;
-    Scalar* scl_subset = nullptr;
-    Scalar* scl_standalone_db = nullptr;
+    double std = IODE_NAN;
+    
+    std::shared_ptr<Scalar> scl_ptr;
+    std::shared_ptr<Scalar> scl_ptr_2;
+    std::shared_ptr<Scalar> scl_ptr_one;
+    std::shared_ptr<Scalar> scl_ptr_bis;
+    std::shared_ptr<Scalar> scl_ptr_ter;
+    std::shared_ptr<Scalar> scl_global_ws;
+    std::shared_ptr<Scalar> scl_subset;
+    std::shared_ptr<Scalar> scl_standalone_db;
     bool copy;
 
     // ==== add scalar in global KDB ====
-    // add scalar in global KDB -> set_obj_ptr() create a copy of 
-    // the scalar and store it in the k_objs map of global_ws_scl. 
-    global_ws_scl->set_obj_ptr("scl_global", scl);
+    scl_ptr = std::make_shared<Scalar>(value, relax);
+    scl_ptr_one = global_ws_scl->set_obj_ptr("scl_global", scl_ptr);
+    global_ws_scl->set_obj_ptr("scl_global_bis", scl_ptr);
+    global_ws_scl->set_obj_ptr("scl_global_ter", scl_ptr);
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));
     scl_global_ws = global_ws_scl->get_obj_ptr("scl_global");
-    EXPECT_DOUBLE_EQ(scl_global_ws->value, scl->value);
-    EXPECT_DOUBLE_EQ(scl_global_ws->relax, scl->relax);
-    EXPECT_DOUBLE_EQ(scl_global_ws->std, scl->std);
-    // check that a copy has been created
-    EXPECT_TRUE(scl_global_ws != scl);
+    EXPECT_DOUBLE_EQ(scl_global_ws->value, scl_ptr->value);
+    EXPECT_DOUBLE_EQ(scl_global_ws->relax, scl_ptr->relax);
+    EXPECT_DOUBLE_EQ(scl_global_ws->std, scl_ptr->std);
+    // check that the same pointer is used by scl_ptr and the global KDB
+    EXPECT_TRUE(scl_global_ws == scl_ptr_one);
+    // check that a different pointer has been created in the global KDB 
+    // for the three different names
+    scl_ptr_bis = global_ws_scl->get_obj_ptr("scl_global_bis");
+    scl_ptr_ter = global_ws_scl->get_obj_ptr("scl_global_ter");
+    EXPECT_TRUE(scl_ptr_bis != scl_ptr_one);
+    EXPECT_TRUE(scl_ptr_ter != scl_ptr_bis);
+    // check that resetting the pointer scl_ptr does not reset the pointer 
+    // in the global KDB since the set_obj_ptr() method
+    scl_ptr.reset();
+    EXPECT_TRUE(scl_ptr.get() == nullptr);
+    EXPECT_TRUE(scl_global_ws.get() != nullptr);
 
     // ==== subset of global KDB ====
     copy = false;    // shallow copy
     KDBScalars* subset = new KDBScalars(global_ws_scl.get(), "s*", copy);
-    subset->set_obj_ptr("scl_subset", scl);
+    scl_ptr = std::make_shared<Scalar>(value, relax);
+    scl_ptr_one = subset->set_obj_ptr("scl_subset", scl_ptr);
+    scl_ptr_bis = subset->set_obj_ptr("scl_subset_bis", scl_ptr);
+    scl_ptr_ter = subset->set_obj_ptr("scl_subset_ter", scl_ptr);
     EXPECT_TRUE(subset->contains("scl_subset"));
-    // check that the same pointer is used in the global KDB and the subset (shallow copy)
     EXPECT_TRUE(global_ws_scl->contains("scl_subset"));
     scl_subset = subset->get_obj_ptr("scl_subset");
-    EXPECT_DOUBLE_EQ(scl_subset->value, scl->value);
-    EXPECT_DOUBLE_EQ(scl_subset->relax, scl->relax);
-    EXPECT_DOUBLE_EQ(scl_subset->std, scl->std);
-    // check that a copy has been created
-    EXPECT_TRUE(scl_subset != scl);
-    EXPECT_TRUE(scl_subset != scl_global_ws);
-    // the subset is a shallow copy of the global KDB, so the same pointer 
-    // is used in the global KDB and the subset
+    EXPECT_DOUBLE_EQ(scl_subset->value, scl_ptr->value);
+    EXPECT_DOUBLE_EQ(scl_subset->relax, scl_ptr->relax);
+    EXPECT_DOUBLE_EQ(scl_subset->std, scl_ptr->std);
+    // check that the same pointer is used in the global KDB and 
+    // in the subset (shallow copy)
     scl_global_ws = global_ws_scl->get_obj_ptr("scl_subset");
+    EXPECT_TRUE(scl_subset == scl_ptr_one);
     EXPECT_TRUE(scl_subset == scl_global_ws);
+    // check that a different pointer has been created in the subset KDB 
+    // for the three different names 
+    EXPECT_TRUE(scl_ptr_bis != scl_ptr_one);
+    EXPECT_TRUE(scl_ptr_ter != scl_ptr_bis);    
+    // check that resetting the pointer scl_ptr does not reset 
+    // the pointer in the global KDB and in the subset
+    scl_ptr.reset();
+    EXPECT_TRUE(scl_ptr.get() == nullptr);
+    EXPECT_TRUE(scl_subset.get() != nullptr);
+    EXPECT_TRUE(scl_global_ws.get() != nullptr);
 
     // ==== standalone KDB (deep copy) ====
+    scl_ptr_2 = std::make_shared<Scalar>(value, relax);
+    subset->set_obj_ptr("scl_common", scl_ptr_2);
     copy = true;    // deep copy
     KDBScalars* standalone_db = new KDBScalars(global_ws_scl.get(), "s*", copy);
-    standalone_db->set_obj_ptr("scl_standalone", scl);
+    EXPECT_TRUE(standalone_db->contains("scl_common"));
+    EXPECT_TRUE(global_ws_scl->contains("scl_common"));
+    EXPECT_TRUE(subset->contains("scl_common"));
+    // check that the pointer in the standalone_db is different from the pointer 
+    // in the global KDB and in the subset (deep copy)
+    scl_standalone_db = standalone_db->get_obj_ptr("scl_common");
+    scl_global_ws = global_ws_scl->get_obj_ptr("scl_common");
+    scl_subset = subset->get_obj_ptr("scl_common");
+    EXPECT_TRUE(scl_standalone_db != scl_ptr_2);
+    EXPECT_TRUE(scl_global_ws != scl_standalone_db);
+    EXPECT_TRUE(scl_subset != scl_standalone_db);
+
+    // adding a new object in the standalone_db should not affect the global KDB 
+    // and the subset since the standalone_db is standalone
+    scl_ptr_2 = std::make_shared<Scalar>(value, relax);
+    scl_ptr_one = standalone_db->set_obj_ptr("scl_standalone", scl_ptr_2);
+    scl_ptr_bis = standalone_db->set_obj_ptr("scl_standalone_bis", scl_ptr_2);
+    scl_ptr_ter = standalone_db->set_obj_ptr("scl_standalone_ter", scl_ptr_2);
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));
-    scl_standalone_db = standalone_db->get_obj_ptr("scl_standalone");
-    EXPECT_DOUBLE_EQ(scl_standalone_db->value, scl->value);
-    EXPECT_DOUBLE_EQ(scl_standalone_db->relax, scl->relax);
-    EXPECT_DOUBLE_EQ(scl_standalone_db->std, scl->std);
-    // check that a copy has been created
-    EXPECT_TRUE(scl_standalone_db != scl);
-    scl_global_ws = global_ws_scl->get_obj_ptr("scl_global");
-    EXPECT_TRUE(scl_standalone_db != scl_global_ws);
-    EXPECT_TRUE(scl_standalone_db != scl_subset);
-    // the standalone_db is a deep copy of the global KDB, so a new pointer is only set 
-    // in the standalone_db and the global KDB does not contain the object
     EXPECT_FALSE(global_ws_scl->contains("scl_standalone"));
     EXPECT_FALSE(subset->contains("scl_standalone"));
-
-    // ==== delete original pointer ====
-    // delete the scalar pointer created in the test
-    delete scl;
-    // deleting scl should not delete the pointer in the global KDB 
-    // since it is a copy of the original pointer
-    EXPECT_TRUE(global_ws_scl->contains("scl_global"));
-    scl_global_ws = global_ws_scl->get_obj_ptr("scl_global");
-    EXPECT_DOUBLE_EQ(scl_global_ws->value, value);
-    EXPECT_DOUBLE_EQ(scl_global_ws->relax, relax);
-    EXPECT_DOUBLE_EQ(scl_global_ws->std, std);
-    // deleting scl should not delete the pointer in the subset and in the global KDB 
-    // since it is a copy of the original pointer
-    EXPECT_TRUE(subset->contains("scl_subset"));
-    scl_subset = subset->get_obj_ptr("scl_subset");
-    EXPECT_DOUBLE_EQ(scl_subset->value, value);
-    EXPECT_DOUBLE_EQ(scl_subset->relax, relax);
-    EXPECT_DOUBLE_EQ(scl_subset->std, std);
-    EXPECT_TRUE(global_ws_scl->contains("scl_subset"));
-    scl_global_ws = global_ws_scl->get_obj_ptr("scl_subset");
-    EXPECT_TRUE(scl_subset == scl_global_ws);
-    // deleting scl should not delete the pointer in the standalone_db 
-    // since it is a copy of the original pointer
-    EXPECT_TRUE(standalone_db->contains("scl_standalone"));
     scl_standalone_db = standalone_db->get_obj_ptr("scl_standalone");
-    EXPECT_DOUBLE_EQ(scl_standalone_db->value, value);
-    EXPECT_DOUBLE_EQ(scl_standalone_db->relax, relax);
-    EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
+    EXPECT_TRUE(scl_standalone_db == scl_ptr_one);
+    EXPECT_DOUBLE_EQ(scl_standalone_db->value, scl_ptr_2->value);
+    EXPECT_DOUBLE_EQ(scl_standalone_db->relax, scl_ptr_2->relax);
+    EXPECT_DOUBLE_EQ(scl_standalone_db->std, scl_ptr_2->std);
+    // check that a different pointer has been created in the standalone KDB 
+    // for the three different names 
+    EXPECT_TRUE(scl_ptr_bis != scl_ptr_one);
+    EXPECT_TRUE(scl_ptr_ter != scl_ptr_bis); 
 
     // ==== delete subset ====
     scl_subset = subset->get_obj_ptr("scl_subset");
     delete subset;
-    // deleting the subset only reset the k_objs map of the subset but
-    // DO NOT DELETE the objects
-    EXPECT_TRUE(scl_subset != nullptr);
+    // deleting the subset only clear the k_objs map of the subset but
+    // DO NOT RESET the associated shared pointers
+    EXPECT_TRUE(scl_subset.get() != nullptr);
     EXPECT_DOUBLE_EQ(scl_subset->value, value);
     EXPECT_DOUBLE_EQ(scl_subset->relax, relax);
     EXPECT_DOUBLE_EQ(scl_subset->std, std);
-    // deleting the subset only reset the k_objs map of the subset but
-    // DO NOT DELETE the objects. Therefore, the global KDB should remain unchanged
+    // deleting the subset only clear the k_objs map of the subset but
+    // DO NOT RESET the associated shared pointers. 
+    // Therefore, the global KDB should remain unchanged
     EXPECT_TRUE(global_ws_scl->contains("scl_subset"));
     scl_global_ws = global_ws_scl->get_obj_ptr("scl_subset");
     EXPECT_DOUBLE_EQ(scl_global_ws->value, value);
@@ -501,12 +517,11 @@ TEST_F(SubsetsTest, AddDeletePtr)
 
     // ==== delete global KDB ====
     global_ws_scl->clear();
-    // deleting the global KDB should delete all the objects in the global KDB
     EXPECT_EQ(global_ws_scl->size(), 0);
-    // deleting the global KDB should not affect the standalone_db 
+    // clearing the global KDB should not affect the standalone_db 
     // since standalone_db represents a deep copy of the global KDB
-    EXPECT_TRUE(standalone_db->contains("scl_standalone"));
-    scl_standalone_db = standalone_db->get_obj_ptr("scl_standalone");
+    EXPECT_TRUE(standalone_db->contains("scl_common"));
+    scl_standalone_db = standalone_db->get_obj_ptr("scl_common");
     EXPECT_DOUBLE_EQ(scl_standalone_db->value, value);
     EXPECT_DOUBLE_EQ(scl_standalone_db->relax, relax);
     EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
@@ -516,24 +531,26 @@ TEST_F(SubsetsTest, AddDeletePtr)
 
     // **** changing order of deletion ****
 
-    scl = new Scalar(value, relax);
-    std = scl->std;
+    scl_ptr.reset();
+    scl_ptr_2.reset();
+    scl_global_ws.reset();
+    scl_subset.reset();
+    scl_standalone_db.reset();
 
-    scl_global_ws = nullptr;
-    scl_subset = nullptr;
-    scl_standalone_db = nullptr;
-
-    global_ws_scl->set_obj_ptr("scl_global", scl);
+    scl_ptr = std::make_shared<Scalar>(value, relax);
+    global_ws_scl->set_obj_ptr("scl_global", scl_ptr);
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));
 
     copy = false;    // shallow copy
     subset = new KDBScalars(global_ws_scl.get(), "s*", copy);
-    subset->set_obj_ptr("scl_subset", scl);
+    scl_ptr = std::make_shared<Scalar>(value, relax);
+    subset->set_obj_ptr("scl_subset", scl_ptr);
     EXPECT_TRUE(subset->contains("scl_subset"));
 
     copy = true;    // deep copy
     standalone_db = new KDBScalars(global_ws_scl.get(), "s*", copy);
-    standalone_db->set_obj_ptr("scl_standalone", scl);
+    scl_ptr_2 = std::make_shared<Scalar>(value, relax);
+    standalone_db->set_obj_ptr("scl_standalone", scl_ptr_2);
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));
     
     // ==== delete the standalone_db first ====
@@ -552,27 +569,25 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl_subset->std, std);
     // deleting the standalone_db should not delete the original pointer scl
     // since the set_obj_ptr() method creates a copy of the original pointer
-    EXPECT_TRUE(scl != nullptr);
-    EXPECT_DOUBLE_EQ(scl->value, value);
-    EXPECT_DOUBLE_EQ(scl->relax, relax);
-    EXPECT_DOUBLE_EQ(scl->std, std);
+    EXPECT_TRUE(scl_ptr.get() != nullptr);
+    EXPECT_DOUBLE_EQ(scl_ptr->value, value);
+    EXPECT_DOUBLE_EQ(scl_ptr->relax, relax);
+    EXPECT_DOUBLE_EQ(scl_ptr->std, std);
 
     // ==== delete the global KDB before the subset ====
     global_ws_scl->clear();
     EXPECT_EQ(global_ws_scl->size(), 0);
     EXPECT_FALSE(global_ws_scl->contains("scl_global"));
-    // deleting the global KDB should delete all the objects in the global KDB 
-    // AND clear the k_objs map of its subsets (if any)
+    // deleting the global KDB should clear all the objects in the global KDB 
+    // AND in its subsets too
     EXPECT_EQ(subset->size(), 0);
     EXPECT_FALSE(subset->contains("scl_subset"));
 
-    // deleting the global KDB should not delete the original pointer scl 
-    // since the set_obj_ptr() method creates a copy of the original pointer
-    EXPECT_TRUE(scl != nullptr);
-    EXPECT_DOUBLE_EQ(scl->value, value);
-    EXPECT_DOUBLE_EQ(scl->relax, relax);
-    EXPECT_DOUBLE_EQ(scl->std, std);
-
-    // ==== delete the original pointer scl ====
-    delete scl;
+    // deleting the global KDB should not reset the original pointer scl 
+    // since deleting or clearing the global KDB only clear the k_objs map 
+    // of the global KDB but DO NOT RESET the shared pointers.
+    EXPECT_TRUE(scl_ptr.get() != nullptr);
+    EXPECT_DOUBLE_EQ(scl_ptr->value, value);
+    EXPECT_DOUBLE_EQ(scl_ptr->relax, relax);
+    EXPECT_DOUBLE_EQ(scl_ptr->std, std);
 }

@@ -26,9 +26,13 @@ from iode.util import check_filepath, split_list, table2str, JUSTIFY
 from iode.time.period import Period
 from iode.time.sample import Sample
 from iode.iode_database.abstract_database import IodeDatabase
-from iode.iode_cython import (Variables as CythonVariables, BinaryOperation, VarsMode, 
-                              LowToHighType, LowToHighMethod, HighToLowType, 
-                              SimulationInitialization, ImportFormats, ExportFormats)
+
+from iode.iode_cython import Period as CythonPeriod
+from iode.iode_cython import Sample as CythonSample
+from iode.iode_cython import Variables as CythonVariables
+from iode.iode_cython import BinaryOperation, VarsMode
+from iode.iode_cython import LowToHighType, LowToHighMethod, HighToLowType 
+from iode.iode_cython import SimulationInitialization, ImportFormats, ExportFormats
 
 
 
@@ -161,20 +165,23 @@ class Variables(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonVariables()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonVariables()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonVariables) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _get_periods_bounds(self) -> Tuple[int, int]:
-        return self._cython_instance._get_periods_bounds()
+        return self._cy_database._get_periods_bounds()
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
                 last_period: Union[str, Period]=None) -> Self:
-        instance = Variables.get_instance()
-
         if isinstance(first_period, str):
             first_period = Period(first_period)
         
@@ -207,13 +214,13 @@ class Variables(IodeDatabase):
         if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
             raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
 
-        cy_first_period = first_period._cython_instance if first_period is not None else None
-        cy_last_period = last_period._cython_instance if last_period is not None else None
+        cy_first_period = first_period._cy_period if first_period is not None else None
+        cy_last_period = last_period._cy_period if last_period is not None else None
         
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy, cy_first_period, cy_last_period)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy, cy_first_period, cy_last_period)
+        subset = Variables.from_cython_obj(cy_subset)
+        return subset
 
     def copy(self, pattern: str=None) -> Self:
         r"""
@@ -538,15 +545,15 @@ class Variables(IodeDatabase):
 
     @property
     def _is_subset_over_periods(self) -> bool:
-        return self._cython_instance.get_is_subset_over_periods()
+        return self._cy_database.get_is_subset_over_periods()
 
     def _get_whole_sample(self) -> Sample:
         r"""
         If the current instance is a subset of a Variables database, 
         returns the sample of the original Variables database.
         """
-        whole_sample = Sample.get_instance()
-        whole_sample._cython_instance = self._cython_instance._get_whole_sample()
+        cy_whole_sample = self._cy_database._get_whole_sample()
+        whole_sample = Sample.from_cython_obj(cy_whole_sample)
         return whole_sample
 
     def _maybe_update_subset_sample(self):
@@ -571,7 +578,7 @@ class Variables(IodeDatabase):
         >>> vars_subset.sample
         Sample("2000Y1:2005Y1")
         """
-        self._cython_instance._maybe_update_subset_sample()
+        self._cy_database._maybe_update_subset_sample()
 
     def _get_real_period_position(self, period: Period) -> int:
         r"""
@@ -580,7 +587,7 @@ class Variables(IodeDatabase):
         """
         if not isinstance(period, Period):
             raise TypeError(f"Expected value of type 'Period'. Got value of type {type(period).__name__} instead.")
-        return self._cython_instance._get_real_period_position(period._cython_instance)
+        return self._cy_database._get_real_period_position(period._cy_period)
 
     def _get_variable(self, key_name: Union[str, int], key_periods: Union[None, Period, List[Period]]) -> Union[float, pd.Series, Self]:
         r"""
@@ -598,7 +605,7 @@ class Variables(IodeDatabase):
             db_subset = self._subset(name, copy=False)
         # key_periods represents a unique period -> return a float 
         elif isinstance(key_periods, Period):
-            db_subset = self._cython_instance._get_variable(key_name, key_periods._cython_instance)
+            db_subset = self._cy_database._get_variable(key_name, key_periods._cy_period)
         # key_periods represents a contiguous range of periods -> return a Variables object
         elif isinstance(key_periods, tuple):
             first_period, last_period = key_periods
@@ -614,8 +621,8 @@ class Variables(IodeDatabase):
         elif isinstance(key_periods, list):
             if not all(isinstance(period, Period) for period in key_periods):
                 raise TypeError("Expected a list of periods each of type 'Period'")
-            cython_key_periods = [p._cython_instance for p in key_periods]
-            values = self._cython_instance._get_variable(key_name, cython_key_periods)
+            cython_key_periods = [per._cy_period for per in key_periods]
+            values = self._cy_database._get_variable(key_name, cython_key_periods)
             key_periods = [str(period) for period in key_periods]
             series = pd.Series(values, index=key_periods, dtype=float)
             series.index.name = "time"
@@ -981,7 +988,7 @@ class Variables(IodeDatabase):
                 raise ValueError(f"Cannot add the IODE variable '{name}': Incompatible periods.\n"
                                 f"Expected right-hand side Variables object to have sample {self.sample}.\n"
                                 f"Got Variables object with sample {values.sample} instead.")
-            values = values._cython_instance
+            values = values._cy_database
         elif isinstance(values, Iterable):
             if len(values) != self.nb_periods:
                 raise ValueError(f"Cannot add the IODE variable '{name}'.\n"
@@ -992,7 +999,7 @@ class Variables(IodeDatabase):
                             f"Expected value of type str, int, float, numpy array, iterable of float or Variables. "
                             f"Got value of type {type(values).__name__} instead")
 
-        self._cython_instance._add(name, values)
+        self._cy_database._add(name, values)
 
     def _set_variable(self, key_name, values, key_periods):
         r"""
@@ -1108,20 +1115,20 @@ class Variables(IodeDatabase):
                                     f"a float or an iterable of float.\nGot input of type {type(values).__name__} instead")
 
             if isinstance(values, Variables):
-                values = values._cython_instance
+                values = values._cy_database
             
             if isinstance(key_periods, Period):
-                key_periods = key_periods._cython_instance
+                key_periods = key_periods._cy_period
             elif isinstance(key_periods, tuple):
-                key_periods = key_periods[0]._cython_instance, key_periods[1]._cython_instance
+                key_periods = key_periods[0]._cy_period, key_periods[1]._cy_period
             elif isinstance(key_periods, list):
-                key_periods = [period._cython_instance for period in key_periods]
+                key_periods = [period._cy_period for period in key_periods]
             else:
                 raise TypeError(f"Cannot update the IODE variable '{name}'.\n"
                                 f"Expected periods to be of type str, Period, list or tuple.\n"
                                 f"Got periods of type {type(key_periods).__name__} instead")
             
-            self._cython_instance._update_variable(name, pos, values, key_periods)
+            self._cy_database._update_variable(name, pos, values, key_periods)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
         if isinstance(value.index, pd.MultiIndex):
@@ -2014,7 +2021,7 @@ class Variables(IodeDatabase):
                                f"whole sample of the IODE Variables workspace")
         if key_periods is not None:
             raise RuntimeError("Cannot select period(s) when deleting (a) variable(s)")
-        self._cython_instance.remove_objects(names)
+        self._cy_database.remove_objects(names)
 
     def __binary_op__(self, other: Union[int, float, np.ndarray, pd.Series, pd.DataFrame, Array, Self], 
                       op: BinaryOperation, copy_self: bool) -> Self:
@@ -2022,7 +2029,7 @@ class Variables(IodeDatabase):
         _self: Variables = self.copy() if copy_self else self
 
         if isinstance(other, (int, float)):
-            _self._cython_instance = _self._cython_instance.binary_op_scalar(other, op, copy_self)
+            _self._cy_database = _self._cy_database.binary_op_scalar(other, op, copy_self)
             return _self
         
         self_names = _self.names
@@ -2055,7 +2062,7 @@ class Variables(IodeDatabase):
                 if data.shape[-1] != nb_periods:
                     raise ValueError(f"Cannot perform arithmetic operation between a left-hand side representing {nb_periods} "
                                     f"periods and a numpy ndarray with {data.shape[-1]} columns") 
-            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            _self._cy_database = _self._cy_database.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
             return _self
 
         if isinstance(other, pd.DataFrame):
@@ -2066,7 +2073,7 @@ class Variables(IodeDatabase):
                 # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
                 if not data.flags['C_CONTIGUOUS']:
                     data = np.ascontiguousarray(data)
-                _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+                _self._cy_database = _self._cy_database.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
                 return _self
 
         if isinstance(other, pd.Series):
@@ -2086,7 +2093,7 @@ class Variables(IodeDatabase):
                 if nb_periods != 1:
                     raise ValueError("Cannot perform arithmetic operation between a left-hand side representing multiple variables "
                                      "and periods and a pandas Series")
-            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            _self._cy_database = _self._cy_database.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
             return _self
 
         if la is not None and isinstance(other, Array):
@@ -2097,7 +2104,7 @@ class Variables(IodeDatabase):
                 data = np.ascontiguousarray(data)
             if len(self_names) == 1 or nb_periods == 1:
                 data = data.flatten()
-            _self._cython_instance = _self._cython_instance.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
+            _self._cy_database = _self._cy_database.binary_op_numpy(data, op, self_names, nb_periods, copy_self)           
             return _self
 
         if isinstance(other, Variables):
@@ -2109,7 +2116,7 @@ class Variables(IodeDatabase):
                                 f"Left operand sample: {_self.sample}\nRight operand sample: {other.sample}")
             if len(self_names) > 1:
                 _self._check_same_names(self_names, other.names)
-            _self._cython_instance = _self._cython_instance.binary_op_variables(other._cython_instance, op, self_names, copy_self)
+            _self._cy_database = _self._cy_database.binary_op_variables(other._cy_database, op, self_names, copy_self)
             return _self
 
         raise TypeError(f"unsupported operand type for {op.name}.\nAccepted types are: "
@@ -5157,7 +5164,7 @@ class Variables(IodeDatabase):
         data = self._convert_values(data)
 
         new_vars = set(vars_names) - set(self_names)
-        self._cython_instance.from_numpy(data, vars_names, new_vars, t_first_period, t_last_period)
+        self._cy_database.from_numpy(data, vars_names, new_vars, t_first_period, t_last_period)
 
     def to_numpy(self) -> np.ndarray:
         r"""
@@ -5266,7 +5273,7 @@ class Variables(IodeDatabase):
                   1.40065206,   1.39697298,   1.39806354,   1.40791334,
                   1.42564488,   1.44633167,   1.46286837]])
         """
-        return self._cython_instance.to_numpy()
+        return self._cy_database.to_numpy()
 
     def __array__(self, dtype=None):
         r"""
@@ -6086,22 +6093,22 @@ class Variables(IodeDatabase):
         >>> variables["ACAF", "1990Y1"]
         23.771
         """
-        return self._cython_instance.get_mode()
+        return self._cy_database.get_mode()
 
     @mode.setter
     def mode(self, value: Union[VarsMode, str]):
         if isinstance(value, str):
             value = value.upper()
             value = VarsMode[value]
-        self._cython_instance.set_mode(int(value))
+        self._cy_database.set_mode(int(value))
 
     @property
     def first_period(self) -> Period:
         r"""
         First period of the current Variables database.
         """
-        period = Period.get_instance()
-        period._cython_instance = self._cython_instance.get_first_period()
+        cy_period = self._cy_database.get_first_period()
+        period = Period.from_cython_obj(cy_period)
         return period
 
     @property
@@ -6109,8 +6116,8 @@ class Variables(IodeDatabase):
         r"""
         Last period of the current Variables database.
         """
-        period = Period.get_instance()
-        period._cython_instance = self._cython_instance.get_last_period()
+        cy_period = self._cy_database.get_last_period()
+        period = Period.from_cython_obj(cy_period)
         return period
 
     @property
@@ -6242,8 +6249,8 @@ class Variables(IodeDatabase):
         ACAF            na      na    1.21  ...  -37.83     na       na
         <BLANKLINE>
         """
-        sample = Sample.get_instance()
-        sample._cython_instance = self._cython_instance.get_sample()
+        cy_sample = self._cy_database.get_sample()
+        sample = Sample.from_cython_obj(cy_sample)
         return sample
 
     @sample.setter
@@ -6266,7 +6273,7 @@ class Variables(IodeDatabase):
             if isinstance(to_period, Period):
                 to_period = str(to_period)
 
-        self._cython_instance.set_sample(from_period, to_period)
+        self._cy_database.set_sample(from_period, to_period)
 
     @property
     def nb_periods(self) -> int:
@@ -6403,11 +6410,11 @@ class Variables(IodeDatabase):
         >>> variables.threshold
         1e-05
         """
-        return self._cython_instance.get_threshold()
+        return self._cy_database.get_threshold()
 
     @threshold.setter
     def threshold(self, value: float):
-        ok = self._cython_instance.set_threshold(value)
+        ok = self._cy_database.set_threshold(value)
         if not ok:
             raise ValueError(f"threshold: Invalid value '{value}'.")
 
@@ -6586,7 +6593,7 @@ class Variables(IodeDatabase):
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        return self._cython_instance.periods_subset(from_period, to_period, as_float)
+        return self._cy_database.periods_subset(from_period, to_period, as_float)
 
     def copy_from(self, input_files: Union[str, List[str]], from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, names: Union[str, List[str]]='*'):
         r"""
@@ -6619,7 +6626,7 @@ class Variables(IodeDatabase):
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        self._cython_instance.copy_from(input_files, from_period, to_period, names)
+        self._cy_database.copy_from(input_files, from_period, to_period, names)
 
     def low_to_high(self, type_of_series: Union[LowToHighType, str], method: Union[LowToHighMethod, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         r"""
@@ -6850,7 +6857,7 @@ class Variables(IodeDatabase):
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        self._cython_instance.low_to_high(type_of_series, method, filepath, var_list)
+        self._cy_database.low_to_high(type_of_series, method, filepath, var_list)
 
     def high_to_low(self, type_of_series: Union[HighToLowType, str], filepath: Union[str, Path], var_list: Union[str, List[str]]):
         r"""
@@ -6991,7 +6998,7 @@ class Variables(IodeDatabase):
             all(isinstance(item, str) for item in var_list):
             var_list = ';'.join(var_list)
 
-        self._cython_instance.high_to_low(type_of_series, filepath, var_list)
+        self._cy_database.high_to_low(type_of_series, filepath, var_list)
 
     def extrapolate(self, method: Union[SimulationInitialization, str], from_period: Union[str, Period]=None, 
                     to_period: Union[str, Period]=None, variables_list: Union[str, List[str]]=None):
@@ -7184,7 +7191,7 @@ class Variables(IodeDatabase):
             all(isinstance(name, str) for name in variables_list):
             variables_list = ';'.join(variables_list)
 
-        self._cython_instance.extrapolate(method, from_period, to_period, variables_list)
+        self._cy_database.extrapolate(method, from_period, to_period, variables_list)
 
     def seasonal_adjustment(self, input_file: str, eps_test: float=5.0, series: Union[str, List[str]]=None):
         r"""
@@ -7233,7 +7240,7 @@ class Variables(IodeDatabase):
             all(isinstance(name, str) for name in series):
             series = ';'.join(series)
         
-        self._cython_instance.seasonal_adjustment(input_file, eps_test, series)
+        self._cy_database.seasonal_adjustment(input_file, eps_test, series)
 
     def trend_correction(self, input_file: str, lambda_: float, series: Union[str, List[str]]=None, log: bool=False):
         r"""
@@ -7273,7 +7280,7 @@ class Variables(IodeDatabase):
             all(isinstance(name, str) for name in series):
             series = ';'.join(series)
         
-        self._cython_instance.trend_correction(input_file, lambda_, series, log)
+        self._cy_database.trend_correction(input_file, lambda_, series, log)
 
     def execute_RAS(self, pattern: str, xdim: Union[str, List[str]], ydim: Union[str, List[str]], ref_year: Union[str, Period], 
                     sum_year: Union[str, Period], max_nb_iterations: int=100, epsilon: float=0.001):
@@ -7431,7 +7438,7 @@ class Variables(IodeDatabase):
             sum_year = Period(sum_year)
         sum_year = str(sum_year)
         
-        success: bool = self._cython_instance.execute_RAS(pattern, xdim, ydim, ref_year, sum_year, max_nb_iterations, epsilon)
+        success: bool = self._cy_database.execute_RAS(pattern, xdim, ydim, ref_year, sum_year, max_nb_iterations, epsilon)
         if not success:
             raise RuntimeError("RAS algorithm did not converge. Please check the input data and parameters.")
 
@@ -8056,7 +8063,7 @@ class Variables(IodeDatabase):
     def _str_table(self, names: List[str]) -> str:
         # self.periods_as_str calls self._maybe_update_subset_sample()
         periods = self.periods_as_str
-        dict_columns = self._cython_instance._str_table(names, periods)
+        dict_columns = self._cy_database._str_table(names, periods)
         return table2str(dict_columns, max_lines=10, max_width=100, precision=2, justify_funcs={"name": JUSTIFY.LEFT})
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):

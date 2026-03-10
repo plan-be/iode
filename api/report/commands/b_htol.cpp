@@ -154,8 +154,8 @@ static int B_htol(int method, char* arg)
     {
         double* from_values = from_var_ptr->data(); 
 
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
-        double* to_values = to_var_ptr->data();
+        Variable to_var(t_smpl->nb_periods, 0);
+        double* to_values = to_var.data();
 
         for(f = 0, t = 0; f < skip; f++) 
         {
@@ -191,7 +191,7 @@ static int B_htol(int method, char* arg)
         for(; t < nb; t++) 
             to_values[t] = IODE_NAN;
 
-        to->set_obj_ptr(from_name, to_var_ptr);
+        to->set(from_name, to_var);
     }
 
     KV_merge(global_ws_var.get(), to, 1);
@@ -243,8 +243,8 @@ KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
     {
         double* from_values = from_var_ptr->data(); 
 
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
-        double* to_values = to_var_ptr->data();
+        Variable to_var(t_smpl->nb_periods, 0);
+        double* to_values = to_var.data();
 
         for(f = 0, t = 0; f < skip; f++) 
         {
@@ -280,7 +280,7 @@ KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
         for(; t < nb; t++) 
             to_values[t] = IODE_NAN;
 
-        kdb_to->set_obj_ptr(from_name, to_var_ptr);
+        kdb_to->set(from_name, to_var);
     }
 
 done:

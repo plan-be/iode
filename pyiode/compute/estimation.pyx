@@ -34,30 +34,33 @@ def cython_dickey_fuller_test(scalars_db: Scalars, lec: str, drift: bool, trend:
 
 
 cdef class CythonCorrelationMatrix:
-    cdef bint ptr_owner
+    cdef shared_ptr[CCorrelationMatrix] correlation_matrix_ptr 
     cdef CCorrelationMatrix* c_correlation_matrix
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_correlation_matrix = NULL
 
     def __init__(self):
         raise TypeError("This class cannot be instantiated directly")
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_correlation_matrix is not NULL:
-            del self.c_correlation_matrix
-            self.c_correlation_matrix = NULL
+        self.correlation_matrix_ptr.reset()
+        self.c_correlation_matrix = NULL
+    
+    cdef update_ptr(self, shared_ptr[CCorrelationMatrix] correlation_matrix_ptr):
+        self.correlation_matrix_ptr = correlation_matrix_ptr
+        self.c_correlation_matrix = correlation_matrix_ptr.get()
 
     @staticmethod
-    cdef CythonCorrelationMatrix from_ptr(CCorrelationMatrix* ptr, bint owner=False):
+    cdef CythonCorrelationMatrix _from_ptr(shared_ptr[CCorrelationMatrix] corr_ptr):
         """
         Factory function to create CythonCorrelationMatrix objects from a given CCorrelationMatrix pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef CythonCorrelationMatrix wrapper = CythonCorrelationMatrix.__new__(CythonCorrelationMatrix)
-        wrapper.c_correlation_matrix = ptr
-        wrapper.ptr_owner = owner
+        if corr_ptr.get() is NULL:
+            return None
+        wrapper.update_ptr(corr_ptr)
         return wrapper
 
     def is_undefined(self) -> bool:
@@ -162,30 +165,23 @@ cdef class CythonEditAndEstimateEquations:
     def update_current_equation(self, lec: str, comment: str):
         self.c_estimation_ptr.update_current_equation(lec.encode(), comment.encode())
 
-    def get_current_equation(self, eq: Equation) -> Equation:
-        cdef CEquation* c_current_eq = self.c_estimation_ptr.current_equation()
-        if c_current_eq is NULL:
-            return None
-        eq.ptr_owner = <bint>False
-        eq.c_equation = c_current_eq
+    def get_current_equation(self) -> Equation:
+        cdef shared_ptr[CEquation] c_current_eq = self.c_estimation_ptr.current_equation()
+        eq = Equation._from_ptr(c_current_eq)
         return eq
 
-    def get_next_equation(self, eq: Equation) -> Equation:
-        cdef CEquation* c_next_eq = self.c_estimation_ptr.next_equation()
-        if c_next_eq is NULL:
-            return None
-        eq.ptr_owner = <bint>False
-        eq.c_equation = c_next_eq
+    def get_next_equation(self) -> Equation:
+        cdef shared_ptr[CEquation] c_next_eq = self.c_estimation_ptr.next_equation()
+        eq = Equation._from_ptr(c_next_eq)
         return eq
 
-    def get_correlation_matrix(self, corr_matrix: CythonCorrelationMatrix) -> CythonCorrelationMatrix:
+    def get_correlation_matrix(self) -> CythonCorrelationMatrix:
         # WARNING: The pointer to the CCorrelationMatrix object is deleted by the 
         #          CEditAndEstimateEquations instance
-        cdef CCorrelationMatrix* c_corr_matrix = self.c_estimation_ptr.get_correlation_matrix()
-        if c_corr_matrix is NULL:
+        cdef shared_ptr[CCorrelationMatrix] corr_matrix_ptr = self.c_estimation_ptr.get_correlation_matrix()
+        if corr_matrix_ptr.get() is NULL:
             return None
-        corr_matrix.ptr_owner = <bint>False
-        corr_matrix.c_correlation_matrix = c_corr_matrix
+        corr_matrix = CythonCorrelationMatrix._from_ptr(corr_matrix_ptr)
         return corr_matrix
 
     def get_observed_values(self, name: str) -> List[float]:

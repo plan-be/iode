@@ -17,6 +17,10 @@ from iode.iode_database.variables_database import variables
 
 from iode.iode_cython import AdjustmentMethod, EqMethod
 from iode.iode_cython import cython_dickey_fuller_test, cython_dynamic_adjustment
+from iode.iode_cython import Sample as CythonSample
+from iode.iode_cython import Equation as CythonEquation
+from iode.iode_cython import Equations as CythonEquations
+from iode.iode_cython import Scalars as CythonScalars
 from iode.iode_cython import CythonCorrelationMatrix
 from iode.iode_cython import CythonEditAndEstimateEquations
 
@@ -146,10 +150,11 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> df_scalars["df3"]
     Scalar(-0.211047, 0.170708, 0.170708)
     """
-    scalars_db = Scalars.get_instance()
-    scalars_db._cython_instance = cython_dickey_fuller_test(scalars_db._cython_instance, lec, drift, trend, order)
-    if scalars_db._cython_instance is None:
+    cy_scalars_db = CythonScalars()
+    cy_scalars_db = cython_dickey_fuller_test(cy_scalars_db, lec, drift, trend, order)
+    if cy_scalars_db is None:
         raise RuntimeError("Dickey-Fuller test failed. No scalars database created.")
+    scalars_db = Scalars.from_cython_obj(cy_scalars_db)
     return scalars_db
 
 
@@ -158,36 +163,36 @@ class CorrelationMatrix:
         raise TypeError("This class cannot be instantiated directly")
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonCorrelationMatrix) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonCorrelationMatrix.__new__(CythonCorrelationMatrix)
+        instance._cy_estimation = obj
         return instance
 
     @property
     def shape(self) -> Tuple[int, int]:
-        if self._cython_instance.is_undefined():
+        if self._cy_estimation.is_undefined():
             warnings.warn("The correlation matrix has not been defined yet")
             return 0, 0
-        return self._cython_instance.get_shape()
+        return self._cy_estimation.get_shape()
 
     @property
     def names(self) -> List[str]:
-        if self._cython_instance.is_undefined():
+        if self._cy_estimation.is_undefined():
             warnings.warn("The correlation matrix has not been defined yet")
             return []
-        return self._cython_instance.get_names()
+        return self._cy_estimation.get_names()
 
     def name(self, index: int) -> str:
-        if self._cython_instance.is_undefined():
+        if self._cy_estimation.is_undefined():
             warnings.warn("The correlation matrix has not been defined yet")
             return -1
         if index < 0 or index >= len(self):
             raise ValueError(f"'index': value must be in range [0, {len(self)}]. "
                              f"Got index value {index} instead")
-        return self._cython_instance.name(index)
+        return self._cy_estimation.name(index)
 
     def __len__(self) -> int:
-        return self._cython_instance.__len__()
+        return self._cy_estimation.__len__()
 
     def __getitem__(self, key: Tuple[int, int]) -> float:
         row, column = key
@@ -198,7 +203,7 @@ class CorrelationMatrix:
         if column < 0 or column >= shape[1]:
             raise ValueError(f"CorrelationMatrix[row, column]: Value for rwo and column must be in range "
                             f"[0, {shape[1]}]. Got column value {column} instead")
-        return self._cython_instance.__getitem__((row, column))
+        return self._cy_estimation.__getitem__((row, column))
 
     def __setitem__(self, key, value):
         warnings.warn("The values of the correlation matrix are read-only.")
@@ -253,7 +258,7 @@ class EditAndEstimateEquations:
         if isinstance(to_period, Period):
             to_period = str(to_period)
 
-        self._cython_instance = CythonEditAndEstimateEquations(from_period, to_period)
+        self._cy_estimation = CythonEditAndEstimateEquations(from_period, to_period)
 
     @property
     def sample(self) -> Sample:
@@ -289,11 +294,11 @@ class EditAndEstimateEquations:
         >>> estimation.sample
         Sample("1980Y1:1996Y1")
         """
-        sample = Sample.get_instance()
-        sample._cython_instance = self._cython_instance.get_sample()
-        if sample._cython_instance is None:
+        cy_sample: CythonSample = self._cy_estimation.get_sample()
+        if cy_sample is None:
             warnings.warn("Estimation sample has not been defined yet.")
             return None
+        sample = Sample.from_cython_obj(cy_sample)
         return sample
 
     @sample.setter
@@ -321,7 +326,7 @@ class EditAndEstimateEquations:
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        self._cython_instance.set_sample(from_period, to_period)
+        self._cy_estimation.set_sample(from_period, to_period)
 
     @property
     def block(self) -> str:
@@ -518,7 +523,7 @@ class EditAndEstimateEquations:
         >>> scalars_res["dpuh_2"]
         Scalar(0.9, 1, na)
         """
-        return self._cython_instance.get_block()
+        return self._cy_estimation.get_block()
 
     @block.setter
     def block(self, value: Union[str, List[str], Tuple[Union[str, List[str]], str]]):
@@ -531,7 +536,7 @@ class EditAndEstimateEquations:
         if not isinstance(_block, str):
             _block = ';'.join(_block)
         
-        self._cython_instance.set_block(_block, current_eq_name)
+        self._cy_estimation.set_block(_block, current_eq_name)
 
     @property
     def method(self) -> str:
@@ -569,7 +574,7 @@ class EditAndEstimateEquations:
         >>> estimation.method
         'MAX_LIKELIHOOD'
         """
-        return self._cython_instance.get_method()
+        return self._cy_estimation.get_method()
 
     @method.setter
     def method(self, value: Union[EqMethod, str, int]):
@@ -580,7 +585,7 @@ class EditAndEstimateEquations:
             value = value.upper()
             value = EqMethod[value]
         value = int(value)
-        self._cython_instance.set_method(value)
+        self._cy_estimation.set_method(value)
 
     @property
     def instruments(self) -> Union[str, List[str]]:
@@ -630,13 +635,13 @@ class EditAndEstimateEquations:
         >>> estimation.instruments
         ['several', 'instruments', 'as', 'list']
         """
-        return self._cython_instance.get_instruments()
+        return self._cy_estimation.get_instruments()
 
     @instruments.setter
     def instruments(self, value: Union[str, List[str]]):
         if not isinstance(value, str):
             value = ';'.join(value)
-        self._cython_instance.set_instruments(value)
+        self._cy_estimation.set_instruments(value)
 
     def update_scalars(self):
         r"""
@@ -659,7 +664,7 @@ class EditAndEstimateEquations:
         -----
         Equivalent to the ODE_blk_coef() function from o_est.c from the old GUI (developed by Jean-Marc Paul)
         """
-        self._cython_instance.update_scalars()
+        self._cy_estimation.update_scalars()
 
     @property
     def scalars_db(self) -> Scalars:
@@ -698,16 +703,17 @@ class EditAndEstimateEquations:
         >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         """
-        scalars_db = Scalars.get_instance()
-        scalars_db._cython_instance = self._cython_instance.get_scalars_db(scalars_db._cython_instance)
-        if scalars_db._cython_instance is None:
+        cy_scalars_db = CythonScalars()
+        cy_scalars_db = self._cy_estimation.get_scalars_db(cy_scalars_db)
+        if cy_scalars_db is None:
             warnings.warn("Estimation Scalars database has not been defined yet.")
             return None
+        scalars_db = Scalars.from_cython_obj(cy_scalars_db)
         return scalars_db
 
     @property
     def equations_list(self) -> List[str]:
-        return self._cython_instance.get_equations_list()
+        return self._cy_estimation.get_equations_list()
 
     @property
     def equations_db(self) -> Equations:
@@ -740,11 +746,12 @@ class EditAndEstimateEquations:
         >>> equations_res.names
         ['ACAF', 'DPUH']
         """
-        equations_db = Equations.get_instance()
-        equations_db._cython_instance = self._cython_instance.get_equations_db(equations_db._cython_instance)
-        if equations_db._cython_instance is None:
+        cy_equations_db = CythonEquations()
+        cy_equations_db = self._cy_estimation.get_equations_db(cy_equations_db)
+        if cy_equations_db is None:
             warnings.warn("Estimation Equations database has not been defined yet.")
             return None
+        equations_db = Equations.from_cython_obj(cy_equations_db)
         return equations_db
 
     def update_current_equation(self, lec: str, comment: str):
@@ -787,7 +794,7 @@ class EditAndEstimateEquations:
         >>> current_eq.comment
         'This is a test equation.'
         """
-        self._cython_instance.update_current_equation(lec, comment)
+        self._cy_estimation.update_current_equation(lec, comment)
 
     @property
     def current_equation(self) -> Equation:
@@ -834,11 +841,11 @@ class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        eq = Equation.get_instance()
-        eq._cython_instance = self._cython_instance.get_current_equation(eq._cython_instance)
-        if eq._cython_instance is None:
+        cy_eq = self._cy_estimation.get_current_equation()
+        if cy_eq is None:
             warnings.warn("Couldn't get the current equation")
             return None
+        eq = Equation.from_cython_obj(cy_eq)
         return eq
 
     @property
@@ -888,11 +895,11 @@ class EditAndEstimateEquations:
         >>> next_eq.lec           # doctest: +NORMALIZE_WHITESPACE
         '(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)'
         """
-        eq = Equation.get_instance()
-        eq._cython_instance = self._cython_instance.get_next_equation(eq._cython_instance)
-        if eq._cython_instance is None:
+        cy_eq = self._cy_estimation.get_next_equation()
+        if cy_eq is None:
             warnings.warn("Couldn't get the next equation")
             return None
+        eq = Equation.from_cython_obj(cy_eq)
         return eq
 
     @property
@@ -935,11 +942,11 @@ class EditAndEstimateEquations:
             dpuh_2 | -0.0372903   0.0395814  -0.00892588  -0.0419869           1
         <BLANKLINE>
         """
-        corr_matrix = CorrelationMatrix.get_instance()
-        corr_matrix._cython_instance = self._cython_instance.get_correlation_matrix(corr_matrix._cython_instance)
-        if corr_matrix._cython_instance is None:
+        cy_corr_matrix = self._cy_estimation.get_correlation_matrix()
+        if cy_corr_matrix is None:
             warnings.warn("Couldn't get the correlation matrix")
             return None
+        corr_matrix = CorrelationMatrix.from_cython_obj(cy_corr_matrix)
         return corr_matrix
 
     def get_observed_values(self, name: str) -> List[float]:
@@ -980,7 +987,7 @@ class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        observed_values = self._cython_instance.get_observed_values(name)
+        observed_values = self._cy_estimation.get_observed_values(name)
         if not observed_values:
             warnings.warn(f"No observed values found for '{name}'", RuntimeWarning)
             return []
@@ -1024,7 +1031,7 @@ class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        fitted_values = self._cython_instance.get_fitted_values(name)
+        fitted_values = self._cy_estimation.get_fitted_values(name)
         if not fitted_values:
             warnings.warn(f"No fitted values found for '{name}'", RuntimeWarning)
             return []
@@ -1068,7 +1075,7 @@ class EditAndEstimateEquations:
         >>> estimation.get_residual_values("DPUH")      # doctest: +ELLIPSIS
         [-0.013173708952551183, 0.02345023294927416, ..., 0.013638637430566126, -0.02561515224340035]
         """
-        residual_values = self._cython_instance.get_residual_values(name)
+        residual_values = self._cy_estimation.get_residual_values(name)
         if not residual_values:
             warnings.warn(f"No residual values found for '{name}'", RuntimeWarning)
             return []
@@ -1279,7 +1286,7 @@ class EditAndEstimateEquations:
             suppress_msgs()
 
         try:
-            self._cython_instance.estimate(maxit, epsilon)
+            self._cy_estimation.estimate(maxit, epsilon)
             success = True
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
@@ -1291,7 +1298,7 @@ class EditAndEstimateEquations:
 
     @property
     def is_done(self) -> bool:
-        return self._cython_instance.get_is_done()
+        return self._cy_estimation.get_is_done()
 
     def save(self, from_period: Union[str, List[str]]=None, to_period: Union[str, List[str]]=None) -> List[str]:
         r"""
@@ -1431,4 +1438,4 @@ class EditAndEstimateEquations:
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        return self._cython_instance.save(from_period, to_period)
+        return self._cy_estimation.save(from_period, to_period)

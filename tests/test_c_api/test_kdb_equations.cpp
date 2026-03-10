@@ -71,43 +71,43 @@ TEST_F(KDBEquationsTest, GetLec)
 
 TEST_F(KDBEquationsTest, Get)
 {
-    Equation* eq = nullptr;
+    std::shared_ptr<Equation> eq_ptr;
     std::string expected_lec;
 
-    eq = global_ws_eqs->get_obj_ptr("ACAF");
-    EXPECT_EQ(eq->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
-    EXPECT_EQ(eq->get_date_as_string(), "12-06-1998");
-    EXPECT_EQ(eq->sample.to_string(), "1980Y1:1996Y1");
-    EXPECT_EQ(eq->get_method(), "LSQ");
+    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    EXPECT_EQ(eq_ptr->get_date_as_string(), "12-06-1998");
+    EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
+    EXPECT_EQ(eq_ptr->get_method(), "LSQ");
 
-    eq = global_ws_eqs->get_obj_ptr("BVY");
-    EXPECT_EQ(eq->lec, "BVY:=YN+YK");
-    EXPECT_EQ(eq->get_date_as_string(), "");
-    EXPECT_EQ(eq->sample.to_string(), ":");
-    EXPECT_EQ(eq->get_method(), "LSQ");
+    eq_ptr = global_ws_eqs->get_obj_ptr("BVY");
+    EXPECT_EQ(eq_ptr->lec, "BVY:=YN+YK");
+    EXPECT_EQ(eq_ptr->get_date_as_string(), "");
+    EXPECT_EQ(eq_ptr->sample.to_string(), ":");
+    EXPECT_EQ(eq_ptr->get_method(), "LSQ");
 
-    eq = global_ws_eqs->get_obj_ptr("W");
+    eq_ptr = global_ws_eqs->get_obj_ptr("W");
     expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
     expected_lec += "+gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)\n";
     expected_lec += "+gamma5*ln PROD[-1])+(XW)+XWC";
-    EXPECT_EQ(eq->lec, expected_lec);
-    EXPECT_EQ(eq->get_method(), "LSQ");
-    EXPECT_EQ(eq->sample.to_string(), "1975Y1:1997Y1");
-    EXPECT_EQ(eq->get_comment(), "");
-    EXPECT_EQ(eq->instruments, "");
-    EXPECT_EQ(eq->block, "W");
-    EXPECT_EQ(eq->get_date_as_string(), "");
+    EXPECT_EQ(eq_ptr->lec, expected_lec);
+    EXPECT_EQ(eq_ptr->get_method(), "LSQ");
+    EXPECT_EQ(eq_ptr->sample.to_string(), "1975Y1:1997Y1");
+    EXPECT_EQ(eq_ptr->get_comment(), "");
+    EXPECT_EQ(eq_ptr->instruments, "");
+    EXPECT_EQ(eq_ptr->block, "W");
+    EXPECT_EQ(eq_ptr->get_date_as_string(), "");
 
     // other
-    eq = global_ws_eqs->get_obj_ptr("DTH1");
-    EXPECT_EQ(eq->endo, "DTH1");
-    EXPECT_EQ(eq->lec, "DTH1:=DTH1C");
-    EXPECT_EQ(eq->solved, 0);
-    EXPECT_EQ(eq->method, EQ_LSQ);
-    EXPECT_EQ(eq->sample.to_string(), ":");
-    EXPECT_EQ(eq->comment, "");
-    EXPECT_EQ(eq->block, "DTH1");
-    EXPECT_EQ(eq->instruments, "");
+    eq_ptr = global_ws_eqs->get_obj_ptr("DTH1");
+    EXPECT_EQ(eq_ptr->endo, "DTH1");
+    EXPECT_EQ(eq_ptr->lec, "DTH1:=DTH1C");
+    EXPECT_EQ(eq_ptr->solved, 0);
+    EXPECT_EQ(eq_ptr->method, EQ_LSQ);
+    EXPECT_EQ(eq_ptr->sample.to_string(), ":");
+    EXPECT_EQ(eq_ptr->comment, "");
+    EXPECT_EQ(eq_ptr->block, "DTH1");
+    EXPECT_EQ(eq_ptr->instruments, "");
 }
 
 TEST_F(KDBEquationsTest, GetNames)
