@@ -82,7 +82,7 @@ jobs:
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
           - name: Test the C and C++ APIs
-            if: runner.os == 'Windows' && matrix.python-minor-version == '3.12'
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             uses: ./.github/actions/test_api
             with:
               cmake-config: ${{ env.os }}-${{ inputs.build-config }}
