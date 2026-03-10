@@ -8,10 +8,11 @@ New Features
 
 - PYTHON: add support for Python 3.14 (closes :issue:`1147`)
 
-
 Improvements 
 ------------
 
+- PYTHON: removed warning message when trying the get the sample of the *Variables* 
+  database while it is undefined (closes :issue:`1150`) 
 
 Fixed Bugs 
 ----------

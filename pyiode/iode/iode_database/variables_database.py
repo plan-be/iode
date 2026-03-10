@@ -6227,8 +6227,6 @@ class Variables(IodeDatabase):
         """
         sample = Sample.get_instance()
         sample._cython_instance = self._cython_instance.get_sample()
-        if sample._cython_instance.is_undefined():
-            warnings.warn("The sample of the Variables database is not defined")
         return sample
 
     @sample.setter
