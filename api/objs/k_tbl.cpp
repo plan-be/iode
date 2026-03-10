@@ -844,8 +844,8 @@ std::string KDBTables::get_title(const std::string& name) const
 	if(!this->contains(name))
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
-    Table* table = this->get_obj_ptr(name);
-    std::string title = std::string((char*) T_get_title(table));
+    std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
+    std::string title = std::string((char*) T_get_title(tbl_ptr.get()));
     return title;
 }
 
@@ -882,13 +882,13 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 {
 	ComputedTable::initialize_printing(destination_file, format);
 
-	Table* table;
+	std::shared_ptr<Table> tbl_ptr;
 	ComputedTable* computed_table;
 	std::set<std::string> v_names = filter_names(names);
 	for(const std::string& name : v_names)
 	{
-		table = this->get_obj_ptr(name);
-		computed_table = new ComputedTable(table, gsample, nb_decimals);
+		tbl_ptr = this->get_obj_ptr(name);
+		computed_table = new ComputedTable(tbl_ptr.get(), gsample, nb_decimals);
 		computed_table->print_to_file();
 		delete computed_table;
 	}
@@ -903,7 +903,7 @@ bool KDBTables::binary_to_obj(const std::string& name, char* pack)
     if(!tbl)
         return false;
 
-    this->k_objs[name] = tbl;
+    this->k_objs[name] = std::make_shared<Table>(*tbl);
     return true;
 }
 
@@ -919,7 +919,7 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
     debug_packing("table " + std::string(name), "--------------------------------", -1);
     
     *pack = NULL;
-    Table* tbl = this->get_obj_ptr(name);
+    std::shared_ptr<Table> tbl = this->get_obj_ptr(name);
     if(!tbl)
         return false;
 
@@ -1067,8 +1067,8 @@ bool KDBTables::grep_obj(const std::string& name, const std::string& pattern,
     bool found = false;
     std::string text;
 
-    Table* tbl = const_cast<KDBTables*>(this)->get_obj_ptr(name);
-    for(const TableLine& tline : tbl->lines) 
+    std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
+    for(const TableLine& tline : tbl_ptr->lines) 
     {
         if(found) 
             break;
@@ -1123,7 +1123,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     char    gsmpl[128], **l = NULL, *buf, *res = NULL;
     COLS    *cls;
 
-    Table* tbl = global_ws_tbl->get_obj_ptr(name);
+    std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     Sample* smpl = global_ws_var->sample;
 
     /* date */
@@ -1138,7 +1138,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     else
         sprintf(gsmpl, "%s", ismpl);
 
-    dim = T_prep_cls(tbl, gsmpl, &cls);
+    dim = T_prep_cls(tbl_ptr.get(), gsmpl, &cls);
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
@@ -1153,10 +1153,10 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
 
     TableLine* line;
     buf = SCR_malloc(256 + dim * 128);
-    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    for(i = 0; rc == 0 && i < tbl_ptr->lines.size(); i++) 
     {
         buf[0] = 0;
-        line = &tbl->lines[i];
+        line = &(tbl_ptr->lines[i]);
 
         switch(line->get_type()) 
         {
@@ -1191,13 +1191,13 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 break;
             case TABLE_LINE_CELL  :
                 COL_clear(cls);
-                if(COL_exec(tbl, i, cls) < 0)
+                if(COL_exec(tbl_ptr.get(), i, cls) < 0)
                     strcat(buf, "Error in calc");
                 else
                     for(j = 0; j < cls->cl_nb; j++) 
                     {
-                        d = j % T_NC(tbl);
-                        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+                        d = j % tbl_ptr->nb_columns;
+                        if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0) 
                             continue;
                         strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
                         strcat(buf, "\t");
@@ -1245,24 +1245,26 @@ char* KDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* n
  */
 bool KDBTables::print_obj_def(const std::string& name)
 {
-    Table* tbl = this->get_obj_ptr(name);
-    if(!tbl) 
+    std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
+    if(!tbl_ptr) 
         return false;
     
     if(B_TABLE_TITLE) 
     {
         if(B_TABLE_TITLE == 1) 
-            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), T_get_title(tbl, false));
+            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), 
+                            T_get_title(tbl_ptr.get(), false));
         else 
-            W_printf((char*) "\n%s\n", T_get_title(tbl, false));
+            W_printf((char*) "\n%s\n", T_get_title(tbl_ptr.get(), false));
         return true;
     }
 
-    B_PrintRtfTopic((char*) T_get_title(tbl, false));
-    W_printf((char*) ".tb %d\n", T_NC(tbl));
+    B_PrintRtfTopic((char*) T_get_title(tbl_ptr.get(), false));
+    W_printf((char*) ".tb %d\n", tbl_ptr->nb_columns);
     W_printfRepl((char*) ".sep &\n");
-    W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", T_NC(tbl), A2M_ESCCH, name.c_str(), A2M_ESCCH);
-    bool success = tbl->print_definition();
+    W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", tbl_ptr->nb_columns, 
+                 A2M_ESCCH, name.c_str(), A2M_ESCCH);
+    bool success = tbl_ptr->print_definition();
     W_printf((char*) ".te\n");
     return success;
 }

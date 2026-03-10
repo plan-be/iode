@@ -345,13 +345,13 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
-    List* pre_lst = global_ws_lst->get_obj_ptr(lsts[0]);
+    std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(lsts[0]);
     char** pre = (char**) KL_expand((char*) pre_lst->c_str());
 
-    List* inter_lst = global_ws_lst->get_obj_ptr(lsts[1]);
+    std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(lsts[1]);
     char** inter = (char**) KL_expand((char*) inter_lst->c_str());
 
-    List* post_lst = global_ws_lst->get_obj_ptr(lsts[2]);
+    std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(lsts[2]);
     char** post = (char**) KL_expand((char*) post_lst->c_str());
 
     SCR_free_tbl((unsigned char**) lsts);

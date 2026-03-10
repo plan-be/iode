@@ -479,7 +479,7 @@ int EV_cc_file(char *filename)
             if(nbcoefs < 0) break;
             
             // Save in WS
-            Equation* eq = global_ws_eqs->get_obj_ptr(endo);
+            std::shared_ptr<Equation> eq = global_ws_eqs->get_obj_ptr(endo);
             if(!eq)
                 break;
             
@@ -545,7 +545,7 @@ int EV_cc_file(char *filename)
             }
             
             // Save in WS
-            Equation* eq = global_ws_eqs->get_obj_ptr(endo);
+            std::shared_ptr<Equation> eq = global_ws_eqs->get_obj_ptr(endo);
             if(!eq)
                 break;
             

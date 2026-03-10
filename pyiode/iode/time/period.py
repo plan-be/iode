@@ -70,22 +70,22 @@ class Period:
         """
         if isinstance(period_or_year, Period):
             period = period_or_year
-            self._cython_instance = CythonPeriod(period.year, period.periodicity, period.step)
+            self._cy_period = CythonPeriod(period.year, period.periodicity, period.step)
         elif isinstance(period_or_year, str):
             period = period_or_year
-            self._cython_instance = CythonPeriod(period)
+            self._cy_period = CythonPeriod(period)
         elif isinstance(period_or_year, int):
             year = period_or_year
             if len(periodicity) != 1:
                 raise ValueError("'periodicity': Expected string of length 1")
             if periodicity not in PeriodICITY_LIST:
                 raise ValueError(f"Wrong periodicity. Valid values for the periodicity are: {', '.join(PeriodICITY_LIST)}")
-            self._cython_instance = CythonPeriod(year, periodicity, step)
+            self._cy_period = CythonPeriod(year, periodicity, step)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonPeriod) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonPeriod.__new__(CythonPeriod)
+        instance._cy_period = obj
         return instance
 
     @property
@@ -100,7 +100,7 @@ class Period:
         >>> period.nb_periods_per_year
         4
         """
-        return self._cython_instance.get_nb_periods_per_year()
+        return self._cy_period.get_nb_periods_per_year()
 
     def difference(self, other: Self) -> int:
         r"""
@@ -125,7 +125,7 @@ class Period:
         >>> period_2.difference(period)
         6
         """
-        return self._cython_instance.difference(other._cython_instance)
+        return self._cy_period.difference(other._cy_period)
 
     def shift(self, nb_periods: int) -> Self:
         r"""
@@ -158,9 +158,9 @@ class Period:
         >>> shifted_period
         Period("1998Q2")
         """
-        instance = self.get_instance()
-        instance._cython_instance = self._cython_instance.shift(nb_periods)
-        return instance
+        cy_period: CythonPeriod = self._cy_period.shift(nb_periods)
+        shifted_per = Period.from_cython_obj(cy_period)
+        return shifted_per
 
     @property
     def year(self) -> int:
@@ -174,7 +174,7 @@ class Period:
         >>> period.year
         2000
         """
-        return self._cython_instance.get_year()
+        return self._cy_period.get_year()
 
     @property
     def periodicity(self) -> str:
@@ -195,7 +195,7 @@ class Period:
         >>> period.periodicity
         'Q'
         """
-        return self._cython_instance.get_periodicity()
+        return self._cy_period.get_periodicity()
 
     @property
     def step(self) -> int:
@@ -209,13 +209,13 @@ class Period:
         >>> period.step
         3
         """
-        return self._cython_instance.get_step()
+        return self._cy_period.get_step()
 
     def __eq__(self, other: Self) -> bool:
         if not isinstance(other, Period):
             warnings.warn(f"Comparing '{self}' with '{other}' is not supported", UserWarning)
             return False
-        return self._cython_instance == other._cython_instance
+        return self._cy_period.__eq__(other._cy_period)
 
     def __float__(self) -> float:
         r"""
@@ -235,7 +235,7 @@ class Period:
         >>> float(period)
         2000.5
         """
-        return float(self._cython_instance)
+        return float(self._cy_period)
 
     def __lt__(self, other: Self) -> bool:
         if not isinstance(other, Period):

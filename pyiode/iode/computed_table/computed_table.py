@@ -18,6 +18,7 @@ except ImportError:
 
 from iode.time.sample import Sample
 
+from iode.iode_cython import Sample as CythonSample
 from iode.iode_cython import ComputedTable as CythonComputedTable
 from iode.iode_cython import TableGraphGrid, TableTextAlign, TableGraphAxis, TableGraphType
 
@@ -104,9 +105,9 @@ class ComputedTable:
         raise TypeError("This class cannot be instantiated directly.")
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonComputedTable) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonComputedTable.__new__(CythonComputedTable)
+        instance._cy_computed_table = obj
         return instance
 
     @property
@@ -151,11 +152,11 @@ class ComputedTable:
         Productivité totale des facteurs |    0.9938 |    1.0037 |    1.0137 |    1.0239 |    1.0341 |    1.0445
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_decimals()
+        return self._cy_computed_table.get_nb_decimals()
 
     @nb_decimals.setter
     def nb_decimals(self, value: int):
-        self._cython_instance.set_nb_decimals(value)
+        self._cy_computed_table.set_nb_decimals(value)
 
     @property
     def nb_lines(self) -> int:
@@ -188,7 +189,7 @@ class ComputedTable:
         Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_lines()
+        return self._cy_computed_table.get_nb_lines()
 
     @property
     def lines(self) -> List[str]:
@@ -221,7 +222,7 @@ class ComputedTable:
         Productivité totale des facteurs |    0.99 |    1.00 |    1.01 |    1.02 |    1.03 |    1.04
         <BLANKLINE>
         """
-        return self._cython_instance.get_lines()
+        return self._cy_computed_table.get_lines()
 
     @property
     def nb_columns(self) -> int:
@@ -254,7 +255,7 @@ class ComputedTable:
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_columns()
+        return self._cy_computed_table.get_nb_columns()
 
     @property
     def columns(self) -> List[str]:
@@ -287,7 +288,7 @@ class ComputedTable:
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
-        return self._cython_instance.get_columns()
+        return self._cy_computed_table.get_columns()
 
     @property
     def nb_files(self) -> int:
@@ -325,7 +326,7 @@ class ComputedTable:
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_files()
+        return self._cy_computed_table.get_nb_files()
 
     @property
     def files(self) -> List[str]:
@@ -363,7 +364,7 @@ class ComputedTable:
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
         """
-        return self._cython_instance.get_files()
+        return self._cy_computed_table.get_files()
 
     @property
     def nb_operations_between_files(self) -> int:
@@ -401,7 +402,7 @@ class ComputedTable:
         Productivité totale des facteurs |    0.02 |    0.02 |    0.02 |    0.02 |    0.02
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_operations_between_files()
+        return self._cy_computed_table.get_nb_operations_between_files()
 
     @property
     def nb_periods(self) -> int:
@@ -434,7 +435,7 @@ class ComputedTable:
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
-        return self._cython_instance.get_nb_periods()
+        return self._cy_computed_table.get_nb_periods()
 
     @property
     def sample(self) -> Sample:
@@ -467,11 +468,11 @@ class ComputedTable:
         Productivité totale des facteurs |     1.10 |  1.00 |     1.11 |  1.00 |     1.12 |  1.00 |     1.13 |  1.00 |     1.14 |  1.00
         <BLANKLINE>
         """
-        sample = Sample.get_instance()
-        sample._cython_instance = self._cython_instance.get_sample()
-        if sample._cython_instance is None:
+        cy_sample: CythonSample = self._cy_computed_table.get_sample()
+        if cy_sample is None:
             warnings.warn("Could not retrieve the sample from the computed table")
             return None
+        sample = Sample.from_cython_obj(cy_sample)
         return sample
 
     @property
@@ -495,7 +496,7 @@ class ComputedTable:
         >>> computed_table.title
         "Déterminants de l'output potentiel"
         """
-        return self._cython_instance.get_title()
+        return self._cy_computed_table.get_title()
 
     @property
     def ymin(self) -> float:
@@ -504,7 +505,7 @@ class ComputedTable:
         The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
         an optimum scale value. 
         """
-        return self._cython_instance.get_ymin()
+        return self._cy_computed_table.get_ymin()
 
     @property
     def ymax(self) -> float:
@@ -513,7 +514,7 @@ class ComputedTable:
         The value :math:`NA` can be set for ymin and/or ymax: in this case, the graphics program will calculate 
         an optimum scale value. 
         """
-        return self._cython_instance.get_ymax()
+        return self._cy_computed_table.get_ymax()
 
     @property
     def gridx(self) -> TableGraphGrid:
@@ -540,7 +541,7 @@ class ComputedTable:
         >>> computed_table.gridx
         <TableGraphGrid.MAJOR: 0>
         """
-        return self._cython_instance.get_gridx()
+        return self._cy_computed_table.get_gridx()
 
     @property
     def gridy(self) -> TableGraphGrid:
@@ -567,7 +568,7 @@ class ComputedTable:
         >>> computed_table.gridy
         <TableGraphGrid.MAJOR: 0>
         """
-        return self._cython_instance.get_gridy()
+        return self._cy_computed_table.get_gridy()
 
     @property
     def graph_axis(self) -> TableGraphAxis:
@@ -595,7 +596,7 @@ class ComputedTable:
         >>> computed_table.graph_axis
         <TableGraphAxis.VALUES: 0>
         """
-        return self._cython_instance.get_graph_axis()
+        return self._cy_computed_table.get_graph_axis()
 
     @property
     def graph_alignment(self) -> TableTextAlign:
@@ -618,7 +619,7 @@ class ComputedTable:
         >>> computed_table.graph_alignment
         <TableTextAlign.LEFT: 0>
         """
-        return self._cython_instance.get_text_alignment()
+        return self._cy_computed_table.get_text_alignment()
 
     @property
     def plot_data(self) -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
@@ -659,8 +660,8 @@ class ComputedTable:
         series = {}
         for row in range(self.nb_lines):
             for op_files in range(self.nb_operations_between_files):
-                series_name = self._cython_instance.plotting_series_name(row, op_files)
-                x_data, y_data = self._cython_instance.plotting_series_values(row, op_files)
+                series_name = self._cy_computed_table.plotting_series_name(row, op_files)
+                x_data, y_data = self._cy_computed_table.plotting_series_values(row, op_files)
                 series[series_name] = (x_data, y_data)
         return series
 
@@ -855,7 +856,7 @@ class ComputedTable:
         """
         # if row and column is a string -> convert to position in the table 
         row, column = self._unfold_key((row, column))
-        return self._cython_instance.is_editable(row, column)
+        return self._cy_computed_table.is_editable(row, column)
 
     def to_frame(self) -> pd.DataFrame:
         r"""
@@ -893,7 +894,7 @@ class ComputedTable:
         <BLANKLINE>
         [4 rows x 6 columns]
         """
-        data = self._cython_instance.to_numpy()
+        data = self._cy_computed_table.to_numpy()
         df = pd.DataFrame(index=self.lines, columns=self.columns, data=data)
         df.index.name = "name"
         df.columns.name = "period[file]"
@@ -1036,7 +1037,7 @@ class ComputedTable:
             format = destination_file.suffix[1]
         destination_file = str(destination_file.resolve())
 
-        self._cython_instance.print_to_file(destination_file, format)
+        self._cy_computed_table.print_to_file(destination_file, format)
 
     def _unfold_key(self, key: Tuple[Union[int, str], Union[int, str]]) -> Tuple[int, int]:
         if not isinstance(key, tuple) and len(key) == 2:
@@ -1131,7 +1132,7 @@ class ComputedTable:
         0.9975986300775119
         """
         row, column = self._unfold_key(key)
-        return self._cython_instance._getitem_(row, column)
+        return self._cy_computed_table._getitem_(row, column)
 
     def __setitem__(self, key: Tuple[Union[int, str], Union[int, str]], value: float):
         r"""
@@ -1248,7 +1249,7 @@ class ComputedTable:
         if not isinstance(value, float):
             raise TypeError("Expected new cell value of type float. Got value of "
                             f"type '{type(value).__name__}' instead.")
-        self._cython_instance._setitem_(row, column, value)
+        self._cy_computed_table._setitem_(row, column, value)
 
     def __str__(self) -> str:
         upper_left_corner = r" line title \ period[file] "
@@ -1262,7 +1263,7 @@ class ComputedTable:
         column_names: List[str] = []
         column_data: List[str] = []
         for j, column_name in enumerate(self.columns):
-            column_data = [self._cython_instance.cell_value_to_str(i, j) for i in range(self.nb_lines)]
+            column_data = [self._cy_computed_table.cell_value_to_str(i, j) for i in range(self.nb_lines)]
             max_length = max([len(column_name)] + [len(value) for value in column_data])
             column_names += [column_name.center(max_length)]
             data += [[value.rjust(max_length) for value in column_data]]

@@ -42,10 +42,9 @@ cdef class Lists(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, subset: Lists, pattern: str, copy: bool) -> Lists:
-        subset.database_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+    def initialize_subset(self, pattern: str, copy: bool) -> Lists:
+        cdef KDBLists* subset_db_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Lists._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
     def _get_object(self, name: str) -> str:

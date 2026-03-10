@@ -29,6 +29,7 @@ cdef extern from "api/all.h":
         LNAME lnames[1]
 
     int B_EqsStepWise(char* arg)    
+    double estimate_step_wise(CSample* smpl, char* eqname, char* cond, char* test);    
 
 
 cdef extern from "api/objs/equations.h":

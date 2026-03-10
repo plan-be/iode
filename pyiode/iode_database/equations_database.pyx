@@ -47,26 +47,29 @@ cdef class Equations(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, subset: Equations, pattern: str, copy: bool) -> Equations:
-        subset.database_ptr = new KDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+    def initialize_subset(self, pattern: str, copy: bool) -> Equations:
+        cdef KDBEquations* subset_db_ptr = new KDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Equations._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
     def get_lec(self, name: str) -> str:
         return self.database_ptr.get_lec(name.encode()).decode()
 
-    def _get_object(self, name: str, eq: Equation) -> Equation:
-        cdef CEquation c_eq
+    def _get_object(self, name: str) -> Equation:
+        cdef shared_ptr[CEquation] eq_ptr
         name = name.strip()
-        c_eq = self.database_ptr.get(name.encode())
-        eq.c_equation = new CEquation(c_eq)
-        eq.ptr_owner = <bint>True
+        eq_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        eq = Equation._from_ptr(eq_ptr)
         return eq
 
-    def _set_object(self, name: str, eq: Equation):
-        cdef CEquation* equation_ptr = eq.c_equation
-        self.database_ptr.set_obj_ptr(name.encode(), equation_ptr)
+    def _set_object(self, name: str, eq: Equation) -> Equation:
+        cdef shared_ptr[CEquation] eq_ptr
+        # NOTE: the C++ set_obj_ptr() method creates a copy of the object stored 
+        #       in the passed shared pointer to avoid that two entries (shared_ptr<T>) 
+        #       in the IODE database point to the same object in memory
+        eq_ptr = self.database_ptr.set_obj_ptr(name.encode(), eq.eq_ptr)
+        eq.update_ptr(eq_ptr)
+        return eq
 
     def estimate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
                  list_eqs: Union[str, List[str]], maxit: int, epsilon: float) -> bool:

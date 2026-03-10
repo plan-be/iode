@@ -15,6 +15,7 @@ except ImportError:
 
 from iode.time.period import Period
 
+from iode.iode_cython import Period as CythonPeriod
 from iode.iode_cython import Sample as CythonSample
 _ALLOWED_TYPES_FOR_Period = {'str', 'float', 'Period'}
 
@@ -74,12 +75,12 @@ class Sample:
         if not start_period or not end_period:
             raise ValueError("Both start and end periods must be specified")
         
-        self._cython_instance = CythonSample(start_period, end_period)
+        self._cy_sample = CythonSample(start_period, end_period)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonSample) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonSample.__new__(CythonSample)
+        instance._cy_sample = obj
         return instance
 
     def index(self, period: Union[str, Period]) -> int:
@@ -110,7 +111,7 @@ class Sample:
         """
         if isinstance(period, Period):
             period = str(period)
-        return self._cython_instance.index(period)
+        return self._cy_sample.index(period)
 
     def get_period_list(self, astype: Union[type(Any), str]=str) -> List[Any]:
         r"""
@@ -148,10 +149,10 @@ class Sample:
             raise ValueError(f"Allowed types for 'astype' are {list(_ALLOWED_TYPES_FOR_Period)}")
         
         if astype == 'Period':
-            list_periods = self._cython_instance.get_period_list('str')
+            list_periods = self._cy_sample.get_period_list('str')
             return [Period(p) for p in list_periods]
         else:
-            return self._cython_instance.get_period_list(astype)
+            return self._cy_sample.get_period_list(astype)
 
     def intersection(self, other_sample: Self) -> Self:
         r"""
@@ -180,32 +181,32 @@ class Sample:
         if not isinstance(other_sample, Sample):
             raise TypeError("Expected argument 'other_sample' of intersection to be of type Sample. "
                             f"Got {type(other_sample).__name__} instead.")
-        instance = self.get_instance()
-        instance._cython_instance = self._cython_instance.intersection(other_sample._cython_instance)
-        if instance._cython_instance is None:
+        cy_sample: CythonSample = self._cy_sample.intersection(other_sample._cy_sample)
+        if cy_sample is None:
             warnings.warn(f"The intersection between '{self}' and '{other_sample}' is empty", UserWarning)
             return None
-        return instance
+        inter_sample = self.from_cython_obj(cy_sample)
+        return inter_sample
 
     @property
     def start(self) -> Period:
-        period = Period.get_instance()
-        period._cython_instance = self._cython_instance.get_start()
-        if period._cython_instance is None:
+        cy_period: CythonPeriod = self._cy_sample.get_start()
+        if cy_period is None:
             return None
+        period = Period.from_cython_obj(cy_period)
         return period
 
     @property
     def end(self) -> Period:
-        period = Period.get_instance()
-        period._cython_instance = self._cython_instance.get_end()
-        if period._cython_instance is None:
+        cy_period: CythonPeriod = self._cy_sample.get_end()
+        if cy_period is None:
             return None
+        period = Period.from_cython_obj(cy_period)
         return period
 
     @property
     def nb_periods(self) -> int:
-        return self._cython_instance.get_nb_periods()
+        return self._cy_sample.get_nb_periods()
 
     @property
     def periods(self) -> List[Period]:
@@ -228,16 +229,16 @@ class Sample:
         return self.get_period_list(astype=Period)
 
     def __len__(self) -> int:
-        return self._cython_instance.__len__()
+        return self._cy_sample.__len__()
 
     def __eq__(self, other: Self) -> bool:
         if not isinstance(other, Sample):
             warnings.warn(f"Comparing '{self}' with '{other}' is not supported", UserWarning)
             return False
-        return self._cython_instance.__eq__(other._cython_instance)
+        return self._cy_sample.__eq__(other._cy_sample)
 
     def __str__(self) -> str:
-        return self._cython_instance.__str__()
+        return self._cy_sample.__str__()
 
     def __repr__(self) -> str:
-        return self._cython_instance.__repr__()
+        return self._cy_sample.__repr__()

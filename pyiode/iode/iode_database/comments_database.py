@@ -68,19 +68,23 @@ class Comments(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonComments()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonComments()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonComments) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        instance = Comments.get_instance()
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy)
+        subset = Comments.from_cython_obj(cy_subset)
+        return subset
 
     @property
     def i(self) -> PositionalIndexer:
@@ -114,12 +118,12 @@ class Comments(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        comment = self._cython_instance._get_object(name)
+        comment = self._cy_database._get_object(name)
         return comment
 
     def _set_object(self, key: Union[str, int], value: str):
         name = self._single_object_key_to_name(key)
-        self._cython_instance._set_object(name, value)
+        self._cy_database._set_object(name, value)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[str, Self]:
         r"""
@@ -395,7 +399,7 @@ class Comments(IodeDatabase):
         317
         """
         input_files, names = self._copy_from(input_files, names)
-        self._cython_instance.copy_from(input_files, names)
+        self._cy_database.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""

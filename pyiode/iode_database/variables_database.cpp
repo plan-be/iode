@@ -72,7 +72,7 @@ void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDB
     double* source_values = source->get_var_ptr(source_var_name, source_t_first);
         
     // add the variable to the destination database
-    Variable* var_ptr = new Variable(nb_periods, IODE_NAN);
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(nb_periods, IODE_NAN);
     double* dest_values = var_ptr->data();
     for(int t = 0; t < nb_periods; t++)
         dest_values[t] = source_values[t];

@@ -31,16 +31,16 @@
 static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
 {
     int keyw;
-    Scalar* scl = new Scalar();
+    Scalar scl;
 
     /* READ AT MOST 3 REALS */
-    scl->value = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl->value)) 
-        scl->value = 0.9;
-    scl->relax = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl->relax)) 
-        scl->relax = 1.0;
-    scl->std = K_read_real(yy);
+    scl.value = K_read_real(yy);
+    if(!IODE_IS_A_NUMBER(scl.value)) 
+        scl.value = 0.9;
+    scl.relax = K_read_real(yy);
+    if(!IODE_IS_A_NUMBER(scl.relax)) 
+        scl.relax = 1.0;
+    scl.std = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
     while(1) 
@@ -53,11 +53,10 @@ static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
 
     try
     {
-        kdb->set_obj_ptr(name, scl);
+        kdb->set(name, scl);
     }
     catch(const std::exception&) 
     {
-        delete scl;
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
         return -1;
     }
@@ -157,16 +156,22 @@ bool KDBScalars::load_asc(const std::string& filename)
  *  @param [in] scl pointer to the Scalar
  *  
  */
-static void print_scl(FILE* fd, Scalar* scl)
+static void print_scl(FILE* fd, std::shared_ptr<Scalar> scl)
 {
-    if(IODE_IS_A_NUMBER(scl->value)) fprintf(fd, "%.14lg ", (double)(scl->value)); /* JMP 06/10/2022 */ 
-    else fprintf(fd, "na ");
+    if(IODE_IS_A_NUMBER(scl->value)) 
+        fprintf(fd, "%.14lg ", (double)(scl->value)); 
+    else 
+        fprintf(fd, "na ");
 
-    if(IODE_IS_A_NUMBER(scl->relax)) fprintf(fd, "%.14lg ", (double)(scl->relax)); /* JMP 06/10/2022 */
-    else fprintf(fd, "na ");
+    if(IODE_IS_A_NUMBER(scl->relax)) 
+        fprintf(fd, "%.14lg ", (double)(scl->relax));
+    else 
+        fprintf(fd, "na ");
 
-    if(IODE_IS_A_NUMBER(scl->std)) fprintf(fd, "%.14lg ", (double)(scl->std));     /* JMP 06/10/2022 */
-    else fprintf(fd, "na ");
+    if(IODE_IS_A_NUMBER(scl->std)) 
+        fprintf(fd, "%.14lg ", (double)(scl->std));
+    else 
+        fprintf(fd, "na ");
 }
 
 /**

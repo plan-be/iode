@@ -12,6 +12,7 @@ from iode.time.period import Period
 from iode.time.sample import Sample
 
 from iode.util import enable_msgs, suppress_msgs
+from iode.iode_cython import Sample as CythonSample
 from iode.iode_cython import Equation as CythonEquation
 
 
@@ -115,14 +116,14 @@ class Equation:
         if isinstance(to_period, Period):
             to_period = str(to_period)
         
-        self._cython_instance = CythonEquation(endogenous, lec, from_period, to_period, 
+        self._cy_equation = CythonEquation(endogenous, lec, from_period, to_period, 
                                                comment, instruments, block)
         self.method = method
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonEquation) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonEquation.__new__(CythonEquation)
+        instance._cy_equation = obj
         return instance
 
     def get_formated_date(self, format: str='dd-mm-yyyy') -> str:
@@ -146,7 +147,7 @@ class Equation:
         >>> equations["ACAF"].get_formated_date("dd/mm/yyyy")
         '12/06/1998'
         """
-        return self._cython_instance.get_formated_date(format)
+        return self._cy_equation.get_formated_date(format)
 
     @property
     def coefficients(self) -> List[str]:
@@ -177,7 +178,7 @@ class Equation:
         >>> eq_ACAF.coefficients
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return self._cython_instance.get_coefficients()
+        return self._cy_equation.get_coefficients()
 
     def _get_and_create_coefficients(self) -> List[str]:
         r"""
@@ -206,7 +207,7 @@ class Equation:
         >>> scalars.names
         ['acaf1', 'acaf2', 'acaf4']
         """
-        return self._cython_instance._get_and_create_coefficients()
+        return self._cy_equation._get_and_create_coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -237,7 +238,7 @@ class Equation:
         >>> eq_ACAF.variables
         ['ACAF', 'VAF', 'GOSF', 'TIME']
         """
-        return self._cython_instance.get_variables()
+        return self._cy_equation.get_variables()
 
     def _get_and_create_variables(self) -> List[str]:
         r"""
@@ -267,7 +268,7 @@ class Equation:
         >>> variables.names
         ['ACAF', 'GOSF', 'TIME', 'VAF']
         """
-        return self._cython_instance._get_and_create_variables()
+        return self._cy_equation._get_and_create_variables()
 
     def split_equation(self) -> Tuple[str, str]:
         r"""
@@ -290,7 +291,7 @@ class Equation:
         >>> rhs
         'acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
         """
-        return self._cython_instance.split_equation()
+        return self._cy_equation.split_equation()
 
     def _estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
                   maxit: int=100, epsilon: float=1.0e-6) -> bool:
@@ -298,7 +299,7 @@ class Equation:
             from_period = str(from_period)
         if isinstance(to_period, Period):
             to_period = str(to_period)
-        return self._cython_instance.estimate(from_period, to_period, maxit, epsilon)
+        return self._cy_equation.estimate(from_period, to_period, maxit, epsilon)
 
     def estimate(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 
                  maxit: int=100, epsilon: float=1.0e-6, quiet: bool=False) -> bool:
@@ -364,7 +365,7 @@ class Equation:
 
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -494,7 +495,7 @@ class Equation:
         if test not in ['r2', 'fstat']:
             raise ValueError("Test must be either 'r2' or 'fstat'")
 
-        success = self._cython_instance.estimate_step_wise(from_period, to_period, lec_condition, test)
+        success = self._cy_equation.estimate_step_wise(from_period, to_period, lec_condition, test)
         if not success:
             msg = f"Estimation of the equation '{self.endogenous}' for the period range [{from_period}, {to_period}]"
             if lec_condition:
@@ -533,7 +534,7 @@ class Equation:
             
         Examples
         --------
-        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation, Scalar
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
@@ -771,7 +772,17 @@ class Equation:
 
     @property
     def endogenous(self) -> str:
-        return self._cython_instance.get_endogenous()
+        r"""
+        Endogenous variable of the current equation.
+
+        Examples
+        --------
+        >>> from iode import Equation
+        >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+        >>> eq_ACAF.endogenous
+        'ACAF'
+        """
+        return self._cy_equation.get_endogenous()
 
     @property
     def lec(self) -> str:
@@ -801,11 +812,11 @@ class Equation:
         ... 
         ValueError: Cannot compile the LEC expression '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' of the equation named 'ACAF'
         """
-        return self._cython_instance.get_lec()
+        return self._cy_equation.get_lec()
 
     @lec.setter
     def lec(self, value: str):
-        self._cython_instance.set_lec(value)
+        self._cy_equation.set_lec(value)
 
     @property
     def method(self) -> str:
@@ -831,7 +842,7 @@ class Equation:
         >>> eq_ACAF.method
         'MAX_LIKELIHOOD'
         """
-        return self._cython_instance.get_method()
+        return self._cy_equation.get_method()
 
     @method.setter
     def method(self, value: Union[EqMethod, str]):
@@ -848,7 +859,7 @@ class Equation:
             else:
                 value = EqMethod[value]
         value = int(value)
-        self._cython_instance.set_method(value)
+        self._cy_equation.set_method(value)
 
     @property
     def sample(self) -> Sample:
@@ -897,8 +908,8 @@ class Equation:
         >>> eq_ACAF.sample
         None
         """
-        sample = Sample.get_instance()
-        sample._cython_instance = self._cython_instance.get_sample()
+        cy_sample: CythonSample = self._cy_equation.get_sample()
+        sample = Sample.from_cython_obj(cy_sample)
         return sample
 
     @sample.setter
@@ -911,18 +922,18 @@ class Equation:
             raise ValueError("New sample value must contain the colon character ':'. "
                              f"Got value '{value}'.")
         from_period, to_period = value.split(':')
-        self._cython_instance.set_sample(from_period, to_period)
+        self._cy_equation.set_sample(from_period, to_period)
 
     @property
     def comment(self) -> str:
         r"""
         Equation comment.
         """
-        return self._cython_instance.get_comment()
+        return self._cy_equation.get_comment()
 
     @comment.setter
     def comment(self, value: str):
-        self._cython_instance.set_comment(value)
+        self._cy_equation.set_comment(value)
 
     @property
     def instruments(self) -> Union[str, List[str]]:
@@ -936,13 +947,13 @@ class Equation:
             a unique string in which instruments are separated by a semi colon ';' or as a list of 
             strings.
         """
-        return self._cython_instance.get_instruments()
+        return self._cy_equation.get_instruments()
 
     @instruments.setter
     def instruments(self, value: Union[str, List[str]]):
         if not isinstance(value, str):
             value = ';'.join(value)
-        self._cython_instance.set_instruments(value)
+        self._cy_equation.set_instruments(value)
 
     @property
     def block(self) -> str:
@@ -962,13 +973,13 @@ class Equation:
         >>> equations["ACAF"].block             # doctest: +NORMALIZE_WHITESPACE
         'ACAF'
         """
-        return self._cython_instance.get_block()
+        return self._cy_equation.get_block()
 
     @block.setter
     def block(self, value: Union[str, List[str]]):
         if not isinstance(value, str):
             value = ';'.join(value)
-        self._cython_instance.set_block(value)
+        self._cy_equation.set_block(value)
 
     @property
     def tests(self) -> Dict[str, float]:
@@ -991,7 +1002,7 @@ class Equation:
         'ssres': 5.1994487876072526e-05, 'stderr': 0.0019271461060270667, 'stderrp': 23.545812606811523, 
         'stdev': 0.004269900266081095}
         """
-        return self._cython_instance.get_tests()
+        return self._cy_equation.get_tests()
 
     def reset_tests(self):
         r"""
@@ -1014,7 +1025,7 @@ class Equation:
         {'corr': 0.0, 'dw': 0.0, 'fstat': 0.0, 'loglik': 0.0, 'meany': 0.0, 'r2': 0.0, 'r2adj': 0.0, 
         'ssres': 0.0, 'stderr': 0.0, 'stderrp': 0.0, 'stdev': 0.0}
         """
-        self._cython_instance.reset_tests()
+        self._cy_equation.reset_tests()
 
     @property
     def date(self) -> str:
@@ -1073,7 +1084,7 @@ class Equation:
         if len(tests) != len(EqTest):
             raise ValueError("Cannot set equation test values. "
                              f"Expected vector of size {len(EqTest)} but got vector of size {len(tests)}.")
-        self._cython_instance._set_tests_from_list(tests)
+        self._cy_equation._set_tests_from_list(tests)
 
     def _set_date(self, value: str, format: str='dd-mm-yyyy'):
         r"""
@@ -1100,7 +1111,7 @@ class Equation:
         >>> eq_ACAF.date
         ''
         """
-        self._cython_instance._set_date(value, format)
+        self._cy_equation._set_date(value, format)
 
     def _as_tuple(self) -> Tuple:
         r"""
@@ -1134,7 +1145,7 @@ class Equation:
         1.0, 0.004269900266081095, 0.008184665814042091, 5.1994487876072526e-05, 0.0019271461060270667, 23.545812606811523, 
         32.273193359375, 0.8217613697052002, 0.7962986826896667, 2.329345941543579, 83.80752563476562, '12-06-1998')
         """
-        tests = self._cython_instance._get_list_tests()
+        tests = self._cy_equation._get_list_tests()
         return self.endogenous, self.lec, self.method, str(self.sample), self.comment, self.instruments, \
                self.block, *tests, self.date
 
@@ -1194,7 +1205,7 @@ class Equation:
         return copy(self)
 
     def __eq__(self, other: Self) -> bool:
-        return self._cython_instance.equal(other)
+        return self._cy_equation.equal(other._cy_equation)
 
     def __copy__(self) -> Self:
         r"""
@@ -1254,18 +1265,18 @@ class Equation:
         to_period = self.sample.end
         copied_eq = Equation(self.endogenous, self.lec, self.method, from_period, to_period, 
                              self.comment, self.instruments, self.block)
-        tests = self._cython_instance._get_list_tests()
-        copied_eq._cython_instance._set_tests_from_list(tests)
-        copied_eq._cython_instance._set_date(self.date)
+        tests = self._cy_equation._get_list_tests()
+        copied_eq._cy_equation._set_tests_from_list(tests)
+        copied_eq._cy_equation._set_date(self.date)
         return copied_eq
 
     def __str__(self) -> str:
-        return self._cython_instance._str_()
+        return self._cy_equation._str_()
 
     def __repr__(self) -> str:
-        return self._cython_instance._repr_()
+        return self._cy_equation._repr_()
 
     def __hash__(self) -> int:
-        return self._cython_instance.__hash__()
+        return self._cy_equation.__hash__()
 
 

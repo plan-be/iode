@@ -10,6 +10,7 @@ import pandas as pd
 from iode.util import table2str, JUSTIFY
 from iode.objects.scalar import Scalar
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
+from iode.iode_cython import Scalar as CythonScalar
 from iode.iode_cython import Scalars as CythonScalars
 
 ScalarInput = Union[int, float, List[float], Tuple[float, float], Dict[str, float], Scalar]
@@ -66,19 +67,23 @@ class Scalars(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonScalars()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonScalars()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonScalars) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        instance = Scalars.get_instance()
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy)
+        subset = Scalars.from_cython_obj(cy_subset)
+        return subset
 
     @property
     def i(self) -> PositionalIndexer:
@@ -112,8 +117,8 @@ class Scalars(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        scalar = Scalar.get_instance()
-        scalar._cython_instance = self._cython_instance._get_object(name, scalar._cython_instance)
+        cy_scalar: CythonScalar = self._cy_database._get_object(name)
+        scalar = Scalar.from_cython_obj(cy_scalar)
         return scalar
 
     def _set_object(self, key: Union[str, int], value):
@@ -166,7 +171,7 @@ class Scalars(IodeDatabase):
                 raise TypeError(f"Cannot add scalar '{name}': Expected input to be of type float or tuple(float, float) "
                                 f"or list(float, float) or dict(str, float) or Scalar. Got value of type {type(value).__name__}")
         
-        self._cython_instance._set_object(name, scalar._cython_instance)
+        scalar._cy_scalar = self._cy_database._set_object(name, scalar._cy_scalar)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Scalar, Self]:
         r"""
@@ -320,7 +325,6 @@ class Scalars(IodeDatabase):
         >>> scl = scalars["acaf4"]
         >>> scl.value = 0.8
         >>> scl.relax = 0.9
-        >>> scalars["acaf4"] = scl
         >>> scalars["acaf4"]
         Scalar(0.8, 0.9, na)
 
@@ -459,6 +463,18 @@ class Scalars(IodeDatabase):
         False
         >>> scalars.get_names("z*")
         ['zkf1', 'zkf3']
+
+        >>> # store a scalar in a Python variable
+        >>> scl = scalars["zkf1"]
+        >>> scl
+        Scalar(0.201117, 1, 0.375671)
+        >>> # then delete it from the database
+        >>> del scalars["zkf1"]
+        >>> "zkf1" in scalars
+        False
+        >>> # NOTE: the Python variable 'scl' still contains the scalar object
+        >>> scl
+        Scalar(0.201117, 1, 0.375671)
         """
         super().__delitem__(key)
 
@@ -475,7 +491,7 @@ class Scalars(IodeDatabase):
             Defaults to load all scalars from the input file(s). 
         """
         input_files, names = self._copy_from(input_files, names)
-        self._cython_instance.copy_from(input_files, names)
+        self._cy_database.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""

@@ -232,7 +232,7 @@ public:
 
     ~KDB() {}
 
-    virtual void clear(bool delete_objs = true) = 0;
+    virtual void clear() = 0;
 
     virtual int size() const = 0;
 
@@ -420,9 +420,9 @@ template<class T> struct KDBTemplate: public KDB
 #endif
 
 public:
-    // NOTE: if an IODE object is added/removed/updated from the current database, 
+    // NOTE: if an IODE object is added/removed/updated from the current database,
     //       it must also done in all subset instances ('shallow copies')
-    std::map<std::string, T*> k_objs;
+    std::map<std::string, std::shared_ptr<T>> k_objs;
 
 private:
     // only used by subsets ('shallow copies')
@@ -431,25 +431,13 @@ private:
     std::set<KDBTemplate*> children_db;
 
 private:
-    void delete_objs()
-    {
-        for(auto& [name, obj_ptr] : k_objs)
-        {
-            // NOTE: it should not be necessary to check for nullptr before deleting, 
-            //       but we do it just in case
-            if(obj_ptr)
-                delete obj_ptr;
-        }
-        k_objs.clear();
-    }
-
     bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
     {
-        T* obj_ptr;
+        std::shared_ptr<T> obj_ptr;
         bool success = true;
-        for(const std::string& name : subset_keys) 
+        for(const std::string& name : subset_keys)
         {
-            if(!other.contains(name))  
+            if(!other.contains(name))
             {
                 std::string error_msg = v_iode_types[this->k_type];
                 error_msg += " with '" + name + "' not found in the source database";
@@ -457,13 +445,13 @@ private:
                 success = false;
                 continue;
             }
-            
+
             obj_ptr = other.get_obj_ptr(name);
             this->k_objs[name] = obj_ptr;
         }
 
         if(!success)
-            this->delete_objs();
+            this->clear();
 
         return success;
     }
@@ -486,9 +474,31 @@ private:
         }
 
         if(!success)
-            this->delete_objs();
+            this->clear();
 
         return success;
+    }
+
+    virtual void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
+    {
+        KDBTemplate* top_db = get_top_level_db();
+
+        // Both the passed obj_ptr and k_objs[key] will point to the same object
+        this->k_objs[key] = obj_ptr;
+
+        // if this is a subset database, we also need to set the object in the 
+        // top-level database
+        if(this->k_db_type == DB_SUBSET)
+            top_db->k_objs[key] = obj_ptr;
+
+        // if this is a top-level database, we also need to set the object in all 
+        // subset instances
+        for(KDBTemplate* subset : get_children_db())
+        {
+            if(!subset->contains(key))
+                continue;
+            subset->k_objs[key] = obj_ptr;
+        }
     }
 
 public:
@@ -591,7 +601,6 @@ public:
                 child_db->db_parent = nullptr;
             }
             children_db.clear();
-            this->delete_objs();
         }
 
         if(db_parent)
@@ -599,10 +608,14 @@ public:
             db_parent->children_db.erase(this);
             db_parent = nullptr;
         }
+
+        this->clear();
     }
 
-    void clear(bool delete_objs = true) override
+    void clear() override
     {
+        // if this is a top-level database, we clear all subset instances and 
+        // then clear the objects
         if(k_db_type != DB_SUBSET)
         {
             for(KDBTemplate* child_db : children_db)
@@ -614,10 +627,7 @@ public:
             children_db.clear();
         }
         
-        if(delete_objs && k_db_type != DB_SUBSET)
-            this->delete_objs();
-        else
-            this->k_objs.clear();
+        this->k_objs.clear();
 
         KDBInfo::clear();
     }
@@ -716,7 +726,7 @@ public:
         return names;
     }
 
-    bool rename(const std::string& old_name, const std::string& new_name, 
+    bool rename(const std::string& old_name, const std::string& new_name,
         const bool overwrite = false) override
     {
         std::string old_key = to_key(old_name);
@@ -733,24 +743,24 @@ public:
 
         if(!contains(old_key))
         {
-            std::string msg = "Cannot rename object: there is no object previously named '" + 
+            std::string msg = "Cannot rename object: there is no object previously named '" +
                               old_key + "' found in the database.";
             throw std::invalid_argument(msg);
         }
 
         // rename in top-level database
-        KDBTemplate* top_db = get_top_level_db();        
+        KDBTemplate* top_db = get_top_level_db();
         if(!overwrite)
         {
             if(top_db->contains(new_key))
             {
-                std::string msg = "Cannot rename object: an object named '" + new_key + 
+                std::string msg = "Cannot rename object: an object named '" + new_key +
                                   "' already exists in the database.";
                 throw std::invalid_argument(msg);
             }
         }
 
-        T* obj_ptr = top_db->get_obj_ptr(old_key);
+        std::shared_ptr<T> obj_ptr = top_db->get_obj_ptr(old_key);
         top_db->k_objs.erase(old_key);
         top_db->k_objs[new_key] = obj_ptr;
 
@@ -773,21 +783,20 @@ public:
         if(!(this->contains(key) && top_db->contains(key)))
         {
             std::string str_type = v_iode_types[this->k_type];
-            std::string msg = "Cannot remove " + str_type + ": no " + str_type + 
+            std::string msg = "Cannot remove " + str_type + ": no " + str_type +
                               " named '" + key + "' found in the database";
             kwarning(msg.c_str());
             return false;
         }
 
         // remove from top-level database
-        T* obj_ptr = top_db->k_objs[key];
+        // No need to manually delete - shared_ptr handles memory management automatically
         top_db->k_objs.erase(key);
 
         // remove from all subset instances (including 'this' if 'this' is a subset)
         for(KDBTemplate* subset : get_children_db())
             subset->k_objs.erase(key);
-        
-        delete obj_ptr;
+
         return true;
     }
 
@@ -797,20 +806,18 @@ public:
         return T(obj);
     }
 
-    void copy_obj_to(KDBTemplate& dest, const std::string& source_key, 
+    void copy_obj_to(KDBTemplate& dest, const std::string& source_key,
         const std::string& dest_key) const
     {
-        T* obj_ptr = this->get_obj_ptr(source_key);
-        T* obj_copy_ptr = new T(*obj_ptr);
-        dest.set_obj_ptr(dest_key, obj_copy_ptr);
+        std::shared_ptr<T> obj_ptr = this->get_obj_ptr(source_key);
+        dest.set_obj_ptr(dest_key, obj_ptr);
     }
 
-    void copy_obj_from(const KDBTemplate& other, const std::string& source_key, 
+    void copy_obj_from(const KDBTemplate& other, const std::string& source_key,
         const std::string& dest_key)
     {
-        T* obj_ptr = other.get_obj_ptr(source_key);
-        T* obj_copy_ptr = new T(*obj_ptr);
-        this->set_obj_ptr(dest_key, obj_copy_ptr);
+        std::shared_ptr<T> obj_ptr = other.get_obj_ptr(source_key);
+        this->set_obj_ptr(dest_key, obj_ptr);
     }
 
     bool duplicate(const KDBTemplate& other, const std::string& old_name, const std::string& new_name)
@@ -932,7 +939,7 @@ public:
         }
     
         if(clear_source)
-            other.clear(false);
+            other.clear();
     }
 
     // NOTE: see KDBVariables::merge_from(const std::string& filename) for the 
@@ -960,11 +967,11 @@ public:
         this->merge(from, true, true);
     }
 
-    // NOTE: get_obj_ptr() and set_obj_ptr() methods to be replaced by operator[] when 
+    // NOTE: get_obj_ptr() and set_obj_ptr() methods to be replaced by operator[] when
     //       k_objs will be changed to std::map<std::string, T>
     //       T& operator[](const std::string& name)
-    T* get_obj_ptr(const std::string& name) const
-    {   
+    std::shared_ptr<T> get_obj_ptr(const std::string& name) const
+    {
         std::string key = to_key(name);
         if(key.empty())
         {
@@ -972,7 +979,7 @@ public:
             error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
             throw std::invalid_argument(error_msg);
         }
-        
+
         try
         {
             return k_objs.at(key);
@@ -986,7 +993,7 @@ public:
     }
 
     // virtual to be overridden in class KDBVariables
-    virtual T* set_obj_ptr(const std::string& name, T* obj_ptr)
+    virtual std::shared_ptr<T> set_obj_ptr(const std::string& name, std::shared_ptr<T> obj_ptr)
     {
         std::string key = to_key(name);
         if(key.empty())
@@ -996,7 +1003,9 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        if(!obj_ptr)
+        check_name(key, this->k_type);
+
+        if(obj_ptr.get() == nullptr)
         {
             std::string error_msg = "Cannot set a null object with name '" + name + "' in the ";
             error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
@@ -1007,65 +1016,48 @@ public:
 
         if(this->k_db_type == DB_SUBSET)
         {
-            // if the object already exists in the top-level database 
-            // -> delete it
+            // if the object already exists in the top-level database
+            // -> check if it's the same shared_ptr
             if(top_db->contains(key))
             {
-                // NOTE: if the object already exists in the top-level database 
-                //       and is the same as the one we want to set, 
+                // NOTE: if the object already exists in the top-level database
+                //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
                 if(top_db->k_objs[key] == obj_ptr)
                     return obj_ptr;
-                delete top_db->k_objs[key];
-            }
-            // if the object does not exist in the top-level database 
-            // -> check the name validity
-            else
-                check_name(key, this->k_type);
+                // No need to delete - shared_ptr handles memory management automatically
+            }     
         }
         else
         {
-            // if the object already exists in this database -> delete it
+            // if the object already exists in this database -> check if it's the same shared_ptr
             if(this->contains(key))
             {
-                // NOTE: if the object already exists in the database 
-                //       and is the same as the one we want to set, 
+                // NOTE: if the object already exists in the database
+                //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
                 if(this->k_objs[key] == obj_ptr)
                     return obj_ptr;
-                delete this->k_objs[key];
+                // No need to delete - shared_ptr handles memory management automatically
             }
-            // if the object does not exist in this database -> check the name validity
-            else
-                check_name(key, this->k_type);
         }
 
-        // create a copy of the object to be set. 
-        // -> to make sure that 2 or more databases do not share the same object pointer 
-        //    (which can lead to bugs when the pointer is deleted in one database but 
-        //     still used in another database or when the destructor of the second database 
-        //     is called and tries to delete the same pointer again) 
-        T* new_obj_ptr = new T(*obj_ptr);
+        // create a copy of the underling object to make that two items with different names 
+        // point to different objects in memory (even if they have the same content)
+        // NOTE: this can happen from the Python module when we do something like:
+        //       scalars[pattern] = Scalar(0.9, 1.0) 
+        //       where pattern can match several scalars and Scalar(0.9, 1.0) is actually 
+        //       created only once.
+        obj_ptr = std::make_shared<T>(*obj_ptr);
 
-        this->k_objs[key] = new_obj_ptr;
-
-        if(this->k_db_type == DB_SUBSET)
-            top_db->k_objs[key] = new_obj_ptr;
-
-        for(KDBTemplate* subset : get_children_db())
-        {
-            if(!subset->contains(name))
-                continue;
-            subset->k_objs[key] = new_obj_ptr;
-        }
-
-        return new_obj_ptr;
+        this->set_obj_ptr_no_check(name, obj_ptr);
+        return obj_ptr;
     }
 
     virtual T get(const std::string& name) const
     {
-        T* obj_ptr = this->get_obj_ptr(name);
-        if(!obj_ptr)
+        std::shared_ptr<T> obj_ptr = this->get_obj_ptr(name);
+        if(obj_ptr.get() == nullptr)
         {
             std::string error_msg = "Cannot get a null object with name '" + name + "' from the ";
             error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
@@ -1075,43 +1067,58 @@ public:
         return *obj_ptr;
     }
 
-    T* set(const std::string& name, const T& obj)
+    void set(const std::string& name, const T& obj)
     {
-        T* obj_ptr = const_cast<T*>(&obj);
-        T* new_obj_ptr = this->set_obj_ptr(name, obj_ptr);
-        return new_obj_ptr;
+        std::string key = to_key(name);
+        if(key.empty())
+        {
+            std::string error_msg = "Cannot set an object with an empty name in the ";
+            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            throw std::invalid_argument(error_msg);
+        }
+
+        check_name(key, this->k_type);
+
+        // NOTE: make_shared creates a copy of 'obj'.
+        //       We DO NOT use std::make_shared<T>(&obj) because this is dangerous and 
+        //       not recommended because the shared_ptr will try to delete 'obj' when  
+        //       it goes out of scope, leading to undefined behavior.
+        std::shared_ptr<T> obj_ptr = std::make_shared<T>(obj);
+        this->set_obj_ptr_no_check(key, obj_ptr);
     }
 
     virtual bool add(const std::string& name, const T& obj)
     {
-        if(this->contains(name))
+        std::string key = to_key(name);
+        if(this->contains(key))
         {
-            std::string msg = "Cannot add list: a list named '" + name + 
+            std::string msg = "Cannot add list: a list named '" + key + 
                               "' already exists in the database.";
             throw std::invalid_argument(msg);
         }
     
-        if(this->parent_contains(name))
+        if(this->parent_contains(key))
         {
-            std::string msg = "Cannot add list: a list named '" + name + 
+            std::string msg = "Cannot add list: a list named '" + key + 
                               "' exists in the parent database of the present subset";
             throw std::invalid_argument(msg);
         }
 
-        this->set(name, obj);
+        this->set(key, obj);
         return true;
     }
 
     virtual void update(const std::string& name, const T& obj)
     {
-        if(!this->contains(name))
+        std::string key = to_key(name);
+        if(!this->contains(key))
         {
-            std::string msg = "Cannot update list: no list named '" + name + 
+            std::string msg = "Cannot update list: no list named '" + key + 
                               "' exists in the database.";
             throw std::invalid_argument(msg);
         }
 
-        this->set(name, obj);
+        this->set(key, obj);
     }
 };
 

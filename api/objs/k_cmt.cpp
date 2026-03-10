@@ -27,8 +27,7 @@ bool KDBComments::binary_to_obj(const std::string& name, char* pack)
     char* value = new char[len];
     strncpy(value, (char*) P_get_ptr(pack, 0), len);
 
-    Comment* comment = new Comment(value);
-    this->k_objs[name] = comment;
+    this->k_objs[name] = std::make_shared<Comment>(value);
     return true;
 }
 
@@ -41,7 +40,7 @@ bool KDBComments::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBComments::obj_to_binary(char** pack, const std::string& name)
 {
-    Comment* comment = this->get_obj_ptr(name);
+    std::shared_ptr<Comment> comment = this->get_obj_ptr(name);
     char* c_cmt = (char*) comment->c_str();
 
     *pack = (char*) P_create();
@@ -56,7 +55,7 @@ bool KDBComments::grep_obj(const std::string& name, const std::string& pattern,
     bool found = false;
     if(texts)
     {
-        Comment* comment = this->get_obj_ptr(name);
+        std::shared_ptr<Comment> comment = this->get_obj_ptr(name);
         found = wrap_grep_gnl(pattern, *comment, ecase, all);
     }
     return found;
@@ -64,14 +63,14 @@ bool KDBComments::grep_obj(const std::string& name, const std::string& pattern,
 
 char* KDBComments::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    Comment* comment = this->get_obj_ptr(name);
+    std::shared_ptr<Comment> comment = this->get_obj_ptr(name);
     char* c_cmt = (char*) comment->c_str();
     return c_cmt;
 }
 
 bool KDBComments::print_obj_def(const std::string& name)
 {
-    Comment* comment = this->get_obj_ptr(name);
+    std::shared_ptr<Comment> comment = this->get_obj_ptr(name);
     char* c_cmt = (char*) comment->c_str();
     bool success = print_definition_generic(name, c_cmt);
     return success;

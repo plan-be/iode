@@ -46,27 +46,29 @@ cdef class Tables(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, subset: Tables, pattern: str, copy: bool) -> Tables:
-        subset.database_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+    def initialize_subset(self, pattern: str, copy: bool) -> Tables:
+        cdef KDBTables* subset_db_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Tables._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
     def get_title(self, name: str) -> str:
         return self.database_ptr.get_title(name.encode()).decode()
 
-    def _get_object(self, name: str, table: Table) -> Table:
-        cdef CTable c_table
+    def _get_object(self, name: str) -> Table:
+        cdef shared_ptr[CTable] tbl_ptr
         name = name.strip()
-        c_table = self.database_ptr.get(name.encode())
-        table.c_table_name = name.encode()
-        table.c_table = new CTable(c_table)
-        table.ptr_owner = <bint>True
+        tbl_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        table = Table._from_ptr(tbl_ptr, name.encode())
         return table
 
-    def _set_object(self, name: str, table: Table):
-        cdef CTable* table_ptr = table.c_table
-        self.database_ptr.set_obj_ptr(name.encode(), table_ptr)
+    def _set_object(self, name: str, table: Table) -> Table:
+        cdef shared_ptr[CTable] tbl_ptr
+        # NOTE: the C++ set_obj_ptr() method creates a copy of the object stored 
+        #       in the passed shared pointer to avoid that two entries (shared_ptr<T>) 
+        #       in the IODE database point to the same object in memory
+        tbl_ptr = self.database_ptr.set_obj_ptr(name.encode(), table.tbl_ptr)
+        table.update_ptr(tbl_ptr)
+        return table
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

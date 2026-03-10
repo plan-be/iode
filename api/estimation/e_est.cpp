@@ -19,6 +19,33 @@
 #include "api/objs/variables.h"
 #include "api/estimation/estimation.h"
 
+// Generic matrix print function
+static void print_matrix(const std::string& name, MAT* mat, int precision = 6) 
+{
+    std::cout << name << " (" << mat->m_nl << ", " << mat->m_nc << "):" << std::endl;
+    // Find max width for alignment
+    int max_width = 0;
+    for(int i = 0; i < mat->m_nl; i++) 
+    {
+        for(int j = 0; j < mat->m_nc; j++) 
+        {
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(precision) << MATE(mat, i, j);
+            int len = static_cast<int>(oss.str().length());
+            if(len > max_width) max_width = len;
+        }
+    }
+
+    for(int i = 0; i < mat->m_nl; i++) 
+    {
+        for(int j = 0; j < mat->m_nc; j++)
+            std::cout << std::setw(max_width) << std::fixed << std::setprecision(precision) << MATE(mat, i, j) << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+
 /**
  *  Computes VCC, the matrix of var/covar bw the coefficients (?).
  *  
@@ -29,20 +56,24 @@ int Estimation::E_c_gmg()
     int i, j;
 
     M_clear(E_VCC);
-    for(i = 0 ; i < E_NEQ  ; i++) {
-        M_clear(E_M);                                       /* M = 0 */
-        for(j = 0 ; j < E_NEQ ; j++) {
-            M_extr(E_MTMPP, E_G, 0, E_T * j, E_NCE, E_T);   /* MTMP = G[..] */
-            M_trans(E_MTMP, E_MTMPP);                       /* MTMP = MTMP' */
-            M_scale(E_MTMP, E_MTMP, MATE(E_IVCU, i, j));    /* MTMP=MTMP*IVCU[..] */
-            M_calc(E_M, E_M, E_MTMP, '+');                  /* M = M + MTMP */
+    for(i = 0 ; i < E_NEQ  ; i++) 
+    {
+        M_clear(E_M);                   // M = 0
+        for(j = 0 ; j < E_NEQ ; j++) 
+        {
+            M_extr(E_MTMPP, E_G, 0, E_T * j, E_NCE, E_T);   // MTMPP = G[0:E_NCE, E_T*j:E_T*(j+1)]
+            M_trans(E_MTMP, E_MTMPP);                                   // MTMP = MTMPP^T
+            M_scale(E_MTMP, E_MTMP, MATE(E_IVCU, i, j));          // MTMP = MTMP * IVCU[i, j]
+            M_calc(E_M, E_M, E_MTMP, '+');                     // M = M + MTMP
         }
-        if(E_NINSTR > 1) M_prod(E_MTMP, E_D, E_M);          /* MTMP = D.M */
-        else M_copy(E_MTMP, E_M);
+        if(E_NINSTR > 1) 
+            M_prod(E_MTMP, E_D, E_M);                               // MTMP = D \dot M
+        else 
+            M_copy(E_MTMP, E_M);
 
-        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);       /* M = G[..] */
-        M_prod(E_VCCTMP, E_MTMPP, E_MTMP);                  /* VCCTMP = M.MTMP */
-        M_calc(E_VCC, E_VCCTMP, E_VCC, '+');                /* VCC=VCCTMP+VCC */
+        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);       // MTMPP = G[0:E_NCE, E_T*i:E_T*(i+1)]
+        M_prod(E_VCCTMP, E_MTMPP, E_MTMP);                          // VCCTMP = MTMPP \dot MTMP
+        M_calc(E_VCC, E_VCCTMP, E_VCC, '+');                    // VCC = VCCTMP + VCC
     }
     return 0;
 }
@@ -58,7 +89,8 @@ int Estimation::E_c_gmg()
  */
 double Estimation::E_rhs_ij(int i, int t)
 {
-    return(L_exec(E_DBV, E_DBS, E_CRHS[i], t + E_FROM));
+    double rhs_i_t = L_exec(E_DBV, E_DBS, E_CRHS[i], t + E_FROM);
+    return rhs_i_t;
 }
 
 
@@ -75,17 +107,20 @@ int Estimation::E_c_rhs()
     int      i, t;
     double   x;
 
-    for(i = 0 ; i < E_NEQ ; i++) {
-        for(t = 0 ; t < E_T ; t++) {
+    for(i = 0 ; i < E_NEQ ; i++) 
+    {
+        for(t = 0 ; t < E_T ; t++) 
+        {
             x = E_rhs_ij(i, t);
-            if(IODE_IS_A_NUMBER(x)) MATE(E_RHS, i, t) = x;
-            else  {
+            if(IODE_IS_A_NUMBER(x)) 
+                MATE(E_RHS, i, t) = x;
+            else  
+            {
                 error_manager.append_error("Estimation: NaN Generated");
                 return -1;
             }
         }
     }
-
     return 0;
 }
 
@@ -98,7 +133,8 @@ int Estimation::E_c_rhs()
 int Estimation::E_residuals()
 {
     /* COMPUTE RHS */
-    if(E_c_rhs() != 0) return -1;
+    if(E_c_rhs() != 0) 
+        return -1;
     M_calc(E_U, E_LHS, E_RHS, '-');
     return 0;
 }
@@ -146,17 +182,21 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
     double  x;
 
     // Pour toute équation
-    for(i = 0 ; i < E_NEQ ; i++) {
-        if(E_scl_in_eq(coef_nb, i)) {
+    for(i = 0 ; i < E_NEQ ; i++) 
+    {
+        if(E_scl_in_eq(coef_nb, i)) 
+        {
             // Si le scalaire i est dans l'éq : calculer le RHS (pour chaque année)
             // et sauver la dérivée dans la matrice E_G  : (f(x + h) - f(x)) / h
-            for(j = 0 ; j < E_T ; j++) {
+            for(j = 0 ; j < E_T ; j++) 
+            {
                 x = E_rhs_ij(i, j);
-                if(x >= MAXFLOAT) x = IODE_NAN;
+                if(x >= MAXFLOAT) 
+                    x = IODE_NAN;
                 if(IODE_IS_A_NUMBER(x))
-                    MATE(E_G, est_coef_nb, i * E_T + j) =
-                        (x - MATE(E_RHS, i, j)) / h;
-                else  {
+                    MATE(E_G, est_coef_nb, i * E_T + j) = (x - MATE(E_RHS, i, j)) / h;
+                else  
+                {
                     error_manager.append_error("Estimation: NaN Generated");
                     return -1;
                 }
@@ -164,7 +204,8 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
         }
         else
             // Sinon, placer des 0 dans la matrice E_G pour le coef en question
-            for(j = 0 ; j < E_T ; j++) MATE(E_G, est_coef_nb, i * E_T + j) = 0;
+            for(j = 0 ; j < E_T ; j++)
+                MATE(E_G, est_coef_nb, i * E_T + j) = 0;
     }
 
     return 0;
@@ -189,23 +230,25 @@ int Estimation::E_jacobian()
     double h = 1e-4, oldc;
 
     std::string scl_name;
+    std::shared_ptr<Scalar> scl_ptr;
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl_ptr = E_DBS->get_obj_ptr(scl_name);
         // Uniquement pour les coef estimés (relax <> 0)
-        if(E_DBS->get_obj_ptr(scl_name)->relax != 0) 
+        if(scl_ptr->relax != 0) 
         {      
-            oldc = E_DBS->get_obj_ptr(scl_name)->value;                   // Stocke l'ancienne valeur du coef
-            if(fabs(oldc) < 1e-15)                                  // ou 0.1 si coef proche de nul
+            oldc = scl_ptr->value;                          // Stocke l'ancienne valeur du coef
+            if(fabs(oldc) < 1e-15)                      // ou 0.1 si coef proche de nul
                 oldc = 0.1;                      
-            E_DBS->get_obj_ptr(scl_name)->value = oldc * (1.0 + h);       // coef augmenté de h pourcents
+            scl_ptr->value = oldc * (1.0 + h);              // coef augmenté de h pourcents
             if(0 != E_mod_residuals(i, j, oldc * h)) 
             {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                E_DBS->get_obj_ptr(scl_name)->value = oldc;               /* reset coef */
+                scl_ptr->value = oldc;                      /* reset coef */
                 return -1;
             }
-            E_DBS->get_obj_ptr(scl_name)->value = oldc;                   /* reset coef */
+            scl_ptr->value = oldc;                          /* reset coef */
             j++;
         }
     }
@@ -224,9 +267,8 @@ int Estimation::E_jacobian()
 int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
     CLEC* clec = E_CRHS[eq_nb];
-    int    j;
 
-    for(j = 0 ; j < clec->nb_names ; j++)
+    for(int j = 0 ; j < clec->nb_names ; j++)
         if(is_coefficient(clec->lnames[j].name) &&
                 E_C_NBS[coef_nb] == clec->lnames[j].pos) 
                     return(1);
@@ -248,21 +290,25 @@ int Estimation::E_c_gmu()
     int     i, j;
 
     M_clear(E_GMU);
-    for(i = 0 ; i < E_NEQ  ; i++) {
-        M_clear(E_UM);                                      /* UM = 0 */
-        for(j = 0 ; j < E_NEQ ; j++) {
-            M_extr(E_UMT, E_U, j, 0, 1, E_T);               /* UMTMP = U[j,:] = residuals of eq j*/
-            M_trans(E_UMTMP, E_UMT);                            
-            M_scale(E_UMTMP, E_UMTMP, MATE(E_IVCU, i, j));  /* UMTMP = UMTMP * IVCU[i;j] */
-            M_calc(E_UM, E_UM, E_UMTMP, '+');               /* UM = UM + UMTMP */
+    for(i = 0 ; i < E_NEQ  ; i++) 
+    {
+        M_clear(E_UM);                  // UM = 0
+        for(j = 0 ; j < E_NEQ ; j++) 
+        {
+            M_extr(E_UMT, E_U, j, 0, 1, E_T);           // UMT = U[j, 0:E_T] (residuals of eq j)
+            M_trans(E_UMTMP, E_UMT);                                // UMTMP = UMT^T
+            M_scale(E_UMTMP, E_UMTMP, MATE(E_IVCU, i, j));    // UMTMP = UMTMP * IVCU[i, j]
+            M_calc(E_UM, E_UM, E_UMTMP, '+');               // UM = UM + UMTMP
         }
 
-        if(E_NINSTR >= 1) M_prod(E_UMTMP, E_D, E_UM);       /* UMTMP = D.UM */
-        else M_copy(E_UMTMP, E_UM);
+        if(E_NINSTR >= 1) 
+            M_prod(E_UMTMP, E_D, E_UM);                         // UMTMP = D \dot UM
+        else 
+            M_copy(E_UMTMP, E_UM);
 
-        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);       /* M = G[:,(E_T * i) ... (E_T * (i+1)-1)] */
-        M_prod(E_GMUTMP, E_MTMPP, E_UMTMP);                 /* UVCCTMP = M.UMTMP */
-        M_calc(E_GMU, E_GMUTMP, E_GMU, '+');                /* GMU=UVCCTMP+GMU */
+        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);   // M = G[0:E_NCE, E_T*i:E_T*(i+1)]
+        M_prod(E_GMUTMP, E_MTMPP, E_UMTMP);                     // GMUTMP = MTMPP \dot UMTMP
+        M_calc(E_GMU, E_GMUTMP, E_GMU, '+');                // GMU = GMUTMP + GMU
     }
     return 0;
 }
@@ -284,21 +330,28 @@ int Estimation::E_testcv()
 
     E_CONV = 0;
     E_get_C();
-    for(i = 0, j = 0 ; i < E_NC ; i++) {
-        if(MATE(E_SMO, i, 0) == 0) continue; /* relax == 0 */
+    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    {
+        if(MATE(E_SMO, i, 0) == 0) 
+            continue; /* relax == 0 */
 
         ci  = MATE(E_C, i, 0);
         dci = MATE(E_dC, j, 0);
-        if(ci != 0) {
+        if(ci != 0) 
+        {
             tmp = fabs(dci / ci);
-            if(tmp < fabs(ci)) sum += tmp * tmp;
-            else sum += ci * ci;
+            if(tmp < fabs(ci)) 
+                sum += tmp * tmp;
+            else 
+                sum += ci * ci;
         }
         j++;
     }
+
     E_CONV_TEST = sqrt(sum);
-    if(E_CONV_TEST <= E_EPS) E_CONV = 1;
-    return(E_CONV);
+    if(E_CONV_TEST <= E_EPS) 
+        E_CONV = 1;
+    return E_CONV;
 }
 
 
@@ -310,15 +363,17 @@ int Estimation::E_testcv()
  */
 int Estimation::E_adaptcoef()
 {
-    int i, j;
-
-    for(i = 0, j = 0; i < E_NC; i++) {
-        if(MATE(E_SMO, i, 0) == 0) continue;
+    int i = 0, j = 0;
+    for(i = 0, j = 0; i < E_NC; i++) 
+    {
+        if(MATE(E_SMO, i, 0) == 0) 
+            continue;
 
         /* C = C + dC * lambda */
         MATE(E_C, i, 0) += MATE(E_dC, j, 0) * MATE(E_SMO, i, 0);
         j++;
     }
+    
     E_put_C();
     return 0;
 }
@@ -368,16 +423,18 @@ int Estimation::E_c_ivcu()
  */
 int Estimation::E_c_mcu()
 {
-    int     i, j;
-    double  x;
-
     M_clear(E_MCU);
-    for(i = 0 ; i < E_NEQ ; i++)
-        for(j = 0 ; j <= i ; j++) {
+
+    double x = 0.0;
+    for(int i = 0 ; i < E_NEQ ; i++)
+    {
+        for(int j = 0 ; j <= i ; j++) 
+        {
             x = sqrt(MATE(E_VCU, i, i) * MATE(E_VCU, j, j));
             if(!IODE_IS_0(x))
                 MATE(E_MCU, i, j) = MATE(E_MCU, j, i) = MATE(E_VCU, i, j) / x;
         }
+    }
 
     return 0;
 }
@@ -433,54 +490,71 @@ int Estimation::E_c_vcc()
  */
 int Estimation::E_gls()
 {
-    int         step = 0;
-    int         conv = 0;
+    int step = 0;
+    int conv = 0;
 
     E_IT = 0;
     E_CONV = 0;
     E_CONV_TEST = 9999.99;
 
 again: /* first step of all methods and second step for Zellner and 3 stages methods */
-    while(conv == 0 && E_IT < E_MAXIT) {
-        if(E_residuals() || E_jacobian()) goto err;
-        if(E_MET == 4) {
-            if(E_c_vcu() || E_c_ivcu()) goto err;
-        }
-        if(E_c_gmg() || E_c_gmu() || E_deltac()) goto err;
+    while(conv == 0 && E_IT < E_MAXIT) 
+    {
+        if(E_residuals() || E_jacobian()) 
+            goto err;
+        
+        if(E_MET == 4) 
+            if(E_c_vcu() || E_c_ivcu()) 
+                goto err;
+        
+        if(E_c_gmg() || E_c_gmu() || E_deltac()) 
+            goto err;
+        
         E_IT++;
         conv = E_testcv();
         kmsg("Estimating : iteration %d (||eps|| = %g)", E_IT, E_CONV_TEST);
-        if(E_adaptcoef()) goto err;
+        
+        if(E_adaptcoef()) 
+            goto err;
     }
 
     E_c_gmg(); /* TMP ??? */
-    if(E_residuals() || E_c_vcu() || E_c_ivcu()) goto err;
+    if(E_residuals() || E_c_vcu() || E_c_ivcu()) 
+        goto err;
 
-    switch(E_MET) {
-        case 3 : /* 3 stages */
-        case 1 : /* Zellner */
-            if(step == 0) {
-                if(E_c_mcu()) goto err;
+    switch(E_MET) 
+    {
+        case EQ_GLS :
+        case EQ_ZELLNER :
+            if(step == 0) 
+            {
+                if(E_c_mcu()) 
+                    goto err;
                 conv = 0;
                 step = 1;
-                goto again; /* next step for Z and 3 */
+                goto again; /* next step for Zellner and GLS */
             }
-            if(E_c_ivcc()) goto err;
+            if(E_c_ivcc()) 
+                goto err;
             break;
 
-        default : /* LSQ, IV */
-            if(E_c_mcu() || E_c_vcc()) goto err;
+        default : /* LSQ, INSTRUMENTAL and MAX_LIKELIHOOD */
+            if(E_c_mcu() || E_c_vcc()) 
+                goto err;
             break;
     }
 
-    if(E_IT < E_MAXIT && conv != 0) E_CONV = 1;
-    else E_CONV = 0;
+    if(E_IT < E_MAXIT && conv != 0) 
+        E_CONV = 1;
+    else 
+        E_CONV = 0;
+    
     kmsg("Solution%s reached after %d iteration(s). Creating results file ...",
         ((E_CONV == 0) ? " not" : ""), E_IT);
-    return((E_CONV == 1) ? 0 : -1);
+    
+    return (E_CONV == 1) ? 0 : -1;
 
 err :
-    error_manager.print_last_error();
     return -1;
 }
 

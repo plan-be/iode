@@ -447,7 +447,6 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     int     t, type;
     double  x;
     char    buf[80], *res;
-    Scalar  *scl;
     std::string name;
 
     SCR_vtime = 1;
@@ -474,7 +473,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
         
         name = std::string((char*) szItem);
         if(!kdb.contains(name)) 
-            return((char *) 0);
+            return (char *) 0;
     
         std::string obj;
         switch(type) 
@@ -508,15 +507,17 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
                 return res;
     
             case SCALARS :
+            {
                 res = SCR_malloc(40);
-                scl = global_ws_scl->get_obj_ptr(name);
-                if(!IODE_IS_A_NUMBER(scl->value)) 
+                std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+                if(!IODE_IS_A_NUMBER(scl_ptr->value)) 
                     strcpy(res, "0");
                 else                  
-                    IodeFmtVal(res, scl->value);
+                    IodeFmtVal(res, scl_ptr->value);
                 return res;
+            }
             default:
-                return((char *)0);
+                return (char *) 0;
         }
     }
     catch(const std::runtime_error& e)
@@ -886,7 +887,6 @@ int B_ExcelSet(char *arg, int type)
 {
     int         shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
-    Scalar      *scl;
     Period      *per = NULL;
     double      d;
     char        **args = NULL,
@@ -912,7 +912,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            Comment* cmt = global_ws_cmt->get_obj_ptr(name);
+            std::shared_ptr<Comment> cmt = global_ws_cmt->get_obj_ptr(name);
             ptr = (char*) SCR_stracpy((unsigned char*) cmt->c_str());
             break;
         }
@@ -932,7 +932,7 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            List* lst = global_ws_lst->get_obj_ptr(name);
+            std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(name);
             ptr = (char*) SCR_stracpy((unsigned char*) lst->c_str());
             break;
         }
@@ -952,8 +952,8 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            scl = global_ws_scl->get_obj_ptr(name);
-            d = scl->value;        
+            std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+            d = scl_ptr->value;        
             ptr = SCR_malloc(80);  
             IodeFmtVal(ptr, d);    
             break;                 

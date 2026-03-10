@@ -40,7 +40,7 @@ class IodeDatabase:
     def __init__(self):
         if self.__class__ is IodeDatabase:
             raise TypeError("Cannot instantiate IodeDatabase directly")
-        self._cython_instance: CythonIodeDatabase = None
+        self._cy_database: CythonIodeDatabase = None
 
     @property
     def is_global_workspace(self) -> bool:
@@ -67,7 +67,7 @@ class IodeDatabase:
         >>> cmt_subset.is_global_workspace
         False
         """
-        return self._cython_instance.get_is_global_workspace()
+        return self._cy_database.get_is_global_workspace()
 
     @property
     def is_detached(self) -> bool:
@@ -129,11 +129,7 @@ class IodeDatabase:
         >>> comments["AOUC"]
         'Kost per eenheid produkt.'
         """
-        return self._cython_instance.get_is_detached()
-
-    @staticmethod
-    def _get_instance(instance: Self) -> Self:
-        return instance
+        return self._cy_database.get_is_detached()
 
     def _subset(self, Self, pattern: str, copy: bool) -> Self:
         raise NotImplementedError()
@@ -298,7 +294,7 @@ class IodeDatabase:
         >>> comments.iode_type
         <IodeType.COMMENTS: 0>
         """
-        return self._cython_instance.get_iode_type()
+        return self._cy_database.get_iode_type()
 
     @property
     def filename(self) -> str:
@@ -326,11 +322,11 @@ class IodeDatabase:
         >>> Path(filename).name
         'new_filename.cmt'
         """
-        return self._cython_instance.get_filename()
+        return self._cy_database.get_filename()
 
     @filename.setter
     def filename(self, value: str):
-        self._cython_instance.set_filename(value)
+        self._cy_database.set_filename(value)
 
     @property
     def description(self) -> str:
@@ -353,17 +349,17 @@ class IodeDatabase:
         >>> comments.description
         "test data from file 'fun.cmt'"
         """
-        return self._cython_instance.get_description()
+        return self._cy_database.get_description()
 
     @description.setter
     def description(self, value: str):
-        self._cython_instance.set_description(value)
+        self._cy_database.set_description(value)
 
     def _get_print_nb_decimals(self) -> int:
-        return self._cython_instance._get_print_nb_decimals()
+        return self._cy_database._get_print_nb_decimals()
 
     def _set_print_nb_decimals(self, value: int):
-        self._cython_instance._set_print_nb_decimals(value)
+        self._cy_database._set_print_nb_decimals(value)
 
     def index(self, name: str) -> int:
         r"""
@@ -390,7 +386,7 @@ class IodeDatabase:
         """
         if name not in self:
             raise KeyError(f"'{name}' is not in the database.")
-        return self._cython_instance.index(name)
+        return self._cy_database.index(name)
 
     def get_name(self, pos: int) -> str:
         r"""
@@ -417,7 +413,7 @@ class IodeDatabase:
         """
         if not (0 <= pos < len(self)):
             raise IndexError(f"Index {pos} is out of bounds for database of size {len(self)}")
-        return self._cython_instance.get_name(pos)
+        return self._cy_database.get_name(pos)
 
     def get_names(self, pattern: Union[str, List[str]]=None, filepath: Union[str, Path]=None) -> List[str]:
         r"""
@@ -498,7 +494,7 @@ class IodeDatabase:
             expected_file_type = IodeFileType(self.iode_type.value)
             filepath = check_filepath(filepath, expected_file_type, file_must_exist=True)
 
-        iode_list = self._cython_instance.get_names(pattern, filepath)
+        iode_list = self._cy_database.get_names(pattern, filepath)
         iode_list = split_list(iode_list)
         return iode_list
 
@@ -586,7 +582,7 @@ class IodeDatabase:
         if ydim is None:
             ydim = ""
         
-        success = self._cython_instance.get_names_from_pattern(list_name, pattern, xdim, ydim)
+        success = self._cy_database.get_names_from_pattern(list_name, pattern, xdim, ydim)
         if not success:
             warnings.warn(f"Could not generate list of names '{list_name}' given the pattern '{pattern}'")
             return []
@@ -612,7 +608,7 @@ class IodeDatabase:
         >>> comments.names                # doctest: +ELLIPSIS
         ['ACAF', 'ACAG', 'AOUC', ..., 'ZKF', 'ZX', 'ZZ_']
         """
-        return self._cython_instance.property_names()
+        return self._cy_database.property_names()
 
     def rename(self, old_name: str, new_name: str, overwrite: bool=True):
         r"""
@@ -652,7 +648,7 @@ class IodeDatabase:
         if self.iode_type == IodeType.EQUATIONS:
             warnings.warn("Renaming an Equation is not allowed")
         else:
-            success = self._cython_instance.rename(old_name, new_name, overwrite)
+            success = self._cy_database.rename(old_name, new_name, overwrite)
             if not success:
                 raise RuntimeError(f"Could not rename item '{old_name}' as '{new_name}'")
 
@@ -691,7 +687,7 @@ class IodeDatabase:
         if isinstance(names, str):
             names = self.get_names(names)
         if isinstance(names, Iterable) and all(isinstance(value, str) for value in names):
-            self._cython_instance.remove(names)
+            self._cy_database.remove(names)
         else:
             raise TypeError("'names': Expected value of type string or list of strings. "
                             f"Got value of type '{type(names).__name__}' instead")
@@ -805,7 +801,7 @@ class IodeDatabase:
         args = f"{filepath} {only_in_workspace_list_name} {only_in_file_list_name} "
         args += f"{equal_objects_list_name} {different_objects_list_name}"
 
-        self._cython_instance.compare(args, i_iode_type)
+        self._cy_database.compare(args, i_iode_type)
 
         result = {only_in_workspace_list_name: lists[only_in_workspace_list_name],
                   only_in_file_list_name: lists[only_in_file_list_name],
@@ -875,7 +871,7 @@ class IodeDatabase:
                             f"Got value of type {type(other).__name__}")
         if not isinstance(overwrite, bool):
             raise TypeError(f"'overwrite': Expected value of type boolean. Got value of type {type(overwrite).__name__}")
-        self._cython_instance.merge(other._cython_instance, overwrite)
+        self._cy_database.merge(other._cy_database, overwrite)
 
     def _copy_from(self, input_files: Union[str, List[str]], names: Union[str, List[str]]) -> Tuple[str, str]:
         if not (self.is_global_workspace or self.is_detached):
@@ -934,7 +930,7 @@ class IodeDatabase:
             raise TypeError(f"'input_file': Expected value of type string. Got value of type {type(input_file).__name__}")
         # convert relative path to absolute path
         input_file = str(Path(input_file).resolve())
-        self._cython_instance.merge_from(input_file)
+        self._cy_database.merge_from(input_file)
 
     def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, in_formula: bool=True, in_text: bool=True, list_result: str='_RES') -> List[str]:
         r"""
@@ -1027,7 +1023,7 @@ class IodeDatabase:
         >>> tables.search("AOUC")
         ['ANAPRIX', 'MULT1FR', 'MULT1RESU', 'T1', 'T1NIVEAU']
         """
-        return self._cython_instance.search(pattern, word, case_sensitive, in_name, in_formula, 
+        return self._cy_database.search(pattern, word, case_sensitive, in_name, in_formula, 
                                             in_text, list_result)
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
@@ -1057,7 +1053,7 @@ class IodeDatabase:
             raise ValueError("'format' must be either 'H', 'M', 'R' or 'C'")
 
         names = ';'.join(self.get_names(names))
-        self._cython_instance.print_to_file(str(filepath), names, format)
+        self._cy_database.print_to_file(str(filepath), names, format)
 
     def _coefficients(self) -> List[str]:
         if self.iode_type == IodeType.EQUATIONS or self.iode_type == IodeType.IDENTITIES \
@@ -1106,7 +1102,7 @@ class IodeDatabase:
         filepath = str(filepath.resolve())
 
         names = ';'.join(self.get_names(names))
-        self._cython_instance.print_to_file(filepath, names, format)
+        self._cy_database.print_to_file(filepath, names, format)
 
     def _load(self, filepath: str):
         raise NotImplementedError()
@@ -1194,7 +1190,7 @@ class IodeDatabase:
         """
         if not isinstance(filepath, str):
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
-        self._cython_instance.save(filepath, compress)
+        self._cy_database.save(filepath, compress)
 
     def clear(self):
         r"""
@@ -1215,7 +1211,7 @@ class IodeDatabase:
         """
         if not (self.is_global_workspace or self.is_detached):
             raise RuntimeError("Cannot call 'clear' method on a subset of a workspace")
-        self._cython_instance.clear()
+        self._cy_database.clear()
 
     def __len__(self) -> int:
         r"""
@@ -1235,7 +1231,7 @@ class IodeDatabase:
         >>> len(comments)
         317
         """
-        return self._cython_instance.size()
+        return self._cy_database.size()
 
     def __contains__(self, item) -> bool:
         r"""
@@ -1260,7 +1256,7 @@ class IodeDatabase:
         """
         if not isinstance(item, str):
             raise TypeError(f"Expected value of type string. Got value of type {type(item).__name__}")
-        return self._cython_instance.contains(item)
+        return self._cy_database.contains(item)
 
     def __iter__(self):
         r"""
@@ -1441,7 +1437,7 @@ class IodeDatabase:
 
     def __delitem__(self, key):
         names = self._unfold_key(key)
-        self._cython_instance.remove_objects(names)
+        self._cy_database.remove_objects(names)
 
     def _str_header(self) -> str:
         type_name = self.__class__.__name__
@@ -1468,4 +1464,4 @@ class IodeDatabase:
         return str(self)
 
     def __hash__(self) -> int:
-        return self._cython_instance.__hash__()
+        return self._cy_database.__hash__()

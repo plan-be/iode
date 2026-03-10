@@ -638,10 +638,10 @@ U_ch *RPF_month(U_ch** args)
  */
 U_ch *RPF_sstderr(U_ch** args)
 {
-    Scalar* scl;
-    U_ch    *res = 0, buf[80];
-
+    U_ch *res = 0, buf[80];
+    
     std::string name;
+    std::shared_ptr<Scalar> scl_ptr;
     for(int i = 0 ; args[i] ; i++) 
     {
         if(i > 0) 
@@ -651,9 +651,9 @@ U_ch *RPF_sstderr(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = global_ws_scl->get_obj_ptr(name);
-            if(IODE_IS_A_NUMBER(scl->std))
-                sprintf((char*) buf, "%lf", (double) scl->std);
+            scl_ptr = global_ws_scl->get_obj_ptr(name);
+            if(IODE_IS_A_NUMBER(scl_ptr->std))
+                sprintf((char*) buf, "%lf", (double) scl_ptr->std);
             else
                 strcpy((char*) buf, "--");
         }
@@ -673,10 +673,10 @@ U_ch *RPF_sstderr(U_ch** args)
  */
 U_ch *RPF_srelax(U_ch** args)
 {
-    Scalar* scl;
-    U_ch    *res = 0, buf[80];
+    U_ch *res = 0, buf[80];
 
     std::string name;
+    std::shared_ptr<Scalar> scl_ptr;
     for(int i = 0 ; args[i] ; i++) 
     {
         if(i > 0) 
@@ -686,9 +686,9 @@ U_ch *RPF_srelax(U_ch** args)
             strcpy((char*) buf, "--");
         else 
         {
-            scl = global_ws_scl->get_obj_ptr(name);
-            if(IODE_IS_A_NUMBER(scl->relax))
-                sprintf((char*) buf, "%lf", (double) scl->relax);
+            scl_ptr = global_ws_scl->get_obj_ptr(name);
+            if(IODE_IS_A_NUMBER(scl_ptr->relax))
+                sprintf((char*) buf, "%lf", (double) scl_ptr->relax);
             else
                 strcpy((char*) buf, "--");
         }
@@ -710,8 +710,8 @@ U_ch *RPF_srelax(U_ch** args)
  */
 U_ch *RPF_ttitle(U_ch** args)
 {
-    U_ch    *res = 0, buf[128];
-    Table*  tbl;
+    U_ch *res = 0, buf[128];
+    std::shared_ptr<Table> tbl_ptr;
 
     std::string name;
     for(int i = 0 ; args[i] ; i++) 
@@ -726,8 +726,8 @@ U_ch *RPF_ttitle(U_ch** args)
         }
         else 
         {
-            tbl = global_ws_tbl->get_obj_ptr(name);
-            res = SCR_strafcat(res, T_get_title(tbl, false));
+            tbl_ptr = global_ws_tbl->get_obj_ptr(name);
+            res = SCR_strafcat(res, T_get_title(tbl_ptr.get(), false));
         }
     }
 
@@ -984,7 +984,7 @@ U_ch *RPF_eqsample(U_ch** args)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else
     {
-        Equation* eq = kdb->get_obj_ptr(name);
+        std::shared_ptr<Equation> eq = kdb->get_obj_ptr(name);
         std::string str_smpl = eq->sample.to_string();
         sprintf((char*) res, (char*) str_smpl.c_str());
     }       
@@ -1022,7 +1022,7 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else 
     {
-        Equation* eq = kdb->get_obj_ptr(name);
+        std::shared_ptr<Equation> eq = kdb->get_obj_ptr(name);
         Sample smpl = eq->sample;
         if(fromto == 0) 
             sprintf((char*) res, (char*) smpl.start_period.to_string().c_str());
@@ -1230,20 +1230,20 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
 U_ch *RPF_vsliste(U_ch** args, int type)
 {
     U_ch  **tbl = 0, *res;
-    int   i, nb = 0;
+    int i, nb = 0;
 
     if(SCR_tbl_size(args) < 1) 
-        return(NULL);
+        return NULL;
 
-    Equation* eq;
     std::string name;
+    std::shared_ptr<Equation> eq_ptr;
     for(i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
         if(!global_ws_eqs->contains(name)) 
             continue;
-        eq = global_ws_eqs->get_obj_ptr(name) ;
-        RPF_vsliste1(eq->clec, &tbl, &nb, type);
+        eq_ptr = global_ws_eqs->get_obj_ptr(name) ;
+        RPF_vsliste1(eq_ptr->clec, &tbl, &nb, type);
     }
 
     SCR_add_ptr(&tbl, &nb, 0L);

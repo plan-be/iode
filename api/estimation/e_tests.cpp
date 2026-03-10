@@ -231,20 +231,20 @@ int Estimation::E_c_mcorru()
 int Estimation::E_c_ttests()
 {
     int     i, j;
-    Scalar* scl;
+    std::shared_ptr<Scalar> scl_ptr;
 
     std::string coef_name;
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
         coef_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = E_DBS->get_obj_ptr(coef_name);
-        scl->std = 0.0;
-        if(scl->relax == 0) 
+        scl_ptr = E_DBS->get_obj_ptr(coef_name);
+        scl_ptr->std = 0.0;
+        if(scl_ptr->relax == 0) 
             continue;
-        if(E_MET == 4) // ??? Max likelihood ???
-            scl->std = E_sqrt(MATE(E_VCC, j, j));
+        if(E_MET == IodeEquationMethod::EQ_MAX_LIKELIHOOD)
+            scl_ptr->std = E_sqrt(MATE(E_VCC, j, j));
         else
-            scl->std = E_sqrt(E_div_0(MATE(E_VCC, j, j) * E_T, MATE(E_DF, 0, j)));
+            scl_ptr->std = E_sqrt(E_div_0(MATE(E_VCC, j, j) * E_T, MATE(E_DF, 0, j)));
         j++;
     }
 

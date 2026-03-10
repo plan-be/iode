@@ -134,7 +134,7 @@ class Simulation:
     def __init__(self, convergence_threshold: float=0.001, relax: float=1.0, max_nb_iterations: int=100, 
                   sort_algorithm: Union[SimulationSort, str]=SimulationSort.BOTH, initialization_method: Union[SimulationInitialization, str]=SimulationInitialization.TM1, 
                   debug: bool=False, nb_passes: int=5, debug_newton: bool=False):
-        self._cython_instance = CythonSimulation()
+        self._cy_simulation = CythonSimulation()
         self.convergence_threshold = convergence_threshold
         self.relax = relax
         self.max_nb_iterations = max_nb_iterations
@@ -170,11 +170,11 @@ class Simulation:
         >>> simu.convergence_threshold
         1e-06
         """
-        return self._cython_instance.get_convergence_threshold()
+        return self._cy_simulation.get_convergence_threshold()
 
     @convergence_threshold.setter
     def convergence_threshold(self, value: float):
-        self._cython_instance.set_convergence_threshold(value)
+        self._cy_simulation.set_convergence_threshold(value)
 
     @property
     def relax(self) -> float:
@@ -216,13 +216,13 @@ class Simulation:
         >>> simu.relax
         0.9
         """
-        return self._cython_instance.get_relax()
+        return self._cy_simulation.get_relax()
 
     @relax.setter
     def relax(self, value: float):
         if not 0.0 <= value <= 1.0:
             raise ValueError(f"'relax': Expected value between 0.0 and 1.0. Got value {value} instead.")
-        self._cython_instance.set_relax(value)
+        self._cy_simulation.set_relax(value)
 
     @property
     def max_nb_iterations(self) -> int:
@@ -248,13 +248,13 @@ class Simulation:
         >>> simu.max_nb_iterations
         1000
         """
-        return self._cython_instance.get_max_nb_iterations()
+        return self._cy_simulation.get_max_nb_iterations()
 
     @max_nb_iterations.setter
     def max_nb_iterations(self, value: int):
         if value < 0:
             raise ValueError(f"'max_nb_iterations_newton': Value must be positive. Got value {value} instead.")
-        self._cython_instance.set_max_nb_iterations(value)
+        self._cy_simulation.set_max_nb_iterations(value)
 
     @property
     def max_nb_iterations_newton(self) -> int:
@@ -277,11 +277,11 @@ class Simulation:
         >>> simu.max_nb_iterations_newton
         100
         """
-        return self._cython_instance.get_max_nb_iterations_newton()
+        return self._cy_simulation.get_max_nb_iterations_newton()
 
     @max_nb_iterations_newton.setter
     def max_nb_iterations_newton(self, value: int):
-        self._cython_instance.set_max_nb_iterations_newton(value)
+        self._cy_simulation.set_max_nb_iterations_newton(value)
 
     @property
     def sort_algorithm(self) -> str:
@@ -366,7 +366,7 @@ class Simulation:
         >>> simu.sort_algorithm
         'BOTH'
         """
-        return self._cython_instance.get_sort_algorithm()
+        return self._cy_simulation.get_sort_algorithm()
 
     @property
     def sort_algorithm_long(self) -> str:
@@ -403,7 +403,7 @@ class Simulation:
         >>> simu.sort_algorithm_long
         'BOTH (Connex compon. + Triangulation)'
         """
-        return self._cython_instance.get_sort_algorithm_long()
+        return self._cy_simulation.get_sort_algorithm_long()
 
     @sort_algorithm.setter
     def sort_algorithm(self, value: Union[SimulationSort, str, int]):
@@ -414,7 +414,7 @@ class Simulation:
             value = value.upper()
             value = SimulationSort[value]
         value = int(value)
-        self._cython_instance.set_sort_algorithm(value)
+        self._cy_simulation.set_sort_algorithm(value)
 
     @property
     def initialization_method(self) -> str:
@@ -503,7 +503,7 @@ class Simulation:
         >>> simu.initialization_method
         'EXTRA_NA'
         """
-        return self._cython_instance.get_initialization_method()
+        return self._cy_simulation.get_initialization_method()
 
     @property
     def initialization_method_long(self) -> str:
@@ -568,7 +568,7 @@ class Simulation:
         >>> simu.initialization_method_long
         'EXTRA_NA (Y := extrapolation, if Y = NA)'
         """
-        return self._cython_instance.get_initialization_method_long()
+        return self._cy_simulation.get_initialization_method_long()
 
     @initialization_method.setter
     def initialization_method(self, value: Union[SimulationInitialization, str, int]):
@@ -579,7 +579,7 @@ class Simulation:
             value = value.upper()
             value = SimulationInitialization[value]
         value = int(value)
-        self._cython_instance.set_initialization_method(value)
+        self._cy_simulation.set_initialization_method(value)
 
     @property
     def debug(self) -> bool:
@@ -643,11 +643,11 @@ class Simulation:
         >>> len(lists["_POST"])
         39
         """
-        return self._cython_instance.get_debug()
+        return self._cy_simulation.get_debug()
 
     @debug.setter
     def debug(self, value: bool):
-        self._cython_instance.set_debug(value)
+        self._cy_simulation.set_debug(value)
 
     @property
     def debug_newton(self) -> bool:
@@ -667,11 +667,11 @@ class Simulation:
         >>> simu.debug_newton
         False
         """
-        return self._cython_instance.get_debug_newton()
+        return self._cy_simulation.get_debug_newton()
 
     @debug_newton.setter
     def debug_newton(self, value: bool):
-        self._cython_instance.set_debug_newton(value)
+        self._cy_simulation.set_debug_newton(value)
 
     @property
     def nb_passes(self) -> int:
@@ -698,13 +698,13 @@ class Simulation:
         >>> simu.nb_passes
         10
         """
-        return self._cython_instance.get_nb_passes()
+        return self._cy_simulation.get_nb_passes()
 
     @nb_passes.setter
     def nb_passes(self, value: int):
         if value < 0:
             raise ValueError(f"'nb_passes': Value cannot be negative. Got value {value}")
-        self._cython_instance.set_nb_passes(value)
+        self._cy_simulation.set_nb_passes(value)
 
     def nb_iterations(self, period: Union[str, Period]) -> int:
         r"""
@@ -757,7 +757,7 @@ class Simulation:
             period = str(period)
         if not isinstance(period, str):
             raise TypeError(f"'period': Expected value of type 'str' or 'Period'. Got value of type {type(period)} instead.")
-        nb_iter = self._cython_instance.get_nb_iterations(period)
+        nb_iter = self._cy_simulation.get_nb_iterations(period)
         if nb_iter < 0:
             raise RuntimeError(f"Could not get the number of iterations for the period {period}")
         return nb_iter
@@ -822,7 +822,7 @@ class Simulation:
         NB_ITER     31.00   24.00   26.00   28.00   27.00  ...      22.00   23.00   21.00   21.00   21.00   21.00
         <BLANKLINE>
         """
-        success = self._cython_instance.save_nb_iterations(var_name)
+        success = self._cy_simulation.save_nb_iterations(var_name)
         if not success:
             warnings.warn(f"Could not save the number of iterations for each period "
                           f"as a new variable '{var_name}'")
@@ -878,7 +878,7 @@ class Simulation:
             period = str(period)
         if not isinstance(period, str):
             raise TypeError(f"'period': Expected value of type 'str' or 'Period'. Got value of type {type(period)} instead.")
-        norm = self._cython_instance.get_norm(period)
+        norm = self._cy_simulation.get_norm(period)
         if norm < 0:
             raise RuntimeError(f"Could not get the norm value for the period {period}")
         return norm
@@ -945,7 +945,7 @@ class Simulation:
         >>> round(variables["SIMU_NORM", "2015Y1"], 10)
         0.0005893242
         """
-        success = self._cython_instance.save_norms(var_name)
+        success = self._cy_simulation.save_norms(var_name)
         if not success:
             warnings.warn(f"Could not save the lowest norm value for each period as "
                           f"a new variable '{var_name}'")
@@ -1102,7 +1102,7 @@ class Simulation:
             raise TypeError("'list_exo': Expected None or value of type str or list of str. "
                             f"Got value of type {type(list_exo)} instead.")
         
-        success = self._cython_instance.model_exchange(list_exo)
+        success = self._cy_simulation.model_exchange(list_exo)
         return success
 
     def model_compile(self, list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
@@ -1147,7 +1147,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            success = self._cython_instance.model_compile(list_eqs)
+            success = self._cy_simulation.model_compile(list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1288,7 +1288,7 @@ class Simulation:
             suppress_msgs()
 
         try: 
-            success = self._cython_instance.model_simulate(from_period, to_period, list_eqs)
+            success = self._cy_simulation.model_simulate(from_period, to_period, list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1394,7 +1394,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            success = self._cython_instance.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
+            success = self._cy_simulation.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False
@@ -1554,7 +1554,7 @@ class Simulation:
             suppress_msgs()
 
         try:
-            success = self._cython_instance.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
+            success = self._cy_simulation.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
         except Exception as e:
             warnings.warn(str(e), RuntimeWarning)
             success = False

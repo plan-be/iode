@@ -176,6 +176,10 @@ def test_type_copy_iode_objects():
 
 def test_database_delete():
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    identities.load(f"{SAMPLE_DATA_DIR}/fun.idt")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
     cmt_subset = comments["A*"]
@@ -192,6 +196,34 @@ def test_database_delete():
     assert "AOUC" not in variables
     assert "AOUC" not in var_subset
     assert variables.get_names("A*") == var_subset.names
+
+    eq = equations["ACAF"]
+    eq_copy = eq.copy()
+    assert eq == equations["ACAF"]
+    del eq
+    assert equations["ACAF"] is not None
+    assert equations["ACAF"] == eq_copy
+
+    idt = identities["AOUC"]
+    idt_copy = idt.copy()
+    assert idt == identities["AOUC"]
+    del idt
+    assert identities["AOUC"] is not None
+    assert identities["AOUC"] == idt_copy
+
+    scl = scalars["acaf1"]
+    scl_copy = scl.copy()
+    assert scl == scalars["acaf1"]
+    del scl
+    assert scalars["acaf1"] is not None
+    assert scalars["acaf1"] == scl_copy
+
+    tbl = tables["C8_1"]
+    tbl_copy = tbl.copy()
+    assert str(tbl) == str(tables["C8_1"])
+    del tbl
+    assert tables["C8_1"] is not None
+    assert str(tables["C8_1"]) == str(tbl_copy)
 
 # Equations
 # ---------

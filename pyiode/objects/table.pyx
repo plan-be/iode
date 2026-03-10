@@ -4,7 +4,9 @@ from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional
 
 from libcpp.string cimport string
+from libcpp.memory cimport shared_ptr, make_shared
 from cython.operator cimport dereference
+
 from pyiode.common cimport TableLang as CTableLang
 from pyiode.common cimport TableCellType as CTableCellType 
 from pyiode.common cimport TableCellFont as CTableCellFont
@@ -28,12 +30,14 @@ cdef class TableCell:
         pass
 
     @staticmethod
-    cdef TableCell from_ptr(CTableCell* c_cell_ptr):
+    cdef TableCell _from_ptr(CTableCell* c_cell_ptr):
         """
         Factory function to create TableCell objects from given CTableCell pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef TableCell wrapper = TableCell.__new__(TableCell)
+        if c_cell_ptr is NULL:
+            return None
         wrapper.c_cell = c_cell_ptr
         return wrapper
 
@@ -102,12 +106,14 @@ cdef class TableLine:
         pass
 
     @staticmethod
-    cdef TableLine from_ptr(CTableLine* c_line_ptr, int nb_columns):
+    cdef TableLine _from_ptr(CTableLine* c_line_ptr, int nb_columns):
         """
         Factory function to create TableLine objects from given CTableLine pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef TableLine wrapper = TableLine.__new__(TableLine)
+        if c_line_ptr is NULL:
+            return None
         wrapper.c_line = c_line_ptr
         wrapper.nb_columns = nb_columns
         return wrapper
@@ -143,12 +149,12 @@ cdef class TableLine:
         else:
             return 0
 
-    def _getitem_(self, col: int, cell: TableCell) -> TableCell:
+    def _getitem_(self, col: int) -> TableCell:
         cdef CTableCell* c_cell
         if self.c_line is NULL:
-            return
+            return None
         c_cell = &(self.c_line.cells[col])
-        cell.c_cell = c_cell
+        cell = TableCell._from_ptr(c_cell)
         return cell
 
     def _setitem_(self, col: int, value: str):
@@ -185,12 +191,11 @@ cdef class TableLine:
 
 
 cdef class Table:
-    cdef bint ptr_owner
     cdef string c_table_name
+    cdef shared_ptr[CTable] tbl_ptr
     cdef CTable* c_table
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_table_name = b''
         self.c_table = NULL
 
@@ -203,11 +208,13 @@ cdef class Table:
         if lines_titles is None:
             variables = lecs_or_vars
             if isinstance(variables, str):
-                self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
+                self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), 
+                                                   <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
             else:
                 for variable in variables:
                     cpp_variables.push_back(variable.encode())
-                self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), cpp_variables, <bint>mode, <bint>files, <bint>date)
+                self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_variables, 
+                                                   <bint>mode, <bint>files, <bint>date)
         else:            
             for line_title in lines_titles:
                 cpp_lines_titles.push_back(line_title.encode())
@@ -216,36 +223,33 @@ cdef class Table:
             for lec in lecs:
                 cpp_lecs.push_back(lec.encode())
 
-            self.c_table = new CTable(nb_columns, <string>table_title.encode(), cpp_lines_titles, cpp_lecs, <bint>mode, <bint>files, <bint>date)
+            self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_lines_titles, 
+                                               cpp_lecs, <bint>mode, <bint>files, <bint>date)
         
         self.c_table_name = b''
-        self.ptr_owner = <bint>True
+        self.c_table = self.tbl_ptr.get()
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_table is not NULL:
-            del self.c_table
-            self.c_table_name = b''
-            self.c_table = NULL
+        self.c_table_name = b''
+        self.tbl_ptr.reset()
+        self.c_table = NULL
+
+    cdef update_ptr(self, shared_ptr[CTable] tbl_ptr):
+        self.tbl_ptr = tbl_ptr
+        self.c_table = tbl_ptr.get()
 
     @staticmethod
-    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b''):
+    cdef Table _from_ptr(shared_ptr[CTable] tbl_ptr, bytes b_table_name=b''):
         """
         Factory function to create Table objects from a given CTable pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Table wrapper = Table.__new__(Table)
-        wrapper.c_table = ptr
+        if tbl_ptr.get() == NULL:
+            return None
+        wrapper.update_ptr(tbl_ptr)
         wrapper.c_table_name = b_table_name
-        wrapper.ptr_owner = owner
         return wrapper
-
-    # for debug purpose only
-    def is_pointer_null(self) -> bool:
-        return self.c_table is NULL
-
-    # for debug purpose only
-    def is_own_owner(self) -> bool:
-        return self.ptr_owner
 
     def get_nb_lines(self) -> int:
         return <int>(self.c_table.lines.size()) if self.c_table is not NULL else 0
@@ -409,15 +413,12 @@ cdef class Table:
                         py_vars += [c_var.decode() for c_var in c_cell.get_variables_from_lec()]
         return sorted(list(set(py_vars)))
 
-    def get_divider(self, divider: TableLine) -> TableLine:
+    def get_divider(self) -> TableLine:
         cdef CTableLine* c_line
         if self.c_table is NULL:
             return None
-        
         c_line = &(self.c_table.divider_line)
-
-        divider.c_line = c_line
-        divider.nb_columns = <int>(self.c_table.nb_columns)
+        divider = TableLine._from_ptr(c_line, self.c_table.nb_columns)
         return divider
 
     def set_divider(self, value: Union[List[str], Tuple[str]]):
@@ -516,7 +517,6 @@ cdef class Table:
             else:
                 self.insert(row, line_type)
         
-
     def compute(self, generalized_sample: str, nb_decimals: int=2) -> ComputedTable:
         if self.c_table is NULL:
             return None
@@ -524,14 +524,12 @@ cdef class Table:
             raise ValueError("'generalized_sample' must not be empty")
         return ComputedTable.initialize(self.c_table, generalized_sample.encode(), nb_decimals)
 
-    def _getitem_(self, row: int, line: TableLine) -> TableLine:
+    def _getitem_(self, row: int) -> TableLine:
         cdef CTableLine* c_line
         if self.c_table is NULL:
             return None
-
         c_line = &(self.c_table.lines[row])
-        line.c_line = c_line
-        line.nb_columns = <int>(self.c_table.nb_columns)
+        line = TableLine._from_ptr(c_line, self.c_table.nb_columns)
         return line
 
     def _setitem_(self, row: int, value: Union[str, List[str], Tuple[str]]):
@@ -610,12 +608,12 @@ cdef class Table:
         return self
 
     def _copy_(self, table: Table) -> Table:
+        cdef shared_ptr[CTable] tbl_ptr
         if self.c_table is NULL:
             return None
-        del table.c_table
-        table.c_table = new CTable(dereference(self.c_table))
-        table.ptr_owner = <bint>True
+        tbl_ptr = make_shared[CTable](dereference(self.c_table))
         table.c_table_name = self.c_table_name
+        table.update_ptr(tbl_ptr)
         return table
 
     def _str_(self) -> str:
@@ -691,4 +689,4 @@ cdef class Table:
         return s
 
     def __hash__(self) -> int:
-        return <int>hash_value_tbl(dereference(self.c_table)) if self.c_table is not NULL else 0
+        return <int>hash_value_tbl(dereference(self.c_table))

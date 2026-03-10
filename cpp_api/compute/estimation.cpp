@@ -101,7 +101,6 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
     set_sample(from, to);
     kdb_eqs = new KDBEquations(false);
     kdb_scl = new KDBScalars(false);
-    m_corr = nullptr;
 }
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
@@ -110,7 +109,6 @@ EditAndEstimateEquations::~EditAndEstimateEquations()
     if(sample)          delete sample;
     if(kdb_eqs)         delete kdb_eqs;
     if(kdb_scl)         delete kdb_scl;
-    if(m_corr)          delete m_corr;
 }
 
 void EditAndEstimateEquations::set_block(const std::string& block, const std::string& current_eq_name)
@@ -183,7 +181,7 @@ void EditAndEstimateEquations::set_block(const std::string& block, const std::st
 
 void EditAndEstimateEquations::update_scalars()
 {
-    Equation* eq;
+    std::shared_ptr<Equation> eq_ptr;
     std::set<std::string> coefficients_list;
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
@@ -193,8 +191,11 @@ void EditAndEstimateEquations::update_scalars()
         if(!kdb_eqs->contains(name))
             throw std::runtime_error("Estimation: Cannot get equation at position " + 
                                      name + " from the local Equations database.");
-        eq = kdb_eqs->get_obj_ptr(name);
-        tmp_coefs_list = eq->get_coefficients_list();
+        eq_ptr = kdb_eqs->get_obj_ptr(name);
+        // NOTE: if a coefficient is not present in the global database of scalars, 
+        //       it will be created with value = 0.9 and relax = 1.0 and saved 
+        //       in the global database of scalars
+        tmp_coefs_list = eq_ptr->get_coefficients_list();
         for(const std::string& coef_name : tmp_coefs_list)
             coefficients_list.insert(coef_name);
     }
@@ -230,8 +231,8 @@ void EditAndEstimateEquations::update_scalars()
             if(!kdb_eqs->contains(eq_name))
                 throw std::runtime_error("Estimation: Could not find equation named '" + eq_name +
                                          " from the local Equations database.");
-            eq = kdb_eqs->get_obj_ptr(eq_name);
-            for(const std::string& scl_name: eq->get_coefficients_list())
+            eq_ptr = kdb_eqs->get_obj_ptr(eq_name);
+            for(const std::string& scl_name: eq_ptr->get_coefficients_list())
                 if(kdb_scl->contains(scl_name))
                     kdb_scl->remove(scl_name);
         }
@@ -252,7 +253,7 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
                                  " from the local Equations database.");
     try
     {
-        Equation* eq = kdb_eqs->get_obj_ptr(name);
+        std::shared_ptr<Equation> eq = kdb_eqs->get_obj_ptr(name);
         eq->set_lec(lec);
         eq->set_comment(comment);
     }
@@ -295,7 +296,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
 
     // copy the values of class attributes 'block', 'method' and 'instruments' 
     // to each local equation 
-    Equation* eq;
+    std::shared_ptr<Equation> eq_ptr;
     for(const std::string& eq_name: v_equations) 
     {
         if(!kdb_eqs->contains(eq_name))
@@ -303,10 +304,10 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
                                      " from the local Equations database.");
         try
         {
-            eq = kdb_eqs->get_obj_ptr(eq_name);
-            eq->set_method(method);
-            eq->block = block;
-            eq->instruments = instruments;
+            eq_ptr = kdb_eqs->get_obj_ptr(eq_name);
+            eq_ptr->set_method(method);
+            eq_ptr->block = block;
+            eq_ptr->instruments = instruments;
         }
         catch(std::exception& e)
         {
@@ -323,19 +324,15 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
                                 i_method, maxit, eps);
     int res = estimation->estimate();
 
+    if(m_corr_ptr) m_corr_ptr.reset();
     if(res == 0)
     {
         estimation_done = true;
         std::set<std::string> v_coeffs = kdb_scl->get_names();
-
-        if(m_corr) delete m_corr;
-        m_corr = new CorrelationMatrix(v_coeffs, estimation->get_MCORR()); 
+        m_corr_ptr = std::make_shared<CorrelationMatrix>(v_coeffs, estimation->get_MCORR()); 
     }
     else
     {
-        if(m_corr) delete m_corr;
-        m_corr = nullptr;
-
         std::string last_error = error_manager.get_last_error();
         if(!last_error.empty())
             throw std::runtime_error("Could not estimate equation(s) " + join(v_equations, ";") + "\n" + last_error);

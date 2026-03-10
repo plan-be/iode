@@ -155,9 +155,9 @@ class TableCell:
         raise TypeError("This class cannot be instantiated directly.")
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonTableCell) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonTableCell()
+        instance._cy_cell = obj
         return instance
 
     @property
@@ -187,7 +187,7 @@ class TableCell:
         >>> table[4][1].cell_type
         'LEC'
         """
-        return self._cython_instance.get_cell_type()
+        return self._cy_cell.get_cell_type()
 
     @property
     def align(self) -> str:
@@ -216,11 +216,11 @@ class TableCell:
         >>> table[4][0].align
         'RIGHT'
         """
-        return self._cython_instance.get_align()
+        return self._cy_cell.get_align()
 
     @align.setter
     def align(self, value: Union[TableCellAlign, str]):
-        self._cython_instance.set_align(value)
+        self._cy_cell.set_align(value)
 
     @property
     def bold(self) -> bool:
@@ -246,11 +246,11 @@ class TableCell:
         >>> table[4][0].bold
         True
         """
-        return self._cython_instance.get_bold()
+        return self._cy_cell.get_bold()
 
     @bold.setter
     def bold(self, value: bool):
-        self._cython_instance.set_bold(value)
+        self._cy_cell.set_bold(value)
 
     @property
     def italic(self) -> bool:
@@ -276,11 +276,11 @@ class TableCell:
         >>> table[4][0].italic
         True
         """
-        return self._cython_instance.get_italic()
+        return self._cy_cell.get_italic()
 
     @italic.setter
     def italic(self, value: bool):
-        self._cython_instance.set_italic(value)
+        self._cy_cell.set_italic(value)
 
     @property
     def underline(self) -> bool:
@@ -306,11 +306,11 @@ class TableCell:
         >>> table[4][0].underline
         True
         """
-        return self._cython_instance.get_underline()
+        return self._cy_cell.get_underline()
 
     @underline.setter
     def underline(self, value: bool):
-        self._cython_instance.set_underline(value)
+        self._cy_cell.set_underline(value)
 
     @property
     def coefficients(self) -> List[str]:
@@ -342,7 +342,7 @@ class TableCell:
             warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
             return []
         else:
-            return self._cython_instance.get_coefficients()
+            return self._cy_cell.get_coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -373,10 +373,10 @@ class TableCell:
             warnings.warn("Cannot get list of variables from a cell which is not of type 'LEC'")
             return []
         else:
-            return self._cython_instance.get_variables()
+            return self._cy_cell.get_variables()
 
     def __str__(self) -> str:
-        return self._cython_instance._str_()
+        return self._cy_cell._str_()
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -460,9 +460,9 @@ class TableLine:
         raise TypeError("This class cannot be instantiated directly.")
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonTableLine) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonTableLine()
+        instance._cy_line = obj
         return instance
 
     @property
@@ -511,7 +511,7 @@ class TableLine:
         >>> table[4].line_type
         'CELL'
         """
-        return self._cython_instance.get_type()
+        return self._cy_line.get_type()
 
     @property
     def graph_type(self) -> str:
@@ -560,7 +560,7 @@ class TableLine:
         >>> table[4].graph_type
         'BAR'
         """
-        return self._cython_instance.get_graph_type()
+        return self._cy_line.get_graph_type()
 
     @graph_type.setter
     def graph_type(self, value: Union[TableGraphType, str]):
@@ -568,7 +568,7 @@ class TableLine:
             value = value.upper()
             value = TableGraphType[value]
         value = int(value)
-        self._cython_instance.set_graph_type(value)
+        self._cy_line.set_graph_type(value)
 
     @property
     def axis_left(self) -> bool:
@@ -613,14 +613,14 @@ class TableLine:
         >>> table[4].axis_left
         False
         """
-        return self._cython_instance.get_axis_left()
+        return self._cy_line.get_axis_left()
 
     @axis_left.setter
     def axis_left(self, value: bool):
-        self._cython_instance.set_axis_left(value)
+        self._cy_line.set_axis_left(value)
 
     def __len__(self) -> int:
-        return self._cython_instance.size()
+        return self._cy_line.size()
 
     def _get_col_from_index(self, index: int) -> int:
         self_size = len(self)
@@ -675,9 +675,9 @@ class TableLine:
         >>> table[4][1]
         GAP_
         """
-        table_cell = TableCell.get_instance()
         col = self._get_col_from_index(index)
-        table_cell._cython_instance = self._cython_instance._getitem_(col, table_cell._cython_instance)
+        cy_cell = self._cy_line._getitem_(col)
+        table_cell = TableCell.from_cython_obj(cy_cell)
         return table_cell
 
     def __setitem__(self, index, value):
@@ -733,13 +733,13 @@ class TableLine:
         if not isinstance(value, str):
             raise TypeError(f"Expected value of type str or TableCell. "
                             f"Got value of type '{type(value).__name__}' instead.")
-        self._cython_instance._setitem_(col, value)
+        self._cy_line._setitem_(col, value)
 
     def __delitem__(self, index):
         raise RuntimeError("A Table cell cannot be deleted")
 
     def __str__(self) -> str:
-        return self._cython_instance._str_()
+        return self._cy_line._str_()
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -1053,21 +1053,21 @@ class Table:
                 raise ValueError(f"'lecs_or_vars' and 'lines_titles': The list of LEC expressions (length={len(lecs)}) " 
                                  f"and the list of line titles (length={len(lines_titles)}) must have the same length")
             
-        self._cython_instance = CythonTable(nb_columns, table_title, lecs_or_vars, lines_titles, mode, files, date)
+        self._cy_table = CythonTable(nb_columns, table_title, lecs_or_vars, lines_titles, mode, files, date)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def from_cython_obj(cls, obj: CythonTable) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonTable.__new__(CythonTable)
+        instance._cy_table = obj
         return instance
 
     @property
     def nb_lines(self) -> int:
-        return self._cython_instance.get_nb_lines()
+        return self._cy_table.get_nb_lines()
 
     @property
     def nb_columns(self) -> int:
-        return self._cython_instance.get_nb_columns()
+        return self._cy_table.get_nb_columns()
 
     @property
     def title(self) -> str:
@@ -1092,11 +1092,11 @@ class Table:
         >>> table.title
         'New title'
         """
-        return self._cython_instance.get_title()
+        return self._cy_table.get_title()
 
     @title.setter
     def title(self, value: str):
-        self._cython_instance.set_title(value)
+        self._cy_table.set_title(value)
 
     @property
     def language(self) -> str:
@@ -1121,11 +1121,11 @@ class Table:
         >>> table.language
         'FRENCH'
         """
-        return self._cython_instance.get_language()
+        return self._cy_table.get_language()
 
     @language.setter
     def language(self, value: Union[TableLang, str]):
-        self._cython_instance.set_language(value)
+        self._cy_table.set_language(value)
 
     @property
     def ymin(self) -> float:
@@ -1182,11 +1182,11 @@ class Table:
         >>> table.gridx
         'MINOR'
         """
-        return self._cython_instance.get_gridx()
+        return self._cy_table.get_gridx()
 
     @gridx.setter
     def gridx(self, value: Union[TableGraphGrid, str]):
-        self._cython_instance.set_gridx(value)
+        self._cy_table.set_gridx(value)
 
     @property
     def gridy(self) -> str:
@@ -1215,11 +1215,11 @@ class Table:
         >>> table.gridy
         'MINOR'
         """
-        return self._cython_instance.get_gridy()
+        return self._cy_table.get_gridy()
 
     @gridy.setter
     def gridy(self, value: Union[TableGraphGrid, str]):
-        self._cython_instance.set_gridy(value)
+        self._cy_table.set_gridy(value)
 
     @property
     def graph_axis(self) -> str:
@@ -1249,11 +1249,11 @@ class Table:
         >>> table.graph_axis
         'PERCENT'
         """
-        return self._cython_instance.get_graph_axis()
+        return self._cy_table.get_graph_axis()
 
     @graph_axis.setter
     def graph_axis(self, value: Union[TableGraphAxis, str]):
-        self._cython_instance.set_graph_axis(value)
+        self._cy_table.set_graph_axis(value)
 
     @property
     def graph_alignment(self) -> str:
@@ -1278,11 +1278,11 @@ class Table:
         >>> table.graph_alignment
         'RIGHT'
         """
-        return self._cython_instance.get_text_alignment()
+        return self._cy_table.get_text_alignment()
 
     @graph_alignment.setter
     def graph_alignment(self, value: Union[TableTextAlign, str]):
-        self._cython_instance.set_text_alignment(value)
+        self._cy_table.set_text_alignment(value)
 
     @property
     def box(self) -> bool:
@@ -1349,7 +1349,7 @@ class Table:
         >>> table.coefficients
         ['knf2', 'knff1']
         """
-        return self._cython_instance.get_coefficients()
+        return self._cy_table.get_coefficients()
 
     @property
     def variables(self) -> List[str]:
@@ -1394,7 +1394,7 @@ class Table:
         >>> table.variables
         ['KNFF', 'QAFF_', 'Q_F', 'Q_I', 'RENT']
         """
-        return self._cython_instance.get_variables()
+        return self._cy_table.get_variables()
 
     @property
     def divider(self) -> TableLine:
@@ -1448,8 +1448,8 @@ class Table:
         >>> table.divider
         ('1', '40.34')
         """
-        div_line = TableLine.get_instance()
-        div_line._cython_instance = self._cython_instance.get_divider(div_line._cython_instance)
+        cy_div_line = self._cy_table.get_divider()
+        div_line = TableLine.from_cython_obj(cy_div_line)
         return div_line
 
     @divider.setter
@@ -1464,7 +1464,7 @@ class Table:
             raise ValueError(f"Cannot update cells of the 'divider' line.\nThe length of the passed "
                              f"{type(value).__name__} ({len(value)}) must be the same of the number of "
                              f"cells ({self.nb_columns}) in the table")
-        self._cython_instance.set_divider(value)
+        self._cy_table.set_divider(value)
 
     def _get_row_from_index(self, index: int) -> int:
         if not (-len(self) < index < len(self)):
@@ -1534,7 +1534,7 @@ class Table:
         >>> table.index("OCUG")
         6
         """
-        return self._cython_instance.index(key)
+        return self._cy_table.index(key)
 
     def insert(self, index: int, value: Union[str, List[str], Tuple[str], TableLine, TableLineType]):
         r"""
@@ -1641,7 +1641,7 @@ class Table:
         <BLANKLINE>
         """
         row = self._get_row_from_index(index)
-        self._cython_instance.insert(row, value)
+        self._cy_table.insert(row, value)
 
     def compute(self, generalized_sample: str, extra_files: Union[str, Path, List[str], List[Path]]=None, 
                 nb_decimals: int=2, quiet: bool=True) -> ComputedTable:
@@ -1841,11 +1841,11 @@ class Table:
         if extra_files is not None:
             load_extra_files(extra_files, quiet)
 
-        computed_table = ComputedTable.get_instance()
-        computed_table._cython_instance = self._cython_instance.compute(generalized_sample, nb_decimals)
-        if computed_table._cython_instance is None:
+        cy_computed_table = self._cy_table.compute(generalized_sample, nb_decimals)
+        if cy_computed_table is None:
             warnings.warn(f"Could not compute the table '{self.title.strip()}' with the generalized sample '{generalized_sample}'.")
             return None
+        computed_table = ComputedTable.from_cython_obj(cy_computed_table)
         return computed_table
 
     def plot(self, title: str=None, plot_type: Union[str, TableGraphType]=TableGraphType.LINE, 
@@ -2094,9 +2094,9 @@ class Table:
         >>> table[-1]
         <DATE>
         """
-        table_line = TableLine.get_instance()
         row = self._get_row_from_index(index)
-        table_line._cython_instance = self._cython_instance._getitem_(row, table_line._cython_instance)
+        cy_line = self._cy_table._getitem_(row)
+        table_line = TableLine.from_cython_obj(cy_line)
         return table_line
 
     def __setitem__(self, index: int, value: Union[str, List[str], Tuple[str], TableLine]):
@@ -2198,7 +2198,7 @@ class Table:
             value = str(value)
         if isinstance(value, str) and '|' in value:
             value = value.split('|')
-        self._cython_instance._setitem_(row, value)
+        self._cy_table._setitem_(row, value)
 
     def __delitem__(self, index: int):
         r"""
@@ -2274,7 +2274,7 @@ class Table:
         <BLANKLINE>        
         """
         row = self._get_row_from_index(index)
-        self._cython_instance._delitem_(row)
+        self._cy_table._delitem_(row)
 
     def __iadd__(self, value: Union[str, List[str], Tuple[str], TableLineType, TableLine]) -> Self:
         r"""
@@ -2363,8 +2363,8 @@ class Table:
         <BLANKLINE>
         """
         if isinstance(value, TableLine):
-            value = value._cython_instance
-        self._cython_instance = self._cython_instance._iadd_(value)
+            value = value._cy_table
+        self._cy_table = self._cy_table._iadd_(value)
         return self
 
     def __copy__(self) -> Self:
@@ -2419,11 +2419,11 @@ class Table:
         <BLANKLINE>
         """
         copied_tbl = Table()
-        copied_tbl._cython_instance = self._cython_instance._copy_(copied_tbl._cython_instance)
+        copied_tbl._cy_table = self._cy_table._copy_(copied_tbl._cy_table)
         return copied_tbl
 
     def __str__(self) -> str:
-        return self._cython_instance._str_()
+        return self._cy_table._str_()
 
     def __repr__(self) -> str:
         s = self.__str__() + '\n'
@@ -2495,4 +2495,4 @@ class Table:
         >>> original_hash == hash(table)
         True
         """
-        return self._cython_instance.__hash__()
+        return self._cy_table.__hash__()

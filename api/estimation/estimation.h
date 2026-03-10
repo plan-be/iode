@@ -372,7 +372,7 @@ private:
     int E_print_results(int ,int ,int ,int ,int );
 
     /* k_est.c */
-    void E_tests2scl(Equation*, int, int, int);
+    void E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k);
     void E_savescl(double, int, char*);
     void E_savevar(char*, int, MAT*);
     int KE_est_s(Sample* smpl);

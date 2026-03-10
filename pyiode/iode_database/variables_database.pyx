@@ -108,13 +108,12 @@ cdef class Variables(CythonIodeDatabase):
             self.first_period_subset: Period = None
             self.last_period_subset: Period = None
 
-    def initialize_subset(self, subset: Variables, pattern: str, copy: bool, 
+    def initialize_subset(self, pattern: str, copy: bool, 
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
         cdef CSample* c_sample
         
-        subset.database_ptr = new KDBVariables(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+        cdef KDBVariables* subset_db_ptr = new KDBVariables(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Variables._from_ptr(subset_db_ptr, <bint>True)
 
         subset.mode_ = IodeVarMode.VAR_MODE_LEVEL
         subset.first_period_subset = first_period

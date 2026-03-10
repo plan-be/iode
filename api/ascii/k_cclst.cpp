@@ -58,8 +58,8 @@ static int read_lst(KDBLists* kdb, YYFILE* yy, char* name)
 
     try
     {
-        List* lst_obj = new List(lst);
-        kdb->set_obj_ptr(name, lst_obj);
+        List lst_obj(lst);
+        kdb->set(name, lst_obj);
     }
     catch(const std::exception&) 
     {

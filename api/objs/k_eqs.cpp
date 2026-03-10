@@ -207,7 +207,7 @@ bool Equation::print_definition() const
                 {
                     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
                     
-                    Scalar* scl = global_ws_scl->get_obj_ptr(sname);
+                    std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(sname);
                     if(!scl) 
                     {
                         W_printf((char*) "?\n");
@@ -329,7 +329,7 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
 
 std::string KDBEquations::get_lec(const std::string& name) const
 {
-    Equation* c_eq = this->get_obj_ptr(name);
+    std::shared_ptr<Equation> c_eq = this->get_obj_ptr(name);
     std::string lec = c_eq->lec;
     return lec; 
 }
@@ -369,7 +369,7 @@ bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
     if(!eq) 
         return false;
     
-    this->k_objs[name] = eq;
+    this->k_objs[name] = std::make_shared<Equation>(*eq);
     return true;
 }
 
@@ -390,7 +390,7 @@ bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBEquations::obj_to_binary(char** pack, const std::string& name)
 {
-    Equation* eq = this->get_obj_ptr(name);
+    std::shared_ptr<Equation> eq = this->get_obj_ptr(name);
     bool success = eq->to_binary(pack);
     return success;
 }
@@ -399,7 +399,7 @@ bool KDBEquations::grep_obj(const std::string& name, const std::string& pattern,
     const bool ecase, const bool forms, const bool texts, const char all) const
 {
     bool found = false;
-    Equation* eq = this->get_obj_ptr(name);
+    std::shared_ptr<Equation> eq = this->get_obj_ptr(name);
     if(forms) 
         found = wrap_grep_gnl(pattern, eq->lec, ecase, all);
     if(!found && texts)
@@ -417,7 +417,7 @@ char* KDBEquations::dde_create_obj_by_name(const std::string& name, int* nc, int
 
 bool KDBEquations::print_obj_def(const std::string& name)
 {
-    Equation* eq = this->get_obj_ptr(name);
+    std::shared_ptr<Equation> eq = this->get_obj_ptr(name);
     if(!eq) 
         return false;
     

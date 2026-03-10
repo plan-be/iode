@@ -14,11 +14,12 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
     // create scalars not yet present in the Scalars Database
     if(create_if_not_exit)
     {
+        Scalar scl(0.9, 1.0, IODE_NAN);
         for(const std::string& coeff_name: coeffs)
         {
             // adds a new scalar with values { 0.9, 1.0, IODE_NAN } to the Scalars database
             if (!global_ws_scl->contains(coeff_name)) 
-                global_ws_scl->set_obj_ptr(coeff_name, new Scalar(0.9, 1.0, IODE_NAN));
+                global_ws_scl->set(coeff_name, scl);
         }
     }
 
@@ -41,11 +42,12 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
                                     std::string(this->lec) +"\nThe global sample is not yet defined");
 
         int nb_obs = sample->nb_periods;
+        Variable new_var(nb_obs, IODE_NAN);
         for(const std::string& var_name: vars)
         {
             // adds a new variable with nb_obs IODE_NAN values to the Variables database
             if (!global_ws_var->contains(var_name))
-                global_ws_var->set_obj_ptr(var_name, new Variable(nb_obs, IODE_NAN));
+                global_ws_var->set(var_name, new_var);
         }
     }
 
@@ -80,7 +82,7 @@ std::string KDBIdentities::get_lec(const std::string& name) const
         throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
                                     "' in the database of '" + get_iode_type_str() + "'.\n" +  
                                     "The identity with name '" + name + "' does not exist.");
-    Identity* idt = this->get_obj_ptr(name);
+    std::shared_ptr<Identity> idt = this->get_obj_ptr(name);
     std::string lec = idt->get_lec();
     return lec;
 }
@@ -146,8 +148,8 @@ bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
     char* c_lec = new char[len];
     strncpy(c_lec, (char*) P_get_ptr(pack, 0), len);
 
-    Identity* idt = new Identity(std::string(c_lec));
-    this->k_objs[name] = idt;
+    std::string lec(c_lec);
+    this->k_objs[name] = std::make_shared<Identity>(lec);
     return true;
 }
 
@@ -160,7 +162,7 @@ bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBIdentities::obj_to_binary(char** pack, const std::string& name)
 {
-    Identity* idt = this->get_obj_ptr(name);
+    std::shared_ptr<Identity> idt = this->get_obj_ptr(name);
     if(!idt)
     {
         std::string error_msg = "Cannot serialize identity with name '" + name + 
@@ -179,7 +181,7 @@ bool KDBIdentities::grep_obj(const std::string& name, const std::string& pattern
     bool found = false;
     if(forms)
     {
-        Identity* idt = this->get_obj_ptr(name);
+        std::shared_ptr<Identity> idt = this->get_obj_ptr(name);
         std::string lec = idt->get_lec();
         found = wrap_grep_gnl(pattern, lec, ecase, all);
     } 

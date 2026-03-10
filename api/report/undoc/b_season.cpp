@@ -94,25 +94,25 @@ int B_season(char* arg)
         res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
         if(!res) 
         {
-            Variable* var_ptr = new Variable(t_vec, t_vec + nb);
+            Variable var(t_vec, t_vec + nb);
             memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
-            to->set_obj_ptr(from_name, var_ptr);
+            to->set(from_name, var);
             continue;
         }
 
         DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        Variable* var_ptr = new Variable(t_vec, t_vec + nb);
-        to->set_obj_ptr(from_name, var_ptr);
+        Variable var(t_vec, t_vec + nb);
+        to->set(from_name, var);
 
-        Variable* c_var_ptr = new Variable(c_vec, c_vec + nb);
+        Variable c_var(c_vec, c_vec + nb);
         sprintf(name, "_C%s", from_name.c_str());
-        to->set_obj_ptr(name, c_var_ptr);
+        to->set(name, c_var);
 
-        Variable* i_var_ptr = new Variable(i_vec, i_vec + nb);
+        Variable i_var(i_vec, i_vec + nb);
         sprintf(name, "_I%s", from_name.c_str());
-        to->set_obj_ptr(name, i_var_ptr);
+        to->set(name, i_var);
     }
     
     KV_merge(global_ws_var.get(), to, 1);

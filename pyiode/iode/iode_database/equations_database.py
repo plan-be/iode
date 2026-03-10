@@ -15,6 +15,7 @@ from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
 from iode.util import suppress_msgs, enable_msgs
+from iode.iode_cython import Equation as CythonEquation
 from iode.iode_cython import Equations as CythonEquations
 
 EquationInput = Union[str, Dict[str, Any], Equation]
@@ -71,19 +72,23 @@ class Equations(IodeDatabase):
     @classmethod
     def get_instance(cls) -> Self:
         instance = cls.__new__(cls)
-        instance._cython_instance = CythonEquations()
-        instance = cls._get_instance(instance)
+        instance._cy_database = CythonEquations()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonEquations) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_database = obj
         return instance
 
     def _load(self, filepath: str):
-        self._cython_instance._load(filepath)
+        self._cy_database._load(filepath)
 
     def _subset(self, pattern: str, copy: bool) -> Self:
-        instance = Equations.get_instance()
-        cy_self = self._cython_instance
-        cy_subset = instance._cython_instance
-        cy_subset = cy_self.initialize_subset(cy_subset, pattern, copy)
-        return instance
+        cy_self = self._cy_database
+        cy_subset = cy_self.initialize_subset(pattern, copy)
+        subset = Equations.from_cython_obj(cy_subset)
+        return subset
 
     def get_lec(self, key: Union[str, int]) -> str:
         r"""
@@ -112,7 +117,7 @@ class Equations(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        return self._cython_instance.get_lec(name)
+        return self._cy_database.get_lec(name)
 
     @property
     def i(self) -> PositionalIndexer:
@@ -188,8 +193,8 @@ class Equations(IodeDatabase):
         name = self._single_object_key_to_name(key)
         if not name in self:
             raise KeyError(f"Name '{name}' not found in the {type(self).__name__} workspace")
-        eq = Equation.get_instance()
-        eq._cython_instance = self._cython_instance._get_object(name, eq._cython_instance)
+        cy_eq: CythonEquation = self._cy_database._get_object(name)
+        eq = Equation.from_cython_obj(cy_eq)
         return eq
 
     def _set_object(self, key: Union[str, int], value):
@@ -248,7 +253,7 @@ class Equations(IodeDatabase):
                 raise TypeError(f"Cannot add equation '{name}': Expected input to be of type str or tuple or list or "
                                 f"dict or Equation. Got value of type {type(value).__name__}")
 
-        self._cython_instance._set_object(name, equation._cython_instance)
+        equation._cy_equation = self._cy_database._set_object(name, equation._cy_equation)
 
     def __getitem__(self, key: Union[str, List[str]]) -> Union[Equation, Self]:
         r"""
@@ -443,7 +448,6 @@ class Equations(IodeDatabase):
         >>> eq.method = EqMethod.MAX_LIKELIHOOD
         >>> eq.sample = "1990Y1:2015Y1"
         >>> eq.block = "ACAF"
-        >>> equations["ACAF"] = eq
         >>> equations["ACAF"]                  # doctest: +NORMALIZE_WHITESPACE
         Equation(endogenous = 'ACAF',
                  lec = '(ACAF/VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)',
@@ -506,9 +510,7 @@ class Equations(IodeDatabase):
         >>> # 3) using another Equations database (subset)
         >>> equations_subset = equations["ACAF, ACAG, AOUC"].copy()
         >>> for eq_name in equations_subset.names:
-        ...     eq = equations_subset[eq_name]
-        ...     eq.method = EqMethod.MAX_LIKELIHOOD
-        ...     equations_subset[eq_name] = eq
+        ...     equations_subset[eq_name].method = EqMethod.MAX_LIKELIHOOD
         >>> equations["ACAF, ACAG, AOUC"] = equations_subset
         >>> equations["ACAF, ACAG, AOUC"]               # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Equations
@@ -610,6 +612,26 @@ class Equations(IodeDatabase):
         False
         >>> equations.get_names("D*")
         ['DEBT', 'DPU', 'DPUF', 'DPUG', 'DPUH', 'DPUU', 'DTF', 'DTH', 'DTH1', 'DTH1C']
+
+        >>> # store an equation in a Python variable
+        >>> eq = equations["DEBT"]
+        >>> eq                                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'DEBT',
+                lec = 'd DEBT := OCP-FLG',
+                method = 'LSQ',
+                comment = ' ',
+                block = 'DEBT')
+        >>> # then delete it from the database
+        >>> del equations["DEBT"]
+        >>> "DEBT" in equations
+        False
+        >>> # NOTE: the Python variable 'eq' still contains the equation object
+        >>> eq                                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Equation(endogenous = 'DEBT',
+                lec = 'd DEBT := OCP-FLG',
+                method = 'LSQ',
+                comment = ' ',
+                block = 'DEBT')
         """
         super().__delitem__(key)
 
@@ -1272,7 +1294,7 @@ class Equations(IodeDatabase):
             Defaults to load all equations from the input file(s). 
         """
         input_files, names = self._copy_from(input_files, names)
-        self._cython_instance.copy_from(input_files, names)
+        self._cy_database.copy_from(input_files, names)
 
     def from_series(self, s: pd.Series):
         r"""
@@ -1877,11 +1899,11 @@ class Equations(IodeDatabase):
         >>> equations.print_nb_decimals
         4
         """
-        return self._cython_instance._get_print_nb_decimals()
+        return self._cy_database._get_print_nb_decimals()
 
     @print_nb_decimals.setter
     def print_nb_decimals(self, value: int):
-        self._cython_instance._set_print_nb_decimals(value)
+        self._cy_database._set_print_nb_decimals(value)
 
     @property
     def print_equations_as(self) -> PrintEquationsAs:
@@ -1908,7 +1930,7 @@ class Equations(IodeDatabase):
         >>> equations.print_equations_as
         <PrintEquationsAs.EQ_COMMENTS_ESTIMATION: 2>
         """
-        i_value = self._cython_instance.get_print_equations_as()
+        i_value = self._cy_database.get_print_equations_as()
         return PrintEquationsAs(i_value)
 
     @print_equations_as.setter
@@ -1925,7 +1947,7 @@ class Equations(IodeDatabase):
                                  f"Expected one of {', '.join(PrintEquationsAs.__members__.keys())}. ")
             value = PrintEquationsAs[upper_str]
         value = str(int(value))
-        self._cython_instance.set_print_equations_as(value)
+        self._cy_database.set_print_equations_as(value)
 
     @property
     def print_equations_lec_as(self) -> PrintEquationsLecAs:
@@ -1955,7 +1977,7 @@ class Equations(IodeDatabase):
         >>> equations.print_equations_lec_as
         <PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST: 2>
         """
-        i_value = self._cython_instance.get_print_equations_lec_as()
+        i_value = self._cy_database.get_print_equations_lec_as()
         return PrintEquationsLecAs(i_value) 
 
     @print_equations_lec_as.setter
@@ -1972,7 +1994,7 @@ class Equations(IodeDatabase):
                                  f"Expected one of {', '.join(PrintEquationsLecAs.__members__.keys())}. ")
             value = PrintEquationsLecAs[upper_str]
         value = str(int(value))
-        self._cython_instance.set_print_equations_lec_as(value)
+        self._cy_database.set_print_equations_lec_as(value)
 
     def print_to_file(self, filepath: Union[str, Path], names: Union[str, List[str]]=None, format: str=None):
         r"""

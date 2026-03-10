@@ -42,23 +42,26 @@ cdef class Scalars(CythonIodeDatabase):
         if self.database_ptr is not NULL:
             self.database_ptr.load(filepath.encode())
 
-    def initialize_subset(self, subset: Scalars, pattern: str, copy: bool) -> Scalars:
-        subset.database_ptr = new KDBScalars(self.database_ptr, pattern.encode(), <bint>copy)
-        subset.abstract_db_ptr = subset.database_ptr
-        subset.ptr_owner = True
+    def initialize_subset(self, pattern: str, copy: bool) -> Scalars:
+        cdef KDBScalars* subset_db_ptr = new KDBScalars(self.database_ptr, pattern.encode(), <bint>copy)
+        subset = Scalars._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
-    def _get_object(self, name: str, scalar: Scalar) -> Scalar:
-        cdef CScalar c_scalar
+    def _get_object(self, name: str) -> Scalar:
+        cdef shared_ptr[CScalar] scl_ptr
         name = name.strip()
-        c_scalar = self.database_ptr.get(name.encode())
-        scalar.c_scalar = new CScalar(c_scalar) 
-        scalar.ptr_owner = <bint>True
+        scl_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        scalar = Scalar._from_ptr(scl_ptr) 
         return scalar
 
-    def _set_object(self, name: str, scalar: Scalar):
-        cdef CScalar* scalar_ptr = scalar.c_scalar
-        self.database_ptr.set_obj_ptr(name.encode(), scalar_ptr)
+    def _set_object(self, name: str, scalar: Scalar) -> Scalar:
+        cdef shared_ptr[CScalar] scl_ptr
+        # NOTE: the C++ set_obj_ptr() method creates a copy of the object stored 
+        #       in the passed shared pointer to avoid that two entries (shared_ptr<T>) 
+        #       in the IODE database point to the same object in memory
+        scl_ptr = self.database_ptr.set_obj_ptr(name.encode(), scalar.scl_ptr)
+        scalar.update_ptr(scl_ptr)
+        return scalar
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

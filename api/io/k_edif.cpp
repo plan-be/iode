@@ -97,7 +97,7 @@ char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
 {
     if(dbc->contains(name))
     {
-        Comment* comment = dbc->get_obj_ptr(name);
+        std::shared_ptr<Comment> comment = dbc->get_obj_ptr(name);
         return write_pre_post("1,0\n\"", "\"\n", (char*) comment->c_str(), cmt);
     }
     else

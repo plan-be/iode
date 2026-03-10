@@ -186,11 +186,11 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
         return -1;
     }
 
-    Table* tbl = global_ws_tbl->get_obj_ptr(name);
+    std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     if(B_viewmode == 0)
-        rc = T_view_tbl(tbl, smpl, (char*) name.c_str());
+        rc = T_view_tbl(tbl_ptr.get(), smpl, (char*) name.c_str());
     else
-        rc = T_print_tbl(tbl, smpl);
+        rc = T_print_tbl(tbl_ptr.get(), smpl);
 
     if(rc < 0) 
         error_manager.append_error("Table '" + name + "' not printed");
@@ -209,9 +209,8 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
  */
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
-    int     rc = 0, hg, ng, i, view = !B_viewmode;
-    Table*  tbl;
-    char    **tbls;
+    int rc = 0, hg, ng, i, view = !B_viewmode;
+    char** tbls;
 
     tbls = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
     ng = SCR_tbl_size((unsigned char**) tbls);
@@ -222,6 +221,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
     }
 
     std::string name;
+    std::shared_ptr<Table> tbl_ptr;
     for(i = 0; i < ng; i ++) 
     {
         if(view) 
@@ -235,11 +235,11 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             break;
         }
 
-        tbl = global_ws_tbl->get_obj_ptr(name);
-        hg = T_graph_tbl_1(tbl, gsmpl, B_viewmode);
+        tbl_ptr = global_ws_tbl->get_obj_ptr(name);
+        hg = T_graph_tbl_1(tbl_ptr.get(), gsmpl, B_viewmode);
 
         if(view) 
-            W_EndDisplay((char*) T_get_title(tbl), -ng, -i, -1, -1);
+            W_EndDisplay((char*) T_get_title(tbl_ptr.get()), -ng, -i, -1, -1);
 
         if(hg < 0) 
         {

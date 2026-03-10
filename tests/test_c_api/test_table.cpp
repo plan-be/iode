@@ -4,18 +4,18 @@
 class TablesTest : public TestAbstract, public ::testing::Test
 {
 protected:
-    Table* table;
+    std::shared_ptr<Table> tbl_ptr;
 
     void SetUp() override
     {
         global_ws_tbl->load(str_input_test_dir + "fun.at");
-        table = global_ws_tbl->get_obj_ptr("GFRPC");
+        tbl_ptr = global_ws_tbl->get_obj_ptr("GFRPC");
     }
 
     void TearDown() override 
     {
         global_ws_tbl->clear();
-        table = nullptr;
+        tbl_ptr.reset();
     }
 };
 
@@ -106,7 +106,7 @@ TEST_F(TablesTest, AddGetTable)
     global_ws_tbl->add(name, *tbl);
 
     // --- extract the table from the Table KDB
-    Table* extracted_tbl = global_ws_tbl->get_obj_ptr(name);
+    std::shared_ptr<Table> extracted_tbl = global_ws_tbl->get_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 
@@ -193,17 +193,17 @@ TEST_F(TablesTest, AddGetTable)
 
 TEST_F(TablesTest, CopyConstructor)
 {
-    int nb_columns = table->nb_columns;
+    int nb_columns = tbl_ptr->nb_columns;
     global_ws_var->load(str_input_test_dir + "fun.var");
 
-    Table copied_table(*table);
-    ASSERT_EQ(*table, copied_table);
+    Table copied_table(*tbl_ptr);
+    ASSERT_EQ(*tbl_ptr, copied_table);
 
-    TableLine& line0 = table->lines[0];
+    TableLine& line0 = tbl_ptr->lines[0];
     TableLine copied_line0(line0);
     ASSERT_EQ(line0, copied_line0);
 
-    TableLine& line5 = table->lines[5];
+    TableLine& line5 = tbl_ptr->lines[5];
     TableLine copied_line5(line5);
     ASSERT_EQ(line5, copied_line5);
 
@@ -218,63 +218,63 @@ TEST_F(TablesTest, CopyConstructor)
 
 TEST_F(TablesTest, Dimension)
 {
-    EXPECT_EQ(table->lines.size(), 31);
-    EXPECT_EQ(table->nb_columns, 2);
+    EXPECT_EQ(tbl_ptr->lines.size(), 31);
+    EXPECT_EQ(tbl_ptr->nb_columns, 2);
 }
 
 TEST_F(TablesTest, NotLineMethods)
 {
-    EXPECT_EQ(table->get_language_as_string(), "English");
-    table->set_language(TABLE_FRENCH);
-    EXPECT_EQ(table->get_language_as_string(), "French");
+    EXPECT_EQ(tbl_ptr->get_language_as_string(), "English");
+    tbl_ptr->set_language(TABLE_FRENCH);
+    EXPECT_EQ(tbl_ptr->get_language_as_string(), "French");
 
-    EXPECT_FLOAT_EQ(table->z_min, (float) IODE_NAN);
-    EXPECT_FLOAT_EQ(table->z_max, (float) IODE_NAN);
-    EXPECT_FLOAT_EQ(table->y_min, (float) IODE_NAN);
-    EXPECT_FLOAT_EQ(table->y_max, (float) IODE_NAN);
-    table->z_min = 0;
-    table->z_max = 10;
-    table->y_min = 0;
-    table->y_max = 100;
-    EXPECT_FLOAT_EQ(table->z_min, 0.);
-    EXPECT_FLOAT_EQ(table->z_max, 10.);
-    EXPECT_FLOAT_EQ(table->y_min, 0.);
-    EXPECT_FLOAT_EQ(table->y_max, 100.);
+    EXPECT_FLOAT_EQ(tbl_ptr->z_min, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(tbl_ptr->z_max, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(tbl_ptr->y_min, (float) IODE_NAN);
+    EXPECT_FLOAT_EQ(tbl_ptr->y_max, (float) IODE_NAN);
+    tbl_ptr->z_min = 0;
+    tbl_ptr->z_max = 10;
+    tbl_ptr->y_min = 0;
+    tbl_ptr->y_max = 100;
+    EXPECT_FLOAT_EQ(tbl_ptr->z_min, 0.);
+    EXPECT_FLOAT_EQ(tbl_ptr->z_max, 10.);
+    EXPECT_FLOAT_EQ(tbl_ptr->y_min, 0.);
+    EXPECT_FLOAT_EQ(tbl_ptr->y_max, 100.);
 
-    EXPECT_EQ(table->attribute, '\0');
+    EXPECT_EQ(tbl_ptr->attribute, '\0');
     // TODO : test setAttribute()
 
-    EXPECT_EQ(table->get_text_alignment(), TABLE_TEXT_LEFT);
-    table->set_text_alignment(TABLE_TEXT_RIGHT);
-    EXPECT_EQ(table->get_text_alignment(), TABLE_TEXT_RIGHT);
+    EXPECT_EQ(tbl_ptr->get_text_alignment(), TABLE_TEXT_LEFT);
+    tbl_ptr->set_text_alignment(TABLE_TEXT_RIGHT);
+    EXPECT_EQ(tbl_ptr->get_text_alignment(), TABLE_TEXT_RIGHT);
 
-    EXPECT_EQ(table->chart_box, '\0');
+    EXPECT_EQ(tbl_ptr->chart_box, '\0');
     // TODO : test setGraphBox()
 
-    EXPECT_EQ(table->chart_shadow, '\0');
+    EXPECT_EQ(tbl_ptr->chart_shadow, '\0');
     // TODO : test setGraphShadow()
 
-    EXPECT_EQ(table->get_graph_axis(), TABLE_GRAPH_VALUES);
-    table->set_graph_axis(TABLE_GRAPH_PERCENT);
-    EXPECT_EQ(table->get_graph_axis(), TABLE_GRAPH_PERCENT);
+    EXPECT_EQ(tbl_ptr->get_graph_axis(), TABLE_GRAPH_VALUES);
+    tbl_ptr->set_graph_axis(TABLE_GRAPH_PERCENT);
+    EXPECT_EQ(tbl_ptr->get_graph_axis(), TABLE_GRAPH_PERCENT);
 
-    EXPECT_EQ(table->get_gridx(), TABLE_GRAPH_MAJOR);
-    table->set_gridx(TABLE_GRAPH_MINOR);
-    EXPECT_EQ(table->get_gridx(), TABLE_GRAPH_MINOR);
+    EXPECT_EQ(tbl_ptr->get_gridx(), TABLE_GRAPH_MAJOR);
+    tbl_ptr->set_gridx(TABLE_GRAPH_MINOR);
+    EXPECT_EQ(tbl_ptr->get_gridx(), TABLE_GRAPH_MINOR);
 
-    EXPECT_EQ(table->get_gridy(), TABLE_GRAPH_MAJOR);
-    table->set_gridy(TABLE_GRAPH_MINOR);
-    EXPECT_EQ(table->get_gridy(), TABLE_GRAPH_MINOR);
+    EXPECT_EQ(tbl_ptr->get_gridy(), TABLE_GRAPH_MAJOR);
+    tbl_ptr->set_gridy(TABLE_GRAPH_MINOR);
+    EXPECT_EQ(tbl_ptr->get_gridy(), TABLE_GRAPH_MINOR);
 }
 
 TEST_F(TablesTest, Divider)
 {
     std::string content;
     std::string expected_content;
-    int nb_cells = table->nb_columns;
+    int nb_cells = tbl_ptr->nb_columns;
 
     // get divider line
-    TableLine& divider_line = table->divider_line;
+    TableLine& divider_line = tbl_ptr->divider_line;
     EXPECT_EQ(divider_line.get_type(), TABLE_LINE_CELL);
 
     // first cell
@@ -304,7 +304,7 @@ TEST_F(TablesTest, Divider)
     first_cell.set_content(new_content);
     content = first_cell.get_content(false);
     EXPECT_EQ(content, new_content);
-    content = table->divider_line.cells[0].get_content(false);
+    content = tbl_ptr->divider_line.cells[0].get_content(false);
     EXPECT_EQ(content, new_content);
 
     // update second cell
@@ -312,7 +312,7 @@ TEST_F(TablesTest, Divider)
     second_cell.set_content(new_lec);
     content = second_cell.get_content(false);
     EXPECT_EQ(content, new_lec);
-    content = table->divider_line.cells[1].get_content(false);
+    content = tbl_ptr->divider_line.cells[1].get_content(false);
     EXPECT_EQ(content, new_lec);
 }
 
@@ -322,56 +322,56 @@ TEST_F(TablesTest, LineTitle)
     std::string expected_title = "Compte de l'ensemble des administrations publiques";
 
     // get line title
-    TableLine& line_title = table->lines[0];
+    TableLine& line_title = tbl_ptr->lines[0];
 
     // get content
     EXPECT_EQ(line_title.get_type(), TableLineType::TABLE_LINE_TITLE);
-    std::string title = table->get_title(0);
+    std::string title = tbl_ptr->get_title(0);
     EXPECT_EQ(title, expected_title + " ");
 
     // set content
     std::string new_title = "New Title with special characters !@µèéï";
-    table->set_title(0, new_title);
-    title = table->get_title(0);
+    tbl_ptr->set_title(0, new_title);
+    title = tbl_ptr->get_title(0);
     EXPECT_EQ(title, new_title);
 
     // add
-    int nb_lines = (int) table->lines.size();
+    int nb_lines = (int) tbl_ptr->lines.size();
     new_title = "New title";
-    TableLine* new_line_title = table->add_title(new_title);
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    new_pos = (int) table->lines.size() - 1;
-    title = table->get_title(new_pos);
+    TableLine* new_line_title = tbl_ptr->add_title(new_title);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    title = tbl_ptr->get_title(new_pos);
     EXPECT_EQ(title, new_title);
 
     // delete
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // insert 
-    new_line_title = table->insert_title(25, new_title, true);
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
+    new_line_title = tbl_ptr->insert_title(25, new_title, true);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
     new_pos = 26;
-    title = table->get_title(new_pos);
+    title = tbl_ptr->get_title(new_pos);
     EXPECT_EQ(title, new_title);
 }
 
 
 TEST_F(TablesTest, LineCells)
 {
-    int nb_cells = table->nb_columns;
+    int nb_cells = tbl_ptr->nb_columns;
     TableLineType expected_type = TABLE_LINE_CELL;
     TableCell* first_cell;
     TableCell* second_cell;
 
     // first CELL line
-    TableLine& first_line = table->lines[1];
+    TableLine& first_line = tbl_ptr->lines[1];
     EXPECT_EQ(first_line.get_type(), expected_type);
     EXPECT_EQ(first_line.get_graph_type(), TABLE_GRAPH_LINE);
     EXPECT_FALSE(first_line.right_axis);
     first_line.set_graph_type(TABLE_GRAPH_BAR);
     EXPECT_EQ(first_line.get_graph_type(), TABLE_GRAPH_BAR);
-    EXPECT_EQ(table->lines[1].get_graph_type(), TABLE_GRAPH_BAR);
+    EXPECT_EQ(tbl_ptr->lines[1].get_graph_type(), TABLE_GRAPH_BAR);
     // ---- column 0
     first_cell = &first_line.cells[0];
     EXPECT_EQ(first_cell->get_type(), TABLE_CELL_STRING);
@@ -391,7 +391,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(second_cell->get_content(false), "");
 
     // second CELL line
-    TableLine& second_line = table->lines[3];
+    TableLine& second_line = tbl_ptr->lines[3];
     EXPECT_EQ(second_line.get_type(), expected_type);
     EXPECT_EQ(second_line.get_graph_type(), TABLE_GRAPH_LINE);
     EXPECT_FALSE(second_line.right_axis);
@@ -413,7 +413,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(second_cell->get_content(false), "#s");
 
     // third CELL line
-    TableLine& third_line = table->lines[5];
+    TableLine& third_line = tbl_ptr->lines[5];
     EXPECT_EQ(third_line.get_type(), expected_type);
     EXPECT_EQ(third_line.get_graph_type(), TABLE_GRAPH_LINE);
     EXPECT_FALSE(third_line.right_axis);
@@ -435,7 +435,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(second_cell->get_content(false), "GOSG+YDTG+IT+YSSG+COTRES+OCUG+RIDG");
 
     // fifth CELL line
-    TableLine& fifth_line = table->lines[7];
+    TableLine& fifth_line = tbl_ptr->lines[7];
     EXPECT_EQ(fifth_line.get_type(), expected_type);
     EXPECT_EQ(fifth_line.get_graph_type(), TABLE_GRAPH_LINE);
     EXPECT_FALSE(fifth_line.right_axis);
@@ -460,24 +460,24 @@ TEST_F(TablesTest, LineCells)
     first_cell->set_align(TABLE_CELL_LEFT);
     first_cell->set_bold(true);
     first_cell->set_italic(true);
-    first_cell = &(table->lines[7].cells[0]);
+    first_cell = &(tbl_ptr->lines[7].cells[0]);
     EXPECT_EQ(first_cell->get_align(), TABLE_CELL_LEFT);
     EXPECT_TRUE(first_cell->is_bold());
     EXPECT_TRUE(first_cell->is_italic());
     EXPECT_FALSE(first_cell->is_underline());
 
     // update cells of a line
-    TableLine& updated_fifth_line = table->lines[7];
+    TableLine& updated_fifth_line = tbl_ptr->lines[7];
     // ---- column 0
     first_cell = &updated_fifth_line.cells[0];
     first_cell->set_text(" -- DTH -- ");
     EXPECT_EQ(first_cell->get_content(false), " -- DTH -- ");
-    EXPECT_EQ(table->lines[7].cells[0].get_content(false), " -- DTH -- ");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(false), " -- DTH -- ");
     // ---- column 1
     second_cell = &updated_fifth_line.cells[1];
     second_cell->set_lec("DTH");
     EXPECT_EQ(second_cell->get_content(false), "DTH");
-    EXPECT_EQ(table->lines[7].cells[1].get_content(false), "DTH");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(false), "DTH");
 
     // add - delete - insert
     int new_pos;
@@ -485,45 +485,45 @@ TEST_F(TablesTest, LineCells)
     std::string second_cell_content = third_line.cells[1].get_content(false);     // LEC cell
 
     // ---- add line
-    int nb_lines = (int) table->lines.size();
-    TableLine* new_line = table->add_line_with_cells();
-    new_pos = (int) table->lines.size() - 1;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
+    int nb_lines = (int) tbl_ptr->lines.size();
+    TableLine* new_line = tbl_ptr->add_line_with_cells();
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
 
     first_cell = &new_line->cells[0];
     first_cell->set_text(first_cell_content);
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
 
     second_cell = &new_line->cells[1];
     second_cell->set_lec(second_cell_content);
-    EXPECT_EQ(table->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(table->lines[new_pos].cells[1].get_content(false), second_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content(false), second_cell_content);
 
     // ---- delete line
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // ---- insert line
-    TableLine* new_line_cell = table->insert_line_with_cells(25, true);
+    TableLine* new_line_cell = tbl_ptr->insert_line_with_cells(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
 
     // Rule: If the content starts with a double quotes, we assume it is a string cell. 
     //       Otherwise, it is a LEC cell.
     new_line_cell->cells[0].set_content("\"" + first_cell_content + "\"");
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
 
     // set_text() forces the cell to become a string cell
     new_line_cell->cells[0].set_text(first_cell_content);
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(table->lines[new_pos].cells[0].get_content(false),  first_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(false),  first_cell_content);
 
     // set_lec forces the cell to become a LEC cell
     new_line_cell->cells[1].set_lec(second_cell_content);
-    EXPECT_EQ(table->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(table->lines[new_pos].cells[1].get_content(false), second_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content(false), second_cell_content);
 }
 
 TEST_F(TablesTest, LineSeparator)
@@ -532,96 +532,96 @@ TEST_F(TablesTest, LineSeparator)
     std::vector<int> line_positions = {2, 4, 26, 30};
 
     for (const int row: line_positions) 
-        EXPECT_EQ(table->lines[row].get_type(), TABLE_LINE_SEP);
+        EXPECT_EQ(tbl_ptr->lines[row].get_type(), TABLE_LINE_SEP);
 
     // add
-    int nb_lines = (int) table->lines.size();
-    TableLine* new_line = table->add_line_separator();
-    new_pos = (int) table->lines.size() - 1;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_SEP);
+    int nb_lines = (int) tbl_ptr->lines.size();
+    TableLine* new_line = tbl_ptr->add_line_separator();
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_SEP);
 
     // delete
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // insert 
-    TableLine* line_inserted = table->insert_line_separator(25, true);
+    TableLine* line_inserted = tbl_ptr->insert_line_separator(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_SEP);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_SEP);
 }
 
 TEST_F(TablesTest, LineMode)
 {
     int new_pos;
 
-    EXPECT_EQ(table->lines[27].get_type(), TABLE_LINE_MODE);
+    EXPECT_EQ(tbl_ptr->lines[27].get_type(), TABLE_LINE_MODE);
 
     // add
-    int nb_lines = (int) table->lines.size();
-    TableLine* new_line = table->add_line_mode();
-    new_pos = (int) table->lines.size() - 1;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_MODE);
+    int nb_lines = (int) tbl_ptr->lines.size();
+    TableLine* new_line = tbl_ptr->add_line_mode();
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_MODE);
 
     // delete
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // insert 
-    TableLine* line_inserted = table->insert_line_mode(25, true);
+    TableLine* line_inserted = tbl_ptr->insert_line_mode(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_MODE);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_MODE);
 }
 
 TEST_F(TablesTest, LineFiles)
 {
     int new_pos;
 
-    EXPECT_EQ(table->lines[28].get_type(), TABLE_LINE_FILES);
+    EXPECT_EQ(tbl_ptr->lines[28].get_type(), TABLE_LINE_FILES);
 
     // add
-    int nb_lines = (int) table->lines.size();
-    TableLine* new_line = table->add_line_files();
-    new_pos = (int) table->lines.size() - 1;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_FILES);
+    int nb_lines = (int) tbl_ptr->lines.size();
+    TableLine* new_line = tbl_ptr->add_line_files();
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_FILES);
 
     // delete
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // insert 
-    TableLine* line_inserted = table->insert_line_files(25, true);
+    TableLine* line_inserted = tbl_ptr->insert_line_files(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_FILES);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_FILES);
 }
 
 TEST_F(TablesTest, LineDate)
 {
     int new_pos;
 
-    EXPECT_EQ(table->lines[29].get_type(), TABLE_LINE_DATE);
+    EXPECT_EQ(tbl_ptr->lines[29].get_type(), TABLE_LINE_DATE);
 
     // add
-    int nb_lines = (int) table->lines.size();
-    TableLine* new_line = table->add_line_date();
-    new_pos = (int) table->lines.size() - 1;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_DATE);
+    int nb_lines = (int) tbl_ptr->lines.size();
+    TableLine* new_line = tbl_ptr->add_line_date();
+    new_pos = (int) tbl_ptr->lines.size() - 1;
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_DATE);
 
     // delete
-    table->remove_line(new_pos);
-    EXPECT_EQ(table->lines.size(), nb_lines);
+    tbl_ptr->remove_line(new_pos);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines);
 
     // insert 
-    TableLine* line_inserted = table->insert_line_date(25, true);
+    TableLine* line_inserted = tbl_ptr->insert_line_date(25, true);
     new_pos = 26;
-    EXPECT_EQ(table->lines.size(), nb_lines + 1);
-    EXPECT_EQ(table->lines[new_pos].get_type(), TABLE_LINE_DATE);
+    EXPECT_EQ(tbl_ptr->lines.size(), nb_lines + 1);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].get_type(), TABLE_LINE_DATE);
 }
 
 TEST_F(TablesTest, ListCoefficients)
@@ -660,59 +660,53 @@ TEST_F(TablesTest, Hash)
     std::size_t hash_original;
     std::size_t hash_before;
     std::size_t hash_after;
+    Table* table_before = nullptr;
 
-    hash_before = table_hasher(*table);
+    hash_before = table_hasher(*tbl_ptr);
     hash_original = hash_before;
 
     // same table
     Table same_table = global_ws_tbl->get("GFRPC");
-    EXPECT_EQ(*table, same_table);
+    EXPECT_EQ(*tbl_ptr, same_table);
     hash_after = table_hasher(same_table);
     EXPECT_EQ(hash_before, hash_after);
 
-    // C++ table vs C table
-    Table* c_table = global_ws_tbl->get_obj_ptr("GFRPC");
-    std::size_t c_hash = table_hasher(*c_table);
-    EXPECT_EQ(hash_original, c_hash);
-
-    Table* table_before = nullptr;
-
     // different title
-    table_before = new Table(*table);
-    std::string title = table->get_title(0);
+    table_before = new Table(*tbl_ptr);
+    std::string title = tbl_ptr->get_title(0);
     std::string new_title = "New Title";
-    table->set_title(0, new_title);
-    EXPECT_NE(*table, *table_before);
-    hash_after = table_hasher(*table);
+    tbl_ptr->set_title(0, new_title);
+    EXPECT_NE(*tbl_ptr, *table_before);
+    hash_after = table_hasher(*tbl_ptr);
     EXPECT_NE(hash_before, hash_after);
     delete table_before;
 
     // different cell
-    table_before = new Table(*table);
-    int nb_cells = table->nb_columns;
-    TableLine& line = table->lines[5];
+    table_before = new Table(*tbl_ptr);
+    int nb_cells = tbl_ptr->nb_columns;
+    TableLine& line = tbl_ptr->lines[5];
     hash_before = hash_after;
     std::string cell_content = line.cells[0].get_content(false);
     line.cells[0].set_text("Nouvelles recettes");
-    EXPECT_NE(*table, *table_before);
-    hash_after = table_hasher(*table);
+    EXPECT_NE(*tbl_ptr, *table_before);
+    hash_after = table_hasher(*tbl_ptr);
     EXPECT_NE(hash_before, hash_after);
     delete table_before;
 
-    table_before = new Table(*table);
+    table_before = new Table(*tbl_ptr);
     hash_before = hash_after;
     std::string lec_content = line.cells[1].get_content(false);
     line.cells[1].set_lec("GOSG+YDTG+IT+YSSG+COTRES+OCUG");
-    EXPECT_NE(*table, *table_before);
-    hash_after = table_hasher(*table);
+    EXPECT_NE(*tbl_ptr, *table_before);
+    hash_after = table_hasher(*tbl_ptr);
     EXPECT_NE(hash_before, hash_after);
     delete table_before;
 
     // return to original title and cell content
-    table->set_title(0, title);
+    tbl_ptr->set_title(0, title);
     line.cells[0].set_text(cell_content);
     line.cells[1].set_lec(lec_content);
-    EXPECT_EQ(*table, same_table);
-    hash_after = table_hasher(*table);
+    EXPECT_EQ(*tbl_ptr, same_table);
+    hash_after = table_hasher(*tbl_ptr);
     EXPECT_EQ(hash_original, hash_after);
 }

@@ -120,14 +120,14 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
         if(is_coefficient(name))
             // add dummy value for the scalar. The value is not relevant 
             // as only the name will be used in the list of scalars.
-            scal->set_obj_ptr(name, new Scalar());
+            scal->set(name, Scalar());
         else 
         {
             if(kdb != nullptr && kdb->contains(name)) 
                 continue;
             // add dummy value for the variable. The value is not relevant 
             // as only the name will be used in the list of variables.
-            exo->set_obj_ptr(name, new Variable());
+            exo->set(name, Variable());
         }
     }
 }
@@ -147,7 +147,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
 void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbe->get_name(i);
-    Equation* eq = dbe->get_obj_ptr(name);
+    std::shared_ptr<Equation> eq = dbe->get_obj_ptr(name);
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
 }
@@ -168,7 +168,8 @@ void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
 void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbi->get_name(i);
-    CLEC* cl_idt = dbi->get_obj_ptr(name)->get_compiled_lec();
+    std::shared_ptr<Identity> idt = dbi->get_obj_ptr(name);
+    CLEC* cl_idt = idt->get_compiled_lec();
 
     int lg = cl_idt->tot_lg;
     CLEC* cl = (CLEC *) SW_nalloc(lg);
@@ -194,7 +195,7 @@ void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
 void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
 {
     std::string name = dbt->get_name(i);
-    Table* tbl = dbt->get_obj_ptr(name);
+    std::shared_ptr<Table> tbl = dbt->get_obj_ptr(name);
 
     CLEC* clec = NULL;
     for(int k = 0; k < T_NL(tbl); k++)   
@@ -243,7 +244,7 @@ int KL_lst(char* name, char** lst, int chunck)
     {
         try
         {
-            global_ws_lst->set_obj_ptr(name, new List(""));    
+            global_ws_lst->set(name, List(""));    
         }
         catch(const std::exception& e)
         {
@@ -258,7 +259,7 @@ int KL_lst(char* name, char** lst, int chunck)
         str = (char*) SCR_mtov((unsigned char**) lst, (int) ';');
         try
         {
-            global_ws_lst->set_obj_ptr(name, new List(str)); 
+            global_ws_lst->set(name, List(str)); 
         }
         catch(const std::exception& e)
         {
@@ -282,7 +283,7 @@ int KL_lst(char* name, char** lst, int chunck)
         buf[K_MAX_NAME] = 0;
         try
         {
-            global_ws_lst->set_obj_ptr(buf, new List(str));
+            global_ws_lst->set(buf, List(str));
         }
         catch(const std::exception& e)
         {
@@ -308,7 +309,7 @@ int KL_lst(char* name, char** lst, int chunck)
 
     try
     {
-        global_ws_lst->set_obj_ptr(name, new List(str));
+        global_ws_lst->set(name, List(str));
     }
     catch(const std::exception& e)
     {
@@ -352,7 +353,7 @@ unsigned char **KL_expand(char *str)
         return(tbl);
     
     std::string list_name;
-    List* list_ptr = nullptr;
+    std::shared_ptr<List> list_ptr;
     char* c_list = NULL;
     for(i = 0 ; tbl[i] ; i++) 
     {
@@ -386,8 +387,7 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
     char* value = new char[len];
     strncpy(value, (char*) P_get_ptr(pack, 0), len);
 
-    List* list = new List(value);
-    this->k_objs[name] = list;
+    this->k_objs[name] = std::make_shared<List>(value);
     return true;
 }
 
@@ -400,7 +400,7 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBLists::obj_to_binary(char** pack, const std::string& name)
 {
-    List* list = this->get_obj_ptr(name);
+    std::shared_ptr<List> list = this->get_obj_ptr(name);
     char* c_list = (char*) list->c_str();
 
     *pack = (char*) P_create();
@@ -414,7 +414,7 @@ bool KDBLists::grep_obj(const std::string& name, const std::string& pattern,
     bool found = false;
     if(texts)
     {
-        List* list = this->get_obj_ptr(name);
+        std::shared_ptr<List> list = this->get_obj_ptr(name);
         found = wrap_grep_gnl(pattern, *list, ecase, all);
     }
     return found;
@@ -422,14 +422,14 @@ bool KDBLists::grep_obj(const std::string& name, const std::string& pattern,
 
 char* KDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
 {
-    List* list = this->get_obj_ptr(name);
+    std::shared_ptr<List> list = this->get_obj_ptr(name);
     char* obj = (char*) list->c_str();
     return obj;
 }
 
 bool KDBLists::print_obj_def(const std::string& name)
 {
-    List* list = this->get_obj_ptr(name);
+    std::shared_ptr<List> list = this->get_obj_ptr(name);
     char* c_list = (char*) list->c_str();
     print_definition_generic(name, c_list);
     return true;

@@ -111,7 +111,6 @@ public:
 
     double get_value(const std::string& name, const int t) const
     {
-        Variable* var_ptr = this->get_obj_ptr(name);
         int nb_periods = this->get_nb_periods();
         if(t < 0 || t >= nb_periods)
         {
@@ -120,12 +119,12 @@ public:
             throw std::out_of_range(error_msg);
         }
 
+        std::shared_ptr<Variable> var_ptr = this->get_obj_ptr(name);
         return (*var_ptr)[t];
     }
 
     double* get_var_ptr(const std::string& name, const int t = 0)
     {
-        Variable* var = this->get_obj_ptr(name);
         int nb_periods = this->get_nb_periods();
         if(t < 0 || t >= nb_periods)
         {
@@ -134,11 +133,12 @@ public:
             throw std::out_of_range(error_msg);
         }
 
-        double* var_ptr = var->data() + t;
-        return var_ptr;
+        std::shared_ptr<Variable> var_ptr = this->get_obj_ptr(name);
+        double* data_ptr = var_ptr->data() + t;
+        return data_ptr;
     }
 
-    Variable* set_obj_ptr(const std::string& name, Variable* var_ptr) override;
+    std::shared_ptr<Variable> set_obj_ptr(const std::string& name, std::shared_ptr<Variable> var_ptr) override;
     
     Variable get(const std::string& name) const override;
     bool add(const std::string& name, const Variable& obj) override;
