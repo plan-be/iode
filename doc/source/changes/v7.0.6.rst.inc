@@ -20,3 +20,6 @@ Fixed Bugs
 Miscellaneous 
 -------------
 
+- PYTHON: hide deprecated functions and objects from ``from iode import *`` 
+  and ``dir(iode)``. Deprecated functionality remains accessible via explicit 
+  imports from ``iode.deprecated`` (closes :issue:`1144`) 
