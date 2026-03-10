@@ -28,6 +28,9 @@ jobs:
               - os: windows-latest
                 python-minor-version: "3.14"
                 without-larray: true
+              - os: ubuntu-latest
+                python-minor-version: "3.14"
+                without-larray: false
     
         runs-on: ${{ matrix.os }}
 
