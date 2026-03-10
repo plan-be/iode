@@ -2,47 +2,44 @@ from copy import copy
 from typing import Union, Tuple, List, Optional
 import numpy as np
 
+from libcpp.memory cimport shared_ptr, make_shared
 from cython.operator cimport dereference
+
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.objects.scalar cimport CScalar
 from pyiode.objects.scalar cimport hash_value as hash_value_scl
 
 
 cdef class Scalar:
-    cdef bint ptr_owner
+    cdef shared_ptr[CScalar] scl_ptr
     cdef CScalar* c_scalar
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_scalar = NULL
 
     def __init__(self, value: float, relax: float) -> Scalar:
-        self.ptr_owner = <bint>True 
-        self.c_scalar = new CScalar(value, relax)
+        self.scl_ptr = make_shared[CScalar](value, relax)
+        self.c_scalar = self.scl_ptr.get()
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_scalar is not NULL:
-            del self.c_scalar
-            self.c_scalar = NULL
+        self.scl_ptr.reset()
+        self.c_scalar = NULL
+
+    cdef update_ptr(self, shared_ptr[CScalar] scl_ptr):
+        self.scl_ptr = scl_ptr
+        self.c_scalar = self.scl_ptr.get()
 
     @staticmethod
-    cdef Scalar _from_ptr(CScalar* ptr, bint owner=False):
+    cdef Scalar _from_ptr(shared_ptr[CScalar] scl_ptr):
         """
         Factory function to create Scalar objects from a given CScalar pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Scalar wrapper = Scalar.__new__(Scalar)
-        wrapper.c_scalar = ptr
-        wrapper.ptr_owner = owner
+        if scl_ptr.get() == NULL:
+            return None
+        wrapper.update_ptr(scl_ptr)
         return wrapper
-
-    # for debug purpose only
-    def is_pointer_null(self) -> bool:
-        return self.c_scalar is NULL
-
-    # for debug purpose only
-    def is_own_owner(self) -> bool:
-        return self.ptr_owner
 
     def get_value(self) -> float:
         return self.c_scalar.value if IODE_IS_A_NUMBER(self.c_scalar.value) else np.nan

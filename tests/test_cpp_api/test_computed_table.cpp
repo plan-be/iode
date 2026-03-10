@@ -168,12 +168,12 @@ TEST_F(ComputedTableTest, BuildFromTable)
     std::string sample;
     std::vector<double> values;
     
-    Table* ref_table = global_ws_tbl->get_obj_ptr(table_name);
+    std::shared_ptr<Table> ref_table = global_ws_tbl->get_obj_ptr(table_name);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
     sample = "2000Y1:2009Y1";
-    ComputedTable table_simple(ref_table, gsample);
+    ComputedTable table_simple(ref_table.get(), gsample);
     EXPECT_EQ(table_simple.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_simple.get_nb_columns(), 10);
     EXPECT_EQ(table_simple.get_nb_files(), 1);
@@ -195,7 +195,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 0), 0.99);
     EXPECT_DOUBLE_EQ(table_simple.get_value(3, 5), 1.04);
 
-    ComputedTableGraph graph_simple(ref_table, gsample);
+    ComputedTableGraph graph_simple(ref_table.get(), gsample);
     EXPECT_EQ(graph_simple.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_simple.get_series_name(0, 0), "Output potentiel");
     EXPECT_EQ(graph_simple.get_series_name(1, 0), "Stock de capital");
@@ -211,7 +211,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_grt(ref_table, gsample);
+    ComputedTable table_grt(ref_table.get(), gsample);
     EXPECT_EQ(table_grt.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_grt.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_grt.get_nb_files(), 1);
@@ -228,7 +228,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 0), 1.1);
     EXPECT_DOUBLE_EQ(table_grt.get_value(3, 5), 1.0);
 
-    ComputedTableGraph graph_grt(ref_table, gsample);
+    ComputedTableGraph graph_grt(ref_table.get(), gsample);
     EXPECT_EQ(graph_grt.get_nb_series(), nb_lines);
     EXPECT_EQ(graph_grt.get_series_name(0, 0), "Output potentiel");
     EXPECT_EQ(graph_grt.get_series_name(1, 0), "Stock de capital");
@@ -244,7 +244,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // simple time series (one extra file) - 5 observations
     gsample = "2010[1;2]:5";
     sample = "2010Y1:2014Y1";
-    ComputedTable table_2_files(ref_table, gsample);
+    ComputedTable table_2_files(ref_table.get(), gsample);
     EXPECT_EQ(table_2_files.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_2_files.get_nb_columns(), 5 * 2);
     EXPECT_EQ(table_2_files.get_nb_files(), 2);
@@ -262,7 +262,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 0), 1.1);
     EXPECT_DOUBLE_EQ(table_2_files.get_value(3, 5), 1.1);
 
-    ComputedTableGraph graph_2_files(ref_table, gsample);
+    ComputedTableGraph graph_2_files(ref_table.get(), gsample);
     EXPECT_EQ(graph_2_files.get_nb_series(), nb_lines * 2);
     EXPECT_EQ(graph_2_files.get_series_name(0, 0), "Output potentiel [1]");
     EXPECT_EQ(graph_2_files.get_series_name(0, 1), "Output potentiel [2]");
@@ -284,7 +284,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     // list of patterns (one extra file) - 6 observations
     gsample = "2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2]";
     sample = "2000Y1:2010Y1";
-    ComputedTable table_multi_patterns(ref_table, gsample);
+    ComputedTable table_multi_patterns(ref_table.get(), gsample);
     EXPECT_EQ(table_multi_patterns.get_nb_lines(), nb_lines);
     EXPECT_EQ(table_multi_patterns.get_nb_columns(), 7);
     EXPECT_EQ(table_multi_patterns.get_nb_files(), 2);
@@ -314,7 +314,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(table_multi_patterns.get_value(3, 5), 2.13);
     EXPECT_DOUBLE_EQ(table_multi_patterns.get_value(3, 6), 1.0);
 
-    ComputedTableGraph graph_multi_patterns(ref_table, gsample);
+    ComputedTableGraph graph_multi_patterns(ref_table.get(), gsample);
     EXPECT_EQ(graph_multi_patterns.get_nb_series(), nb_lines * 4);
     EXPECT_EQ(graph_multi_patterns.get_series_name(0, 0), "Output potentiel [1]");
     EXPECT_EQ(graph_multi_patterns.get_series_name(0, 1), "Output potentiel [2]");
@@ -330,8 +330,8 @@ TEST_F(ComputedTableTest, BuildFromTable)
     EXPECT_DOUBLE_EQ(round(values[0] * 100) / 100, 0.99);
 
     // wrong number of decimals (must in range [0, 99])
-    EXPECT_THROW(ComputedTable(ref_table, gsample, -1), std::invalid_argument);
-    EXPECT_THROW(ComputedTable(ref_table, gsample, 100), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(ref_table.get(), gsample, -1), std::invalid_argument);
+    EXPECT_THROW(ComputedTable(ref_table.get(), gsample, 100), std::invalid_argument);
 }
 
 TEST_F(ComputedTableTest, BuildFromVariables)
@@ -741,7 +741,7 @@ TEST_F(ComputedTableTest, PrintToFile)
                                           "Productivité totale des facteurs" };
     std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
 
-    Table* ref_table = global_ws_tbl->get_obj_ptr(table_name); 
+    std::shared_ptr<Table> ref_table = global_ws_tbl->get_obj_ptr(table_name); 
 
     int i = 0;
     TableLine* line;
@@ -793,7 +793,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
-    ComputedTable table_simple(ref_table, gsample, 4);
+    ComputedTable table_simple(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -820,7 +820,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
-    ComputedTable table_grt(ref_table, gsample, 4);
+    ComputedTable table_grt(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -848,7 +848,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // simple time series (current workspace + one extra file) - 5 observations
     gsample = "2010[1-2]:5";
-    ComputedTable table_2_files(ref_table, gsample, 4);
+    ComputedTable table_2_files(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "c_api_file.csv C";
@@ -879,7 +879,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     KDBTables* bin_kdb_tables = new KDBTables(false);
     bin_kdb_tables->load(input_test_dir + "fun.tbl");
     
-    Table* bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
+    std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
 
     TableCell* bin_cell;
     
@@ -928,7 +928,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
-    ComputedTable table_simple_bin(bin_ref_table, gsample, 4);
+    ComputedTable table_simple_bin(bin_ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
     arg = output_test_dir + "bin_file.csv C";

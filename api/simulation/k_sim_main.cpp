@@ -419,7 +419,7 @@ int CSimulation::K_diverge(int t, char* c_name, double eps)
     
     if(diverg)
     {
-        List* lst_ptr = new List(diverg);
+        std::shared_ptr<List> lst_ptr = std::make_shared<List>(diverg);
         global_ws_lst->set_obj_ptr(name, lst_ptr);
     }
     
@@ -598,7 +598,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
     kmsg("Linking equations ....");
     
     std::string eq_name;
-    Equation *eq = nullptr;
+    std::shared_ptr<Equation> eq_ptr;
     for(i = 0 ; i < dbe->size(); i++) 
     {
         eq_name = dbe->get_name(i);   
@@ -613,9 +613,9 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
         }
         KSIM_POSXK_REV[posvar] = i; // Position of equation with endo nb posvar = i
         
-        eq = dbe->get_obj_ptr(eq_name);
-        eq->compile();
-        rc = L_link(dbv, dbs, eq->clec);
+        eq_ptr = dbe->get_obj_ptr(eq_name);
+        eq_ptr->compile();
+        rc = L_link(dbv, dbs, eq_ptr->clec);
         if(rc) 
         {
             std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
@@ -744,7 +744,7 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
     double x;
 
     std::string eq_name = KSIM_DBE->get_name(eqnb);
-    Equation* eq = KSIM_DBE->get_obj_ptr(eq_name);
+    std::shared_ptr<Equation> eq = KSIM_DBE->get_obj_ptr(eq_name);
     CLEC* eq_clec = eq->clec;
     int lg = eq_clec->tot_lg;
     CLEC* clec = (CLEC*) SW_nalloc(lg);

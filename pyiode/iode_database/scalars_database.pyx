@@ -49,16 +49,15 @@ cdef class Scalars(CythonIodeDatabase):
         return subset
 
     def _get_object(self, name: str, scalar: Scalar) -> Scalar:
-        cdef CScalar c_scalar
+        cdef shared_ptr[CScalar] scl_ptr
         name = name.strip()
-        c_scalar = self.database_ptr.get(name.encode())
-        scalar.c_scalar = new CScalar(c_scalar) 
-        scalar.ptr_owner = <bint>True
+        scl_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        scalar.update_ptr(scl_ptr) 
         return scalar
 
     def _set_object(self, name: str, scalar: Scalar):
-        cdef CScalar* scalar_ptr = scalar.c_scalar
-        self.database_ptr.set_obj_ptr(name.encode(), scalar_ptr)
+        cdef shared_ptr[CScalar] scl_ptr = scalar.scl_ptr
+        self.database_ptr.set_obj_ptr(name.encode(), scl_ptr)
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

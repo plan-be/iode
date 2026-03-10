@@ -27,8 +27,8 @@ TEST_F(EstimationTest, SetBlock)
     std::string to = "1996Y1";
     EditAndEstimateEquations est(from, to);
 
-    Equation* eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
-    Equation* eq_DPUH = global_ws_eqs->get_obj_ptr("DPUH");
+    std::shared_ptr<Equation> eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_DPUH = global_ws_eqs->get_obj_ptr("DPUH");
 
     // ---- block = ACAF;DPUH ----
     // set_block("new_block", "currently_displayed_equation")
@@ -47,12 +47,12 @@ TEST_F(EstimationTest, SetBlock)
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
     // current equation
-    Equation* current_eq = est.current_equation();
+    std::shared_ptr<Equation> current_eq = est.current_equation();
     EXPECT_EQ(current_eq->endo, "ACAF");
     EXPECT_EQ(current_eq->lec, eq_ACAF->lec);
 
     // next equation 
-    Equation* next_eq = est.next_equation();
+    std::shared_ptr<Equation> next_eq = est.next_equation();
     EXPECT_EQ(next_eq->endo, "DPUH");
     EXPECT_EQ(next_eq->lec, eq_DPUH->lec);
 
@@ -174,8 +174,8 @@ TEST_F(EstimationTest, Estimate)
     Estimation* c_estimation;
     std::string from = "1980Y1";
     std::string to = "1996Y1";
-    Equation* eq_ACAF;
-    Equation* eq_DPUH;
+    std::shared_ptr<Equation> eq_ACAF;
+    std::shared_ptr<Equation> eq_DPUH;
 
     global_ws_scl->update("acaf1", Scalar(0., 1.));
     global_ws_scl->update("acaf2", Scalar(0., 1.));
@@ -239,7 +239,7 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF;DPUH
 
-    CorrelationMatrix* m_corr = est.get_correlation_matrix();
+    std::shared_ptr<CorrelationMatrix> m_corr = est.get_correlation_matrix();
     EXPECT_EQ(m_corr->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr->get_value(0, 0), 1.);
@@ -313,7 +313,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("e0_dw").value) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("e0_loglik").value) / 1e6, 83.810104);
 
-    Equation* eq_est = global_ws_eqs->get_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_est = global_ws_eqs->get_obj_ptr("ACAF");
     std::array<float, EQS_NBTESTS> tests = eq_est->tests;
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDEV]) / 1e6, 0.00427);
@@ -370,7 +370,7 @@ TEST_F(EstimationTest, Estimate)
     // Correlation matrix
     // -- ACAF
 
-    CorrelationMatrix* m_corr2 = est.get_correlation_matrix();
+    std::shared_ptr<CorrelationMatrix> m_corr2 = est.get_correlation_matrix();
     EXPECT_EQ(m_corr2->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr2->get_value(0, 0), 1.);
@@ -400,7 +400,7 @@ TEST_F(EstimationTest, Estimate)
     // number of equations
     EXPECT_EQ(c_estimation->E_NEQ, 1);
 
-    CorrelationMatrix* m_corr3 = est.get_correlation_matrix();
+    std::shared_ptr<CorrelationMatrix> m_corr3 = est.get_correlation_matrix();
     EXPECT_EQ(m_corr3->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr3->get_value(0, 0), 1.);
@@ -455,9 +455,9 @@ TEST_F(EstimationTest, DickeyFullerTest)
     bool trend = false;
     int order = 0;
 
-    Scalar* scl_drift;
-    Scalar* scl_trend;
-    Scalar* scl_order_0;
+    std::shared_ptr<Scalar> scl_drift;
+    std::shared_ptr<Scalar> scl_trend;
+    std::shared_ptr<Scalar> scl_order_0;
 
     // Unknown variable
     EXPECT_THROW(dickey_fuller_test("XORGLUB", drift, trend, order), std::runtime_error);

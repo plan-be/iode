@@ -134,7 +134,7 @@ KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* 
             try
             {
                 var_name = std::string(oname);
-                Variable* var_ptr = new Variable(vector, vector + nb);
+                std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(vector, vector + nb);
                 kdb->set_obj_ptr(var_name, var_ptr);
             }
             catch(const std::exception&)
@@ -164,7 +164,7 @@ KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* 
                 kmsg("Reading object %d : %s", ++cmpt, oname);
                 try
                 {
-                    Variable* var_ptr = new Variable(nb, IODE_NAN);
+                    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(nb, IODE_NAN);
                     kdb->set_obj_ptr(var_name, var_ptr);
                 }
                 catch(const std::exception& e) 
@@ -254,7 +254,7 @@ KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* c
         try
         {
             cmt_name = std::string(oname);
-            Comment* cmt_ptr = new Comment(cmt);
+            std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>(cmt);
             kdb->set_obj_ptr(cmt_name, cmt_ptr);
             SW_nfree(cmt);
         }

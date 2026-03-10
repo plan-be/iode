@@ -49,20 +49,18 @@ cdef class Identities(CythonIodeDatabase):
         return subset
 
     def _get_object(self, name: str, identity: Identity) -> Identity:
-        cdef CIdentity c_identity
+        cdef shared_ptr[CIdentity] idt_ptr
         name  = name.strip()
-        c_identity = self.database_ptr.get(name.encode())
-        
-        identity.c_identity = new CIdentity(c_identity)
-        identity.ptr_owner = <bint>True
+        idt_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        identity.update_ptr(idt_ptr)
         return identity
 
     def _set_object(self, name: str, value: str):
-        cdef CIdentity* c_idt = NULL
+        cdef shared_ptr[CIdentity] idt_ptr
         name = name.strip()
         value = value.strip()
-        c_idt = new CIdentity(value.encode())
-        self.database_ptr.set_obj_ptr(name.encode(), c_idt)
+        idt_ptr = make_shared[CIdentity](value.encode())
+        self.database_ptr.set_obj_ptr(name.encode(), idt_ptr)
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

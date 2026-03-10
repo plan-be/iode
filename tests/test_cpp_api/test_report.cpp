@@ -71,8 +71,8 @@ TEST_F(ReportTest, REPORT_LINE)
     std::string generalized_sample = "1990Y1:2";
     int nb_dec = 2;
 
-    Table* tbl;
     std::string command;
+    std::shared_ptr<Table> tbl_ptr;
     KDBTables* subset_tbl = new KDBTables(global_ws_tbl.get(), "A*", false);
     for(const std::string& name : subset_tbl->get_names())
     {
@@ -81,8 +81,8 @@ TEST_F(ReportTest, REPORT_LINE)
         filepath_cpp = output_dir / filename_cpp;
         if(std::filesystem::exists(filepath_cpp))
             std::filesystem::remove(filepath_cpp);
-        tbl = subset_tbl->get_obj_ptr(name);
-        ComputedTable computed_tbl(tbl, generalized_sample, nb_dec);
+        tbl_ptr = subset_tbl->get_obj_ptr(name);
+        ComputedTable computed_tbl(tbl_ptr.get(), generalized_sample, nb_dec);
         computed_tbl.print_to_file(filepath_cpp.string(), 'C');
         EXPECT_TRUE(std::filesystem::exists(filepath_cpp));
 

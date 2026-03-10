@@ -372,7 +372,7 @@ static int B_ltoh(int type, char* arg)
     to->sample = new Sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
+        std::shared_ptr<Variable> to_var_ptr = std::make_shared<Variable>(t_smpl->nb_periods, 0);
         switch(method[0]) 
         {
             case LTOH_CS :

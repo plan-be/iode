@@ -190,12 +190,13 @@ int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
 {
     char* c_name;
     std::string name;
+    std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>();
     for(int j = 0 ; j < clec->nb_names ; j++) 
     {
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
         if(is_coefficient(name) && !dbs->contains(name))
-            dbs->set_obj_ptr(name, new Scalar());
+            dbs->set_obj_ptr(name, scl_ptr);
     }
     
     return 0;

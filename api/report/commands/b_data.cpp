@@ -251,7 +251,7 @@ int B_DataCalcVar(char* arg, int unused)
     {
         try
         {
-            Variable* var_ptr = new Variable(nb_periods, IODE_NAN);
+            std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(nb_periods, IODE_NAN);
             kdb->set_obj_ptr(var_name, var_ptr);
         }
         catch (const std::runtime_error& e)
@@ -311,7 +311,7 @@ int B_DataCreate_1(char* arg, int* ptype)
         {
             case COMMENTS :
             {
-                Comment* cmt_ptr = new Comment("");
+                std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>("");
                 global_ws_cmt->set_obj_ptr(name, cmt_ptr);
                 break;
             }
@@ -320,31 +320,31 @@ int B_DataCreate_1(char* arg, int* ptype)
                 char deflt[41];
                 sprintf(deflt, "%s := %s", arg, arg);
                 std::string lec = std::string(deflt);
-                Equation* eq = new Equation(name, lec, EQ_LSQ, "", "", "", "", "", false);
-                global_ws_eqs->set_obj_ptr(name, eq);
+                std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(name, lec, EQ_LSQ, "", "", "", "", "", false);
+                global_ws_eqs->set_obj_ptr(name, eq_ptr);
                 break;
             }
             case IDENTITIES :
             {
-                Identity* idt_ptr = new Identity(name);
+                std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(name);
                 global_ws_idt->set_obj_ptr(name, idt_ptr);
                 break;  
             }
             case LISTS :
             {
-                List* lst_ptr = new List("");
+                std::shared_ptr<List> lst_ptr = std::make_shared<List>("");
                 global_ws_lst->set_obj_ptr(name, lst_ptr);
                 break;
             }
             case SCALARS :
             {
-                Scalar* scl_ptr = new Scalar();
+                std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>();
                 global_ws_scl->set_obj_ptr(name, scl_ptr);
                 break;
             }
             case TABLES :
             {
-                Table* tbl_ptr = new Table(2, "TITLE", "LEC", false, false, false);
+                std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(2, "TITLE", "LEC", false, false, false);
                 global_ws_tbl->set_obj_ptr(name, tbl_ptr);
                 break;
             }
@@ -353,8 +353,8 @@ int B_DataCreate_1(char* arg, int* ptype)
                 Sample* sample = kdb.sample;
                 if(sample == nullptr) 
                     throw std::runtime_error("No sample defined in the Variables database");
-                Variable* var_ptr = new Variable(sample->nb_periods, IODE_NAN);
-                global_ws_var->set_obj_ptr(name, var_ptr); 
+                std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(sample->nb_periods, IODE_NAN);
+                global_ws_var->set_obj_ptr(name, var_ptr);
                 break;
             }
         }
@@ -601,14 +601,14 @@ int B_DataUpdate(char* arg, int type)
         }
         case EQUATIONS :
         {
-            Equation* eq = global_ws_eqs->get_obj_ptr(name);
+            std::shared_ptr<Equation> eq = global_ws_eqs->get_obj_ptr(name);
             eq->set_lec(std::string(value));
             break;
         }
         case IDENTITIES :
         {
             std::string lec = std::string(value);
-            Identity* idt = global_ws_idt->get_obj_ptr(name);
+            std::shared_ptr<Identity> idt = global_ws_idt->get_obj_ptr(name);
             idt->set_lec(lec);
             break;
         }
@@ -638,7 +638,7 @@ int B_DataUpdate(char* arg, int type)
             args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
             int nb_args = SCR_tbl_size((unsigned char**) args);
 
-            Scalar* scl = global_ws_scl->get_obj_ptr(name);
+            std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
             switch(nb_args) 
             {
             case 2:
@@ -922,7 +922,7 @@ int B_DataListSort(char* arg, int unused)
     }
     else
     {
-        List* lst_ptr = global_ws_lst->get_obj_ptr(in);
+        std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(in);
         lst = (char*) lst_ptr->c_str();
     }
     
@@ -950,7 +950,7 @@ int B_DataListSort(char* arg, int unused)
 
     try
     {
-        List* sorted_lst = new List(lst);
+        std::shared_ptr<List> sorted_lst = std::make_shared<List>(lst);
         global_ws_lst->set_obj_ptr(out, sorted_lst); 
     }
     catch (const std::runtime_error& e)
@@ -1365,8 +1365,8 @@ int B_DataCalcLst(char* arg, int unused)
     int rc = 0;
     unsigned char **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
                   *res, *list1, *list2, *op;
-    List* list1_ptr = nullptr;
-    List* list2_ptr = nullptr;
+    std::shared_ptr<List> list1_ptr;
+    std::shared_ptr<List> list2_ptr;
 
     /* arg: res list1 op list2 */
     args = (unsigned char**) B_vtom_chk(arg, 4);
@@ -1439,7 +1439,7 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    List* lst_ptr = global_ws_lst->get_obj_ptr(name);
+    std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(name);
     char* lst = (char*) SCR_stracpy((unsigned char*) lst_ptr->c_str());
     if(lst == NULL) 
         return -1;

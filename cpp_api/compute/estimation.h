@@ -99,7 +99,7 @@ class EditAndEstimateEquations
 
     KDBEquations* kdb_eqs;
     KDBScalars* kdb_scl;
-    CorrelationMatrix* m_corr;
+    std::shared_ptr<CorrelationMatrix> m_corr_ptr;
     Estimation* estimation;
 
 public:
@@ -298,14 +298,14 @@ public:
      */
     void update_current_equation(const std::string& lec, const std::string& comment);
 
-    Equation* current_equation() 
+    std::shared_ptr<Equation> current_equation() 
     {
         std::string eq_name = *current_eq;
-        Equation* eq = kdb_eqs->get_obj_ptr(eq_name);
-        return eq;
+        std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr(eq_name);
+        return eq_ptr;
     }
 
-    Equation* next_equation()
+    std::shared_ptr<Equation> next_equation()
     {
         current_eq++;
         
@@ -313,13 +313,13 @@ public:
             current_eq = v_equations.begin();
 
         std::string eq_name = *current_eq;
-        Equation* eq = kdb_eqs->get_obj_ptr(eq_name);
-        return eq;
+        std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr(eq_name);
+        return eq_ptr;
     }
 
-    CorrelationMatrix* get_correlation_matrix() 
+    std::shared_ptr<CorrelationMatrix> get_correlation_matrix() 
     { 
-        return m_corr;
+        return m_corr_ptr;
     }
 
     std::vector<double> get_observed_values(const std::string& name) const

@@ -70,15 +70,15 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     std::string eq_name;
-    Equation* eq = nullptr;
+    std::shared_ptr<Equation> eq_ptr;
     kmsg("Pseudo-linking equations ....");
     for(int i = 0 ; i < dbe->size(); i++) 
     {
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
-        eq = dbe->get_obj_ptr(eq_name); 
-        L_link_endos(dbe, eq->clec);
+        eq_ptr = dbe->get_obj_ptr(eq_name); 
+        L_link_endos(dbe, eq_ptr->clec);
     }
 
     /* ORDERING EQUATIONS */
@@ -148,7 +148,7 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     std::string eq_name;
-    Equation* eq = nullptr;
+    std::shared_ptr<Equation> eq_ptr = nullptr;
     kmsg("Linking equations ....");
     for(i = 0 ; i < dbe->size(); i++) 
     {
@@ -163,9 +163,9 @@ int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScala
             goto fin;
         }
         
-        eq = dbe->get_obj_ptr(eq_name);
-        eq->compile();
-        rc = L_link(dbv, dbs, eq->clec);
+        eq_ptr = dbe->get_obj_ptr(eq_name);
+        eq_ptr->compile();
+        rc = L_link(dbv, dbs, eq_ptr->clec);
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
@@ -218,9 +218,9 @@ int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* d
     // Simulation
     t = smpl->start_period.difference(dbv->sample->start_period);
 
-    for(i = 0; i < smpl->nb_periods; i++, t++) {
-        if(rc = K_simul_1(t)) goto fin;
-    }
+    for(i = 0; i < smpl->nb_periods; i++, t++)
+        if(rc = K_simul_1(t)) 
+            goto fin;
 
 fin:
     K_simul_free();

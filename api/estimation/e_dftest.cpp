@@ -113,8 +113,9 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     SCR_add_ptr((unsigned char***) &eqs, &neqs, (unsigned char*) "_DF");
     SCR_add_ptr((unsigned char***) &eqs, &neqs, NULL);
 
-    Equation* eq = new Equation("_DF", std::string(buf), EQ_LSQ, "", "", "", "", "", false);
-    global_ws_eqs->set_obj_ptr("_DF", eq);
+    std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>("_DF", std::string(buf), EQ_LSQ, 
+                                                                  "", "", "", "", "", false);
+    global_ws_eqs->set_obj_ptr("_DF", eq_ptr);
     
     Estimation est(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
     rc = est.estimate();
@@ -161,7 +162,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         return NULL;
     }
     int nb_periods = var_sample->nb_periods;
-    Variable* var_ptr = new Variable(vec, vec + nb_periods);
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(vec, vec + nb_periods);
     global_ws_var->set_obj_ptr(varname, var_ptr);
     SW_nfree(vec);
     
@@ -172,30 +173,35 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     if(smpl.nb_periods < (drift + trend + order + 1) * 2) 
     {
         error_manager.append_error("Sample too small for this test");
-        goto cleanup;
+        global_ws_var->remove("_DF");
+        return NULL;
     }
 
     /* Dickey Fuller */
     // build the equation to estimate, step by step according to the parameters
+    std::shared_ptr<Scalar> scl_df_ptr = std::make_shared<Scalar>();
     sprintf(buf, "d(%s) := df_ * %s[-1]", varname, varname);
-    global_ws_scl->set_obj_ptr("df_", new Scalar());
+    global_ws_scl->set_obj_ptr("df_", scl_df_ptr);
     
     if(drift) 
     {
+        std::shared_ptr<Scalar> scl_drift_ptr = std::make_shared<Scalar>();
         sprintf(buf + strlen(buf), "+ df_d");
-        global_ws_scl->set_obj_ptr("df_d", new Scalar());
+        global_ws_scl->set_obj_ptr("df_d", scl_drift_ptr);
     }
 
     if(trend) 
     {
+        std::shared_ptr<Scalar> scl_trend_ptr = std::make_shared<Scalar>();
         sprintf(buf + strlen(buf), "+ df_t*t");
-        global_ws_scl->set_obj_ptr("df_t", new Scalar());
+        global_ws_scl->set_obj_ptr("df_t", scl_trend_ptr);
     }
 
     for(i = 1 ; i <= order ; i++) 
     {
+        std::shared_ptr<Scalar> scl_i_ptr = std::make_shared<Scalar>();
         sprintf(scl, "df%d", i);
-        global_ws_scl->set_obj_ptr(scl, new Scalar());
+        global_ws_scl->set_obj_ptr(scl, scl_i_ptr);
     }
 
     if(order) 
@@ -239,10 +245,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         pos += 3;
         global_ws_scl->remove(buf);
     }
-
-cleanup:
-    // Deletes the tmp var _DF
-    global_ws_var->remove("_DF");
+ 
     return res;
 }
 
@@ -259,7 +262,7 @@ void E_SclToReal(char* name, double* res)
     if(!global_ws_scl->contains(name))
         return;
 
-    Scalar* scl = global_ws_scl->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
     res[0] = scl->value;
     res[1] = scl->std;
     if(!IODE_IS_0(scl->std)) 

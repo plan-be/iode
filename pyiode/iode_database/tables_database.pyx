@@ -56,17 +56,16 @@ cdef class Tables(CythonIodeDatabase):
         return self.database_ptr.get_title(name.encode()).decode()
 
     def _get_object(self, name: str, table: Table) -> Table:
-        cdef CTable c_table
+        cdef shared_ptr[CTable] tbl_ptr
         name = name.strip()
-        c_table = self.database_ptr.get(name.encode())
-        table.c_table_name = name.encode()
-        table.c_table = new CTable(c_table)
-        table.ptr_owner = <bint>True
+        tbl_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        table.tbl_ptr_name = name.encode()
+        table.update_ptr(tbl_ptr)
         return table
 
     def _set_object(self, name: str, table: Table):
-        cdef CTable* table_ptr = table.c_table
-        self.database_ptr.set_obj_ptr(name.encode(), table_ptr)
+        cdef shared_ptr[CTable] tbl_ptr = table.tbl_ptr
+        self.database_ptr.set_obj_ptr(name.encode(), tbl_ptr)
 
     def copy_from(self, input_files: str, names: str='*'):
         self.database_ptr.copy_from(input_files.encode(), names.encode())

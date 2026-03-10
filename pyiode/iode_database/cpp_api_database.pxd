@@ -4,7 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.map cimport map
-from libcpp.memory cimport unique_ptr
+from libcpp.memory cimport unique_ptr, shared_ptr
 
 from libcpp cimport bool
 
@@ -196,14 +196,8 @@ cdef extern from "api/objs/equations.h":
 
         # Public methods
         CEquation get(string& name) except +
-        # WARNING: do not delete the pointer returned by get_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CEquation* get_obj_ptr(string& name) except +
-        # WARNING: do not delete the pointer returned by set_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CEquation* set_obj_ptr(string& name, CEquation* eq) except +
+        shared_ptr[CEquation] get_obj_ptr(string& name) except +
+        void set_obj_ptr(string& name, shared_ptr[CEquation] eq) except +
 
         string get_lec(string& name) except +
         bool add(string& name, string& lec) except +
@@ -224,14 +218,8 @@ cdef extern from "api/objs/identities.h":
 
         # Public methods
         CIdentity get(string& name) except +
-        # WARNING: do not delete the pointer returned by get_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CIdentity* get_obj_ptr(string& name) except +
-        # WARNING: do not delete the pointer returned by set_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CIdentity* set_obj_ptr(string& name, CIdentity* idt) except +
+        shared_ptr[CIdentity] get_obj_ptr(string& name) except +
+        void set_obj_ptr(string& name, shared_ptr[CIdentity] idt) except +
 
         string get_lec(string& name) except +
         bool add(string& name, string& lec) except +
@@ -272,14 +260,8 @@ cdef extern from "api/objs/scalars.h":
 
         # Public methods
         CScalar get(string& name) except +
-        # WARNING: do not delete the pointer returned by get_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CScalar* get_obj_ptr(string& name) except +
-        # WARNING: do not delete the pointer returned by set_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CScalar* set_obj_ptr(string& name, CScalar* scl) except +
+        shared_ptr[CScalar] get_obj_ptr(string& name) except +
+        void set_obj_ptr(string& name, shared_ptr[CScalar] scl) except +
 
     size_t hash_value(KDBScalars&) except +
 
@@ -296,14 +278,8 @@ cdef extern from "api/objs/tables.h":
 
         # Public methods
         CTable get(string& name) except +
-        # WARNING: do not delete the pointer returned by get_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CTable* get_obj_ptr(string& name) except +
-        # WARNING: do not delete the pointer returned by set_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
-        CTable* set_obj_ptr(string& name, CTable* tbl) except +
+        shared_ptr[CTable] get_obj_ptr(string& name) except +
+        void set_obj_ptr(string& name, shared_ptr[CTable] tbl) except +
 
         string get_title(string& name) except +
 
@@ -332,9 +308,6 @@ cdef extern from "api/objs/variables.h":
         KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 
 
         # Public methods
-        # WARNING: do not delete the pointer returned by get_obj_ptr, 
-        #          it is owned by the C++ database and will be automatically  
-        #          deleted when the database is deleted
         vector[double]* get_obj_ptr(string& name) except +
         void set(string& name, vector[double]& values) except +
 

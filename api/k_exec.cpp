@@ -159,8 +159,9 @@ static KDBVariables* KI_series_list(KDBIdentities* dbi)
 
     // Create a new KDB of vars with all the names in tbl
     dbv = new KDBVariables(false);
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>();
     for(const std::string& name : vars_to_compute)
-        dbv->set_obj_ptr(name, new Variable());
+        dbv->set_obj_ptr(name, var_ptr);
 
     return dbv;
 }
@@ -181,6 +182,7 @@ static KDBScalars* KI_scalar_list(KDBIdentities* dbi)
 
     std::string name;
     dbs = new KDBScalars(false);
+    std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>();
     for(const auto& [idt_name, idt] : dbi->k_objs) 
     {
         clec = idt->get_compiled_lec();
@@ -193,7 +195,7 @@ static KDBScalars* KI_scalar_list(KDBIdentities* dbi)
             name = std::string(lname[j].name);
             if(!is_coefficient(name)) 
                 continue;
-            dbs->set_obj_ptr(name, new Scalar());
+            dbs->set_obj_ptr(name, scl_ptr);
         }
         SW_nfree(tclec);
     }
@@ -394,7 +396,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
     int nb_found = 0;
     for(const std::string& name : vars_to_read)
     {
-        Variable* var_ptr = dbv->get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr = dbv->get_obj_ptr(name);
         // NOTE: should not happen because we check above that the VAR is present 
         //       in dbv before, but we put this check just in case to avoid a crash 
         if(!var_ptr)
@@ -409,7 +411,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
             continue;
 
         // get values to be copied from dbv_tmp
-        Variable* tmp_var_ptr = dbv_tmp->get_obj_ptr(name);
+        std::shared_ptr<Variable> tmp_var_ptr = dbv_tmp->get_obj_ptr(name);
         if(!tmp_var_ptr)
         {
             std::string msg = "Execution of identities: the variable '" + name + "' has not been found in the ";
@@ -422,7 +424,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
         }
 
         // copy the VAR from dbv_tmp to dbv
-        var_ptr = new Variable(vsmpl->nb_periods, IODE_NAN);
+        var_ptr = std::make_shared<Variable>(vsmpl->nb_periods, IODE_NAN);
         for(int t = 0; t < smpl.nb_periods; t++)
             (*var_ptr)[start + t] = (*tmp_var_ptr)[start_tmp + t];
 
@@ -553,8 +555,16 @@ static int KI_read_vars(KDBIdentities* dbi, KDBVariables* dbv, KDBVariables* dbv
     {
         j = 0;
         dim = dbv->sample->nb_periods;
-        for(auto& [name, var_ptr] : dbv->k_objs) 
+        // using iterator to avoid concurrent modification of dbv when we add the 
+        // missing VARs with NaN values
+        std::string name;
+        std::shared_ptr<Variable> var_ptr;
+        std::shared_ptr<Variable> new_var_ptr;
+        for(auto it = dbv->k_objs.begin(); it != dbv->k_objs.end(); ++it)
         {
+            name = it->first;
+            var_ptr = it->second;
+
             // more than 10 exogenous vars not found => stop listing
             if(j > 10)
                 break;
@@ -566,8 +576,9 @@ static int KI_read_vars(KDBIdentities* dbi, KDBVariables* dbv, KDBVariables* dbv
             // series = identity ("endogenous") => creates an IODE_NAN Variable
             if(dbi->contains(name)) 
             {
-                delete var_ptr;
-                var_ptr = new Variable(dim, IODE_NAN);      
+                it->second.reset();
+                new_var_ptr = std::make_shared<Variable>(dim, IODE_NAN);
+                it->second = new_var_ptr;     
                 continue;
             }
 

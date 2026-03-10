@@ -91,8 +91,8 @@ bool KDBIdentities::load_asc(const std::string& filename)
                 lec = K_wrap((char*) yy->yy_text, 60);
                 try
                 {
-                    Identity* idt = new Identity(lec);
-                    this->set_obj_ptr(name, idt);
+                    Identity idt(lec);
+                    this->set(name, idt);
                     cmpt++;
                 }
                 catch(const std::exception& e) 

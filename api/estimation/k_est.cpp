@@ -14,7 +14,7 @@
  *  
  *  Utility function
  *  ----------------
- *      void E_tests2scl(Equation* eq, int j, int n, int k)   Creates the scalars containing the results of an estimated equation
+ *      void E_tests2scl(const std::shared_ptr<Equation>& eq, const int j, const int n, const int k)   Creates the scalars containing the results of an estimated equation
  *  
  */
 #include "scr4/s_prodt.h"
@@ -45,11 +45,11 @@
 void Estimation::E_savescl(double val, int eqnb, char*txt)  
 {
     char buf[40];
-    Scalar* scl = new Scalar(0.9, 1.0, IODE_NAN);
+    std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>(0.9, 1.0, IODE_NAN);
 
-    scl->value = val;
+    scl_ptr->value = val;
     sprintf(buf, "e%d_%s", eqnb, txt);
-    global_ws_scl->set_obj_ptr(buf, scl);
+    global_ws_scl->set_obj_ptr(buf, scl_ptr);
 }
 
 /**
@@ -72,23 +72,23 @@ void Estimation::E_savescl(double val, int eqnb, char*txt)
  *  @param [in] int     n   number of observations
  *  @param [in] int     k   number of degrees of freedom
  */
-void Estimation::E_tests2scl(Equation* eq, int j, int n, int k)
+void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k)
 {
-    if(!eq) 
+    if(!eq_ptr) 
         return;
 
     E_savescl((double) n, j, "n");
     E_savescl((double) k, j, "k");
-    E_savescl(eq->tests[EQ_STDEV], j,   "stdev");
-    E_savescl(eq->tests[EQ_MEANY], j,   "meany");
-    E_savescl(eq->tests[EQ_SSRES], j,   "ssres");
-    E_savescl(eq->tests[EQ_STDERR], j,  "stderr");
-    E_savescl(eq->tests[EQ_STDERRP], j, "stderrp");
-    E_savescl(eq->tests[EQ_FSTAT], j,   "fstat");
-    E_savescl(eq->tests[EQ_R2], j,      "r2");
-    E_savescl(eq->tests[EQ_R2ADJ], j,   "r2adj");
-    E_savescl(eq->tests[EQ_DW], j,      "dw");
-    E_savescl(eq->tests[EQ_LOGLIK], j,  "loglik");
+    E_savescl(eq_ptr->tests[EQ_STDEV], j,   "stdev");
+    E_savescl(eq_ptr->tests[EQ_MEANY], j,   "meany");
+    E_savescl(eq_ptr->tests[EQ_SSRES], j,   "ssres");
+    E_savescl(eq_ptr->tests[EQ_STDERR], j,  "stderr");
+    E_savescl(eq_ptr->tests[EQ_STDERRP], j, "stderrp");
+    E_savescl(eq_ptr->tests[EQ_FSTAT], j,   "fstat");
+    E_savescl(eq_ptr->tests[EQ_R2], j,      "r2");
+    E_savescl(eq_ptr->tests[EQ_R2ADJ], j,   "r2adj");
+    E_savescl(eq_ptr->tests[EQ_DW], j,      "dw");
+    E_savescl(eq_ptr->tests[EQ_LOGLIK], j,  "loglik");
 }
 
 /**
@@ -146,6 +146,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
     try
     {
         Equation* eq;
+        std::shared_ptr<Equation> eq_ptr;
         if(!E_DBE->contains(name)) 
         {
             std::string comment = "";
@@ -157,16 +158,17 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
                               comment, instruments, block, true);
             eq->update_date();
             memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));
-            E_DBE->set_obj_ptr(name, eq);
+            eq_ptr = std::shared_ptr<Equation>(eq);
+            E_DBE->set_obj_ptr(name, eq_ptr);
         }
         else
         {
-            eq = E_DBE->get_obj_ptr(name);
-            eq->sample = (smpl != nullptr) ? *smpl : Sample();
-            eq->set_lec(lec);
-            eq->set_method(method);
-            eq->update_date();
-            memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
+            eq_ptr = E_DBE->get_obj_ptr(name);
+            eq_ptr->sample = (smpl != nullptr) ? *smpl : Sample();
+            eq_ptr->set_lec(lec);
+            eq_ptr->set_method(method);
+            eq_ptr->update_date();
+            memcpy(eq_ptr->tests.data(), tests, EQS_NBTESTS * sizeof(float));   
         }
         return 0;
     }
@@ -204,7 +206,7 @@ int Estimation::KE_est_s(Sample* smpl)
     U_ch**     lecs = 0;
     U_ch**     instrs = 0;
     float      tests[EQS_NBTESTS];
-    Equation*  eq;
+    std::shared_ptr<Equation> eq_ptr;
     
     nb = SCR_tbl_size((unsigned char**) est_endos);
     
@@ -224,17 +226,17 @@ int Estimation::KE_est_s(Sample* smpl)
             goto err;
         }
 
-        eq = E_DBE->get_obj_ptr(endo);
-        eq->reset_tests();
+        eq_ptr = E_DBE->get_obj_ptr(endo);
+        eq_ptr->reset_tests();
 
         if(est_method < 0) 
-            E_MET = eq->method;
+            E_MET = eq_ptr->method;
         else 
             E_MET = est_method;
 
         if(!smpl) 
         {
-            eq_smpl = new Sample(eq->sample);
+            eq_smpl = new Sample(eq_ptr->sample);
             E_SMPL = eq_smpl;
         }
         else
@@ -247,20 +249,20 @@ int Estimation::KE_est_s(Sample* smpl)
         }
         E_T = E_SMPL->nb_periods;
 
-        std::string _instruments = eq->instruments;
+        std::string _instruments = eq_ptr->instruments;
         if(_instruments.empty()) 
             instrs = NULL;
         else 
             instrs = SCR_vtoms((unsigned char*) _instruments.c_str(), (unsigned char*) ",;");
 
-        std::string _block = eq->block;
+        std::string _block = eq_ptr->block;
         blk =  SCR_vtoms((unsigned char*) _block.c_str(), (unsigned char*) " ,;");
         nblk = SCR_tbl_size(blk);
 
         std::string eq_name;
         if(nblk == 0)  
         {
-            SCR_add_ptr(&lecs, &nbl, (unsigned char*) eq->lec.c_str());
+            SCR_add_ptr(&lecs, &nbl, (unsigned char*) eq_ptr->lec.c_str());
             SCR_add_ptr(&endos, &nbe, (unsigned char*) endo.c_str());
         }
         else 
@@ -291,7 +293,6 @@ int Estimation::KE_est_s(Sample* smpl)
 
         SCR_add_ptr(&lecs, &nbl, 0L);
         SCR_add_ptr(&endos, &nbe, 0L);
-        eq = nullptr;
 
         error = E_est((char**) endos, (char**) lecs, (char**) instrs);
 
@@ -316,9 +317,8 @@ int Estimation::KE_est_s(Sample* smpl)
                 eq_name = std::string((char*) endos[j]);
                 KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
-                eq = E_DBE->get_obj_ptr(eq_name);
-                E_tests2scl(eq, j, E_T, E_NCE);
-                eq = nullptr;
+                eq_ptr = E_DBE->get_obj_ptr(eq_name);
+                E_tests2scl(eq_ptr, j, E_T, E_NCE);
                 // create the Variables containing the fitted, observed and residual values
                 E_savevar("_YCALC", j, E_RHS);   
                 E_savevar("_YOBS", j, E_LHS);    

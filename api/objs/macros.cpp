@@ -8,7 +8,9 @@
 
 std::string KDBMacros::get_macro(const std::string& name) const
 {    
-    std::string* macro_ptr = this->get_obj_ptr(name);
+    std::shared_ptr<std::string> macro_ptr = this->get_obj_ptr(name);
+    if(!macro_ptr)
+        return "";
     return *macro_ptr;
 }
 
@@ -20,8 +22,7 @@ bool KDBMacros::set_macro(const std::string& name, std::string& macro)
         return false;
     }
 
-    std::string* macro_ptr = new std::string(macro);
-    this->set_obj_ptr(name, macro_ptr);
+    this->set(name, macro);
     return true;
 }
 

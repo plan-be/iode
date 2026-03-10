@@ -37,11 +37,11 @@ static int check_scl_var(char *eqs)
     if(!global_ws_eqs->contains(name)) 
         return -1;
     
-    Equation* eq = global_ws_eqs->get_obj_ptr(name) ;
-    if(!eq) 
+    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name) ;
+    if(!eq_ptr) 
         return -1;
 
-    CLEC* cl = eq->clec;
+    CLEC* cl = eq_ptr->clec;
 
     char* c_name;
     for(int j = 0 ; j < cl->nb_names ; j++) 

@@ -65,7 +65,7 @@ char* ExportObjsWKS::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
     if(dbc->contains(name))
     {
-        Comment* comment = dbc->get_obj_ptr(name);
+        std::shared_ptr<Comment> comment = dbc->get_obj_ptr(name);
         wks_string((char*) comment->c_str(), WKS_COL, WKS_ROW);
     }
     else 

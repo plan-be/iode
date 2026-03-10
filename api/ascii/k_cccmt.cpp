@@ -53,8 +53,8 @@ static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
 
     try
     {
-        Comment* cmt_obj = new Comment(cmt);
-        kdb->set_obj_ptr(name, cmt_obj);
+        Comment cmt_obj(cmt);
+        kdb->set(name, cmt_obj);
     }
     catch(const std::exception&)
     {

@@ -443,8 +443,9 @@ public:
             {
                 // adds a new scalar with values { 0.9, 1.0, IODE_NAN } 
                 // to the Scalars Database
-                if (!global_ws_scl->contains(coeff_name)) 
-                    global_ws_scl->set_obj_ptr(coeff_name, new Scalar(0.9, 1.0));
+                Scalar coeff(0.9, 1.0, IODE_NAN);
+                if(!global_ws_scl->contains(coeff_name)) 
+                    global_ws_scl->set(coeff_name, coeff);
             }
         }
 
@@ -467,9 +468,9 @@ public:
             {
                 // adds a new variable with nb_obs IODE_NAN values to the 
                 // Variables database
-                Variable* var_ptr = new Variable(nb_obs, IODE_NAN);
+                Variable var(nb_obs, IODE_NAN);
                 if (!global_ws_var->contains(var_name)) 
-                    global_ws_var->set_obj_ptr(var_name, var_ptr);
+                    global_ws_var->set(var_name, var);
             }
         }
 

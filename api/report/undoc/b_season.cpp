@@ -40,6 +40,7 @@ int B_season(char* arg)
     std::vector<std::string> v_data;
     KDBVariables* to = nullptr;
     KDBVariables* from = new KDBVariables(false);
+    std::shared_ptr<Variable> var_ptr;
 
     int lg = B_get_arg0(name, arg, 80);
     char** data = B_ainit_chk(arg + lg, NULL, 0);
@@ -94,7 +95,7 @@ int B_season(char* arg)
         res = DS_test(t_vec, nb, &beg, &dim, nbper, &scale);
         if(!res) 
         {
-            Variable* var_ptr = new Variable(t_vec, t_vec + nb);
+            var_ptr = std::make_shared<Variable>(t_vec, t_vec + nb);
             memcpy(t_vec, from->get_var_ptr(from_name) + shift, nb * sizeof(double));
             to->set_obj_ptr(from_name, var_ptr);
             continue;
@@ -103,14 +104,14 @@ int B_season(char* arg)
         DS_vec(t_vec + beg, c_vec + beg, i_vec + beg, season, dim, nbper, scale);
         DS_extr(t_vec + beg + dim, nb - (beg + dim), nbper, season, scale);
 
-        Variable* var_ptr = new Variable(t_vec, t_vec + nb);
+        var_ptr = std::make_shared<Variable>(t_vec, t_vec + nb);
         to->set_obj_ptr(from_name, var_ptr);
 
-        Variable* c_var_ptr = new Variable(c_vec, c_vec + nb);
+        std::shared_ptr<Variable> c_var_ptr = std::make_shared<Variable>(c_vec, c_vec + nb);
         sprintf(name, "_C%s", from_name.c_str());
         to->set_obj_ptr(name, c_var_ptr);
 
-        Variable* i_var_ptr = new Variable(i_vec, i_vec + nb);
+        std::shared_ptr<Variable> i_var_ptr = std::make_shared<Variable>(i_vec, i_vec + nb);
         sprintf(name, "_I%s", from_name.c_str());
         to->set_obj_ptr(name, i_var_ptr);
     }

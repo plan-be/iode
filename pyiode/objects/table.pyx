@@ -4,7 +4,9 @@ from collections.abc import Iterable
 from typing import Union, Tuple, List, Dict, Optional
 
 from libcpp.string cimport string
+from libcpp.memory cimport shared_ptr, make_shared
 from cython.operator cimport dereference
+
 from pyiode.common cimport TableLang as CTableLang
 from pyiode.common cimport TableCellType as CTableCellType 
 from pyiode.common cimport TableCellFont as CTableCellFont
@@ -185,12 +187,11 @@ cdef class TableLine:
 
 
 cdef class Table:
-    cdef bint ptr_owner
     cdef string c_table_name
+    cdef shared_ptr[CTable] tbl_ptr
     cdef CTable* c_table
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_table_name = b''
         self.c_table = NULL
 
@@ -203,11 +204,13 @@ cdef class Table:
         if lines_titles is None:
             variables = lecs_or_vars
             if isinstance(variables, str):
-                self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
+                self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), 
+                                                   <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
             else:
                 for variable in variables:
                     cpp_variables.push_back(variable.encode())
-                self.c_table = new CTable(<int>nb_columns, <string>table_title.encode(), cpp_variables, <bint>mode, <bint>files, <bint>date)
+                self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_variables, 
+                                                   <bint>mode, <bint>files, <bint>date)
         else:            
             for line_title in lines_titles:
                 cpp_lines_titles.push_back(line_title.encode())
@@ -216,36 +219,33 @@ cdef class Table:
             for lec in lecs:
                 cpp_lecs.push_back(lec.encode())
 
-            self.c_table = new CTable(nb_columns, <string>table_title.encode(), cpp_lines_titles, cpp_lecs, <bint>mode, <bint>files, <bint>date)
+            self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_lines_titles, 
+                                               cpp_lecs, <bint>mode, <bint>files, <bint>date)
         
         self.c_table_name = b''
-        self.ptr_owner = <bint>True
+        self.c_table = self.tbl_ptr.get()
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_table is not NULL:
-            del self.c_table
-            self.c_table_name = b''
-            self.c_table = NULL
+        self.c_table_name = b''
+        self.tbl_ptr.reset()
+        self.c_table = NULL
+
+    cdef update_ptr(self, shared_ptr[CTable] tbl_ptr):
+        self.tbl_ptr = tbl_ptr
+        self.c_table = self.tbl_ptr.get()
 
     @staticmethod
-    cdef Table _from_ptr(CTable* ptr, bint owner=False, bytes b_table_name=b''):
+    cdef Table _from_ptr(shared_ptr[CTable] tbl_ptr, bytes b_table_name=b''):
         """
         Factory function to create Table objects from a given CTable pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Table wrapper = Table.__new__(Table)
-        wrapper.c_table = ptr
+        if tbl_ptr.get() == NULL:
+            return None
+        wrapper.update_ptr(tbl_ptr)
         wrapper.c_table_name = b_table_name
-        wrapper.ptr_owner = owner
         return wrapper
-
-    # for debug purpose only
-    def is_pointer_null(self) -> bool:
-        return self.c_table is NULL
-
-    # for debug purpose only
-    def is_own_owner(self) -> bool:
-        return self.ptr_owner
 
     def get_nb_lines(self) -> int:
         return <int>(self.c_table.lines.size()) if self.c_table is not NULL else 0
@@ -691,4 +691,4 @@ cdef class Table:
         return s
 
     def __hash__(self) -> int:
-        return <int>hash_value_tbl(dereference(self.c_table)) if self.c_table is not NULL else 0
+        return <int>hash_value_tbl(dereference(self.c_table))

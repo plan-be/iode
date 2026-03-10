@@ -145,7 +145,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
-        kdb_shallow_copy->clear(false);
+        kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
         kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
@@ -155,7 +155,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), nb_names);
-        kdb_shallow_copy->clear(false);
+        kdb_shallow_copy->clear();
 
         // ==== All names from global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
@@ -166,7 +166,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
-        kdb_shallow_copy->clear(false);
+        kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
         kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
@@ -176,7 +176,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
                   << " variables in " << elapsed.count() << " seconds" << std::endl;
         EXPECT_TRUE(kdb_shallow_copy != nullptr);
         EXPECT_EQ(kdb_shallow_copy->size(), all_nb_names);
-        kdb_shallow_copy->clear(false);
+        kdb_shallow_copy->clear();
 
         // **** KDBVariables(global, filepath) performance tests ****
 

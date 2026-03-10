@@ -82,25 +82,25 @@ void Estimation::E_print_instrs()
  */
 void Estimation::E_print_coefs()
 {
-    Scalar* scl;
-
     W_print_tb("Coefficients and tests", 5);
     W_printfRepl((char*) "&1CName&1CValue&1CStandard Error&1CT-Statistic&1CRelax\n");
     W_printf((char*) ".tl\n");
 
     std::string scl_name;
+    std::shared_ptr<Scalar> scl_ptr;
     for(int i = 0 ; i < E_NC ; i++) 
     {
         scl_name = E_DBS->get_name(E_C_NBS[i]);
-        scl = E_DBS->get_obj_ptr(scl_name);
+        scl_ptr = E_DBS->get_obj_ptr(scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
                  scl_name.c_str(),
-                 (double) scl->value,
-                 (double) scl->std,
-                 (double) E_div_0(scl->value, scl->std),
-                 (double) scl->relax);
+                 (double) scl_ptr->value,
+                 (double) scl_ptr->std,
+                 (double) E_div_0(scl_ptr->value, scl_ptr->std),
+                 (double) scl_ptr->relax);
     }
+    
     W_printf((char*) ".te\n");
 }
 

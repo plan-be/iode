@@ -154,7 +154,7 @@ static int B_htol(int method, char* arg)
     {
         double* from_values = from_var_ptr->data(); 
 
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
+        std::shared_ptr<Variable> to_var_ptr = std::make_shared<Variable>(t_smpl->nb_periods, 0);
         double* to_values = to_var_ptr->data();
 
         for(f = 0, t = 0; f < skip; f++) 
@@ -243,7 +243,7 @@ KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
     {
         double* from_values = from_var_ptr->data(); 
 
-        Variable* to_var_ptr = new Variable(t_smpl->nb_periods, 0);
+        std::shared_ptr<Variable> to_var_ptr = std::make_shared<Variable>(t_smpl->nb_periods, 0);
         double* to_values = to_var_ptr->data();
 
         for(f = 0, t = 0; f < skip; f++) 

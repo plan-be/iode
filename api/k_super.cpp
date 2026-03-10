@@ -566,7 +566,7 @@ char* A_expand_super_API(char* name)
     if(!global_ws_lst->contains(name)) 
         return NULL;
     
-    List* lst = global_ws_lst->get_obj_ptr(name);
+    std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(name);
     if(!lst) 
         return NULL;
     return (char*) lst->c_str();

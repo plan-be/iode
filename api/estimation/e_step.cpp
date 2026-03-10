@@ -69,7 +69,7 @@ static int E_GetScls(CLEC* clec, char*** scl)
  */
 static void E_SetScl(int relax, char* name)                                             
 {
-    Scalar* scl = global_ws_scl->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
     if(relax == 1) 
     {
         scl->value = 0.9;
@@ -237,22 +237,21 @@ double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
     int         i, l=0,nbscl, nbcom;
     int         lasti;
     double      lnumtest, numtest;
-    Equation*   eq;
     CLEC*       cl;
     char        **scl = NULL, **eqs = NULL;
 
     // Crée le tableau d'équations à partir de arg (il faut qu'une seule eqs!!)
     eqs = B_ainit_chk(eqname, NULL, 0);         
     if(eqs == NULL) 
-        return(0.0);
+        return 0.0;
     
     std::string name = std::string(eqs[0]);
     if(!global_ws_eqs->contains(name)) 
         return 0.0;
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
-    eq = global_ws_eqs->get_obj_ptr(name);               
-    cl = eq->clec;
+    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);               
+    cl = eq_ptr->clec;
     nbscl = E_GetScls(cl, &scl);
 
     // Effectue les estimations pour toutes les combi

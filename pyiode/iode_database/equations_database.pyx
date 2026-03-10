@@ -57,16 +57,15 @@ cdef class Equations(CythonIodeDatabase):
         return self.database_ptr.get_lec(name.encode()).decode()
 
     def _get_object(self, name: str, eq: Equation) -> Equation:
-        cdef CEquation c_eq
+        cdef shared_ptr[CEquation] eq_ptr
         name = name.strip()
-        c_eq = self.database_ptr.get(name.encode())
-        eq.c_equation = new CEquation(c_eq)
-        eq.ptr_owner = <bint>True
+        eq_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        eq.update_ptr(eq_ptr)
         return eq
 
     def _set_object(self, name: str, eq: Equation):
-        cdef CEquation* equation_ptr = eq.c_equation
-        self.database_ptr.set_obj_ptr(name.encode(), equation_ptr)
+        cdef shared_ptr[CEquation] eq_ptr = eq.eq_ptr
+        self.database_ptr.set_obj_ptr(name.encode(), eq_ptr)
 
     def estimate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
                  list_eqs: Union[str, List[str]], maxit: int, epsilon: float) -> bool:
