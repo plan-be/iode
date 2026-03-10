@@ -13,6 +13,9 @@ Improvements
 
 - PYTHON: removed warning message when trying the get the sample of the *Variables* 
   database while it is undefined (closes :issue:`1150`) 
+- PYTHON: made :meth:`Variables.from_frame` and :meth:`Variables.from_array` methods to 
+  also accept columns / time axis with labels of type int (closes :issue:`1151`) 
+
 
 Fixed Bugs 
 ----------
