@@ -5386,6 +5386,7 @@ class Variables(IodeDatabase):
         Copy the pandas DataFrame `df` into the IODE Variables database.
         The variable names to copy are deduced from the index of the DataFrame.
         The column names must match the sub-periods of the current Variables sample.
+        The column names can be of type string or int.
 
         Parameters
         ----------
@@ -5517,7 +5518,14 @@ class Variables(IodeDatabase):
         vars_names = df.index.to_list()
 
         # list of periods
-        periods_list = df.columns.to_list()
+        if df.columns.inferred_type == 'integer':
+            periods_list = [f"{period}Y1" for period in df.columns.to_list()]
+        elif df.columns.inferred_type == 'string':
+            periods_list = df.columns.to_list()
+        else:
+            raise TypeError("The column names of the passed DataFrame must be either " \
+                             "strings or integers representing periods")
+        # first and last periods
         first_period, last_period = periods_list[0], periods_list[-1]
 
         if not (self.is_global_workspace or self.is_detached):
@@ -5719,6 +5727,8 @@ class Variables(IodeDatabase):
         If the passed array has more than two dimensions, the non-time axes are grouped 
         (with 'sep' as separator) to form the Variables names.
 
+        The time axis of the passed array can be of type string or int.
+
         Parameters
         ----------
         array: Array
@@ -5854,7 +5864,14 @@ class Variables(IodeDatabase):
         if time_axis_name not in array.axes:
             raise ValueError(f"Passed Array object must contain an axis named {time_axis_name}.\nGot axes {repr(array.axes)}.")
         time = array.axes[time_axis_name]
-        first_period, last_period = time.labels[0], time.labels[-1]
+        labels = time.labels
+        if labels.dtype.kind == 'i':
+            first_period, last_period = f"{labels[0]}Y1", f"{labels[-1]}Y1" 
+        elif labels.dtype.kind in 'SU':
+            first_period, last_period = labels[0], labels[-1]
+        else:
+            raise TypeError("The labels of the time axis in the passed Array must be either " \
+                             "strings or integers representing periods")
 
         # override the current sample if not set (empty Variables workspace)
         if not self.sample:

@@ -909,6 +909,37 @@ def test_variables_from_frame():
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
 
+
+def test_variables_from_frame_integer_columns():
+    """Test from_frame() method with integer column names (years)."""
+    variables.clear()
+    assert len(variables) == 0
+
+    # create the pandas DataFrame with integer column names (years)
+    vars_names = ["VAR1", "VAR2", "VAR3"]
+    integer_years = list(range(2000, 2006))  # [2000, 2001, 2002, 2003, 2004, 2005]
+    data = np.arange(len(vars_names) * len(integer_years), dtype=float).reshape(len(vars_names), len(integer_years))
+    df = pd.DataFrame(index=vars_names, columns=integer_years, data=data)
+    
+    # Verify that columns are indeed integers
+    assert df.columns.inferred_type == 'integer'
+    
+    # load into the IODE Variables database
+    variables.from_frame(df)
+    assert len(variables) == 3
+    
+    # Check that integer years were converted to proper period format
+    assert str(variables.sample) == '2000Y1:2005Y1'
+    
+    # check some values to ensure data was loaded correctly
+    assert variables["VAR1", "2000Y1"] == 0.0
+    assert variables["VAR1", "2005Y1"] == 5.0
+    assert variables["VAR2", "2000Y1"] == 6.0
+    assert variables["VAR2", "2005Y1"] == 11.0
+    assert variables["VAR3", "2000Y1"] == 12.0
+    assert variables["VAR3", "2005Y1"] == 17.0
+
+
 @pytest.mark.skipif(la is None, reason="larray is not installed")
 def test_variables_from_array():
     # check that LArray nan are converted to IODE NA
@@ -933,6 +964,42 @@ def test_variables_from_array():
     assert variables["VLA_00", "1970Y1"] == 10.0
     assert variables["BXL_02", "1960Y1"] == 88.0
     assert is_NA(variables["BXL_02", "1970Y1"])
+
+
+@pytest.mark.skipif(la is None, reason="larray is not installed")
+def test_variables_from_array_integer_time_axis():
+    """Test from_array() method with integer time axis labels (years)."""
+    variables.clear()
+    assert len(variables) == 0
+
+    # create LArray with integer time axis labels
+    regions_axis = la.Axis("region=VLA,WAL,BXL")
+    code_axis = la.Axis("code=00,01")
+    # Use integer years as time axis labels
+    integer_years = list(range(2020, 2026))  # [2020, 2021, 2022, 2023, 2024, 2025]
+    periods_axis = la.Axis(integer_years, name='time')
+    
+    # Create array with test data
+    array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
+    
+    # Verify that time axis labels are indeed integers
+    assert array.axes['time'].labels.dtype.kind == 'i'
+    
+    # load the IODE Variables from the Array object
+    variables.from_array(array)
+    assert len(variables) == 6  # 3 regions x 2 codes = 6 variables
+    
+    # Check that integer years were converted to proper period format
+    assert str(variables.sample) == '2020Y1:2025Y1'
+    
+    # check some values to ensure data was loaded correctly
+    # Array data follows pattern: region_index * codes_count * years_count + code_index * years_count + year_index
+    assert variables["VLA_00", "2020Y1"] == 0.0   # 0 * 2 * 6 + 0 * 6 + 0 = 0
+    assert variables["VLA_00", "2025Y1"] == 5.0   # 0 * 2 * 6 + 0 * 6 + 5 = 5  
+    assert variables["VLA_01", "2020Y1"] == 6.0   # 0 * 2 * 6 + 1 * 6 + 0 = 6
+    assert variables["WAL_00", "2020Y1"] == 12.0  # 1 * 2 * 6 + 0 * 6 + 0 = 12
+    assert variables["BXL_01", "2025Y1"] == 35.0  # 2 * 2 * 6 + 1 * 6 + 5 = 35
+
 
 def test_variables_big_file():
     variables.clear()
