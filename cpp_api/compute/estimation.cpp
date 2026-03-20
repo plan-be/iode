@@ -37,7 +37,7 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
 }
 
 // Note: +/- the same as E_SclToReal()
-static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, double* res, const int pos)
+static void add_df_test_coeff(std::shared_ptr<KDBScalars> kdb, const std::string& coeff_name, double* res, const int pos)
 {
     Scalar scl;
     scl.value = res[pos];
@@ -49,7 +49,7 @@ static void add_df_test_coeff(KDBScalars* kdb, const std::string& coeff_name, do
 // QUESTION FOR JMP : Why E_UnitRoot does not return a new KDB of scalars ? 
 //                    In E_UnitRoot, you first create new scalars then you delete them after computation of DF test.
 //                    Then, why not working on a local KDB of scalars ?
-KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
+std::shared_ptr<KDBScalars> dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
 {
     double* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
     if(!res)
@@ -68,7 +68,7 @@ KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, i
     }
 
     int pos = 0;
-    KDBScalars* kdb_res = new KDBScalars(false);
+    std::shared_ptr<KDBScalars> kdb_res = new KDBScalars(false);
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
@@ -319,7 +319,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
     int i_method = (int) method;
-    KDBVariables* kdb_var = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
     estimation = new Estimation(c_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
                                 i_method, maxit, eps);
     int res = estimation->estimate();
@@ -422,7 +422,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
     std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;
 
-    Estimation estimation(to_char_array(eqs), global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
+    Estimation estimation(to_char_array(eqs), global_ws_eqs, global_ws_var, global_ws_scl, 
                           to_char_array(from_period), to_char_array(to_period), -1, maxit, eps);
     int res = estimation.estimate();
     if(res != 0)

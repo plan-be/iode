@@ -218,7 +218,7 @@ public:
     KDB(const IodeType type, const bool is_global) : KDBInfo(type, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDB(KDB* db_parent, const bool copy) : KDBInfo((IodeType) db_parent->k_type, false)
+    KDB(const std::shared_ptr<KDB> db_parent, const bool copy) : KDBInfo((IodeType) db_parent->k_type, false)
     {
         k_db_type = copy ? DB_STANDALONE : DB_SUBSET;
     }
@@ -426,9 +426,11 @@ public:
 
 private:
     // only used by subsets ('shallow copies')
-    KDBTemplate* db_parent = nullptr;
+    // NOTE: weak_ptr is used to avoid circular references between parent and 
+    //       child databases (shared_ptr would cause memory leaks)
+    std::weak_ptr<KDBTemplate> db_parent;
     // only used by global or standalone databases
-    std::set<KDBTemplate*> children_db;
+    std::set<std::shared_ptr<KDBTemplate>> children_db;
 
 private:
     bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
@@ -481,7 +483,7 @@ private:
 
     virtual void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
     {
-        KDBTemplate* top_db = get_top_level_db();
+        std::shared_ptr<KDBTemplate> top_db = get_top_level_db();
 
         // Both the passed obj_ptr and k_objs[key] will point to the same object
         this->k_objs[key] = obj_ptr;
@@ -493,7 +495,7 @@ private:
 
         // if this is a top-level database, we also need to set the object in all 
         // subset instances
-        for(KDBTemplate* subset : get_children_db())
+        for(auto& subset : get_children_db())
         {
             if(!subset->contains(key))
                 continue;
@@ -506,7 +508,7 @@ public:
     KDBTemplate(const IodeType type, const bool is_global) : KDB(type, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBTemplate(KDBTemplate* db_parent, const std::string& pattern, const bool copy) 
+    KDBTemplate(const std::shared_ptr<KDBTemplate> db_parent, const std::string& pattern, const bool copy) 
         : KDB(db_parent, copy)
     {
         std::string error_msg;
@@ -532,10 +534,16 @@ public:
             throw std::runtime_error(error_msg);
         }
 
-        KDBTemplate* true_db_parent = db_parent;
+        std::shared_ptr<KDBTemplate> true_db_parent;
         // case where we create a subset of a subset
         if(db_parent->k_db_type == DB_SUBSET)
-            true_db_parent = db_parent->db_parent;
+        {
+            std::shared_ptr<KDBTemplate> parent_ptr = db_parent->db_parent.lock();
+            if(parent_ptr)
+                true_db_parent = parent_ptr;
+            else
+                true_db_parent = db_parent; 
+        }
         // normal case (global/standalone -> subset)
         else
             true_db_parent = db_parent;
@@ -552,7 +560,7 @@ public:
             if(!success)
                 throw std::runtime_error(error_msg);
             
-            true_db_parent->children_db.insert(this);
+            true_db_parent->children_db.insert(std::shared_ptr<KDBTemplate>(this));
             this->db_parent = true_db_parent;
         }
         else
@@ -561,7 +569,7 @@ public:
             if(!success)
                 throw std::runtime_error(error_msg);
             
-            this->db_parent = nullptr;
+            this->db_parent.reset();
         }
     }
 
@@ -595,18 +603,28 @@ public:
     {
         if(k_db_type != DB_SUBSET)
         {
-            for(KDBTemplate* child_db : children_db)
+            for(auto& child_db : children_db)
             {
                 child_db->k_objs.clear();
-                child_db->db_parent = nullptr;
+                child_db->db_parent.reset();
             }
             children_db.clear();
         }
 
-        if(db_parent)
+        std::shared_ptr<KDBTemplate> parent = db_parent.lock();
+        if(parent)
         {
-            db_parent->children_db.erase(this);
-            db_parent = nullptr;
+            // Find and erase the child that points to this instance
+            for(auto it = parent->children_db.begin(); it != parent->children_db.end(); ++it)
+            {
+                if(it->get() == this)
+                {
+                    parent->children_db.erase(it);
+                    break;
+                }
+            }
+
+            db_parent.reset();
         }
 
         this->clear();
@@ -618,10 +636,10 @@ public:
         // then clear the objects
         if(k_db_type != DB_SUBSET)
         {
-            for(KDBTemplate* child_db : children_db)
+            for(auto& child_db : children_db)
             {
                 child_db->k_objs.clear();
-                child_db->db_parent = nullptr;
+                child_db->db_parent.reset();
             }
 
             children_db.clear();
@@ -632,28 +650,34 @@ public:
         KDBInfo::clear();
     }
 
-    KDBTemplate* get_top_level_db()
+    std::shared_ptr<KDBTemplate> get_top_level_db()
     {
         if(k_db_type != DB_SUBSET)
-            return this;
+            return std::shared_ptr<KDBTemplate>(this);
         else
         {
-            if(!db_parent)
+            std::shared_ptr<KDBTemplate> parent = db_parent.lock();
+            if(!parent)
             {
                 std::string error_msg = "Internal error: subset database of type '";
                 error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
                 throw std::runtime_error(error_msg);
             }
-            return db_parent;
+            return parent;
         }
     }
 
-    std::set<KDBTemplate*> get_children_db() const
+    std::set<std::shared_ptr<KDBTemplate>> get_children_db() const
     {
         if(k_db_type != DB_SUBSET)
             return children_db; 
         else
-            return db_parent->children_db;
+        {
+            std::shared_ptr<KDBTemplate> parent = db_parent.lock();
+            if(parent)
+                return parent->children_db;
+            return std::set<std::shared_ptr<KDBTemplate>>();
+        }
     }
 
     int size() const override
@@ -669,10 +693,11 @@ public:
 
     bool parent_contains(const std::string& name) const
     {
-        if(k_db_type != DB_SUBSET || !db_parent)
+        std::shared_ptr<KDBTemplate> parent = db_parent.lock();
+        if(k_db_type != DB_SUBSET || !parent)
             return false;
 
-        return db_parent->contains(name);
+        return parent->contains(name);
     }
 
     int index_of(const std::string& name) const override
@@ -749,7 +774,7 @@ public:
         }
 
         // rename in top-level database
-        KDBTemplate* top_db = get_top_level_db();
+        std::shared_ptr<KDBTemplate> top_db = get_top_level_db();
         if(!overwrite)
         {
             if(top_db->contains(new_key))
@@ -765,7 +790,7 @@ public:
         top_db->k_objs[new_key] = obj_ptr;
 
         // rename in all subset instances (including 'this' if 'this' is a subset)
-        for(KDBTemplate* subset : get_children_db())
+        for(auto& subset : get_children_db())
         {
             if(!subset->contains(old_key))
                 continue;
@@ -779,7 +804,7 @@ public:
     bool remove(const std::string& name) override
     {
         std::string key = to_key(name);
-        KDBTemplate* top_db = get_top_level_db();
+        std::shared_ptr<KDBTemplate> top_db = get_top_level_db();
         if(!(this->contains(key) && top_db->contains(key)))
         {
             std::string str_type = v_iode_types[this->k_type];
@@ -794,7 +819,7 @@ public:
         top_db->k_objs.erase(key);
 
         // remove from all subset instances (including 'this' if 'this' is a subset)
-        for(KDBTemplate* subset : get_children_db())
+        for(auto& subset : get_children_db())
             subset->k_objs.erase(key);
 
         return true;
@@ -1012,7 +1037,7 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        KDBTemplate* top_db = get_top_level_db();
+        std::shared_ptr<KDBTemplate> top_db = get_top_level_db();
 
         if(this->k_db_type == DB_SUBSET)
         {
@@ -1124,7 +1149,7 @@ public:
 
 /*----------------------- GLOBALS ----------------------------*/
 
-KDB& get_global_db(const int iode_type);
+std::shared_ptr<KDB> get_global_db(const int iode_type);
 
 /**
  * k_ext[][4] : extensions of IODE filenames.

@@ -103,7 +103,7 @@ public:
     KDBVariables(const bool is_global) : KDBTemplate(VARIABLES, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBVariables(KDBVariables* db_parent, const std::string& pattern, const bool copy) 
+    KDBVariables(const std::shared_ptr<KDBVariables> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
@@ -281,8 +281,8 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBVariables> global_ws_var = std::make_unique<KDBVariables>(true);
-inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
+inline std::shared_ptr<KDBVariables> global_ws_var = std::make_shared<KDBVariables>(true);
+inline std::array<std::shared_ptr<KDBVariables>, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -319,14 +319,14 @@ inline bool var_to_binary(char** pack, const Variable& var)
 }
 
 /* k_wsvar.c */
-int KV_sample(KDBVariables*, Sample*);
-int KV_merge(KDBVariables*, KDBVariables*, int);
-void KV_merge_del(KDBVariables*, KDBVariables*, int);
-int KV_add(KDBVariables* kdb, char* varname);
-double KV_get(KDBVariables*, const std::string& ,int ,int );
-void KV_set(KDBVariables*, const std::string& ,int ,int ,double );
-int KV_extrapolate(KDBVariables*, int, Sample*, char*);
-KDBVariables* KV_aggregate(KDBVariables*,int ,char *,char *);
+int KV_sample(std::shared_ptr<KDBVariables>, Sample*);
+int KV_merge(std::shared_ptr<KDBVariables>, std::shared_ptr<KDBVariables>, int);
+void KV_merge_del(std::shared_ptr<KDBVariables>, std::shared_ptr<KDBVariables>, int);
+int KV_add(std::shared_ptr<KDBVariables> kdb, char* varname);
+double KV_get(std::shared_ptr<KDBVariables>, const std::string& ,int ,int );
+void KV_set(std::shared_ptr<KDBVariables>, const std::string& ,int ,int ,double );
+int KV_extrapolate(std::shared_ptr<KDBVariables>, int, Sample*, char*);
+std::shared_ptr<KDBVariables> KV_aggregate(std::shared_ptr<KDBVariables>,int ,char *,char *);
 void KV_init_values_1(double* val, int t, int method);
 //int KV_GetSmpl(Sample *,char *);
 double KV_get_at_t(char*varname, int t);

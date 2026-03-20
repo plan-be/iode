@@ -480,7 +480,7 @@ Sample* kasksmpl()
     if(kasksmpl_super) 
         return((*kasksmpl_super)());
     
-    if(global_ws_var.get())
+    if(global_ws_var)
         return global_ws_var->sample;
     else 
         return nullptr;

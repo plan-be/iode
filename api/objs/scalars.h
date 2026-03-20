@@ -88,7 +88,7 @@ struct KDBScalars : public KDBTemplate<Scalar>
     KDBScalars(const bool is_global) : KDBTemplate(SCALARS, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBScalars(KDBScalars* db_parent, const std::string& pattern, const bool copy) 
+    KDBScalars(const std::shared_ptr<KDBScalars> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
@@ -127,8 +127,8 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBScalars> global_ws_scl = std::make_unique<KDBScalars>(true);
-inline std::array<KDBScalars*, 5> global_ref_scl = { nullptr };
+inline std::shared_ptr<KDBScalars> global_ws_scl = std::make_shared<KDBScalars>(true);
+inline std::array<std::shared_ptr<KDBScalars>, 5> global_ref_scl = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
 

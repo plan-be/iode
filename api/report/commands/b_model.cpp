@@ -10,7 +10,7 @@
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
  *      int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
  *      int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
- *      int KE_compile(KDBEquations* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
+ *      int KE_compile(std::shared_ptr<KDBEquations> dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
  *      int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
@@ -56,14 +56,14 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
     int rc = -1;
     CSimulation simu;
     if(nb_eqs == 0)
-        rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
+        rc = simu.K_simul(global_ws_eqs, global_ws_var, global_ws_scl, smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+        std::shared_ptr<KDBEquations> tdbe = new KDBEquations(global_ws_eqs, eqs, false);
         if(tdbe)
         {
             if(tdbe->size() > 0)
-                rc = simu.K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
+                rc = simu.K_simul(tdbe, global_ws_var, global_ws_scl, smpl, 
                                   CSimulation::KSIM_EXO, c_eqs);
             delete tdbe;
         }
@@ -199,7 +199,7 @@ int B_ModelExchange(char* const_arg, int unused)
  *  @param [in, out] KDB*   dbe     KDB of equations to recompile
  *  @return          int            0 on success, -1 of dbe is null or empty
  */
-int KE_compile(KDBEquations* dbe)
+int KE_compile(std::shared_ptr<KDBEquations> dbe)
 {
     if(dbe == nullptr || dbe->size() == 0) 
     {
@@ -226,15 +226,15 @@ int B_ModelCompile(char* arg, int unused)
 
     /* EndoExo whole WS */
     if(arg == NULL || arg[0] == 0) 
-        rc = KE_compile(global_ws_eqs.get());
+        rc = KE_compile(global_ws_eqs);
     else 
     {
         std::string eqs = std::string(arg);
         if(eqs.empty())
-            rc = KE_compile(global_ws_eqs.get());
+            rc = KE_compile(global_ws_eqs);
         else 
         {
-            KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+            std::shared_ptr<KDBEquations> tdbe = new KDBEquations(global_ws_eqs, eqs, false);
             if(tdbe)
             {
                 if(tdbe->size() > 0)
@@ -276,13 +276,13 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    KDBEquations* tdbe = nullptr;
+    std::shared_ptr<KDBEquations> tdbe = nullptr;
     std::string list_eqs = std::string(arg + lg1);
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
-        tdbe = global_ws_eqs.get();
+        tdbe = global_ws_eqs;
     else
-        tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
+        tdbe = new KDBEquations(global_ws_eqs, list_eqs, false);
 
     CSimulation simu;
     int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
@@ -366,11 +366,11 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+    std::shared_ptr<KDBEquations> tdbe = new KDBEquations(global_ws_eqs, eqs, false);
 
     // Lance la simulation
     CSimulation simu;
-    int rc = simu.K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
+    int rc = simu.K_simul_SCC(tdbe, global_ws_var, global_ws_scl, smpl, pre, inter, post);
 
     // Cleanup
     delete tdbe;
@@ -429,7 +429,7 @@ static double *B_GetVarPtr(char* c_name)
  */
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
-    if(!global_ws_var.get())
+    if(!global_ws_var)
         return -1;
 
     // Create var and get Ptr
@@ -461,7 +461,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  */
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
-    if(!global_ws_var.get())
+    if(!global_ws_var)
         return -1;
 
     // Create var and get Ptr

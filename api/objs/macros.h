@@ -10,7 +10,7 @@ struct KDBMacros : public KDBTemplate<std::string>
     KDBMacros(const bool is_global) : KDBTemplate(OBJECTS, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBMacros(KDBMacros* db_parent, const std::string& pattern, const bool copy) 
+    KDBMacros(const std::shared_ptr<KDBMacros> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor

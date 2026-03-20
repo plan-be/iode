@@ -13,7 +13,7 @@ from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblT
 
 cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBTables* database_ptr
+    cdef std::shared_ptr<KDBTables> database_ptr
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
@@ -28,7 +28,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Tables _from_ptr(KDBTables* database_ptr = NULL, bint owner=False):
+    cdef Tables _from_ptr(std::shared_ptr<KDBTables> database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
         if database_ptr is not NULL:
@@ -47,7 +47,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Tables:
-        cdef KDBTables* subset_db_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef std::shared_ptr<KDBTables> subset_db_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
         subset = Tables._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
@@ -74,7 +74,7 @@ cdef class Tables(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Tables, overwrite: bool=True):        
-        cdef KDBTables* other_db_ptr = other.database_ptr
+        cdef std::shared_ptr<KDBTables> other_db_ptr = other.database_ptr
         self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     # Specify how to print a TABLE 

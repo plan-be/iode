@@ -574,7 +574,7 @@ struct KDBEquations : public KDBTemplate<Equation>
     KDBEquations(const bool is_global) : KDBTemplate(EQUATIONS, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBEquations(KDBEquations* db_parent, const std::string& pattern, const bool copy) 
+    KDBEquations(const std::shared_ptr<KDBEquations> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
@@ -628,8 +628,8 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBEquations> global_ws_eqs = std::make_unique<KDBEquations>(true);
-inline std::array<KDBEquations*, 5> global_ref_eqs = { nullptr };
+inline std::shared_ptr<KDBEquations> global_ws_eqs = std::make_shared<KDBEquations>(true);
+inline std::array<std::shared_ptr<KDBEquations>, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -654,20 +654,20 @@ int E_dynadj(int ,char *,char *,char *,char **);
 int E_DynamicAdjustment(int ,char **,char *,char *);
 
 // Estimation tests by equation name
-double K_etest(KDBEquations* kdb, char*name, int test_nb);
-double K_e_stdev (KDBEquations* kdb, char*name);
-double K_e_meany (KDBEquations* kdb, char*name);
-double K_e_ssres (KDBEquations* kdb, char*name);
-double K_e_stderr(KDBEquations* kdb, char*name);
-double K_e_fstat (KDBEquations* kdb, char*name);
-double K_e_r2    (KDBEquations* kdb, char*name);
-double K_e_r2adj (KDBEquations* kdb, char*name);
-double K_e_dw    (KDBEquations* kdb, char*name);
-double K_e_loglik(KDBEquations* kdb, char*name);
+double K_etest(std::shared_ptr<KDBEquations> kdb, char*name, int test_nb);
+double K_e_stdev (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_meany (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_ssres (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_stderr(std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_fstat (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_r2    (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_r2adj (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_dw    (std::shared_ptr<KDBEquations> kdb, char*name);
+double K_e_loglik(std::shared_ptr<KDBEquations> kdb, char*name);
 
 /*----------------------- FUNCS ----------------------------*/
 
 int K_epack(char **,char *,char *);
 
 /* lec/l_link.c */
-void L_link_endos(KDBEquations* dbe, CLEC *cl);
+void L_link_endos(std::shared_ptr<KDBEquations> dbe, CLEC *cl);

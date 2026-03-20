@@ -188,7 +188,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  @return     int             0        
  *  
  */
-int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
+int Estimation::E_add_scls(CLEC* clec, std::shared_ptr<KDBScalars> dbs)
 {
     char* c_name;
     std::string name;

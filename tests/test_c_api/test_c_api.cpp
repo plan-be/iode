@@ -168,8 +168,8 @@ public:
 	    std::string lst;
 	    static int  done = 0;
 
-        KDBLists*     kdb_lst = global_ws_lst.get();
-        KDBVariables* kdb_var = global_ws_var.get();
+        std::shared_ptr<KDBLists>     kdb_lst = global_ws_lst;
+        std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
 	
 	    // Create or update lists
         if(kdb_lst->contains("LST1"))
@@ -261,9 +261,9 @@ public:
 	
 	    clec = L_cc(lec);
         EXPECT_TRUE(clec != NULL);
-	    rc = L_link(global_ws_var.get(), global_ws_scl.get(), clec);
+	    rc = L_link(global_ws_var, global_ws_scl, clec);
 	    EXPECT_EQ(rc, 0);
-	    calc_val = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
+	    calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
@@ -275,8 +275,8 @@ public:
 	
 	    clec = L_cc(lec);
 	    if(clec == NULL) return(IODE_NAN);
-	    if(L_link(global_ws_var.get(), global_ws_scl.get(), clec)) return(IODE_NAN);
-	    res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
+	    if(L_link(global_ws_var, global_ws_scl, clec)) return(IODE_NAN);
+	    res = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    return res;
 	}
@@ -479,7 +479,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -536,7 +536,7 @@ public:
 	    int      rc;
 	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
-        KDB*     kdb_var = global_ws_var.get();
+        KDB*     kdb_var = global_ws_var;
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
@@ -554,7 +554,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 21; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -600,7 +600,7 @@ public:
 	
 	    // Create ACAF = 0 1 IODE_NAN...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         var[7] = IODE_NAN;
@@ -620,11 +620,11 @@ public:
 	    double  *A;
 	    int     nb;
 	
-	    if(!global_ws_var.get()) 
+	    if(!global_ws_var) 
             return false;
         
 	    nb = global_ws_var->sample->nb_periods;
-	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
+	    A = L_cc_link_exec(lec, global_ws_var, global_ws_scl);
 	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
 	    return true;
@@ -788,7 +788,7 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
 
     // Test KV_sample()
     std::string asmpl1 = global_ws_var->sample->to_string();
-    KV_sample(global_ws_var.get(), NULL);
+    KV_sample(global_ws_var, NULL);
     std::string asmpl2 = global_ws_var->sample->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
@@ -1053,7 +1053,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    KDBVariables* kdb_var = new KDBVariables(false);
+    std::shared_ptr<KDBVariables> kdb_var = new KDBVariables(false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1094,9 +1094,9 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 
 TEST_F(LegacyAPITest, Tests_Simulation)
 {
-    KDBVariables* kdbv;
-    KDBEquations* kdbe;
-    KDBScalars*   kdbs;
+    std::shared_ptr<KDBVariables> kdbv;
+    std::shared_ptr<KDBEquations> kdbe;
+    std::shared_ptr<KDBScalars>   kdbs;
     Sample* smpl;
     char*   filename = "fun";
     U_ch**  endo_exo;
@@ -1111,11 +1111,11 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     // Check list _DIVER does not exist before simulation
@@ -1190,8 +1190,8 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     char    **varlist;
     Sample  *smpl;
     int     rc;
-    KDBTables*    kdbt;
-    KDBVariables* kdbv; 
+    std::shared_ptr<KDBTables>    kdbt;
+    std::shared_ptr<KDBVariables> kdbv; 
 
     U_test_suppress_a2m_msgs();
 
@@ -1199,13 +1199,13 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     global_ref_var[0] = new KDBVariables(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
-    kdbt = global_ws_tbl.get();
+    kdbt = global_ws_tbl;
     global_ref_tbl[0] = new KDBTables(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
@@ -1299,7 +1299,7 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     EXPECT_EQ(rc, 0);
 
     EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs.get(), "ACAF") * 1e6) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs, "ACAF") * 1e6) / 1e6, 0.821815);
 
     //TODO:add some tests with other estimation methods / on blocks / with instruments
 
@@ -1569,13 +1569,13 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     U_test_print_title("Tests B_DATA");
 
-    KDB* kdb_cmt = global_ws_cmt.get();
-    KDB* kdb_eqs = global_ws_eqs.get();
-    KDB* kdb_idt = global_ws_idt.get();
-    KDB* kdb_lst = global_ws_lst.get();
-    KDB* kdb_scl = global_ws_scl.get();
-    KDB* kdb_tbl = global_ws_tbl.get();
-    KDB* kdb_var = global_ws_var.get();
+    KDB* kdb_cmt = global_ws_cmt;
+    KDB* kdb_eqs = global_ws_eqs;
+    KDB* kdb_idt = global_ws_idt;
+    KDB* kdb_lst = global_ws_lst;
+    KDB* kdb_scl = global_ws_scl;
+    KDB* kdb_tbl = global_ws_tbl;
+    KDB* kdb_var = global_ws_var;
 
     // Clear WS, then loads 3 WS and check ok
     //K_end_ws(0);
@@ -1780,7 +1780,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
 
-    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
     std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
     eq_ptr->reset_tests();
     EXPECT_DOUBLE_EQ(eq_ptr->get_test_r2(), 0.0);
@@ -2081,7 +2081,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(true);
+    std::shared_ptr<KDBVariables> kdb_var = new KDBVariables(true);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2096,7 +2096,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDBComments* kdb_cmt = new KDBComments(true);
+        std::shared_ptr<KDBComments> kdb_cmt = new KDBComments(true);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
         global_ws_cmt.reset(kdb_cmt);
@@ -2128,7 +2128,7 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(true);
+    std::shared_ptr<KDBVariables> kdb_var = new KDBVariables(true);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var.reset(kdb_var);
@@ -2152,7 +2152,7 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2010Q1", "2020Q4");
-    KV_sample(global_ws_var.get(), smpl);
+    KV_sample(global_ws_var, smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun.av", input_test_dir);
@@ -2214,7 +2214,7 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2000Y1", "2020Y1");
-    KV_sample(global_ws_var.get(), smpl);
+    KV_sample(global_ws_var, smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun_q.var", input_test_dir);
@@ -2268,11 +2268,11 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     // B_ModelSimulateParms()
@@ -2303,11 +2303,11 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     // Set values of endo UY
@@ -2350,11 +2350,11 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     //  3. Simulate & compare
@@ -2999,7 +2999,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
     out_filepath = str_output_test_dir + "fun2.ae";
     _unlink((char*) out_filepath.c_str());
-    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
     rc = B_WsSave((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     B_WsClear("", EQUATIONS);
@@ -3959,72 +3959,72 @@ TEST_F(LegacyAPITest, Tests_RAS_EXECUTE)
     B_WsClear("Var", VARIABLES);
     B_WsSample("2000Y1 2001Y1");
 
-    KV_add(global_ws_var.get(), "R1C1");
+    KV_add(global_ws_var, "R1C1");
     global_ws_var->get_var_ptr("R1C1")[0] = 5.0;
-    KV_add(global_ws_var.get(), "R1C2");
+    KV_add(global_ws_var, "R1C2");
     global_ws_var->get_var_ptr("R1C2")[0] = 3.0;
-    KV_add(global_ws_var.get(), "R1C3");
+    KV_add(global_ws_var, "R1C3");
     global_ws_var->get_var_ptr("R1C3")[0] = 5.0;
-    KV_add(global_ws_var.get(), "R1C4");
+    KV_add(global_ws_var, "R1C4");
     global_ws_var->get_var_ptr("R1C4")[0] = 7.0;
     global_ws_var->get_var_ptr("R1C4", 1)[0] = 5.0;
-    KV_add(global_ws_var.get(), "R1CT");
+    KV_add(global_ws_var, "R1CT");
     global_ws_var->get_var_ptr("R1CT")[0] = 20.0;
     global_ws_var->get_var_ptr("R1CT", 1)[0] = 20.0;
 
-    KV_add(global_ws_var.get(), "R2C1");
+    KV_add(global_ws_var, "R2C1");
     global_ws_var->get_var_ptr("R2C1")[0] = 1.0;
-    KV_add(global_ws_var.get(), "R2C2");
+    KV_add(global_ws_var, "R2C2");
     global_ws_var->get_var_ptr("R2C2")[0] = 1.0;
     global_ws_var->get_var_ptr("R2C2", 1)[0] = 2.0;
-    KV_add(global_ws_var.get(), "R2C3");
+    KV_add(global_ws_var, "R2C3");
     global_ws_var->get_var_ptr("R2C3")[0] = 4.0;
-    KV_add(global_ws_var.get(), "R2C4");
+    KV_add(global_ws_var, "R2C4");
     global_ws_var->get_var_ptr("R2C4")[0] = 4.0;
-    KV_add(global_ws_var.get(), "R2CT");
+    KV_add(global_ws_var, "R2CT");
     global_ws_var->get_var_ptr("R2CT")[0] = 10.0;
     global_ws_var->get_var_ptr("R2CT", 1)[0] = 10.0;
 
-    KV_add(global_ws_var.get(), "R3C1");
+    KV_add(global_ws_var, "R3C1");
     global_ws_var->get_var_ptr("R3C1")[0] = 3.0;
-    KV_add(global_ws_var.get(), "R3C2");
+    KV_add(global_ws_var, "R3C2");
     global_ws_var->get_var_ptr("R3C2")[0] = 1.0;
-    KV_add(global_ws_var.get(), "R3C3");
+    KV_add(global_ws_var, "R3C3");
     global_ws_var->get_var_ptr("R3C3")[0] = 3.0;
     global_ws_var->get_var_ptr("R3C3", 1)[0] = 2.0;
-    KV_add(global_ws_var.get(), "R3C4");
+    KV_add(global_ws_var, "R3C4");
     global_ws_var->get_var_ptr("R3C4")[0] = 3.0;
-    KV_add(global_ws_var.get(), "R3CT");
+    KV_add(global_ws_var, "R3CT");
     global_ws_var->get_var_ptr("R3CT")[0] = 10.0;
     global_ws_var->get_var_ptr("R3CT", 1)[0] = 10.0;
 
-    KV_add(global_ws_var.get(), "R4C1");
+    KV_add(global_ws_var, "R4C1");
     global_ws_var->get_var_ptr("R4C1")[0] = 1.0;
     global_ws_var->get_var_ptr("R4C1", 1)[0] = 0.0;
-    KV_add(global_ws_var.get(), "R4C2");
+    KV_add(global_ws_var, "R4C2");
     global_ws_var->get_var_ptr("R4C2")[0] = 2.0;
-    KV_add(global_ws_var.get(), "R4C3");
+    KV_add(global_ws_var, "R4C3");
     global_ws_var->get_var_ptr("R4C3")[0] = 1.0;
-    KV_add(global_ws_var.get(), "R4C4");
+    KV_add(global_ws_var, "R4C4");
     global_ws_var->get_var_ptr("R4C4")[0] = 1.0;
-    KV_add(global_ws_var.get(), "R4CT");
+    KV_add(global_ws_var, "R4CT");
     global_ws_var->get_var_ptr("R4CT")[0] = 5.0;
     global_ws_var->get_var_ptr("R4CT", 1)[0] = 5.0;
 
-    KV_add(global_ws_var.get(), "RTC1");
+    KV_add(global_ws_var, "RTC1");
     global_ws_var->get_var_ptr("RTC1")[0] = 10.0;
     global_ws_var->get_var_ptr("RTC1", 1)[0] = 10.0;
-    KV_add(global_ws_var.get(), "RTC2");
+    KV_add(global_ws_var, "RTC2");
     global_ws_var->get_var_ptr("RTC2")[0] = 7.0;
     global_ws_var->get_var_ptr("RTC2", 1)[0] = 7.0;
-    KV_add(global_ws_var.get(), "RTC3");
+    KV_add(global_ws_var, "RTC3");
     global_ws_var->get_var_ptr("RTC3")[0] = 13.0;
     global_ws_var->get_var_ptr("RTC3", 1)[0] = 13.0;
-    KV_add(global_ws_var.get(), "RTC4");
+    KV_add(global_ws_var, "RTC4");
     global_ws_var->get_var_ptr("RTC4")[0] = 15.0;
     global_ws_var->get_var_ptr("RTC4", 1)[0] = 15.0;
 
-    KV_add(global_ws_var.get(), "RTCT");
+    KV_add(global_ws_var, "RTCT");
     global_ws_var->get_var_ptr("RTCT")[0] = 90.0;
     global_ws_var->get_var_ptr("RTCT", 1)[0] = 90.0;
 

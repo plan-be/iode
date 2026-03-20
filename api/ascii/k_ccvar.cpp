@@ -34,9 +34,9 @@ int   KDBVariables::CSV_NBDEC = 15;
  *  @return                 int     0 on success, -1 if the var <name> cannot be created.
  *  
  */
-static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
+static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
 {
-    Sample* smpl = kdb->sample;
+    Sample* smpl = kdb.sample;
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
@@ -63,7 +63,7 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
 
     try
     {
-        kdb->set(name, var);
+        kdb.set(name, var);
     }
     catch(const std::exception&) 
     {
@@ -89,16 +89,13 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
  *  @return                        KDB*    a new KDB of IODE vars or NULL on error
  *  
  */
-static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
+static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
 {
     int     cmpt = 0;
     ONAME   name;
     Sample* smpl = nullptr;
 
-    if(!kdb)
-        return false;
-
-    kdb->clear();  /* clear KDB */
+    kdb.clear();  /* clear KDB */
 
     // The keyword sample must be the first on the YY stream */
     // if not:
@@ -123,7 +120,7 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
     if(!smpl) 
         goto err;
     
-    kdb->sample = new Sample(*smpl);
+    kdb.sample = new Sample(*smpl);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
@@ -156,7 +153,7 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
 
 err:
     if(smpl) delete smpl;
-    if(kdb) kdb->clear();
+    kdb.clear();
     return false;
 }
 
@@ -206,7 +203,7 @@ bool KDBVariables::load_asc_type_ask(const std::string& file_or_string, int type
         return false;
     }
 
-    bool success = load_yy(this, yy, ask);
+    bool success = load_yy(*this, yy, ask);
     YY_close(yy);
     return success;
 }

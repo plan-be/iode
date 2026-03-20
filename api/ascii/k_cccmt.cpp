@@ -27,7 +27,7 @@
  *  @return                     int     0 if the CMT is read and saved, -1 if the CMT can't be created.
  *  
  */
-static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
+static int read_cmt(KDBComments& kdb, YYFILE* yy, char* name)
 {
     int keyw;
     char* cmt;
@@ -54,7 +54,7 @@ static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
     try
     {
         Comment cmt_obj(cmt);
-        kdb->set(name, cmt_obj);
+        kdb.set(name, cmt_obj);
     }
     catch(const std::exception&)
     {
@@ -133,7 +133,7 @@ bool KDBComments::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                rc = read_cmt(this, yy, name);
+                rc = read_cmt(*this, yy, name);
                 if(rc == 0) 
                     cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);

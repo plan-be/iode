@@ -41,7 +41,7 @@ int RP_macro_createdb()
     if(RP_MACRO) 
         return 0;
 
-    RP_MACRO = new KDBMacros(true);
+    RP_MACRO = new std::shared_ptr<KDBVariables>(true);
     if(!RP_MACRO) 
     {
         error_manager.append_error("Report : Memory Full");

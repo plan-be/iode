@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Scalars(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBScalars* database_ptr
+    cdef std::shared_ptr<KDBScalars> database_ptr
 
     def __cinit__(self, filepath: str=None) -> Scalars:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Scalars(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Scalars _from_ptr(KDBScalars* database_ptr = NULL, bint owner=False):
+    cdef Scalars _from_ptr(std::shared_ptr<KDBScalars> database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Scalars wrapper = Scalars.__new__(Scalars)
         if database_ptr is not NULL:
@@ -43,7 +43,7 @@ cdef class Scalars(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Scalars:
-        cdef KDBScalars* subset_db_ptr = new KDBScalars(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef std::shared_ptr<KDBScalars> subset_db_ptr = new KDBScalars(self.database_ptr, pattern.encode(), <bint>copy)
         subset = Scalars._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
@@ -67,7 +67,7 @@ cdef class Scalars(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Scalars, overwrite: bool=True):        
-        cdef KDBScalars* other_db_ptr = other.database_ptr
+        cdef std::shared_ptr<KDBScalars> other_db_ptr = other.database_ptr
         self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:

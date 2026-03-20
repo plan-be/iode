@@ -1271,7 +1271,8 @@ bool KDBTables::print_obj_def(const std::string& name)
 
 void KDBTables::update_reference_db()
 {
-    if(global_ref_tbl[0]) 
-        delete global_ref_tbl[0];
-    global_ref_tbl[0] = new KDBTables(this, "*", false);      
+    if(this == global_ws_tbl.get())
+        global_ref_tbl[0] = global_ws_tbl;
+    else
+        global_ref_tbl[0].reset(this);      
 }

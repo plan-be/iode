@@ -84,7 +84,8 @@ bool KDBScalars::print_obj_def(const std::string& name)
 
 void KDBScalars::update_reference_db()
 {
-    if(global_ref_scl[0]) 
-        delete global_ref_scl[0];
-    global_ref_scl[0] = new KDBScalars(this, "*", false);      
+    if(this == global_ws_scl.get())
+        global_ref_scl[0] = global_ws_scl;
+    else
+        global_ref_scl[0].reset(this);
 }

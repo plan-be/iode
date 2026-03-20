@@ -128,7 +128,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ==== Load all variables from big.var into global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
         B_WsLoad(fullfilename, VARIABLES);
-        EXPECT_TRUE(global_ws_var.get() != nullptr);
+        EXPECT_TRUE(global_ws_var != nullptr);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(B_WsLoad)               loaded " << std::to_string(global_ws_var->size()) 
@@ -138,7 +138,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== Only names matching a specific pattern ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = new KDBVariables(global_ws_var, pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
@@ -148,7 +148,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = new KDBVariables(global_ws_var, pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -159,7 +159,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== All names from global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = new KDBVariables(global_ws_var, "*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
@@ -169,7 +169,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = new KDBVariables(global_ws_var, "*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 
@@ -181,7 +181,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // **** KDBVariables(global, filepath) performance tests ****
 
         start = std::chrono::high_resolution_clock::now();
-        EXPECT_TRUE(global_ws_var.get() != nullptr);
+        EXPECT_TRUE(global_ws_var != nullptr);
         global_ws_var->load(std::string(fullfilename));
         EXPECT_EQ(global_ws_var->size(), 175760);
         EXPECT_EQ(global_ws_var->sample->to_string(), "1990Y1:2060Y1");
@@ -238,7 +238,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // **** KDBVariables(global, filepath) performance tests ****
 
         start = std::chrono::high_resolution_clock::now();
-        EXPECT_TRUE(global_ws_var.get() != nullptr);
+        EXPECT_TRUE(global_ws_var != nullptr);
         global_ws_var->load(std::string(fullfilename));
         EXPECT_EQ(global_ws_var->size(), 175760);
         EXPECT_EQ(global_ws_var->sample->to_string(), "1990Y1:2060Y1");

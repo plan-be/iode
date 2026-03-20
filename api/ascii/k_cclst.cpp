@@ -31,7 +31,7 @@
  *                                      -1 if the LST can't be created. (call to kerror() in that case)
  *  
  */
-static int read_lst(KDBLists* kdb, YYFILE* yy, char* name)
+static int read_lst(std::shared_ptr<KDBLists> kdb, YYFILE* yy, char* name)
 {
     int keyw;
     char* lst;

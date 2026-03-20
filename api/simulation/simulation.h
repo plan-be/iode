@@ -69,9 +69,9 @@ public:
 	static int     KSIM_CPU_SORT;  		// Elapsed time to sort interdep block
 
 protected:
-	KDBVariables*  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
-	KDBScalars*    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
-	KDBEquations*  KSIM_DBE;         	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
+	std::shared_ptr<KDBVariables>  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
+	std::shared_ptr<KDBScalars>    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
+	std::shared_ptr<KDBEquations>  KSIM_DBE;         	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
 
@@ -210,12 +210,12 @@ public:
     }
 
 	/* k_sim_main.c */
-	int K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
+	int K_simul(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, 
 		        Sample* smpl, char** endo_exo, char** eqs);
 
 	/* k_sim_scc.c */
-	int KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post);
-	int K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+	int KE_ModelCalcSCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post);
+	int K_simul_SCC(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, 
 		            char** pre, char** inter, char** post);
 
 protected:
@@ -295,5 +295,5 @@ private:
 	int KE_findpath(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
+	int K_simul_SCC_init(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl);
 };

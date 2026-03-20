@@ -74,14 +74,14 @@ static CLEC *COL_cp_clec(CLEC* clec)
  */
 static int COL_link(int i, CLEC* clec)
 {
-    KDBVariables* kdbv = (KDBVariables*) global_ref_var[i - 1];
+    std::shared_ptr<KDBVariables> kdbv = (std::shared_ptr<KDBVariables>) global_ref_var[i - 1];
     if(!kdbv) 
     {
         kmsg("File [%d] not present", i);
         return -1;
     }
 
-    int res = L_link(kdbv, global_ws_scl.get(), clec);
+    int res = L_link(kdbv, global_ws_scl, clec);
     return res;
 }
 
@@ -106,7 +106,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 {
     int     i, j, t[2], tmp, per;
     double  vy[2], vf[2], div, mant, sign;
-    KDBVariables* kdb = nullptr;
+    std::shared_ptr<KDBVariables> kdb = nullptr;
 
     /* deux fichiers */
     for(i = 0; i < 2; i++) 
@@ -121,7 +121,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
             return -1;
         
-        kdb = (KDBVariables*) global_ref_var[cl->cl_fnb[i] - 1];
+        kdb = (std::shared_ptr<KDBVariables>) global_ref_var[cl->cl_fnb[i] - 1];
 
         for(j = 0 ; j < 2 ; j++) 
         {
@@ -132,12 +132,12 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 break;
             }
             t[j]  = cl->cl_per[j].difference(kdb->sample->start_period);
-            vy[j] = L_exec(kdb, global_ws_scl.get(), clec, t[j]);
+            vy[j] = L_exec(kdb, global_ws_scl, clec, t[j]);
             if(!IODE_IS_A_NUMBER(vy[j])) 
                 goto err; /* JMP 16-12-93 */
             div = 1.0;
             if(dclec) 
-                div = L_exec(kdb, global_ws_scl.get(), dclec, t[j]);
+                div = L_exec(kdb, global_ws_scl, dclec, t[j]);
             if(!IODE_IS_A_NUMBER(div) || div == 0) 
                 goto err; /* JMP 16-12-93 */
             vy[j] /= div;
@@ -199,12 +199,12 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
                 vf[i] = 0.0;
                 for(j = t[0]; j <= t[1] ; j++) 
                 {
-                    vy[0] = L_exec(kdb, global_ws_scl.get(), clec, j);
+                    vy[0] = L_exec(kdb, global_ws_scl, clec, j);
                     if(!IODE_IS_A_NUMBER(vy[0])) 
                         goto err; /* JMP 16-12-93 */
                     div = 1.0;
                     if(dclec) 
-                        div = L_exec(kdb, global_ws_scl.get(), dclec, j);
+                        div = L_exec(kdb, global_ws_scl, dclec, j);
                     if(!IODE_IS_A_NUMBER(div) || div == 0) 
                         goto err; /* JMP 16-12-93 */
                     vf[i] += vy[0] / div;

@@ -4,7 +4,7 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.set cimport set
 from libcpp.map cimport map
-from libcpp.memory cimport unique_ptr, shared_ptr
+from libcpp.memory cimport shared_ptr
 
 from libcpp cimport bool
 
@@ -107,9 +107,9 @@ cdef extern from "api/all.h":
         void clear() except +
 
     # k_wsvar.c
-    int KV_add(KDBVariables* kdb, char* varname)
-    double KV_get(KDBVariables* kdb, string name, int t, int mode)
-    void KV_set(KDBVariables* kdb, string name, int t, int mode, double value)
+    int KV_add(std::shared_ptr<KDBVariables> kdb, char* varname)
+    double KV_get(std::shared_ptr<KDBVariables> kdb, string name, int t, int mode)
+    void KV_set(std::shared_ptr<KDBVariables> kdb, string name, int t, int mode, double value)
 
     # k_grep.c
     char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
@@ -140,10 +140,10 @@ cdef extern from "cpp_api/compute/simulation.h":
                       const int maxit, const double eps) except +
 
 cdef extern from "pyiode/iode_database/variables_database.cpp":
-    void _c_add_var_from_other(const string& name, KDBVariables* dest, KDBVariables* source, 
+    void _c_add_var_from_other(const string& name, std::shared_ptr<KDBVariables> dest, std::shared_ptr<KDBVariables> source, 
                                const int source_t_first, const int source_t_last) except +
-    void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
-                             const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
+    void _c_copy_var_content(const string& dest_name, std::shared_ptr<KDBVariables> dest, const int dest_t_first, const int dest_t_last,
+                             const string& source_name, std::shared_ptr<KDBVariables> source, const int source_t_first, const int source_t_last) except +
 
     cdef enum BinaryOperation:
         OP_ADD,
@@ -152,11 +152,11 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
         OP_DIV,
         OP_POW
 
-    void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int t_last, const double value) except +
-    void _c_operation_one_period(const int op, KDBVariables* database, const int t, const double* values, const int nb_values) except +
-    void _c_operation_one_var(const int op, KDBVariables* database, const string& name, int t_first, int t_last, const double* values) except +
-    void _c_operation_between_two_vars(const int op, KDBVariables* database, const string& name, const int t_first, const int t_last, 
-                                       KDBVariables* other, const string& other_name, const int other_t_first, const int other_t_last) except +
+    void _c_operation_scalar(const int op, std::shared_ptr<KDBVariables> database, int t_first, int t_last, const double value) except +
+    void _c_operation_one_period(const int op, std::shared_ptr<KDBVariables> database, const int t, const double* values, const int nb_values) except +
+    void _c_operation_one_var(const int op, std::shared_ptr<KDBVariables> database, const string& name, int t_first, int t_last, const double* values) except +
+    void _c_operation_between_two_vars(const int op, std::shared_ptr<KDBVariables> database, const string& name, const int t_first, const int t_last, 
+                                       std::shared_ptr<KDBVariables> other, const string& other_name, const int other_t_first, const int other_t_last) except +
 
 
 cdef extern from "api/b_errors.h":
@@ -175,7 +175,7 @@ cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBComments(KDBComments* db_parent, string pattern, bool copy) 
+        KDBComments(shared_ptr[KDBComments] db_parent, string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
@@ -184,7 +184,7 @@ cdef extern from "api/objs/comments.h":
     size_t hash_value(KDBComments&) except +
 
     # Define the global Comments instance
-    ctypedef unique_ptr[KDBComments] KDBCommentsPtr
+    ctypedef shared_ptr[KDBComments] KDBCommentsPtr
     cdef KDBCommentsPtr global_ws_cmt
 
 
@@ -192,7 +192,7 @@ cdef extern from "api/objs/equations.h":
     cdef cppclass KDBEquations(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBEquations(KDBEquations* db_parent, string pattern, bool copy) 
+        KDBEquations(shared_ptr[KDBEquations] db_parent, string pattern, bool copy) 
 
         # Public methods
         CEquation get(string& name) except +
@@ -207,7 +207,7 @@ cdef extern from "api/objs/equations.h":
     size_t hash_value(KDBEquations&) except +
 
     # Define the global Equations instance
-    ctypedef unique_ptr[KDBEquations] KDBEquationsPtr
+    ctypedef shared_ptr[KDBEquations] KDBEquationsPtr
     cdef KDBEquationsPtr global_ws_eqs
 
 
@@ -215,7 +215,7 @@ cdef extern from "api/objs/identities.h":
     cdef cppclass KDBIdentities(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBIdentities(KDBIdentities* db_parent, string pattern, bool copy) 
+        KDBIdentities(shared_ptr[KDBIdentities] db_parent, string pattern, bool copy) 
 
         # Public methods
         CIdentity get(string& name) except +
@@ -233,7 +233,7 @@ cdef extern from "api/objs/identities.h":
     size_t hash_value(KDBIdentities&) except +
 
     # Define the global Identities instance
-    ctypedef unique_ptr[KDBIdentities] KDBIdentitiesPtr
+    ctypedef shared_ptr[KDBIdentities] KDBIdentitiesPtr
     cdef KDBIdentitiesPtr global_ws_idt
 
 
@@ -241,7 +241,7 @@ cdef extern from "api/objs/lists.h":
     cdef cppclass KDBLists(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBLists(KDBLists* db_parent, string pattern, bool copy) 
+        KDBLists(shared_ptr[KDBLists] db_parent, string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
@@ -250,7 +250,7 @@ cdef extern from "api/objs/lists.h":
     size_t hash_value(KDBLists&) except +
 
     # Define the global Lists instance
-    ctypedef unique_ptr[KDBLists] KDBListsPtr
+    ctypedef shared_ptr[KDBLists] KDBListsPtr
     cdef KDBListsPtr global_ws_lst
 
 
@@ -258,7 +258,7 @@ cdef extern from "api/objs/scalars.h":
     cdef cppclass KDBScalars(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBScalars(KDBScalars* db_parent, string pattern, bool copy) 
+        KDBScalars(shared_ptr[KDBScalars] db_parent, string pattern, bool copy) 
 
         # Public methods
         CScalar get(string& name) except +
@@ -269,7 +269,7 @@ cdef extern from "api/objs/scalars.h":
     size_t hash_value(KDBScalars&) except +
 
     # Define the global Scalars instance
-    ctypedef unique_ptr[KDBScalars] KDBScalarsPtr
+    ctypedef shared_ptr[KDBScalars] KDBScalarsPtr
     cdef KDBScalarsPtr global_ws_scl
 
 
@@ -277,7 +277,7 @@ cdef extern from "api/objs/tables.h":
     cdef cppclass KDBTables(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBTables(KDBTables* db_parent, string pattern, bool copy) 
+        KDBTables(shared_ptr[KDBTables] db_parent, string pattern, bool copy) 
 
         # Public methods
         CTable get(string& name) except +
@@ -301,7 +301,7 @@ cdef extern from "api/objs/tables.h":
     size_t hash_value(KDBTables&) except +
 
     # Define the global Tables instance
-    ctypedef unique_ptr[KDBTables] KDBTablesPtr
+    ctypedef shared_ptr[KDBTables] KDBTablesPtr
     cdef KDBTablesPtr global_ws_tbl
 
 
@@ -309,7 +309,7 @@ cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 
+        KDBVariables(shared_ptr[KDBVariables] db_parent, string pattern, bool copy) 
 
         # Public methods
         vector[double]* get_obj_ptr(string& name) except +
@@ -343,5 +343,5 @@ cdef extern from "api/objs/variables.h":
     size_t hash_value(KDBVariables&) except +
 
     # Define the global Variables instance
-    ctypedef unique_ptr[KDBVariables] KDBVariablesPtr
+    ctypedef shared_ptr[KDBVariables] KDBVariablesPtr
     cdef KDBVariablesPtr global_ws_var

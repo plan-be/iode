@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 
-static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
-                             KDBVariables* source, const int source_t_first, const int source_t_last)
+static void _c_sanity_checks(std::shared_ptr<KDBVariables> dest, const int dest_t_first, const int dest_t_last, 
+                             std::shared_ptr<KDBVariables> source, const int source_t_first, const int source_t_last)
 {
     if(!source)
         throw std::invalid_argument("C API: Variables Source database is empty");
@@ -50,7 +50,7 @@ static void _c_sanity_checks(KDBVariables* dest, const int dest_t_first, const i
                                     "and destination (" + std::to_string(dest_nb_periods) + " periods) databases do not match");
 }
 
-void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDBVariables* source, 
+void _c_add_var_from_other(const std::string& dest_name, std::shared_ptr<KDBVariables> dest, std::shared_ptr<KDBVariables> source, 
                            const int source_t_first, const int source_t_last)
 {
     if(dest_name.empty())
@@ -79,8 +79,8 @@ void _c_add_var_from_other(const std::string& dest_name, KDBVariables* dest, KDB
     dest->set_obj_ptr(dest_name, var_ptr);
 }
 
-void _c_copy_var_content(const std::string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last, 
-                         const std::string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last)
+void _c_copy_var_content(const std::string& dest_name, std::shared_ptr<KDBVariables> dest, const int dest_t_first, const int dest_t_last, 
+                         const std::string& source_name, std::shared_ptr<KDBVariables> source, const int source_t_first, const int source_t_last)
 {
     if(dest_name.empty())
        throw std::invalid_argument("C API: Destination variable name is empty");
@@ -121,7 +121,7 @@ enum BinaryOperation
     OP_POW
 };
 
-void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int t_last, const double value)
+void _c_operation_scalar(const int op, std::shared_ptr<KDBVariables> database, int t_first, int t_last, const double value)
 {
     // sanity checks
     if(!database)
@@ -178,7 +178,7 @@ void _c_operation_scalar(const int op, KDBVariables* database, int t_first, int 
     }
 }
 
-void _c_operation_one_period(const int op, KDBVariables* database, const int t, const double* values, const int nb_values)
+void _c_operation_one_period(const int op, std::shared_ptr<KDBVariables> database, const int t, const double* values, const int nb_values)
 {
     // sanity checks
     if(!database)
@@ -224,7 +224,7 @@ void _c_operation_one_period(const int op, KDBVariables* database, const int t, 
     }
 }
 
-void _c_operation_one_var(const int op, KDBVariables* database, const std::string& name, int t_first, int t_last, const double* values)
+void _c_operation_one_var(const int op, std::shared_ptr<KDBVariables> database, const std::string& name, int t_first, int t_last, const double* values)
 {
     double value;
 
@@ -279,8 +279,8 @@ void _c_operation_one_var(const int op, KDBVariables* database, const std::strin
     }
 }
 
-void _c_operation_between_two_vars(const int op, KDBVariables* database, const std::string& name, const int t_first, const int t_last, 
-    KDBVariables* other, const std::string& other_name, const int other_t_first, const int other_t_last)
+void _c_operation_between_two_vars(const int op, std::shared_ptr<KDBVariables> database, const std::string& name, const int t_first, const int t_last, 
+    std::shared_ptr<KDBVariables> other, const std::string& other_name, const int other_t_first, const int other_t_last)
 {
     if(name.empty())
         throw std::invalid_argument("C API: Destination variable name is empty");

@@ -39,43 +39,43 @@
 // API 
 // ---
 
-KDB& get_global_db(const int iode_type)
+std::shared_ptr<KDB> get_global_db(const int iode_type)
 {
-    KDB* kdb = nullptr;
+    std::shared_ptr<KDB> kdb_ptr = nullptr;
     switch(iode_type)
     {
         case COMMENTS :
-            kdb = global_ws_cmt.get();
+            kdb_ptr = global_ws_cmt;
             break;
         case EQUATIONS :
-            kdb = global_ws_eqs.get();
+            kdb_ptr = global_ws_eqs;
             break;
         case IDENTITIES :
-            kdb = global_ws_idt.get();
+            kdb_ptr = global_ws_idt;
             break;
         case LISTS :
-            kdb = global_ws_lst.get();
+            kdb_ptr = global_ws_lst;
             break;
         case SCALARS :
-            kdb = global_ws_scl.get();
+            kdb_ptr = global_ws_scl;
             break;
         case TABLES :
-            kdb = global_ws_tbl.get();
+            kdb_ptr = global_ws_tbl;
             break;
         case VARIABLES :
-            kdb = global_ws_var.get();
+            kdb_ptr = global_ws_var;
             break;
         default :
             throw std::runtime_error("get_global_db(): invalid IODE type");
     }
 
-    if(!kdb)
+    if(!kdb_ptr)
     {
         std::string error_msg = "Global " + v_iode_types[iode_type] + " database not loaded";
         throw std::runtime_error(error_msg);
     }
 
-    return *kdb;
+    return kdb_ptr;
 }
 
 char* KDB::dde_create_obj(int objnb, int *nc, int *nl)

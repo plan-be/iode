@@ -24,7 +24,7 @@ struct KDBLists : public KDBTemplate<List>
     KDBLists(const bool is_global) : KDBTemplate(LISTS, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBLists(KDBLists* db_parent, const std::string& pattern, const bool copy) 
+    KDBLists(const std::shared_ptr<KDBLists> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
@@ -63,8 +63,8 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBLists> global_ws_lst = std::make_unique<KDBLists>(true);
-inline std::array<KDBLists*, 5> global_ref_lst = { nullptr };
+inline std::shared_ptr<KDBLists> global_ws_lst = std::make_shared<KDBLists>(true);
+inline std::array<std::shared_ptr<KDBLists>, 5> global_ref_lst = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -85,8 +85,8 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
 
 /* k_lst.c */
 int K_scan(KDB*, char*, char*);
-void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal);
-void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal);
-void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal);
+void KE_scan(std::shared_ptr<KDBEquations> dbe, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal);
+void KI_scan(std::shared_ptr<KDBIdentities> dbi, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal);
+void KT_scan(std::shared_ptr<KDBTables> dbt, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal);
 int KL_lst(char*, char** , int);
 unsigned char **KL_expand(char*);

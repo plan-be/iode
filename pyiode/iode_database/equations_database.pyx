@@ -17,7 +17,7 @@ import pandas as pd
 
 cdef class Equations(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBEquations* database_ptr
+    cdef std::shared_ptr<KDBEquations> database_ptr
 
     def __cinit__(self, filepath: str=None) -> Equations:
         self.ptr_owner = False
@@ -30,7 +30,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Equations _from_ptr(KDBEquations* database_ptr = NULL, bint owner=False):
+    cdef Equations _from_ptr(std::shared_ptr<KDBEquations> database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Equations wrapper = Equations.__new__(Equations)
         if database_ptr is not NULL:
@@ -48,7 +48,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Equations:
-        cdef KDBEquations* subset_db_ptr = new KDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef std::shared_ptr<KDBEquations> subset_db_ptr = new KDBEquations(self.database_ptr, pattern.encode(), <bint>copy)
         subset = Equations._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
@@ -104,7 +104,7 @@ cdef class Equations(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Equations, overwrite: bool=True):        
-        cdef KDBEquations* other_db_ptr = other.database_ptr
+        cdef std::shared_ptr<KDBEquations> other_db_ptr = other.database_ptr
         self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     # Information detail to print (for equations)

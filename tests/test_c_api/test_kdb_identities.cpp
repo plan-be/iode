@@ -35,7 +35,7 @@ TEST_F(KDBIdentitiesTest, Subset)
     std::set<std::string> names = global_ws_idt->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBIdentities* kdb_subset_deep_copy = new KDBIdentities(global_ws_idt.get(), pattern, true);
+    std::shared_ptr<KDBIdentities> kdb_subset_deep_copy = new KDBIdentities(global_ws_idt, pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
@@ -43,7 +43,7 @@ TEST_F(KDBIdentitiesTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("AOUC"), new_lec);
 
     // SHALLOW COPY SUBSET
-    KDBIdentities* kdb_subset_shallow_copy = new KDBIdentities(global_ws_idt.get(), pattern, false);
+    std::shared_ptr<KDBIdentities> kdb_subset_shallow_copy = new KDBIdentities(global_ws_idt, pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("AOUC", new_lec);
@@ -139,7 +139,7 @@ TEST_F(KDBIdentitiesTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    KDBIdentities* kdb_subset;
+    std::shared_ptr<KDBIdentities> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_idt->size(); p++) 
@@ -156,7 +156,7 @@ TEST_F(KDBIdentitiesTest, Filter)
             expected_names.insert(name);
 
     // create a subset (shallow copy)
-    kdb_subset = new KDBIdentities(global_ws_idt.get(), pattern, false);
+    kdb_subset = new KDBIdentities(global_ws_idt, pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -201,14 +201,14 @@ TEST_F(KDBIdentitiesTest, Filter)
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(KDBIdentities(global_ws_idt.get(), pattern, false), std::runtime_error);
+    EXPECT_THROW(KDBIdentities(global_ws_idt, pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBIdentitiesTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    KDBIdentities* kdb_subset;
+    std::shared_ptr<KDBIdentities> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_idt->size(); p++) 
@@ -225,7 +225,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
             expected_names.insert(name);
 
     // create a subset (deep copy)
-    kdb_subset = new KDBIdentities(global_ws_idt.get(), pattern, true);
+    kdb_subset = new KDBIdentities(global_ws_idt, pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -363,9 +363,9 @@ TEST_F(KDBIdentitiesTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    KDBIdentities* kdb0 = new KDBIdentities(global_ws_idt.get(), pattern, true);
-    KDBIdentities* kdb1 = new KDBIdentities(global_ws_idt.get(), pattern, true);
-    KDBIdentities* kdb_to_merge = new KDBIdentities(global_ws_idt.get(), pattern, true);
+    std::shared_ptr<KDBIdentities> kdb0 = new KDBIdentities(global_ws_idt, pattern, true);
+    std::shared_ptr<KDBIdentities> kdb1 = new KDBIdentities(global_ws_idt, pattern, true);
+    std::shared_ptr<KDBIdentities> kdb_to_merge = new KDBIdentities(global_ws_idt, pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_IDENTITY";

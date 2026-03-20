@@ -116,7 +116,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    KDBComments* dbc = new KDBComments(false);
+    std::shared_ptr<KDBComments> dbc = new KDBComments(false);
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
@@ -126,7 +126,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    KDBVariables* dbv = new KDBVariables(false);
+    std::shared_ptr<KDBVariables> dbv = new KDBVariables(false);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);

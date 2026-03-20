@@ -21,8 +21,8 @@ def cython_dynamic_adjustment(method: int, eqs: str, c1: str, c2: str) -> str:
 
 
 def cython_dickey_fuller_test(scalars_db: Scalars, lec: str, drift: bool, trend: bool, order: int) -> Scalars:
-    # NOTE: cpp_dickey_fuller_test allocates a new KDBScalars* pointer
-    cdef KDBScalars* cpp_scalars
+    # NOTE: cpp_dickey_fuller_test allocates a new std::shared_ptr<KDBScalars> pointer
+    cdef std::shared_ptr<KDBScalars> cpp_scalars
     cpp_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
     if cpp_scalars is NULL:
         return None
@@ -142,7 +142,7 @@ cdef class CythonEditAndEstimateEquations:
         self.c_estimation_ptr.update_scalars()
 
     def get_scalars_db(self, scalars_db: Scalars) -> Scalars:
-        cdef KDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
+        cdef std::shared_ptr<KDBScalars> c_scalars_ptr = self.c_estimation_ptr.get_scalars()
         if c_scalars_ptr is NULL:
             return None
         scalars_db.ptr_owner = <bint>False
@@ -154,7 +154,7 @@ cdef class CythonEditAndEstimateEquations:
         return [eq_name.decode() for eq_name in self.c_estimation_ptr.get_list_equations()]
 
     def get_equations_db(self, equations_db: Equations) -> Equations:
-        cdef KDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
+        cdef std::shared_ptr<KDBEquations> c_equations_ptr = self.c_estimation_ptr.get_equations()
         if c_equations_ptr is NULL:
             return None
         equations_db.ptr_owner = <bint>False

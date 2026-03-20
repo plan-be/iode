@@ -12,7 +12,7 @@ import pandas as pd
 
 cdef class Lists(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBLists* database_ptr
+    cdef std::shared_ptr<KDBLists> database_ptr
 
     def __cinit__(self, filepath: str=None) -> Lists:
         self.ptr_owner = False
@@ -25,7 +25,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Lists _from_ptr(KDBLists* database_ptr = NULL, bint owner=False):
+    cdef Lists _from_ptr(std::shared_ptr<KDBLists> database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
         if database_ptr is not NULL:
@@ -43,7 +43,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Lists:
-        cdef KDBLists* subset_db_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef std::shared_ptr<KDBLists> subset_db_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
         subset = Lists._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
@@ -59,7 +59,7 @@ cdef class Lists(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Lists, overwrite: bool=True):        
-        cdef KDBLists* other_db_ptr = other.database_ptr
+        cdef std::shared_ptr<KDBLists> other_db_ptr = other.database_ptr
         self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:

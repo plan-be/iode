@@ -82,7 +82,7 @@
  * List of functions 
  * -----------------
  *
- *      int K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
+ *      int K_simul(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
  *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
  *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
@@ -543,7 +543,7 @@ int CSimulation::K_simul_1(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
+int CSimulation::K_simul(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, 
     Sample* smpl, char** endo_exo, char** eqs)
 {
     int     i, t, bt, at, j, k, res, endo_exonb,

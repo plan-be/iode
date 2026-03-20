@@ -13,7 +13,7 @@ import pandas as pd
 
 cdef class Comments(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBComments* database_ptr
+    cdef std::shared_ptr<KDBComments> database_ptr
 
     def __cinit__(self, filepath: str=None) -> Comments:
         self.ptr_owner = False
@@ -26,7 +26,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database_ptr = NULL
 
     @staticmethod
-    cdef Comments _from_ptr(KDBComments* database_ptr = NULL, bint owner=False):
+    cdef Comments _from_ptr(std::shared_ptr<KDBComments> database_ptr = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Comments wrapper = Comments.__new__(Comments)
         if database_ptr is not NULL:
@@ -44,7 +44,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database_ptr.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Comments:
-        cdef KDBComments* subset_db_ptr = new KDBComments(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef std::shared_ptr<KDBComments> subset_db_ptr = new KDBComments(self.database_ptr, pattern.encode(), <bint>copy)
         subset = Comments._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
@@ -60,7 +60,7 @@ cdef class Comments(CythonIodeDatabase):
         self.database_ptr.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Comments, overwrite: bool=True):        
-        cdef KDBComments* other_db_ptr = other.database_ptr
+        cdef std::shared_ptr<KDBComments> other_db_ptr = other.database_ptr
         self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     @classmethod

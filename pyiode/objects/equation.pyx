@@ -70,7 +70,7 @@ cdef class Equation:
 
     def estimate(self, from_period: str, to_period: str, maxit: int, epsilon: float) -> bool:
         cdef shared_ptr[CEquation] eq_ptr
-        cdef KDBEquations* eqs_db = NULL
+        cdef std::shared_ptr<KDBEquations> eqs_db = NULL
         cdef CEquation* c_eq = NULL
         cdef string eq_name = self.c_equation.endo
 
@@ -105,7 +105,7 @@ cdef class Equation:
         cdef int res = -1
         cdef shared_ptr[CEquation] eq_ptr
         cdef CEquation* c_eq = NULL
-        cdef KDBEquations* eqs_db = NULL
+        cdef std::shared_ptr<KDBEquations> eqs_db = NULL
         cdef string eq_name = self.c_equation.endo
         
         if from_period is None or to_period is None:

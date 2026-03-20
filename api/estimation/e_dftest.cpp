@@ -116,7 +116,7 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     Equation eq("_DF", std::string(buf), EQ_LSQ, "", "", "", "", "", false);
     global_ws_eqs->set("_DF", eq);
     
-    Estimation est(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
+    Estimation est(eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
     rc = est.estimate();
 
     global_ws_eqs->remove("_DF");
@@ -150,7 +150,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     double   *res = NULL, *vec;
 
     // Computes the lec formula and stores the result in the VAR _DF
-    vec = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
+    vec = L_cc_link_exec(lec, global_ws_var, global_ws_scl);
     if(vec == NULL) 
         return NULL;
     strcpy(varname, "_DF");

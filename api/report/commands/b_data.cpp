@@ -238,7 +238,7 @@ int B_DataRasVar(char* arg, int unused)
 int B_DataCalcVar(char* arg, int unused)
 {
     char name[K_MAX_NAME + 1];
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
     int nb_periods = kdb->get_nb_periods();
 
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
@@ -266,12 +266,12 @@ int B_DataCalcVar(char* arg, int unused)
     if(lec[0]) 
     {
         CLEC* clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, global_ws_scl.get(), clec)) 
+        if(clec != 0 && !L_link(kdb, global_ws_scl, clec)) 
         {
             double d;
             for(int t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                d = L_exec(kdb, global_ws_scl.get(), clec, t);
+                d = L_exec(kdb, global_ws_scl, clec, t);
                 kdb->get_var_ptr(name)[t] = d;
             }
             SW_nfree(clec);
@@ -711,7 +711,7 @@ int B_DataUpdate(char* arg, int type)
                         var = (double) atof(args[i + nb_p]);
                         if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                             var = IODE_NAN;
-                        KV_set(global_ws_var.get(), var_name, shift + i, mode, var);
+                        KV_set(global_ws_var, var_name, shift + i, mode, var);
                     }
                     success = true;
                 }

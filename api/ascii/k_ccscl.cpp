@@ -28,7 +28,7 @@
  *  @return                     int     0 if the Scalar is read and saved, -1 if it can't be created.
  *  
  */
-static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
+static int read_scl(KDBScalars& kdb, YYFILE* yy, char* name)
 {
     int keyw;
     Scalar scl;
@@ -53,7 +53,7 @@ static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
 
     try
     {
-        kdb->set(name, scl);
+        kdb.set(name, scl);
     }
     catch(const std::exception&) 
     {
@@ -134,7 +134,7 @@ bool KDBScalars::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(read_scl(this, yy, name) == 0) 
+                if(read_scl(*this, yy, name) == 0) 
                     cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;

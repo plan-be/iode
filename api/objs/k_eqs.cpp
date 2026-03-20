@@ -427,9 +427,10 @@ bool KDBEquations::print_obj_def(const std::string& name)
 
 void KDBEquations::update_reference_db()
 {
-    if(global_ref_eqs[0]) 
-        delete global_ref_eqs[0];
-    global_ref_eqs[0] = new KDBEquations(this, "*", false);      
+    if(this == global_ws_eqs.get())
+        global_ref_eqs[0] = global_ws_eqs;
+    else
+        global_ref_eqs[0].reset(this);      
 }
 
 /**
@@ -441,7 +442,7 @@ void KDBEquations::update_reference_db()
  *  @return     double           test value or IODE_NAN if equation name not found
  *  
  */
-double K_etest(KDBEquations* kdb, char* c_name, int test_nb)
+double K_etest(std::shared_ptr<KDBEquations> kdb, char* c_name, int test_nb)
 {   
     std::string name = std::string(c_name);
     if(!kdb->contains(name)) 
@@ -453,12 +454,12 @@ double K_etest(KDBEquations* kdb, char* c_name, int test_nb)
 }
 
 // Returns test calculated during the last estimation of equation name
-double K_e_stdev (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
-double K_e_meany (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
-double K_e_ssres (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
-double K_e_stderr(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
-double K_e_fstat (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
-double K_e_r2    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
-double K_e_r2adj (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
-double K_e_dw    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
-double K_e_loglik(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
+double K_e_stdev (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
+double K_e_meany (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
+double K_e_ssres (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
+double K_e_stderr(std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
+double K_e_fstat (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
+double K_e_r2    (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
+double K_e_r2adj (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
+double K_e_dw    (std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
+double K_e_loglik(std::shared_ptr<KDBEquations> kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}

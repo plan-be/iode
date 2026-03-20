@@ -63,7 +63,7 @@ void ComputedTable::initialize()
         files_usage[column.cl_fnb[1]] = 1;
     }
 
-    KDBVariables* kdb = nullptr;
+    std::shared_ptr<KDBVariables> kdb = nullptr;
     for(int ref=1; ref < K_MAX_FREF + 1; ref++) 
     {
         if(files_usage.test(ref))
@@ -268,15 +268,15 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         if(clec == NULL)
             return false;
 
-        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
+        L_link(global_ws_var, global_ws_scl, clec);
         // Newton-Raphson method
-        res = L_zero(global_ws_var.get(), global_ws_scl.get(), clec, period_pos, var_pos, var_pos);
+        res = L_zero(global_ws_var, global_ws_scl, clec, period_pos, var_pos, var_pos);
     }
     else
     {
         // inverse formula
-        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
-        res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, period_pos);
+        L_link(global_ws_var, global_ws_scl, clec);
+        res = L_exec(global_ws_var, global_ws_scl, clec, period_pos);
     }
 
     SW_nfree(clec);
@@ -285,7 +285,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         return false;
 
     // update the variable var_name in the database
-    KV_set(global_ws_var.get(), var_name, period_pos, 0, res);
+    KV_set(global_ws_var, var_name, period_pos, 0, res);
 
     return true;
 }

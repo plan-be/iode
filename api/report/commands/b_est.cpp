@@ -83,13 +83,13 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
     {
         try
         {
-            KDBEquations* dbe = new KDBEquations(global_ws_eqs.get(), std::string(pattern), false);
+            std::shared_ptr<KDBEquations> dbe = new KDBEquations(global_ws_eqs, std::string(pattern), false);
 
             if(dbe->size() > 0)
             {
                 std::string from_period = smpl->start_period.to_string();
                 std::string to_period   = smpl->end_period.to_string();
-                Estimation est(pattern, dbe, global_ws_var.get(), global_ws_scl.get(), 
+                Estimation est(pattern, dbe, global_ws_var, global_ws_scl, 
                                (char*) from_period.c_str(), (char*) to_period.c_str());
                 rc = est.estimate();
             }

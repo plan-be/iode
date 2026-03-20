@@ -47,7 +47,7 @@ TEST_F(KDBVariablesTest, Subset)
     std::set<std::string> names = global_ws_var->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBVariables* kdb_subset_deep_copy = new KDBVariables(global_ws_var.get(), pattern, true);
+    std::shared_ptr<KDBVariables> kdb_subset_deep_copy = new KDBVariables(global_ws_var, pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", lec);
@@ -55,7 +55,7 @@ TEST_F(KDBVariablesTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
 
     // SHALLOW COPY SUBSET
-    KDBVariables* kdb_subset_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+    std::shared_ptr<KDBVariables> kdb_subset_shallow_copy = new KDBVariables(global_ws_var, pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", lec);
@@ -405,7 +405,7 @@ TEST_F(KDBVariablesTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    KDBVariables* kdb_subset;
+    std::shared_ptr<KDBVariables> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_var->size(); p++) 
@@ -422,7 +422,7 @@ TEST_F(KDBVariablesTest, Filter)
             expected_names.insert(name);
 
     // create a subset (shallow copy)
-    kdb_subset = new KDBVariables(global_ws_var.get(), pattern, false);
+    kdb_subset = new KDBVariables(global_ws_var, pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -473,14 +473,14 @@ TEST_F(KDBVariablesTest, Filter)
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(KDBVariables(global_ws_var.get(), pattern, false), std::runtime_error);
+    EXPECT_THROW(KDBVariables(global_ws_var, pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBVariablesTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    KDBVariables* kdb_subset;
+    std::shared_ptr<KDBVariables> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_var->size(); p++) 
@@ -497,7 +497,7 @@ TEST_F(KDBVariablesTest, DeepCopy)
             expected_names.insert(name);
 
     // create a subset (deep copy)
-    kdb_subset = new KDBVariables(global_ws_var.get(), pattern, true);
+    kdb_subset = new KDBVariables(global_ws_var, pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -581,9 +581,9 @@ TEST_F(KDBVariablesTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    KDBVariables* kdb0 = new KDBVariables(global_ws_var.get(), pattern, true);
-    KDBVariables* kdb1 = new KDBVariables(global_ws_var.get(), pattern, true);
-    KDBVariables* kdb_to_merge = new KDBVariables(global_ws_var.get(), pattern, true);
+    std::shared_ptr<KDBVariables> kdb0 = new KDBVariables(global_ws_var, pattern, true);
+    std::shared_ptr<KDBVariables> kdb1 = new KDBVariables(global_ws_var, pattern, true);
+    std::shared_ptr<KDBVariables> kdb_to_merge = new KDBVariables(global_ws_var, pattern, true);
 
     int nb_periods = kdb_to_merge->get_nb_periods();
 

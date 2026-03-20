@@ -111,8 +111,8 @@ static int B_htol(int method, char* arg)
     int file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    KDBVariables* to = nullptr;
-    KDBVariables* from = new KDBVariables(false);
+    std::shared_ptr<KDBVariables> to = nullptr;
+    std::shared_ptr<KDBVariables> from = new KDBVariables(false);
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
@@ -194,7 +194,7 @@ static int B_htol(int method, char* arg)
         to->set(from_name, to_var);
     }
 
-    KV_merge(global_ws_var.get(), to, 1);
+    KV_merge(global_ws_var, to, 1);
 
 done:
     if(to)
@@ -218,11 +218,11 @@ done:
 
 // Same function but acting on kdb instead of file and global_ws_var (for pyiode - larray)
 // !!! NOT TESTED !!!
-KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
+std::shared_ptr<KDBVariables> B_htol_kdb(int method, std::shared_ptr<KDBVariables> kdb_from)
 {
     int nb, rc = 0, f, t, shift, skip;
     Sample* t_smpl = nullptr;
-    KDBVariables* kdb_to = nullptr;
+    std::shared_ptr<KDBVariables> kdb_to = nullptr;
 
     int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
     if(res < 0) 

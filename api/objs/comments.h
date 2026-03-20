@@ -17,7 +17,7 @@ struct KDBComments : public KDBTemplate<Comment>
     KDBComments(const bool is_global) : KDBTemplate(COMMENTS, is_global) {}
 
     // subset (shallow or deep copy) 
-    KDBComments(KDBComments* db_parent, const std::string& pattern, const bool copy) 
+    KDBComments(const std::shared_ptr<KDBComments> db_parent, const std::string& pattern, const bool copy) 
         : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
@@ -60,8 +60,8 @@ private:
 /*----------------------- GLOBALS ----------------------------*/
 // unique_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBComments> global_ws_cmt = std::make_unique<KDBComments>(true);
-inline std::array<KDBComments*, 5> global_ref_cmt = { nullptr };
+inline std::shared_ptr<KDBComments> global_ws_cmt = std::make_shared<KDBComments>(true);
+inline std::array<std::shared_ptr<KDBComments>, 5> global_ref_cmt = { nullptr };
 
 /*------------------------- FUNCS ----------------------------*/
 

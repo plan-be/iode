@@ -45,8 +45,8 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         return -1;
     }
 
-    KDBVariables* exo = new KDBVariables(false);
-    KDBScalars* scal = new KDBScalars(false);
+    std::shared_ptr<KDBVariables> exo = new KDBVariables(false);
+    std::shared_ptr<KDBScalars> scal = new KDBScalars(false);
 
     if(exo == nullptr || scal == nullptr) 
     {
@@ -60,13 +60,13 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
         switch(kdb->k_type) 
         {
             case IDENTITIES :
-                KI_scan((KDBIdentities*) kdb, i, exo, scal);
+                KI_scan((std::shared_ptr<KDBIdentities>) kdb, i, exo, scal);
                 break;
             case EQUATIONS :
-                KE_scan((KDBEquations*) kdb, i, exo, scal);
+                KE_scan((std::shared_ptr<KDBEquations>) kdb, i, exo, scal);
                 break;
             case TABLES :
-                KT_scan((KDBTables*) kdb, i, exo, scal);
+                KT_scan((std::shared_ptr<KDBTables>) kdb, i, exo, scal);
                 break;
         }
     }
@@ -106,7 +106,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
  *  
  *  @details 
  */
-static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
+static void K_clecscan(KDB* kdb, CLEC* cl, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal)
 {
     if(cl == NULL) 
         return;
@@ -144,7 +144,7 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
+void KE_scan(std::shared_ptr<KDBEquations> dbe, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal)
 {
     std::string name = dbe->get_name(i);
     std::shared_ptr<Equation> eq = dbe->get_obj_ptr(name);
@@ -165,7 +165,7 @@ void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
+void KI_scan(std::shared_ptr<KDBIdentities> dbi, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal)
 {
     std::string name = dbi->get_name(i);
     std::shared_ptr<Identity> idt = dbi->get_obj_ptr(name);
@@ -192,7 +192,7 @@ void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
+void KT_scan(std::shared_ptr<KDBTables> dbt, int i, std::shared_ptr<KDBVariables> exo, std::shared_ptr<KDBScalars> scal)
 {
     std::string name = dbt->get_name(i);
     std::shared_ptr<Table> tbl = dbt->get_obj_ptr(name);
@@ -437,7 +437,8 @@ bool KDBLists::print_obj_def(const std::string& name)
 
 void KDBLists::update_reference_db()
 {
-    if(global_ref_lst[0]) 
-        delete global_ref_lst[0];
-    global_ref_lst[0] = new KDBLists(this, "*", false);      
+    if(this == global_ws_lst.get())
+        global_ref_lst[0] = global_ws_lst;
+    else
+        global_ref_lst[0].reset(this);    
 }

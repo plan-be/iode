@@ -3,14 +3,14 @@
  *
  * Functions acting on workspaces of variables.
  *
- *    int KV_sample(KDBVariables* kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
- *    int KV_merge(KDBVariables* kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
- *    void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(KDBVariables* kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
- *    double KV_get(KDBVariables* kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(KDBVariables* kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(KDBVariables* dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
- *    KDBVariables* KV_aggregate(KDBVariables*dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
+ *    int KV_sample(std::shared_ptr<KDBVariables> kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
+ *    int KV_merge(std::shared_ptr<KDBVariables> kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
+ *    void KV_merge_del(std::shared_ptr<KDBVariables> kdb1, std::shared_ptr<KDBVariables> kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
+ *    int KV_add(std::shared_ptr<KDBVariables> kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
+ *    double KV_get(std::shared_ptr<KDBVariables> kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
+ *    void KV_set(std::shared_ptr<KDBVariables> kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
+ *    int KV_extrapolate(std::shared_ptr<KDBVariables> dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
+ *    std::shared_ptr<KDBVariables> KV_aggregate(std::shared_ptr<KDBVariables>dbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
  *    void KV_init_values_1(double* val, int t, int method)                     Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
  *   
  *    int KV_per_pos(Period* per2)                                              Retrieves the position of a Period in the current global_ws_var sample.
@@ -42,7 +42,7 @@
  *                                               0 otherwise
  */
  
-int KV_sample(KDBVariables* kdb, Sample *new_sample)
+int KV_sample(std::shared_ptr<KDBVariables> kdb, Sample *new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0) 
         return 0;
@@ -96,7 +96,7 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
  *  @return                           int     -1 if there is no intersection between the 2 samples
  *                                            0 if ok.
  */
-int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
+int KV_merge(std::shared_ptr<KDBVariables> kdb1, std::shared_ptr<KDBVariables> kdb2, int replace)
 {
     if(!kdb1)
     {
@@ -190,7 +190,7 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
  * 
  */
 
-void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
+void KV_merge_del(std::shared_ptr<KDBVariables> kdb1, std::shared_ptr<KDBVariables> kdb2, int replace)
 {
     if(!kdb1)
     {
@@ -242,7 +242,7 @@ void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
  *  @param [in] char*   varname     name of the new variable
  *  @return     int                 position of varname in the kdb
  */
-int KV_add(KDBVariables* kdb, char* varname)
+int KV_add(std::shared_ptr<KDBVariables> kdb, char* varname)
 {
     int t, nobs;
 
@@ -296,7 +296,7 @@ int KV_add(KDBVariables* kdb, char* varname)
  *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
-double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
+double KV_get(std::shared_ptr<KDBVariables> kdb, const std::string& name, int t, int mode)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -367,7 +367,7 @@ double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
  *                              
  */
  
-void KV_set(KDBVariables* kdb, const std::string& name, int t, int mode, double value)
+void KV_set(std::shared_ptr<KDBVariables> kdb, const std::string& name, int t, int mode, double value)
 {
     Sample* smpl = kdb->sample;
     if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
@@ -481,7 +481,7 @@ calc2:
  *                                        from the list vars
  */
  
-int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
+int KV_extrapolate(std::shared_ptr<KDBVariables> dbv, int method, Sample* smpl, char* pattern)
 {
     int bt = smpl->start_period.difference(dbv->sample->start_period);
     int at = dbv->sample->end_period.difference(smpl->end_period);
@@ -529,15 +529,15 @@ int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
  *                                           NULL on error (filename given but inexistent, not enough memory...)
  */
 
-KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *filename)
+std::shared_ptr<KDBVariables> KV_aggregate(std::shared_ptr<KDBVariables> dbv, int method, char *pattern, char *filename)
 {
     int     nb_per, res, npos, added, *times, nbtimes = 500;
     Sample* smpl;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
-    KDBVariables* ndbv = nullptr;
+    std::shared_ptr<KDBVariables> ndbv = nullptr;
 
-    KDBVariables* edbv = nullptr;
+    std::shared_ptr<KDBVariables> edbv = nullptr;
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
     else
@@ -659,7 +659,7 @@ done:
  
 int KV_per_pos(Period* per2)
 {   
-    if(!global_ws_var.get()) 
+    if(!global_ws_var) 
         return -1;
     
     Sample* smpl = global_ws_var->sample;
@@ -864,7 +864,7 @@ Variable KDBVariables::get(const std::string& name) const
 	int nb_obs = get_nb_periods();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
-		vars.push_back(KV_get(const_cast<KDBVariables*>(this), name, i, 0));
+		vars.push_back(KV_get(const_cast<std::shared_ptr<KDBVariables>>(this), name, i, 0));
 	return vars;
 }
 
@@ -894,7 +894,7 @@ double KDBVariables::get_var(const std::string& name, const int t, const IodeVar
         throw std::invalid_argument(error_msg);
     }
 
-    return KV_get(const_cast<KDBVariables*>(this), name, t, mode);
+    return KV_get(const_cast<std::shared_ptr<KDBVariables>>(this), name, t, mode);
 }
 
 double KDBVariables::get_var(const std::string& name, const std::string& period, const IodeVarMode mode) const
@@ -997,10 +997,10 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	CLEC* clec = L_cc(c_lec);
 	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
 	// The CLEC object is modified (inplace) by L_link()
-	if (clec != NULL && L_link(global_ws_var.get(), global_ws_scl.get(), clec) == 0)
+	if (clec != NULL && L_link(global_ws_var, global_ws_scl, clec) == 0)
 	{
 		for (int t = t_first; t <= t_last; t++) 
-			var.push_back(L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t));
+			var.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
 		SW_nfree(clec);
 		return var;
 	}
@@ -1273,7 +1273,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
         return false;
     }
 
-    int rc = KV_sample((KDBVariables*) &from, &merge_sample);
+    int rc = KV_sample((std::shared_ptr<KDBVariables>) &from, &merge_sample);
     if(rc < 0) 
         return false;
 
@@ -1307,7 +1307,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
     kmsg(msg.c_str());
 
-    rc = KV_merge((KDBVariables*) this, (KDBVariables*) &from, 1);
+    rc = KV_merge((std::shared_ptr<KDBVariables>) this, (std::shared_ptr<KDBVariables>) &from, 1);
     if(rc < 0) 
         return false;
 
@@ -1525,7 +1525,8 @@ bool KDBVariables::print_obj_def(const std::string& name)
 
 void KDBVariables::update_reference_db()
 {
-    if(global_ref_var[0]) 
-        delete global_ref_var[0];
-    global_ref_var[0] = new KDBVariables(this, "*", false);      
+    if(this == global_ws_var.get())
+        global_ref_var[0] = global_ws_var;
+    else
+        global_ref_var[0].reset(this);     
 }

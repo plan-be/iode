@@ -81,7 +81,7 @@ KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* 
     double  *vector = NULL, value;
     YYFILE  *yy;
     std::string var_name;
-    KDBVariables* kdb = nullptr;
+    std::shared_ptr<KDBVariables> kdb = nullptr;
 
     if(!smpl)
         return nullptr;
@@ -291,7 +291,7 @@ err:
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
-    KDBComments* kdb;
+    std::shared_ptr<KDBComments> kdb;
     ImportCmtFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);
@@ -347,7 +347,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
     Sample* smpl;
-    KDBVariables* kdb;
+    std::shared_ptr<KDBVariables> kdb;
     ImportVarFromFile* impdef;
 
     SCR_strip((unsigned char*) trace);
