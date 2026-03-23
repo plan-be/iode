@@ -18,7 +18,7 @@ protected:
         std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
         ref_file = input_test_dir + "ref2.av";
         global_ws_var->load(input_test_dir + "fun.av");
-        KDBVariables* kdb_ref = new KDBVariables(global_ws_var.get(), pattern, true);
+        std::shared_ptr<KDBVariables> kdb_ref = global_ws_var->get_subset(pattern, true);
         
         double value;
         for(int t=0; t < kdb_ref->get_nb_periods(); t++)

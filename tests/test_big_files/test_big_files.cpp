@@ -13,7 +13,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
     int nb_names = 0;
     int all_nb_names = 0;
     KDB* kdb_var = nullptr;
-    KDB* kdb_shallow_copy = nullptr;
+    std::shared_ptr<KDB> kdb_shallow_copy = nullptr;
     char fullfilename[256];
     char out_filename[256];
     std::chrono::duration<double> elapsed;
@@ -138,7 +138,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== Only names matching a specific pattern ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = global_ws_var->get_subset(pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
@@ -148,7 +148,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = global_ws_var->get_subset(pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -159,7 +159,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== All names from global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = global_ws_var->get_subset("*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
@@ -169,7 +169,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = global_ws_var->get_subset("*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 

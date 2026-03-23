@@ -9,12 +9,13 @@ struct KDBMacros : public KDBTemplate<std::string>
     // global or standalone database
     KDBMacros(const bool is_global) : KDBTemplate(OBJECTS, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBMacros(KDBMacros* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
     // copy constructor
     KDBMacros(const KDBMacros& other): KDBTemplate(other) {}
+
+    std::shared_ptr<KDBMacros> get_subset(const std::string& pattern, const bool copy)
+    {
+        throw std::runtime_error("Subsets are not supported for Macros database");
+    }
 
     std::string get_macro(const std::string& name) const;
     bool set_macro(const std::string& name, std::string& macro);

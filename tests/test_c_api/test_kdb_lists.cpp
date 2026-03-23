@@ -35,7 +35,7 @@ TEST_F(KDBListsTest, Subset)
     std::set<std::string> names = global_ws_lst->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBLists* kdb_subset_deep_copy = new KDBLists(global_ws_lst.get(), pattern, true);
+    std::shared_ptr<KDBLists> kdb_subset_deep_copy = global_ws_lst->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("COPY", new_list);
@@ -43,7 +43,7 @@ TEST_F(KDBListsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get("COPY"), new_list);
 
     // SHALLOW COPY SUBSET
-    KDBLists* kdb_subset_shallow_copy = new KDBLists(global_ws_lst.get(), pattern, false);
+    std::shared_ptr<KDBLists> kdb_subset_shallow_copy = global_ws_lst->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("COPY", new_list);
@@ -108,7 +108,7 @@ TEST_F(KDBListsTest, Filter)
 {
     std::string pattern = "C*";
     std::set<std::string> expected_names;
-    KDBLists* kdb_subset;
+    std::shared_ptr<KDBLists> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_lst->size(); p++) 
@@ -120,7 +120,7 @@ TEST_F(KDBListsTest, Filter)
     int nb_total_lists = global_ws_lst->size();
 
     // create a subset (shallow copy)
-    kdb_subset = new KDBLists(global_ws_lst.get(), pattern, false);
+    kdb_subset = global_ws_lst->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -159,20 +159,19 @@ TEST_F(KDBListsTest, Filter)
     EXPECT_THROW(kdb_subset->add("ENDO", new_list), std::invalid_argument);
 
     // delete subset
-    delete kdb_subset;
     EXPECT_EQ(global_ws_lst->size(), nb_total_lists);
     EXPECT_EQ(global_ws_lst->get(name), expanded_list);
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(KDBLists(global_ws_lst.get(), pattern, false), std::runtime_error);
+    EXPECT_THROW(global_ws_lst->get_subset(pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBListsTest, DeepCopy)
 {
     std::string pattern = "C*";
     std::set<std::string> expected_names;
-    KDBLists* kdb_subset;
+    std::shared_ptr<KDBLists> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_lst->size(); p++) 
@@ -184,7 +183,7 @@ TEST_F(KDBListsTest, DeepCopy)
     int nb_total_lists = global_ws_lst->size();
 
     // create a subset (deep copy)
-    kdb_subset = new KDBLists(global_ws_lst.get(), pattern, true);
+    kdb_subset = global_ws_lst->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -222,7 +221,6 @@ TEST_F(KDBListsTest, DeepCopy)
     EXPECT_TRUE(global_ws_lst->contains(name));
 
     // delete subset
-    delete kdb_subset;
     EXPECT_EQ(global_ws_lst->size(), nb_total_lists);
 }
 
@@ -251,9 +249,9 @@ TEST_F(KDBListsTest, Merge)
     std::string pattern = "C*";
 
     // create deep copies kdb
-    KDBLists* kdb0 = new KDBLists(global_ws_lst.get(), pattern, true);
-    KDBLists* kdb1 = new KDBLists(global_ws_lst.get(), pattern, true);
-    KDBLists* kdb_to_merge = new KDBLists(global_ws_lst.get(), pattern, true);
+    std::shared_ptr<KDBLists> kdb0 = global_ws_lst->get_subset(pattern, true);
+    std::shared_ptr<KDBLists> kdb1 = global_ws_lst->get_subset(pattern, true);
+    std::shared_ptr<KDBLists> kdb_to_merge = global_ws_lst->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_LIST";

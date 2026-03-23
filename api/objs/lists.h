@@ -23,12 +23,16 @@ struct KDBLists : public KDBTemplate<List>
     // global or standalone database
     KDBLists(const bool is_global) : KDBTemplate(LISTS, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBLists(KDBLists* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
     // copy constructor
     KDBLists(const KDBLists& other): KDBTemplate(other) {}
+
+    std::shared_ptr<KDBLists> get_subset(const std::string& pattern, const bool copy) 
+    {
+        std::shared_ptr<KDBLists> subset = std::make_shared<KDBLists>(false);
+        std::shared_ptr<KDBTemplate> subset_template = std::static_pointer_cast<KDBTemplate>(subset);
+        prepare_subset(subset_template, pattern, copy);
+        return subset;
+    }
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -61,9 +65,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBLists> global_ws_lst = std::make_unique<KDBLists>(true);
+inline std::shared_ptr<KDBLists> global_ws_lst = std::make_shared<KDBLists>(true);
 inline std::array<KDBLists*, 5> global_ref_lst = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

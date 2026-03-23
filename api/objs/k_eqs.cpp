@@ -442,9 +442,7 @@ bool KDBEquations::print_obj_def(const std::string& name)
 
 void KDBEquations::update_reference_db()
 {
-    if(global_ref_eqs[0]) 
-        delete global_ref_eqs[0];
-    global_ref_eqs[0] = new KDBEquations(this, "*", false);      
+    global_ref_eqs[0] = this;
 }
 
 /**

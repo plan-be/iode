@@ -64,7 +64,5 @@ bool KDBComments::print_obj_def(const std::string& name)
 
 void KDBComments::update_reference_db()
 {
-    if(global_ref_cmt[0]) 
-        delete global_ref_cmt[0];
-    global_ref_cmt[0] = new KDBComments(this, "*", false);      
+    global_ref_cmt[0] = this;
 }

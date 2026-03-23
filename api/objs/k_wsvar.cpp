@@ -1525,7 +1525,5 @@ bool KDBVariables::print_obj_def(const std::string& name)
 
 void KDBVariables::update_reference_db()
 {
-    if(global_ref_var[0]) 
-        delete global_ref_var[0];
-    global_ref_var[0] = new KDBVariables(this, "*", false);      
+    global_ref_var[0] = this;
 }

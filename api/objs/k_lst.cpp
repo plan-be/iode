@@ -448,7 +448,5 @@ bool KDBLists::print_obj_def(const std::string& name)
 
 void KDBLists::update_reference_db()
 {
-    if(global_ref_lst[0]) 
-        delete global_ref_lst[0];
-    global_ref_lst[0] = new KDBLists(this, "*", false);      
+    global_ref_lst[0] = this;
 }

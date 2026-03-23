@@ -213,9 +213,9 @@ int B_PrintObjDef_1(char* arg, int* type)
 
     try
     {
-        KDB& kdb = get_global_db(*type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(*type);
         std::string name = std::string(arg);
-        bool found = kdb.contains(name);
+        bool found = kdb_ptr->contains(name);
         if(!found) 
             goto err;
     
@@ -234,7 +234,7 @@ int B_PrintObjDef_1(char* arg, int* type)
                 W_flush();
             }
     
-            Sample* smpl = kdb.sample;
+            Sample* smpl = kdb_ptr->sample;
             if(!smpl || smpl->nb_periods == 0) 
             {
                 std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";
@@ -254,7 +254,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             W_printf((char*) "\n.tl\n");
         }
         
-        success = kdb.print_obj_def(name);
+        success = kdb_ptr->print_obj_def(name);
     
         if(*type == VARIABLES)
             BEG++;
@@ -305,8 +305,8 @@ int B_PrintObjDefArgs(char* arg, int type)
     {
         try
         {
-            KDB& kdb = get_global_db(type);
-            for(const std::string& name : kdb.get_names())
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+            for(const std::string& name : kdb_ptr->get_names())
             {
                 rc = B_PrintObjDef_1((char*) name.c_str(), &type);
                 if(rc) break;

@@ -95,14 +95,18 @@ struct KDBIdentities : public KDBTemplate<Identity>
 public:
     // global or standalone database
     KDBIdentities(const bool is_global) : KDBTemplate(IDENTITIES, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBIdentities(KDBIdentities* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
+    
     // copy constructor
     KDBIdentities(const KDBIdentities& other): KDBTemplate(other) {}
     
+    std::shared_ptr<KDBIdentities> get_subset(const std::string& pattern, const bool copy) 
+    {
+        std::shared_ptr<KDBIdentities> subset = std::make_shared<KDBIdentities>(false);
+        std::shared_ptr<KDBTemplate> subset_template = std::static_pointer_cast<KDBTemplate>(subset);
+        prepare_subset(subset_template, pattern, copy);
+        return subset;
+    }
+
     bool add(const std::string& name, const Identity& idt) override 
     { 
         return KDBTemplate::add(name, idt); 
@@ -155,9 +159,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBIdentities> global_ws_idt = std::make_unique<KDBIdentities>(true);
+inline std::shared_ptr<KDBIdentities> global_ws_idt = std::make_shared<KDBIdentities>(true);
 inline std::array<KDBIdentities*, 5> global_ref_idt = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/

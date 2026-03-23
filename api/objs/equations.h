@@ -573,12 +573,16 @@ struct KDBEquations : public KDBTemplate<Equation>
     // global or standalone database
     KDBEquations(const bool is_global) : KDBTemplate(EQUATIONS, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBEquations(KDBEquations* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
     // copy constructor
     KDBEquations(const KDBEquations& other): KDBTemplate(other) {}
+
+    std::shared_ptr<KDBEquations> get_subset(const std::string& pattern, const bool copy) 
+    {
+        std::shared_ptr<KDBEquations> subset = std::make_shared<KDBEquations>(false);
+        std::shared_ptr<KDBTemplate> subset_template = std::static_pointer_cast<KDBTemplate>(subset);
+        prepare_subset(subset_template, pattern, copy);
+        return subset;
+    }
 
     std::string get_lec(const std::string& name) const;
 
@@ -626,9 +630,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBEquations> global_ws_eqs = std::make_unique<KDBEquations>(true);
+inline std::shared_ptr<KDBEquations> global_ws_eqs = std::make_shared<KDBEquations>(true);
 inline std::array<KDBEquations*, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

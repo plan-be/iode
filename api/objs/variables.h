@@ -102,12 +102,16 @@ public:
     // global or standalone database
     KDBVariables(const bool is_global) : KDBTemplate(VARIABLES, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBVariables(KDBVariables* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) {}
+
+    std::shared_ptr<KDBVariables> get_subset(const std::string& pattern, const bool copy) 
+    {
+        std::shared_ptr<KDBVariables> subset = std::make_shared<KDBVariables>(false);
+        std::shared_ptr<KDBTemplate> subset_template = std::static_pointer_cast<KDBTemplate>(subset);
+        prepare_subset(subset_template, pattern, copy);
+        return subset;
+    }
 
     double get_value(const std::string& name, const int t) const
     {
@@ -279,9 +283,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBVariables> global_ws_var = std::make_unique<KDBVariables>(true);
+inline std::shared_ptr<KDBVariables> global_ws_var = std::make_shared<KDBVariables>(true);
 inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

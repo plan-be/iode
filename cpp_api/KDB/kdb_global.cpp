@@ -6,8 +6,8 @@ bool is_global_database_loaded(const IodeType iodeType)
 { 
     try
     {
-        KDB& kdb = get_global_db(iodeType);
-        if(kdb.size() == 0) 
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(iodeType);
+        if(kdb_ptr->size() == 0) 
             return false;
     }
     catch(const std::exception&)

@@ -54,7 +54,7 @@
 
 
 template<typename T>
-static bool load_global_database(std::unique_ptr<T>& global_ptr, 
+static bool load_global_database(std::shared_ptr<T>& global_ptr, 
         const std::string& filepath)
 {
     T* kdb = new T(true);
@@ -163,8 +163,8 @@ int B_WsSave(char* arg, int type)
     
     try
     {
-        KDB& kdb = get_global_db(type);
-        int res = B_WsDump(&kdb, buf);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        int res = B_WsDump(kdb_ptr.get(), buf);
         return res;
     }
     catch(const std::runtime_error& e)
@@ -200,8 +200,8 @@ int B_WsSave(char* arg, int type)
     
     try
     {
-        KDB& kdb = get_global_db(type);
-        rc = B_WsDump(&kdb, buf);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        rc = B_WsDump(kdb_ptr.get(), buf);
     }
     catch(const std::runtime_error& e)
     {
@@ -224,8 +224,8 @@ int B_WsExport(char* arg, int type)
 {
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.save_asc(arg);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->save_asc(arg);
         return 0;
     }
     catch(const std::runtime_error& e)
@@ -312,8 +312,8 @@ int B_WsClear(char* arg, int type)
     B_WsName("", type);
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.clear();
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->clear();
         return 0;
     }
     catch(const std::runtime_error& e)
@@ -348,8 +348,8 @@ int B_WsDescr(char* arg, int type)
 {
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.description = std::string(arg);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->description = std::string(arg);
         return 0;
     }
     catch(const std::runtime_error& e)
@@ -369,8 +369,8 @@ int B_WsName(char* arg, int type)
 {
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.filepath = std::string(arg);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->filepath = std::string(arg);
         return 0;
     }
     catch(const std::runtime_error& e)
@@ -463,8 +463,8 @@ int B_WsCopy(char* arg, int type)
     }
     else
     {
-        KDB& kdb = get_global_db(type);
-        success = kdb.copy_from(v_files, data);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        success = kdb_ptr->copy_from(v_files, data);
     }
 
     return success ? 0 : -1;
@@ -484,8 +484,8 @@ int B_WsMerge(char* arg, int type)
 
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.merge_from(file);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->merge_from(file);
         return 0;
     }
     catch(const std::runtime_error& e)
@@ -801,8 +801,8 @@ int B_CsvSave(char* arg, int type)
     int rc = 0;
     try
     {
-        KDB& kdb = get_global_db(type);
-        kdb.save_csv(file_ext, vars, smpl);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        kdb_ptr->save_csv(file_ext, vars, smpl);
     }
     catch(const std::runtime_error& e)
     {

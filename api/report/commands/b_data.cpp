@@ -142,34 +142,47 @@ int B_DataPattern(char* arg,int type)
 
     args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
     nbargs = SCR_tbl_size((unsigned char**) args);
-    if(nbargs < 3) goto cleanup;
-    else {
+    if(nbargs < 3) 
+        goto cleanup;
+    else 
+    {
         lstname = args[0];
         pattern = args[1];
         xvars = B_ainit_chk(args[2], NULL, 0);
         nrows = SCR_tbl_size((unsigned char**) xvars);
 
-        if(nbargs > 3) {
+        if(nbargs > 3) 
+        {
             yvars = B_ainit_chk(args[3], NULL, 0);
             ncols = SCR_tbl_size((unsigned char**) yvars);
         }
 
-        if(nrows == 0) goto cleanup;
-        for(crow = 0; crow < nrows; crow++) {
+        if(nrows == 0) 
+            goto cleanup;
+        
+        for(crow = 0; crow < nrows; crow++) 
+        {
             strcpy(rvar, pattern);
             SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
-            if(ncols == 0) {
+            if(ncols == 0) 
+            {
                 sprintf(toappend, "%s %s", lstname, rvar);
-                if(crow == 0) B_DataUpdate(toappend, LISTS);
-                else B_DataAppend(toappend, LISTS);
+                if(crow == 0) 
+                    B_DataUpdate(toappend, LISTS);
+                else 
+                    B_DataAppend(toappend, LISTS);
             }
-            for(ccol = 0; ccol < ncols; ccol++) {
+            for(ccol = 0; ccol < ncols; ccol++) 
+            {
                 strcpy(cvar, rvar);
                 SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
-                if(B_DataExist(cvar, type) >= 0) {
+                if(B_DataExist(cvar, type) >= 0) 
+                {
                     sprintf(toappend, "%s %s", lstname, cvar);
-                    if(crow == 0 && ccol == 0) B_DataUpdate(toappend, LISTS); // Creates the list
-                    else B_DataAppend(toappend, LISTS);                       // Appends to the list  
+                    if(crow == 0 && ccol == 0) 
+                        B_DataUpdate(toappend, LISTS); // Creates the list
+                    else 
+                        B_DataAppend(toappend, LISTS);                       // Appends to the list  
                 }
             }
         }
@@ -301,10 +314,10 @@ int B_DataCreate_1(char* arg, int* ptype)
 {
     try 
     {
-        KDB& kdb = get_global_db(*ptype);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(*ptype);
 
         std::string name = std::string(arg);
-        if(kdb.contains(name)) 
+        if(kdb_ptr->contains(name)) 
             return -1;
 
         switch(*ptype) 
@@ -350,7 +363,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             }
             case VARIABLES :
             {
-                Sample* sample = kdb.sample;
+                Sample* sample = kdb_ptr->sample;
                 if(sample == nullptr) 
                     throw std::runtime_error("No sample defined in the Variables database");
                 Variable var(sample->nb_periods, IODE_NAN);
@@ -405,12 +418,12 @@ int B_DataDelete_1(char* arg, int* ptype)
     std::string name = std::string(arg);
     try
     {
-        KDB& kdb = get_global_db(*ptype);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(*ptype);
     
-        if(!kdb.contains(name)) 
+        if(!kdb_ptr->contains(name)) 
             return -1;
         
-        bool success = kdb.remove(name);
+        bool success = kdb_ptr->remove(name);
         if(!success) 
         {
             error_manager.append_error("Failed to delete '" + name + "'");
@@ -480,7 +493,8 @@ int B_DataRename(char* arg, int type)
 
     try
     {
-        bool success = get_global_db(type).rename(std::string(args[0]), std::string(args[1]));
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        bool success = kdb_ptr->rename(std::string(args[0]), std::string(args[1]));
         if(!success) 
         {
             std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
@@ -529,8 +543,8 @@ int B_DataRename(char* arg, int type)
     
     try
     {
-        KDB& kdb = get_global_db(type);
-        bool success = kdb.duplicate(old_name, new_name);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        bool success = kdb_ptr->duplicate(old_name, new_name);
         if(!success) 
         {
             std::string error_msg = "DataDuplicate '" + old_name + "' as '";
@@ -582,8 +596,8 @@ int B_DataUpdate(char* arg, int type)
     bool success = true;
     try
     {
-        KDB& kdb = get_global_db(type);
-        if(!kdb.contains(std::string(name))) 
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        if(!kdb_ptr->contains(std::string(name))) 
         {
             if(B_DataCreate(name, type)) 
                 return -1;
@@ -774,8 +788,8 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
 
     try
     {
-        KDB& kdb = get_global_db(type);
-        std::vector<std::string> lst = kdb.grep(buf, ecase, names, forms, texts, '*');
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        std::vector<std::string> lst = kdb_ptr->grep(buf, ecase, names, forms, texts, '*');
         char** c_lst = vector_to_double_char(lst);
         return c_lst;
     }
@@ -974,16 +988,16 @@ int template_data_scan(const int type, const std::string& objs, const std::strin
 {
     try
     {
-        KDB& global_kdb = get_global_db(type);
+        std::shared_ptr<KDB> global_kdb = get_global_db(type);
+        std::shared_ptr<T> kdb_typed_ptr = std::dynamic_pointer_cast<T>(global_kdb);
         
         // create a temporary subset with only the selected objects
         bool copy = false;
-        T* global_kdb_ptr = dynamic_cast<T*>(&global_kdb);
-        T kdb(global_kdb_ptr, objs, copy);
-        if(kdb.size() == 0)
+        std::shared_ptr<T> kdb_ptr = kdb_typed_ptr->get_subset(objs, copy);
+        if(kdb_ptr->size() == 0)
             return -1;
         
-        int rc = K_scan(&kdb, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
+        int rc = K_scan(kdb_ptr.get(), (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
         return rc;
     }
     catch (const std::runtime_error& e) 
@@ -1022,8 +1036,8 @@ int B_DataScan(char* arg, int type)
     {
         try
         {
-            KDB& kdb = get_global_db(type);
-            rc = K_scan(&kdb, "_EXO", "_SCAL");
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+            rc = K_scan(kdb_ptr.get(), "_EXO", "_SCAL");
         }
         catch (const std::runtime_error& e) 
         {
@@ -1038,8 +1052,8 @@ int B_DataScan(char* arg, int type)
         {
             try
             {
-                KDB& kdb = get_global_db(type);
-                rc = K_scan(&kdb, "_EXO", "_SCAL");
+                std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+                rc = K_scan(kdb_ptr.get(), "_EXO", "_SCAL");
             }
             catch (const std::runtime_error& e) 
             {
@@ -1104,8 +1118,8 @@ int B_DataExist(char* arg, int type)
 {
     try
     {
-        KDB& kdb = get_global_db(type);
-        return kdb.contains(std::string(arg));
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+        return kdb_ptr->contains(std::string(arg));
     }
     catch (const std::runtime_error& e) 
     {
@@ -1245,8 +1259,8 @@ int B_DataList(char* arg, int type)
     {
         try
         {
-            KDB& kdb = get_global_db(type);
-            lst = kdb.grep(pattern, false, true, false, false, '*');
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+            lst = kdb_ptr->grep(pattern, false, true, false, false, '*');
         }
         catch (const std::runtime_error& e) 
         {
@@ -1490,7 +1504,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
     try
     {
         int type = (int) kdb2.k_type;
-        KDB& kdb1 = get_global_db(type);
+        std::shared_ptr<KDB> kdb1_ptr = get_global_db(type);
     
         // K_compare() return codes:
         //      0 -> if name neither in global_db nor in file
@@ -1499,11 +1513,11 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         //      3 -> if name in both global_db and file, IODE object in global_db == IODE object in file
         //      4 -> if name in both global_db and file, IODE object in global_db != IODE object in file
         std::string name;
-        for(int i = 0; i < kdb1.size(); i++) 
+        for(int i = 0; i < kdb1_ptr->size(); i++) 
         {
-            name = kdb1.get_name(i);
+            name = kdb1_ptr->get_name(i);
             c_name = (char*) name.c_str();
-            rc = K_compare(c_name, &kdb1, &kdb2);
+            rc = K_compare(c_name, kdb1_ptr.get(), &kdb2);
             switch(rc)
             {
             // name neither in global_db nor in file

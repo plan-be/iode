@@ -415,8 +415,9 @@ public:
 	    sprintf(fullfilename, "%s%s", input_test_dir, source_file);
 	    rc = B_WsImport(fullfilename, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    EXPECT_EQ(kdb_ptr->size(), expected_nb_objects);
+	    return rc == 0 && kdb_ptr->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsClear(int type)
@@ -425,8 +426,9 @@ public:
 	
 	    rc = B_WsClear("", type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), 0);
-	    return get_global_db(type).size() == 0;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    EXPECT_EQ(kdb_ptr->size(), 0);
+	    return kdb_ptr->size() == 0;
 	}
 
 	bool U_test_B_WsDescr(char* descr, int type)
@@ -435,8 +437,9 @@ public:
 	
 	    rc = B_WsDescr(descr, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).description, descr);
-	    return rc == 0 && get_global_db(type).description == descr;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    EXPECT_EQ(kdb_ptr->description, descr);
+	    return rc == 0 && kdb_ptr->description == descr;
 	}
 
 	bool U_test_B_WsName(char* c_name, int type)
@@ -445,7 +448,8 @@ public:
 	
 	    rc = B_WsName(c_name, type);
         EXPECT_EQ(rc, 0);
-	    std::string name = get_global_db(type).filepath;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    std::string name = kdb_ptr->filepath;
 	    EXPECT_EQ(name, std::string(c_name));
 	    return rc == 0 && name == std::string(c_name);
 	}
@@ -527,8 +531,9 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsCopy(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    EXPECT_EQ(kdb_ptr->size(), expected_nb_objects);
+	    return rc == 0 && kdb_ptr->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsMergeVar()
@@ -584,8 +589,9 @@ public:
 	    sprintf(arg,  "%s%s *", input_test_dir, filename);
 	    rc = B_WsMerge(arg, type);
         EXPECT_EQ(rc, 0);
-	    EXPECT_EQ(get_global_db(type).size(), expected_nb_objects);
-	    return rc == 0 && get_global_db(type).size() == expected_nb_objects;
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+	    EXPECT_EQ(kdb_ptr->size(), expected_nb_objects);
+	    return rc == 0 && kdb_ptr->size() == expected_nb_objects;
 	}
 
 	bool U_test_B_WsExtrapolate(int method, double expected_value)
@@ -1609,13 +1615,13 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     int pos;
     for(i = 0; i < 7 ; i++) 
     {
-        KDB& kdb = get_global_db(i);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(i);
         char* x_name = (i == SCALARS) ? (char*) "xxx" : (char*) "XXX";
         rc = B_DataCreate(x_name, i);
         EXPECT_EQ(rc, 0);
-        found = kdb.contains(x_name);
+        found = kdb_ptr->contains(x_name);
         EXPECT_TRUE(found);
-        pos = kdb.index_of(x_name);
+        pos = kdb_ptr->index_of(x_name);
         EXPECT_TRUE(pos >= 0);
 
         // Equations cannot be renamed or duplicated
@@ -1625,22 +1631,22 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
             char* dup_names = (i == SCALARS) ? (char*) "xxx yyy" : (char*) "XXX YYY";
             rc = B_DataDuplicate(dup_names, i);
             EXPECT_EQ(rc, 0);
-            found = kdb.contains(y_name);
+            found = kdb_ptr->contains(y_name);
             EXPECT_TRUE(found);
-            pos = kdb.index_of(y_name);
+            pos = kdb_ptr->index_of(y_name);
             EXPECT_TRUE(pos >= 0);
 
             char* z_name = (i == SCALARS) ? (char*) "zzz" : (char*) "ZZZ";
             char* ren_name = (i == SCALARS) ? (char*) "yyy zzz" : (char*) "YYY ZZZ";
             rc = B_DataRename(ren_name, i);
             EXPECT_EQ(rc, 0);
-            found = kdb.contains(z_name);
+            found = kdb_ptr->contains(z_name);
             EXPECT_TRUE(found);
         }
 
         rc = B_DataDelete(x_name, i);
         EXPECT_EQ(rc, 0);
-        found = kdb.contains(x_name);
+        found = kdb_ptr->contains(x_name);
         EXPECT_TRUE(!found);
     }
 

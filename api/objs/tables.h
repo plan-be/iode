@@ -911,12 +911,16 @@ struct KDBTables : public KDBTemplate<Table>
     // global or standalone database
     KDBTables(const bool is_global) : KDBTemplate(TABLES, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBTables(KDBTables* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
-
     // copy constructor
     KDBTables(const KDBTables& other): KDBTemplate(other) {}
+    
+    std::shared_ptr<KDBTables> get_subset(const std::string& pattern, const bool copy) 
+    {
+        std::shared_ptr<KDBTables> subset = std::make_shared<KDBTables>(false);
+        std::shared_ptr<KDBTemplate> subset_template = std::static_pointer_cast<KDBTemplate>(subset);
+        prepare_subset(subset_template, pattern, copy);
+        return subset;
+    }
 
     std::string get_title(const std::string& name) const;
 
@@ -995,9 +999,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBTables> global_ws_tbl = std::make_unique<KDBTables>(true);
+inline std::shared_ptr<KDBTables> global_ws_tbl = std::make_shared<KDBTables>(true);
 inline std::array<KDBTables*, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

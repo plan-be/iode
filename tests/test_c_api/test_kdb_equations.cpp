@@ -38,7 +38,7 @@ TEST_F(KDBEquationsTest, Subset)
     std::set<std::string> names = global_ws_eqs->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBEquations* kdb_subset_deep_copy = new KDBEquations(global_ws_eqs.get(), pattern, true);
+    std::shared_ptr<KDBEquations> kdb_subset_deep_copy = global_ws_eqs->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
@@ -46,7 +46,7 @@ TEST_F(KDBEquationsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get_lec("ACAF"), new_lec);
 
     // SHALLOW COPY SUBSET
-    KDBEquations* kdb_subset_shallow_copy = new KDBEquations(global_ws_eqs.get(), pattern, false);
+    std::shared_ptr<KDBEquations> kdb_subset_shallow_copy = global_ws_eqs->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", new_lec);
@@ -162,7 +162,7 @@ TEST_F(KDBEquationsTest, Filter)
 {
     std::string pattern = "A*;$ENVI;*_";
     std::set<std::string> expected_names;
-    KDBEquations* kdb_subset;
+    std::shared_ptr<KDBEquations> kdb_subset;
 
     global_ws_lst->load(str_input_test_dir + "fun.al");
     EXPECT_TRUE(global_ws_lst->contains("ENVI"));
@@ -187,7 +187,7 @@ TEST_F(KDBEquationsTest, Filter)
             expected_names.insert(name);
 
     // create a subset (shallow copy)
-    kdb_subset = new KDBEquations(global_ws_eqs.get(), pattern, false);
+    kdb_subset = global_ws_eqs->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -225,20 +225,19 @@ TEST_F(KDBEquationsTest, Filter)
     EXPECT_THROW(kdb_subset->add("BQY", eq), std::invalid_argument);
 
     // delete subset
-    delete kdb_subset;
     EXPECT_EQ(global_ws_eqs->size(), nb_total_equations);
     EXPECT_EQ(global_ws_eqs->get_lec(name), lec);
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(KDBEquations(global_ws_eqs.get(), pattern, false), std::runtime_error);
+    EXPECT_THROW(global_ws_eqs->get_subset(pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBEquationsTest, DeepCopy)
 {
     std::string pattern = "A*;$ENVI;*_";
     std::set<std::string> expected_names;
-    KDBEquations* kdb_subset;
+    std::shared_ptr<KDBEquations> kdb_subset;
 
     global_ws_lst->load(str_input_test_dir + "fun.al");
     EXPECT_TRUE(global_ws_lst->contains("ENVI"));
@@ -262,7 +261,7 @@ TEST_F(KDBEquationsTest, DeepCopy)
             expected_names.insert(name);
 
     // create a subset (deep copy)
-    kdb_subset = new KDBEquations(global_ws_eqs.get(), pattern, true);
+    kdb_subset = global_ws_eqs->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -283,7 +282,6 @@ TEST_F(KDBEquationsTest, DeepCopy)
     EXPECT_TRUE(global_ws_eqs->contains(name));
 
     // delete subset
-    delete kdb_subset;
     EXPECT_EQ(global_ws_eqs->size(), nb_total_equations);
 }
 
@@ -312,9 +310,9 @@ TEST_F(KDBEquationsTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    KDBEquations* kdb0 = new KDBEquations(global_ws_eqs.get(), pattern, true);
-    KDBEquations* kdb1 = new KDBEquations(global_ws_eqs.get(), pattern, true);
-    KDBEquations* kdb_to_merge = new KDBEquations(global_ws_eqs.get(), pattern, true);
+    std::shared_ptr<KDBEquations> kdb0 = global_ws_eqs->get_subset(pattern, true);
+    std::shared_ptr<KDBEquations> kdb1 = global_ws_eqs->get_subset(pattern, true);
+    std::shared_ptr<KDBEquations> kdb_to_merge = global_ws_eqs->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "ACAF2";

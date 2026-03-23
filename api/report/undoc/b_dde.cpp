@@ -144,7 +144,7 @@ char *IodeDdeGetWS(char *szItem)
 
     try
     {
-        KDB& kdb = get_global_db(type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
         if(strcmp(szItem, "Sample") == 0) 
         {
             res = (char*) global_ws_var->sample->to_string().c_str();
@@ -152,30 +152,30 @@ char *IodeDdeGetWS(char *szItem)
         }
         else if(strcmp(szItem + 1, "LIST") == 0) 
         {
-            if(kdb.size() == 0) 
+            if(kdb_ptr->size() == 0) 
                 return((char *)0);
-            res = SCR_malloc((sizeof(ONAME) + 1) * (1 + kdb.size())); /* IODE64K */
-            for(i = 0 ; i < kdb.size() ; i++) 
+            res = SCR_malloc((sizeof(ONAME) + 1) * (1 + kdb_ptr->size())); /* IODE64K */
+            for(i = 0 ; i < kdb_ptr->size() ; i++) 
             {
-                strcat(res, kdb.get_name(i).c_str());
+                strcat(res, kdb_ptr->get_name(i).c_str());
                 strcat(res, "\t");
             }
             return res;
         }
         else if(strcmp(szItem + 1, "NAME") == 0) 
         {       
-            res = (char*) kdb.filepath.c_str();
+            res = (char*) kdb_ptr->filepath.c_str();
             return res;
         }
         else if(strcmp(szItem + 1, "DESCR") == 0) 
         {
-            res = (char*) kdb.description.c_str();
+            res = (char*) kdb_ptr->description.c_str();
             return res;
         }
         else if(strcmp(szItem + 1, "NB") == 0) 
         {
             res = SCR_malloc(20);
-            sprintf(res, "%d", kdb.size());
+            sprintf(res, "%d", kdb_ptr->size());
             return res;
         }
 
@@ -342,10 +342,12 @@ char *IodeDdeGetXObj(char *szItem, int type)
 
     try
     {
-        KDB& kdb = get_global_db(type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
         tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
-        if(SCR_tbl_size(tbl) < 1) lst = SCR_vtom((unsigned char*) "", (int) ',');
-        else {
+        if(SCR_tbl_size(tbl) < 1) 
+            lst = SCR_vtom((unsigned char*) "", (int) ',');
+        else 
+        {
             plst = K_expand(type, NULL, (char*) tbl[0], '*');
             lst = (unsigned char**) B_ainit_chk(plst, NULL, 0);
         }
@@ -356,44 +358,50 @@ char *IodeDdeGetXObj(char *szItem, int type)
         else                      item = (char*) tbl[2];
     
         hConv = WscrDdeConnect("EXCEL", sheet);
-        if(hConv == 0) return((char*) SCR_stracpy((unsigned char*) "Error"));
+        if(hConv == 0) 
+            return((char*) SCR_stracpy((unsigned char*) "Error"));
     
-        switch(type) {
+        switch(type) 
+        {
             case VARIABLES:
-                if(SCR_tbl_size(lst) == 0) {
+                if(SCR_tbl_size(lst) == 0) 
+                {
                     res = IodeDdeCreatePer(0);
-                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1,  kdb.sample->nb_periods, 1), 
+                    WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1,  kdb_ptr->sample->nb_periods, 1), 
                                    (unsigned char*) res);
                     SCR_free(res);
                 }
     
-                if(SCR_tbl_size(lst) == 0) {
-                    for(i = 0 ; i < kdb.size() ; i++) {
+                if(SCR_tbl_size(lst) == 0) 
+                {
+                    for(i = 0 ; i < kdb_ptr->size() ; i++) 
+                    {
                         res = IodeDdeCreateSeries(i, 0);
-                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + kdb.sample->nb_periods, 1), 
+                        WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + kdb_ptr->sample->nb_periods, 1), 
                                        (unsigned char*) res);
                         SCR_free(res);
                     }
                 }
-    
-                else {
+                else 
+                {
                     for(i = 0 ; lst[i] ; i++) 
                     {
                         name = std::string((char*) lst[i]);
-                        if(strcmp((char*) lst[i], "t") == 0) {
+                        if(strcmp((char*) lst[i], "t") == 0) 
+                        {
                             res = IodeDdeCreatePer(0);
-                            WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + kdb.sample->nb_periods, 1), 
+                            WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + kdb_ptr->sample->nb_periods, 1), 
                                            (unsigned char*) res);
                             SCR_free(res);
                         }
                         else 
                         {
-                            objnb = kdb.index_of(name);
+                            objnb = kdb_ptr->index_of(name);
                             if(objnb < 0) 
                                 continue;
     
                             res = IodeDdeCreateSeries(objnb, 0);
-                            WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + kdb.sample->nb_periods, 1), 
+                            WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, 1 + kdb_ptr->sample->nb_periods, 1), 
                                            (unsigned char*) res);
                             SCR_free(res);
                         }
@@ -404,9 +412,9 @@ char *IodeDdeGetXObj(char *szItem, int type)
             default :
                 if(SCR_tbl_size(lst) == 0) 
                 {
-                    for(i = 0 ; i < kdb.size() ; i++) 
+                    for(i = 0 ; i < kdb_ptr->size() ; i++) 
                     {
-                        res = kdb.dde_create_obj(i, &l, &h);
+                        res = kdb_ptr->dde_create_obj(i, &l, &h);
                         WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                        (unsigned char*) res);
                         SCR_free(res);
@@ -417,11 +425,11 @@ char *IodeDdeGetXObj(char *szItem, int type)
                     for(i = 0 ; lst[i] ; i++) 
                     {
                         name = std::string((char*) lst[i]);
-                        objnb = kdb.index_of((char*) lst[i]);
+                        objnb = kdb_ptr->index_of((char*) lst[i]);
                         if(objnb < 0) 
                             continue;
                         
-                        res = kdb.dde_create_obj(objnb, &l, &h);
+                        res = kdb_ptr->dde_create_obj(objnb, &l, &h);
                         WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 0, l, h), 
                                        (unsigned char*) res);
                         SCR_free(res);
@@ -467,12 +475,12 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     
     try
     {
-        KDB& kdb = get_global_db(type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
         if(type == SCALARS) 
             SCR_lower((unsigned char*) szItem);
         
         name = std::string((char*) szItem);
-        if(!kdb.contains(name)) 
+        if(!kdb_ptr->contains(name)) 
             return (char *) 0;
     
         std::string obj;
@@ -493,8 +501,8 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
                 return res;
     
             case VARIABLES :
-                res = SCR_malloc(40 * (1 + kdb.sample->nb_periods));
-                for(t = 0 ; t < kdb.sample->nb_periods ; t++) 
+                res = SCR_malloc(40 * (1 + kdb_ptr->sample->nb_periods));
+                for(t = 0 ; t < kdb_ptr->sample->nb_periods ; t++) 
                 {
                     x = global_ws_var->get_value(name, t);
                     if(!IODE_IS_A_NUMBER(x)) 
@@ -539,7 +547,7 @@ int IodeDdeSetWS(char *szItem, char *szBuffer)
 
     try
     {
-        KDB& kdb = get_global_db(type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
         if(strcmp(szItem, "Sample") == 0) rc = B_WsSample(szBuffer);
         else if(strcmp(szItem + 1, "NAME") == 0)  rc = B_WsName(szBuffer, type);
         else if(strcmp(szItem + 1, "DESCR") == 0) rc = B_WsDescr(szBuffer, type);
@@ -628,12 +636,12 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
 
     try
     {
-        KDB& kdb = get_global_db(type);
+        std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
         tmp = SCR_malloc((int)strlen(szBuffer) + 30);
         if(type == VARIABLES) 
         {
             sprintf(tmp, "%s %s %s", szItem,
-                    (char*) kdb.sample->start_period.to_string().c_str(), szBuffer);
+                    (char*) kdb_ptr->sample->start_period.to_string().c_str(), szBuffer);
         }
         else
             sprintf(tmp, "%s %s", szItem, szBuffer);

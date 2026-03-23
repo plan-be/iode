@@ -117,8 +117,8 @@ char* K_expand(int type, char* file, char* c_pattern, int all)
     {
         try
         {
-            KDB& kdb = get_global_db(type);
-            lst = kdb.expand(pattern, (char) all);
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(type);
+            lst = kdb_ptr->expand(pattern, (char) all);
         }
         catch(const std::exception& e)
         {

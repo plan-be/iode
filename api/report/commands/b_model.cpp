@@ -59,13 +59,12 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
         rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
-        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+        std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(eqs, false);
         if(tdbe)
         {
             if(tdbe->size() > 0)
-                rc = simu.K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
+                rc = simu.K_simul(tdbe.get(), global_ws_var.get(), global_ws_scl.get(), smpl, 
                                   CSimulation::KSIM_EXO, c_eqs);
-            delete tdbe;
         }
     }
 
@@ -234,12 +233,11 @@ int B_ModelCompile(char* arg, int unused)
             rc = KE_compile(global_ws_eqs.get());
         else 
         {
-            KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+            std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(eqs, false);
             if(tdbe)
             {
                 if(tdbe->size() > 0)
-                    rc = KE_compile(tdbe);
-                delete tdbe;
+                    rc = KE_compile(tdbe.get());
             }
         }
     }
@@ -276,22 +274,16 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    KDBEquations* tdbe = nullptr;
+    std::shared_ptr<KDBEquations> tdbe = nullptr;
     std::string list_eqs = std::string(arg + lg1);
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
-        tdbe = global_ws_eqs.get();
+        tdbe = global_ws_eqs;
     else
-        tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
+        tdbe = global_ws_eqs->get_subset(list_eqs, false);
 
     CSimulation simu;
-    int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
-
-    if(!list_eqs.empty())
-    {
-        delete tdbe;
-        tdbe = nullptr;
-    }
+    int rc = simu.KE_ModelCalcSCC(tdbe.get(), tris, pre, inter, post);
 
     return rc;
 }
@@ -366,14 +358,13 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+    std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(eqs, false);
 
     // Lance la simulation
     CSimulation simu;
-    int rc = simu.K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
+    int rc = simu.K_simul_SCC(tdbe.get(), global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
 
     // Cleanup
-    delete tdbe;
     tdbe = nullptr;
     SCR_free_tbl((unsigned char**) pre);
     SCR_free_tbl((unsigned char**) inter);

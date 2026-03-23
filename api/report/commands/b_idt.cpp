@@ -109,13 +109,11 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
         for(int i = 0; i < nb_idts; i++)
             idts += std::string(c_idts[i]) + ";";
 
-        KDBIdentities* kdb_idt = new KDBIdentities(global_ws_idt.get(), idts, false);
-        kdb_var = KI_exec(kdb_idt,
+        std::shared_ptr<KDBIdentities> kdb_idt = global_ws_idt->get_subset(idts, false);
+        kdb_var = KI_exec(kdb_idt.get(),
                           global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           global_ws_scl.get(), SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
-        delete kdb_idt;
-        kdb_idt = nullptr;
     }
 
     SCR_free_tbl((unsigned char**) KEXEC_VFILES);

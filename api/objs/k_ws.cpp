@@ -44,7 +44,8 @@ void K_init_ws(int ws)
     {
         try
         {
-            get_global_db(i).merge_from(I_DEFAULT_FILENAME);
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(i);
+            kdb_ptr->merge_from(I_DEFAULT_FILENAME);
         }
         catch(const std::exception& e)
         {
@@ -68,7 +69,8 @@ void K_end_ws(int ws)
     {
         try
         {
-            get_global_db(i).save_binary(I_DEFAULT_FILENAME, false);
+            std::shared_ptr<KDB> kdb_ptr = get_global_db(i);
+            kdb_ptr->save_binary(I_DEFAULT_FILENAME, false);
         }
         catch(const std::exception& e)
         {
