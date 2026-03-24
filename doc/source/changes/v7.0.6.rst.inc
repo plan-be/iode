@@ -17,10 +17,11 @@ Improvements
 - PYTHON: made :meth:`Variables.from_frame` and :meth:`Variables.from_array` methods to 
   also accept columns / time axis with labels of type int (closes :issue:`1151`) 
 
-
 Fixed Bugs 
 ----------
 
+- PYTHON : fixed reading IODE equations, identities, lists or tables files if they 
+  contain any LEC expression with non-ASCII characters (closes :issue:`1157`)
 
 Miscellaneous 
 -------------
