@@ -25,7 +25,7 @@ bool debug_pack = false;
 // ========================= TableCell methods ========================= //
 
 // If quotes is true, the content is returned between double quotes.
-std::string TableCell::get_content(const bool quotes, const bool to_utf8) const
+std::string TableCell::get_content(const bool quotes) const
 {
     if(type == TABLE_CELL_LEC)
     {
@@ -41,15 +41,11 @@ std::string TableCell::get_content(const bool quotes, const bool to_utf8) const
         std::string _content = content;
         if(quotes) 
             _content = '\"' + _content + '\"';
-        if(to_utf8)
-            _content = oem_to_utf8(_content);
         return _content;
     }
 }
 
-// to_oem set to false means that the text is already in OEM encoding
-// i.e. when reading from old binary files
-void TableCell::set_text(const std::string& text, const bool to_oem)
+void TableCell::set_text(const std::string& text)
 {   
     type = TABLE_CELL_STRING;
     if(idt)
@@ -71,17 +67,15 @@ void TableCell::set_text(const std::string& text, const bool to_oem)
         return;
     }
 
-    std::string text_oem = text;
-    if(to_oem)
-        text_oem = utf8_to_oem(text_oem);
+    std::string _text_ = text;
 
     // remove the leading and trailing double quotes
-    if (text_oem.front() == '\"') 
-        text_oem.erase(0, 1);
-    if (text_oem.back() == '\"')
-        text_oem.pop_back();
+    if(_text_.front() == '\"') 
+        _text_.erase(0, 1);
+    if(_text_.back() == '\"')
+        _text_.pop_back();
 
-    content = text_oem;
+    content = _text_;
 }
 
 void TableCell::set_lec(const std::string& lec)
@@ -109,12 +103,10 @@ void TableCell::set_lec(const std::string& lec)
 
 // Rule: If the content starts with a double quotes, we assume it is a string cell. 
 //       Otherwise, it is a LEC cell.
-// to_oem set to false means that the text is already in OEM encoding
-// i.e. when reading from old binary files
-void TableCell::set_content(const std::string& content, const bool to_oem)
+void TableCell::set_content(const std::string& content)
 {
     if(content.starts_with('\"'))
-        set_text(content, to_oem);
+        set_text(content);
     else
         set_lec(content);
 }
@@ -136,7 +128,9 @@ bool TableCell::print_definition(int nb_columns) const
     }
 
     int attribute = (int) get_attribute();
-    std::string content = get_content(false, false);
+    std::string content = get_content(false);
+    // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
+    content = utf8_to_oem(content);
     switch(get_type()) 
     {
         case TABLE_CELL_STRING :
@@ -210,6 +204,7 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
 
         char* pack_idt = NULL;
         Identity idt(lec);
+        // NOTE: the LEC expression is converted to OEM encoding by Identity::to_binary() 
         idt.to_binary(&pack_idt);
         len = P_len(pack_idt);
         pack = (char*) P_add(pack, pack_idt, len);
@@ -219,13 +214,16 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
     }
     else
     {
-        std::string text = this->get_content(false, false);
-        char* c_text = (char*) text.c_str();
+        std::string text_utf8 = this->get_content(false);
+        // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
+        //       the text from UTF-8 to OEM before writing the IODE table 
+        std::string text_oem = utf8_to_oem(text_utf8);
+        char* c_text = (char*) text_oem.c_str();
         len = (int) strlen(c_text) + 1;
         pack = (char*) P_add(pack, c_text, len);
         p++;
 
-        debug_packing("cell", "STR  ", p, i, j, text, len);
+        debug_packing("cell", "STR  ", p, i, j, text_utf8, len);
     }
 
     return pack;
@@ -237,9 +235,12 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
 
     if(this->get_type() == TABLE_CELL_STRING)
     {
-        std::string content = (value == NULL) ? "" : std::string(value);
+        std::string content_oem = (value == NULL) ? "" : std::string(value);
+        // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
+        //       the text from OEM to UTF-8 after reading the IODE table
+        std::string content_utf8 = oem_to_utf8(content_oem);
         debug_unpacking("cell", "STR  ", p, i, j, content);
-        this->set_text(content, false);
+        this->set_text(content_utf8);
         p++;
         return true;
     }
@@ -247,9 +248,12 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
     {   
         // NOTE: 'value' is a serialized Identity
         char* c_lec = (char*) P_get_ptr(value, 0);
-        std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
-        debug_unpacking("cell", "LEC  ", p, i, j, lec);
-        this->set_lec(lec);
+        std::string lec_oem = (c_lec == NULL) ? "" : std::string(c_lec);
+        // NOTE: in binary files, the lec of a cell is in OEM encoding, we need to convert 
+        //       the lec from OEM to UTF-8 after reading the IODE table
+        std::string lec_utf8 = oem_to_utf8(lec_oem);
+        debug_unpacking("cell", "LEC  ", p, i, j, lec_utf8);
+        this->set_lec(lec_utf8);
         p++;
         return true;
     }
@@ -845,7 +849,7 @@ std::string KDBTables::get_title(const std::string& name) const
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
     std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
-    std::string title = std::string((char*) T_get_title(tbl_ptr.get()));
+    std::string title = T_get_title(tbl_ptr.get());
     return title;
 }
 
@@ -1249,17 +1253,19 @@ bool KDBTables::print_obj_def(const std::string& name)
     if(!tbl_ptr) 
         return false;
     
+    std::string title = T_get_title(tbl_ptr.get());
+    // W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing 
+    title = utf8_to_oem(title);
     if(B_TABLE_TITLE) 
     {
         if(B_TABLE_TITLE == 1) 
-            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), 
-                            T_get_title(tbl_ptr.get(), false));
+            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), title.c_str());
         else 
-            W_printf((char*) "\n%s\n", T_get_title(tbl_ptr.get(), false));
+            W_printf((char*) "\n%s\n", title.c_str());
         return true;
     }
 
-    B_PrintRtfTopic((char*) T_get_title(tbl_ptr.get(), false));
+    B_PrintRtfTopic((char*) title.c_str());
     W_printf((char*) ".tb %d\n", tbl_ptr->nb_columns);
     W_printfRepl((char*) ".sep &\n");
     W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", tbl_ptr->nb_columns, 

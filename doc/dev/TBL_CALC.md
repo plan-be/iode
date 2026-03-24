@@ -115,7 +115,7 @@ Functions to generate IODE tables in A2M format based on Table structures and GS
 |`void T_close_attr(int attr)`|Closes an A2M attribute sequence.|
 |`void T_print_cell(TableCell* cell, COL* cl, int straddle)`|Prints a Table cell on a specific GSample column.|
 |`char **T_find_files(COLS* cls)`|Retrieves the filenames used in the COLS (from GSample) needed to print the special table line KT\_FILES.|
-|`unsigned char *T_get_title(Table* tbl)`|Retrieves a Table title, i.e. the contents of the first line of type KT\_TITLE|
+|`std::string (Table* tbl)`|Retrieves a Table title, i.e. the contents of the first line of type KT\_TITLE|
 |`int T_print_tbl(Table* tbl, char* smpl)`|Computes a table on a GSample and saves the result in A2M format|
 
 Global variables

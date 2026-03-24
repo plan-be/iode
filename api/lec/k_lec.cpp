@@ -124,8 +124,7 @@ char* L_expand(char* list_name)
  *                                   if 2: replace scalars by their value and their t-test   
  *  @return            bool
  */
-bool print_lec_definition(const std::string& name, const std::string& eqlec, 
-    CLEC* eqclec, int coefs)
+bool print_lec_definition(const std::string& name, const std::string& eqlec, CLEC* eqclec, int coefs)
 {
     // create a char* array containing a copy of the string eqlec
     int lg = (int) eqlec.size();

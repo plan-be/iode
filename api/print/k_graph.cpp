@@ -26,6 +26,7 @@
  */
 #include "api/constants.h"
 #include "api/b_errors.h"
+#include "api/b_a2mini.h"
 #include "api/k_lang.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -58,7 +59,7 @@ int T_GraphTest(Table *tbl)
         return -1;
     }
 
-    W_EndDisplay((char*) T_get_title(tbl), -1, -1, -1, -1);
+    W_EndDisplay((char*) T_get_title(tbl).c_str(), -1, -1, -1, -1);
     return 0;
 }
 
@@ -133,10 +134,8 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
     Sample  smpl;
     double  step, *x, *y;
     TableCell   *cells; 
-    
-    bool to_utf8 = false;
 
-//    KT_attr = 4;
+    // KT_attr = 4;
     if(tbl->nb_columns != 2) 
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
@@ -163,10 +162,14 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
 
     y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
 
-    //if(B_viewmode != 0) B_PrintRtfTopic(T_get_title(tbl)); /* JMP 06-01-02 */
-    //if(mode != 0) B_PrintRtfTopic(T_get_title(tbl)); // JMP 11-05-2022
-    if(mode != 0) 
-        W_print_rtf_topic((char*) T_get_title(tbl, to_utf8)); // JMP 01-07-2022
+    if(mode != 0)
+    {
+        std::string title = T_get_title(tbl);
+        // NOTE: W_Print(...) functions expect OEM encoding, so convert title 
+        //       from UTF-8 to OEM before printing 
+        title = utf8_to_oem(title);
+        W_print_rtf_topic((char*) title.c_str());
+    } 
     
     w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
                     (int) tbl->get_gridx(), (int) tbl->get_gridy(),
@@ -186,18 +189,21 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, &smpl, x, y, fcls, to_utf8)) 
+                if(T_GraphLine(tbl, i, cls, &smpl, x, y, fcls)) 
                     w = -1;
                 break;
 
             case TABLE_LINE_TITLE :
-                content = cells[0].get_content(false, to_utf8);
+                content = cells[0].get_content(false);
+                // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
+                //       from UTF-8 to OEM before printing
+                content = utf8_to_oem(content);
                 T_GraphTitle((char*) content.c_str());
                 break;
 
             case TABLE_LINE_FILES :
-            /*
-                for(j = 0 ; files[j] ; j++) T_add_title(f, files[j], 'L');*/
+             // for(j = 0 ; files[j] ; j++) T_add_title(f, files[j], 'L');
+                break;
 
             default :
                 break;
@@ -252,17 +258,19 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
 /**
  *  Adds (in A2M) the graph *time* axis corresponding to a TableLine and a specific COL.
  *  
- *  @param [in] TableLine* line     pointer to a Table line
- *  @param [in] COLS*  fcls     compiled GSample (combination of files, op on files, periods, op on periods)
- *  @param [in] int    i        nb of the GSample column to use for generating the legend
+ *  @param [in] TableLine* line  pointer to a Table line
+ *  @param [in] COLS*  fcls      compiled GSample (combination of files, op on files, periods, op on periods)
+ *  @param [in] int    i         nb of the GSample column to use for generating the legend
  *  @return 
  */
-static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i, bool to_utf8) 
+static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i) 
 {
     char    *fileop = NULL;
     COL     *cl = fcls->cl_cols + i;
     TableCell   *cell = &(line->cells[0]);
-    std::string content = cell->get_content(false, to_utf8);
+    std::string content = cell->get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM 
+    content = utf8_to_oem(content);
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
         fileop = COL_ctoa(cl, 'f', 0, 2);
@@ -358,8 +366,7 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  @return 
  *  
  */
-int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, 
-    COLS *fcls, bool to_utf8)
+int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
 {
     int     j, dt, k;
     TableLine   *line = &tbl->lines[i];
@@ -371,7 +378,7 @@ int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y
 
     for(k = 0 ; k < fcls->cl_nb ; k++) 
     {
-        T_GraphLineTitle(line, fcls, k, to_utf8);
+        T_GraphLineTitle(line, fcls, k);
 
         for(j = 0 ; j < smpl->nb_periods ; j++) 
             y[j] = IODE_NAN;
@@ -782,6 +789,8 @@ int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i)
     COL     *cl = fcls->cl_cols + i;
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content();
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
+    content = utf8_to_oem(content);
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
         fileop = COL_ctoa(cl, 'f', 0, 2);
@@ -961,6 +970,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
 
             case TABLE_LINE_TITLE :
                 content = line->cells[0].get_content();
+                // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
+                content = utf8_to_oem(content);
                 APIGraphTitle(hdl, (char*) content.c_str(), x, smpl.nb_periods);
                 break;
 

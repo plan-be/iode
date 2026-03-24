@@ -46,6 +46,8 @@ char* KDBMacros::dde_create_obj_by_name(const std::string& name, int* nc, int* n
 bool KDBMacros::print_obj_def(const std::string& name)
 {
     std::string macro = this->get_macro(name);
+    // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
+    macro = utf8_to_oem(macro);
     bool success = print_definition_generic(name, (char*) macro.c_str());
     return success;
 }

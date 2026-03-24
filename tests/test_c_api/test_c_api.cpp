@@ -3424,8 +3424,6 @@ TEST_F(LegacyAPITest, Tests_B_WsExport)
     B_WsLoad(fullfilename, TABLES);
     B_WsLoad(fullfilename, VARIABLES);
 
-
-
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
     U_test_print_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS);

@@ -70,6 +70,17 @@ TEST_F(KDBTablesTest, Get)
     EXPECT_EQ(table.lines.size(), 31);
     EXPECT_EQ(table.nb_columns, 2);
     EXPECT_EQ(table.lines[0].get_type(), TABLE_LINE_TITLE);
+
+    // with non-ASCII characters in LEC cells
+    Table table_GAP = global_ws_tbl->get("GAP");
+    TableLine line = table_GAP.lines[5];
+    EXPECT_EQ(line.get_type(), TABLE_LINE_CELL);
+    TableCell cell_title = line.cells[0];
+    EXPECT_EQ(cell_title.get_type(), TABLE_CELL_STRING);
+    EXPECT_EQ(cell_title.get_content(false), "Ecart chômage classique et chômage");
+    TableCell cell_lec = line.cells[1];
+    EXPECT_EQ(cell_lec.get_type(), TABLE_CELL_LEC);
+    EXPECT_EQ(cell_lec.get_content(false), "-100*(LCLASS-(NATY-UY))/NATY /* écart chômage */");
 }
 
 TEST_F(KDBTablesTest, GetNames)

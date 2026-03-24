@@ -53,8 +53,9 @@ static int read_cmt(KDBComments* kdb, YYFILE* yy, char* name)
 
     try
     {
-        Comment cmt_obj(cmt);
-        kdb->set(name, cmt_obj);
+        Comment cmt_oem(cmt);
+        Comment cmt_utf8 = oem_to_utf8(cmt_oem);
+        kdb->set(name, cmt_utf8);
     }
     catch(const std::exception&)
     {
@@ -179,16 +180,18 @@ bool KDBComments::save_asc(const std::string& filename)
         }
     }
 
-    Comment cmt;
+    Comment cmt_utf8;
+    Comment cmt_oem;
     bool success = true;
     for(auto& [name, cmt_ptr] : k_objs) 
     {
         try
         {
             fprintf(fd, "%s ", (char*) name.c_str());
-            cmt = Comment(*cmt_ptr);
-            std::replace(cmt.begin(), cmt.end(), '\n', ' ');
-            SCR_fprintf_esc(fd, (char*) cmt.c_str(), 1);
+            cmt_utf8 = Comment(*cmt_ptr);
+            cmt_oem = utf8_to_oem(cmt_utf8);
+            std::replace(cmt_oem.begin(), cmt_oem.end(), '\n', ' ');
+            SCR_fprintf_esc(fd, (char*) cmt_oem.c_str(), 1);
             fprintf(fd, "\n");
         }
         catch(const std::exception& e) 

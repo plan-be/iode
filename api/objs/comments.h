@@ -23,10 +23,6 @@ struct KDBComments : public KDBTemplate<Comment>
     // copy constructor
     KDBComments(const KDBComments& other): KDBTemplate(other) {}
 
-    Comment get(const std::string& name) const override;
-    bool add(const std::string& name, const Comment& comment) override;
-    void update(const std::string& name, const Comment& comment) override;
-
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
 

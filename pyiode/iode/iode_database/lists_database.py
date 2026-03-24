@@ -687,7 +687,7 @@ class Lists(IodeDatabase):
         ...     print(f.read())
         ...
         " - ENVI : EX;PWMAB;PWMS;PWXAB;PWXS;QWXAB;QWXS;POIL;NATY;TFPFHP_"
-        " - IDT : OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR; WBGR;YSFICR;YSEFPR"
+        " - IDT : OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR; WBGR;YSFICR;YSEFPR /* liste des identités */"
         " - MAINEQ : W;NFYH;KNFF;PC;PXAB;PMAB;QXAB;QMAB;QC_"
         """
         super().print_to_file(filepath, names, format)

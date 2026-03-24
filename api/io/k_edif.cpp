@@ -97,8 +97,10 @@ char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
 {
     if(dbc->contains(name))
     {
-        std::shared_ptr<Comment> comment = dbc->get_obj_ptr(name);
-        return write_pre_post("1,0\n\"", "\"\n", (char*) comment->c_str(), cmt);
+        std::shared_ptr<Comment> cmt_ptr = dbc->get_obj_ptr(name);
+        Comment cmt_utf8 = *cmt_ptr;
+        Comment cmt_oem = utf8_to_oem(cmt_utf8);
+        return write_pre_post("1,0\n\"", "\"\n", (char*) cmt_oem.c_str(), cmt);
     }
     else
         return write_pre_post("1,0\n\"", "\"\n", "", cmt);

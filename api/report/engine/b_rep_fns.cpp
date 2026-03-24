@@ -706,7 +706,7 @@ U_ch *RPF_srelax(U_ch** args)
  *      @ttitle( c8_10)         =>  "Coin salarial parafiscal"
  *      @ttitle(C8_1 c8_10)     =>  "Table C8_1 c8_10 not found"
  *      @ttitle(C8_1, c8_10)    =>  "Déterminants de l'output potentiel
- *                                  Coin salarial parafiscal"
+ *                                   Coin salarial parafiscal"
  */
 U_ch *RPF_ttitle(U_ch** args)
 {
@@ -727,7 +727,11 @@ U_ch *RPF_ttitle(U_ch** args)
         else 
         {
             tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-            res = SCR_strafcat(res, T_get_title(tbl_ptr.get(), false));
+            std::string title = T_get_title(tbl_ptr.get());
+            // W_printf() called in RP_ReportExec_tbl() expects OEM encoding, so convert the title 
+            // from UTF-8 to OEM before printing
+            title = utf8_to_oem(title);
+            res = SCR_strafcat(res, (unsigned char*) title.c_str());
         }
     }
 

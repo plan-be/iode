@@ -83,15 +83,18 @@ TEST_F(KDBIdentitiesTest, GetLec)
 
 TEST_F(KDBIdentitiesTest, Get)
 {
-    std::string name = "AOUC";
+    std::string name;
+    std::string expected_lec;
     CLEC* clec = NULL;
-    CLEC* expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
-    std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
-
+    CLEC* expected_clec = NULL;
+    
     // by name
-    Identity identity_name = global_ws_idt->get(name);
-    EXPECT_EQ(identity_name.get_lec(), expected_lec);
-    clec = identity_name.get_compiled_lec();
+    name = "AOUC";
+    Identity identity = global_ws_idt->get(name);
+    expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
+    EXPECT_EQ(identity.get_lec(), expected_lec);
+    clec = identity.get_compiled_lec();
+    expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
     EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
     EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
     EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
@@ -103,6 +106,13 @@ TEST_F(KDBIdentitiesTest, Get)
         EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
     }
     EXPECT_TRUE(clec_equal(clec, expected_clec));
+
+    // with non-ASCII characters
+    name = "PROD";
+    Identity identity_prod = global_ws_idt->get(name);
+    expected_lec = "QAF_/NFYH\n/* QAF_: Bruto toegevoegde waarde tegen factorkosten:\n";
+    expected_lec += "ondernemingen, P.1985 (vóór statistische aanpassing) */";
+    EXPECT_EQ(identity_prod.get_lec(), expected_lec);
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)

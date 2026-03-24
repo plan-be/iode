@@ -386,8 +386,12 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
     size_t len = (size_t) P_get_len(pack, 0);
     char* value = new char[len];
     strncpy(value, (char*) P_get_ptr(pack, 0), len);
-
-    this->k_objs[name] = std::make_shared<List>(value);
+    // NOTE: in binary files, the value is in OEM encoding, we need to convert it from OEM  
+    //       to UTF-8 after reading the List object (IODE lists may contain non-ASCII characters  
+    //       in comments written as /* ... */)
+    std::string list_oem(value);
+    std::string list_utf8 = oem_to_utf8(list_oem);
+    this->k_objs[name] = std::make_shared<List>(list_utf8);
     return true;
 }
 
@@ -400,8 +404,13 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
  */
 bool KDBLists::obj_to_binary(char** pack, const std::string& name)
 {
-    std::shared_ptr<List> list = this->get_obj_ptr(name);
-    char* c_list = (char*) list->c_str();
+    std::shared_ptr<List> list_ptr = this->get_obj_ptr(name);
+    // NOTE: in binary files, the value is in OEM encoding, we need to convert it from UTF-8 
+    //       to OEM before writing the List object (IODE lists may contain non-ASCII characters in  
+    //       comments written as /* ... */)
+    std::string list_utf8 = *list_ptr;
+    std::string list_oem = utf8_to_oem(list_utf8);
+    char* c_list = (char*) list_oem.c_str();
 
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, c_list, (int) strlen(c_list) + 1);
@@ -429,8 +438,10 @@ char* KDBLists::dde_create_obj_by_name(const std::string& name, int* nc, int* nl
 
 bool KDBLists::print_obj_def(const std::string& name)
 {
-    std::shared_ptr<List> list = this->get_obj_ptr(name);
-    char* c_list = (char*) list->c_str();
+    std::shared_ptr<List> list_ptr = this->get_obj_ptr(name);
+    // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
+    std::string list_oem = utf8_to_oem(*list_ptr);
+    char* c_list = (char*) list_oem.c_str();
     print_definition_generic(name, c_list);
     return true;
 }

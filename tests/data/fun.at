@@ -339,7 +339,7 @@ DIV LEC "1" LEFT ""
 - "" "#s" CENTER  LAXIS  GRLINE 
 - LINE 
 - "Output gap (methodologie FPB)." LEFT LEC "GAP" DECIMAL  LAXIS  GRLINE 
-- "Ecart ch“mage classique et ch“mage" LEFT LEC "-100*(LCLASS-(NATY-UY))/NATY" DECIMAL  LAXIS  GRLINE 
+- "Ecart ch“mage classique et ch“mage" LEFT LEC "-100*(LCLASS-(NATY-UY))/NATY /* ‚cart ch“mage */" DECIMAL  LAXIS  GRLINE 
 - LINE 
 /* END OF TABLE */
 }

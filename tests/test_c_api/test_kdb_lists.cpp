@@ -62,8 +62,16 @@ TEST_F(KDBListsTest, Save)
 
 TEST_F(KDBListsTest, Get)
 {
+    std::string name = "COPY";
     std::string expected_list = "$COPY0;$COPY1;";
-    std::string list = global_ws_lst->get("COPY");
+    std::string list = global_ws_lst->get(name);
+    EXPECT_EQ(expected_list, list);
+
+    // with non-ASCII characters
+    name = "IDT";
+    expected_list = "OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR;\n";
+    expected_list += "WBGR;YSFICR;YSEFPR /* liste des identités */";
+    list = global_ws_lst->get(name);
     EXPECT_EQ(expected_list, list);
 }
 

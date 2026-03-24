@@ -113,8 +113,10 @@ char* ExportObjsCSV::extract_comment(KDBComments* dbc, char* name, char**cmt)
         return write_separator("", cmt);
     else
     {
-        std::shared_ptr<Comment> comment = dbc->get_obj_ptr(name);
-        U_ch* c_cmt = (unsigned char*) comment->c_str();
+        std::shared_ptr<Comment> cmt_ptr = dbc->get_obj_ptr(name);
+        Comment cmt_utf8 = *cmt_ptr;
+        Comment cmt_oem = utf8_to_oem(cmt_utf8);
+        U_ch* c_cmt = (unsigned char*) cmt_oem.c_str();
         SCR_replace(c_cmt, (unsigned char*) "\n", (unsigned char*) "");
         return write_separator((char*) c_cmt, cmt);
     }
