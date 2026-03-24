@@ -302,19 +302,15 @@ public:
     }
 
     // If quotes is true, the content is returned between double quotes.
-    std::string get_content(const bool quotes=false, const bool to_utf8=true) const;
+    std::string get_content(const bool quotes=false) const;
 
-    // to_oem set to false means that the text is already in OEM encoding
-    // i.e. when reading from old binary files
-    void set_text(const std::string& text, const bool to_oem=true);
+    void set_text(const std::string& text);
 
     void set_lec(const std::string& lec);
 
     // Rule: If the content starts with a double quotes, we assume it is a string cell. 
     //       Otherwise, it is a LEC cell.
-    // to_oem set to false means that the text is already in OEM encoding
-    // i.e. when reading from old binary files
-    void set_content(const std::string& content, const bool to_oem=true);
+    void set_content(const std::string& content);
 
 	CLEC* get_compiled_lec()
     {

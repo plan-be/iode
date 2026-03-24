@@ -239,7 +239,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         hg = T_graph_tbl_1(tbl_ptr.get(), gsmpl, B_viewmode);
 
         if(view) 
-            W_EndDisplay((char*) T_get_title(tbl_ptr.get()), -ng, -i, -1, -1);
+            W_EndDisplay((char*) T_get_title(tbl_ptr.get()).c_str(), -ng, -i, -1, -1);
 
         if(hg < 0) 
         {

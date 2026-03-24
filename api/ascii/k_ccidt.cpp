@@ -43,7 +43,6 @@
  */
 bool KDBIdentities::load_asc(const std::string& filename)
 {
-    char    *lec = NULL;
     int     cmpt = 0;
     YYFILE  *yy;
     ONAME   name;
@@ -65,6 +64,9 @@ bool KDBIdentities::load_asc(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */
+    char* c_lec = NULL;
+    std::string lec_oem;
+    std::string lec_utf8;
     this->set_fullpath(c_filename);
     while(1) 
     {
@@ -88,21 +90,23 @@ bool KDBIdentities::load_asc(const std::string& filename)
                     kwarning("%s : identity not defined", YY_error(yy));
                     break;
                 }
-                lec = K_wrap((char*) yy->yy_text, 60);
+                c_lec = K_wrap((char*) yy->yy_text, 60);
+                lec_oem = std::string(c_lec);
                 try
                 {
-                    Identity idt(lec);
+                    lec_utf8 = oem_to_utf8(lec_oem);
+                    Identity idt(lec_utf8);
                     this->set(name, idt);
                     cmpt++;
                 }
                 catch(const std::exception& e) 
                 {
-                    SW_nfree(lec);
+                    SW_nfree(c_lec);
                     error_manager.append_error(std::string(e.what()));
                     return false;
                 }
 
-                SW_nfree(lec);
+                SW_nfree(c_lec);
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
@@ -146,15 +150,17 @@ bool KDBIdentities::save_asc(const std::string& filename)
         }
     }
 
-    std::string lec;
+    std::string lec_utf8;
+    std::string lec_oem;
     bool success = true;
     for(auto& [name, idt_ptr] : k_objs) 
     {
         try
         {
             fprintf(fd, "%s ", (char*) name.c_str());
-            lec = idt_ptr->get_lec();
-            fprintf(fd, "\"%s\"\n", (char*) lec.c_str());
+            lec_utf8 = idt_ptr->get_lec();
+            lec_oem = utf8_to_oem(lec_utf8);
+            fprintf(fd, "\"%s\"\n", (char*) lec_oem.c_str());
         }
         catch(const std::exception& e) 
         {

@@ -20,7 +20,9 @@ NFYHO "1"
 OCP "d DEBT + FLG"
 PCO "1"
 PKF "PIF*(RLBER+VKFF+.1)"
-PROD "QAF_/NFYH"
+PROD "QAF_/NFYH
+/* QAF_: Bruto toegevoegde waarde tegen factorkosten:
+ondernemingen, P.1985 (v¢¢r statistische aanpassing) */"
 QCO "1"
 QL "KLFHP**(ZZF_-1)*TFPFHP_"
 RDEBT "YIDG/DEBT[-1]"

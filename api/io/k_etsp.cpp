@@ -93,8 +93,10 @@ char* ExportObjsTSP::extract_comment(KDBComments* dbc, char* name, char** cmt)
 {
     if(dbc->contains(name))
     {
-        Comment comment = dbc->get(name);
-        *cmt = (char*) SCR_stracpy((unsigned char*) comment.c_str());
+        std::shared_ptr<Comment> cmt_ptr = dbc->get_obj_ptr(name);
+        Comment cmt_utf8 = *cmt_ptr;
+        Comment cmt_oem = utf8_to_oem(cmt_utf8);
+        *cmt = (char*) SCR_stracpy((unsigned char*) cmt_oem.c_str());
     }  
     else 
         *cmt = (char*) SCR_stracpy((unsigned char*) " ");

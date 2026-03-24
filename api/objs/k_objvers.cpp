@@ -134,7 +134,7 @@ static char *T_cell_repack(char* pack, TableCell* cell)
     }
     else
     {
-        std::string text = cell->get_content(false, false);
+        std::string text = cell->get_content(false);
         if(text.empty()) 
             return(pack);
         pack = (char*) P_add(pack, (void*) text.c_str(), (int) text.size() + 1);

@@ -17,7 +17,7 @@
  *      void T_print_title(TableCell* cell, int straddle)           Prints a Table line of type TITLE
  *      void T_print_cell(TableCell* cell, COL* cl, int straddle)   Prints a Table cell on a specific GSample column. 
  *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
- *      unsigned char *T_get_title(Table* tbl)                      Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE
+ *      std::string T_get_title(Table* tbl)                         Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE
  *      int T_print_tbl(Table* tbl, char* smpl)                     Computes a table on a GSample and saves the result in A2M format
  *  
  *  Global variables
@@ -29,6 +29,7 @@
 #include "scr4/s_a2m.h"
 
 #include "api/constants.h"
+#include "api/b_a2mini.h"
 #include "api/k_lang.h"
 #include "api/b_errors.h"
 #include "api/objs/kdb.h"
@@ -181,7 +182,10 @@ void T_print_title(TableCell* cell, int straddle)
         return;                
     }
 
-    std::string content = cell->get_content(false, false);
+    std::string content = cell->get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
+    //       from UTF-8 to OEM before printing 
+    content = utf8_to_oem(content);
 
     int attribute = (int) cell->get_attribute();
     T_open_cell(attribute, straddle, TABLE_CELL_STRING);
@@ -211,7 +215,11 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
     }
 
     TableCellType cell_type = cell->get_type();
-    std::string content = cell->get_content(false, false);
+    
+    std::string content = cell->get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
+    //       from UTF-8 to OEM before printing
+    content = utf8_to_oem(content);
 
     if(cell_type == TABLE_CELL_STRING && content.find('#') != std::string::npos)
         cell->set_align(TABLE_CELL_RIGHT);
@@ -333,11 +341,11 @@ char **T_find_files(COLS* cls)
  
 void T_print_files(COLS* cls, int dim)
 {
-    int     i;
+    if(KT_nbnames <= 0) 
+        return;  
 
-    if(KT_nbnames <= 0) return;  
-
-    for(i = 0; KT_names[i]; i++) {
+    for(int i = 0; KT_names[i]; i++) 
+    {
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
         W_printf((char*) "%s\n", KT_names[i]);
     }
@@ -357,8 +365,10 @@ void T_print_mode(COLS* cls, int dim)
 {
     int    i;
 
-    for(i = 0; i < MAX_MODE; i++) {
-        if(KT_mode[i] == 0) continue;
+    for(i = 0; i < MAX_MODE; i++) 
+    {
+        if(KT_mode[i] == 0) 
+            continue;
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);  /* JMP 17-12-93 */
         //W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
         W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
@@ -379,7 +389,7 @@ void T_print_date(int dim)
     char    date[11];
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
-    T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
+    T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
     W_printf((char*) "%s\n", date);
 }
 
@@ -391,21 +401,21 @@ void T_print_date(int dim)
  *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
  *  @param [in] COLS*   cls     columns to print = compiled GSample
  *  @return 
- *  
  */
- 
 int T_begin_tbl(int dim, COLS* cls)
 {
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) return -1; /* JMP 11-06-99 */
+    if(KT_nbnames == 0) 
+        return -1;
+    
     COL_find_mode(cls, KT_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
-    //if(KT_sep == '\t') W_printf((char*) ".sep TAB\n");
-    //else W_printf((char*) ".sep %c\n", KT_sep);
-    if(A2M_SEPCH == '\t') W_printf((char*) ".sep TAB\n");
-    else W_printf((char*) ".sep %c\n", A2M_SEPCH);
+    if(A2M_SEPCH == '\t') 
+        W_printf((char*) ".sep TAB\n");
+    else 
+        W_printf((char*) ".sep %c\n", A2M_SEPCH);
     
     return 0;
 }
@@ -414,7 +424,6 @@ int T_begin_tbl(int dim, COLS* cls)
 /**
  *  Prints a table footer in A2M and frees the temporary allocated variables. 
  */
-
 void T_end_tbl()
 {
     W_printf((char*) ".te \n");
@@ -427,33 +436,26 @@ void T_end_tbl()
 /**
  *  Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE.
  *  
- *  @param [in] Table*    tbl     pointer to a table
+ *  @param [in] Table*    tbl   pointer to a table
  *  @return     char*           local static buffer with the contents of the title or the text "No title"
  *                              if no line of type TABLE_LINE_TITLE can be found or if the first line of that type is empty.
  */
-
-unsigned char* T_get_title(Table* tbl, const bool to_utf8)  
-{
-    int                     k;
-    static unsigned char    buf[256];
-    
+std::string T_get_title(Table* tbl)  
+{   
     // get the first line of type TABLE_LINE_TITLE
+    int k = 0;
     for(k = 0; k < T_NL(tbl); k++)
         if(tbl->lines[k].get_type() == TABLE_LINE_TITLE) 
             break;
 
     TableLine line = tbl->lines[k];
     TableCell cell = line.cells[0];
-    std::string title = cell.get_content(false, to_utf8);
-
-    // New version using local static buffer to solve link problems // JMP 11/04/2022
+    std::string title = cell.get_content(false);
 
     if(k == T_NL(tbl) || title.empty())
-        strcpy((char*) buf, "No title");
-    else
-        SCR_strlcpy(buf, (unsigned char*) title.c_str(), sizeof(buf) - 1);
+        title = "No title";
 
-    return(buf);
+    return title;
 }
 
 
@@ -475,16 +477,17 @@ int T_print_tbl(Table* tbl, char* smpl)
     if(dim < 0) 
         return -1;
 
-    // Anciennement
-    // B_PrintRtfTopic(T_get_title(tbl));
-    // Nouveau JMP 18/04/2022
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(tbl, false));
-    //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
-    
+    std::string title = T_get_title(tbl);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 
+    //       to OEM before printing 
+    title = utf8_to_oem(title);
+
+    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title.c_str());
+
     if(T_begin_tbl(dim, cls)) 
         return -1;
     
-    W_printf((char*) ".ttitle %s\n", T_get_title(tbl, false));  /* JMP 27-02-98 */
+    W_printf((char*) ".ttitle %s\n", title.c_str());
     
     TableLine* line;
     TableCell* cell;
@@ -497,7 +500,8 @@ int T_print_tbl(Table* tbl, char* smpl)
                 W_printf((char*) ".tl\n");
                 break;
             case TABLE_LINE_TITLE :
-                if(first) {
+                if(first) 
+                {
                     first = 0;
                     break;
                 }

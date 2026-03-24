@@ -59,14 +59,10 @@ YYKEYS KE_TABLE[] = {
  */
 static Equation* read_eq(YYFILE* yy, char* name)
 {
-    int         keyw;
-    char*       c_lec;
-    Sample*     smpl = NULL;
-    long        date = 0L;
-    std::string block;
-    std::string comment;
-    std::string instruments;
-    float       tests[EQS_NBTESTS] = { 0.0f };
+    int keyw;
+    char* c_lec;
+    std::string lec;
+    std::string lec_oem;
 
     std::string endo(name);
     IodeEquationMethod method = EQ_LSQ;
@@ -76,9 +72,10 @@ static Equation* read_eq(YYFILE* yy, char* name)
         YY_unread(yy);
         c_lec = K_read_str(yy);
         c_lec = K_wrap(c_lec, 60);  
-        std::string lec(c_lec);
+        lec_oem = std::string(c_lec);
         SW_nfree(c_lec);
 
+        lec = oem_to_utf8(lec_oem);
         if(lec.empty()) 
         {
             kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
@@ -92,9 +89,10 @@ static Equation* read_eq(YYFILE* yy, char* name)
 
     c_lec = K_read_str(yy);
     c_lec = K_wrap(c_lec, 60);
-    std::string lec(c_lec);
+    lec_oem = std::string(c_lec);
     SW_nfree(c_lec);
 
+    lec = oem_to_utf8(lec_oem);
     if(lec.empty()) 
     {
         kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
@@ -103,17 +101,25 @@ static Equation* read_eq(YYFILE* yy, char* name)
     }
 
     bool exit = false;
+    long date = 0L;
+    std::string block;
+    std::string comment;
+    std::string instruments;
+    Sample* smpl = nullptr;
+    float tests[EQS_NBTESTS] = { 0.0f };
     while(!exit) 
     {
         keyw = YY_lex(yy);
-        switch(keyw) {
+        switch(keyw) 
+        {
             case YY_WORD :
             case YY_EOF  :
                 YY_unread(yy);
             case EQ_ASCII_CLOSE:
                 exit = true;
                 break;
-            case EQ_ASCII_DATE :
+            
+            case EQ_ASCII_DATE :            
                 date = K_read_long(yy);
                 break;
 
@@ -134,14 +140,18 @@ static Equation* read_eq(YYFILE* yy, char* name)
                 break;
 
             case EQ_ASCII_SMPL :
+            {
                 smpl = K_read_smpl(yy);
-                if(smpl == NULL)
+                if(!smpl)
                 {
                     kerror(0, "Failed to read sample for equation '%s', [%s]", name, YY_error(yy));
                     return nullptr;
                 }
                 break;
+            }
+
             case EQ_ASCII_BLK  :
+            {
                 block = std::string(K_read_str(yy));
                 if(block.empty()) 
                 {
@@ -149,22 +159,31 @@ static Equation* read_eq(YYFILE* yy, char* name)
                     return nullptr;
                 }
                 break;
+            }
+
             case EQ_ASCII_CMT  :
-                comment = std::string(K_read_str(yy));
+            {
+                std::string comment_oem = std::string(K_read_str(yy));
+                comment = oem_to_utf8(comment_oem);
                 if(comment.empty()) 
                 {
                     kerror(0, "Missing comment value for equation '%s', [%s]", name, YY_error(yy));
                     return nullptr;
                 }
                 break;
+            }
+
             case EQ_ASCII_INSTR:
-                instruments = std::string(K_read_str(yy));
+            {
+                std::string instruments_oem = std::string(K_read_str(yy));
+                instruments = oem_to_utf8(instruments_oem);
                 if(instruments.empty()) 
                 {
                     kerror(0, "Missing instruments value for equation '%s', [%s]", name, YY_error(yy));
                     return nullptr;
                 }
                 break;
+            }
 
             case EQ_ASCII_STDEV :
                 tests[EQ_STDEV] = (float) K_read_real(yy);
@@ -379,55 +398,64 @@ static void print_test(FILE* fd, char* txt, double val)
  *  @see read_eq() the detailed syntax of an ascii equation. 
  *  
  *  @param [in, out]    fd      FILE*       output stream    
- *  @param [in]         eq      Equation*         pointer to the EQ to print  
+ *  @param [in]         eq      Equation*   pointer to the EQ to print  
  *  @param [in]         name    char*       equation endo (i.e. equation name)
  *  
  */
 static void print_eq(FILE* fd, std::shared_ptr<Equation> eq, const std::string& name)
 {
-    fprintf(fd, "{\n\t\"%s\"\n", (char*) eq->lec.c_str());
+    std::string lec_oem = utf8_to_oem(eq->lec);
+    fprintf(fd, "{\n\t\"%s\"\n", (char*) lec_oem.c_str());
+
+    switch(eq->method) 
+    {
+    case 0 :
+        fprintf(fd, "\tLSQ\n");
+        break;
+    case 1 :
+        fprintf(fd, "\tZELLNER\n");
+        break;
+    case 2 :
+        fprintf(fd, "\tINF\n");
+        break;
+    case 3 :
+        fprintf(fd, "\tGLS\n");
+        break;
+    case 4 :
+        fprintf(fd, "\tMAXLIK\n");
+        break;
+    default: 
+        fprintf(fd, "\t/* UNKNOWN ESTIMATION METHOD: %d*/\n", eq->method);
+        break;
+    }
+
+    std::string block = trim(eq->block);
+    if(block.empty()) 
+        block = name;
+    fprintf(fd, "\tBLOCK \"%s\"\n", eq->block.c_str());
 
     std::string comment = trim(eq->comment);
-    if(!comment.empty()) 
+    if(!comment.empty())
     {
+        std::string comment_oem = utf8_to_oem(comment);
         fprintf(fd, "\tCOMMENT ");
-        SCR_fprintf_esc(fd, (char*) comment.c_str(), 1);
+        SCR_fprintf_esc(fd, (char*) comment_oem.c_str(), 1);
         fprintf(fd, "\n");
+    }
+
+    std::string instruments = trim(eq->instruments);
+    if(!instruments.empty())
+    {
+        std::string instruments_oem = utf8_to_oem(eq->instruments);
+        fprintf(fd, "\tINSTRUMENTS \"%s\"\n", instruments_oem.c_str());
     }
 
     // Estimated equation => Sample not null 30/10/2023
     if(eq->sample.nb_periods != 0) 
-    {
-        switch(eq->method) {
-            case 0 :
-                fprintf(fd, "\tLSQ\n");
-                break;
-            case 1 :
-                fprintf(fd, "\tZELLNER\n");
-                break;
-            case 2 :
-                fprintf(fd, "\tINF\n");
-                break;
-            case 3 :
-                fprintf(fd, "\tGLS\n");
-                break;
-            case 4 :
-                fprintf(fd, "\tMAXLIK\n");
-                break;
-            default: 
-                fprintf(fd, "\t/* UNKNOWN ESTIMATION METHOD: %d*/\n", eq->method);
-                break;
-            }
-        
+    {   
         std::string from = eq->sample.start_period.to_string();
         std::string to   = eq->sample.end_period.to_string();
         fprintf(fd, "\tSAMPLE %s %s\n", (char*) from.c_str(), (char*) to.c_str());
-
-        if((!eq->block.empty()) && eq->block != std::string(name))
-            fprintf(fd, "\tBLOCK \"%s\"\n", eq->block.c_str());
-        
-        if(!eq->instruments.empty())
-            fprintf(fd, "\tINSTRUMENTS \"%s\"\n", eq->instruments.c_str());
         
         //if(eq->date != 0L)
         fprintf(fd, "\tDATE %ld\n", eq->date);

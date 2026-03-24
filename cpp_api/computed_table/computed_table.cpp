@@ -411,17 +411,16 @@ void ComputedTable::print_to_file()
                     "Invalid value for 'language' argument.\n" + last_error);
     }
 
-    // Anciennement
-    // B_PrintRtfTopic(T_get_title(tbl));
-    // Nouveau JMP 18/04/2022
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, T_get_title(ref_table, false));
-    //if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf(".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, T_get_title(tbl));
+    std::string title_utf8 = T_get_title(ref_table);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
+    std::string title_oem = utf8_to_oem(title_utf8);
+    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title_oem.c_str());
     
     res = T_begin_tbl(dim, columns);
     if(res != 0) 
         throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
 
-    W_printf(".ttitle %s\n", T_get_title(ref_table, false));  /* JMP 27-02-98 */
+    W_printf(".ttitle %s\n", title_oem.c_str());
 
     TableCell* cell;
     bool first_title = true;
@@ -429,7 +428,8 @@ void ComputedTable::print_to_file()
     {
         TableLine& line = ref_table->lines[i];
 
-        switch(line.get_type()) {
+        switch(line.get_type()) 
+        {
             case TABLE_LINE_SEP:
                 W_printf(".tl\n");
                 break;

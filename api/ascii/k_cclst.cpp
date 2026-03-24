@@ -58,8 +58,9 @@ static int read_lst(KDBLists* kdb, YYFILE* yy, char* name)
 
     try
     {
-        List lst_obj(lst);
-        kdb->set(name, lst_obj);
+        List lst_oem(lst);
+        List lst_utf8 = oem_to_utf8(lst_oem);
+        kdb->set(name, lst_utf8);
     }
     catch(const std::exception&) 
     {
@@ -188,15 +189,17 @@ bool KDBLists::save_asc(const std::string& filename)
         } 
     }
 
-    List lst;
+    List lst_utf8;
+    List lst_oem;
     bool success = true;
     for(auto& [name, lst_ptr] : k_objs) 
     {
         try
         {
             fprintf(fd, "%s ", (char*) name.c_str());
-            lst = List(*lst_ptr);
-            SCR_fprintf_esc(fd, (char*) lst.c_str(), 1);
+            lst_utf8 = List(*lst_ptr);
+            lst_oem = utf8_to_oem(lst_utf8);
+            SCR_fprintf_esc(fd, (char*) lst_oem.c_str(), 1);
             fprintf(fd, "\n");
         }
         catch(const std::exception& e) 

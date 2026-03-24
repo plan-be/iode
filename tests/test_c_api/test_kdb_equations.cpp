@@ -108,6 +108,13 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_ptr->comment, "");
     EXPECT_EQ(eq_ptr->block, "DTH1");
     EXPECT_EQ(eq_ptr->instruments, "");
+
+    // with non-ASCII characters
+    eq_ptr = global_ws_eqs->get_obj_ptr("COEFON");
+    expected_lec = "COEFON :=(ITON/(VBBP_P-VAG-VAH))[1990Y1]\n";
+    expected_lec += "/* Coëfficiënt voor berekening indirecte\n"; 
+    expected_lec += "belastingen in constante prijzen */";
+    EXPECT_EQ(eq_ptr->lec, expected_lec);
 }
 
 TEST_F(KDBEquationsTest, GetNames)

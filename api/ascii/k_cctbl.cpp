@@ -38,7 +38,8 @@ static TableCell* read_cell(YYFILE* yy, int mode)
     }
 
     int ok = 0;
-    std::string content;
+    std::string content_oem;
+    std::string content_utf8;
     TableCell* cell = new TableCell(TABLE_CELL_STRING);
     while(1) 
     {
@@ -79,8 +80,9 @@ static TableCell* read_cell(YYFILE* yy, int mode)
                     YY_unread(yy);
                     break;
                 }
-                content = std::string((char*) yy->yy_text);
-                cell->set_lec(content);
+                content_oem = std::string((char*) yy->yy_text);
+                content_utf8 = oem_to_utf8(content_oem);
+                cell->set_lec(content_utf8);
                 cell->set_align(TABLE_CELL_DECIMAL);
                 break;
 
@@ -88,8 +90,9 @@ static TableCell* read_cell(YYFILE* yy, int mode)
                 if(ok == 1) 
                     goto ret;
                 ok = 1;
-                content = std::string((char*) yy->yy_text);
-                cell->set_text(content, false);
+                content_oem = std::string((char*) yy->yy_text);
+                content_utf8 = oem_to_utf8(content_oem);
+                cell->set_text(content_utf8);
                 break;
 
             case YY_EOF   :
@@ -567,14 +570,15 @@ static void print_attribute(FILE* fd, const TableCell* cell)
  */
 static void print_cell(FILE *fd, const TableCell* cell)
 { 
-    std::string content = cell->get_content(false, false);
-    if(content.empty())
+    std::string content_utf8 = cell->get_content(false);
+    if(content_utf8.empty())
     {
         fprintf(fd, "\"\" ");
         return;
     }
 
-    char* c_content = (char*) content.c_str();
+    std::string content_oem = utf8_to_oem(content_utf8);
+    char* c_content = (char*) content_oem.c_str();
     switch(cell->get_type()) 
     {
         case TABLE_CELL_STRING :
