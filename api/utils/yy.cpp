@@ -40,7 +40,8 @@ double K_read_real(YYFILE *yy)
     int     minus = 1;
 
 ag:
-    switch(YY_lex(yy)) {
+    switch(YY_lex(yy)) 
+    {
         case YY_DOUBLE :
             val = minus * yy->yy_double;
             break;
@@ -49,7 +50,8 @@ ag:
             break;
         case TABLE_ASCII_BREAK :
         case YY_SPECIAL:
-            if(yy->yy_text[0] == '-') {
+            if(yy->yy_text[0] == '-') 
+            {
                 minus = -1;
                 goto ag;
             }
@@ -69,7 +71,7 @@ ag:
             return(IODE_NAN);
     }
 
-    return(val);
+    return val;
 }
 
 /**
@@ -85,16 +87,19 @@ long K_read_long(YYFILE* yy)
     int     minus = 1;
 
 ag:
-    switch(YY_lex(yy)) {
+    switch(YY_lex(yy)) 
+    {
         case YY_LONG   :
             val = minus * yy->yy_long;
             break;
         case YY_SPECIAL:
-            if(yy->yy_text[0] == '-') {
+            if(yy->yy_text[0] == '-') 
+            {
                 minus = -1;
                 goto ag;
             }
-            else if(yy->yy_text[0] == '+') { /* JMP 16-05-00 */
+            else if(yy->yy_text[0] == '+') 
+            {
                 minus = 1;
                 goto ag;
             }
@@ -106,7 +111,7 @@ ag:
             return 0;
     }
 
-    return(val);
+    return val;
 }
 
 /**
@@ -120,9 +125,11 @@ char* K_read_str(YYFILE* yy)
 {
     char    *ptr = NULL;
 
-    if(YY_lex(yy) != YY_STRING) return(NULL);
+    if(YY_lex(yy) != YY_STRING) 
+        return(NULL);
+    
     ptr = (char*) SCR_stracpy(yy->yy_text);
-    return(ptr);
+    return ptr;
 }
 
 /**
@@ -134,25 +141,29 @@ char* K_read_str(YYFILE* yy)
  *  
  */
 
-Period  *K_read_per(YYFILE* yy)
+Period* K_read_per(YYFILE* yy)
 {
-    char    buf[30], buf1[2];
-    Period  *tmp = NULL;
+    int type = -1;
+    std::string buf;
 
-    buf[0] = 0;
-    if(YY_lex(yy) != YY_LONG) goto err;
-    strcpy(buf, (char*) yy->yy_text);
-    buf1[0] = YY_getc(yy);
-    buf1[1] = 0;
-    strcat(buf, buf1);
-    if(YY_lex(yy) != YY_LONG) goto err;
-    strcat(buf, (char*) yy->yy_text);
+    // read the year (4 digits)
+    type = YY_lex(yy);
+    if(type != YY_LONG) 
+        return nullptr;
+    buf = std::string((char*) yy->yy_text);
+    
+    // read the period type (Y, Q, M, W, D)
+    char period_type = (char) YY_getc(yy);
+    buf += period_type;
 
-    tmp = new Period(std::string(buf));
-    return(tmp);
+    // read the period step (digits)
+    type = YY_lex(yy);
+    if(type != YY_LONG) 
+        return nullptr;
+    buf += std::string((char*) yy->yy_text);
 
-err:
-    return(NULL);
+    Period* period = new Period(std::string(buf));
+    return period;
 }
 
 
@@ -165,25 +176,39 @@ err:
  *  
  *  TODO: improve (correct) if the syntax is incorrect on YY stream.
  */
-
-Sample  *K_read_smpl(YYFILE* yy)
+Sample* K_read_smpl(YYFILE* yy)
 {
-    int     nb;
-    Sample  *smpl = NULL;
-    Period  *one, *two;
-
-    one = K_read_per(yy);
-    two = K_read_per(yy);
-    nb = two->difference(*one);
-    if(one == 0 || two == 0 || nb < 0)
+    Period* one = K_read_per(yy);
+    if(!one)
+    {
         kerror(0, "%s incorrect period", YY_error(yy));
-    else 
-        smpl = new Sample(*one, *two);
+        return nullptr;
+    }
+
+    Period* two = K_read_per(yy);
+    if(!two)
+    {
+        kerror(0, "%s incorrect period", YY_error(yy));
+        delete one;
+        return nullptr;
+    }
+    
+    int nb = two->difference(*one);
+    if(nb < 0)
+    {
+        kerror(0, "%s second period is before the first one", YY_error(yy));
+        delete one;
+        delete two;
+        return nullptr;
+    }
+        
+    Sample* smpl = new Sample(*one, *two);
 
     delete one;
     one = nullptr;
     delete two;
     two = nullptr;
+
     return smpl;
 }
 
@@ -201,13 +226,14 @@ int K_read_align(YYFILE* yy)
     int keyw;
 
     keyw = YY_lex(yy);
-    switch(keyw) {
+    switch(keyw) 
+    {
         case TABLE_CELL_LEFT :
             return 0;
         case TABLE_CELL_CENTER:
-            return(1);
+            return 1;
         case TABLE_CELL_RIGHT :
-            return(2);
+            return 2;
         default       :
             YY_unread(yy);
             return 0;
@@ -227,7 +253,7 @@ int K_read_align(YYFILE* yy)
 
 void K_stracpy(char** to, char* from)
 {
-    *to = SW_nalloc((int)strlen(from) + 1);
+    *to = SW_nalloc((int) strlen(from) + 1);
     strcpy(*to, from);
 }
 
@@ -248,10 +274,14 @@ int K_wrdef(FILE* fd, YYKEYS* table, int def)
     YYKEYS  *yk;
 
     for(yk = table ; yk->yk_word != 0 ; yk++)
-        if(yk->yk_def == def) {
+    {
+        if(yk->yk_def == def) 
+        {
             fprintf(fd, "%s ", yk->yk_word);
             return 0;
         }
+    }
+
     fprintf(fd, "/* UNDEFINED */ ");
     return 0;
 }
@@ -291,9 +321,9 @@ char *K_wrap(char *in, int lg)
 
     tbl = SCR_text((unsigned char*) in, (unsigned char*) ";,*+-/) ", lg); /* JMP 09-03-95 */
     if(tbl == 0) 
-        return((char*) txt);
+        return (char*) txt;
 
     txt = SCR_mtov(tbl, '\n');
     SCR_free_tbl(tbl);
-    return((char*) txt);
+    return (char*) txt;
 }
