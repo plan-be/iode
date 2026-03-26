@@ -12,19 +12,16 @@ inline char K_AggrChar;
 int B_DataPattern(char* arg, int type);
 int B_DataRasVar(char* arg, int unused=-1);
 int B_DataCalcVar(char* arg, int unused=-1);
-int B_DataCreate_1(char *,int *);
+int B_DataCreate_1(char* arg, int* ptype);
 int B_DataCreate(char* arg, int type);
-int B_DataDelete_1(char *,int *);
+int B_DataDelete_1(char* arg, int* ptype);
 int B_DataDelete(char* arg, int type);
 int B_DataRename(char* arg, int type);
 int B_DataDuplicate(char* arg, int type);
-//int B_DataUpdateEqs(char *,char *,char *,int ,Sample *,char *,char *,float *,int );
-//int B_DataUpdateTbl(char *,char *);
 int B_DataUpdate(char* arg, int type);
 char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type);
 int B_DataSearch(char* arg, int type);
 int B_DataEditCnf(char* arg, int unused=-1);
-// int my_strcmp(const void *,const void *);
 int B_DataListSort(char* arg, int unused=-1);
 int B_DataScan(char* arg, int type);
 int B_DataExist(char* arg, int type);
@@ -34,7 +31,6 @@ int B_DataCalcLst(char* arg, int unused=-1);
 int B_DataListCount(char* arg, int unused=-1);
 int B_DataCompareEps(char* arg, int unused=-1);
 int B_DataCompare(char* arg, int type);
-//int B_DataEditGraph(int ,char *);
 int B_DataDisplayGraph(char* arg, int unused=-1);
 int B_DataPrintGraph(char* arg, int unused=-1);
 
@@ -49,7 +45,6 @@ int B_EqsSetInstrs(char* arg, int unused=-1);
 
 /* b_file.c */
 int B_FilePrint(char* arg, int type);
-//int B_unlink_1(char *,int *);
 int B_FileDelete(char* arg, int type);
 int B_FileCopy(char* arg, int type);
 int B_FileRename(char* arg, int type);
@@ -68,12 +63,10 @@ int B_SysOemToAnsi(char* arg, int unused=-1);
 int B_WsHtoLLast(char* arg, int unused=-1);
 int B_WsHtoLMean(char* arg, int unused=-1);
 int B_WsHtoLSum(char* arg, int unused=-1);
-//int HTOL_smpl(Sample *,Sample *,Sample **,int *,int *);
-//int B_htol(int ,char *);
 
 /* b_idt.c */
 int B_IdtExecute(char* arg, int unused=-1);
-int B_IdtExecuteIdts(Sample *,char **);
+int B_IdtExecuteIdts(Sample* smpl, char** c_idts);
 int B_IdtExecuteVarFiles(char* arg, int unused=-1);
 int B_IdtExecuteSclFiles(char* arg, int unused=-1);
 int B_IdtExecuteTrace(char* arg, int unused=-1);
@@ -81,21 +74,13 @@ int B_IdtExecuteTrace(char* arg, int unused=-1);
 /* b_ltoh.c */
 int B_WsLtoHStock(char* arg, int unused=-1);
 int B_WsLtoHFlow(char* arg, int unused=-1);
-//int LTOH_smpl(Sample *,Sample *,Sample **,int *,int *);
-// int B_ltoh(int ,char *);
-//double LTOH_ylin(double *,double );
-//int LTOH_lin(int ,double *,int ,double *,int ,int );
-//int LTOH_y2cs(double *,int ,double *);
-//double LTOH_ycs(double *,double *,double );
-//int LTOH_cs(int ,double *,int ,double *,int ,int );
 
 /* b_model.c */
 int B_ModelSimulate(char* arg, int unused=-1);
-//int B_ModelSimulateEqs(Sample *,char **);
 int B_ModelSimulateParms(char* arg, int unused=-1);
 int B_ModelExchange(char* arg, int unused=-1);
 int B_ModelCompile(char* arg, int unused=-1);
-int KE_compile(KDBEquations *);
+int KE_compile(KDBEquations* dbe);
 int B_ModelCalcSCC(char* arg, int unused=-1);
 int B_ModelSimulateSCC(char* arg, int unused=-1);
 int B_ModelSimulateSaveNIters(char* arg, int unused=-1);
@@ -106,7 +91,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper
 
 /* b_ws.c */
 int B_WsLoad(char* arg, int type);
-int B_WsDump(KDB *,char *);
+int B_WsDump(KDB* kdb, char* filename);
 int B_WsSave(char* arg, int type);
 int B_WsSaveCmp(char* arg, int type);
 int B_WsExport(char* arg, int type);

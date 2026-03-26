@@ -68,9 +68,9 @@ struct ImportVarFromFile {
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
     bool read_variable_implemented;
     virtual ~ImportVarFromFile() = default;
-    virtual int read_header(YYFILE*, Sample*) { return 0; }                         // method to open the input file and to read its header
-    virtual int read_variable(YYFILE*, char*, int, double*) { return 0; }           // method to read full variable (i.e. a name + a series of values)
-    virtual int read_numerical_value(YYFILE*, char*, int*, double*) { return 0; }   // method to read a single numerical value (a double)
+    virtual int read_header(YYFILE* yy, Sample* smpl) { return 0; }                         // method to open the input file and to read its header
+    virtual int read_variable(YYFILE* yy, char* iname, int nb, double* vector) { return 0; }           // method to read full variable (i.e. a name + a series of values)
+    virtual int read_numerical_value(YYFILE* yy, char* iname, int* shift, double* value) { return 0; }   // method to read a single numerical value (a double)
     virtual int close(void) { return 0; }                                           // method to close the input file
 };
 
@@ -85,8 +85,8 @@ struct ImportObjsASCII : public ImportVarFromFile
         read_variable_implemented = true;
     }
 
-    int read_header(YYFILE*, Sample*) override;
-    int read_variable(YYFILE*, char*, int, double*) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_variable(YYFILE* yy, char* iname, int nb, double* vector) override;
 };
 
 /* k_irasc.c */
@@ -104,8 +104,8 @@ public:
         read_variable_implemented = false;
     }
 
-    int read_header(YYFILE *,Sample *) override;
-    int read_numerical_value(YYFILE*, char*, int*, double*) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_numerical_value(YYFILE* yy, char* iname, int* shift, double* value) override;
     int close(void) override;
 };
 
@@ -129,8 +129,8 @@ public:
         read_variable_implemented = true;
     }
 
-    int read_header(YYFILE*, Sample*) override;
-    int read_variable(YYFILE *,char *,int ,double *) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_variable(YYFILE* yy, char* iname, int nb, double* vector) override;
     int close(void) override;
 };
 
@@ -143,16 +143,16 @@ class ImportObjsBST : public ImportObjsDIF
 
 public:
     bool read_variable_implemented = false;
-    int read_header(YYFILE *,Sample *) override;
-    int read_numerical_value(YYFILE *,char *,int *,double *) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_numerical_value(YYFILE* yy, char* iname, int* shift, double* value) override;
 };
 
 /* k_inis.c */
 struct ImportObjsNIS : public ImportVarFromFile 
 {
     bool read_variable_implemented = true;
-    int read_header(YYFILE *,Sample *) override;
-    int read_variable(YYFILE *,char *,int ,double *) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_variable(YYFILE* yy, char* iname, int nb, double* vector) override;
 };
 
 /* k_igem.c */
@@ -169,8 +169,8 @@ class ImportObjsGEM : public ImportVarFromFile
 
 public:
     bool read_variable_implemented = true;
-    int read_header(YYFILE *,Sample *) override;
-    int read_variable(YYFILE *,char *,int ,double *) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_variable(YYFILE* yy, char* iname, int nb, double* vector) override;
     int close(void) override;
     
 private:
@@ -185,7 +185,7 @@ private:
 struct ImportObjsPRN : public ImportVarFromFile 
 {
     bool read_variable_implemented = true;
-    int read_variable(YYFILE *,char *,int ,double *) override;
+    int read_variable(YYFILE* yy, char* iname, int nb, double* vector) override;
 
 private:
     double read_real(YYFILE *);
@@ -201,8 +201,8 @@ class ImportObjsTXT : public ImportVarFromFile
 
 public:
     bool read_variable_implemented = false;
-    int read_header(YYFILE*, Sample*) override;
-    int read_numerical_value(YYFILE*, char*, int*, double*) override;
+    int read_header(YYFILE* yy, Sample* smpl) override;
+    int read_numerical_value(YYFILE* yy, char* iname, int* shift, double* value) override;
 
 private:
     int read_value(char* date, int* shift, char* tval, double* dval);
@@ -227,8 +227,8 @@ struct ImportCmtFromFile
     YYKEYS  *imp_keys = NULL;                                                       // Table of keywords (see YY group of functions in scr4 libs)
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
     virtual ~ImportCmtFromFile() = default;
-    virtual int read_header(ImportCmtFromFile*, char*, int) { return 0; }           // method to open the input file and to read its header
-    virtual int read_comment(char*, char**) { return 0; }                           // method to read full comment
+    virtual int read_header(ImportCmtFromFile* impdef, char* file, int lang) { return 0; }           // method to open the input file and to read its header
+    virtual int read_comment(char* name, char** cmt) { return 0; }                           // method to read full comment
     virtual int close(void) { return 0; }                                           // method to close the input file
 };
 
@@ -237,7 +237,7 @@ class ImportCommentsASCII : public ImportCmtFromFile
     YYFILE* AYY = NULL;
 
 public:
-    int read_header(ImportCmtFromFile*, char*, int) override;
+    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
 };
 
@@ -255,8 +255,8 @@ public:
         imp_dim = 8;                   // Nb of keys in imp_keys
     }
 
-    int read_header(ImportCmtFromFile*, char*, int) override;
-    int read_comment(char*, char**) override;
+    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
+    int read_comment(char* name, char** cmt) override;
     int close() override;
 
 private:
@@ -272,7 +272,7 @@ class ImportCommentsPRN : public ImportCmtFromFile
     YYFILE* PYY = NULL;
 
 public:
-    int read_header(ImportCmtFromFile*, char*, int) override;
+    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
 };
 
@@ -285,7 +285,7 @@ class ImportCommentsTXT : public ImportCmtFromFile
     int     TXT_lang = 0;
 
 public:
-    int read_header(ImportCmtFromFile*, char*, int) override;
+    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
     int close() override;
 };
@@ -305,14 +305,14 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-KDBVariables* IMP_InterpretVar(ImportVarFromFile *,char *,char *,Sample *);
-KDBComments* IMP_InterpretCmt(ImportCmtFromFile *,char *,char *,int );
-int IMP_RuleImport(int ,char *,char *,char *,char *,char *,char *,int ,int );
+KDBVariables* IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl);
+KDBComments* IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang);
+int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang);
 
 /* k_rules.c */
-int IMP_readrule(char *);
-int IMP_change(char **,char **,char *,char *);
+int IMP_readrule(char* filename);
+int IMP_change(char** rule, char** pat, char* in, char* out);
 
 /* k_idif.c */
-int dif_read_cell(YYFILE *,char **,double *);
-int dif_skip_to(YYFILE *,int );
+int dif_read_cell(YYFILE* yy, char** str, double* value);
+int dif_skip_to(YYFILE* yy, int skey);

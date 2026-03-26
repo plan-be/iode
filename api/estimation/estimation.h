@@ -334,8 +334,8 @@ private:
     int E_est(char** endos, char** lecs, char** instrs);
 
     /* e_tests.c */
-    double M_c_line(MAT *,int ,int );
-    double E_div_0(double ,double );
+    double M_c_line(MAT* m1, int line, int oper);
+    double E_div_0(double a, double b);
     double E_sqrt(double val);
     void E_deg_freed();
     double E_c_umu();
@@ -346,7 +346,7 @@ private:
     int E_output(void);
 
     /* e_prep.c */
-    int E_prep(char **,char **);
+    int E_prep(char** lecs, char** instrs);
     int E_prep_alloc();
     int E_prep_lecs(char** lecs);
     int E_prep_instrs(char** instrs);
@@ -369,12 +369,12 @@ private:
     void E_print_eqres_2(int eq_nb);
     void E_print_eqres(int obs);
     int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res);
-    int E_print_results(int ,int ,int ,int ,int );
+    int E_print_results(int corr, int corru, int obs, int grobs, int grres);
 
     /* k_est.c */
     void E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k);
-    void E_savescl(double, int, char*);
-    void E_savevar(char*, int, MAT*);
+    void E_savescl(double val, int eqnb, char* txt);
+    void E_savevar(char* name, int eqnb, MAT* mat);
     int KE_est_s(Sample* smpl);
     int KE_update(char* name, char* lec, int method, Sample* smpl, float* tests);
 };
@@ -382,11 +382,11 @@ private:
 /* ---------------------- FUNCS ---------------------- */
 
 /* e_dftest.c */
-double *E_UnitRoot(char *,int ,int ,int );
-void E_SclToReal(char *,double *);
-void E_PrintDF(char *,double *,int ,int ,int );
-int E_GetLecName(char *,char *);
+double *E_UnitRoot(char* lec, int drift, int trend, int order);
+void E_SclToReal(char* name, double* res);
+void E_PrintDF(char* lec, double* res, int drift, int trend, int order);
+int E_GetLecName(char* lec, char* name);
 
 /* e_step.c */
-double C_evallec(char *,int);
+double C_evallec(char* lec, int t);
 double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test);

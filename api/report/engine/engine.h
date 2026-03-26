@@ -13,29 +13,29 @@ inline KDBMacros* RP_MACRO = nullptr;
 /* b_rep_utils.c */
 int RP_alloc_ptrs();
 char *RP_alloc(int size);
-int RP_find_ptr(char *ptr);
-int RP_free(char *ptr);
+int RP_find_ptr(char* ptr);
+int RP_free(char* ptr);
 void RP_free_bufs();
-char *RP_stracpy(char *ptr);
-unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps);
+char *RP_stracpy(char* ptr);
+unsigned char **RP_vtoms(unsigned char* str, unsigned char* seps);
 unsigned char **RP_vtom(unsigned char* str, int sep);
-int RP_free_tbl(unsigned char **tbl);
-int RP_tbl_size(unsigned char **tbl);
-int RP_is_cmd(char *line);
+int RP_free_tbl(unsigned char** tbl);
+int RP_tbl_size(unsigned char** tbl);
+int RP_is_cmd(char* line);
 U_ch **SCR_vtomsq(char* str, char* seps, int quote);
 
 /* b_rep_debug.c */
 void RP_debug(char* txt);
 
 /* b_rep_engine.c */
-REPFILE *RP_create_repfile(char *filename, unsigned char **tbl);
-int RP_free_repfile(REPFILE *rf);
+REPFILE *RP_create_repfile(char* filename, unsigned char** tbl);
+int RP_free_repfile(REPFILE* rf);
 unsigned char **RP_read_file(char* filename);
 char* RP_read_multiline(REPFILE* rf);
 int RP_readline(REPFILE* rf, char** line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, char** arg, int lg);
-BFNS* RP_find_fn(char* name, int* type, int fs);
+BFNS* RP_find_fn(char* c_name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 int RP_err_dump(char* name, char* arg);
 char *RP_extract(char* buf, int* i, int ch);
@@ -47,7 +47,7 @@ int RP_fmt(char* buf, char* format, double value);
 int RP_eval(char** res, char* farg);
 int RP_add(char** line, int* lg, int* j, char* res);
 int RP_expand(char** line, char* buf);
-int RP_ReportExec_tbl(REPFILE *rf);
+int RP_ReportExec_tbl(REPFILE* rf);
 int RP_ReportExec_1(char* file);
 int B_ReportExec(char* arg, int unused=-1);
 int B_ReportLine(char* line, int cleanup);
@@ -55,16 +55,16 @@ int B_ReportLine(char* line, int cleanup);
 /* b_rep_defs.c */
 int RP_macro_createdb();
 int RP_macro_deletedb();
-int RP_define_1(char *name, char *macro);
+int RP_define_1(char* name, char* c_macro);
 int RP_define(char* arg, int unused=-1);
 char* RP_get_macro_ptr(char* macro_name);
-int RP_undef_1(char *name);
-int RP_undef(char *arg, int unused=-1);
-int RP_define_calcdepth(char *name);
-int RP_define_save(char *name);
-int RP_define_restore(char *name);
-int RP_define_save_list(char **list);
-int RP_define_restore_list(char **list);
+int RP_undef_1(char* name);
+int RP_undef(char* arg, int unused=-1);
+int RP_define_calcdepth(char* name);
+int RP_define_save(char* name);
+int RP_define_restore(char* name);
+int RP_define_save_list(char** list);
+int RP_define_restore_list(char** list);
 
 /* b_rep_cmds.c */
 int RP_vseps(char* seps, int unused=-1);
@@ -76,7 +76,7 @@ int RP_abort(char* arg, int unused=-1);
 int RP_quitode(char* arg, int unused=-1);
 int RP_return(char* arg, int unused=-1);
 int RP_label(char* arg, int unused=-1);
-int RP_goto_label(char *command, char *parm);
+int RP_goto_label(char* command, char* parm);
 int RP_goto(char* arg, int unused=-1);
 int RP_message(char* arg, int unused=-1);
 int RP_warning(char* arg, int unused=-1);
@@ -182,7 +182,7 @@ U_ch *RPF_rmdir(U_ch **args);
 
 /* b_rep_foreach.C */ 
 int RP_foreach(char* arg, int unused=-1);
-int RP_foreach_break(char *name);
+int RP_foreach_break(char* name);
 int RP_foreach_next(char* arg, int unused=-1);
 
 /* b_rep_proc.c */
@@ -235,9 +235,7 @@ inline int (*SB_IdtExecute_super    )(char* arg, int unused) = nullptr;
 inline int (*SB_EqsEstimate_super   )(char* arg, int unused) = nullptr;
 inline int (*SB_Dir_super           )(char* arg, int unused) = nullptr;
 inline int (*SB_XodeRuleImport_super)(char* arg, int unused) = nullptr;
-
-//int (*B_DataDisplayGraph_super)();
-//int (*B_DataPrintGraph_super  )();   
+ 
 inline int (*B_WindowMinimize_super  )() = nullptr;
 inline int (*B_WindowMaximize_super  )() = nullptr; 
 
@@ -252,7 +250,7 @@ inline int (*B_ScrollVTW_super )(char *arg) = nullptr;
 inline int (*B_ScrollVTW0_super)(char *arg) = nullptr;
 inline int (*B_ScrollVTN_super )(char *arg) = nullptr;
 
-inline int (*ODE_scroll_super) (KDB *kdb, char **lst) = nullptr;
+inline int (*ODE_scroll_super) (KDB* kdb, char **lst) = nullptr;
 inline int (*T_view_tbl_super) (Table *tbl, char *smpl, char* name) = nullptr;
 // inline int (*T_view_tbl_super) (char* name, char *smpl, char** vars_names) = nullptr; // TEMP version for IODE-QT
 
@@ -301,11 +299,8 @@ int SB_IdtExecute       (char* arg, int unused=-1);
 int SB_EqsEstimate      (char* arg, int unused=-1);
 int SB_Dir              (char* arg, int unused=-1);
 int SB_XodeRuleImport   (char* arg, int unused=-1);
-//int B_DataDisplayGraph  ();
-//int B_DataPrintGraph    ();  
-int B_WindowMinimize(char* unused, int unused2);  
-int B_WindowMaximize(char* unused, int unused2);
+int B_WindowMinimize    (char* unused, int unused2);  
+int B_WindowMaximize    (char* unused, int unused2);
 
-int ODE_scroll(KDB *kdb, char **lst);
+int ODE_scroll(KDB* kdb, char **lst);
 int T_view_tbl(Table *tbl, char *smpl, char* name);
-// int T_view_tbl(char* name, char *smpl, char** vars_names); // Temp version for IODE-QT

@@ -12,8 +12,6 @@
 #define W_RTF       A2M_DESTRTF
 #define W_CSV       A2M_DESTCSV
 #define W_DUMMY     A2M_DESTDUMMY
-//#define W_DISP  A2M_DESTGDIEMF
-//#define W_DISP  A2M_DESTGDIWMF
 #define W_DISP      A2M_DESTTCHRT
 
 void B_A2mGetGnlParms();
@@ -34,5 +32,3 @@ void B_A2mGetGdiParms();
 void B_A2mSaveGdiParms();
 void B_A2mGetAllParms();
 void B_A2mSaveAllParms();
-//void K_load_iode_ini();
-//void K_save_iode_ini();

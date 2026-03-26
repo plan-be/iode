@@ -649,25 +649,23 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 }
 
 /* k_eqs.c */
-int E_split_eq(char *,char **,char **);
-int E_dynadj(int ,char *,char *,char *,char **);
-int E_DynamicAdjustment(int ,char **,char *,char *);
+int E_split_eq(char* lec, char** lhs, char** rhs);
+int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec);
+int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
 
 // Estimation tests by equation name
-double K_etest(KDBEquations* kdb, char*name, int test_nb);
-double K_e_stdev (KDBEquations* kdb, char*name);
-double K_e_meany (KDBEquations* kdb, char*name);
-double K_e_ssres (KDBEquations* kdb, char*name);
-double K_e_stderr(KDBEquations* kdb, char*name);
-double K_e_fstat (KDBEquations* kdb, char*name);
-double K_e_r2    (KDBEquations* kdb, char*name);
-double K_e_r2adj (KDBEquations* kdb, char*name);
-double K_e_dw    (KDBEquations* kdb, char*name);
-double K_e_loglik(KDBEquations* kdb, char*name);
+double K_etest(KDBEquations* kdb, char* name, int test_nb);
+double K_e_stdev (KDBEquations* kdb, char* name);
+double K_e_meany (KDBEquations* kdb, char* name);
+double K_e_ssres (KDBEquations* kdb, char* name);
+double K_e_stderr(KDBEquations* kdb, char* name);
+double K_e_fstat (KDBEquations* kdb, char* name);
+double K_e_r2    (KDBEquations* kdb, char* name);
+double K_e_r2adj (KDBEquations* kdb, char* name);
+double K_e_dw    (KDBEquations* kdb, char* name);
+double K_e_loglik(KDBEquations* kdb, char* name);
 
 /*----------------------- FUNCS ----------------------------*/
-
-int K_epack(char **,char *,char *);
 
 /* lec/l_link.c */
 void L_link_endos(KDBEquations* dbe, CLEC *cl);
