@@ -80,8 +80,7 @@ struct Period
 {
     long    year;        	// year
     long    step;        	// position in the year (according to the periodicity)
-    char    periodicity;	// periodicity (Y S Q M W D)
-    // char    p_pad[3]; 
+    char    periodicity;	// periodicity (Y S Q M W D) 
 
 public:
 	Period()

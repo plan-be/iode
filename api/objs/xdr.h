@@ -4,8 +4,8 @@
 extern int (*K_xdrobj[])(unsigned char* ptr, unsigned char** xdr_ptr);
 
 /* k_xdr.c */
-void K_xdrPINT(unsigned char *);
-void K_xdrPLONG(unsigned char *);
+void K_xdrPINT(unsigned char* a);
+void K_xdrPLONG(unsigned char* a);
 void K_xdrSMPL(unsigned char* a);
 
 #define K_xdrSHORT(a)   XDR_rev(a, 1, sizeof(short))

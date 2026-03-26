@@ -15,7 +15,7 @@ inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
 /* k_objvers.c */
-int K_calcvers(char *);
+int K_calcvers(char* label);
 char* convert_obj_version(const std::string& name, const int type, char* opack, 
                           const int vers, const Sample* sample);
 
@@ -23,13 +23,13 @@ char* convert_obj_version(const std::string& name, const int type, char* opack,
 char *K_add_ext(char* filename, char* ext);
 int K_get_ext(char* filename, char* ext, int max_ext_len);
 int K_has_ext(char* filename);
-char *K_set_ext(char *,char *,int );
-char *K_set_ext_asc(char *,char *,int );
-void K_strip(char *);
+char *K_set_ext(char* res, char* fname, int type);
+char *K_set_ext_asc(char* res, char* fname, int type);
+void K_strip(char* filename);
 int K_set_backup_on_save(int take_backup);
 int K_get_backup_on_save();
-int K_backup(char *);
-int K_setname(char *,char *);
+int K_backup(char* filename);
+int K_setname(char* from, char* to);
 int K_findtype(char* filename, int type);
-int K_filetype(char *,char *,int *,Sample *);
+int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl);
 int X_findtype(char* arg);

@@ -220,16 +220,16 @@ public:
 
 protected:
 	/* k_sim_main.c */
-	double K_calc_clec(int ,int ,int ,int);
-	void K_lstorder(char *,char *,char *);
+	double K_calc_clec(int eqnb, int t, int varnb, int msg);
+	void K_lstorder(char* pre, char* inter, char* post);
 
 	/* k_sim_order.c */
-	void KE_order(KDBEquations *, char **);
-	int KE_poseq(int );
-	void KE_tri(KDBEquations *,int **,int );
+	void KE_order(KDBEquations* dbe, char** eqs);
+	int KE_poseq(int posendo);
+	void KE_tri(KDBEquations* dbe, int** predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
-	int KE_exo2endo(int ,int );
+	int KE_exo2endo(int posendo, int posexo);
 
 	///< Name of the endogenous of equation i (possibly after endo-exo)
 	std::string KSIM_NAME(const int i) const
@@ -270,26 +270,26 @@ private:
 	}
 
 	/* k_sim_main.c */
-	void K_init_values(int );
-	void K_restore_XK(int );
-	int K_prolog(int );
-	int K_interdep(int );
-	int K_interdep_1(int );
-	int K_interdep_2(int );
-	int K_epilog(int );
-	int K_diverge(int ,char *,double );
+	void K_init_values(int t);
+	void K_restore_XK(int t);
+	int K_prolog(int t);
+	int K_interdep(int t);
+	int K_interdep_1(int t);
+	int K_interdep_2(int t);
+	int K_epilog(int t);
+	int K_diverge(int t, char* c_name, double eps);
 	int K_simul_1(int t);
 	void K_lstorder_1(char* lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int KE_preorder(KDBEquations *,int **,int **);
-	int KE_add_post(int **,int ,int );
-	int KE_postorder(KDBEquations *,int **,int **);
-	int KE_pre(KDBEquations *,int **,int );
-	int KE_interdep(KDBEquations *,int **);
-	void KE_tri_perm1(KDBEquations *,int ,int *);
-	int KE_tri_begin(KDBEquations *);
-	int KE_tri_end(KDBEquations *);
+	int KE_preorder(KDBEquations* dbe, int** predecessors, int** successors);
+	int KE_add_post(int** successors, int i, int pos);
+	int KE_postorder(KDBEquations* dbe, int** predecessors, int** successors);
+	int KE_pre(KDBEquations* dbe, int** predecessors, int from);
+	int KE_interdep(KDBEquations* dbe, int** predecessors);
+	void KE_tri_perm1(KDBEquations* dbe, int i, int* vars);
+	int KE_tri_begin(KDBEquations* dbe);
+	int KE_tri_end(KDBEquations* dbe);
 
 	/* k_sim_exo2endo.c */
 	int KE_findpath(int posendo, int posexo, int* depth);

@@ -208,7 +208,8 @@ struct ALEC
     } al_val;
 };
 
-struct CVAR {
+struct CVAR 
+{
     short   pos,
             lag,
             ref,
@@ -216,7 +217,8 @@ struct CVAR {
     Period  per;
 };
 
-struct TOKEN {
+struct TOKEN 
+{
     LECREAL tk_real;
     long    tk_long;
     Period  tk_period;
@@ -232,13 +234,15 @@ struct LSTACK
     unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
 };
 
-struct LNAME {
+struct LNAME 
+{
     ONAME   name;   // scalar or variable name
     char    pad[3];
     long    pos;
 };
 
-struct CLEC {
+struct CLEC 
+{
     long    tot_lg,      
             exec_lg;       
     short   nb_names;   // number of scalar and variables names
@@ -497,53 +501,28 @@ inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
 
 /* l_token.c */
 int L_nb_tokens(void);
-int L_open_all(char *,int );
+int L_open_all(char* filename, int type);
 void L_close(void);
-//int L_lex(void);
-//int L_read(void);
-//int L_unread(void);
-//int L_macro(void);
-//int L_string(void);
-//int L_read_string(void);
-//int L_getc(void);
-//void L_ungetc(int );
-//void L_skip(void);
 int L_get_token(void);
-//int L_include(char *,char *);
-//int L_get_int(void);
-//int L_get_period(YYFILE *,Period *);
 
 /* l_cc1.c */
-void L_alloc_expr(int );
-int L_cc1(int );
-// int L_add_new_series(char *);
+void L_alloc_expr(int nb);
+int L_cc1(int nb_names);
 void L_free_anames(void);
-//int L_save_var(void);
-//int L_save_op(void);
-//int L_priority_sup(int );
-//int L_add_stack(int );
-//int L_clear_stack(void);
-//int L_anal_lag(void);
-int L_sub_expr(ALEC *,int );
-//int L_time_expr(void);
-//int L_lag_expr(int );
-
-/* ode.c */
-// char    *L_expand(char *);
+int L_sub_expr(ALEC* al, int i);
 
 /* l_alloc.c */
-char *L_malloc(int );
-//int L_free(char *);
-void L_free(void *);
+char *L_malloc(int lg);
+void L_free(void* ptr);
 
 /* l_err.c */
 char *L_error(void);
 
 /* l_cc2.c */
-CLEC *L_cc2(ALEC *);
-void L_move_arg(char *,char *,int );
+CLEC *L_cc2(ALEC* expr);
+void L_move_arg(char* s1, char* s2, int lg);
 CLEC *L_cc_stream(void);
-CLEC *L_cc(char *);
+CLEC *L_cc(char* lec);
 
 /* l_link.c */
 int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl);
@@ -563,18 +542,18 @@ int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl);
         
         int matherr(struct exception *e);
 #endif
-void L_fperror(void);
+void L_fperror(int sig);
 double L_exec(KDBVariables* dbv, KDBScalars* dbs, CLEC* expr, int t);
-double L_exec_sub(unsigned char *,int ,int ,double *);
+double L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack);
 L_REAL* L_cc_link_exec(char* lec, KDBVariables* dbv, KDBScalars* dbs);
-int L_intlag(double );
+int L_intlag(L_REAL lag);
 double L_uminus(double* stack, int nbargs=-1);
 double L_uplus(double* stack, int nbargs=-1);
-double L_logn(double );
+double L_logn(double v);
 double L_log(double* stack, int nbargs);
 double L_ln(double* stack, int nbargs=-1);
 double L_not(double* stack, int nbargs=-1);
-double L_expn(double *, int);
+double L_expn(L_REAL* stack, int nargs);
 double L_max(double* stack, int nbargs);
 double L_min(double* stack, int nbargs);
 double L_sin(double* stack, int nbargs=-1);
@@ -599,59 +578,59 @@ double L_lsum(double* stack, int nbargs);
 double L_lstderr(double* stack, int nbargs);
 double L_lmean(double* stack, int nbargs);
 double L_random(double* stack, int nbargs=-1);
-double L_or(double ,double );
-double L_and(double ,double );
-double L_ge(double ,double );
-double L_gt(double ,double );
-double L_eq(double ,double );
-double L_ne(double ,double );
-double L_le(double ,double );
-double L_lt(double ,double );
-double L_plus(double ,double );
-double L_minus(double ,double );
-double L_divide(double ,double );
-double L_times(double ,double );
-double L_exp(double ,double );
+double L_or(double a, double b);
+double L_and(double a, double b);
+double L_ge(double a, double b);
+double L_gt(double a, double b);
+double L_eq(double a, double b);
+double L_ne(double a, double b);
+double L_le(double a, double b);
+double L_lt(double a, double b);
+double L_plus(double a, double b);
+double L_minus(double a, double b);
+double L_divide(double a, double b);
+double L_times(double a, double b);
+double L_exp(double a, double b);
 double L_pi(int t=-1);
 double L_euro(int t=-1);
 double L_e(int t=-1);
 double L_time(int t);
 double L_i(int t);
-double L_lag(unsigned char *,short ,int ,double *,int );
-double L_diff(unsigned char *,short,int ,double *,int );
-double L_rapp(unsigned char *,short,int ,double *,int );
-double L_dln(unsigned char *,short,int ,double *,int );
-double L_grt(unsigned char *,short,int ,double *,int );
-double L_mavg(unsigned char *,short,int ,double *,int );
-void L_tfn_args(int ,double *,int ,int *,int *);
-double L_vmax(unsigned char *,short,int ,double *,int );
-double L_vmin(unsigned char *,short,int ,double *,int );
-double L_sum(unsigned char *,short,int ,double *,int );
-double L_prod(unsigned char *,short,int ,double *,int );
-double L_mean(unsigned char *,short ,int ,double *,int );
-double L_stderr(unsigned char *,short,int ,double *,int );
-double L_lastobs(unsigned char *,short,int ,double *,int );
-double L_calccorr(unsigned char *,short ,unsigned char *,short ,int ,double *,int );
-double L_corr(unsigned char *,short ,int ,double *,int );
-double L_calccovar(unsigned char *,short ,unsigned char *,short ,int ,double *,int ,int );
-double L_covar(unsigned char *,short ,int ,double *,int );
-double L_covar0(unsigned char *,short ,int ,double *,int );
-double L_var(unsigned char *,short ,int ,double *,int );
-double L_stddev(unsigned char *,short ,int ,double *,int );
-double L_index(unsigned char *,short ,int ,double *,int );
-double L_acf(unsigned char *,short ,int ,double *,int );
-int L_stackna(double **,int );
-int L_calcvals(unsigned char *,short ,int ,double *,int *,double *, int);
-double L_interpol(unsigned char *,short ,int ,double *,int );
-double L_app(unsigned char *,short ,int ,double *,int );
+double L_lag(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_diff(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_rapp(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_dln(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_grt(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_mavg(unsigned char* expr, short lg, int t, double* stack, int nargs);
+void L_tfn_args(int nvargs, double* stack, int nargs, int* from, int* to);
+double L_vmax(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_vmin(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_sum(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_prod(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_mean(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_stderr(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_lastobs(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_calccorr(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int t, double* stack, int nargs);
+double L_corr(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_calccovar(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int t, double* stack, int nargs, int center);
+double L_covar(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_covar0(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_var(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_stddev(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_index(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_acf(unsigned char* expr, short lg, int t, double* stack, int nargs);
+int L_stackna(double** p_stack, int nargs);
+int L_calcvals(unsigned char* expr, short lg, int t, double* stack, int* p_nargs, double* res, int nbvals);
+double L_interpol(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_app(unsigned char* expr, short lg, int t, double* stack, int nargs);
 
 /* l_hodrick.c */
 int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
 void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
-CLEC *L_solve(char *,char *);
-int L_split_eq(char *);
+CLEC *L_solve(char* eq, char* endo);
+int L_split_eq(char* eq);
 
 /* l_newton.c */
 double L_zero(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb);
@@ -666,11 +645,11 @@ void L_debug(char*, ...);
 /* k_lec.c */
 inline char *(*L_expand_super)(char* list_name) = nullptr;
 
-double *L_getvar(KDBVariables*, int);
-double L_getscl(KDBScalars*, int);
-Sample *L_getsmpl(KDBVariables*);
-int L_findscl(KDBScalars*, char*);
-int L_findvar(KDBVariables*, char*);
+double *L_getvar(KDBVariables* kdb, int pos);
+double L_getscl(KDBScalars* kdb, int pos);
+Sample *L_getsmpl(KDBVariables* kdb);
+int L_findscl(KDBScalars* kdb, char* name);
+int L_findvar(KDBVariables* kdb, char* name);
 char* L_expand(char* list_name);
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
                           CLEC* eqclec, int coefs);

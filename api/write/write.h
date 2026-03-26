@@ -29,31 +29,28 @@ inline int     W_a2mapp = 0;                        // A2M Dest only:
 inline int     W_rtfhelp = 0;                       // RTF only: generate RTF output for the outdated Windows help format (.hlp).
 inline int     W_htmlhelp = 0;                      // RTF only: generate HTML output for the Windows HEML help format (.chm).
 
+
+// TODO : make functions W_(...)() to expect text in UTF-8 encoding instead of OEM encoding
+
 /* w_wrt.c (MSC) */
-int W_dest(char *filename, int type);
-// int W_InitParms();
-// int W_open();
+int W_dest(char* filename, int type);
 int W_close();
 int W_flush();
 int W_putc(int ch);
-//int W_isempty(char *buf);
-int W_record(char *str);
+int W_record(char* str);
 int W_InitDisplay();
-int W_EndDisplay(char *title,int x,int y,int w,int h);
-// int W_SavePrinterSettings();
-// int W_ResetPrinterSettings();
-// int W_SetPrinterSettings();
-int W_printf(char *fmt,...);
+int W_EndDisplay(char* title, int x, int y, int w, int h);
+int W_printf(char* fmt, ...);
 int W_printfDbl(char* fmt, ...);
 int W_printfRepl(char* fmt, ...);
 int W_printfReplEsc(char* fmt, ...);
-int W_printfEx(int dup, int ch1, int ch2, char *fmt, va_list args);
+int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args);
 
 /* w_wrt1.c */
-void W_print_enum(int );
-void W_print_cmd(int );
-void W_print_par(int );
-void W_print_tit(int );
+void W_print_enum(int n);
+void W_print_cmd(int n);
+void W_print_par(int n);
+void W_print_tit(int n);
 void W_print_pg_header(char* arg);
 void W_print_pg_footer(char* arg);
 void W_print_rtf_topic(char* arg);

@@ -9,7 +9,6 @@ struct Sample
     Period  start_period;     	// starting period
     Period  end_period;       	// ending period
     short   nb_periods;       	// number of periods in the sample
-    // char    s_pad[2];
 
 private:
 	void sample_from_periods(const Period& start_period, const Period& end_period)

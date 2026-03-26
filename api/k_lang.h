@@ -16,7 +16,7 @@
 
 
 // Current Language
-inline int     K_LANG = 0;         // 0=English, 1=French, 2=Dutch
+inline int     K_LANG = 0;         // 0 = English, 1 = French, 2 = Dutch
 
 // Object types
 inline char   *KLG_TYPE[][3] = {

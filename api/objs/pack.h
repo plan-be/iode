@@ -3,15 +3,15 @@
 
 
 /* pack.c */
-int P_free(char *);
+int P_free(char* ptr);
 void *P_create();
-void *P_add(void *,void *,int );
-void *P_get_ptr(void *,int );
-OSIZE P_get_len(void *,int );
-void *P_alloc_get_ptr(void *, int );
+void *P_add(void* vptr1, void* vptr2, int lg);
+void *P_get_ptr(void* vptr, int i);
+OSIZE P_get_len(void* vptr, int i);
+void *P_alloc_get_ptr(void* ptr, int p);
 
 /* k_pack.c */
-bool K_opack(char **,char *,int *);
+bool K_opack(char** pack, char* a1, int* a2);
 
 extern bool debug_pack;
 extern bool debug_unpack;

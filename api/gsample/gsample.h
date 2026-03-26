@@ -143,29 +143,18 @@ inline int col_compare(const void* a, const void* b)
 }
 
 /* c_cc.c */
-COLS *COL_cc(char *);
-int COL_free_cols(COLS *);
-//int COL_stripy(char *);
-char *COL_ctoa(COL *,int ,int ,int );
-char *COL_text(COL *,char *,int );
-COLS *COL_add_col(COLS *);
-//COLS *COL_construct(COLS *,COLS *,FILS *,REP *, int, int);
-//int COL_apply_fil(COL *,FIL *);
-//int COL_read_per(YYFILE *,Period *);
-//COLS *COL_read_y(YYFILE *);
-//int COL_read_rep(YYFILE *,REP *);
-//int COL_read_1f(YYFILE *,FIL *);
-//FILS *COL_read_f(YYFILE *);
-//COLS *COL_read_cols(YYFILE *);
-int COL_find_mode(COLS *,int *,int );
+COLS *COL_cc(char* gsample);
+int COL_free_cols(COLS* cls);
+char *COL_ctoa(COL* cl, int ch, int n, int nbf);
+char *COL_text(COL* cl, char* str, int nbnames);
+COLS *COL_add_col(COLS* cls);
+int COL_find_mode(COLS* cls, int* mode, int type);
 
 /* c_calc.c */
-int COL_resize(Table *,COLS *);
-void COL_clear(COLS *);
-//CLEC *COL_cp_clec(CLEC *);
-int COL_exec(Table *,int ,COLS *);
-//int COL_calc(COL *,CLEC *,CLEC *);
-// int COL_link(int ,CLEC *);
+int COL_resize(Table* tbl, COLS* cls);
+void COL_clear(COLS* cls);
+int COL_exec(Table* tbl, int i, COLS* cls);
+
 
 extern bool debug_calc;
 

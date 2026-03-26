@@ -55,10 +55,6 @@ int B_ExcelExecute(char *arg, int unused=-1);
 int B_ExcelCmd(char *cmd, char *arg);
 int B_DDEGet(char *arg, int unused=-1);
 int B_ExcelWrite(char *ptr, int unused=-1);
-char* B_ExcelGetItem(char *arg);
-int B_ExcelGet(char *arg, int type);
-int B_ExcelSet(char *arg, int type);
-int B_ExcelCmd(char *cmd, char *arg);
 int B_ExcelOpen(char *arg, int unused=-1);
 int B_ExcelClose(char *arg, int unused=-1);
 int B_ExcelPrint(char *arg, int unused=-1);
@@ -80,7 +76,7 @@ int IODE_CDECL B_DSImportDb_1(char *arg,struct _sample *smpl);
 int IODE_CDECL B_DSImportDb(char *arg, int unused=-1);
 
 /* b_global.c */
-int B_ScrollSet(char *,long *,int ,int );
+int B_ScrollSet(char* arg, long *plong, int inf, int sup);
 int B_ScrollVarW(char* arg, int unused=-1);
 int B_ScrollVarN(char* arg, int unused=-1);
 int B_ScrollVarM(char* arg, int unused=-1);
@@ -152,26 +148,25 @@ int B_PrintHtmlTHClass(char *th_class, int unused=-1);
 int B_PrintHtmlTDClass(char *td_class, int unused=-1);
 
 /* b_print.c */
-int B_PrintVal(double );
-int B_replesc(unsigned char *,unsigned char *);
+int B_PrintVal(double val);
+int B_replesc(unsigned char* out, unsigned char* in);
 int B_isdef(char* arg);
 int B_PrintObjTblTitle(char* arg, int unused=-1);
 int B_PrintObjLec(char* arg, int unused=-1);
 int B_PrintObjEqsInfos(char* arg, int unused=-1);
-int B_PrintObjDef_1(char *,int *);
-int B_PrintObjDef(char* arg, int unused=-1);
-int B_PrintObjDefArgs(char* arg, int unused=-1);
+int B_PrintObjDef_1(char* arg, int* type);
+int B_PrintObjDef(char* arg, int type);
+int B_PrintObjDefArgs(char* arg, int type);
 
 /* b_season.c */
 int B_WsSeasonAdj(char* arg, int unused=-1);
 int B_season(char* arg);
-int DS_test(double *,int ,int *,int *,int ,double *);
-int DS_vec(double *,double *,double *,double *,int ,int ,double );
-int DS_smpl(Sample *,Sample *,Sample **,int *);
-int DS_extr(double *,int ,int ,double *,double );
+int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift);
+int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbper, double shift);
+int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift);
+int DS_extr(double* vec, int dim, int nbper, double* bi, double shift);
 
 /* b_sql.c */
-//KDB  *K_load_odbc(int , char *, int , char **);
 U_ch *RPS_Open(U_ch** args);
 U_ch *RPS_Field(U_ch** args);
 U_ch *RPS_NbFlds(U_ch** args);
@@ -187,23 +182,18 @@ int B_EqsStepWise(char* arg, int unused=-1);
 /* b_trend.c */
 int B_WsTrend(char* arg, int unused=-1);
 int B_WsTrendStd(char* arg, int unused=-1);
-//int HP_smpl(Sample *,Sample *,Sample **,int *);
-//int HP_calc(double *,double *,int ,int );
-//int HP_calc(double *,double *,int , double);     // JMP 7-3-2019
-//int HP_calc(double *,double *,int , double, int);  // JMP 12-4-2019
-//void HP_test(double *,double *,int ,int *,int *);
 
 /* b_view.c */
 int B_ViewVar(char* arg, int unused=-1);
 int B_PrintVar(char* arg, int unused=-1);
-int B_ViewPrintVar(char* arg, int unused=-1);
+int B_ViewPrintVar(char* arg, int mode);
 int B_ViewByTbl(char* arg, int unused=-1);
 int B_ViewTbl(char* arg, int unused=-1);
 int B_PrintTbl(char* arg, int unused=-1);
 int B_ViewGr(char* arg, int unused=-1);
 int B_PrintGr(char* arg, int unused=-1);
-int B_ViewPrintTbl_1(char*, char*);
-int B_ViewPrintGr_1(char*, char*);
-int B_ViewPrintTbl(char* arg, int, int);
+int B_ViewPrintTbl_1(char* c_name, char* smpl);
+int B_ViewPrintGr_1(char* names, char* gsmpl);
+int B_ViewPrintTbl(char* arg, int type, int mode);
 int B_ViewTblFile(char* arg, int unused=-1);
-int B_ViewTblEnd(void);
+int B_ViewTblEnd();

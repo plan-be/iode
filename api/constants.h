@@ -117,7 +117,6 @@
 #define OK_MAX_FILE  64
 #define K_MAX_FILE   512
 #define K_MAX_DESC   64
-//#define K_CHUNCK    1024 /* JMP 11-03-07 */
 #define K_CHUNCK     (64 * 1024)
 #define LMAGIC       32
 
@@ -132,7 +131,7 @@ const static char NAN_REP[3] = "--";
 typedef char    OFNAME[OK_MAX_FILE];
 typedef char    FNAME[K_MAX_FILE];
 typedef char    ONAME[K_MAX_NAME + 1];
-typedef long    OSIZE;   /* JMP 23-05-00 */
+typedef long    OSIZE;
 
 /*---------------- ENUMS ------------------------*/
 

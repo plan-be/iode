@@ -301,13 +301,13 @@ Functions acting on workspaces of variables.
 
 |Syntax|Description|
 |:---|:---|
-|`int KV_sample(KDB *kdb, Sample *nsmpl)`|Changes the Sample of a KDB of variables.|
-|`int KV_merge(KDB *kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
-|`void KV_merge_del(KDB *kdb1, KDB *kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
+|`int KV_sample(KDB* kdb, Sample *nsmpl)`|Changes the Sample of a KDB of variables.|
+|`int KV_merge(KDB* kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
+|`void KV_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
 |`int KV_add(KDBVariables* kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
-|`double KV_get(KDB *kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
-|`void KV_set(KDB *kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
-|`int KV_extrapolate(KDB *dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|
+|`double KV_get(KDB* kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
+|`void KV_set(KDB* kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
+|`int KV_extrapolate(KDB* dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|
 |`KDB *KV_aggregate(KDBVariables*dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
 |`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 |`double KV_get_at_t(char*varname, int t)`|Retrieves the value of varname\[t\]|
@@ -483,7 +483,7 @@ Loading and saving IODE ascii comment files.
 |:---|:---|
 |`KDB *KC_load_asc(char* filename, int db_global)`||
 |`int KC_save_asc(KDB* kdb, char* filename)`||
-|`int KC_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KC_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cceqs.c {#T46}
 
@@ -493,7 +493,7 @@ Loading and saving IODE ascii equation files.
 |:---|:---|
 |`KDB *KE_load_asc(char* filename, int db_global)`||
 |`int KE_save_asc(KDB* kdb, char* filename)`||
-|`int KE_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KE_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_ccidt.c {#T47}
 
@@ -503,7 +503,7 @@ Loading and saving IODE ascii identity files.
 |:---|:---|
 |`KDB *KI_load_asc(char* filename, int db_global)`||
 |`int KI_save_asc(KDB* kdb, char* filename)`||
-|`int KI_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KI_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cclst.c {#T48}
 
@@ -513,7 +513,7 @@ Loading and saving IODE ascii list files.
 |:---|:---|
 |`KDB *KL_load_asc(char* filename, int db_global)`||
 |`int KL_save_asc(KDB* kdb, char* filename)`||
-|`int KL_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KL_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_ccscl.c {#T49}
 
@@ -523,7 +523,7 @@ Loading and saving IODE ascii scalar files.
 |:---|:---|
 |`KDB *KS_load_asc(char* filename, int db_global)`||
 |`int KS_save_asc(KDB* kdb, char* filename)`||
-|`int KS_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KS_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cctbl.c {#T50}
 
@@ -533,7 +533,7 @@ Loading and saving IODE ascii table files.
 |:---|:---|
 |`KDB *KT_load_asc(char* filename, int db_global)`||
 |`int KT_save_asc(KDB* kdb, char* filename)`||
-|`int KT_save_csv(KDB *kdb, char *filename)`|Not implemented|
+|`int KT_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_ccvar.c {#T51}
 
@@ -543,7 +543,7 @@ Functions to import and export IODE files to/from ascii and LArray\-csv format.
 |:---|
 |`KDB *KV_load_asc(char *filename)`|
 |`KV_save_asc(KDB* kdb, char* filename)`|
-|`int KV_save_csv(KDB *kdb, char *filename, Sample *smpl, char **varlist)`|
+|`int KV_save_csv(KDB* kdb, char *filename, Sample *smpl, char **varlist)`|
 
 ## Group "LEC language" {#T52}
 
