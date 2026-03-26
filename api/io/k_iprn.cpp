@@ -84,10 +84,10 @@ int ImportObjsPRN::read_variable(YYFILE* yy, char* name, int dim, double* vector
 
 // COMMENTS
 
-int ImportCommentsPRN::read_header(ImportCmtFromFile* impdef, char* file, int lang)
+int ImportCommentsPRN::read_header(char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
-    PYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
+    PYY = YY_open(file, imp_keys, imp_dim, YY_FILE);
 
     if(PYY == 0) {
         kerror(0,"Cannot open '%s'", file);

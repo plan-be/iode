@@ -72,7 +72,7 @@ static int compare(const void *a, const void *b)
  *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDBVariables *IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl)
+KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     bool    found;
     int     i, nb, size, shift = 0, cmpt = 0, rc;
@@ -210,7 +210,7 @@ err:
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang)
+KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang)
 {
     KDBComments *kdb = nullptr;
     int          size, cmpt = 0, rc;
@@ -230,7 +230,7 @@ KDBComments *IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* c
     else 
         size = 0;
 
-    rc = impdef->read_header(impdef, cfile, lang);
+    rc = impdef->read_header(cfile, lang);
     if(rc < 0) 
         goto err;
 
@@ -291,9 +291,6 @@ err:
  */
 static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int fmt, int lang)
 {
-    KDBComments* kdb;
-    ImportCmtFromFile* impdef;
-
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
     SCR_strip((unsigned char*) ode);
@@ -306,13 +303,13 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     }
     else 
         IMP_trace = 0;
-   
-    impdef = import_comments[fmt].get();
+    
+    std::unique_ptr<ImportCmtFromFile>& impdef = import_comments[fmt];
 
     int rc = 0;
     if(impdef)
     {
-        kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
+        KDBComments* kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb) 
         {
             kdb->save_binary(ode);
@@ -346,10 +343,6 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
  */
 static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt)
 {
-    Sample* smpl;
-    KDBVariables* kdb;
-    ImportVarFromFile* impdef;
-
     SCR_strip((unsigned char*) trace);
     SCR_strip((unsigned char*) rule);
     SCR_strip((unsigned char*) ode);
@@ -363,10 +356,11 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     else 
         IMP_trace = 0;
 
-    impdef = import_variables[fmt].get();
+    std::unique_ptr<ImportVarFromFile>& impdef = import_variables[fmt];
 
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
+    Sample* smpl = nullptr;
     if(from[0] == 0 || to[0] == 0)
         return -1;
     try
@@ -381,7 +375,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     }
     
     int rc = 0;
-    kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
+    KDBVariables* kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb) 
     {
         kdb->save_binary(ode);

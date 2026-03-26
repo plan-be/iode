@@ -227,7 +227,7 @@ struct ImportCmtFromFile
     YYKEYS  *imp_keys = NULL;                                                       // Table of keywords (see YY group of functions in scr4 libs)
     int imp_dim = 0;                                                                // Nb of keys in imp_keys
     virtual ~ImportCmtFromFile() = default;
-    virtual int read_header(ImportCmtFromFile* impdef, char* file, int lang) { return 0; }           // method to open the input file and to read its header
+    virtual int read_header(char* file, int lang) { return 0; }           // method to open the input file and to read its header
     virtual int read_comment(char* name, char** cmt) { return 0; }                           // method to read full comment
     virtual int close(void) { return 0; }                                           // method to close the input file
 };
@@ -237,7 +237,7 @@ class ImportCommentsASCII : public ImportCmtFromFile
     YYFILE* AYY = NULL;
 
 public:
-    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
+    int read_header(char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
 };
 
@@ -255,7 +255,7 @@ public:
         imp_dim = 8;                   // Nb of keys in imp_keys
     }
 
-    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
+    int read_header(char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
     int close() override;
 
@@ -272,7 +272,7 @@ class ImportCommentsPRN : public ImportCmtFromFile
     YYFILE* PYY = NULL;
 
 public:
-    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
+    int read_header(char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
 };
 
@@ -285,7 +285,7 @@ class ImportCommentsTXT : public ImportCmtFromFile
     int     TXT_lang = 0;
 
 public:
-    int read_header(ImportCmtFromFile* impdef, char* file, int lang) override;
+    int read_header(char* file, int lang) override;
     int read_comment(char* name, char** cmt) override;
     int close() override;
 };
@@ -305,8 +305,8 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-KDBVariables* IMP_InterpretVar(ImportVarFromFile* impdef, char* rulefile, char* vecfile, Sample* smpl);
-KDBComments* IMP_InterpretCmt(ImportCmtFromFile* impdef, char* rulefile, char* cfile, int lang);
+KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl);
+KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang);
 int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang);
 
 /* k_rules.c */

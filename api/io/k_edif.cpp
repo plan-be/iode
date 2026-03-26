@@ -45,12 +45,12 @@
  * 
  *  List of functions
  *  -----------------
- *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a DIF export file.
- *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
+ *      int write_header(KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a DIF export file.
+ *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for DIF output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for DIF output. 
  *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
- *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
+ *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
  *  
  */
 #include "api/objs/kdb.h"
@@ -62,29 +62,29 @@
 #include "api/io/export.h"
 
 
-int ExportObjsDIF::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::write_header(KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim = dbv->sample->nb_periods;
     int nb  = dbv->size();
 
-    expdef->file_descriptor.open(outfile);
+    file_descriptor.open(outfile);
 
-    expdef->file_descriptor << "TABLE\n0,1\n\"\"\nVECTORS\n0," << std::to_string(dim + 2)
-                            << "\n\"\"\nTUPLES\n0," << std::to_string(nb + 1) << "\n\"\"\n";
-    expdef->file_descriptor << "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n";
+    file_descriptor << "TABLE\n0,1\n\"\"\nVECTORS\n0," << std::to_string(dim + 2)
+                          << "\n\"\"\nTUPLES\n0," << std::to_string(nb + 1) << "\n\"\"\n";
+    file_descriptor << "DATA\n0,0\n\"\"\n-1,0\nBOT\n1,0\n\"CODE\"\n1,0\n\"COMMENT\"\n";
 
     for(int i = 0; i < dim; i++) 
     {
         Period per = dbv->sample->start_period.shift(i);
-        expdef->file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
+        file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
     return 0;
 }
 
-int ExportObjsDIF::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::close(KDB* dbv, KDB* dbc, char* outfile)
 {
-    expdef->file_descriptor <<  "-1,0\nEOD\n";
-    expdef->file_descriptor.close();
+    file_descriptor <<  "-1,0\nEOD\n";
+    file_descriptor.close();
     return 0;
 }
 
@@ -126,8 +126,8 @@ char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char**
     return(*vec);
 }
 
-int ExportObjsDIF::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
+int ExportObjsDIF::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
-    expdef->file_descriptor << code << cmt << vec;
+    file_descriptor << code << cmt << vec;
     return 0;
 }
