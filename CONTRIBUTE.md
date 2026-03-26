@@ -330,7 +330,7 @@ For rapid testing, you may run the script `gui/run_test_gui.py`.
 To create the [SDist tarfile](https://scikit-build-core.readthedocs.io/en/latest/build.html#sdist), type:
 ```bash
 root_dir_iode> cd gui
-gui> python3 -m build --sdist
+gui> python -m build --sdist
 ```
 
 Then, to create the [Wheel file](https://scikit-build-core.readthedocs.io/en/latest/build.html#wheel), type:
