@@ -152,7 +152,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     else 
         IMP_trace = 0;
 
-    ExportToFile* expdef = export_handlers[format].get();
+    std::unique_ptr<ExportToFile>& expdef = export_handlers[format];
 
     int res;
     if(format < EXPORT_RCSV)

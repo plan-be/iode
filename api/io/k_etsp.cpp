@@ -28,12 +28,12 @@
  *  
  *  List of functions
  *  -----------------
- *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a tsp export file.
- *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
+ *      int write_header(KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a tsp export file.
+ *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for tsp output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for tsp output. 
  *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
- *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
+ *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -43,7 +43,7 @@
 #include "api/io/export.h"
 
 
-int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsTSP::write_header(KDB* dbv, KDB* dbc, char* outfile)
 {
     int freq = get_nb_periods_per_year(dbv->sample->start_period.periodicity);
     std::string start_period_year = std::to_string((dbv->sample->start_period).year);
@@ -51,7 +51,7 @@ int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
     std::string start_period_step = std::to_string((dbv->sample->start_period).step);
     std::string end_period_step   = std::to_string((dbv->sample->end_period).step);
 
-    expdef->file_descriptor.open(outfile);
+    file_descriptor.open(outfile);
 
     std::string str_sample;
     std::string str_periodicity;
@@ -74,13 +74,13 @@ int ExportObjsTSP::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* 
             break;
     }
 
-    expdef->file_descriptor << "FREQ " + str_periodicity + ";\nSMPL " << str_sample << " ;\n";
+    file_descriptor << "FREQ " + str_periodicity + ";\nSMPL " << str_sample << " ;\n";
     return 0;
 }
 
-int ExportObjsTSP::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsTSP::close(KDB* dbv, KDB* dbc, char* outfile)
 {
-    expdef->file_descriptor.close();
+    file_descriptor.close();
     return 0;
 }
 
@@ -126,24 +126,24 @@ char* ExportObjsTSP::get_variable_value(KDBVariables* dbv, int nb, int t, char**
     return(*vec);
 }
 
-int ExportObjsTSP::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
+int ExportObjsTSP::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
     int     i;
     char    **text;
 
-    expdef->file_descriptor <<  code << " \n";
+    file_descriptor <<  code << " \n";
     if(cmt) 
     {
         text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
         for(i = 0; text[i]; i++)  
-            expdef->file_descriptor <<  "? " << text[i] << "\n";
+            file_descriptor <<  "? " << text[i] << "\n";
         SCR_free_tbl((unsigned char**) text);
     }
 
     text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
     for(i = 0; text[i]; i++)  
-        expdef->file_descriptor << text[i] << "\n";
-    expdef->file_descriptor <<  " ;\n";
+        file_descriptor << text[i] << "\n";
+    file_descriptor <<  " ;\n";
     SCR_free_tbl((unsigned char**) text);
     return 0;
 }

@@ -247,12 +247,12 @@ int ImportCommentsBST::sub_read_header(int lang)
     return 0;
 }
 
-int ImportCommentsBST::read_header(ImportCmtFromFile* impdef, char* file, int lang)
+int ImportCommentsBST::read_header(char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
-    FYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "ftr.dif");
-    RYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "rub.dif");
-    SYY = open_file(impdef->imp_keys, impdef->imp_dim, file, "ser.dif");
+    FYY = open_file(imp_keys, imp_dim, file, "ftr.dif");
+    RYY = open_file(imp_keys, imp_dim, file, "rub.dif");
+    SYY = open_file(imp_keys, imp_dim, file, "ser.dif");
 
     if(FYY == 0 || RYY == 0 || SYY == 0) 
     {

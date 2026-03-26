@@ -87,18 +87,18 @@ int ImportObjsASCII::read_variable(YYFILE* yy, char* name, int dim, double* vect
 /**
  *  Opens an ASCII comment file for reading with the YY library functions. 
  *  
- *  @param [in] ImportCmtFromFile* impdef  struct containing the fn pointers to interpret the content of the ascii file (see iode.h)
  *  @param [in] char*   file       input filename
  *  @param [in] int     lang       language (unused)
  *  
  *  @return     int             0 on success, -1 on error
  */
-int ImportCommentsASCII::read_header(ImportCmtFromFile* impdef, char* file, int lang)
+int ImportCommentsASCII::read_header(char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
-    AYY = YY_open(file, impdef->imp_keys, impdef->imp_dim, YY_FILE);
+    AYY = YY_open(file, imp_keys, imp_dim, YY_FILE);
 
-    if(AYY == 0) {
+    if(AYY == 0) 
+    {
         kerror(0,"Cannot open '%s'", file);
         return -1;
     }
