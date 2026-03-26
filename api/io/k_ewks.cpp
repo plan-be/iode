@@ -9,12 +9,12 @@
  *  
  *  List of functions
  *  -----------------
- *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a wks export file.
- *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
+ *      int write_header(KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a wks export file.
+ *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for wks output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
  *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
- *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
+ *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -24,7 +24,7 @@
 #include "api/io/export.h"
 
 
-int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS:: write_header(KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim, nb, i;
 
@@ -47,7 +47,7 @@ int ExportObjsWKS:: write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*
     return 0;
 }
 
-int ExportObjsWKS::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS::close(KDB* dbv, KDB* dbc, char* outfile)
 {
     wks_end();
     return 0;
@@ -90,7 +90,7 @@ char* ExportObjsWKS::get_variable_value(KDBVariables* dbv, int nb, int t, char**
     return(*vec = NULL);
 }
 
-int ExportObjsWKS::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
+int ExportObjsWKS::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
     wks_name(code, 3, WKS_ROW, WKS_COL, WKS_ROW);
     WKS_ROW ++;

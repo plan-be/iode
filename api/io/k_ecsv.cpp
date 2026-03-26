@@ -19,15 +19,15 @@
  *  
  *  List of functions
  *  -----------------
- *      int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a CSV export file.
- *      int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
+ *      int write_header(KDB* dbv, KDB* dbc, char* outfile)       Opens and initialise a CSV export file.
+ *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for CSV output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
  *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
- *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
- *      int write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
+ *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
+ *      int write_header(KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
  *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
- *      int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
+ *      int write_variable_and_comment(char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */
 #include "api/b_errors.h"
@@ -42,49 +42,47 @@
 /**
  *  Opens and initialise a CSV file.
  *  
- *  @param [in] ExportToFile* expdef      struct that contains implementation for csv output
  *  @param [in] KDB*    dbv         VAR KDB
  *  @param [in] KDB*    dbc         CMT KDB
  *  @param [in] char*   outfile     output filename
  *  @return     int                 0 on success, -1 if outfile cannot be created  
  */
-int ExportObjsCSV::write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsCSV::write_header(KDB* dbv, KDB* dbc, char* outfile)
 {
     int dim, i;
 
-    expdef->file_descriptor.open(outfile);
-    if((expdef->file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
+    file_descriptor.open(outfile);
+    if((file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
     {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
         return -1;
     }
 
-    expdef->file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
+    file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
     dim = dbv->sample->nb_periods;
     std::string str_period;
     for(i = 0; i < dim; i++) 
     {
         Period period = dbv->sample->start_period.shift(i);
         str_period = period.to_string();
-        expdef->file_descriptor << str_period << EXP_SEP;
+        file_descriptor << str_period << EXP_SEP;
     }
-    expdef->file_descriptor << "\n";
+    file_descriptor << "\n";
     return 0;
 }
 
 /**
  *  Saves the footer and closes the CSV export files.
  *  
- *  @param [in] ExportToFile* expdef      struct that contains implementation for csv output
  *  @param [in] KDB*    dbv         VAR KDB
  *  @param [in] KDB*    dbc         CMT KDB
  *  @return     int                 0 always
  */
-int ExportObjsCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsCSV::close(KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
-    expdef->file_descriptor.close();
+    file_descriptor.close();
     return 0;
 }
 
@@ -156,16 +154,15 @@ char* ExportObjsCSV::get_variable_value(KDBVariables* dbv, int nb, int t, char**
 /**
  *  Saves one VAR in the csv export file.
  *  
- *  @param [in] ExportToFile* expdef  struct that contains implementation for csv output
  *  @param [in] char*   code    code of the VAR  in csv format
  *  @param [in] char*   cmt     comment in csv format
  *  @param [in] char*   vec     values in csv format
  *  @return 
  */
-int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
+int ExportObjsCSV::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
-    expdef->file_descriptor << (code == NULL ? "" : code) << " " << (cmt == NULL  ? "" : cmt)
-                            << " " << (vec == NULL  ? "" : vec) << "\n";
+    file_descriptor << (code == NULL ? "" : code) << " " << (cmt == NULL  ? "" : cmt)
+                          << " " << (vec == NULL  ? "" : vec) << "\n";
     return 0;        
 }
 
@@ -174,10 +171,10 @@ int ExportObjsCSV::write_variable_and_comment(ExportToFile* expdef, char* code, 
 
 // Same functions as for normal CSV export. See above for details.
 
-int ExportObjsRevertCSV::write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)
+int ExportObjsRevertCSV::write_header(KDB* dbv, KDB* dbc, char*outfile)
 {
-    expdef->file_descriptor.open(outfile);
-    if((expdef->file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
+    file_descriptor.open(outfile);
+    if((file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
     {
         std::string error_msg = "Cannot create file '" + std::string(outfile) + "'";
         error_manager.append_error(error_msg);
@@ -205,20 +202,20 @@ char* ExportObjsRevertCSV::get_variable_value(KDBVariables* dbv, int nb, int t, 
     return buf;
 }
 
-int ExportObjsRevertCSV::write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)
+int ExportObjsRevertCSV::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
     if(code == 0) 
     {
-        expdef->file_descriptor << "\n";
+        file_descriptor << "\n";
         return 0;
     }
-    expdef->file_descriptor << code << " ";
+    file_descriptor << code << " ";
     return 0;
 }
 
-int ExportObjsRevertCSV::close(ExportToFile* expdef, KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsRevertCSV::close(KDB* dbv, KDB* dbc, char* outfile)
 {
     // No footer needed for CSV output
-    expdef->file_descriptor.close();
+    file_descriptor.close();
     return 0;
 }

@@ -164,8 +164,8 @@ A set of rules can be defined to select and/or determine the name each object is
 |`void write_value(char* tmp, double val)`|Formats a double value on 20 positions in general format.|
 |`char *write_pre_post(char* pre, char* post, char* src, char** tg)`|Creates an allocated string formatted as \{pre\}\{src\}\{post\}.|
 |`char *write_separator(char* src, char** tg)`|Creates an allocated string formatted as \{src\}\{EXP\_SEP\}.|
-|`int EXP_Ws(ExportToFile* expdef, KDB* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile|
-|`int EXP_Rev_Ws(ExportToFile* expdef, KDB* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
+|`int EXP_Ws(const std::unique_ptr<ExportToFile> expdef, KDB* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Exports a KDB of VARs (and optionally of CMTs) in the format defined by the virtual functions in ExportToFile|
+|`int EXP_Rev_Ws(const std::unique_ptr<ExportToFile> expdef, KDB* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep)`|Same as EXP\_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.|
 |`int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)`|Exports VAR files into an external format.|
 
 ### k\_ecsv.c {#T15}
@@ -194,15 +194,15 @@ Implementation of the CSV and rotated CSV export functions. See k\_emain.c for m
 
 |Syntax|Description|
 |:---|:---|
-|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a CSV export file.|
-|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the CSV export files.|
+|`int write_header(KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a CSV export file.|
+|`int close(KDB* dbv, KDB* dbc)`|Saves the footer and closes the CSV export files.|
 |`char *write_object_name(char* name, char** code)`|Variable name translation for CSV output.|
 |`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for CSV output.|
 |`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in CSV format.|
-|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the csv export file.|
-|`int write_header(ExportToFile* expdef, KDB* dbv, KDB* dbc, char*outfile)`|Opens and initialise a rotated CSV export file.|
+|`int write_variable_and_comment(char* code, char* cmt, char* vec)`|Saves one VAR in the csv export file.|
+|`int write_header(KDB* dbv, KDB* dbc, char*outfile)`|Opens and initialise a rotated CSV export file.|
 |`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in rotated CSV format.|
-|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the rotated csv export file.|
+|`int write_variable_and_comment(char* code, char* cmt, char* vec)`|Saves one VAR in the rotated csv export file.|
 |`int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)`|Exports VAR files into an external format.|
 
 ### k\_edif.c {#T19}
@@ -239,12 +239,12 @@ Export functions specific to DIF format.
 
 |Syntax|Description|
 |:---|:---|
-|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a DIF export file.|
-|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the DIF export files.|
+|`int write_header(KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a DIF export file.|
+|`int close(KDB* dbv, KDB* dbc)`|Saves the footer and closes the DIF export files.|
 |`char *write_object_name(char* name, char** code)`|Variable name translation for DIF output.|
 |`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for DIF output.|
 |`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in DIF format.|
-|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the DIF export file.|
+|`int write_variable_and_comment(char* code, char* cmt, char* vec)`|Saves one VAR in the DIF export file.|
 
 ### k\_etsp.c {#T22}
 
@@ -274,12 +274,12 @@ Export functions specific to TSP format.
 
 |Syntax|Description|
 |:---|:---|
-|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a tsp export file.|
-|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the tsp export files.|
+|`int write_header(KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a tsp export file.|
+|`int close(KDB* dbv, KDB* dbc)`|Saves the footer and closes the tsp export files.|
 |`char *write_object_name(char* name, char** code)`|Variable name translation for tsp output.|
 |`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for tsp output.|
 |`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in tsp format.|
-|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the tsp export file.|
+|`int write_variable_and_comment(char* code, char* cmt, char* vec)`|Saves one VAR in the tsp export file.|
 
 ### k\_ewks.c {#T25}
 
@@ -289,12 +289,12 @@ Export functions specific to WKS format (obsolete).
 
 |Syntax|Description|
 |:---|:---|
-|`int write_header(ExportToFile *expdef, KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a wks export file.|
-|`int close(ExportToFile* expdef, KDB* dbv, KDB* dbc)`|Saves the footer and closes the wks export files.|
+|`int write_header(KDB* dbv, KDB* dbc, char* outfile)`|Opens and initialise a wks export file.|
+|`int close(KDB* dbv, KDB* dbc)`|Saves the footer and closes the wks export files.|
 |`char *write_object_name(char* name, char** code)`|Variable name translation for wks output.|
 |`char *write_comment(KDB* dbc, char* name, char**cmt)`|Creates the CMT text \+ separator for wks output.|
 |`char *write_numerical_value(KDB* dbv, int nb, int t, char** vec)`|Adds one element of a VAR (KDB\[nb\]\[t\]) to the export vector in wks format.|
-|`int write_variable_and_comment(ExportToFile* expdef, char* code, char* cmt, char* vec)`|Saves one VAR in the wks export file.|
+|`int write_variable_and_comment(char* code, char* cmt, char* vec)`|Saves one VAR in the wks export file.|
 
 ### k\_wks.c {#T27}
 

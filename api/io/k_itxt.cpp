@@ -109,7 +109,7 @@ int ImportObjsTXT::read_numerical_value(YYFILE* yy, char* name, int* shift, doub
 /* Comments */
 
 
-int ImportCommentsTXT::read_header(ImportCmtFromFile* impdef, char* file, int lang)
+int ImportCommentsTXT::read_header(char* file, int lang)
 {
     SCR_strip((unsigned char*) file);
     TXT_fd = fopen(file, "r");
