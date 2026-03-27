@@ -403,7 +403,7 @@ Function to compare two IODE objects.
 
 |Syntax|Description|
 |:---|:---|
-|`int K_compare(char* name, KDB* kdb1, KDB* kdb2)`|Compares IODE objects having the same name in two KDB.|
+|`int K_compare(char* name, const KDB& kdb1, const KDB& kdb2)`|Compares IODE objects having the same name in two KDB.|
 
 ### k\_grep.c {#T37}
 

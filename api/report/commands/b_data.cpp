@@ -1503,7 +1503,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         {
             name = kdb1.get_name(i);
             c_name = (char*) name.c_str();
-            rc = K_compare(c_name, &kdb1, &kdb2);
+            rc = K_compare(c_name, kdb1, kdb2);
             switch(rc)
             {
             // name neither in global_db nor in file

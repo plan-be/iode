@@ -16,4 +16,4 @@ inline double K_COMPARE_EPS = 1e-7;
 /* k_cmp.c */
 bool K_compare_var(const Variable& var1, const Variable& var2);
 // TODO : make a method of KDBTemplate class
-int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2);
+int K_compare(const std::string& name, const KDB& kdb1, const KDB& kdb2);
