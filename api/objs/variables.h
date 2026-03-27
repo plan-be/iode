@@ -328,9 +328,3 @@ void KV_set(KDBVariables* kdb, const std::string& name, int t, int mode, double 
 int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern);
 KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char* pattern, char* filename);
 void KV_init_values_1(double* val, int t, int method);
-double KV_get_at_t(char*varname, int t);
-double KV_get_at_per(char*varname, Period* per);
-double KV_get_at_aper(char*varname, char* aper);
-int KV_set_at_t(char*varname, int t, double val);
-int KV_set_at_per(char*varname, Period* per, double val);
-int KV_set_at_aper(char*varname, char* aper, double val);

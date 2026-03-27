@@ -1103,7 +1103,6 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     int     rc;
     List    lst, expected_lst;
     void    (*kmsg_super_ptr)(const char*);
-    double  XNATY_2000Y1;
 
     U_test_print_title("Tests Simulation");
 
@@ -1163,9 +1162,9 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Version with exchange in at least 2 equations
     // Set values of endo UY
-    KV_set_at_aper("UY", "2000Y1", 650.0);
-    KV_set_at_aper("UY", "2001Y1", 670.0);
-    KV_set_at_aper("UY", "2002Y1", 680.0);
+    global_ws_var->set_var("UY", "2000Y1", 650.0);
+    global_ws_var->set_var("UY", "2001Y1", 670.0);
+    global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     // Simulate with exchange UY - XNATY
     endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
@@ -1173,9 +1172,8 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Check result
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
-    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
+    EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
 
     // Cleanup
     SCR_free_tbl(endo_exo);
@@ -2247,7 +2245,6 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
                 *kdbs;
     char        *filename = "fun";
     int         rc;
-    double      XNATY_2000Y1;
 
     // B_Model*() tests
     // ----------------
@@ -2294,7 +2291,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
     // TODO: check result of one ENDO
-    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
 
     // B_ModelExchange()
 
@@ -2310,9 +2307,9 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbe, nullptr);
 
     // Set values of endo UY
-    KV_set_at_aper("UY", "2000Y1", 650.0);
-    KV_set_at_aper("UY", "2001Y1", 670.0);
-    KV_set_at_aper("UY", "2002Y1", 680.0);
+    global_ws_var->set_var("UY", "2000Y1", 650.0);
+    global_ws_var->set_var("UY", "2001Y1", 670.0);
+    global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     // Exchange
     rc = B_ModelExchange("UY-XNATY");
@@ -2323,10 +2320,9 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_EQ(rc, 0);
 
     // Check some results
-    EXPECT_EQ(KV_get_at_aper("UY", "2000Y1"), 650.0);
-    XNATY_2000Y1 = KV_get_at_aper("XNATY", "2000Y1");
+    EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
     //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
-    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("XNATY", "2000Y1") * 1e6) / 1e6, 0.800673);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800673);
 
     // B_ModelCompile(char* arg, int unused)
     rc = B_ModelCompile("");
@@ -2359,7 +2355,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     //  3. Simulate & compare
     rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_DOUBLE_EQ(round(KV_get_at_aper("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
 
     // B_ModelSimulateSaveNIters(char *arg)                    
     // $ModelSimulateSaveNiters varname
