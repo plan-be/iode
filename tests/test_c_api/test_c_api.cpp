@@ -1299,9 +1299,8 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     EXPECT_EQ(rc, 0);
 
     EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-    EXPECT_DOUBLE_EQ(round(K_e_r2(global_ws_eqs.get(), "ACAF") * 1e6) / 1e6, 0.821815);
-
-    //TODO:add some tests with other estimation methods / on blocks / with instruments
+    EXPECT_DOUBLE_EQ(round(global_ws_eqs->get_obj_ptr("ACAF")->get_test_r2() * 1e6) / 1e6, 0.821815);
+    //TODO : add some tests with other estimation methods / on blocks / with instruments
 
     //W_flush();
     W_close();

@@ -354,22 +354,6 @@ Functions for "packing" and "unpacking" IODE objects.
 
 Basic functions to retrieve object data based on their position or name in the kdb. If the object is packed (EQ, Table...) the position (n) of the element in the pack must be given.
 
-List of functions
-
-|Syntax|Meaning|
-|:---|:---|
-|**Equation tests**||
-|`double K_etest(KDB* kdb, char*name, int test_nb)`|Retrieves a statistical test stored the equation whose endo is name.|
-|`double K_e_stdev (KDB* kdb, char*name)`|Returns stdev calculated during the last estimation of equation name|
-|`double K_e_meany (KDB* kdb, char*name)`|Returns meany calculated during the last estimation of equation name|
-|`double K_e_ssres (KDB* kdb, char*name)`|Returns ssres calculated during the last estimation of equation name|
-|`double K_e_stderr(KDB* kdb, char*name)`|Returns stderr calculated during the last estimation of equation name|
-|`double K_e_fstat (KDB* kdb, char*name)`|Returns fstat calculated during the last estimation of equation name|
-|`double K_e_r2 (KDB* kdb, char*name)`|Returns r2 calculated during the last estimation of equation name|
-|`double K_e_r2adj (KDB* kdb, char*name)`|Returns r2adj calculated during the last estimation of equation name|
-|`double K_e_dw (KDB* kdb, char*name)`|Returns dw calculated during the last estimation of equation name|
-|`double K_e_loglik(KDB* kdb, char*name)`|Returns loglik calculated during the last estimation of equation name|
-
 ### k\_eqs.c {#T33}
 
 Functions to manipulate equation expressions and objects.

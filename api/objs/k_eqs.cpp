@@ -446,34 +446,3 @@ void KDBEquations::update_reference_db()
         delete global_ref_eqs[0];
     global_ref_eqs[0] = new KDBEquations(this, "*", false);      
 }
-
-/**
- *  Retrieves a statistical test stored the equation whose endo is name.
- *  
- *  @param [in] KDB*    kdb      KDB containing EQ name
- *  @param [in] char*   name     name of the equation (=endogenous)
- *  @param [in] int     test_nb  position of the test in eq->tests 
- *  @return     double           test value or IODE_NAN if equation name not found
- *  
- */
-double K_etest(KDBEquations* kdb, char* c_name, int test_nb)
-{   
-    std::string name = std::string(c_name);
-    if(!kdb->contains(name)) 
-        return(IODE_NAN);
-    
-    std::array<float, EQS_NBTESTS> tests = kdb->get_obj_ptr(name)->tests;
-    double value = (double) tests[test_nb];
-    return value;
-}
-
-// Returns test calculated during the last estimation of equation name
-double K_e_stdev (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDEV));}
-double K_e_meany (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_MEANY));}
-double K_e_ssres (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_SSRES));}
-double K_e_stderr(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_STDERR));}
-double K_e_fstat (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_FSTAT));}
-double K_e_r2    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2));}
-double K_e_r2adj (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_R2ADJ));}
-double K_e_dw    (KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_DW));}
-double K_e_loglik(KDBEquations* kdb, char*name) {return(K_etest(kdb, name, EQ_LOGLIK));}
