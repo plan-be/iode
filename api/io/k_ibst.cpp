@@ -169,7 +169,7 @@ int ImportCommentsBST::sub_read_header(int lang)
     if(dif_skip_to(RYY, DIF_BOT) < 0) 
         return -1;
 
-    KDBComments* c_kdb = global_ws_cmt.get();
+    kdb_cmt = global_ws_cmt.get();
 
     while(1) 
     {
@@ -223,7 +223,7 @@ int ImportCommentsBST::sub_read_header(int lang)
             try
             {
                 Comment comment(cmt);
-                c_kdb->set(name, comment);
+                kdb_cmt->set(name, comment);
             }
             catch(const std::exception& e)
             {
@@ -369,7 +369,6 @@ int ImportCommentsBST::get_niv(char* name)
 
 int ImportCommentsBST::close()
 {
-    delete kdb_cmt;
     YY_close(SYY);
     YY_close(FYY);
     return 0;
