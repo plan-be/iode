@@ -78,7 +78,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
         eq_ptr = dbe->get_obj_ptr(eq_name); 
-        L_link_endos(dbe, eq_ptr->clec);
+        L_link_endos(*dbe, eq_ptr->clec);
     }
 
     /* ORDERING EQUATIONS */

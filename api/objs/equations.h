@@ -656,4 +656,4 @@ int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
 /*----------------------- FUNCS ----------------------------*/
 
 /* lec/l_link.c */
-void L_link_endos(KDBEquations* dbe, CLEC *cl);
+void L_link_endos(const KDBEquations& dbe, CLEC *cl);

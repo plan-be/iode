@@ -228,7 +228,7 @@ Three functions, implemented in k\_lec.c, are called during the link process: L\
 |Syntax|Description|
 |:---|:---|
 |`int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)`|Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.|
-|`void L_link_endos(KDB* dbe, CLEC *cl)`|Pseudo linking used to calculate the strong connex components of a model (SCC).|
+|`void L_link_endos(const KDBEquations& dbe, CLEC *cl)`|Pseudo linking used to calculate the strong connex components of a model (SCC).|
 
 ## LEC execution {#T21}
 
