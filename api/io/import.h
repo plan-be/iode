@@ -246,7 +246,7 @@ class ImportCommentsBST : public ImportCmtFromFile
     YYFILE* FYY = NULL;
     YYFILE* RYY = NULL;
     YYFILE* SYY = NULL;
-    KDBComments* C_kdb = nullptr;
+    KDBComments* kdb_cmt = nullptr;
 
 public:
     ImportCommentsBST() 
