@@ -10,7 +10,7 @@
  *  Main functions
  * 
  *      int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
- *      void L_link_endos(KDBEquations* dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
+ *      void L_link_endos(const KDBEquations& dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -176,15 +176,14 @@ int L_link(KDBVariables* dbv, KDBScalars* dbs, CLEC* cl)
  * @param [in, out] cl      CLEC*    Compiled lec
  *
  */
-static void L_link1_endos(KDB* dbe, CLEC* cl)
+static void L_link1_endos(const KDBEquations& dbe, CLEC* cl)
 {
-    int     i;
-
-    for (i = 0; i < cl->nb_names; i++) {
+    for(int i = 0; i < cl->nb_names; i++) 
+    {
         if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
-            cl->lnames[i].pos = dbe->index_of(cl->lnames[i].name);
+            cl->lnames[i].pos = dbe.index_of(cl->lnames[i].name);
 
         if (cl->lnames[i].pos < 0)  // Not found => exogenous var
             cl->lnames[i].pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
@@ -204,8 +203,10 @@ static void L_link1_endos(KDB* dbe, CLEC* cl)
  * 
  * @author JMP 16/3/2012
  */
-void L_link_endos(KDBEquations* dbe, CLEC *cl)
+void L_link_endos(const KDBEquations& dbe, CLEC *cl)
 {
-    if (cl == 0) return;
+    if (cl == NULL) 
+        return;
+    
     L_link1_endos(dbe, cl);
 }
