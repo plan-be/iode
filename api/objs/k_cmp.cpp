@@ -1,11 +1,3 @@
-/**
- * @header4iode
- *
- * Function to compare 2 IODE objects.
- * -----------------------------------
- *
- *      int K_compare(char* name, KDB* kdb1, KDB* kdb2) : compare object named name in 2 kdb.
- */ 
 #include <math.h>
 
 #include "api/objs/objs.h"
@@ -74,16 +66,13 @@ bool K_compare_var(const Variable& var1, const Variable& var2)
  *                                  3 -> if name in both kdb1 and kdb2, IODE object in kdb1 == IODE object in kdb2
  *                                  4 -> if name in both kdb1 and kdb2, IODE object in kdb1 != IODE object in kdb2
  */
-int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
+int K_compare(const std::string& name, const KDB& kdb1, const KDB& kdb2)
 {
-    if(!kdb1 || !kdb2) 
+    if(kdb1.k_type != kdb2.k_type) 
         return -1;
 
-    if(kdb1->k_type != kdb2->k_type) 
-        return -1;
-
-    bool found_in_kdb1 = kdb1->contains(name);
-    bool found_in_kdb2 = kdb2->contains(name);
+    bool found_in_kdb1 = kdb1.contains(name);
+    bool found_in_kdb2 = kdb2.contains(name);
 
     if(!found_in_kdb1 && !found_in_kdb2) 
         return 0;
@@ -98,68 +87,68 @@ int K_compare(const std::string& name, KDB* kdb1, KDB* kdb2)
     // res = 0 -> IODE object in kdb1 == IODE object in kdb2
     // res = 1 -> IODE object in kdb1 != IODE object in kdb2
     bool success = false;
-    switch(kdb1->k_type)
+    switch(kdb1.k_type)
     {
     case COMMENTS:
     {
-        KDBComments* kdb_cmt1 = dynamic_cast<KDBComments*>(kdb1);
-        KDBComments* kdb_cmt2 = dynamic_cast<KDBComments*>(kdb2);
-        std::shared_ptr<Comment> cmt1_ptr = kdb_cmt1->get_obj_ptr(name);
-        std::shared_ptr<Comment> cmt2_ptr = kdb_cmt2->get_obj_ptr(name);
+        const KDBComments& kdb_cmt1 = dynamic_cast<const KDBComments&>(kdb1);
+        const KDBComments& kdb_cmt2 = dynamic_cast<const KDBComments&>(kdb2);
+        std::shared_ptr<Comment> cmt1_ptr = kdb_cmt1.get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt2_ptr = kdb_cmt2.get_obj_ptr(name);
         success = *cmt1_ptr == *cmt2_ptr;
         break;
     }
     case EQUATIONS:
     {
-        KDBEquations* kdb_eqs1 = dynamic_cast<KDBEquations*>(kdb1);
-        KDBEquations* kdb_eqs2 = dynamic_cast<KDBEquations*>(kdb2);
-        std::shared_ptr<Equation> eqs1_ptr = kdb_eqs1->get_obj_ptr(name);
-        std::shared_ptr<Equation> eqs2_ptr = kdb_eqs2->get_obj_ptr(name);
+        const KDBEquations& kdb_eqs1 = dynamic_cast<const KDBEquations&>(kdb1);
+        const KDBEquations& kdb_eqs2 = dynamic_cast<const KDBEquations&>(kdb2);
+        std::shared_ptr<Equation> eqs1_ptr = kdb_eqs1.get_obj_ptr(name);
+        std::shared_ptr<Equation> eqs2_ptr = kdb_eqs2.get_obj_ptr(name);
         success = *eqs1_ptr == *eqs2_ptr;
         break;
     }
     case IDENTITIES:
     {
-        KDBIdentities* kdb_idt1 = dynamic_cast<KDBIdentities*>(kdb1);
-        KDBIdentities* kdb_idt2 = dynamic_cast<KDBIdentities*>(kdb2);
-        std::shared_ptr<Identity> idt1_ptr = kdb_idt1->get_obj_ptr(name);
-        std::shared_ptr<Identity> idt2_ptr = kdb_idt2->get_obj_ptr(name);
+        const KDBIdentities& kdb_idt1 = dynamic_cast<const KDBIdentities&>(kdb1);
+        const KDBIdentities& kdb_idt2 = dynamic_cast<const KDBIdentities&>(kdb2);
+        std::shared_ptr<Identity> idt1_ptr = kdb_idt1.get_obj_ptr(name);
+        std::shared_ptr<Identity> idt2_ptr = kdb_idt2.get_obj_ptr(name);
         success = *idt1_ptr == *idt2_ptr;
         break;
     }
     case LISTS:
     {
-        KDBLists* kdb_lst1 = dynamic_cast<KDBLists*>(kdb1);
-        KDBLists* kdb_lst2 = dynamic_cast<KDBLists*>(kdb2);
-        std::shared_ptr<List> lst1_ptr = kdb_lst1->get_obj_ptr(name);
-        std::shared_ptr<List> lst2_ptr = kdb_lst2->get_obj_ptr(name);
+        const KDBLists& kdb_lst1 = dynamic_cast<const KDBLists&>(kdb1);
+        const KDBLists& kdb_lst2 = dynamic_cast<const KDBLists&>(kdb2);
+        std::shared_ptr<List> lst1_ptr = kdb_lst1.get_obj_ptr(name);
+        std::shared_ptr<List> lst2_ptr = kdb_lst2.get_obj_ptr(name);
         success = *lst1_ptr == *lst2_ptr;
         break;
     }
     case SCALARS:
     {
-        KDBScalars* kdb_scl1 = dynamic_cast<KDBScalars*>(kdb1);
-        KDBScalars* kdb_scl2 = dynamic_cast<KDBScalars*>(kdb2);
-        std::shared_ptr<Scalar> scl1_ptr = kdb_scl1->get_obj_ptr(name);
-        std::shared_ptr<Scalar> scl2_ptr = kdb_scl2->get_obj_ptr(name);
+        const KDBScalars& kdb_scl1 = dynamic_cast<const KDBScalars&>(kdb1);
+        const KDBScalars& kdb_scl2 = dynamic_cast<const KDBScalars&>(kdb2);
+        std::shared_ptr<Scalar> scl1_ptr = kdb_scl1.get_obj_ptr(name);
+        std::shared_ptr<Scalar> scl2_ptr = kdb_scl2.get_obj_ptr(name);
         success = *scl1_ptr == *scl2_ptr;
         break;
     }
     case TABLES:
     {
-        KDBTables* kdb_tbl1 = dynamic_cast<KDBTables*>(kdb1);
-        KDBTables* kdb_tbl2 = dynamic_cast<KDBTables*>(kdb2);
-        std::shared_ptr<Table> tbl1_ptr = kdb_tbl1->get_obj_ptr(name);
-        std::shared_ptr<Table> tbl2_ptr = kdb_tbl2->get_obj_ptr(name);
+        const KDBTables& kdb_tbl1 = dynamic_cast<const KDBTables&>(kdb1);
+        const KDBTables& kdb_tbl2 = dynamic_cast<const KDBTables&>(kdb2);
+        std::shared_ptr<Table> tbl1_ptr = kdb_tbl1.get_obj_ptr(name);
+        std::shared_ptr<Table> tbl2_ptr = kdb_tbl2.get_obj_ptr(name);
         success = *tbl1_ptr == *tbl2_ptr;
         break;
     }
     case VARIABLES:
     {
-        KDBVariables* kdb_var1 = dynamic_cast<KDBVariables*>(kdb1);
-        KDBVariables* kdb_var2 = dynamic_cast<KDBVariables*>(kdb2);
-        std::shared_ptr<Variable> var1_ptr = kdb_var1->get_obj_ptr(name);
-        std::shared_ptr<Variable> var2_ptr = kdb_var2->get_obj_ptr(name);
+        const KDBVariables& kdb_var1 = dynamic_cast<const KDBVariables&>(kdb1);
+        const KDBVariables& kdb_var2 = dynamic_cast<const KDBVariables&>(kdb2);
+        std::shared_ptr<Variable> var1_ptr = kdb_var1.get_obj_ptr(name);
+        std::shared_ptr<Variable> var2_ptr = kdb_var2.get_obj_ptr(name);
         success = K_compare_var(*var1_ptr, *var2_ptr);
         break;
     }
