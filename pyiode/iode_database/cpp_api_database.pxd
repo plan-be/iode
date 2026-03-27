@@ -106,13 +106,13 @@ cdef extern from "api/all.h":
         bool save(const string& filepath, const bool compress) except +
         void clear() except +
 
-    # k_wsvar.c
-    int KV_add(KDBVariables* kdb, char* varname)
-    double KV_get(KDBVariables* kdb, string name, int t, int mode)
-    void KV_set(KDBVariables* kdb, string name, int t, int mode, double value)
-
     # k_grep.c
     char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
+
+    # see k_wsvar.c
+    int KV_add(KDBVariables& kdb, char* varname)
+    double KV_get(KDBVariables& kdb, const string& name, int t, int mode)
+    void KV_set(KDBVariables& kdb, const string& name, int t, int mode, double value)
 
 
 # C++ classes
@@ -144,6 +144,7 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
                                const int source_t_first, const int source_t_last) except +
     void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
                              const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
+
 
     cdef enum BinaryOperation:
         OP_ADD,

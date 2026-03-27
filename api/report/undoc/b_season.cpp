@@ -115,7 +115,7 @@ int B_season(char* arg)
         to->set(name, i_var);
     }
     
-    KV_merge(global_ws_var.get(), to, 1);
+    KV_merge(*global_ws_var, *to, 1);
     rc = 0;
 
 done:

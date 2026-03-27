@@ -83,6 +83,8 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
     return seed;
 }
 
+// TODO : make functions below methods of KDBEquations, KDBIdentities and KDBTables
+
 /* k_lst.c */
 int K_scan(const KDB& kdb, char* l_var, char* l_scal);
 void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal);

@@ -318,13 +318,15 @@ inline bool var_to_binary(char** pack, const Variable& var)
     return true;
 }
 
+// TODO : make functions below methods of KDBVariables
+
 /* k_wsvar.c */
-int KV_sample(KDBVariables* kdb, Sample* new_sample);
-int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace);
-void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace);
-int KV_add(KDBVariables* kdb, char* varname);
-double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode);
-void KV_set(KDBVariables* kdb, const std::string& name, int t, int mode, double value);
-int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern);
+int KV_sample(KDBVariables& kdb, Sample* new_sample);
+int KV_merge(KDBVariables& kdb1, KDBVariables& kdb2, int replace);
+void KV_merge_del(KDBVariables& kdb1, KDBVariables& kdb2, int replace);
+int KV_add(KDBVariables& kdb, char* varname);
+double KV_get(const KDBVariables& kdb, const std::string& name, int t, int mode);
+void KV_set(KDBVariables& kdb, const std::string& name, int t, int mode, double value);
+int KV_extrapolate(KDBVariables& dbv, int method, Sample* smpl, char* pattern);
 KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char* pattern, char* filename);
 void KV_init_values_1(double* val, int t, int method);

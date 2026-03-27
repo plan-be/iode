@@ -177,7 +177,7 @@ KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef,
                 }
             }
 
-            KV_set(kdb, var_name, shift, VAR_MODE_LEVEL, value);
+            KV_set(*kdb, var_name, shift, VAR_MODE_LEVEL, value);
         }
     }
 
