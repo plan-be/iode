@@ -33,7 +33,7 @@
  *                                               0 otherwise
  */
  
-int KV_sample(KDBVariables* kdb, Sample *new_sample)
+int KV_sample(KDBVariables& kdb, Sample *new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0) 
         return 0;
@@ -41,31 +41,33 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
     Sample smpl;
     int start1 = 0;
     int start2 = 0;
-    if(kdb->sample) 
+    if(kdb.sample) 
     {
-        smpl = kdb->sample->intersection(*new_sample);
+        smpl = kdb.sample->intersection(*new_sample);
         if(smpl.nb_periods > 0) 
         {
-            start1 = smpl.start_period.difference(kdb->sample->start_period);
+            start1 = smpl.start_period.difference(kdb.sample->start_period);
             start2 = smpl.start_period.difference(new_sample->start_period);
         }
     }
 
-    if(kdb->sample)
-        delete kdb->sample;
-    kdb->sample = new Sample(*new_sample);
+    if(kdb.sample)
+        delete kdb.sample;
+    kdb.sample = new Sample(*new_sample);
 
     std::shared_ptr<Variable> var_ptr;
     std::shared_ptr<Variable> new_var_ptr;
     // use iterator to allow modifying k_objs while looping on it
-    for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
+    for(auto it = kdb.k_objs.begin(); it != kdb.k_objs.end(); it++)   
     {
         var_ptr = it->second;
-        new_var_ptr = std::make_shared<Variable>(kdb->sample->nb_periods, IODE_NAN);
+        new_var_ptr = std::make_shared<Variable>(kdb.sample->nb_periods, IODE_NAN);
         if(var_ptr) 
         {
+            Variable& var = *var_ptr;
+            Variable& new_var = *new_var_ptr;
             for(int t = 0; t < smpl.nb_periods; t++)
-                (*new_var_ptr)[start2 + t] = (*var_ptr)[start1 + t];
+                new_var[start2 + t] = var[start1 + t];
         }
         it->second.reset();
         it->second = new_var_ptr;
@@ -87,36 +89,24 @@ int KV_sample(KDBVariables* kdb, Sample *new_sample)
  *  @return                           int     -1 if there is no intersection between the 2 samples
  *                                            0 if ok.
  */
-int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
+int KV_merge(KDBVariables& kdb1, KDBVariables& kdb2, int replace)
 {
-    if(!kdb1)
-    {
-        kwarning("Cannot merge into a NULL database");
-        return -1;
-    }
-
-    if(!kdb2)
-    {
-        kwarning("Cannot merge from a NULL database");
-        return -1;
-    }
-
-    if(kdb1->k_type != kdb2->k_type)
+    if(kdb1.k_type != kdb2.k_type)
     {
         kwarning("Cannot merge 2 KDB of different types");
         return -1;
     }
 
-    if(kdb1->k_type != VARIABLES) 
+    if(kdb1.k_type != VARIABLES) 
     {
         kwarning("KV_merge is only implemented for databases of type VARIABLES");
         return -1;
     }
 
-    if(!kdb1->sample)
+    if(!kdb1.sample)
     {
-        if(kdb2->sample)
-            kdb1->sample = new Sample(*kdb2->sample);
+        if(kdb2.sample)
+            kdb1.sample = new Sample(*kdb2.sample);
         else
         {
             kwarning("Cannot merge the 2 Variables databases: sample of both databases is empty");
@@ -125,20 +115,20 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
     }
 
     int start1, start2;
-    Sample smpl = kdb1->sample->intersection(*kdb2->sample);
+    Sample smpl = kdb1.sample->intersection(*kdb2.sample);
     if(smpl.nb_periods > 0) 
     {
-        start1 = smpl.start_period.difference(kdb1->sample->start_period); /* always >= 0 */
-        start2 = smpl.start_period.difference(kdb2->sample->start_period); /* always >= 0 */
+        start1 = smpl.start_period.difference(kdb1.sample->start_period); /* always >= 0 */
+        start2 = smpl.start_period.difference(kdb2.sample->start_period); /* always >= 0 */
     }
 
     bool found;
-    int nb_periods_1 = kdb1->get_nb_periods();
+    int nb_periods_1 = kdb1.get_nb_periods();
     int nb_periods_to_copy = smpl.nb_periods;
     // copy variables from kdb2 to kdb1 (kdb1 <- kdb2)
-    for(const auto& [name, var_ptr] : kdb2->k_objs) 
+    for(const auto& [name, var_ptr] : kdb2.k_objs) 
     {
-        found = kdb1->contains(name);
+        found = kdb1.contains(name);
 
         // replace == 0 means do not replace existing variables
         if(found && replace == 0)
@@ -146,11 +136,11 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         
         // if the variable does not exist in kdb1, create it with NaN values
         if(!found)
-            kdb1->set(name, Variable(nb_periods_1, IODE_NAN));
+            kdb1.set(name, Variable(nb_periods_1, IODE_NAN));
 
-        // should not happen because we called kdb1->set_obj_ptr() if not found above, 
+        // should not happen because we called kdb1.set_obj_ptr() if not found above, 
         // but we put this check just in case to avoid a crash 
-        if(!kdb1->contains(name))
+        if(!kdb1.contains(name))
         {
             std::string error_msg = "Cannot merge variable '" + name + "' ";
             error_msg += "from the second Variables database into the first one.\n";
@@ -159,8 +149,8 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
         }
 
         // copy values from kdb2 to kdb1 inside the intersection of the samples
-        std::shared_ptr<Variable> var_ptr_1 = kdb1->get_obj_ptr(name);
-        std::shared_ptr<Variable> var_ptr_2 = kdb2->get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr_1 = kdb1.get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr_2 = kdb2.get_obj_ptr(name);
         for(int t = 0; t < nb_periods_to_copy; t++)
             (*var_ptr_1)[start1 + t] = (*var_ptr_2)[start2 + t];
     }
@@ -181,47 +171,33 @@ int KV_merge(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
  * 
  */
 
-void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
+void KV_merge_del(KDBVariables& kdb1, KDBVariables& kdb2, int replace)
 {
-    if(!kdb1)
-    {
-        kwarning("Cannot merge into a NULL database");
-        return;
-    }
-
-    if(!kdb2)
-    {
-        kwarning("Cannot merge from a NULL database");
-        return;
-    }
-
-    if(kdb1->k_type != kdb2->k_type) 
+    if(kdb1.k_type != kdb2.k_type) 
     {
         kwarning("Cannot merge 2 KDB of different types");
         return;
     }
 
-    if(kdb2->size() == 0) 
+    if(kdb2.size() == 0) 
         return;
     
-    if(kdb1->size() == 0) 
+    if(kdb1.size() == 0) 
     {
-        if(kdb1->k_type == VARIABLES)
+        if(kdb1.k_type == VARIABLES)
         {
-            if(kdb1->sample)
-                KV_sample(kdb2, kdb1->sample);
-            else if(kdb2->sample)
-                kdb1->sample = new Sample(*kdb2->sample);
+            if(kdb1.sample)
+                KV_sample(kdb2, kdb1.sample);
+            else if(kdb2.sample)
+                kdb1.sample = new Sample(*kdb2.sample);
         }
-        kdb1->k_objs = kdb2->k_objs;
-        kdb2->clear();
-        kdb2 = nullptr;
+        kdb1.k_objs = kdb2.k_objs;
+        kdb2.clear();
         return;
     }
 
     KV_merge(kdb1, kdb2, replace);
-    kdb2->clear();
-    kdb2 = nullptr;
+    kdb2.clear();
 }
 
 
@@ -233,42 +209,34 @@ void KV_merge_del(KDBVariables* kdb1, KDBVariables* kdb2, int replace)
  *  @param [in] char*   varname     name of the new variable
  *  @return     int                 position of varname in the kdb
  */
-int KV_add(KDBVariables* kdb, char* varname)
+int KV_add(KDBVariables& kdb, char* varname)
 {
-    int t, nobs;
-
-    if(!kdb)
-    {
-        kwarning("Cannot add a variable to a NULL database");
-        return -1;
-    }
-
-    if(kdb->k_type != VARIABLES)
+    if(kdb.k_type != VARIABLES)
     {
         kwarning("KV_add is only implemented for databases of type VARIABLES");
         return -1;
     } 
     
     // Create varname with NaN 
-    bool found = kdb->contains(varname);
+    bool found = kdb.contains(varname);
     if(!found) 
     {
-        nobs = kdb->sample->nb_periods;
+        int nobs = kdb.sample->nb_periods;
         // Set IODE_NAN if the new var
-        kdb->set(varname, Variable(nobs, IODE_NAN));
+        kdb.set(varname, Variable(nobs, IODE_NAN));
     }
     else 
     { 
         // Replaces all values by IODE_NAN 
-        double* vptr = kdb->get_var_ptr(varname);
+        double* vptr = kdb.get_var_ptr(varname);
         if(vptr == NULL) 
             return -1;
         
-        for(t = 0; t < kdb->sample->nb_periods; t++)
+        for(int t = 0; t < kdb.sample->nb_periods; t++)
             vptr[t] = IODE_NAN;
     }
     
-    int pos = kdb->index_of(varname);
+    int pos = kdb.index_of(varname);
     return pos;
 }
 
@@ -287,23 +255,47 @@ int KV_add(KDBVariables* kdb, char* varname)
  *                                    VAR_MODE_GROWTH_RATE   : grt on one period  (x[t]/x[t-1] - 1)*100
  *                                    VAR_MODE_Y0Y_GROWTH_RATE  : grt on one year    (x[t]/x[t-{nb sub periods}] - 1) * 100
  */
-double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
+double KV_get(const KDBVariables& kdb, const std::string& name, int t, int mode)
 {
-    Sample* smpl = kdb->sample;
-    if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
+    std::string error_msg = "Cannot get the value of the variable named '" + name + "' ";
+    error_msg += "at period position " + std::to_string(t) + ":\n";
+    
+    if(!kdb.contains(name))
     {
-        kwarning("Cannot get the value of the variable name %s at period position %d", name.c_str(), t);
+        error_msg += "Variable not found in the database.";
+        kwarning(error_msg.c_str());
+        return IODE_NAN;
+    }
+
+    Sample* smpl = kdb.sample;
+    if(!smpl) 
+    {
+        error_msg += "sample of the KDB is empty.";
+        kwarning(error_msg.c_str());
+        return IODE_NAN;
+    }
+
+    if(t < 0 || t >= smpl->nb_periods)
+    {
+        error_msg += "invalid period index " + std::to_string(t) + ". Valid values are between 0 and ";
+        error_msg += std::to_string(smpl->nb_periods - 1) + ".";
+        kwarning(error_msg.c_str());
         return IODE_NAN;
     }
     
     int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
-    double var;
-    double* vt;
+
+    std::shared_ptr<Variable> var_ptr = kdb.get_obj_ptr(name);
+    Variable& var = *var_ptr;
+
+    double value;
+    double vt;
+    double vt_shifted;
     switch(mode) 
     {
         case VAR_MODE_LEVEL :
-            var = *kdb->get_var_ptr(name, t);
+            value = var[t];
             break;
         case VAR_MODE_DIFF :
             pernb = 1;
@@ -311,14 +303,15 @@ double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
         case VAR_MODE_Y0Y_DIFF : 
             if(t < pernb) 
             {
-                var = IODE_NAN;
+                value = IODE_NAN;
                 break;
             }
-            vt = kdb->get_var_ptr(name);
-            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]))
-                var = vt[t] - vt[t - pernb];
+            vt = var[t];
+            vt_shifted = var[t - pernb];
+            if(IODE_IS_A_NUMBER(vt) && IODE_IS_A_NUMBER(vt_shifted))
+                value = vt - vt_shifted;
             else 
-                var = IODE_NAN;
+                value = IODE_NAN;
             break;
         case VAR_MODE_GROWTH_RATE :
             pernb = 1;
@@ -326,18 +319,19 @@ double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
         case VAR_MODE_Y0Y_GROWTH_RATE :
             if(t < pernb) 
             {
-                var = IODE_NAN;
+                value = IODE_NAN;
                 break;
             }
-            vt = kdb->get_var_ptr(name);
-            if(IODE_IS_A_NUMBER(vt[t]) && IODE_IS_A_NUMBER(vt[t - pernb]) && !IODE_IS_0(vt[t - pernb]))
-                var = (vt[t]/vt[t - pernb] - 1) * 100.0;
+            vt = var[t];
+            vt_shifted = var[t - pernb];
+            if(IODE_IS_A_NUMBER(vt) && IODE_IS_A_NUMBER(vt_shifted) && !IODE_IS_0(vt_shifted))
+                value = (vt / vt_shifted - 1) * 100.0;
             else 
-                var = IODE_NAN;
+                value = IODE_NAN;
             break;
     }
 
-    return(var);
+    return value;
 }
 
 
@@ -358,18 +352,39 @@ double KV_get(KDBVariables* kdb, const std::string& name, int t, int mode)
  *                              
  */
  
-void KV_set(KDBVariables* kdb, const std::string& name, int t, int mode, double value)
+void KV_set(KDBVariables& kdb, const std::string& name, int t, int mode, double value)
 {
-    Sample* smpl = kdb->sample;
-    if(!smpl || !kdb->contains(name) || t < 0 || t >= smpl->nb_periods)
+    std::string error_msg = "Cannot set the value of the variable named '" + name + "' ";
+    error_msg += "at period position " + std::to_string(t) + ":\n";
+    
+    if(!kdb.contains(name))
     {
-        kwarning("Cannot set the value of the variable named %s at period position %d", name.c_str(), t);
+        error_msg += "Variable not found in the database.";
+        kwarning(error_msg.c_str());
+        return;
+    }
+
+    Sample* smpl = kdb.sample;
+    if(!smpl) 
+    {
+        error_msg += "sample of the KDB is empty.";
+        kwarning(error_msg.c_str());
+        return;
+    }
+
+    if(t < 0 || t >= smpl->nb_periods)
+    {
+        error_msg += "invalid period index " + std::to_string(t) + ". Valid values are between 0 and ";
+        error_msg += std::to_string(smpl->nb_periods - 1) + ".";
+        kwarning(error_msg.c_str());
         return;
     }
     
     int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
-    double* var = kdb->get_var_ptr(name);
+    std::shared_ptr<Variable> var_ptr = kdb.get_obj_ptr(name);
+    Variable& var = *var_ptr;
+
     switch(mode) 
     {
         case VAR_MODE_LEVEL :
@@ -472,20 +487,17 @@ calc2:
  *                                        from the list vars
  */
  
-int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
+int KV_extrapolate(KDBVariables& dbv, int method, Sample* smpl, char* pattern)
 {
-    int bt = smpl->start_period.difference(dbv->sample->start_period);
-    int at = dbv->sample->end_period.difference(smpl->end_period);
+    int bt = smpl->start_period.difference(dbv.sample->start_period);
+    int at = dbv.sample->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         error_manager.append_error("WsExtrapolate : sample definition error");
         return -1;
     }
 
-    if(!dbv)
-        return -1;
-
-    if(dbv->size() == 0) 
+    if(dbv.size() == 0) 
     {
         error_manager.append_error("WsExtrapolate : database is empty");
         return -1;
@@ -494,13 +506,13 @@ int KV_extrapolate(KDBVariables* dbv, int method, Sample* smpl, char* pattern)
     std::string pattern_str = (pattern != NULL) ? std::string(pattern) : std::string("*");
     if(pattern_str.empty())
         pattern_str = "*";
-    std::set<std::string> var_list = dbv->filter_names(pattern);
+    std::set<std::string> var_list = dbv.filter_names(pattern);
 
     int i, t;
     double* val;
     for(const std::string& name : var_list) 
     {
-        val = dbv->get_var_ptr(name);
+        val = dbv.get_var_ptr(name);
         for(i = 0, t = bt; i < smpl->nb_periods; i++, t++)
             KV_init_values_1(val, t, method);
     }
@@ -527,8 +539,8 @@ KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char *pattern, char *f
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
     KDBVariables* ndbv = nullptr;
-
     KDBVariables* edbv = nullptr;
+
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
     else
@@ -674,7 +686,7 @@ Variable KDBVariables::get(const std::string& name) const
 	int nb_obs = get_nb_periods();
 	vars.reserve(nb_obs);
 	for (int i=0; i < nb_obs; i++) 
-		vars.push_back(KV_get(const_cast<KDBVariables*>(this), name, i, 0));
+		vars.push_back(KV_get(*this, name, i, 0));
 	return vars;
 }
 
@@ -704,7 +716,7 @@ double KDBVariables::get_var(const std::string& name, const int t, const IodeVar
         throw std::invalid_argument(error_msg);
     }
 
-    return KV_get(const_cast<KDBVariables*>(this), name, t, mode);
+    return KV_get(*this, name, t, mode);
 }
 
 double KDBVariables::get_var(const std::string& name, const std::string& period, const IodeVarMode mode) const
@@ -744,7 +756,7 @@ void KDBVariables::set_var(const std::string& name, const int t, const double va
         throw std::invalid_argument(error_msg);
     }
 
-	KV_set(this, name, t, mode, value);
+	KV_set(*this, name, t, mode, value);
 }
 
 void KDBVariables::set_var(const std::string& name, const std::string& period, const double value, const IodeVarMode mode)
@@ -972,7 +984,7 @@ void KDBVariables::set_sample(const Period& from, const Period& to)
 	if(this->is_subset_database())
 		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
 
-	int res = KV_sample(this, &new_sample);
+	int res = KV_sample(*this, &new_sample);
 	if (res < 0) 
 	{
 		std::string error_msg = "Cannot set sample -> invalid \"from_period\" or \"to_period\" argument\n";
@@ -1059,7 +1071,7 @@ void KDBVariables::merge_from(const std::string& input_file)
         this->filepath = from.filepath;
     }
 
-    KV_merge_del(this, &from, 1);
+    KV_merge_del(*this, from, 1);
 }
 
 bool KDBVariables::copy_from_file(const std::string& file, const std::string& objs_names, 
@@ -1083,7 +1095,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
         return false;
     }
 
-    int rc = KV_sample((KDBVariables*) &from, &merge_sample);
+    int rc = KV_sample(from, &merge_sample);
     if(rc < 0) 
         return false;
 
@@ -1117,7 +1129,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
     kmsg(msg.c_str());
 
-    rc = KV_merge((KDBVariables*) this, (KDBVariables*) &from, 1);
+    rc = KV_merge(*this, from, 1);
     if(rc < 0) 
         return false;
 
@@ -1185,7 +1197,7 @@ void KDBVariables::extrapolate(const VariablesInitialization method, const std::
 	if(pattern.empty())
 		pattern = "*";
 	
-	int res = KV_extrapolate(this, (int) method, &sample, (char*) pattern.c_str());
+	int res = KV_extrapolate(*this, (int) method, &sample, (char*) pattern.c_str());
 
 	if (res < 0)
 	{

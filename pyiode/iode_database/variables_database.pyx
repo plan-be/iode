@@ -250,7 +250,7 @@ cdef class Variables(CythonIodeDatabase):
         if isinstance(key_periods, Period):
             t = self._get_real_period_position(key_periods)
             if isinstance(values, float):
-                KV_set(self.database_ptr, c_name, t, self.mode_, <double>values)
+                KV_set(dereference(self.database_ptr), c_name, t, self.mode_, <double>values)
             # values is a LEC expression
             elif isinstance(values, str):
                 self.database_ptr.update(c_name, <string>values.encode(), t, t) 
@@ -272,7 +272,7 @@ cdef class Variables(CythonIodeDatabase):
             # set same value for all periods in the range
             if isinstance(values, float):
                 for t in range(t_first, t_last + 1): 
-                    KV_set(self.database_ptr, c_name, t, self.mode_, <double>values)  
+                    KV_set(dereference(self.database_ptr), c_name, t, self.mode_, <double>values)  
             # values is a LEC expression
             elif isinstance(values, str):
                 self.database_ptr.update(c_name, <string>values.encode(), t_first, t_last) 
@@ -290,14 +290,14 @@ cdef class Variables(CythonIodeDatabase):
             # assume values is an iterable
             else:
                 for i, t in enumerate(range(t_first, t_last + 1)):
-                    KV_set(self.database_ptr, c_name, t, self.mode_, <double>(values[i]))
+                    KV_set(dereference(self.database_ptr), c_name, t, self.mode_, <double>(values[i]))
         # update values for a list of periods
         elif isinstance(key_periods, list):
             if not all(isinstance(p, Period) for p in key_periods):
                 raise TypeError("key_periods must be a list of Cython Period objects")             
             for p, v in zip(key_periods, values):
                 t = self._get_real_period_position(p)
-                KV_set(self.database_ptr, c_name, t, self.mode_, <double>v)
+                KV_set(dereference(self.database_ptr), c_name, t, self.mode_, <double>v)
 
     def binary_op_scalar(self, other: float, op: BinaryOperation, copy_self: bool) -> Variables:
         cdef int i_op = int(op)
@@ -375,7 +375,7 @@ cdef class Variables(CythonIodeDatabase):
             b_name = name.encode()
             c_name = b_name
             # add a new variable with all values set to IODE_NAN
-            var_pos = KV_add(self.database_ptr, c_name)
+            var_pos = KV_add(dereference(self.database_ptr), c_name)
             if var_pos < 0:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
 
@@ -402,7 +402,7 @@ cdef class Variables(CythonIodeDatabase):
                     raise RuntimeError(f"Variable '{name}' not found in the IODE Variables database")
                 for j, t in enumerate(range(t_first_period, t_last_period + 1)):
                     value = data_view[i, j]
-                    KV_set(self.database_ptr, <string>b_name, t, mode, value)
+                    KV_set(dereference(self.database_ptr), <string>b_name, t, mode, value)
 
     def to_numpy(self) -> np.ndarray:
         cdef int i, t
@@ -444,7 +444,7 @@ cdef class Variables(CythonIodeDatabase):
             # WARNING: do not use enumerate() here as it does not respect the C++ set order
             for c_name in cpp_names:
                 for t in range(t_first_period, t_last_period + 1):
-                    value = KV_get(self.database_ptr, c_name, t, mode)
+                    value = KV_get(dereference(self.database_ptr), c_name, t, mode)
                     data_view[i, t - t_first_period] = value
                 i += 1
         

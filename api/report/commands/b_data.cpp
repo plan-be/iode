@@ -711,7 +711,7 @@ int B_DataUpdate(char* arg, int type)
                         var = (double) atof(args[i + nb_p]);
                         if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                             var = IODE_NAN;
-                        KV_set(global_ws_var.get(), var_name, shift + i, mode, var);
+                        KV_set(*global_ws_var, var_name, shift + i, mode, var);
                     }
                     success = true;
                 }

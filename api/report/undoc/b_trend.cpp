@@ -117,7 +117,7 @@ static int B_WsTrendAll(char* arg, int std)
         to->set(from_name, var);
     }
 
-    KV_merge(global_ws_var.get(), to, 1);
+    KV_merge(*global_ws_var, *to, 1);
 
 done:
     if(to)

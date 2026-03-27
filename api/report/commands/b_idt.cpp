@@ -133,10 +133,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     if(!kdb_var) 
         return -1;
     
-    KV_sample(kdb_var, smpl);
+    KV_sample(*kdb_var, smpl);
 
     if(global_ws_var.get()) 
-        KV_merge_del(global_ws_var.get(), kdb_var, 1);
+        KV_merge_del(*global_ws_var, *kdb_var, 1);
     else
         global_ws_var.reset(kdb_var);
 

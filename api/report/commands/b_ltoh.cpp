@@ -401,7 +401,7 @@ static int B_ltoh(int type, char* arg)
         to->set(from_name, to_var);
     }
 
-    KV_merge(global_ws_var.get(), to, 1);
+    KV_merge(*global_ws_var, *to, 1);
 
 done:
     if(to)

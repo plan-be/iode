@@ -527,7 +527,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         }
 
         for(t = 0; t < nt; t++) 
-            y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
+            y[t] = (double ) KV_get(*kdb, var_name, dt + t, mode);
 
         T_GraphLegend(0, "LSBL"[type], vars[i], NULL);
         T_GraphTimeData(smpl, y);

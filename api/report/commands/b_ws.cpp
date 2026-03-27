@@ -281,7 +281,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    if(KV_sample(global_ws_var.get(), new_smpl) < 0)
+    if(KV_sample(*global_ws_var, new_smpl) < 0)
     {
         error_manager.append_error("New sample invalid");
         goto err;
@@ -566,7 +566,7 @@ int B_WsExtrapolate(char* arg, int unused)
     }
     SCR_free_tbl((unsigned char**) args);
 
-    rc = KV_extrapolate(global_ws_var.get(), method, smpl, (char*) pattern.c_str());
+    rc = KV_extrapolate(*global_ws_var, method, smpl, (char*) pattern.c_str());
 
 done:
     if(smpl) 
@@ -602,7 +602,7 @@ int B_WsAggr(int method, char* arg)
     nkdb = KV_aggregate(kdb, method, pattern, args[1]);
     if(nkdb) 
     {
-        KV_merge_del(kdb, nkdb, 1);
+        KV_merge_del(*kdb, *nkdb, 1);
         rc = 0;
     }    
     

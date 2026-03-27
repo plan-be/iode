@@ -393,7 +393,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         if(!success) 
             return -1;
         if(smpl) 
-            KV_sample(&dbv, smpl);
+            KV_sample(dbv, smpl);
     }
 
     KDBComments dbc = new KDBComments(false);

@@ -137,7 +137,7 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
         if(smpl) 
-            KV_sample(dbv, smpl);
+            KV_sample(*dbv, smpl);
     }
 
     std::string rule_file_ = check_file_exists(rule_file, caller_name);
