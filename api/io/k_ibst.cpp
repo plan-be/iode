@@ -304,7 +304,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
     }
     as1 --;
 
-    char* name1 = (char*) C_kdb->get_name(as1).c_str();
+    char* name1 = (char*) kdb_cmt->get_name(as1).c_str();
     niv = get_niv(name1);
     if(niv < 1 || niv > 9) 
         return -1;
@@ -315,7 +315,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         r_niv = get_niv(name1);
         if(niv == r_niv) 
         {
-            std::shared_ptr<Comment> cmt_ptr = C_kdb->get_obj_ptr(name);
+            std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_obj_ptr(name);
             str = (char*) cmt_ptr->c_str();
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
@@ -326,14 +326,14 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
 
     if(as2 > 0) 
     {
-        char* name2 = (char*) C_kdb->get_name(as2).c_str();
+        char* name2 = (char*) kdb_cmt->get_name(as2).c_str();
         niv = get_niv(name2);
         while(niv > 0 && as2 >= 0 && niv + shift < 10) 
         {
             r_niv = get_niv(name2);
             if(niv == r_niv) 
             {
-                std::shared_ptr<Comment> cmt_ptr = C_kdb->get_obj_ptr(name2);
+                std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_obj_ptr(name2);
                 str = (char*) cmt_ptr->c_str();
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv --;
@@ -369,7 +369,7 @@ int ImportCommentsBST::get_niv(char* name)
 
 int ImportCommentsBST::close()
 {
-    delete C_kdb;
+    delete kdb_cmt;
     YY_close(SYY);
     YY_close(FYY);
     return 0;
