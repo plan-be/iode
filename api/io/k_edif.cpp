@@ -62,10 +62,10 @@
 #include "api/io/export.h"
 
 
-int ExportObjsDIF::write_header(KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
 {
-    int dim = dbv->sample->nb_periods;
-    int nb  = dbv->size();
+    int dim = dbv.sample->nb_periods;
+    int nb  = dbv.size();
 
     file_descriptor.open(outfile);
 
@@ -75,13 +75,13 @@ int ExportObjsDIF::write_header(KDB* dbv, KDB* dbc, char* outfile)
 
     for(int i = 0; i < dim; i++) 
     {
-        Period per = dbv->sample->start_period.shift(i);
+        Period per = dbv.sample->start_period.shift(i);
         file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
     return 0;
 }
 
-int ExportObjsDIF::close(KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsDIF::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
 {
     file_descriptor <<  "-1,0\nEOD\n";
     file_descriptor.close();
@@ -93,11 +93,11 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
     return(write_pre_post("-1,0\nBOT\n1,0\n\"", "\"\n", name, code));
 }
 
-char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
+char* ExportObjsDIF::extract_comment(const KDBComments& dbc, char* name, char **cmt)
 {
-    if(dbc->contains(name))
+    if(dbc.contains(name))
     {
-        std::shared_ptr<Comment> cmt_ptr = dbc->get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt_ptr = dbc.get_obj_ptr(name);
         Comment cmt_utf8 = *cmt_ptr;
         Comment cmt_oem = utf8_to_oem(cmt_utf8);
         return write_pre_post("1,0\n\"", "\"\n", (char*) cmt_oem.c_str(), cmt);
@@ -106,14 +106,14 @@ char* ExportObjsDIF::extract_comment(KDBComments* dbc, char* name, char **cmt)
         return write_pre_post("1,0\n\"", "\"\n", "", cmt);
 }
 
-char* ExportObjsDIF::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)
+char* ExportObjsDIF::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    std::string name = dbv->get_name(nb);
-    double* value_ptr = dbv->get_var_ptr(name, t);
-    write_value(tmp, *value_ptr);
+    std::string name = dbv.get_name(nb);
+    double value = dbv.get_var(name, t);
+    write_value(tmp, value);
     write_pre_post("0,", "\nV\n", tmp, &buf);
     lg = (int) strlen(buf) + 1;
 

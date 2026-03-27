@@ -37,43 +37,43 @@ inline char EXP_NA[11];         // string to indicate a NaN value in CSV
 
 /*---------------- CLASSES ------------------ */
 
-// struct defining output File descriptor and fn pointers for one type of data format to export
+// struct defining output File descriptor and methods for one type of data format to export
 struct ExportToFile 
 {
     std::ofstream file_descriptor;                                                                  // Output file descriptor (output of fopen)
     virtual ~ExportToFile() = default;
-    virtual int   write_header(KDB* dbv, KDB* dbc, char* outfile) { return 0; }                      // method that creates the output file and writes the header
+    virtual int   write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) { return 0; }                      // method that creates the output file and writes the header
     virtual char* write_object_name(char* name, char** code)                                       // method to create the output object name + the separator
     {
         *code = (char*) SCR_stracpy((unsigned char*) name);
         return *code;
     }
-    virtual char* extract_comment(KDBComments* dbc, char* name, char** cmt) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
-    virtual char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec){ return 0; }                           // method constructing an allocated string of one value + sep
+    virtual char* extract_comment(const KDBComments& dbc, char* name, char** cmt) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
+    virtual char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) { return 0; }                           // method constructing an allocated string of one value + sep
     virtual int   write_variable_and_comment(char* code, char* cmt, char* vec) { return 0; }      // method saving the VAR and CMT in the output file
-    virtual int   close(KDB* dbv, KDB* dbc, char* outfile) { return 0; }                             // method that closes the output file after having written its footer
+    virtual int   close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) { return 0; }                             // method that closes the output file after having written its footer
 };
 
 /* k_ecsv.c */
 struct ExportObjsCSV : public ExportToFile
 {
-    int write_header(KDB* dbv, KDB* dbc, char* outfile) override;
+    int write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* extract_comment(KDBComments* dbc, char* name, char** cmt) override;
-    char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec) override;
+    char* extract_comment(const KDBComments& dbc, char* name, char** cmt) override;
+    char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
-    int close(KDB* dbv, KDB* dbc, char* outfile) override;
+    int close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
 };
 
 /* k_edif.c */
 struct ExportObjsDIF : public ExportToFile
 {
-    int write_header(KDB* dbv, KDB* dbc, char* outfile) override;
+    int write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* extract_comment(KDBComments* dbc, char* name, char** cmt) override;
-    char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec) override;
+    char* extract_comment(const KDBComments& dbc, char* name, char** cmt) override;
+    char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
-    int close(KDB* dbv, KDB* dbc, char* outfile) override;
+    int close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
 };
 
 /* k_ewks.c */
@@ -83,33 +83,33 @@ class ExportObjsWKS : public ExportToFile
     int WKS_ROW = 1;
     
 public:
-    int write_header(KDB* dbv, KDB* dbc, char* outfile) override;
+    int write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* extract_comment(KDBComments* dbc, char* name, char** cmt) override;
-    char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec) override;
+    char* extract_comment(const KDBComments& dbc, char* name, char** cmt) override;
+    char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
-    int close(KDB* dbv, KDB* dbc, char* outfile) override;
+    int close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
 };
 
 /* k_etsp.c */
 struct ExportObjsTSP : public ExportToFile
 {
-    int write_header(KDB* dbv, KDB* dbc, char* outfile) override;
+    int write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* extract_comment(KDBComments* dbc, char* name, char** cmt) override;
-    char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec) override;
+    char* extract_comment(const KDBComments& dbc, char* name, char** cmt) override;
+    char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
-    int close(KDB* dbv, KDB* dbc, char* outfile) override;
+    int close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
 };
 
 /* k_ecsv.c */
 struct ExportObjsRevertCSV : public ExportToFile
 {
-    int write_header(KDB* dbv, KDB* dbc, char* outfile) override;
+    int write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* get_variable_value(KDBVariables* dbv, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
-    int close(KDB* dbv, KDB* dbc, char* outfile) override;
+    int close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile) override;
 };
 
 inline std::array<std::unique_ptr<ExportToFile>, IODE_NB_EXPORT_FORMATS> export_handlers = 
@@ -124,12 +124,11 @@ inline std::array<std::unique_ptr<ExportToFile>, IODE_NB_EXPORT_FORMATS> export_
 /*---------------- FUNCS ------------------ */
 
 /* k_emain.c */
-//void EXP_set(char *,char *);
 void write_value(char* tmp, double val);
 char *write_pre_post(char* pre, char* post, char* src, char** tg);
 char *write_separator(char* src, char** tg);
-int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
-int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, KDBVariables* dbv, KDBComments* dbc, char* rulefile, char* outfile, char* na, char* sep);
+int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv, const KDBComments& dbc, char* rulefile, char* outfile, char* na, char* sep);
+int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv, const KDBComments& dbc, char* rulefile, char* outfile, char* na, char* sep);
 int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt);
 
 /* k_wks.c */

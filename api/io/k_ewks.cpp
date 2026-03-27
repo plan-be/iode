@@ -24,13 +24,13 @@
 #include "api/io/export.h"
 
 
-int ExportObjsWKS:: write_header(KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS:: write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
 {
     int dim, nb, i;
 
     WKS_COL = 1, WKS_ROW = 1;
-    dim = dbv->sample->nb_periods;
-    nb = dbv->size();
+    dim = dbv.sample->nb_periods;
+    nb = dbv.size();
 
     wks_init(outfile, dim + 2, nb + 1);
     wks_cwidth(2, 20);
@@ -38,7 +38,7 @@ int ExportObjsWKS:: write_header(KDB* dbv, KDB* dbc, char* outfile)
     std::string period_str;
     for(i = 0, WKS_COL = 3; i < dim; i++, WKS_COL++)
     {
-        Period period = dbv->sample->start_period.shift(i);
+        Period period = dbv.sample->start_period.shift(i);
         period_str = period.to_string();
         wks_string((char*) period_str.c_str(), WKS_COL, WKS_ROW);
     }
@@ -47,7 +47,7 @@ int ExportObjsWKS:: write_header(KDB* dbv, KDB* dbc, char* outfile)
     return 0;
 }
 
-int ExportObjsWKS::close(KDB* dbv, KDB* dbc, char* outfile)
+int ExportObjsWKS::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
 {
     wks_end();
     return 0;
@@ -61,11 +61,11 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
     return(*code);
 }
 
-char* ExportObjsWKS::extract_comment(KDBComments* dbc, char* name, char** cmt)
+char* ExportObjsWKS::extract_comment(const KDBComments& dbc, char* name, char** cmt)
 {
-    if(dbc->contains(name))
+    if(dbc.contains(name))
     {
-        std::shared_ptr<Comment> cmt_ptr = dbc->get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt_ptr = dbc.get_obj_ptr(name);
         Comment cmt_utf8 = *cmt_ptr;
         Comment cmt_oem = utf8_to_oem(cmt_utf8);
         wks_string((char*) cmt_oem.c_str(), WKS_COL, WKS_ROW);
@@ -78,14 +78,14 @@ char* ExportObjsWKS::extract_comment(KDBComments* dbc, char* name, char** cmt)
     return *cmt;
 }
 
-char* ExportObjsWKS::get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)
+char* ExportObjsWKS::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
 {
     char* buf = NULL;
 
-    std::string name = dbv->get_name(nb);
-    double* value_ptr = dbv->get_var_ptr(name, t);
-    wks_value(*value_ptr, WKS_COL, WKS_ROW);
-    WKS_COL ++;
+    std::string name = dbv.get_name(nb);
+    double value = dbv.get_var(name, t);
+    wks_value(value, WKS_COL, WKS_ROW);
+    WKS_COL++;
 
     return(*vec = NULL);
 }
