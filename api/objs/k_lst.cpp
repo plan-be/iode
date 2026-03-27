@@ -34,39 +34,32 @@
  *  @return     int        
  *  
  */
-int K_scan(KDB* kdb, char* l_var, char* l_scal)
+int K_scan(const KDB& kdb, char* l_var, char* l_scal)
 {
-    if(kdb == nullptr || kdb->size() == 0) 
+    if(kdb.size() == 0) 
     {
         std::string error_msg = "scan : '";
-        error_msg += v_iode_types[kdb->k_type];
+        error_msg += v_iode_types[kdb.k_type];
         error_msg += "' database is empty";
         error_manager.append_error(error_msg);
         return -1;
     }
 
-    KDBVariables* exo = new KDBVariables(false);
-    KDBScalars* scal = new KDBScalars(false);
+    KDBVariables exo(false);
+    KDBScalars scal(false);
 
-    if(exo == nullptr || scal == nullptr) 
+    for(int i = 0; i < kdb.size(); i++) 
     {
-        if(scal) delete scal;
-        if(exo)  delete exo;
-        return -1;
-    }
-
-    for(int i = 0; i < kdb->size(); i++) 
-    {
-        switch(kdb->k_type) 
+        switch(kdb.k_type) 
         {
             case IDENTITIES :
-                KI_scan((KDBIdentities*) kdb, i, exo, scal);
+                KI_scan(kdb, i, exo, scal);
                 break;
             case EQUATIONS :
-                KE_scan((KDBEquations*) kdb, i, exo, scal);
+                KE_scan(kdb, i, exo, scal);
                 break;
             case TABLES :
-                KT_scan((KDBTables*) kdb, i, exo, scal);
+                KT_scan(kdb, i, exo, scal);
                 break;
         }
     }
@@ -75,18 +68,16 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
     char** c_lst;
     std::vector<std::string> lst;
 
-    lst = scal->grep("*", true, true, false, false, '*');
+    lst = scal.grep("*", true, true, false, false, '*');
     c_lst = vector_to_double_char(lst);
     rc =  KL_lst(l_scal, c_lst, 200);
     SCR_free_tbl((unsigned char**) c_lst);
 
-    lst = exo->grep("*", true, true, false, false, '*');
+    lst = exo.grep("*", true, true, false, false, '*');
     c_lst = vector_to_double_char(lst);
     rc = KL_lst(l_var, c_lst, 200);
     SCR_free_tbl((unsigned char**) c_lst);
 
-    delete scal;
-    delete exo;
     return 0;
 }
 
@@ -106,7 +97,7 @@ int K_scan(KDB* kdb, char* l_var, char* l_scal)
  *  
  *  @details 
  */
-static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
+static void K_clecscan(const KDB& kdb, CLEC* cl, KDBVariables& exo, KDBScalars& scal)
 {
     if(cl == NULL) 
         return;
@@ -120,14 +111,14 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
         if(is_coefficient(name))
             // add dummy value for the scalar. The value is not relevant 
             // as only the name will be used in the list of scalars.
-            scal->set(name, Scalar());
+            scal.set(name, Scalar());
         else 
         {
-            if(kdb != nullptr && kdb->contains(name)) 
+            if(kdb.contains(name)) 
                 continue;
             // add dummy value for the variable. The value is not relevant 
             // as only the name will be used in the list of variables.
-            exo->set(name, Variable());
+            exo.set(name, Variable());
         }
     }
 }
@@ -144,10 +135,10 @@ static void K_clecscan(KDB* kdb, CLEC* cl, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
+void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal)
 {
-    std::string name = dbe->get_name(i);
-    std::shared_ptr<Equation> eq = dbe->get_obj_ptr(name);
+    std::string name = dbe.get_name(i);
+    std::shared_ptr<Equation> eq = reinterpret_cast<const KDBEquations&>(dbe).get_obj_ptr(name);
     CLEC* cl = eq->clec;
     K_clecscan(dbe, cl, exo, scal);
 }
@@ -165,10 +156,10 @@ void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
+void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal)
 {
-    std::string name = dbi->get_name(i);
-    std::shared_ptr<Identity> idt = dbi->get_obj_ptr(name);
+    std::string name = dbi.get_name(i);
+    std::shared_ptr<Identity> idt = reinterpret_cast<const KDBIdentities&>(dbi).get_obj_ptr(name);
     CLEC* cl_idt = idt->get_compiled_lec();
 
     int lg = cl_idt->tot_lg;
@@ -192,12 +183,13 @@ void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal)
  *  @return          void
  *  
  */
-void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
+void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal)
 {
-    std::string name = dbt->get_name(i);
-    std::shared_ptr<Table> tbl = dbt->get_obj_ptr(name);
+    std::string name = dbt.get_name(i);
+    std::shared_ptr<Table> tbl = reinterpret_cast<const KDBTables&>(dbt).get_obj_ptr(name);
 
     CLEC* clec = NULL;
+    KDBTables kdb_empty(false);
     for(int k = 0; k < T_NL(tbl); k++)   
     {
         if(tbl->lines[k].get_type() != TABLE_LINE_CELL) 
@@ -209,7 +201,7 @@ void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal)
                 continue;
 
             clec = cell.get_compiled_lec();
-            K_clecscan(nullptr, clec, exo, scal);
+            K_clecscan(kdb_empty, clec, exo, scal);
         }
     }
 }
