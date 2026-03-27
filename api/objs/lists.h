@@ -84,9 +84,9 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
 }
 
 /* k_lst.c */
-int K_scan(KDB* kdb, char* l_var, char* l_scal);
-void KE_scan(KDBEquations* dbe, int i, KDBVariables* exo, KDBScalars* scal);
-void KI_scan(KDBIdentities* dbi, int i, KDBVariables* exo, KDBScalars* scal);
-void KT_scan(KDBTables* dbt, int i, KDBVariables* exo, KDBScalars* scal);
+int K_scan(const KDB& kdb, char* l_var, char* l_scal);
+void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal);
+void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal);
+void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal);
 int KL_lst(char* name, char** lst, int chunck);
 unsigned char **KL_expand(char* str);

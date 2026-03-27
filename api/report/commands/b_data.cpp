@@ -983,7 +983,7 @@ int template_data_scan(const int type, const std::string& objs, const std::strin
         if(kdb.size() == 0)
             return -1;
         
-        int rc = K_scan(&kdb, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
+        int rc = K_scan(kdb, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
         return rc;
     }
     catch (const std::runtime_error& e) 
@@ -1023,7 +1023,7 @@ int B_DataScan(char* arg, int type)
         try
         {
             KDB& kdb = get_global_db(type);
-            rc = K_scan(&kdb, "_EXO", "_SCAL");
+            rc = K_scan(kdb, "_EXO", "_SCAL");
         }
         catch (const std::runtime_error& e) 
         {
@@ -1039,7 +1039,7 @@ int B_DataScan(char* arg, int type)
             try
             {
                 KDB& kdb = get_global_db(type);
-                rc = K_scan(&kdb, "_EXO", "_SCAL");
+                rc = K_scan(kdb, "_EXO", "_SCAL");
             }
             catch (const std::runtime_error& e) 
             {
