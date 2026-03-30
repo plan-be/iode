@@ -38,8 +38,6 @@
  *  @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
  *  @return                  KDB*    new KDB of IDT or NULL on error
  *  
- *  TODO: what if KC_read_cmt returns an error code ?
- *  
  */
 bool KDBIdentities::load_asc(const std::string& filename)
 {
