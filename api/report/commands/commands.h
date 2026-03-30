@@ -80,7 +80,7 @@ int B_ModelSimulate(char* arg, int unused=-1);
 int B_ModelSimulateParms(char* arg, int unused=-1);
 int B_ModelExchange(char* arg, int unused=-1);
 int B_ModelCompile(char* arg, int unused=-1);
-int KE_compile(KDBEquations* dbe);
+int KE_compile(KDBEquations& dbe);
 int B_ModelCalcSCC(char* arg, int unused=-1);
 int B_ModelSimulateSCC(char* arg, int unused=-1);
 int B_ModelSimulateSaveNIters(char* arg, int unused=-1);
