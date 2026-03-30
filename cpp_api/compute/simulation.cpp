@@ -52,20 +52,19 @@ bool Simulation::model_compile(const std::string& list_eqs)
 
     // EndoExo whole WS
     if(list_eqs.empty()) 
-        rc = KE_compile(global_ws_eqs.get());
+        rc = KE_compile(*global_ws_eqs);
     else 
     {        
         // EndoExo whole WS
         if(list_eqs.empty()) 
-            rc = KE_compile(global_ws_eqs.get());
+            rc = KE_compile(*global_ws_eqs);
         else 
         {
             try
             {
-                KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
-                if(tdbe->size() > 0)
+                KDBEquations tdbe(global_ws_eqs.get(), list_eqs, false);
+                if(tdbe.size() > 0)
                     rc = KE_compile(tdbe);
-                delete tdbe;
             }
             catch(const std::exception& e)
             {

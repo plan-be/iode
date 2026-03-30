@@ -10,7 +10,7 @@
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
  *      int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
  *      int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
- *      int KE_compile(KDBEquations* dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
+ *      int KE_compile(KDBEquations& dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
  *      int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
@@ -199,16 +199,16 @@ int B_ModelExchange(char* const_arg, int unused)
  *  @param [in, out] KDB*   dbe     KDB of equations to recompile
  *  @return          int            0 on success, -1 of dbe is null or empty
  */
-int KE_compile(KDBEquations* dbe)
+int KE_compile(KDBEquations& dbe)
 {
-    if(dbe == nullptr || dbe->size() == 0) 
+    if(dbe.size() == 0) 
     {
         error_manager.append_error("Empty set of equations");
         return -1;
     }
 
     // recompile all CLEC of the equations in the KDB
-    for(const auto& [name, eq] : dbe->k_objs)
+    for(const auto& [name, eq] : dbe.k_objs)
         eq->set_lec(eq->lec);
     
     return 0;
@@ -226,21 +226,17 @@ int B_ModelCompile(char* arg, int unused)
 
     /* EndoExo whole WS */
     if(arg == NULL || arg[0] == 0) 
-        rc = KE_compile(global_ws_eqs.get());
+        rc = KE_compile(*global_ws_eqs);
     else 
     {
         std::string eqs = std::string(arg);
         if(eqs.empty())
-            rc = KE_compile(global_ws_eqs.get());
+            rc = KE_compile(*global_ws_eqs);
         else 
         {
-            KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
-            if(tdbe)
-            {
-                if(tdbe->size() > 0)
-                    rc = KE_compile(tdbe);
-                delete tdbe;
-            }
+            KDBEquations tdbe(global_ws_eqs.get(), eqs, false);
+            if(tdbe.size() > 0)
+                rc = KE_compile(tdbe);
         }
     }
 
