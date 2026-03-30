@@ -90,8 +90,6 @@ static int read_scl(KDBScalars* kdb, YYFILE* yy, char* name)
  *  @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
  *  @return                  KDB*    new KDB of Scalar or NULL on error
  *  
- *  TODO: what if read_cmt returns an error code ?
- *  
  */
 bool KDBScalars::load_asc(const std::string& filename)
 {
