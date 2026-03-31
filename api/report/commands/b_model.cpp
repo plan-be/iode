@@ -44,27 +44,34 @@
  */
 static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
 {
-    int nb_eqs = 0;
-    std::string eqs;
+    std::string s_eqs;
+    std::vector<std::string> v_eqs;
     if(c_eqs != NULL) 
     {
         int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-        for(int i = 0; i < nb_eqs; i++) 
-            eqs += std::string(c_eqs[i]) + std::string(";");
+        v_eqs.reserve(nb_eqs);
+
+        std::string eq_name;
+        for(int i = 0; i < nb_eqs; i++)
+        {
+            eq_name = std::string(c_eqs[i]);
+            v_eqs.push_back(eq_name);
+            s_eqs += eq_name + ";";
+        } 
     }
 
     int rc = -1;
     CSimulation simu;
-    if(nb_eqs == 0)
-        rc = simu.simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
+    if(v_eqs.size() == 0)
+        rc = simu.simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO);
     else 
     {
-        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), s_eqs, false);
         if(tdbe)
         {
             if(tdbe->size() > 0)
                 rc = simu.simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
-                                  CSimulation::KSIM_EXO, c_eqs);
+                                  CSimulation::KSIM_EXO, v_eqs);
             delete tdbe;
         }
     }

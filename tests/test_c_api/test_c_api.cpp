@@ -1138,7 +1138,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Test simulation : divergence
     CSimulation::KSIM_MAXIT = 2;
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL);
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
@@ -1155,7 +1155,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL, NULL);
+    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL);
     EXPECT_EQ(rc, 0);
 
     // Test Endo-exo
@@ -1168,7 +1168,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Simulate with exchange UY - XNATY
     endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, (char**)endo_exo, NULL);
+    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, (char**) endo_exo);
 
     // Check result
     EXPECT_EQ(rc, 0);

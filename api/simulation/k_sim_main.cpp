@@ -544,7 +544,7 @@ int CSimulation::sub_simulate(int t)
  *
  */
 int CSimulation::simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
-    Sample* smpl, char** endo_exo, char** eqs)
+    Sample* smpl, char** endo_exo, const std::vector<std::string>& eqs)
 {
     int     i, t, bt, at, j, k, res, endo_exonb,
             posendo, posexo, posvar,

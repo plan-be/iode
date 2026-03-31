@@ -261,7 +261,7 @@ int CSimulation::pre_order(KDBEquations* dbe, int** predecessors, int** successo
  *  @global [out]   int  KSIM_POST   number of equations in the "epilog"
  *  
  */
-void CSimulation::order(KDBEquations* dbe, char** eqs)
+void CSimulation::order(KDBEquations* dbe, const std::vector<std::string>& eqs)
 {
     int     **predecessors, **successors, *tmp2, i, k, nb;
     long    cpu_order = 0; 
@@ -277,12 +277,12 @@ void CSimulation::order(KDBEquations* dbe, char** eqs)
         KSIM_PRE = KSIM_POST = 0;
         KSIM_INTER = nb;
         KSIM_ORDER = (int *) SW_nalloc(sizeof(int) * nb);
-        if(eqs == 0)
+        if(eqs.size() == 0)
             for(i = 0; i < KSIM_INTER; i++) 
                 KSIM_ORDER[i] = i;
         else
             for(i = 0; i < KSIM_INTER; i++) 
-                KSIM_ORDER[i] = dbe->index_of(std::string(eqs[i]));
+                KSIM_ORDER[i] = dbe->index_of(eqs[i]);
         return;
     }
 

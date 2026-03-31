@@ -82,7 +82,7 @@ int CSimulation::calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* int
     }
 
     /* ORDERING EQUATIONS */
-    order(dbe, NULL);
+    order(dbe);
     build_lists_order(pre, inter, post);
 
     SW_nfree(KSIM_POSXK);
