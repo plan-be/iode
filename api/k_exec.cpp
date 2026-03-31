@@ -590,30 +590,30 @@ static int KI_read_vars(const KDBIdentities& dbi, KDBVariables* dbv, KDBVariable
 /**
  *  Copies from the KDB dbs_tmp the unallocated Scalars of dbs (i.e. the Scalar with no associated object).
  *  
- *  @param [in] KDB*    dbs         KDB of Scalars to read
+ *  @param [out] KDB*   dbs         KDB of Scalars to read
  *  @param [in] KDB*    dbs_tmp     temporary KDB (read from an external file) where the needed Scalars must be copied from
  *  @param [in] char*   source_name name of the input source (WS or filename)
  *  @return     int                 nb of Scalars copied
  *                                  -3 if there is no common sample between dbv_tmp and dbv
  */
-static int KI_read_scls_db(KDBScalars* dbs, KDBScalars* dbs_tmp, char* source_name)
+static int KI_read_scls_db(KDBScalars& dbs, const KDBScalars& dbs_tmp, char* source_name)
 {
     if(KEXEC_TRACE) 
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
     
     int nb_found = 0;
-    for(const std::string& name : dbs->get_names()) 
+    for(const std::string& name : dbs.get_names()) 
     {
         // scalar already loaded in dbs
-        if(dbs->contains(name)) 
+        if(dbs.contains(name)) 
             continue;
 
         // scalar not present in dbs_tmp
-        if(!dbs_tmp->contains(name)) 
+        if(!dbs_tmp.contains(name)) 
             continue;
         
         // copy the scalar from dbs_tmp to dbs
-        dbs->copy_obj_from(*dbs_tmp, name, name);
+        dbs.copy_obj_from(dbs_tmp, name, name);
 
         if(KEXEC_TRACE) 
             W_printf((char*) "%s ", name.c_str());
@@ -629,19 +629,19 @@ static int KI_read_scls_db(KDBScalars* dbs, KDBScalars* dbs_tmp, char* source_na
 /**
  *  Tries to read in file the unallocated Scalars of dbs (i.e. the Scalars with no associated object).
  *  
- *  @param [in] KDB*    dbs     KDB of all needed Scalars for calculating the identities
+ *  @param [out] KDB*   dbs     KDB of all needed Scalars for calculating the identities
  *  @param [in] char*   file    name of a Scalar file
  *  @return     int             nb of Scalars read 
  *                              -1 if the file cannot be opened
  *  
  */
-static int KI_read_scls_file(KDBScalars* dbs, char* file)
+static int KI_read_scls_file(KDBScalars& dbs, char* file)
 {
     char    **scls = NULL;
     int     nbs = 0, nbf;
 
     std::set<std::string> scls_to_read;
-    for(const auto& [name, scl_ptr] : dbs->k_objs) 
+    for(const auto& [name, scl_ptr] : dbs.k_objs) 
     {
         // scalar already present
         if(scl_ptr) 
@@ -654,8 +654,8 @@ static int KI_read_scls_file(KDBScalars* dbs, char* file)
     if(scls_to_read.size() == 0)
         return 0;
 
-    KDBScalars* kdb = new KDBScalars(false);
-    bool success = kdb->load(std::string(file));
+    KDBScalars kdb_tmp(false);
+    bool success = kdb_tmp.load(std::string(file));
     if(!success) 
     {
         std::string msg = "Scalar file '" + std::string(file) + "' not found";
@@ -663,10 +663,7 @@ static int KI_read_scls_file(KDBScalars* dbs, char* file)
         return -1;
     }
 
-    nbf = KI_read_scls_db(dbs, kdb, file);
-    delete kdb;
-    kdb = nullptr;
-
+    nbf = KI_read_scls_db(dbs, kdb_tmp, file);
     return nbf;
 }
 
@@ -675,7 +672,7 @@ static int KI_read_scls_file(KDBScalars* dbs, char* file)
  *  Reads, from a list of files, the Scalars needed to compute identities. 
  *  For the Scalars to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
  *  
- *  @param [in] KDB*    dbs         Scalars to be read
+ *  @param [out] KDB*   dbs         Scalars to be read
  *  @param [in] KDB*    dbs_ws      current Scalar KDB (global_ws_scl)
  *  @param [in] int     nb          Number of Scalar input files
  *  @param [in] char*   files[]     list of input Scalar files, including "WS" for the current KDB of Scalars 
@@ -685,7 +682,7 @@ static int KI_read_scls_file(KDBScalars* dbs, char* file)
  *                                  -2 if some Scalars were not found in the files
  */
 
-static int KI_read_scls(KDBScalars* dbs, KDBScalars* dbs_ws, int nb, char* files[])
+static int KI_read_scls(KDBScalars& dbs, const KDBScalars& dbs_ws, int nb, char* files[])
 {
     int nbf;
     int nb_found = 0;
@@ -698,7 +695,7 @@ static int KI_read_scls(KDBScalars* dbs, KDBScalars* dbs_ws, int nb, char* files
     }
     else 
     {
-        for(int i = 0;  i < nb && nb_found < dbs->size(); i++) 
+        for(int i = 0;  i < nb && nb_found < dbs.size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 nbf = KI_read_scls_db(dbs, dbs_ws, "WS");
@@ -712,9 +709,9 @@ static int KI_read_scls(KDBScalars* dbs, KDBScalars* dbs_ws, int nb, char* files
     }
 
     int j = 0;
-    if(nb_found < dbs->size()) 
+    if(nb_found < dbs.size()) 
     {
-        for(const auto& [name, scl_ptr] : dbs->k_objs) 
+        for(const auto& [name, scl_ptr] : dbs.k_objs) 
         {
             if(j > 10)
                 break;
@@ -752,7 +749,7 @@ static int KI_read_scls(KDBScalars* dbs, KDBScalars* dbs_ws, int nb, char* files
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities& dbi, 
+static int KI_execute(KDBVariables* dbv, KDBScalars& dbs, KDBIdentities& dbi, 
     int* order, Sample* smpl)
 {
     int     tot_lg, start;
@@ -772,12 +769,12 @@ static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities& dbi,
         tot_lg = idt_clec->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, idt_clec, tot_lg);
-        if(L_link(dbv, dbs, (CLEC *)tmp)) 
+        if(L_link(dbv, &dbs, (CLEC *)tmp)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(dbv, dbs, (CLEC *)tmp, t);
+            d = L_exec(dbv, &dbs, (CLEC *)tmp, t);
             dbv->get_var_ptr(idt_name)[t] = d;
         }
         SW_nfree(tmp);
@@ -803,7 +800,7 @@ static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities& dbi,
  *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfiles[], KDBScalars* dbs, 
+KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfiles[], KDBScalars& dbs, 
     int ns, char* sfiles[], Sample* in_smpl)
 {
     int* order;
@@ -888,7 +885,7 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfile
     KDBScalars* dbs_i = KI_scalar_list(dbi);
     if(KEXEC_TRACE) 
         W_printf((char*) ".par1 tit_1\nScalars loaded\n");
-    res = KI_read_scls(dbs_i, dbs, ns, sfiles);
+    res = KI_read_scls(*dbs_i, dbs, ns, sfiles);
     if(res != 0) 
     {
         SW_nfree(order);
@@ -903,7 +900,7 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfile
     if(KEXEC_TRACE) 
         W_flush();
 
-    KI_execute(dbv_i, dbs_i, dbi, order, exec_sample);
+    KI_execute(dbv_i, *dbs_i, dbi, order, exec_sample);
     KI_quick_extract(dbv_i, dbi);
     SW_nfree(order);
     delete dbs_i;
