@@ -8,14 +8,8 @@
  *  is then saved in IODE lists. 
  *  
  *  The simulation can later be run multiple times without having to reorder the model for each simulation.
- *   
- *  List of functions 
- *  -----------------
- *  
- *   int calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
- *   int simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
- *
  */
+
 #include "api/constants.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"

@@ -76,16 +76,8 @@
  *  If lambda == 1, there is no damping.
  *  
  *  The solution is reached when the difference between 2 iterations is under a defined threshold for each endogenous {y1...yn}.
- *  
- *   
- * 
- * List of functions 
- * -----------------
- *
- *      int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
- *      void clear()                                             Frees all temporary allocated memory for the simulation.
- *      double calculate_CLEC(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
+
 #include "api/constants.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
