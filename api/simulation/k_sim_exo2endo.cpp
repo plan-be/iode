@@ -7,7 +7,7 @@
  *  List of functions 
  *  -----------------
  *  
- *      int KE_exo2endo(int posendo, int posexo)  Modify the model to solve it with respect to another set of variables
+ *      int exo_to_endo(int posendo, int posexo)  Modify the model to solve it with respect to another set of variables
  *
  *
  *  Exchanges Endo-Exo
@@ -79,7 +79,7 @@
  *  TODO: check that eclec is freed
  *  
  */
-int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
+int CSimulation::find_path(int posendo, int posexo, int* depth)
 {
     int j, poseq, posseq, posvar, rc = -1;
 
@@ -91,7 +91,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
     // Endo and exo are in same equation 
     // => replace the endo var position in KSIM_POSXK by the exo var position 
     std::string coef_name, eq_name;
-    poseq = KE_poseq(posendo);
+    poseq = get_eq_position(posendo);
     eq_name = KSIM_DBV->get_name(posendo);
     eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
     CLEC* clec = eq_ptr->clec;
@@ -121,7 +121,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
         coef_name = std::string(clec->lnames[j].name);
         if(is_coefficient(coef_name)) 
             continue;
-        posseq = KE_poseq((clec->lnames[j]).pos);
+        posseq = get_eq_position((clec->lnames[j]).pos);
 
         /* if same endo, variable exo or endo already exchanged continue */
         if(poseq == posseq || posseq < 0) 
@@ -134,7 +134,7 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
             KSIM_PATH[posseq] = 1;
 
         (*depth) ++;
-        rc = KE_findpath((clec->lnames[j]).pos, posexo, depth);
+        rc = find_path((clec->lnames[j]).pos, posexo, depth);
         // If not found, try the next variable in clec
         if(rc < 0) 
         {
@@ -180,12 +180,12 @@ int CSimulation::KE_findpath(int posendo, int posexo, int* depth)
  *                                      path between endo and exo inexistent 
  *  
  */
-int CSimulation::KE_exo2endo(int posendo, int posexo)
+int CSimulation::exo_to_endo(int posendo, int posexo)
 {
     int endo, exo;
     int depth = 0;
 
-    endo = KE_poseq(posendo);
+    endo = get_eq_position(posendo);
     if(endo < 0) 
     {
         std::string error_msg = "Goal Seeking: ";
@@ -195,7 +195,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
         return -1;
     }
 
-    exo = KE_poseq(posexo);
+    exo = get_eq_position(posexo);
     if(exo >= 0) 
     {
         std::string error_msg = "Goal Seeking: ";
@@ -207,7 +207,7 @@ int CSimulation::KE_exo2endo(int posendo, int posexo)
 
     /* check if exo in equation */
     memset(KSIM_PATH, 0, KSIM_MAXDEPTH);
-    exo = KE_findpath(posendo, posexo, &depth);
+    exo = find_path(posendo, posexo, &depth);
     if(exo < 0) 
     {
         std::string error_msg = "Goal Seeking: ";

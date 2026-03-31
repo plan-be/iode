@@ -40,7 +40,7 @@
  *  
  *  @param [in] Sample* smpl    simulation Sample
  *  @param [in] char**  eqs     NULL or list of equations defining the model 
- *  @return     int             0 on success, return code of K_simul() on error.    
+ *  @return     int             0 on success, return code of simulate() on error.    
  */
 static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
 {
@@ -56,14 +56,14 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
     int rc = -1;
     CSimulation simu;
     if(nb_eqs == 0)
-        rc = simu.K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
+        rc = simu.simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO, NULL);
     else 
     {
         KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
         if(tdbe)
         {
             if(tdbe->size() > 0)
-                rc = simu.K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
+                rc = simu.simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
                                   CSimulation::KSIM_EXO, c_eqs);
             delete tdbe;
         }
@@ -281,7 +281,7 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
 
     CSimulation simu;
-    int rc = simu.KE_ModelCalcSCC(tdbe, tris, pre, inter, post);
+    int rc = simu.calculate_SCC(tdbe, tris, pre, inter, post);
 
     if(!list_eqs.empty())
     {
@@ -366,7 +366,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     // Lance la simulation
     CSimulation simu;
-    int rc = simu.K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
+    int rc = simu.simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
 
     // Cleanup
     delete tdbe;

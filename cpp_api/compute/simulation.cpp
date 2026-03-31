@@ -120,7 +120,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
 
     int rc = -1;
     if(list_eqs.empty())
-        rc = K_simul(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
+        rc = simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
                      sample, KSIM_EXO, NULL);
     else 
     {
@@ -130,7 +130,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
             if(tdbe->size() > 0)
             {
                 char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-                rc = K_simul(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+                rc = simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
                                 KSIM_EXO, c_eqs);
                 SCR_free_tbl((unsigned char**) c_eqs);
             }
@@ -206,7 +206,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     if(list_eqs.empty())
     {
         tdbe = global_ws_eqs.get();
-        rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
+        rc = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
     }
     else
     {
@@ -214,7 +214,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
         {
             tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
             if(tdbe->size() > 0)
-                rc = KE_ModelCalcSCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
+                rc = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
             delete tdbe;
         }
         catch(const std::exception& e)
@@ -315,7 +315,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     {
         KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
         if(tdbe->size() > 0)
-            rc = K_simul_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+            rc = simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
                              c_pre, c_inter, c_post);
         delete tdbe;
     }
