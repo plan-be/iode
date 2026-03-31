@@ -86,21 +86,6 @@
 #include <vector>
 
 
-// Function declarations
-static int KI_strcmp(const char *pa, const char *pb);
-static KDB *KI_series_list(KDB* dbi);
-static KDB *KI_scalar_list(KDB* dbi);
-static int *KI_reorder(KDB* dbi);
-static int KI_read_vars_db(KDB* dbv, KDB* dbv_tmp, char* source_name);
-static int KI_read_vars_file(KDB* dbv, char* file);
-static int KI_read_vars(KDB* dbi, KDB* dbv, KDB* dbv_ws, int nb, char* files[]);
-static int KI_read_scls_db(KDB* dbs, KDB* dbs_tmp, char* source_name);
-static int KI_read_scls_file(KDB* dbs, char* file);
-static int KI_read_scls(KDB* dbs, KDB* dbs_ws, int nb, char* files[]);
-static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDB* dbi, int* order, Sample* smpl);
-static int KI_quick_extract(KDB* dbv, KDB* dbi);
-
-
 /**
  *  Helper function used to compare 2 strings in KI_series_list().
  *  
@@ -130,7 +115,7 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  *  @param [in] KDB*    dbi     KDB of identities
  *  @return     KDB*            KDB of all vars found in dbi. All vars are initialised to L_NaN
  */
-static KDBVariables* KI_series_list(KDBIdentities* dbi)
+static KDBVariables* KI_series_list(const KDBIdentities& dbi)
 {
     int     nb_names;
     LNAME   *lname;
@@ -141,7 +126,7 @@ static KDBVariables* KI_series_list(KDBIdentities* dbi)
     // (without checking for duplicates)
     std::string name;
     std::set<std::string> vars_to_compute;
-    for(const auto& [idt_name, idt] : dbi->k_objs) 
+    for(const auto& [idt_name, idt] : dbi.k_objs) 
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
@@ -173,7 +158,7 @@ static KDBVariables* KI_series_list(KDBIdentities* dbi)
  *  @param [in] KDB*    dbi     KDB of identities
  *  @return     KDB*            KDB of all scalars found in dbi.
  */
-static KDBScalars* KI_scalar_list(KDBIdentities* dbi)
+static KDBScalars* KI_scalar_list(const KDBIdentities& dbi)
 {
     int     nb_names;
     LNAME   *lname;
@@ -182,7 +167,7 @@ static KDBScalars* KI_scalar_list(KDBIdentities* dbi)
     Scalar new_scl;
     std::string name;
     KDBScalars* dbs = new KDBScalars(false);
-    for(const auto& [idt_name, idt] : dbi->k_objs) 
+    for(const auto& [idt_name, idt] : dbi.k_objs) 
     {
         clec = idt->get_compiled_lec();
         tclec = (CLEC*) SW_nalloc(clec->tot_lg);
@@ -212,7 +197,7 @@ static KDBScalars* KI_scalar_list(KDBIdentities* dbi)
  *  @param [in]      KDB*   dbi     
  *  @return          int    0 always
  */
-static int KI_quick_extract(KDBVariables* dbv, KDBIdentities* dbi) 
+static int KI_quick_extract(KDBVariables* dbv, const KDBIdentities& dbi) 
 {
     // get list of VARs names
     std::vector<std::string> names;
@@ -223,7 +208,7 @@ static int KI_quick_extract(KDBVariables* dbv, KDBIdentities* dbi)
     // keep only VARs that have the same name as an IDT in dbi
     for(const std::string& name : names)
     {
-        if(!dbi->contains(name))
+        if(!dbi.contains(name))
             dbv->remove(name);
     }
 
@@ -249,7 +234,7 @@ static int KI_quick_extract(KDBVariables* dbv, KDBIdentities* dbi)
  *  @return     int*            execution order or NULL if reordering is impossible             
  */
 
-static int *KI_reorder(KDBIdentities* dbi)
+static int *KI_reorder(const KDBIdentities& dbi)
 {
     int     nb, *order,
             nb_order = 0,
@@ -258,7 +243,7 @@ static int *KI_reorder(KDBIdentities* dbi)
     LNAME   *lname;
     CLEC    *clec;
 
-    nb = dbi->size();
+    nb = dbi.size();
     order = (int *)SW_nalloc(sizeof(int) * nb);
     mark  = SW_nalloc(nb);
 
@@ -268,7 +253,7 @@ static int *KI_reorder(KDBIdentities* dbi)
     {
         i = 0;
         mod = 0;
-        for(const auto& [idt_name, idt] : dbi->k_objs) 
+        for(const auto& [idt_name, idt] : dbi.k_objs) 
         {
             if(mark[i]) 
                 continue;
@@ -282,7 +267,7 @@ static int *KI_reorder(KDBIdentities* dbi)
                 name = std::string(lname[j].name);
                 if(idt_name == name) 
                     continue;
-                pos = dbi->index_of(name);
+                pos = dbi.index_of(name);
                 if(pos < 0) 
                     continue;
                 if(mark[pos]) 
@@ -306,19 +291,19 @@ static int *KI_reorder(KDBIdentities* dbi)
                 for(i = 0; i < nb; i++) 
                 {
                     if(mark[i])
-                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi->get_name(i));
+                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi.get_name(i));
                     else
-                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi->get_name(i));
+                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi.get_name(i));
                 }
             }
             SW_nfree(order);
             SW_nfree(mark);
-            return((int *)0);
+            return (int*) 0;
         }
     }
 
     SW_nfree(mark);
-    return(order);
+    return order;
 }
 
 
@@ -518,7 +503,7 @@ static int KI_read_vars_file(KDBVariables* dbv, char* file)
  *                                  -1 if one of the files is not found
  *                                  -2 if some vars are not found in the files
  */
-static int KI_read_vars(KDBIdentities* dbi, KDBVariables* dbv, KDBVariables* dbv_ws, 
+static int KI_read_vars(const KDBIdentities& dbi, KDBVariables* dbv, KDBVariables* dbv_ws, 
     int nb, char* files[])
 {
     int i, j, dim, nbf, nb_found = 0;
@@ -573,7 +558,7 @@ static int KI_read_vars(KDBIdentities* dbi, KDBVariables* dbv, KDBVariables* dbv
                 continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN Variable
-            if(dbi->contains(name)) 
+            if(dbi.contains(name)) 
             {
                 it->second.reset();
                 new_var_ptr = std::make_shared<Variable>(dim, IODE_NAN);
@@ -767,7 +752,7 @@ static int KI_read_scls(KDBScalars* dbs, KDBScalars* dbs_ws, int nb, char* files
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities* dbi, 
+static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities& dbi, 
     int* order, Sample* smpl)
 {
     int     tot_lg, start;
@@ -780,10 +765,10 @@ static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities* dbi,
 
     std::string idt_name;
     CLEC* idt_clec;
-    for(int i = 0; i < dbi->size(); i++) 
+    for(int i = 0; i < dbi.size(); i++) 
     {
-        idt_name = dbi->get_name(order[i]);
-        idt_clec = dbi->get_obj_ptr(idt_name)->get_compiled_lec();
+        idt_name = dbi.get_name(order[i]);
+        idt_clec = dbi.get_obj_ptr(idt_name)->get_compiled_lec();
         tot_lg = idt_clec->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, idt_clec, tot_lg);
@@ -818,7 +803,7 @@ static int KI_execute(KDBVariables* dbv, KDBScalars* dbs, KDBIdentities* dbi,
  *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDBVariables* KI_exec(KDBIdentities* dbi, KDBVariables* dbv, int nv, char* vfiles[], KDBScalars* dbs, 
+KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfiles[], KDBScalars* dbs, 
     int ns, char* sfiles[], Sample* in_smpl)
 {
     int* order;
@@ -860,7 +845,7 @@ KDBVariables* KI_exec(KDBIdentities* dbi, KDBVariables* dbv, int nv, char* vfile
         }
     }
     
-    if(dbi->size() == 0) 
+    if(dbi.size() == 0) 
     {
         delete exec_sample;
         error_manager.append_error("Empty set of identities");
