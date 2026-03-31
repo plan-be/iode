@@ -61,9 +61,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBLists> global_ws_lst = std::make_unique<KDBLists>(true);
+inline std::shared_ptr<KDBLists> global_ws_lst = std::make_shared<KDBLists>(true);
 inline std::array<KDBLists*, 5> global_ref_lst = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

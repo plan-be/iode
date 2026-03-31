@@ -54,7 +54,7 @@
 
 
 template<typename T>
-static bool load_global_database(std::unique_ptr<T>& global_ptr, 
+static bool load_global_database(std::shared_ptr<T>& global_ptr, 
         const std::string& filepath)
 {
     T* kdb = new T(true);

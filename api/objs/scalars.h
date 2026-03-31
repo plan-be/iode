@@ -125,9 +125,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBScalars> global_ws_scl = std::make_unique<KDBScalars>(true);
+inline std::shared_ptr<KDBScalars> global_ws_scl = std::make_shared<KDBScalars>(true);
 inline std::array<KDBScalars*, 5> global_ref_scl = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/

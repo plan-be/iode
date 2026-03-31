@@ -279,9 +279,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBVariables> global_ws_var = std::make_unique<KDBVariables>(true);
+inline std::shared_ptr<KDBVariables> global_ws_var = std::make_shared<KDBVariables>(true);
 inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

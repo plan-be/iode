@@ -995,9 +995,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBTables> global_ws_tbl = std::make_unique<KDBTables>(true);
+inline std::shared_ptr<KDBTables> global_ws_tbl = std::make_shared<KDBTables>(true);
 inline std::array<KDBTables*, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/

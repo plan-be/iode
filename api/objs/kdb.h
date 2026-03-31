@@ -12,7 +12,7 @@
 #include <memory>               // std::shared_ptr
 #include <vector>
 #include <array>
-#include <memory>               // std::unique_ptr, std::shared_ptr
+#include <memory>               // std::shared_ptr, std::shared_ptr
 #include <stdexcept>            // std::invalid_argument, std::out_of_range, std::runtime_error
 
 #ifndef SKBUILD

@@ -155,9 +155,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBIdentities> global_ws_idt = std::make_unique<KDBIdentities>(true);
+inline std::shared_ptr<KDBIdentities> global_ws_idt = std::make_shared<KDBIdentities>(true);
 inline std::array<KDBIdentities*, 5> global_ref_idt = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
