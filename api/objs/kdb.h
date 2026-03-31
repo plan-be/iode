@@ -431,6 +431,30 @@ private:
     std::set<KDBTemplate*> children_db;
 
 private:
+    KDBTemplate* get_top_level_db()
+    {
+        if(k_db_type != DB_SUBSET)
+            return this;
+        else
+        {
+            if(!db_parent)
+            {
+                std::string error_msg = "Internal error: subset database of type '";
+                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
+                throw std::runtime_error(error_msg);
+            }
+            return db_parent;
+        }
+    }
+
+    std::set<KDBTemplate*> get_children_db() const
+    {
+        if(k_db_type != DB_SUBSET)
+            return children_db; 
+        else
+            return db_parent->children_db;
+    }
+
     bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
     {
         std::shared_ptr<T> obj_ptr;
@@ -630,30 +654,6 @@ public:
         this->k_objs.clear();
 
         KDBInfo::clear();
-    }
-
-    KDBTemplate* get_top_level_db()
-    {
-        if(k_db_type != DB_SUBSET)
-            return this;
-        else
-        {
-            if(!db_parent)
-            {
-                std::string error_msg = "Internal error: subset database of type '";
-                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
-                throw std::runtime_error(error_msg);
-            }
-            return db_parent;
-        }
-    }
-
-    std::set<KDBTemplate*> get_children_db() const
-    {
-        if(k_db_type != DB_SUBSET)
-            return children_db; 
-        else
-            return db_parent->children_db;
     }
 
     int size() const override
