@@ -185,7 +185,7 @@ cdef extern from "api/objs/comments.h":
     size_t hash_value(KDBComments&) except +
 
     # Define the global Comments instance
-    ctypedef unique_ptr[KDBComments] KDBCommentsPtr
+    ctypedef shared_ptr[KDBComments] KDBCommentsPtr
     cdef KDBCommentsPtr global_ws_cmt
 
 
@@ -208,7 +208,7 @@ cdef extern from "api/objs/equations.h":
     size_t hash_value(KDBEquations&) except +
 
     # Define the global Equations instance
-    ctypedef unique_ptr[KDBEquations] KDBEquationsPtr
+    ctypedef shared_ptr[KDBEquations] KDBEquationsPtr
     cdef KDBEquationsPtr global_ws_eqs
 
 
@@ -234,7 +234,7 @@ cdef extern from "api/objs/identities.h":
     size_t hash_value(KDBIdentities&) except +
 
     # Define the global Identities instance
-    ctypedef unique_ptr[KDBIdentities] KDBIdentitiesPtr
+    ctypedef shared_ptr[KDBIdentities] KDBIdentitiesPtr
     cdef KDBIdentitiesPtr global_ws_idt
 
 
@@ -251,7 +251,7 @@ cdef extern from "api/objs/lists.h":
     size_t hash_value(KDBLists&) except +
 
     # Define the global Lists instance
-    ctypedef unique_ptr[KDBLists] KDBListsPtr
+    ctypedef shared_ptr[KDBLists] KDBListsPtr
     cdef KDBListsPtr global_ws_lst
 
 
@@ -270,7 +270,7 @@ cdef extern from "api/objs/scalars.h":
     size_t hash_value(KDBScalars&) except +
 
     # Define the global Scalars instance
-    ctypedef unique_ptr[KDBScalars] KDBScalarsPtr
+    ctypedef shared_ptr[KDBScalars] KDBScalarsPtr
     cdef KDBScalarsPtr global_ws_scl
 
 
@@ -302,7 +302,7 @@ cdef extern from "api/objs/tables.h":
     size_t hash_value(KDBTables&) except +
 
     # Define the global Tables instance
-    ctypedef unique_ptr[KDBTables] KDBTablesPtr
+    ctypedef shared_ptr[KDBTables] KDBTablesPtr
     cdef KDBTablesPtr global_ws_tbl
 
 
@@ -344,5 +344,5 @@ cdef extern from "api/objs/variables.h":
     size_t hash_value(KDBVariables&) except +
 
     # Define the global Variables instance
-    ctypedef unique_ptr[KDBVariables] KDBVariablesPtr
+    ctypedef shared_ptr[KDBVariables] KDBVariablesPtr
     cdef KDBVariablesPtr global_ws_var

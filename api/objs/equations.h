@@ -626,9 +626,9 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
-// unique_ptr -> automatic memory management
+// shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::unique_ptr<KDBEquations> global_ws_eqs = std::make_unique<KDBEquations>(true);
+inline std::shared_ptr<KDBEquations> global_ws_eqs = std::make_shared<KDBEquations>(true);
 inline std::array<KDBEquations*, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
