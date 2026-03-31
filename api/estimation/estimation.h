@@ -351,7 +351,7 @@ private:
     int E_prep_lecs(char** lecs);
     int E_prep_instrs(char** instrs);
     int E_prep_coefs();
-    int E_add_scls(CLEC* clec, KDBScalars* dbs);
+    int E_add_scls(CLEC* clec, KDBScalars& dbs);
     void E_prep_reset();
     void E_get_C(void);
     void E_put_C(void);
