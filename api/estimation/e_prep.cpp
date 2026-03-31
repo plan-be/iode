@@ -129,7 +129,7 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1;
         }
 
-        if(E_add_scls(clec, E_DBS))
+        if(E_add_scls(clec, *E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
             return -1; // JMP 13/11/2012
@@ -163,7 +163,7 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1;
         } 
 
-        if(E_add_scls(E_CRHS[i], E_DBS))
+        if(E_add_scls(E_CRHS[i], *E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
             return -1; // JMP 13/11/2012
@@ -188,7 +188,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  @return     int             0        
  *  
  */
-int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
+int Estimation::E_add_scls(CLEC* clec, KDBScalars& dbs)
 {
     char* c_name;
     std::string name;
@@ -197,8 +197,8 @@ int Estimation::E_add_scls(CLEC* clec, KDBScalars* dbs)
     {
         c_name = clec->lnames[j].name;
         name = std::string(c_name);
-        if(is_coefficient(name) && !dbs->contains(name))
-            dbs->add(name, scl);
+        if(is_coefficient(name) && !dbs.contains(name))
+            dbs.add(name, scl);
     }
     
     return 0;
