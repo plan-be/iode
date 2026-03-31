@@ -169,7 +169,7 @@ int ImportCommentsBST::sub_read_header(int lang)
     if(dif_skip_to(RYY, DIF_BOT) < 0) 
         return -1;
 
-    kdb_cmt = global_ws_cmt.get();
+    kdb_cmt = global_ws_cmt;
 
     while(1) 
     {

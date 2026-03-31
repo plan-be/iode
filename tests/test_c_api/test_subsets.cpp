@@ -6,21 +6,13 @@ protected:
     void SetUp() override 
     {
         global_ws_cmt->clear();
-        if(global_ref_cmt[0])
-        {
-            delete global_ref_cmt[0];
-            global_ref_cmt[0] = nullptr;
-        }
+        global_ref_cmt[0].reset();
     }
 
     void TearDown() override 
     {
         global_ws_cmt->clear();
-        if(global_ref_cmt[0])
-        {
-            delete global_ref_cmt[0];
-            global_ref_cmt[0] = nullptr;
-        }
+        global_ref_cmt[0].reset();
     }
 };
 
@@ -33,7 +25,7 @@ TEST_F(SubsetsTest, Subset)
 
     // GLOBAL KDB
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
-    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
+    std::shared_ptr<KDBComments>& ref_db_cmt_ptr = global_ref_cmt[0];      // updated in the load() method
     std::string cmt_ACAF = global_ws_cmt->get("ACAF");
     std::string cmt_ACAG = global_ws_cmt->get("ACAG");
 
@@ -42,6 +34,7 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_TRUE(global_ws_cmt->is_global_database());
     // global_ws_cmt->children_db contains the pointer to global_ref_cmt
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     std::set<std::string> names = global_ws_cmt->filter_names(pattern);
@@ -53,7 +46,7 @@ TEST_F(SubsetsTest, Subset)
 
     // ==== STANDALONE KDB -> DEEP COPY SUBSET ====
 
-    KDBComments* standalone_db = new KDBComments(global_ws_cmt.get(), pattern, true);
+    std::shared_ptr<KDBComments> standalone_db = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern, true);
     EXPECT_EQ(standalone_db->size(), names.size());
     EXPECT_EQ(standalone_db->get_names(), expected_names);
     EXPECT_TRUE(standalone_db->is_detached_database());
@@ -61,6 +54,7 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_TRUE(standalone_db->children_db.empty());
     // global_ws_cmt->children_db contains the pointer to global_ref_cmt
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     // ---- add in standalone database only ----
@@ -125,32 +119,35 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_TRUE(standalone_db->contains("AQC"));
     EXPECT_FALSE(global_ws_cmt->contains("AQC"));
 
-    delete standalone_db;
+    standalone_db->clear();
     // after deleting the standalone database, the global KDB should remain unchanged 
     // and the pointer to global_ref_cmt should still be in global_ws_cmt->children_db
     EXPECT_EQ(global_ws_cmt->size(), expected_size);
     EXPECT_TRUE(global_ws_cmt->is_global_database());
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
     // ==== SHALLOW COPY SUBSET ====
 
     global_ws_cmt->clear();
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
-    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
+    ref_db_cmt_ptr = global_ref_cmt[0];      // updated in the load() method
     // global_ws_cmt->children_db contains the pointer to global_ref_cmt
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
-    KDBComments* subset_shallow_copy = new KDBComments(global_ws_cmt.get(), pattern, false);
+    std::shared_ptr<KDBComments> subset_shallow_copy = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern, false);
     EXPECT_EQ(subset_shallow_copy->size(), names.size());
     EXPECT_EQ(subset_shallow_copy->get_names(), expected_names);
     EXPECT_TRUE(subset_shallow_copy->is_subset_database());
     EXPECT_TRUE(subset_shallow_copy->db_parent == global_ws_cmt.get());
 
     EXPECT_EQ(global_ws_cmt->children_db.size(), 2);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_shallow_copy));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_shallow_copy.get()));
 
     // ---- add in shallow copy subset ----
     // the new comment is added in the shallow copy subset AND in the global KDB
@@ -221,13 +218,15 @@ TEST_F(SubsetsTest, Subset)
     EXPECT_FALSE(subset_shallow_copy->contains("AQC"));
     EXPECT_FALSE(global_ws_cmt->contains("AQC"));
 
-    delete subset_shallow_copy;
+    subset_shallow_copy->clear();
+    subset_shallow_copy.reset();
     // deleting the subset only reset the k_objs map of the subset but DO NOT DELETE 
     // the objects. Therefore, the global KDB should remain unchanged and the pointer 
     // to global_ref_cmt should still be in global_ws_cmt->children_db
     EXPECT_EQ(global_ws_cmt->size(), expected_size);
     EXPECT_TRUE(global_ws_cmt->is_global_database());
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 }
 
@@ -238,7 +237,7 @@ TEST_F(SubsetsTest, MultiSubsets)
     std::string description = "Global comments KDB";
 
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
-    ref_db_cmt = (KDBComments*) global_ref_cmt[0];      // updated in the load() method
+    std::shared_ptr<KDBComments>& ref_db_cmt_ptr = global_ref_cmt[0];      // updated in the load() method
     global_ws_cmt->description = description;
     std::string cmt_BENEF = global_ws_cmt->get("BENEF");
 
@@ -250,7 +249,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if (name.front() == 'A' || name.front() == 'B' || name.back() == '_')
             expected_names_0.insert(name);
 
-    KDBComments* subset_0 = new KDBComments(global_ws_cmt.get(), pattern_0, false);
+    std::shared_ptr<KDBComments> subset_0 = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern_0, false);
     EXPECT_EQ(subset_0->size(), names_0.size());
     EXPECT_EQ(subset_0->get_names(), expected_names_0);
     EXPECT_TRUE(subset_0->is_subset_database());
@@ -258,8 +257,9 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_EQ(subset_0->db_parent->description, description);
     // global_ws_cmt->children_db contains the pointer to global_ref_cmt
     EXPECT_EQ(global_ws_cmt->children_db.size(), 2);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0.get()));
 
     // ==== subset of subset ====
     std::string pattern_1 = "B*;*_";
@@ -269,7 +269,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.back() == '_')
             expected_names_1.insert(name);
 
-    KDBComments* subset_1 = new KDBComments(subset_0, pattern_1, false);
+    std::shared_ptr<KDBComments> subset_1 = std::make_shared<KDBComments>(subset_0.get(), pattern_1, false);
     EXPECT_EQ(subset_1->size(), names_1.size());
     EXPECT_EQ(subset_1->get_names(), expected_names_1);
     EXPECT_TRUE(subset_1->is_subset_database());
@@ -277,9 +277,10 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_EQ(subset_1->db_parent->description, description);
 
     EXPECT_EQ(global_ws_cmt->children_db.size(), 3);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0.get()));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1.get()));
 
     // ==== subset of subset of subset ====
     std::string pattern_2 = "B*;C*";
@@ -289,7 +290,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.front() == 'C')
             expected_names_2.insert(name);
 
-    KDBComments* subset_2 = new KDBComments(subset_1, pattern_2, false);
+    std::shared_ptr<KDBComments> subset_2 = std::make_shared<KDBComments>(subset_1.get(), pattern_2, false);
     EXPECT_EQ(subset_2->size(), names_2.size());
     EXPECT_EQ(subset_2->get_names(), expected_names_2);
     EXPECT_TRUE(subset_2->is_subset_database());
@@ -297,10 +298,11 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_EQ(subset_2->db_parent->description, description);
 
     EXPECT_EQ(global_ws_cmt->children_db.size(), 4);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1));
-    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_2));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_0.get()));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_1.get()));
+    EXPECT_TRUE(global_ws_cmt->children_db.contains(subset_2.get()));
 
     // ==== add, modify, rename, remove ====
     // ---- add in subset ----
@@ -372,11 +374,16 @@ TEST_F(SubsetsTest, MultiSubsets)
     EXPECT_FALSE(subset_1->contains("BVY"));
     EXPECT_FALSE(subset_2->contains("BVY"));
 
-    delete subset_2;
-    delete subset_1;
-    delete subset_0;
+    subset_2->clear();
+    subset_1->clear();
+    subset_0->clear();
+
+    subset_2.reset();
+    subset_1.reset();
+    subset_0.reset();
 
     EXPECT_EQ(global_ws_cmt->children_db.size(), 1);
+    ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 }
 
@@ -487,7 +494,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
 
     // ==== delete subset ====
     scl_subset = subset->get_obj_ptr("scl_subset");
-    delete subset;
+    subset->clear();
     // deleting the subset only clear the k_objs map of the subset but
     // DO NOT RESET the associated shared pointers
     EXPECT_TRUE(scl_subset.get() != nullptr);
@@ -527,7 +534,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_DOUBLE_EQ(scl_standalone_db->std, std);
 
     // ==== delete standalone_db ==== 
-    delete standalone_db;
+    standalone_db->clear();
 
     // **** changing order of deletion ****
 
@@ -554,7 +561,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));
     
     // ==== delete the standalone_db first ====
-    delete standalone_db;
+    standalone_db->clear();
     // deleting the standalone_db should not affect the global KDB and the subset 
     // since standalone_db represents a deep copy of the global KDB
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));

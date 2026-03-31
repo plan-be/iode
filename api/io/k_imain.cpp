@@ -210,16 +210,16 @@ err:
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang)
+std::shared_ptr<KDBComments> IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang)
 {
-    KDBComments *kdb = nullptr;
     int          size, cmpt = 0, rc;
     char         iname[256], *cmt = NULL;
     ONAME        oname;
     std::string  cmt_name;
+    std::shared_ptr<KDBComments> kdb = nullptr;
 
     if(IMP_readrule(rulefile) < 0) 
-        return nullptr;
+        return kdb;
 
     YY_CASE_SENSITIVE = 1;
     if(impdef->imp_keys != NULL) 
@@ -232,9 +232,9 @@ KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, 
 
     rc = impdef->read_header(cfile, lang);
     if(rc < 0) 
-        goto err;
+        return kdb;
 
-    kdb = new KDBComments(false);
+    kdb = std::make_shared<KDBComments>(false);
 
     while(1) 
     {
@@ -261,21 +261,21 @@ KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, 
         catch(const std::exception& e)
         {
             SW_nfree(cmt);
-            delete kdb;
+            kdb->clear();
+            kdb.reset();
             throw std::runtime_error("Unable to create '" + cmt_name + "':\n" + 
                   std::string(e.what()));
         }
     }
 
     rc = impdef->close();
-    if(rc < 0) 
-        goto err;
+    if(rc < 0)
+    {
+        kdb->clear();
+        kdb.reset();
+    }
 
     return kdb;
-
-err:
-    delete kdb;
-    return nullptr;
 }
 
 /**
@@ -309,13 +309,9 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     int rc = 0;
     if(impdef)
     {
-        KDBComments* kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
+        std::shared_ptr<KDBComments> kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb) 
-        {
             kdb->save_binary(ode);
-            delete kdb;
-            kdb = nullptr;
-        }
         else
             rc = -1;
     }

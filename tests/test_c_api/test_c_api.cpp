@@ -1566,13 +1566,13 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     U_test_print_title("Tests B_DATA");
 
-    KDB* kdb_cmt = global_ws_cmt.get();
-    KDB* kdb_eqs = global_ws_eqs.get();
-    KDB* kdb_idt = global_ws_idt.get();
-    KDB* kdb_lst = global_ws_lst.get();
-    KDB* kdb_scl = global_ws_scl.get();
-    KDB* kdb_tbl = global_ws_tbl.get();
-    KDB* kdb_var = global_ws_var.get();
+    std::shared_ptr<KDBComments> kdb_cmt = global_ws_cmt;
+    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
+    std::shared_ptr<KDBIdentities> kdb_idt = global_ws_idt;
+    std::shared_ptr<KDBLists> kdb_lst = global_ws_lst;
+    std::shared_ptr<KDBScalars> kdb_scl = global_ws_scl;
+    std::shared_ptr<KDBTables> kdb_tbl = global_ws_tbl;
+    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
 
     // Clear WS, then loads 3 WS and check ok
     //K_end_ws(0);
@@ -2093,10 +2093,10 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        KDBComments* kdb_cmt = new KDBComments(true);
+        std::shared_ptr<KDBComments> kdb_cmt = std::make_shared<KDBComments>(true);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
-        global_ws_cmt.reset(kdb_cmt);
+        global_ws_cmt = kdb_cmt;
         EXPECT_TRUE(global_ws_cmt != nullptr);
         EXPECT_EQ(global_ws_cmt->get("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }

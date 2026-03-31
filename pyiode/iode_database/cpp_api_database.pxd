@@ -176,7 +176,7 @@ cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
         # Constructor
         # subset (shallow or deep copy) 
-        KDBComments(KDBComments* db_parent, string pattern, bool copy) 
+        KDBComments(shared_ptr[KDBComments] db_parent, string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +

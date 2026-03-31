@@ -28,8 +28,8 @@ def cython_dickey_fuller_test(scalars_db: Scalars, lec: str, drift: bool, trend:
         return None
 
     scalars_db.ptr_owner = <bint>True
-    scalars_db.database_ptr = cpp_scalars
-    scalars_db.abstract_db_ptr = cpp_scalars
+    scalars_db.database = cpp_scalars
+    scalars_db.abstract_database = cpp_scalars
     return scalars_db
 
 
@@ -146,8 +146,8 @@ cdef class CythonEditAndEstimateEquations:
         if c_scalars_ptr is NULL:
             return None
         scalars_db.ptr_owner = <bint>False
-        scalars_db.database_ptr = c_scalars_ptr
-        scalars_db.abstract_db_ptr = c_scalars_ptr
+        scalars_db.database = c_scalars_ptr
+        scalars_db.abstract_database = c_scalars_ptr
         return scalars_db
 
     def get_equations_list(self) -> List[str]:
@@ -158,8 +158,8 @@ cdef class CythonEditAndEstimateEquations:
         if c_equations_ptr is NULL:
             return None
         equations_db.ptr_owner = <bint>False
-        equations_db.database_ptr = c_equations_ptr
-        equations_db.abstract_db_ptr = c_equations_ptr
+        equations_db.database = c_equations_ptr
+        equations_db.abstract_database = c_equations_ptr
         return equations_db
 
     def update_current_equation(self, lec: str, comment: str):
