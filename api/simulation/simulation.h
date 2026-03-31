@@ -210,8 +210,8 @@ public:
     }
 
 	/* k_sim_main.c */
-	int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
-		         Sample* smpl, char** endo_exo, char** eqs);
+	int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+		char** endo_exo, const std::vector<std::string>& eqs = std::vector<std::string>());
 
 	/* k_sim_scc.c */
 	int calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post);
@@ -224,7 +224,7 @@ protected:
 	void build_lists_order(char* pre, char* inter, char* post);
 
 	/* k_sim_order.c */
-	void order(KDBEquations* dbe, char** eqs);
+	void order(KDBEquations* dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	int get_eq_position(int posendo);
 	void compute_tri(KDBEquations* dbe, int** predecessors, int passes);
 
@@ -250,6 +250,35 @@ protected:
 		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
 		*KSIM_DBV->get_var_ptr(name, t) = value;
 	}
+
+    std::vector<std::string> eqs_to_vector(const std::string& list_eqs)
+    {
+        std::vector<std::string> v_eqs;
+        if(list_eqs.empty())
+            return v_eqs;
+
+        char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+        if(c_eqs == NULL) 
+        {
+            std::string error_msg = "Invalid equations list: " + list_eqs;
+            throw std::invalid_argument(error_msg);
+        }
+
+        std::string eq_name;
+        v_eqs.reserve(KSIM_DBE->size());
+        for(int i = 0; c_eqs[i] != NULL; i++)
+        {
+            eq_name = std::string(c_eqs[i]);
+            if(!KSIM_DBE->contains(eq_name))
+            {
+                std::string error_msg = "Equation '" + eq_name + "' not found in the model\n";
+                throw std::invalid_argument(error_msg);
+            }
+            v_eqs.push_back(eq_name);
+        }
+
+        return v_eqs;
+    }
 
 private:
 	void clear()

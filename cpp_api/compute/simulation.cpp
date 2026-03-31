@@ -121,7 +121,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     int rc = -1;
     if(list_eqs.empty())
         rc = simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
-                     sample, KSIM_EXO, NULL);
+                     sample, KSIM_EXO);
     else 
     {
         try
@@ -129,10 +129,9 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
             KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
             if(tdbe->size() > 0)
             {
-                char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
+                std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
                 rc = simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
-                                KSIM_EXO, c_eqs);
-                SCR_free_tbl((unsigned char**) c_eqs);
+                                KSIM_EXO, v_eqs);
             }
             delete tdbe;
         }
