@@ -656,6 +656,22 @@ public:
         KDBInfo::clear();
     }
 
+    std::shared_ptr<KDBTemplate> get_subset(const std::string& pattern, const bool copy)
+    {
+        try
+        {
+            std::shared_ptr<KDBTemplate> subset_ptr = std::make_shared<KDBTemplate>(this, pattern, copy);
+            return subset_ptr;
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "Cannot create a subset of the database of type '";
+            error_msg += v_iode_types[this->k_type] + "' using the pattern '";
+            error_msg += pattern + "':\n" + std::string(e.what());
+            throw std::runtime_error(error_msg);
+        }
+    } 
+
     int size() const override
     { 
         return (int) k_objs.size();
