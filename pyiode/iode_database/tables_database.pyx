@@ -4,6 +4,8 @@ from typing import Union, Tuple, List, Dict, Optional, Any
 
 cimport cython
 from cython.operator cimport dereference
+from libcpp.memory cimport shared_ptr
+
 from pyiode.objects.table cimport CTable
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBTables
@@ -13,51 +15,51 @@ from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblT
 
 cdef class Tables(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBTables* database_ptr
+    cdef KDBTables* database
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
         self.ptr_owner = False
-        self.database_ptr = cpp_global_tables.get()
-        self.abstract_db_ptr = cpp_global_tables.get()
+        self.database = cpp_global_tables.get()
+        self.abstract_database = cpp_global_tables.get()
         self.print_as = B_TABLE_TITLE
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database_ptr is not NULL:
-            del self.database_ptr
-            self.database_ptr = NULL
+        if self.ptr_owner and self.database is not NULL:
+            del self.database
+            self.database = NULL
 
     @staticmethod
-    cdef Tables _from_ptr(KDBTables* database_ptr = NULL, bint owner=False):
+    cdef Tables _from_ptr(KDBTables* database = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
-        if database_ptr is not NULL:
+        if database is not NULL:
             wrapper.ptr_owner = owner
-            wrapper.database_ptr = database_ptr
-            wrapper.abstract_db_ptr = database_ptr
+            wrapper.database = database
+            wrapper.abstract_database = database
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = cpp_global_tables.get()
-            wrapper.abstract_db_ptr = cpp_global_tables.get()
+            wrapper.database = cpp_global_tables.get()
+            wrapper.abstract_database = cpp_global_tables.get()
         wrapper.print_as = B_TABLE_TITLE
         return wrapper
 
     def _load(self, filepath: str):
-        if self.database_ptr is not NULL:
-            self.database_ptr.load(filepath.encode())
+        if self.database is not NULL:
+            self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Tables:
-        cdef KDBTables* subset_db_ptr = new KDBTables(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef KDBTables* subset_db_ptr = new KDBTables(self.database, pattern.encode(), <bint>copy)
         subset = Tables._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
     def get_title(self, name: str) -> str:
-        return self.database_ptr.get_title(name.encode()).decode()
+        return self.database.get_title(name.encode()).decode()
 
     def _get_object(self, name: str) -> Table:
         cdef shared_ptr[CTable] tbl_ptr
         name = name.strip()
-        tbl_ptr = self.database_ptr.get_obj_ptr(name.encode())
+        tbl_ptr = self.database.get_obj_ptr(name.encode())
         table = Table._from_ptr(tbl_ptr, name.encode())
         return table
 
@@ -66,16 +68,16 @@ cdef class Tables(CythonIodeDatabase):
         # NOTE: the C++ set_obj_ptr() method creates a copy of the object stored 
         #       in the passed shared pointer to avoid that two entries (shared_ptr<T>) 
         #       in the IODE database point to the same object in memory
-        tbl_ptr = self.database_ptr.set_obj_ptr(name.encode(), table.tbl_ptr)
+        tbl_ptr = self.database.set_obj_ptr(name.encode(), table.tbl_ptr)
         table.update_ptr(tbl_ptr)
         return table
 
     def copy_from(self, input_files: str, names: str='*'):
-        self.database_ptr.copy_from(input_files.encode(), names.encode())
+        self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Tables, overwrite: bool=True):        
-        cdef KDBTables* other_db_ptr = other.database_ptr
-        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef KDBTables* other_db_ptr = other.database
+        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     # Specify how to print a TABLE 
     #      0 : print table full definitions
@@ -91,10 +93,10 @@ cdef class Tables(CythonIodeDatabase):
 
     def cpp_tables_print_to_file(self, filepath: str, names: List[str], format: str, generalized_sample: str, nb_decimals: int):
         cdef char c_format = format.encode('utf-8')[0]
-        self.database_ptr.print_to_file(filepath.encode(), generalized_sample.encode(), 
+        self.database.print_to_file(filepath.encode(), generalized_sample.encode(), 
                                         names.encode(), nb_decimals, c_format)
 
     def __hash__(self) -> int:
-        return hash_value(dereference(self.database_ptr))
+        return hash_value(dereference(self.database))
 
 

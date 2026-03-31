@@ -3,6 +3,8 @@ from typing import Union, Tuple, List, Optional, Any
 
 cimport cython
 from cython.operator cimport dereference
+from libcpp.memory cimport shared_ptr
+
 from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport KDBLists
 from pyiode.iode_database.cpp_api_database cimport global_ws_lst as cpp_global_lists
@@ -12,57 +14,57 @@ import pandas as pd
 
 cdef class Lists(CythonIodeDatabase):
     cdef bint ptr_owner
-    cdef KDBLists* database_ptr
+    cdef KDBLists* database
 
     def __cinit__(self, filepath: str=None) -> Lists:
         self.ptr_owner = False
-        self.database_ptr = cpp_global_lists.get()
-        self.abstract_db_ptr = cpp_global_lists.get()
+        self.database = cpp_global_lists.get()
+        self.abstract_database = cpp_global_lists.get()
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database_ptr is not NULL:
-            del self.database_ptr
-            self.database_ptr = NULL
+        if self.ptr_owner and self.database is not NULL:
+            del self.database
+            self.database = NULL
 
     @staticmethod
-    cdef Lists _from_ptr(KDBLists* database_ptr = NULL, bint owner=False):
+    cdef Lists _from_ptr(KDBLists* database = NULL, bint owner=False):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
-        if database_ptr is not NULL:
+        if database is not NULL:
             wrapper.ptr_owner = owner
-            wrapper.database_ptr = database_ptr
-            wrapper.abstract_db_ptr = database_ptr
+            wrapper.database = database
+            wrapper.abstract_database = database
         else:
             wrapper.ptr_owner = False
-            wrapper.database_ptr = cpp_global_lists.get()
-            wrapper.abstract_db_ptr = cpp_global_lists.get()
+            wrapper.database = cpp_global_lists.get()
+            wrapper.abstract_database = cpp_global_lists.get()
         return wrapper
 
     def _load(self, filepath: str):
-        if self.database_ptr is not NULL:
-            self.database_ptr.load(filepath.encode())
+        if self.database is not NULL:
+            self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Lists:
-        cdef KDBLists* subset_db_ptr = new KDBLists(self.database_ptr, pattern.encode(), <bint>copy)
+        cdef KDBLists* subset_db_ptr = new KDBLists(self.database, pattern.encode(), <bint>copy)
         subset = Lists._from_ptr(subset_db_ptr, <bint>True)
         return subset
 
     def _get_object(self, name: str) -> str:
         name = name.strip()
-        return self.database_ptr.get(name.encode()).decode()
+        return self.database.get(name.encode()).decode()
 
     def _set_object(self, name: str, value: str):
         name = name.strip()
-        self.database_ptr.set(name.encode(), <string>(value.encode()))
+        self.database.set(name.encode(), <string>(value.encode()))
 
     def copy_from(self, input_files: str, names: str='*'):     
-        self.database_ptr.copy_from(input_files.encode(), names.encode())
+        self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Lists, overwrite: bool=True):        
-        cdef KDBLists* other_db_ptr = other.database_ptr
-        self.database_ptr.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef KDBLists* other_db_ptr = other.database
+        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:
-        return hash_value(dereference(self.database_ptr))
+        return hash_value(dereference(self.database))
 
 

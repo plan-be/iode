@@ -57,7 +57,7 @@ private:
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::shared_ptr<KDBComments> global_ws_cmt = std::make_shared<KDBComments>(true);
-inline std::array<KDBComments*, 5> global_ref_cmt = { nullptr };
+inline std::array<std::shared_ptr<KDBComments>, 5> global_ref_cmt = { nullptr };
 
 /*------------------------- FUNCS ----------------------------*/
 

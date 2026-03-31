@@ -246,7 +246,7 @@ class ImportCommentsBST : public ImportCmtFromFile
     YYFILE* FYY = NULL;
     YYFILE* RYY = NULL;
     YYFILE* SYY = NULL;
-    KDBComments* kdb_cmt = nullptr;
+    std::shared_ptr<KDBComments> kdb_cmt = nullptr;
 
 public:
     ImportCommentsBST() 
@@ -306,7 +306,7 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 
 /* k_imain.c */
 KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl);
-KDBComments* IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang);
+std::shared_ptr<KDBComments> IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang);
 int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang);
 
 /* k_rules.c */

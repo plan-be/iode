@@ -116,28 +116,27 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
         smpl->nb_periods = sample.nb_periods;
     }
 
-    KDBComments* dbc = new KDBComments(false);
+    KDBComments dbc(false);
     if(!cmt_file.empty())
     {
         std::string cmt_file_ = check_file_exists(cmt_file, caller_name);
         error_msg += "Comments file " + cmt_file_;
-        success = dbc->load(cmt_file_);
+        success = dbc.load(cmt_file_);
         if(!success)
             throw std::invalid_argument(error_msg + "\n" + "Comment file: '" + cmt_file + "'");
     } 
 
-    KDBVariables* dbv = new KDBVariables(false);
+    KDBVariables dbv(false);
     if(!var_file.empty()) 
     {
         std::string var_file_ = check_file_exists(var_file, caller_name);
-        if(dbc) error_msg += "and";
-        error_msg += "Variables file " + var_file_;
-        success = dbv->load(var_file);
+        error_msg += "and Variables file " + var_file_;
+        success = dbv.load(var_file);
         if(!success)
             throw std::invalid_argument(error_msg + "\n" + "Variable file: '" + var_file + "'");
         
         if(smpl) 
-            KV_sample(*dbv, smpl);
+            KV_sample(dbv, smpl);
     }
 
     std::string rule_file_ = check_file_exists(rule_file, caller_name);
@@ -161,10 +160,6 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
     else
         res = EXP_Rev_Ws(expdef, dbv, dbc, to_char_array(rule_file_), to_char_array(save_file_), 
                          to_char_array(nan), to_char_array(separator));
-
-
-    if(dbv) delete dbv;
-    if(dbc) delete dbc;
 
     if(res != 0)
     {

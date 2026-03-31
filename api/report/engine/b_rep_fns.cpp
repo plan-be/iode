@@ -752,7 +752,7 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDBComments* kdb = global_ws_cmt.get();
+    std::shared_ptr<KDBComments> kdb = global_ws_cmt;
 
     if(!kdb) 
         return res;

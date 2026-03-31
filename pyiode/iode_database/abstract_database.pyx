@@ -22,37 +22,36 @@ from pyiode.iode_database.cpp_api_database cimport W_dest, W_flush, W_close
 
 
 cdef class CythonIodeDatabase:
-    cdef CppDatabase* abstract_db_ptr 
+    cdef CppDatabase* abstract_database 
 
     def __cinit__(self):
-        # the C++ attribute abstract_db_ptr is initialized in the subclasses
+        # the C++ attribute abstract_database is initialized in the subclasses
         pass
 
     def __dealloc__(self):
-        # the C++ attribute abstract_db_ptr is destroyed in the subclasses
         pass
 
     def get_is_global_workspace(self) -> bool:
-        return self.abstract_db_ptr.is_global_database()
+        return self.abstract_database.is_global_database()
 
     def get_is_detached(self) -> bool:
-        return self.abstract_db_ptr.is_detached_database()
+        return self.abstract_database.is_detached_database()
 
     def get_iode_type(self) -> IodeType:
-        int_iode_type: int = self.abstract_db_ptr.get_iode_type()
+        int_iode_type: int = self.abstract_database.get_iode_type()
         return IodeType(int_iode_type)
 
     def get_filename(self) -> str:
-        return self.abstract_db_ptr.get_filename_utf8().decode()
+        return self.abstract_database.get_filename_utf8().decode()
 
     def set_filename(self, value: str):
-        self.abstract_db_ptr.set_filename_utf8(value.encode())
+        self.abstract_database.set_filename_utf8(value.encode())
 
     def get_description(self) -> str:
-        return self.abstract_db_ptr.get_description_utf8().decode()
+        return self.abstract_database.get_description_utf8().decode()
 
     def set_description(self, value: str):
-        self.abstract_db_ptr.set_description_utf8(value.encode())
+        self.abstract_database.set_description_utf8(value.encode())
 
     def _get_print_nb_decimals(self) -> int:
         return K_NBDEC
@@ -63,13 +62,13 @@ cdef class CythonIodeDatabase:
         B_PrintNbDec(c_value)
 
     def index(self, name: str) -> int:
-        return self.abstract_db_ptr.index_of(name.encode())
+        return self.abstract_database.index_of(name.encode())
 
     def get_name(self, pos: int) -> str:
-        return self.abstract_db_ptr.get_name(pos).decode()
+        return self.abstract_database.get_name(pos).decode()
 
     def get_names(self, pattern: str, filepath: str=None) -> str:
-        cdef int i_iode_type = self.abstract_db_ptr.get_iode_type()
+        cdef int i_iode_type = self.abstract_database.get_iode_type()
         cdef int _all = ord('*')
         cdef KDB* kdb_ptr = NULL
         cdef size_t length = 0
@@ -87,20 +86,20 @@ cdef class CythonIodeDatabase:
             b_list = c_list[:length]
             SCR_free(c_list)
         else:
-            if self.abstract_db_ptr is not NULL:
-                b_list = self.abstract_db_ptr.expand(pattern.encode(), _all)  
+            if self.abstract_database is not NULL:
+                b_list = self.abstract_database.expand(pattern.encode(), _all)  
 
         return b_list.decode()
 
     def property_names(self) -> List[str]:
-        return [name.decode() for name in self.abstract_db_ptr.get_names()]
+        return [name.decode() for name in self.abstract_database.get_names()]
 
     def rename(self, old_name: str, new_name: str, overwrite: bool) -> bool:
-        return self.abstract_db_ptr.rename(old_name.encode(), new_name.encode(), <bint>overwrite)
+        return self.abstract_database.rename(old_name.encode(), new_name.encode(), <bint>overwrite)
 
     def remove(self, names: List[str]):
         for name in names:
-            self.abstract_db_ptr.remove(name.encode())
+            self.abstract_database.remove(name.encode())
 
     def compare(self, args: str, i_iode_type: int):
         res = B_DataCompare(args.encode(), i_iode_type)
@@ -108,13 +107,13 @@ cdef class CythonIodeDatabase:
             error_manager.display_last_error()
 
     def merge_from(self, input_file: str):
-        self.abstract_db_ptr.merge_from(input_file.encode())
+        self.abstract_database.merge_from(input_file.encode())
 
     def search(self, pattern: str, word: bool=True, case_sensitive: bool=True, in_name: bool=True, 
                in_formula: bool=True, in_text: bool=True, list_result: str='_RES') -> List[str]:
         cdef string s_pattern = pattern.encode('utf-8')
         cdef string s_list_result = list_result.encode('utf-8')
-        return [name_other.decode() for name_other in self.abstract_db_ptr.search(s_pattern, 
+        return [name_other.decode() for name_other in self.abstract_database.search(s_pattern, 
                 <bint>word, <bint>case_sensitive, <bint>in_name, <bint>in_formula, <bint>in_text, s_list_result)]
 
     def get_names_from_pattern(self, list_name: str, pattern: str, xdim: str, ydim: str) -> bool:
@@ -157,17 +156,17 @@ cdef class CythonIodeDatabase:
         W_close()
 
     def save(self, filepath: str, compress: bool):
-        self.abstract_db_ptr.save(filepath.encode(), <bint>compress)
+        self.abstract_database.save(filepath.encode(), <bint>compress)
 
     def clear(self):
-        self.abstract_db_ptr.clear()
+        self.abstract_database.clear()
 
     def size(self) -> int:
-        return self.abstract_db_ptr.size()
+        return self.abstract_database.size()
 
     def contains(self, item) -> bool:
-        return self.abstract_db_ptr.contains(item.encode())
+        return self.abstract_database.contains(item.encode())
 
     def remove_objects(self, names: List[str]):
         for name in names:
-            self.abstract_db_ptr.remove(name.encode())
+            self.abstract_database.remove(name.encode())

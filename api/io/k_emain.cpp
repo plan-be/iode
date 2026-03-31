@@ -396,7 +396,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
             KV_sample(dbv, smpl);
     }
 
-    KDBComments dbc = new KDBComments(false);
+    KDBComments dbc(false);
     if(cfile && cfile[0] != 0)
         success = dbc.load(std::string(cfile)); 
     
