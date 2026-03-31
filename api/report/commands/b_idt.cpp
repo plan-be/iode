@@ -99,7 +99,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     if(c_idts == NULL || nb_idts == 0)
     {
         kdb_var = KI_exec(*global_ws_idt,
-                          global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          *global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           *global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }
@@ -111,7 +111,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
         KDBIdentities kdb_idt(global_ws_idt.get(), idts, false);
         kdb_var = KI_exec(kdb_idt,
-                          global_ws_var.get(), SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          *global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
                           *global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }

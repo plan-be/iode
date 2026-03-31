@@ -197,19 +197,19 @@ static KDBScalars* KI_scalar_list(const KDBIdentities& dbi)
  *  @param [in]      KDB*   dbi     
  *  @return          int    0 always
  */
-static int KI_quick_extract(KDBVariables* dbv, const KDBIdentities& dbi) 
+static int KI_quick_extract(KDBVariables& dbv, const KDBIdentities& dbi) 
 {
     // get list of VARs names
     std::vector<std::string> names;
-    names.reserve(dbv->size());
-    for(const auto& [name, _] : dbv->k_objs)
+    names.reserve(dbv.size());
+    for(const auto& [name, _] : dbv.k_objs)
         names.push_back(name);
 
     // keep only VARs that have the same name as an IDT in dbi
     for(const std::string& name : names)
     {
         if(!dbi.contains(name))
-            dbv->remove(name);
+            dbv.remove(name);
     }
 
     return 0;
@@ -318,25 +318,19 @@ static int *KI_reorder(const KDBIdentities& dbi)
  *                                  -3 if there is no common sample between dbv_tmp and dbv
  *  
  */
-static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* source_name)
+static int KI_read_vars_db(KDBVariables& dbv, KDBVariables& dbv_tmp, char* source_name)
 {
     int start, start_tmp;
 
-    if(!dbv)
-    {
-        error_manager.append_error("Function KI_read_vars_db: input Variables database is null");
-        return -3;
-    }
-
     // get list of VARs to be read (from dbv_tmp)
     std::set<std::string> vars_to_read;
-    for(const auto& [name, var_ptr] : dbv->k_objs)
+    for(const auto& [name, var_ptr] : dbv.k_objs)
     {
         // series already present
         if(var_ptr->size() > 0)
             continue;
         
-        if(dbv_tmp->contains(name)) 
+        if(dbv_tmp.contains(name)) 
             vars_to_read.insert(name);
     }
 
@@ -344,8 +338,8 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
     if(vars_to_read.size() == 0)
         return 0;
 
-    Sample* vsmpl = dbv->sample;
-    Sample* tsmpl = dbv_tmp->sample;
+    Sample* vsmpl = dbv.sample;
+    Sample* tsmpl = dbv_tmp.sample;
     if(!tsmpl)
     {
         std::string msg = "Function KI_read_vars_db: the sample of the ";
@@ -361,8 +355,8 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
     // The sample of the KDB of the variables to read is empty 
     if(!vsmpl) 
     {
-        dbv->sample = new Sample(*tsmpl);
-        vsmpl = dbv->sample;
+        dbv.sample = new Sample(*tsmpl);
+        vsmpl = dbv.sample;
     }
     
     Sample smpl = vsmpl->intersection(*tsmpl);
@@ -380,7 +374,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
     int nb_found = 0;
     for(const std::string& name : vars_to_read)
     {
-        std::shared_ptr<Variable> var_ptr = dbv->get_obj_ptr(name);
+        std::shared_ptr<Variable> var_ptr = dbv.get_obj_ptr(name);
         // NOTE: should not happen because we check above that the VAR is present 
         //       in dbv before, but we put this check just in case to avoid a crash 
         if(!var_ptr)
@@ -395,7 +389,7 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
             continue;
 
         // get values to be copied from dbv_tmp
-        var_ptr = dbv_tmp->get_obj_ptr(name);
+        var_ptr = dbv_tmp.get_obj_ptr(name);
         if(!var_ptr)
         {
             std::string msg = "Execution of identities: the variable '" + name + "' has not been found in the ";
@@ -413,8 +407,8 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
             var[start + t] = (*var_ptr)[start_tmp + t];
 
         // update dbv with the copied VAR
-        dbv->remove(name);
-        dbv->set(name, var);
+        dbv.remove(name);
+        dbv.set(name, var);
         
         if(KEXEC_TRACE)
             W_printf((char*) "%s ", name.c_str());
@@ -438,13 +432,13 @@ static int KI_read_vars_db(KDBVariables* dbv, KDBVariables* dbv_tmp, char* sourc
  *                              -3 if there is no common sample between dbv and file
  *  
  */
-static int KI_read_vars_file(KDBVariables* dbv, char* file)
+static int KI_read_vars_file(KDBVariables& dbv, char* file)
 {
     char    **vars = NULL;
     int     nbv = 0, nbf;
 
     std::set<std::string> vars_to_read;
-    for(const auto& [name, var_ptr] : dbv->k_objs) 
+    for(const auto& [name, var_ptr] : dbv.k_objs) 
     {
         // series already loaded in dbv
         if(var_ptr->size() > 0) 
@@ -463,8 +457,8 @@ static int KI_read_vars_file(KDBVariables* dbv, char* file)
         return -1;
     }
     
-    KDBVariables* kdb = new KDBVariables(false);
-    bool success = kdb->load(std::string(file));
+    KDBVariables dbv_tmp(false);
+    bool success = dbv_tmp.load(std::string(file));
     if(!success) 
     {
         std::string msg = "Variables file '" + std::string(file) + "' not found";
@@ -472,18 +466,14 @@ static int KI_read_vars_file(KDBVariables* dbv, char* file)
         return -1;
     }
 
-    if(kdb->size() == 0) 
+    if(dbv_tmp.size() == 0) 
     {
-        delete kdb;
-        kdb = nullptr;
         std::string msg = "Variables file '" + std::string(file) + "' contains no variable";
         error_manager.append_error(msg);
         return -1;
     }
 
-    nbf = KI_read_vars_db(dbv, kdb, file);
-    delete kdb;
-    kdb = nullptr;
+    nbf = KI_read_vars_db(dbv, dbv_tmp, file);
 
     return nbf;
 }
@@ -503,7 +493,7 @@ static int KI_read_vars_file(KDBVariables* dbv, char* file)
  *                                  -1 if one of the files is not found
  *                                  -2 if some vars are not found in the files
  */
-static int KI_read_vars(const KDBIdentities& dbi, KDBVariables* dbv, KDBVariables* dbv_ws, 
+static int KI_read_vars(const KDBIdentities& dbi, KDBVariables& dbv, KDBVariables& dbv_ws, 
     int nb, char* files[])
 {
     int i, j, dim, nbf, nb_found = 0;
@@ -519,7 +509,7 @@ static int KI_read_vars(const KDBIdentities& dbi, KDBVariables* dbv, KDBVariable
     else 
     {
         // Files given, search in files in the same order as they are listed
-        for(i = 0;  i < nb && nb_found < dbv->size(); i++) 
+        for(i = 0;  i < nb && nb_found < dbv.size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
@@ -535,16 +525,16 @@ static int KI_read_vars(const KDBIdentities& dbi, KDBVariables* dbv, KDBVariable
     }
 
     // If all target VARs are not found, creates them with NaN values
-    if(nb_found < dbv->size()) 
+    if(nb_found < dbv.size()) 
     {
         j = 0;
-        dim = dbv->sample->nb_periods;
+        dim = dbv.sample->nb_periods;
         // using iterator to avoid concurrent modification of dbv when we add the 
         // missing VARs with NaN values
         std::string name;
         std::shared_ptr<Variable> var_ptr;
         std::shared_ptr<Variable> new_var_ptr;
-        for(auto it = dbv->k_objs.begin(); it != dbv->k_objs.end(); ++it)
+        for(auto it = dbv.k_objs.begin(); it != dbv.k_objs.end(); ++it)
         {
             name = it->first;
             var_ptr = it->second;
@@ -749,14 +739,14 @@ static int KI_read_scls(KDBScalars& dbs, const KDBScalars& dbs_ws, int nb, char*
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariables* dbv, KDBScalars& dbs, KDBIdentities& dbi, 
+static int KI_execute(KDBVariables& dbv, KDBScalars& dbs, KDBIdentities& dbi, 
     int* order, Sample* smpl)
 {
     int     tot_lg, start;
     char    *tmp;
     double  d;
 
-    start = smpl->start_period.difference(dbv->sample->start_period);
+    start = smpl->start_period.difference(dbv.sample->start_period);
     if(start < 0) 
         start = 0;
 
@@ -769,13 +759,13 @@ static int KI_execute(KDBVariables* dbv, KDBScalars& dbs, KDBIdentities& dbi,
         tot_lg = idt_clec->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, idt_clec, tot_lg);
-        if(L_link(dbv, &dbs, (CLEC *)tmp)) 
+        if(L_link(&dbv, &dbs, (CLEC *)tmp)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(dbv, &dbs, (CLEC *)tmp, t);
-            dbv->get_var_ptr(idt_name)[t] = d;
+            d = L_exec(&dbv, &dbs, (CLEC *)tmp, t);
+            dbv.get_var_ptr(idt_name)[t] = d;
         }
         SW_nfree(tmp);
     }
@@ -800,7 +790,7 @@ static int KI_execute(KDBVariables* dbv, KDBScalars& dbs, KDBIdentities& dbi,
  *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfiles[], KDBScalars& dbs, 
+KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfiles[], KDBScalars& dbs, 
     int ns, char* sfiles[], Sample* in_smpl)
 {
     int* order;
@@ -872,7 +862,7 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfile
         W_printf((char*) ".par1 tit_1\nVariables loaded\n");
     }
     
-    res = KI_read_vars(dbi, dbv_i, dbv, nv, vfiles);
+    res = KI_read_vars(dbi, *dbv_i, dbv, nv, vfiles);
     if(res != 0) 
     {
         SW_nfree(order);
@@ -900,8 +890,8 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables* dbv, int nv, char* vfile
     if(KEXEC_TRACE) 
         W_flush();
 
-    KI_execute(dbv_i, *dbs_i, dbi, order, exec_sample);
-    KI_quick_extract(dbv_i, dbi);
+    KI_execute(*dbv_i, *dbs_i, dbi, order, exec_sample);
+    KI_quick_extract(*dbv_i, dbi);
     SW_nfree(order);
     delete dbs_i;
     dbs_i = nullptr;
