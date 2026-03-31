@@ -226,7 +226,7 @@ protected:
 	/* k_sim_order.c */
 	void order(KDBEquations* dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	int get_eq_position(int posendo);
-	void compute_tri(KDBEquations* dbe, int** predecessors, int passes);
+	void compute_tri(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
 	int exo_to_endo(int posendo, int posexo);
@@ -311,12 +311,12 @@ private:
 	void sub_build_lists_order(char* lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int pre_order(KDBEquations* dbe, int** predecessors, int** successors);
-	int add_post(int** successors, int i, int pos);
-	int post_order(KDBEquations* dbe, int** predecessors, int** successors);
-	int build_pre_post_list(KDBEquations* dbe, int** predecessors, int from);
-	int build_inter_list(KDBEquations* dbe, int** predecessors);
-	void compute_tri_perm1(KDBEquations* dbe, int i, int* vars);
+	int pre_order(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
+	int add_post(std::vector<std::vector<int>>& successors, int i, int pos);
+	int post_order(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
+	int build_pre_post_list(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, int from);
+	int build_inter_list(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors);
+	void compute_tri_perm1(KDBEquations* dbe, int i, std::vector<int>& vars);
 	int compute_tri_begin(KDBEquations* dbe);
 	int compute_tri_end(KDBEquations* dbe);
 
