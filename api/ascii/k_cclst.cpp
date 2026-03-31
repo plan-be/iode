@@ -31,7 +31,7 @@
  *                                      -1 if the LST can't be created. (call to kerror() in that case)
  *  
  */
-static int read_lst(KDBLists* kdb, YYFILE* yy, char* name)
+static int read_lst(KDBLists& kdb, YYFILE* yy, char* name)
 {
     int keyw;
     char* lst;
@@ -60,7 +60,7 @@ static int read_lst(KDBLists* kdb, YYFILE* yy, char* name)
     {
         List lst_oem(lst);
         List lst_utf8 = oem_to_utf8(lst_oem);
-        kdb->set(name, lst_utf8);
+        kdb.set(name, lst_utf8);
     }
     catch(const std::exception&) 
     {
@@ -144,7 +144,7 @@ bool KDBLists::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                if(read_lst(this, yy, name) == 0) 
+                if(read_lst(*this, yy, name) == 0) 
                     cmpt++;
                 kmsg("Reading object %d : %s", cmpt, name);
                 break;
