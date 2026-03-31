@@ -478,7 +478,7 @@ calc2:
  *  described in the function KV_init_values(). 
  *  
  *  @param [in, out]    dbv      KDB*     KDB of variables on which the operation will be applied
- *  @param [in]         method   int      identification of the extrapolation method (see K_init_values())
+ *  @param [in]         method   int      identification of the extrapolation method (see init_values())
  *  @param [in]         smpl     Sample*  Sample on which the operation is to be carried out
  *  @param [in]         pattern  char*    if not NULL, restricted list of variables to extrapolate
  *                                        if NULL, all variables in KDB will be modified

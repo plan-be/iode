@@ -12,8 +12,8 @@
  *  List of functions 
  *  -----------------
  *  
- *   int KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
- *   int K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
+ *   int calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)                         Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.     
+ *   int simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)  Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.
  *
  */
 #include "api/constants.h"
@@ -37,7 +37,7 @@
  *  @return     int             0 if ok, -1 if dbe is empty    
  *  
  */
-int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)
+int CSimulation::calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)
 {
     int opasses = KSIM_PASSES;
     int osort = KSIM_SORT;
@@ -50,7 +50,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     }
 
     KSIM_DBE = dbe;
-    KSIM_DBV = (KDBVariables*) dbe;    // Pour reconstruire les listes dans K_lstorder via KSIM_NAME
+    KSIM_DBV = (KDBVariables*) dbe;    // Pour reconstruire les listes dans build_lists_order via KSIM_NAME
     KSIM_MAXDEPTH = dbe->size();
     KSIM_PASSES = tris;
 
@@ -82,8 +82,8 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
     }
 
     /* ORDERING EQUATIONS */
-    KE_order(dbe, NULL);
-    K_lstorder(pre, inter, post);
+    order(dbe, NULL);
+    build_lists_order(pre, inter, post);
 
     SW_nfree(KSIM_POSXK);
     SW_nfree(KSIM_POSXK_REV);
@@ -96,7 +96,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
 
 
 /**
- *  Initialize the function K_simul_SCC by allocating the needed global vars and linking the equations.
+ *  Initialize the function simulate_SCC by allocating the needed global vars and linking the equations.
  *  
  *  @param [in]         KDB*    dbe         global_ws_eqs or subset of global_ws_eqs containing all the model equations
  *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
@@ -108,7 +108,7 @@ int CSimulation::KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* i
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
+int CSimulation::simulate_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -199,7 +199,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 
@@ -207,7 +207,7 @@ int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* d
     KSIM_INTER = SCR_tbl_size((unsigned char**) inter);
     KSIM_POST = SCR_tbl_size((unsigned char**) post);
 
-    if(K_simul_SCC_init(dbe, dbv, dbs, smpl)) return -1;
+    if(simulate_SCC_init(dbe, dbv, dbs, smpl)) return -1;
 
     // Fixe l'ordre d'exécution dans KSIM_ORDER
     KSIM_ORDER = (int *)  SW_nalloc(sizeof(int) * (KSIM_PRE + KSIM_INTER + KSIM_POST));
@@ -219,10 +219,10 @@ int CSimulation::K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* d
     t = smpl->start_period.difference(dbv->sample->start_period);
 
     for(i = 0; i < smpl->nb_periods; i++, t++)
-        if(rc = K_simul_1(t)) 
+        if(rc = sub_simulate(t)) 
             goto fin;
 
 fin:
-    K_simul_free();
+    clear();
     return rc;
 }

@@ -104,7 +104,7 @@ public:
 
 	~CSimulation()
 	{
-		K_simul_free();
+		clear();
 	}
 
     // ==== GETTER AND SETTER ====
@@ -210,26 +210,26 @@ public:
     }
 
 	/* k_sim_main.c */
-	int K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
-		        Sample* smpl, char** endo_exo, char** eqs);
+	int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
+		         Sample* smpl, char** endo_exo, char** eqs);
 
 	/* k_sim_scc.c */
-	int KE_ModelCalcSCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post);
-	int K_simul_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
-		            char** pre, char** inter, char** post);
+	int calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post);
+	int simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+		             char** pre, char** inter, char** post);
 
 protected:
 	/* k_sim_main.c */
-	double K_calc_clec(int eqnb, int t, int varnb, int msg);
-	void K_lstorder(char* pre, char* inter, char* post);
+	double calculate_CLEC(int eqnb, int t, int varnb, int msg);
+	void build_lists_order(char* pre, char* inter, char* post);
 
 	/* k_sim_order.c */
-	void KE_order(KDBEquations* dbe, char** eqs);
-	int KE_poseq(int posendo);
-	void KE_tri(KDBEquations* dbe, int** predecessors, int passes);
+	void order(KDBEquations* dbe, char** eqs);
+	int get_eq_position(int posendo);
+	void compute_tri(KDBEquations* dbe, int** predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
-	int KE_exo2endo(int posendo, int posexo);
+	int exo_to_endo(int posendo, int posexo);
 
 	///< Name of the endogenous of equation i (possibly after endo-exo)
 	std::string KSIM_NAME(const int i) const
@@ -252,7 +252,7 @@ protected:
 	}
 
 private:
-	void K_simul_free()
+	void clear()
 	{
 		SW_nfree(KSIM_XK);
 		SW_nfree(KSIM_XK1);
@@ -270,30 +270,30 @@ private:
 	}
 
 	/* k_sim_main.c */
-	void K_init_values(int t);
-	void K_restore_XK(int t);
-	int K_prolog(int t);
-	int K_interdep(int t);
-	int K_interdep_1(int t);
-	int K_interdep_2(int t);
-	int K_epilog(int t);
-	int K_diverge(int t, char* c_name, double eps);
-	int K_simul_1(int t);
-	void K_lstorder_1(char* lstname, int eq1, int eqn);
+	void init_values(int t);
+	void restore_XK(int t);
+	int prolog(int t);
+	int interdep(int t);
+	int sub_interdep_1(int t);
+	int sub_interdep_2(int t);
+	int epilog(int t);
+	int diverge(int t, char* c_name, double eps);
+	int sub_simulate(int t);
+	void sub_build_lists_order(char* lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int KE_preorder(KDBEquations* dbe, int** predecessors, int** successors);
-	int KE_add_post(int** successors, int i, int pos);
-	int KE_postorder(KDBEquations* dbe, int** predecessors, int** successors);
-	int KE_pre(KDBEquations* dbe, int** predecessors, int from);
-	int KE_interdep(KDBEquations* dbe, int** predecessors);
-	void KE_tri_perm1(KDBEquations* dbe, int i, int* vars);
-	int KE_tri_begin(KDBEquations* dbe);
-	int KE_tri_end(KDBEquations* dbe);
+	int pre_order(KDBEquations* dbe, int** predecessors, int** successors);
+	int add_post(int** successors, int i, int pos);
+	int post_order(KDBEquations* dbe, int** predecessors, int** successors);
+	int build_pre_post_list(KDBEquations* dbe, int** predecessors, int from);
+	int build_inter_list(KDBEquations* dbe, int** predecessors);
+	void compute_tri_perm1(KDBEquations* dbe, int i, int* vars);
+	int compute_tri_begin(KDBEquations* dbe);
+	int compute_tri_end(KDBEquations* dbe);
 
 	/* k_sim_exo2endo.c */
-	int KE_findpath(int posendo, int posexo, int* depth);
+	int find_path(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int K_simul_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
+	int simulate_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
 };

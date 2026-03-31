@@ -82,9 +82,9 @@
  * List of functions 
  * -----------------
  *
- *      int K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
- *      void K_simul_free()                                             Frees all temporary allocated memory for the simulation.
- *      double K_calc_clec(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
+ *      int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs) Simulates a model defined by a set of equations and optional replacements endo-exo.
+ *      void clear()                                             Frees all temporary allocated memory for the simulation.
+ *      double calculate_CLEC(int eqnb, int t, int varnb, int msg)      Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  */
 #include "api/constants.h"
 #include "api/k_super.h"
@@ -133,7 +133,7 @@ int     CSimulation::KSIM_CPU_SORT = 0;
  *  @global     int     KSIM_START  initialisation method 
  *  
  */
-void CSimulation::K_init_values(int t)
+void CSimulation::init_values(int t)
 {
     if(KSIM_START == VAR_INIT_ASIS) 
         return;
@@ -158,7 +158,7 @@ void CSimulation::K_init_values(int t)
  *  @global [in]  double*    KSIM_XK   result of the last Gauss-Seidel iteration 
  *  
  */
-void CSimulation::K_restore_XK(int t)
+void CSimulation::restore_XK(int t)
 {
     int i, j;
     for(i = KSIM_PRE, j = 0; j < KSIM_INTER; i++, j++)
@@ -173,12 +173,12 @@ void CSimulation::K_restore_XK(int t)
  *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
-int CSimulation::K_prolog(int t)
+int CSimulation::prolog(int t)
 {
     double x;
     for(int i = 0; i < KSIM_PRE; i++)  
     {
-        x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
+        x = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_SET_VAL(KSIM_ORDER[i], t, x);
     }
     return 0;
@@ -201,7 +201,7 @@ int CSimulation::K_prolog(int t)
  *  @global [out]   double   KSIM_NORM    maximum difference bw endos before and after iteration
  *  
  */
-int CSimulation::K_interdep_1(int t)
+int CSimulation::sub_interdep_1(int t)
 {
     int     i, j;
     double  x;
@@ -215,7 +215,7 @@ int CSimulation::K_interdep_1(int t)
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
         /* execute lec */
-        x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
+        x = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
 
@@ -259,7 +259,7 @@ int CSimulation::K_interdep_1(int t)
  *                              0 otherwise
  *  @global [out]   double   KSIM_NORM    maximum difference between 2 iterations
  */
-int CSimulation::K_interdep_2(int t)
+int CSimulation::sub_interdep_2(int t)
 {
     int     i, j;
     double  d, pd;
@@ -271,7 +271,7 @@ int CSimulation::K_interdep_2(int t)
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
         /* execute lec and save in KSIM_XK1 */
-        KSIM_XK1[j] = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
+        KSIM_XK1[j] = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(KSIM_XK1[j])) 
             return -1;
@@ -317,22 +317,22 @@ int CSimulation::K_interdep_2(int t)
  *  Solves the interdependent part of the model by a modified Gauss-Seidel algorithm.
  *  
  *  Two methods are available depending on KSIM_RELAX sign: 
- *      - if KSIM_RELAX > 0: K_interdep_1() that "relaxes" each endo directly after its calculation
- *      - else:              K_interdep_2() that waits for the end of the iteration before "relaxing" 
+ *      - if KSIM_RELAX > 0: sub_interdep_1() that "relaxes" each endo directly after its calculation
+ *      - else:              sub_interdep_2() that waits for the end of the iteration before "relaxing" 
  *                              all endos at the same time
  *  
  *  @param [in] int     t   period to solve (=simulate)
  *  @return     int         0 on success, -1 on error
  *  
  */
-int CSimulation::K_interdep(int t)
+int CSimulation::interdep(int t)
 {
     int         rc;
     double      relax = KSIM_RELAX;
 
     KSIM_RELAX = fabs(relax);
-    if(relax >= 0)      rc = K_interdep_1(t);
-    else                rc = K_interdep_2(t);
+    if(relax >= 0)      rc = sub_interdep_1(t);
+    else                rc = sub_interdep_2(t);
 
     KSIM_RELAX = relax;
     return rc;
@@ -346,14 +346,14 @@ int CSimulation::K_interdep(int t)
  *  @return     int         0 (should be IODE_NAN on error ?)
  *  
  */
-int CSimulation::K_epilog(int t)
+int CSimulation::epilog(int t)
 {
     int     i, j;
     double  x;
 
     for(i = KSIM_PRE + KSIM_INTER, j = 0; j < KSIM_POST; i++, j++)  
     {
-        x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
+        x = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_SET_VAL(KSIM_ORDER[i], t, x);  
     }
 
@@ -362,7 +362,7 @@ int CSimulation::K_epilog(int t)
 
 
 /**
- *  At the end of a failed simulation, K_diverge() creates a list containing all the equations 
+ *  At the end of a failed simulation, diverge() creates a list containing all the equations 
  *  whose difference between the 2 last iterations exceeds KSIM_EPS.
  *  
  *  @param [in] int         t       current simulation period
@@ -375,7 +375,7 @@ int CSimulation::K_epilog(int t)
  *      replace B_ fns by K_ fns (see comments)
  *  
  */
-int CSimulation::K_diverge(int t, char* c_name, double eps)
+int CSimulation::diverge(int t, char* c_name, double eps)
 {
     char        *diverg = NULL;
     int         i, j;
@@ -393,7 +393,7 @@ int CSimulation::K_diverge(int t, char* c_name, double eps)
         KSIM_XK[j] = KSIM_VAL(KSIM_ORDER[i], t);
 
         /* execute lec */
-        x = K_calc_clec(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
+        x = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
@@ -428,7 +428,7 @@ int CSimulation::K_diverge(int t, char* c_name, double eps)
 
 
 /**
- *  Simulates one period of the current model (see K_simul() for more details on the model definition).
+ *  Simulates one period of the current model (see simulate() for more details on the model definition).
  *  
  *  The initial values of the endogenous variables are set before starting the process.
  *  
@@ -443,24 +443,24 @@ int CSimulation::K_diverge(int t, char* c_name, double eps)
  *  @return     int         0 no success, 
  *                          -1 on error (the algorithm does not reach a solution or a NaN value is generated).
  */
-int CSimulation::K_simul_1(int t)
+int CSimulation::sub_simulate(int t)
 {
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime;
     char    msg[80];
     long    ms_iter;
 
-    K_init_values(t);
+    init_values(t);
     KSIM_NITERS[t] = 0; 
     KSIM_NORMS[t] = 0;  
     KSIM_CPUS[t] = 0;  
-    if(K_prolog(t)) 
+    if(prolog(t)) 
         return -1;
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
     while(conv == 0 && it++ < KSIM_MAXIT) 
     {
         ms_iter = WscrGetMS();
-        rc = K_interdep(t);
+        rc = interdep(t);
         KSIM_NITERS[t]++; 			
         KSIM_NORMS[t] = KSIM_NORM;	
         if(rc) 
@@ -479,7 +479,7 @@ int CSimulation::K_simul_1(int t)
             kgetkey();      // Reads the keyboard buffer
             if(!kconfirm("Stop Simulation")) 
             {  
-                K_restore_XK(t);
+                restore_XK(t);
                 ktermvkey(ovtime); 
                 return -1;
             }
@@ -489,8 +489,8 @@ int CSimulation::K_simul_1(int t)
 
     if(conv) 
     {
-        K_restore_XK(t);
-        if(K_epilog(t)) 
+        restore_XK(t);
+        if(epilog(t)) 
             return -1;
         return 0;
     }
@@ -500,8 +500,8 @@ int CSimulation::K_simul_1(int t)
         err_msg += std::to_string(KSIM_MAXIT);
         err_msg += " iterations";
         error_manager.append_error(err_msg);
-        K_restore_XK(t);
-        K_diverge(t, "_DIVER", KSIM_EPS); // Saves the list of non convergent eqs in the list _DIVER
+        restore_XK(t);
+        diverge(t, "_DIVER", KSIM_EPS); // Saves the list of non convergent eqs in the list _DIVER
     }
 
     return -1;
@@ -526,7 +526,7 @@ int CSimulation::K_simul_1(int t)
  *                                      and exo1, exo2 replace endo1 and endo2 as endogenous to the model.
  *                                      NULL for a normal simulation (model solved with respect to default endogenous) 
  *  @param [in] char**  eqs         set of equations defining the model to simulate, not necessarily in alphabetic order
- *                                  NULL if the order must be calculated by K_simul()
+ *                                  NULL if the order must be calculated by simulate()
  *  @return     int                 0 on succes, -1 on error            
  *  
  *  @global [out] double   *KSIM_NORMS     convergence threshold reached at the end of each simulation period
@@ -543,7 +543,7 @@ int CSimulation::K_simul_1(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
+int CSimulation::simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
     Sample* smpl, char** endo_exo, char** eqs)
 {
     int     i, t, bt, at, j, k, res, endo_exonb,
@@ -664,7 +664,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
                 goto fin;
             }
             
-            res = KE_exo2endo(posendo, posexo);
+            res = exo_to_endo(posendo, posexo);
             if(res < 0) 
             {
                 rc = -1;
@@ -677,9 +677,9 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
     }
 
     // ORDERING EQUATIONS 
-    KE_order(dbe, eqs);
+    order(dbe, eqs);
     if(KSIM_DEBUG) 
-        K_lstorder("_PRE", "_INTER", "_POST");
+        build_lists_order("_PRE", "_INTER", "_POST");
 
     // SIMULATE 
     KSIM_XK  = (double *) SW_nalloc(sizeof(double) * KSIM_INTER);
@@ -688,7 +688,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
     for(i = 0; i < smpl->nb_periods; i++, t++) 
     {
         cpu_iter = WscrGetMS();
-        if(rc = K_simul_1(t)) 
+        if(rc = sub_simulate(t)) 
             goto fin;
         
         KSIM_CPUS[t] = WscrGetMS() - cpu_iter;
@@ -714,7 +714,7 @@ int CSimulation::K_simul(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs,
 
 fin:
     SCR_free_tbl((unsigned char**) var);
-    K_simul_free();
+    clear();
     return rc;
 }
 
@@ -725,7 +725,7 @@ fin:
  *  If the varnb is not the endogenous variable of the equation eqnb or if the equation was not analytically 
  *  solved with respect to its endogenous, the funtion L_zero() is called to (try to) solve the equation numerically.
  *  
- *  The equation must be linked before the call to K_calc_clec().
+ *  The equation must be linked before the call to calculate_CLEC().
  *  
  *  If no solution can be found, the function kerror() is called to display an error message
  *  
@@ -738,7 +738,7 @@ fin:
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
-double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
+double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
 {
     int eqvarnb = -1;
     double x;
@@ -771,14 +771,14 @@ double CSimulation::K_calc_clec(int eqnb, int t, int varnb, int msg)
 /**
  *  Creates or updates a list of equations from equation KSIM_ORDER[eq1] to equation KSIM_ORDER[eqn].
  *  
- *  Sub-function  of K_lstorder().
+ *  Sub-function  of build_lists_order().
  *  
  *  @param [in] char*   lstname     name of the list to be created / updated    
  *  @param [in] int     eq1         first equation position in KSIM_ORDER (name = KSIM_NAME[KSIM_ORDER[eq1]])
  *  @param [in] int     eqn         last equation pos in KSIM_ORDER (name = KSIM_NAME[KSIM_ORDER[eqn]])
  *  
  */
-void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
+void CSimulation::sub_build_lists_order(char* lstname, int eq1, int eqn)
 {
     U_ch** lst = NULL;                     
     U_ch** tbl_todel = NULL;
@@ -816,17 +816,17 @@ void CSimulation::K_lstorder_1(char* lstname, int eq1, int eqn)
 /**
  *  Creates 3 lists of equations: the prolog, the epilog and the interdependent part of the model.
  *  
- *  Called by K_simul() if KSIM_DEBUG is not null: creates the lists _PRE, _INTER and _POST.
+ *  Called by simulate() if KSIM_DEBUG is not null: creates the lists _PRE, _INTER and _POST.
  *   
  *  @param [in] char*   pre     name of the list containing the prolog  
  *  @param [in] char*   inter   name of the list containing the interdep
  *  @param [in] char*   post    name of the list containing the epilog
  *  
  */
-void CSimulation::K_lstorder(char* pre, char* inter, char *post)
+void CSimulation::build_lists_order(char* pre, char* inter, char *post)
 {
-    K_lstorder_1(pre,   0, 					   KSIM_PRE - 1);
-    K_lstorder_1(inter, KSIM_PRE, 			   KSIM_PRE + KSIM_INTER - 1);
-    K_lstorder_1(post,  KSIM_PRE + KSIM_INTER, KSIM_PRE + KSIM_INTER + KSIM_POST - 1);
+    sub_build_lists_order(pre,   0, 					   KSIM_PRE - 1);
+    sub_build_lists_order(inter, KSIM_PRE, 			   KSIM_PRE + KSIM_INTER - 1);
+    sub_build_lists_order(post,  KSIM_PRE + KSIM_INTER, KSIM_PRE + KSIM_INTER + KSIM_POST - 1);
 }
 
