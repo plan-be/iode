@@ -18,31 +18,28 @@ import pandas as pd
 
 
 cdef class Equations(CythonIodeDatabase):
-    cdef bint ptr_owner
+    cdef shared_ptr[KDBEquations] database_ptr
     cdef KDBEquations* database
 
     def __cinit__(self, filepath: str=None) -> Equations:
-        self.ptr_owner = False
-        self.database = cpp_global_equations.get()
-        self.abstract_database = cpp_global_equations.get()
+        self.database_ptr = cpp_global_equations
+        self.database = self.database_ptr.get()
+        self.abstract_database = self.database
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database is not NULL:
-            del self.database
-            self.database = NULL
+        self.database_ptr.reset()
+        self.database = NULL
 
     @staticmethod
-    cdef Equations _from_ptr(KDBEquations* database = NULL, bint owner=False):
+    cdef Equations _from_ptr(shared_ptr[KDBEquations] database_ptr):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Equations wrapper = Equations.__new__(Equations)
-        if database is not NULL:
-            wrapper.ptr_owner = owner
-            wrapper.database = database
-            wrapper.abstract_database = database
+        if database_ptr.get() is not NULL:
+            wrapper.database_ptr = database_ptr
         else:
-            wrapper.ptr_owner = False
-            wrapper.database = cpp_global_equations.get()
-            wrapper.abstract_database = cpp_global_equations.get()
+            wrapper.database_ptr = cpp_global_equations
+        wrapper.database = wrapper.database_ptr.get()
+        wrapper.abstract_database = wrapper.database
         return wrapper
 
     def _load(self, filepath: str):
@@ -50,8 +47,8 @@ cdef class Equations(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Equations:
-        cdef KDBEquations* subset_db_ptr = new KDBEquations(self.database, pattern.encode(), <bint>copy)
-        subset = Equations._from_ptr(subset_db_ptr, <bint>True)
+        cdef shared_ptr[KDBEquations] subset_db_ptr = make_shared[KDBEquations](self.database, pattern.encode(), <bint>copy)
+        subset = Equations._from_ptr(subset_db_ptr)
         return subset
 
     def get_lec(self, name: str) -> str:

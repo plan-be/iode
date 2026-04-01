@@ -13,31 +13,28 @@ import pandas as pd
 
 
 cdef class Scalars(CythonIodeDatabase):
-    cdef bint ptr_owner
+    cdef shared_ptr[KDBScalars] database_ptr
     cdef KDBScalars* database
 
     def __cinit__(self, filepath: str=None) -> Scalars:
-        self.ptr_owner = False
-        self.database = cpp_global_scalars.get()
-        self.abstract_database = cpp_global_scalars.get()
+        self.database_ptr = cpp_global_scalars
+        self.database = self.database_ptr.get()
+        self.abstract_database = self.database
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database is not NULL:
-            del self.database
-            self.database = NULL
+        self.database_ptr.reset()
+        self.database = NULL
 
     @staticmethod
-    cdef Scalars _from_ptr(KDBScalars* database = NULL, bint owner=False):
+    cdef Scalars _from_ptr(shared_ptr[KDBScalars] database_ptr):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Scalars wrapper = Scalars.__new__(Scalars)
-        if database is not NULL:
-            wrapper.ptr_owner = owner
-            wrapper.database = database
-            wrapper.abstract_database = database
+        if database_ptr.get() is not NULL:
+            wrapper.database_ptr = database_ptr
         else:
-            wrapper.ptr_owner = False
-            wrapper.database = cpp_global_scalars.get()
-            wrapper.abstract_database = cpp_global_scalars.get()
+            wrapper.database_ptr = cpp_global_scalars
+        wrapper.database = wrapper.database_ptr.get()
+        wrapper.abstract_database = wrapper.database
         return wrapper
 
     def _load(self, filepath: str):
@@ -45,8 +42,8 @@ cdef class Scalars(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Scalars:
-        cdef KDBScalars* subset_db_ptr = new KDBScalars(self.database, pattern.encode(), <bint>copy)
-        subset = Scalars._from_ptr(subset_db_ptr, <bint>True)
+        cdef shared_ptr[KDBScalars] subset_db_ptr = make_shared[KDBScalars](self.database, pattern.encode(), <bint>copy)
+        subset = Scalars._from_ptr(subset_db_ptr)
         return subset
 
     def _get_object(self, name: str) -> Scalar:
