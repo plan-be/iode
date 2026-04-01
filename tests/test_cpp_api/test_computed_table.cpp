@@ -876,7 +876,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // ---- binary table files ----
 
-    KDBTables* bin_kdb_tables = new KDBTables(false);
+    std::shared_ptr<KDBTables> bin_kdb_tables = std::make_shared<KDBTables>(false);
     bin_kdb_tables->load(input_test_dir + "fun.tbl");
     
     std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
@@ -953,7 +953,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.html", 'H');
     compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
 
-    delete bin_kdb_tables;
+    bin_kdb_tables->clear();
 
     // ---- titles with special character '#' ----
     

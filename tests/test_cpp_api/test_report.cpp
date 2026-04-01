@@ -73,7 +73,7 @@ TEST_F(ReportTest, REPORT_LINE)
 
     std::string command;
     std::shared_ptr<Table> tbl_ptr;
-    KDBTables* subset_tbl = new KDBTables(global_ws_tbl.get(), "A*", false);
+    std::shared_ptr<KDBTables> subset_tbl = std::make_shared<KDBTables>(global_ws_tbl.get(), "A*", false);
     for(const std::string& name : subset_tbl->get_names())
     {
         // **** C++ API ****
