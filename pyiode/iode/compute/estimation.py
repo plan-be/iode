@@ -150,8 +150,7 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> df_scalars["df3"]
     Scalar(-0.211047, 0.170708, 0.170708)
     """
-    cy_scalars_db = CythonScalars()
-    cy_scalars_db = cython_dickey_fuller_test(cy_scalars_db, lec, drift, trend, order)
+    cy_scalars_db: CythonScalars = cython_dickey_fuller_test(lec, drift, trend, order)
     if cy_scalars_db is None:
         raise RuntimeError("Dickey-Fuller test failed. No scalars database created.")
     scalars_db = Scalars.from_cython_obj(cy_scalars_db)
@@ -703,8 +702,7 @@ class EditAndEstimateEquations:
         >>> scalars_res.names
         ['acaf1', 'acaf2', 'acaf4', 'dpuh_1', 'dpuh_2']
         """
-        cy_scalars_db = CythonScalars()
-        cy_scalars_db = self._cy_estimation.get_scalars_db(cy_scalars_db)
+        cy_scalars_db: CythonScalars = self._cy_estimation.get_scalars_db()
         if cy_scalars_db is None:
             warnings.warn("Estimation Scalars database has not been defined yet.")
             return None
@@ -746,8 +744,7 @@ class EditAndEstimateEquations:
         >>> equations_res.names
         ['ACAF', 'DPUH']
         """
-        cy_equations_db = CythonEquations()
-        cy_equations_db = self._cy_estimation.get_equations_db(cy_equations_db)
+        cy_equations_db: CythonEquations = self._cy_estimation.get_equations_db()
         if cy_equations_db is None:
             warnings.warn("Estimation Equations database has not been defined yet.")
             return None

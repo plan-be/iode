@@ -13,31 +13,28 @@ import pandas as pd
 
 
 cdef class Lists(CythonIodeDatabase):
-    cdef bint ptr_owner
+    cdef shared_ptr[KDBLists] database_ptr
     cdef KDBLists* database
 
     def __cinit__(self, filepath: str=None) -> Lists:
-        self.ptr_owner = False
-        self.database = cpp_global_lists.get()
-        self.abstract_database = cpp_global_lists.get()
+        self.database_ptr = cpp_global_lists
+        self.database = self.database_ptr.get()
+        self.abstract_database = self.database
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database is not NULL:
-            del self.database
-            self.database = NULL
+        self.database_ptr.reset()
+        self.database = NULL
 
     @staticmethod
-    cdef Lists _from_ptr(KDBLists* database = NULL, bint owner=False):
+    cdef Lists _from_ptr(shared_ptr[KDBLists] database_ptr):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Lists wrapper = Lists.__new__(Lists)
-        if database is not NULL:
-            wrapper.ptr_owner = owner
-            wrapper.database = database
-            wrapper.abstract_database = database
+        if database_ptr.get() is not NULL:
+            wrapper.database_ptr = database_ptr
         else:
-            wrapper.ptr_owner = False
-            wrapper.database = cpp_global_lists.get()
-            wrapper.abstract_database = cpp_global_lists.get()
+            wrapper.database_ptr = cpp_global_lists
+        wrapper.database = wrapper.database_ptr.get()
+        wrapper.abstract_database = wrapper.database
         return wrapper
 
     def _load(self, filepath: str):
@@ -45,8 +42,8 @@ cdef class Lists(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Lists:
-        cdef KDBLists* subset_db_ptr = new KDBLists(self.database, pattern.encode(), <bint>copy)
-        subset = Lists._from_ptr(subset_db_ptr, <bint>True)
+        cdef shared_ptr[KDBLists] subset_db_ptr = make_shared[KDBLists](self.database, pattern.encode(), <bint>copy)
+        subset = Lists._from_ptr(subset_db_ptr)
         return subset
 
     def _get_object(self, name: str) -> str:

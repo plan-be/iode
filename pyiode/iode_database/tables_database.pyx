@@ -14,33 +14,30 @@ from pyiode.iode_database.cpp_api_database cimport B_TABLE_TITLE, B_PrintObjTblT
 
 
 cdef class Tables(CythonIodeDatabase):
-    cdef bint ptr_owner
+    cdef shared_ptr[KDBTables] database_ptr
     cdef KDBTables* database
     cdef int print_as
 
     def __cinit__(self, filepath: str=None) -> Tables:
-        self.ptr_owner = False
-        self.database = cpp_global_tables.get()
-        self.abstract_database = cpp_global_tables.get()
+        self.database_ptr = cpp_global_tables
+        self.database = self.database_ptr.get()
+        self.abstract_database = self.database
         self.print_as = B_TABLE_TITLE
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database is not NULL:
-            del self.database
-            self.database = NULL
+        self.database_ptr.reset()
+        self.database = NULL
 
     @staticmethod
-    cdef Tables _from_ptr(KDBTables* database = NULL, bint owner=False):
+    cdef Tables _from_ptr(shared_ptr[KDBTables] database_ptr):
         # call to __new__() that bypasses the __init__() constructor.
         cdef Tables wrapper = Tables.__new__(Tables)
-        if database is not NULL:
-            wrapper.ptr_owner = owner
-            wrapper.database = database
-            wrapper.abstract_database = database
+        if database_ptr.get() is not NULL:
+            wrapper.database_ptr = database_ptr
         else:
-            wrapper.ptr_owner = False
-            wrapper.database = cpp_global_tables.get()
-            wrapper.abstract_database = cpp_global_tables.get()
+            wrapper.database_ptr = cpp_global_tables
+        wrapper.database = wrapper.database_ptr.get()
+        wrapper.abstract_database = wrapper.database
         wrapper.print_as = B_TABLE_TITLE
         return wrapper
 
@@ -49,8 +46,8 @@ cdef class Tables(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Tables:
-        cdef KDBTables* subset_db_ptr = new KDBTables(self.database, pattern.encode(), <bint>copy)
-        subset = Tables._from_ptr(subset_db_ptr, <bint>True)
+        cdef shared_ptr[KDBTables] subset_db_ptr = make_shared[KDBTables](self.database, pattern.encode(), <bint>copy)
+        subset = Tables._from_ptr(subset_db_ptr)
         return subset
 
     def get_title(self, name: str) -> str:

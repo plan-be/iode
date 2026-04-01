@@ -1,5 +1,6 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr, make_shared
 
 from pyiode.common cimport IodeAdjustmentMethod
 from pyiode.time.sample cimport CSample
@@ -20,16 +21,14 @@ def cython_dynamic_adjustment(method: int, eqs: str, c1: str, c2: str) -> str:
     return cpp_dynamic_adjustment(<IodeAdjustmentMethod>method, eqs.encode(), c1.encode(), c2.encode()).decode()
 
 
-def cython_dickey_fuller_test(scalars_db: Scalars, lec: str, drift: bool, trend: bool, order: int) -> Scalars:
+def cython_dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalars:
     # NOTE: cpp_dickey_fuller_test allocates a new KDBScalars* pointer
     cdef KDBScalars* cpp_scalars
     cpp_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
     if cpp_scalars is NULL:
         return None
-
-    scalars_db.ptr_owner = <bint>True
-    scalars_db.database = cpp_scalars
-    scalars_db.abstract_database = cpp_scalars
+    cdef shared_ptr[KDBScalars] scalars_ptr = shared_ptr[KDBScalars](cpp_scalars)
+    scalars_db = Scalars._from_ptr(scalars_ptr)
     return scalars_db
 
 
@@ -141,25 +140,35 @@ cdef class CythonEditAndEstimateEquations:
     def update_scalars(self):
         self.c_estimation_ptr.update_scalars()
 
-    def get_scalars_db(self, scalars_db: Scalars) -> Scalars:
+    def get_scalars_db(self) -> Scalars:
         cdef KDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
         if c_scalars_ptr is NULL:
             return None
-        scalars_db.ptr_owner = <bint>False
+        # TODO : remove lines below when self.c_estimation_ptr.get_scalars() will return 
+        #        a shared_ptr<KDBScalars> instead of a raw pointer KDBScalars*
+        cdef shared_ptr[KDBScalars] scalars_ptr = make_shared[KDBScalars](<bint>False)
+        scalars_db = Scalars._from_ptr(scalars_ptr)
         scalars_db.database = c_scalars_ptr
         scalars_db.abstract_database = c_scalars_ptr
+        # ---- END TODO ----
+        # scalars_db = Scalars._from_ptr(scalars_ptr)
         return scalars_db
 
     def get_equations_list(self) -> List[str]:
         return [eq_name.decode() for eq_name in self.c_estimation_ptr.get_list_equations()]
 
-    def get_equations_db(self, equations_db: Equations) -> Equations:
+    def get_equations_db(self) -> Equations:
         cdef KDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
         if c_equations_ptr is NULL:
             return None
-        equations_db.ptr_owner = <bint>False
+        # TODO : remove lines below when self.c_estimation_ptr.get_equations() will return 
+        #        a shared_ptr<KDBEquations> instead of a raw pointer KDBEquations*
+        cdef shared_ptr[KDBEquations] equations_ptr = make_shared[KDBEquations](<bint>False) 
+        equations_db = Equations._from_ptr(equations_ptr)
         equations_db.database = c_equations_ptr
         equations_db.abstract_database = c_equations_ptr
+        # ---- END TODO ----
+        # equations_db = Equations._from_ptr(equations_ptr)
         return equations_db
 
     def update_current_equation(self, lec: str, comment: str):

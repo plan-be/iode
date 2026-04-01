@@ -53,38 +53,38 @@ class BinaryOperation(IntEnum):
 
 
 cdef class Variables(CythonIodeDatabase):
-    cdef bint ptr_owner
+    cdef shared_ptr[KDBVariables] database_ptr
     cdef KDBVariables* database
+    
     cdef IodeVarMode mode_
     cdef Period first_period_subset
     cdef Period last_period_subset
 
     def __cinit__(self, filepath: str=None) -> Variables:
-        self.ptr_owner = False
-        self.database = cpp_global_variables.get()
-        self.abstract_database = cpp_global_variables.get()
+        self.database_ptr = cpp_global_variables
+        self.database = self.database_ptr.get()
+        self.abstract_database = self.database
+        
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
         self.first_period_subset = None
         self.last_period_subset = None
 
     def __dealloc__(self):
-        if self.ptr_owner and self.database is not NULL:
-            del self.database
-            self.database = NULL
+        self.database_ptr.reset()
+        self.database = NULL
 
     @staticmethod
-    cdef Variables _from_ptr(KDBVariables* database = NULL, bint owner=False):
+    cdef Variables _from_ptr(shared_ptr[KDBVariables] database_ptr):
         cdef CSample* c_sample
         # call to __new__() that bypasses the __init__() constructor.
         cdef Variables wrapper = Variables.__new__(Variables)
-        if database is not NULL:
-            wrapper.ptr_owner = owner
-            wrapper.database = database
-            wrapper.abstract_database = database
+        if database_ptr.get() is not NULL:
+            wrapper.database_ptr = database_ptr
         else:
-            wrapper.ptr_owner = False
-            wrapper.database = cpp_global_variables.get()
-            wrapper.abstract_database = cpp_global_variables.get()
+            wrapper.database_ptr = cpp_global_variables
+        wrapper.database = wrapper.database_ptr.get()
+        wrapper.abstract_database = wrapper.database
+        
         wrapper.mode_ = IodeVarMode.VAR_MODE_LEVEL
         wrapper.first_period_subset = None
         wrapper.last_period_subset = None
@@ -114,8 +114,8 @@ cdef class Variables(CythonIodeDatabase):
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
         cdef CSample* c_sample
         
-        cdef KDBVariables* subset_db_ptr = new KDBVariables(self.database, pattern.encode(), <bint>copy)
-        subset = Variables._from_ptr(subset_db_ptr, <bint>True)
+        cdef shared_ptr[KDBVariables] subset_db_ptr = make_shared[KDBVariables](self.database, pattern.encode(), <bint>copy)
+        subset = Variables._from_ptr(subset_db_ptr)
 
         subset.mode_ = IodeVarMode.VAR_MODE_LEVEL
         subset.first_period_subset = first_period
