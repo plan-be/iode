@@ -1188,7 +1188,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     char    **varlist;
     Sample  *smpl;
     int     rc;
-    KDBTables*    kdbt;
+    std::shared_ptr<KDBTables>    kdbt;
     KDBVariables* kdbv; 
 
     U_test_suppress_a2m_msgs();
@@ -1203,8 +1203,8 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
-    kdbt = global_ws_tbl.get();
-    global_ref_tbl[0] = new KDBTables(*kdbt);
+    kdbt = global_ws_tbl;
+    global_ref_tbl[0] = std::make_shared<KDBTables>(*kdbt);
     EXPECT_NE(kdbt, nullptr);
 
     // Load a second VAR workspace in global_ref_var[2]
