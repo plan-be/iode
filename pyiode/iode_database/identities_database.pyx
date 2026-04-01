@@ -69,8 +69,8 @@ cdef class Identities(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Identities, overwrite: bool=True):        
-        cdef KDBIdentities* other_db_ptr = other.database
-        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef KDBIdentities* other_database = other.database
+        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
 
     def execute(self, identities: str, from_period: str, to_period: str, var_files: str, scalar_files: str, trace: bool=False) -> bool:
         return self.database.execute_identities(from_period.encode(), to_period.encode(), identities.encode(), 
