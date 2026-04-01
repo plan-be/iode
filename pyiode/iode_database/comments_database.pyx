@@ -59,8 +59,8 @@ cdef class Comments(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Comments, overwrite: bool=True):        
-        cdef shared_ptr[KDBComments] other_db_ptr = other.database_ptr
-        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef shared_ptr[KDBComments] other_database = other.database_ptr
+        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
 
     @classmethod
     def convert_file(cls, args: str) -> int:

@@ -168,7 +168,7 @@ public:
 	    std::string lst;
 	    static int  done = 0;
 
-        KDBLists*     kdb_lst = global_ws_lst.get();
+        std::shared_ptr<KDBLists>     kdb_lst = global_ws_lst;
         KDBVariables* kdb_var = global_ws_var.get();
 	
 	    // Create or update lists

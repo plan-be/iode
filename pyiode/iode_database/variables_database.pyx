@@ -549,8 +549,8 @@ cdef class Variables(CythonIodeDatabase):
         self.database.copy_from(s_input_files, s_from_period, s_to_period, s_names)
 
     def merge(self, other: Variables, overwrite: bool=True):        
-        cdef KDBVariables* other_db_ptr = other.database
-        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef KDBVariables* other_database = other.database
+        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
 
     def low_to_high(self, type_of_series: int, method: str, filepath: str, var_list: str):
         cpp_low_to_high(<IodeLowToHigh>type_of_series, <char>ord(method), filepath.encode(), var_list.encode())

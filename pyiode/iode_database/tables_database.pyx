@@ -73,8 +73,8 @@ cdef class Tables(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Tables, overwrite: bool=True):        
-        cdef KDBTables* other_db_ptr = other.database
-        self.database.merge(dereference(other_db_ptr), <bint>overwrite, <bint>False)
+        cdef KDBTables* other_database = other.database
+        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
 
     # Specify how to print a TABLE 
     #      0 : print table full definitions

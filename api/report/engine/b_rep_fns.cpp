@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    KDBLists* kdb = global_ws_lst.get();
+    std::shared_ptr<KDBLists> kdb = global_ws_lst;
 
     if(!kdb) 
         return res;
