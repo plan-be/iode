@@ -885,7 +885,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    KDBIdentities* kdb = global_ws_idt.get();
+    std::shared_ptr<KDBIdentities> kdb = global_ws_idt;
 
     if(!kdb) 
         return res;
