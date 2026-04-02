@@ -486,7 +486,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, Sample* smpl, int dt, int nt, KDBVariables* kdb, 
+           double ymin, double ymax, Sample* smpl, int dt, int nt, std::shared_ptr<KDBVariables> kdb, 
            char* names, int mode)
 {
     char    *buf, **vars;
@@ -552,7 +552,7 @@ fin:
  */
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, Sample* smpl, KDBVariables* kdb, char** names, int mode)
+    double ymin, double ymax, Sample* smpl, std::shared_ptr<KDBVariables> kdb, char** names, int mode)
 {
     int i, ng;
 
@@ -637,7 +637,7 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis,
     //int old_mode = global_VM, rc;
 
     //global_VM = mode;
-    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var.get(), names, mode); // JMP 8/8//2022
+    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var, names, mode); // JMP 8/8//2022
 
     //global_VM = old_mode;
     return rc;

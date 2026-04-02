@@ -305,7 +305,7 @@ inline std::array<std::unique_ptr<ImportCmtFromFile>, IODE_NB_IMPORT_FORMATS> im
 /*---------------- FUNCS -------------------------*/
 
 /* k_imain.c */
-KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl);
+std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl);
 std::shared_ptr<KDBComments> IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang);
 int IMP_RuleImport(int type, char* trace, char* rule, char* ode, char* asc, char* from, char* to, int fmt, int lang);
 

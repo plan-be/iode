@@ -588,8 +588,8 @@ int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
     char    *pattern = NULL;
-    KDBVariables* kdb = global_ws_var.get();
-    KDBVariables* nkdb = NULL;
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
+    std::shared_ptr<KDBVariables> nkdb = NULL;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);

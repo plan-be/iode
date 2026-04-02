@@ -34,9 +34,9 @@ int   KDBVariables::CSV_NBDEC = 15;
  *  @return                 int     0 on success, -1 if the var <name> cannot be created.
  *  
  */
-static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
+static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
 {
-    Sample* smpl = kdb->sample;
+    Sample* smpl = kdb.sample;
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
@@ -63,7 +63,7 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
 
     try
     {
-        kdb->set(name, var);
+        kdb.set(name, var);
     }
     catch(const std::exception&) 
     {
@@ -85,20 +85,14 @@ static int read_vec(KDBVariables* kdb, YYFILE* yy, char* name)
  *    
  *  @param [in, out]    yy         YY*     YY stream to read data from
  *  @param [in]         ask        int     see load_asc_type_ask() 
- *  @param [in]         db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
- *  @return                        KDB*    a new KDB of IODE vars or NULL on error
- *  
  */
-static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
+static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
 {
     int     cmpt = 0;
     ONAME   name;
     Sample* smpl = nullptr;
 
-    if(!kdb)
-        return false;
-
-    kdb->clear();  /* clear KDB */
+    kdb.clear();  /* clear KDB */
 
     // The keyword sample must be the first on the YY stream */
     // if not:
@@ -109,7 +103,8 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
         if(!ask) 
         {
             kwarning("%s Expected sample definition", YY_error(yy));
-            goto err;
+            kdb.clear();
+            return false;
         }
         else 
         {
@@ -121,9 +116,12 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
         smpl = K_read_smpl(yy);
 
     if(!smpl) 
-        goto err;
+    {
+        kdb.clear();
+        return false;
+    }
     
-    kdb->sample = new Sample(*smpl);
+    kdb.sample = new Sample(*smpl);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
@@ -140,7 +138,9 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
                 if(smpl->nb_periods == 0) 
                 {
                     kwarning("%s : undefined sample", YY_error(yy));
-                    goto err;
+                    kdb.clear();
+                    delete smpl;
+                    return false;
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
@@ -154,10 +154,7 @@ static bool load_yy(KDBVariables* kdb, YYFILE* yy, int ask)
         }
     }
 
-err:
-    if(smpl) delete smpl;
-    if(kdb) kdb->clear();
-    return false;
+    return true;
 }
 
 /**
@@ -206,7 +203,7 @@ bool KDBVariables::load_asc_type_ask(const std::string& file_or_string, int type
         return false;
     }
 
-    bool success = load_yy(this, yy, ask);
+    bool success = load_yy(*this, yy, ask);
     YY_close(yy);
     return success;
 }

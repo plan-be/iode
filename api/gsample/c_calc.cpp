@@ -74,7 +74,7 @@ static CLEC *COL_cp_clec(CLEC* clec)
  */
 static int COL_link(int i, CLEC* clec)
 {
-    KDBVariables* kdbv = (KDBVariables*) global_ref_var[i - 1];
+    std::shared_ptr<KDBVariables> kdbv = (std::shared_ptr<KDBVariables>) global_ref_var[i - 1];
     if(!kdbv) 
     {
         kmsg("File [%d] not present", i);
@@ -106,7 +106,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 {
     int     i, j, t[2], tmp, per;
     double  vy[2], vf[2], div, mant, sign;
-    KDBVariables* kdb = nullptr;
+    std::shared_ptr<KDBVariables> kdb = nullptr;
 
     /* deux fichiers */
     for(i = 0; i < 2; i++) 
@@ -121,7 +121,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
             return -1;
         
-        kdb = (KDBVariables*) global_ref_var[cl->cl_fnb[i] - 1];
+        kdb = (std::shared_ptr<KDBVariables>) global_ref_var[cl->cl_fnb[i] - 1];
 
         for(j = 0 ; j < 2 ; j++) 
         {

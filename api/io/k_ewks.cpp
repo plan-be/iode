@@ -13,7 +13,7 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for wks output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
- *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
+ *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
 #include "api/objs/kdb.h"

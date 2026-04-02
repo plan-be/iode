@@ -699,7 +699,7 @@ int RP_evaltime()
     if(RP_PER.year == 0) 
         return 0;
     
-    KDBVariables* kdb_var = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
     if(!kdb_var)
         return 0;
     Sample* sample = kdb_var->sample;
@@ -744,8 +744,8 @@ double RP_evallec(char* lec)
             error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
-        if(clec != 0 && !L_link(global_ws_var.get(), global_ws_scl, clec))
-            x = L_exec(global_ws_var.get(), global_ws_scl, clec, RP_T);
+        if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
+            x = L_exec(global_ws_var, global_ws_scl, clec, RP_T);
         SW_nfree(clec);
     }
 

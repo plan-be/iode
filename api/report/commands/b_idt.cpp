@@ -95,7 +95,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
     int nb_idts = SCR_tbl_size((unsigned char**) c_idts);
 
-    KDBVariables* kdb_var = nullptr;
+    std::shared_ptr<KDBVariables> kdb_var = nullptr;
     if(c_idts == NULL || nb_idts == 0)
     {
         kdb_var = KI_exec(*global_ws_idt,
@@ -133,10 +133,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     
     KV_sample(*kdb_var, smpl);
 
-    if(global_ws_var.get()) 
+    if(global_ws_var) 
         KV_merge_del(*global_ws_var, *kdb_var, 1);
     else
-        global_ws_var.reset(kdb_var);
+        global_ws_var = kdb_var;
 
     return 0;
 }

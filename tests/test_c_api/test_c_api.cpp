@@ -169,7 +169,7 @@ public:
 	    static int  done = 0;
 
         std::shared_ptr<KDBLists>     kdb_lst = global_ws_lst;
-        KDBVariables* kdb_var = global_ws_var.get();
+        std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
 	
 	    // Create or update lists
         if(kdb_lst->contains("LST1"))
@@ -261,9 +261,9 @@ public:
 	
 	    clec = L_cc(lec);
         EXPECT_TRUE(clec != NULL);
-	    rc = L_link(global_ws_var.get(), global_ws_scl, clec);
+	    rc = L_link(global_ws_var, global_ws_scl, clec);
 	    EXPECT_EQ(rc, 0);
-	    calc_val = L_exec(global_ws_var.get(), global_ws_scl, clec, t);
+	    calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
@@ -275,8 +275,8 @@ public:
 	
 	    clec = L_cc(lec);
 	    if(clec == NULL) return(IODE_NAN);
-	    if(L_link(global_ws_var.get(), global_ws_scl, clec)) return(IODE_NAN);
-	    res = L_exec(global_ws_var.get(), global_ws_scl, clec, t);
+	    if(L_link(global_ws_var, global_ws_scl, clec)) return(IODE_NAN);
+	    res = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    return res;
 	}
@@ -479,7 +479,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -536,7 +536,6 @@ public:
 	    int      rc;
 	    char     arg[256];
 	    double   *ACAF, ACAF92, ACAF00, ACAF16, ACAG92, ACAG00;
-        KDB*     kdb_var = global_ws_var.get();
 	
 	    // 1. Merge into an empty WS
 	    B_WsClearAll("");
@@ -554,7 +553,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 21; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -600,7 +599,7 @@ public:
 	
 	    // Create ACAF = 0 1 IODE_NAN...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
+	    ACAF = L_cc_link_exec("t", global_ws_var, global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         var[7] = IODE_NAN;
@@ -620,11 +619,11 @@ public:
 	    double  *A;
 	    int     nb;
 	
-	    if(!global_ws_var.get()) 
+	    if(!global_ws_var) 
             return false;
         
 	    nb = global_ws_var->sample->nb_periods;
-	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl);
+	    A = L_cc_link_exec(lec, global_ws_var, global_ws_scl);
 	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
 	    return true;
@@ -1053,25 +1052,23 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    KDBVariables* kdb_var = new KDBVariables(false);
+    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
     kdb_var->save_binary(out_filename);
-    delete kdb_var;
-    kdb_var = nullptr;
+    kdb_var.reset();
 
     // load (binary files)
     // load all objects
-    kdb_var = new KDBVariables(true);
+    kdb_var = std::make_shared<KDBVariables>(true);
     kdb_var->load_binary(VARIABLES, in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
-    delete kdb_var;
-    kdb_var = nullptr;
+    kdb_var.reset();
 
     // load only 2 objects
     char** objs = B_ainit_chk("ACAF ACAG", NULL, 0);
@@ -1080,21 +1077,20 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
         v_objs.push_back(std::string(objs[i]));
     SCR_free_tbl((unsigned char**) objs);
 
-    kdb_var = new KDBVariables(true);
+    kdb_var = std::make_shared<KDBVariables>(true);
     kdb_var->load_binary(VARIABLES, in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
-    delete kdb_var;
-    kdb_var = nullptr;
+    kdb_var.reset();
 }
 
 
 TEST_F(LegacyAPITest, Tests_Simulation)
 {
-    KDBVariables* kdbv;
+    std::shared_ptr<KDBVariables> kdbv;
     std::shared_ptr<KDBEquations> kdbe;
     std::shared_ptr<KDBScalars>   kdbs;
     Sample* smpl;
@@ -1110,7 +1106,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    kdbv = global_ws_var;
     EXPECT_NE(kdbv, nullptr);
     kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
@@ -1189,7 +1185,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     Sample  *smpl;
     int     rc;
     std::shared_ptr<KDBTables>    kdbt;
-    KDBVariables* kdbv; 
+    std::shared_ptr<KDBVariables> kdbv; 
 
     U_test_suppress_a2m_msgs();
 
@@ -1197,8 +1193,8 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
-    kdbv = global_ws_var.get();
-    global_ref_var[0] = new KDBVariables(*kdbv);
+    kdbv = global_ws_var;
+    global_ref_var[0] = std::make_shared<KDBVariables>(*kdbv);
     EXPECT_NE(kdbv, nullptr);
 
     // Load the Table workspace
@@ -2078,10 +2074,10 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(true);
+    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(true);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
-    global_ws_var.reset(kdb_var);
+    global_ws_var = kdb_var;
     U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
 
     U_test_print_title("Tests IMP CMT: Import Ascii Comments");
@@ -2125,10 +2121,10 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    KDBVariables* kdb_var = new KDBVariables(true);
+    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(true);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
-    global_ws_var.reset(kdb_var);
+    global_ws_var = kdb_var;
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
 
     U_test_reset_kmsg_msgs();
@@ -2261,10 +2257,10 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    KDBVariables* kdbv = global_ws_var.get();
-    EXPECT_NE(kdbv, nullptr);
+    std::shared_ptr<KDBVariables> kdbv = global_ws_var;
+    EXPECT_NE(kdbv.get(), nullptr);
     std::shared_ptr<KDBScalars> kdbs = global_ws_scl;
-    EXPECT_NE(kdbs, nullptr);
+    EXPECT_NE(kdbs.get(), nullptr);
     std::shared_ptr<KDBEquations> kdbe = global_ws_eqs;
     EXPECT_NE(kdbe.get(), nullptr);
 
@@ -2296,12 +2292,12 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
-    EXPECT_NE(kdbv, nullptr);
+    kdbv = global_ws_var;
+    EXPECT_NE(kdbv.get(), nullptr);
     kdbs = global_ws_scl;
-    EXPECT_NE(kdbs, nullptr);
+    EXPECT_NE(kdbs.get(), nullptr);
     kdbe = global_ws_eqs;
-    EXPECT_NE(kdbe, nullptr);
+    EXPECT_NE(kdbe.get(), nullptr);
 
     // Set values of endo UY
     global_ws_var->set_var("UY", "2000Y1", 650.0);
@@ -2342,12 +2338,12 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
-    EXPECT_NE(kdbv, nullptr);
+    kdbv = global_ws_var;
+    EXPECT_NE(kdbv.get(), nullptr);
     kdbs = global_ws_scl;
-    EXPECT_NE(kdbs, nullptr);
+    EXPECT_NE(kdbs.get(), nullptr);
     kdbe = global_ws_eqs;
-    EXPECT_NE(kdbe, nullptr);
+    EXPECT_NE(kdbe.get(), nullptr);
 
     //  3. Simulate & compare
     rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");

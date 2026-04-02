@@ -63,12 +63,12 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
     int rc = -1;
     CSimulation simu;
     if(v_eqs.size() == 0)
-        rc = simu.simulate(global_ws_eqs, global_ws_var.get(), global_ws_scl, smpl, CSimulation::KSIM_EXO);
+        rc = simu.simulate(global_ws_eqs, global_ws_var, global_ws_scl, smpl, CSimulation::KSIM_EXO);
     else 
     {
         std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), s_eqs, false);
         if(tdbe->size() > 0)
-            rc = simu.simulate(tdbe, global_ws_var.get(), global_ws_scl, smpl, 
+            rc = simu.simulate(tdbe, global_ws_var, global_ws_scl, smpl, 
                                 CSimulation::KSIM_EXO, v_eqs);
     }
 
@@ -362,7 +362,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     // Lance la simulation
     CSimulation simu;
-    int rc = simu.simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl, smpl, pre, inter, post);
+    int rc = simu.simulate_SCC(tdbe, global_ws_var, global_ws_scl, smpl, pre, inter, post);
 
     // Cleanup
     SCR_free_tbl((unsigned char**) pre);
@@ -419,7 +419,7 @@ static double *B_GetVarPtr(char* c_name)
  */
 static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
 {
-    if(!global_ws_var.get())
+    if(!global_ws_var)
         return -1;
 
     // Create var and get Ptr
@@ -451,7 +451,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  */
 static int B_CreateVarFromVecOfInts(char *name, int *vec)
 {
-    if(!global_ws_var.get())
+    if(!global_ws_var)
         return -1;
 
     // Create var and get Ptr

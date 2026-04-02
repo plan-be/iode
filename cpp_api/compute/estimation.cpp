@@ -326,7 +326,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
     int i_method = (int) method;
-    KDBVariables* kdb_var = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
     estimation = new Estimation(c_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
                                 i_method, maxit, eps);
     int res = estimation->estimate();
@@ -429,7 +429,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
     std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;
 
-    Estimation estimation(to_char_array(eqs), global_ws_eqs, global_ws_var.get(), global_ws_scl, 
+    Estimation estimation(to_char_array(eqs), global_ws_eqs, global_ws_var, global_ws_scl, 
                           to_char_array(from_period), to_char_array(to_period), -1, maxit, eps);
     int res = estimation.estimate();
     if(res != 0)

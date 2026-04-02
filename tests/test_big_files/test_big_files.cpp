@@ -12,10 +12,10 @@ TEST(BigFilesTest, Tests_BIG_WS)
     bool success;
     int nb_names = 0;
     int all_nb_names = 0;
-    KDB* kdb_var = nullptr;
-    KDB* kdb_shallow_copy = nullptr;
     char fullfilename[256];
     char out_filename[256];
+    std::shared_ptr<KDBVariables> kdb_var = nullptr;
+    std::shared_ptr<KDBVariables> kdb_shallow_copy = nullptr;
     std::chrono::duration<double> elapsed;
 
     kpause_continue = 1;
@@ -56,7 +56,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ==== Load all variables from big.var in GLOBAL and STANDALONE modes ====
 
         // ---- GLOBAL ----
-        kdb_var = new KDBVariables(true);
+        kdb_var = std::make_shared<KDBVariables>(true);
         auto start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(VARIABLES, fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -73,11 +73,11 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::vector<std::string> v_objs(set_objs.begin(), set_objs.end());
         nb_names = (int) v_objs.size();
 
-        delete kdb_var;
-        kdb_var = nullptr;
+        kdb_var->clear();
+        kdb_var.reset();
 
         // ---- STANDALONE ----
-        kdb_var = new KDBVariables(false);
+        kdb_var = std::make_shared<KDBVariables>(false);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(VARIABLES, fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -88,13 +88,14 @@ TEST(BigFilesTest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(STANDALONE - ALL VARS)  loaded " << std::to_string(kdb_var->size()) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl; 
-        delete kdb_var;
-        kdb_var = nullptr;
+        
+        kdb_var->clear();
+        kdb_var.reset();
 
         // ==== Load list of variables from big.var in GLOBAL and STANDALONE modes ====
 
         // ---- GLOBAL ----
-        kdb_var = new KDBVariables(true);
+        kdb_var = std::make_shared<KDBVariables>(true);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(VARIABLES, fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -105,11 +106,12 @@ TEST(BigFilesTest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(GLOBAL - SOME VARS)     loaded " << std::to_string(nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl;  
-        delete kdb_var; 
-        kdb_var = nullptr;
+    
+        kdb_var->clear();
+        kdb_var.reset();
 
         // ---- STANDALONE ----
-        kdb_var = new KDBVariables(false);
+        kdb_var = std::make_shared<KDBVariables>(false);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(VARIABLES, fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -120,8 +122,9 @@ TEST(BigFilesTest, Tests_BIG_WS)
         elapsed = end - start;
         std::cout << "(STANDALONE - SOME VARS) loaded " << std::to_string(nb_names) 
                   << " variables in " << elapsed.count() << " seconds" << std::endl; 
-        delete kdb_var;
-        kdb_var = nullptr;
+
+        kdb_var->clear();
+        kdb_var.reset();
 
         // **** B_WsLoad() performance test ****
 
@@ -138,7 +141,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== Only names matching a specific pattern ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = std::make_shared<KDBVariables>(global_ws_var.get(), pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(nb_names) 
@@ -148,7 +151,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), pattern, false);
+        kdb_shallow_copy = std::make_shared<KDBVariables>(global_ws_var.get(), pattern, false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(nb_names) 
@@ -159,7 +162,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
         // ==== All names from global_ws_var ====
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = std::make_shared<KDBVariables>(global_ws_var.get(), "*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_refer)                created a shallow copy of " << std::to_string(all_nb_names) 
@@ -169,7 +172,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_shallow_copy->clear();
 
         start = std::chrono::high_resolution_clock::now();
-        kdb_shallow_copy = new KDBVariables(global_ws_var.get(), "*", false);
+        kdb_shallow_copy = std::make_shared<KDBVariables>(global_ws_var.get(), "*", false);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(K_quick_refer)          created a shallow copy of " << std::to_string(all_nb_names) 

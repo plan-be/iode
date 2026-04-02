@@ -88,7 +88,7 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
             {
                 std::string from_period = smpl->start_period.to_string();
                 std::string to_period   = smpl->end_period.to_string();
-                Estimation est(pattern, dbe, global_ws_var.get(), global_ws_scl, 
+                Estimation est(pattern, dbe, global_ws_var, global_ws_scl, 
                                (char*) from_period.c_str(), (char*) to_period.c_str());
                 rc = est.estimate();
             }

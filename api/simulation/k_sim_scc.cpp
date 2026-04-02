@@ -47,8 +47,11 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
     KSIM_MAXDEPTH = dbe->size();
     KSIM_PASSES = tris;
 
-    // Pour reconstruire les listes dans build_lists_order via KSIM_NAME
-    KSIM_DBV = (KDBVariables*) dbe.get();
+    // to build the PRE, INTER and POST lists in build_lists_order() via KSIM_NAME
+    std::shared_ptr<Variable> var_ptr;
+    KSIM_DBV = std::make_shared<KDBVariables>(false);
+    for(const std::string& var_name : dbe->get_names())
+        KSIM_DBV->k_objs[var_name] = var_ptr;
 
     if(tris > 0) 
         KSIM_SORT = SORT_BOTH;
@@ -60,9 +63,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
     KSIM_POSXK = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
     KSIM_POSXK_REV = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
     for(int i = 0 ; i < dbe->size(); i++) 
-    {
         KSIM_POSXK_REV[i] = -1;  
-    }
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     std::string eq_name;
@@ -104,7 +105,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl)
+int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -195,7 +196,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 

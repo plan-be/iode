@@ -111,8 +111,8 @@ static int B_htol(int method, char* arg)
     int file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    KDBVariables* to = nullptr;
-    KDBVariables* from = new KDBVariables(false);
+    std::shared_ptr<KDBVariables> to = nullptr;
+    std::shared_ptr<KDBVariables> from = std::make_shared<KDBVariables>(false);
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
@@ -148,7 +148,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    to = new KDBVariables(false);
+    to = std::make_shared<KDBVariables>(false);
     to->sample = new Sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
@@ -197,12 +197,12 @@ static int B_htol(int method, char* arg)
     KV_merge(*global_ws_var, *to, 1);
 
 done:
-    if(to)
-        delete to;
-    to = nullptr;
-    if(from)
-        delete from;
-    from = nullptr;
+    to->clear();
+    to.reset();
+
+    from->clear();
+    from.reset();
+
     if(t_smpl)
         delete t_smpl;
     t_smpl = nullptr;
@@ -218,11 +218,11 @@ done:
 
 // Same function but acting on kdb instead of file and global_ws_var (for pyiode - larray)
 // !!! NOT TESTED !!!
-KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
+std::shared_ptr<KDBVariables> B_htol_kdb(int method, std::shared_ptr<KDBVariables> kdb_from)
 {
     int nb, rc = 0, f, t, shift, skip;
     Sample* t_smpl = nullptr;
-    KDBVariables* kdb_to = nullptr;
+    std::shared_ptr<KDBVariables> kdb_to = nullptr;
 
     int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
     if(res < 0) 
@@ -237,7 +237,7 @@ KDBVariables* B_htol_kdb(int method, KDBVariables* kdb_from)
         goto done;
     }
 
-    kdb_to = new KDBVariables(false);
+    kdb_to = std::make_shared<KDBVariables>(false);
     kdb_to->sample = new Sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : kdb_from->k_objs) 
     {

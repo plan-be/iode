@@ -106,8 +106,8 @@ double C_evallec(char* lec, int t)
             error_manager.append_error(error_msg);
             return x;
         }
-        if(clec != 0 && !L_link(global_ws_var.get(), global_ws_scl, clec))
-            x = L_exec(global_ws_var.get(), global_ws_scl, clec, t);
+        if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
+            x = L_exec(global_ws_var, global_ws_scl, clec, t);
         SW_nfree(clec);
     }
 
@@ -163,7 +163,7 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
     std::shared_ptr<Scalar> scl_ptr;
     if(nscl > 1) 
     {                   
-        Estimation* est = new Estimation(eqs, global_ws_eqs, global_ws_var.get(), global_ws_scl, smpl);
+        Estimation* est = new Estimation(eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
         est->estimate();
         delete est;
 
