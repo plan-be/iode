@@ -71,7 +71,7 @@ public:
 protected:
 	KDBVariables*  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
 	KDBScalars*    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
-	KDBEquations*  KSIM_DBE;         	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
+	std::shared_ptr<KDBEquations>  KSIM_DBE; 	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
 
@@ -210,12 +210,12 @@ public:
     }
 
 	/* k_sim_main.c */
-	int simulate(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+	int simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
 		char** endo_exo, const std::vector<std::string>& eqs = std::vector<std::string>());
 
 	/* k_sim_scc.c */
-	int calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post);
-	int simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+	int calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post);
+	int simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
 		             char** pre, char** inter, char** post);
 
 protected:
@@ -224,9 +224,9 @@ protected:
 	void build_lists_order(char* pre, char* inter, char* post);
 
 	/* k_sim_order.c */
-	void order(KDBEquations* dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
+	void order(std::shared_ptr<KDBEquations> dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	int get_eq_position(int posendo);
-	void compute_tri(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, int passes);
+	void compute_tri(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
 	int exo_to_endo(int posendo, int posexo);
@@ -311,18 +311,18 @@ private:
 	void sub_build_lists_order(char* lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int pre_order(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
+	int pre_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
 	int add_post(std::vector<std::vector<int>>& successors, int i, int pos);
-	int post_order(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
-	int build_pre_post_list(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors, int from);
-	int build_inter_list(KDBEquations* dbe, std::vector<std::vector<int>>& predecessors);
-	void compute_tri_perm1(KDBEquations* dbe, int i, std::vector<int>& vars);
-	int compute_tri_begin(KDBEquations* dbe);
-	int compute_tri_end(KDBEquations* dbe);
+	int post_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
+	int build_pre_post_list(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, int from);
+	int build_inter_list(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors);
+	void compute_tri_perm1(std::shared_ptr<KDBEquations> dbe, int i, std::vector<int>& vars);
+	int compute_tri_begin(std::shared_ptr<KDBEquations> dbe);
+	int compute_tri_end(std::shared_ptr<KDBEquations> dbe);
 
 	/* k_sim_exo2endo.c */
 	int find_path(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int simulate_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
+	int simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
 };

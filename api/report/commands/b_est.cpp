@@ -83,8 +83,7 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
     {
         try
         {
-            KDBEquations* dbe = new KDBEquations(global_ws_eqs.get(), std::string(pattern), false);
-
+            std::shared_ptr<KDBEquations> dbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), std::string(pattern), false);
             if(dbe->size() > 0)
             {
                 std::string from_period = smpl->start_period.to_string();
@@ -93,8 +92,6 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
                                (char*) from_period.c_str(), (char*) to_period.c_str());
                 rc = est.estimate();
             }
-            delete dbe;
-            dbe = nullptr;
         }
         catch(const std::exception& e)
         {

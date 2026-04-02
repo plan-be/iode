@@ -158,17 +158,11 @@ cdef class CythonEditAndEstimateEquations:
         return [eq_name.decode() for eq_name in self.c_estimation_ptr.get_list_equations()]
 
     def get_equations_db(self) -> Equations:
-        cdef KDBEquations* c_equations_ptr = self.c_estimation_ptr.get_equations()
-        if c_equations_ptr is NULL:
+        cdef shared_ptr[KDBEquations] equations_ptr = self.c_estimation_ptr.get_equations()
+        if equations_ptr.get() is NULL:
             return None
-        # TODO : remove lines below when self.c_estimation_ptr.get_equations() will return 
-        #        a shared_ptr<KDBEquations> instead of a raw pointer KDBEquations*
-        cdef shared_ptr[KDBEquations] equations_ptr = make_shared[KDBEquations](<bint>False) 
-        equations_db = Equations._from_ptr(equations_ptr)
-        equations_db.database = c_equations_ptr
-        equations_db.abstract_database = c_equations_ptr
         # ---- END TODO ----
-        # equations_db = Equations._from_ptr(equations_ptr)
+        equations_db = Equations._from_ptr(equations_ptr)
         return equations_db
 
     def update_current_equation(self, lec: str, comment: str):

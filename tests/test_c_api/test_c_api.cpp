@@ -1095,7 +1095,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 TEST_F(LegacyAPITest, Tests_Simulation)
 {
     KDBVariables* kdbv;
-    KDBEquations* kdbe;
+    std::shared_ptr<KDBEquations> kdbe;
     KDBScalars*   kdbs;
     Sample* smpl;
     char*   filename = "fun";
@@ -1114,7 +1114,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     EXPECT_NE(kdbv, nullptr);
     kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     // Check list _DIVER does not exist before simulation
@@ -1777,7 +1777,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
 
-    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
     std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
     eq_ptr->reset_tests();
     EXPECT_DOUBLE_EQ(eq_ptr->get_test_r2(), 0.0);
@@ -2240,11 +2240,8 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
 
 TEST_F(LegacyAPITest, Tests_B_MODEL)
 {
-    KDB         *kdbv,
-                *kdbe,
-                *kdbs;
-    char        *filename = "fun";
-    int         rc;
+    char* filename = "fun";
+    int rc;
 
     // B_Model*() tests
     // ----------------
@@ -2264,12 +2261,12 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var.get();
+    KDBVariables* kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    KDBScalars* kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
-    EXPECT_NE(kdbe, nullptr);
+    std::shared_ptr<KDBEquations> kdbe = global_ws_eqs;
+    EXPECT_NE(kdbe.get(), nullptr);
 
     // B_ModelSimulateParms()
     CSimulation::KSIM_START = VAR_INIT_TM1;
@@ -2303,7 +2300,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbv, nullptr);
     kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     // Set values of endo UY
@@ -2349,7 +2346,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbv, nullptr);
     kdbs = global_ws_scl.get();
     EXPECT_NE(kdbs, nullptr);
-    kdbe = global_ws_eqs.get();
+    kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
 
     //  3. Simulate & compare
@@ -2994,7 +2991,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
     out_filepath = str_output_test_dir + "fun2.ae";
     _unlink((char*) out_filepath.c_str());
-    KDBEquations* kdb_eqs = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
     rc = B_WsSave((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     B_WsClear("", EQUATIONS);

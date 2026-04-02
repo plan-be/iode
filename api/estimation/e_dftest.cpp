@@ -116,7 +116,7 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     Equation eq("_DF", std::string(buf), EQ_LSQ, "", "", "", "", "", false);
     global_ws_eqs->set("_DF", eq);
     
-    Estimation est(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
+    Estimation est(eqs, global_ws_eqs, global_ws_var.get(), global_ws_scl.get(), smpl);
     rc = est.estimate();
 
     global_ws_eqs->remove("_DF");

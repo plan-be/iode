@@ -67,7 +67,7 @@ protected:
     int       E_FROM;         // Position in E_DBV of the first period in the estimation sample
     int       E_MAXIT;        // Max number of iterations for the estimation
     int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
-    KDBEquations*  E_DBE;    // KDB of equations used for the estimation
+    std::shared_ptr<KDBEquations>  E_DBE;    // KDB of equations used for the estimation
     KDBScalars*    E_DBS;    // KDB of scalars used for the estimation
     KDBVariables*  E_DBV;    // KDB of variables used for the estimation 
     Sample    *E_SMPL;        // Current estimation sample
@@ -151,7 +151,7 @@ public:
      *  @param [in] int     maxit           max number of iterations
      *  @param [in] double  eps             convergence threshold
      */
-    Estimation(char* endos, KDBEquations* dbe = nullptr, KDBVariables* dbv = nullptr, 
+    Estimation(char* endos, std::shared_ptr<KDBEquations> dbe = nullptr, KDBVariables* dbv = nullptr, 
                KDBScalars* dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
@@ -179,7 +179,7 @@ public:
         smpl = nullptr;
     }
 
-    Estimation(char** endos, KDBEquations* dbe = nullptr, KDBVariables* dbv = nullptr, 
+    Estimation(char** endos, std::shared_ptr<KDBEquations> dbe = nullptr, KDBVariables* dbv = nullptr, 
                KDBScalars* dbs = nullptr, Sample* smpl = NULL, int method = -1, 
                int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
@@ -277,7 +277,7 @@ public:
     }
 
 private:
-    void initialize(char** endos, KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, 
+    void initialize(char** endos, std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, 
         Sample* smpl, int method, int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)
@@ -298,7 +298,7 @@ private:
             throw std::invalid_argument("Max iterations must be greater than 0");
         E_MAXIT = maxit;
 
-        E_DBE  = (dbe != NULL) ? dbe : global_ws_eqs.get();
+        E_DBE  = (dbe != NULL) ? dbe : global_ws_eqs;
         E_DBV  = (dbv != NULL) ? dbv : global_ws_var.get();
         E_DBS  = (dbs != NULL) ? dbs : global_ws_scl.get();
 

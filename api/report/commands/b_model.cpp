@@ -63,17 +63,13 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
     int rc = -1;
     CSimulation simu;
     if(v_eqs.size() == 0)
-        rc = simu.simulate(global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO);
+        rc = simu.simulate(global_ws_eqs, global_ws_var.get(), global_ws_scl.get(), smpl, CSimulation::KSIM_EXO);
     else 
     {
-        KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), s_eqs, false);
-        if(tdbe)
-        {
-            if(tdbe->size() > 0)
-                rc = simu.simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
-                                  CSimulation::KSIM_EXO, v_eqs);
-            delete tdbe;
-        }
+        std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), s_eqs, false);
+        if(tdbe->size() > 0)
+            rc = simu.simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, 
+                                CSimulation::KSIM_EXO, v_eqs);
     }
 
     return rc;
@@ -279,23 +275,16 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    KDBEquations* tdbe = nullptr;
+    std::shared_ptr<KDBEquations> tdbe = nullptr;
     std::string list_eqs = std::string(arg + lg1);
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
-        tdbe = global_ws_eqs.get();
+        tdbe = global_ws_eqs;
     else
-        tdbe = new KDBEquations(global_ws_eqs.get(), list_eqs, false);
+        tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), list_eqs, false);
 
     CSimulation simu;
     int rc = simu.calculate_SCC(tdbe, tris, pre, inter, post);
-
-    if(!list_eqs.empty())
-    {
-        delete tdbe;
-        tdbe = nullptr;
-    }
-
     return rc;
 }
 
@@ -369,15 +358,13 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    KDBEquations* tdbe = new KDBEquations(global_ws_eqs.get(), eqs, false);
+    std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), eqs, false);
 
     // Lance la simulation
     CSimulation simu;
     int rc = simu.simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), smpl, pre, inter, post);
 
     // Cleanup
-    delete tdbe;
-    tdbe = nullptr;
     SCR_free_tbl((unsigned char**) pre);
     SCR_free_tbl((unsigned char**) inter);
     SCR_free_tbl((unsigned char**) post);

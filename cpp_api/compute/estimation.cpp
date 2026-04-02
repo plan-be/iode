@@ -99,16 +99,15 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
     : estimation_done(false), sample(nullptr), method(EQ_LSQ), current_eq(v_equations.end())
 {
     set_sample(from, to);
-    kdb_eqs = new KDBEquations(false);
+    kdb_eqs = std::make_shared<KDBEquations>(false);
     kdb_scl = new KDBScalars(false);
 }
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
 {
     if(estimation_done) delete estimation;
-    if(sample)          delete sample;
-    if(kdb_eqs)         delete kdb_eqs;
-    if(kdb_scl)         delete kdb_scl;
+    if(sample)  delete sample;
+    if(kdb_scl) delete kdb_scl;
 }
 
 void EditAndEstimateEquations::set_block(const std::string& block, const std::string& current_eq_name)
@@ -422,7 +421,7 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
     std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;
 
-    Estimation estimation(to_char_array(eqs), global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), 
+    Estimation estimation(to_char_array(eqs), global_ws_eqs, global_ws_var.get(), global_ws_scl.get(), 
                           to_char_array(from_period), to_char_array(to_period), -1, maxit, eps);
     int res = estimation.estimate();
     if(res != 0)

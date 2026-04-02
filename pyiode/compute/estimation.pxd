@@ -58,7 +58,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         KDBScalars* get_scalars()
         void update_scalars() except +
 
-        KDBEquations* get_equations()
+        shared_ptr[KDBEquations] get_equations()
         set[string] get_list_equations()
         void update_current_equation(const string& lec, const string& comment) except +
 

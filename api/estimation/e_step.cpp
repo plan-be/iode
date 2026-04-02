@@ -163,7 +163,7 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
     std::shared_ptr<Scalar> scl_ptr;
     if(nscl > 1) 
     {                   
-        Estimation* est = new Estimation(eqs, global_ws_eqs.get(), global_ws_var.get(), global_ws_scl.get(), smpl);
+        Estimation* est = new Estimation(eqs, global_ws_eqs, global_ws_var.get(), global_ws_scl.get(), smpl);
         est->estimate();
         delete est;
 

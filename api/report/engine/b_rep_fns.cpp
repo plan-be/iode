@@ -930,7 +930,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch* res = 0, buf[128];
-    KDBEquations* kdb = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
 
     if(!kdb) 
         return res;
@@ -971,7 +971,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch* res = 0;
-    KDBEquations* kdb = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1009,7 +1009,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch* res = 0;
-    KDBEquations* kdb = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1082,7 +1082,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch* eq = 0, *rhs;
     int poscolon;
-    KDBEquations* kdb = global_ws_eqs.get();
+    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
