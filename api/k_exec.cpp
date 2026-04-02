@@ -158,7 +158,7 @@ static KDBVariables* KI_series_list(const KDBIdentities& dbi)
  *  @param [in] KDB*    dbi     KDB of identities
  *  @return     KDB*            KDB of all scalars found in dbi.
  */
-static KDBScalars* KI_scalar_list(const KDBIdentities& dbi)
+static std::shared_ptr<KDBScalars> KI_scalar_list(const KDBIdentities& dbi)
 {
     int     nb_names;
     LNAME   *lname;
@@ -166,7 +166,7 @@ static KDBScalars* KI_scalar_list(const KDBIdentities& dbi)
 
     Scalar new_scl;
     std::string name;
-    KDBScalars* dbs = new KDBScalars(false);
+    std::shared_ptr<KDBScalars> dbs = std::make_shared<KDBScalars>(false);
     for(const auto& [idt_name, idt] : dbi.k_objs) 
     {
         clec = idt->get_compiled_lec();
@@ -739,14 +739,14 @@ static int KI_read_scls(KDBScalars& dbs, const KDBScalars& dbs_ws, int nb, char*
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariables& dbv, KDBScalars& dbs, KDBIdentities& dbi, 
+static int KI_execute(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, KDBIdentities& dbi, 
     int* order, Sample* smpl)
 {
     int     tot_lg, start;
     char    *tmp;
     double  d;
 
-    start = smpl->start_period.difference(dbv.sample->start_period);
+    start = smpl->start_period.difference(dbv->sample->start_period);
     if(start < 0) 
         start = 0;
 
@@ -759,13 +759,13 @@ static int KI_execute(KDBVariables& dbv, KDBScalars& dbs, KDBIdentities& dbi,
         tot_lg = idt_clec->tot_lg;
         tmp = SW_nalloc(tot_lg);
         memcpy(tmp, idt_clec, tot_lg);
-        if(L_link(&dbv, &dbs, (CLEC *)tmp)) 
+        if(L_link(dbv, dbs, (CLEC*) tmp)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(&dbv, &dbs, (CLEC *)tmp, t);
-            dbv.get_var_ptr(idt_name)[t] = d;
+            d = L_exec(dbv, dbs, (CLEC*) tmp, t);
+            dbv->get_var_ptr(idt_name)[t] = d;
         }
         SW_nfree(tmp);
     }
@@ -872,7 +872,7 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
         return nullptr;
     }
 
-    KDBScalars* dbs_i = KI_scalar_list(dbi);
+    std::shared_ptr<KDBScalars> dbs_i = KI_scalar_list(dbi);
     if(KEXEC_TRACE) 
         W_printf((char*) ".par1 tit_1\nScalars loaded\n");
     res = KI_read_scls(*dbs_i, dbs, ns, sfiles);
@@ -881,8 +881,6 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
         SW_nfree(order);
         delete dbv_i;
         dbv_i = nullptr;
-        delete dbs_i;
-        dbs_i = nullptr;
         delete exec_sample;
         return nullptr;
     }
@@ -890,11 +888,9 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
     if(KEXEC_TRACE) 
         W_flush();
 
-    KI_execute(*dbv_i, *dbs_i, dbi, order, exec_sample);
+    KI_execute(dbv_i, dbs_i, dbi, order, exec_sample);
     KI_quick_extract(*dbv_i, dbi);
     SW_nfree(order);
-    delete dbs_i;
-    dbs_i = nullptr;
     delete exec_sample;
     return dbv_i;
 }

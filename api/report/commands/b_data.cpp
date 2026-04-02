@@ -266,12 +266,12 @@ int B_DataCalcVar(char* arg, int unused)
     if(lec[0]) 
     {
         CLEC* clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, global_ws_scl.get(), clec)) 
+        if(clec != 0 && !L_link(kdb, global_ws_scl, clec)) 
         {
             double d;
             for(int t = 0 ; t < kdb->sample->nb_periods ; t++) 
             {
-                d = L_exec(kdb, global_ws_scl.get(), clec, t);
+                d = L_exec(kdb, global_ws_scl, clec, t);
                 kdb->get_var_ptr(name)[t] = d;
             }
             SW_nfree(clec);

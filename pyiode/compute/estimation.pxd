@@ -19,7 +19,7 @@ from pyiode.iode_database.cpp_api_database cimport KDBScalars
 cdef extern from "cpp_api/compute/estimation.h":
     string dynamic_adjustment(const IodeAdjustmentMethod method, const string& eqs, 
                               const string& c1, const string& c2) except +
-    KDBScalars* dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
+    shared_ptr[KDBScalars] dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
 
 
     # Declaration of the CorrelationMatrix class
@@ -55,7 +55,7 @@ cdef extern from "cpp_api/compute/estimation.h":
         void set_instruments(const string& instruments) except +
 
         # Public methods
-        KDBScalars* get_scalars()
+        shared_ptr[KDBScalars] get_scalars()
         void update_scalars() except +
 
         shared_ptr[KDBEquations] get_equations()

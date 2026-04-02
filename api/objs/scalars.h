@@ -128,7 +128,7 @@ private:
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::shared_ptr<KDBScalars> global_ws_scl = std::make_shared<KDBScalars>(true);
-inline std::array<KDBScalars*, 5> global_ref_scl = { nullptr };
+inline std::array<std::shared_ptr<KDBScalars>, 5> global_ref_scl = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
 

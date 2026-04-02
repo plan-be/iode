@@ -282,7 +282,7 @@ Main functions for model simulations.
 
 |Syntax|Description|
 |:---|:---|
-|`int simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
+|`int simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void clear()`|Frees all temporary allocated memory for the simulation.|
 |`double calculate_CLEC(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
@@ -305,7 +305,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 |Syntax|Description|
 |:---|:---|
 |`int model_calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
-|`int simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
+|`int simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}
 
@@ -327,13 +327,13 @@ Two methods are used: a simple Newton\-Raphson method or a secant method in case
 
 |Syntax|Description|
 |:---|:---|
-|`double L_zero(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
-|`double L_newton(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
+|`double L_zero(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
+|`double L_newton(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
 
 #### l\_secant.c {#T17}
 
 |Syntax|Description|
 |:---|:---|
 |`static double L_fx(double x, int t)`|Computes the value of f(x) in time t|
-|`double L_secant(KDBVariables* dbv, KDBScalars* dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
+|`double L_secant(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
 

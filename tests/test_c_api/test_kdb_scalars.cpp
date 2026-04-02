@@ -38,7 +38,7 @@ TEST_F(KDBScalarsTest, Subset)
     std::set<std::string> names = global_ws_scl->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    KDBScalars* kdb_subset_deep_copy = new KDBScalars(global_ws_scl.get(), pattern, true);
+    std::shared_ptr<KDBScalars> kdb_subset_deep_copy = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("acaf1", new_scalar);
@@ -46,7 +46,7 @@ TEST_F(KDBScalarsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get("acaf1"), new_scalar);
 
     // SHALLOW COPY SUBSET
-    KDBScalars* kdb_subset_shallow_copy = new KDBScalars(global_ws_scl.get(), pattern, false);
+    std::shared_ptr<KDBScalars> kdb_subset_shallow_copy = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("acaf1", new_scalar);
@@ -117,7 +117,7 @@ TEST_F(KDBScalarsTest, Filter)
 {
     std::string pattern = "a*;*_";
     std::set<std::string> expected_names;
-    KDBScalars* kdb_subset;
+    std::shared_ptr<KDBScalars> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_scl->size(); p++) 
@@ -134,7 +134,7 @@ TEST_F(KDBScalarsTest, Filter)
             expected_names.insert(name);
 
     // create a subset (shallow copy)
-    kdb_subset = new KDBScalars(global_ws_scl.get(), pattern, false);
+    kdb_subset = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -186,7 +186,7 @@ TEST_F(KDBScalarsTest, Filter)
     EXPECT_THROW(kdb_subset->add("gamma_", new_scalar_local), std::invalid_argument);
 
     // delete subset
-    delete kdb_subset;
+    kdb_subset->clear();
     EXPECT_EQ(global_ws_scl->size(), nb_total_scalars);
     updated_scalar_global = global_ws_scl->get(name);
     EXPECT_EQ(updated_scalar_global, expected_updated_scalar);
@@ -200,7 +200,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
 {
     std::string pattern = "a*;*_";
     std::set<std::string> expected_names;
-    KDBScalars* kdb_subset;
+    std::shared_ptr<KDBScalars> kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_scl->size(); p++) 
@@ -217,7 +217,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
             expected_names.insert(name);
 
     // create a subset (deep copy)
-    kdb_subset = new KDBScalars(global_ws_scl.get(), pattern, true);
+    kdb_subset = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -271,7 +271,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
     EXPECT_TRUE(global_ws_scl->contains(name));
 
     // delete subset
-    delete kdb_subset;
+    kdb_subset->clear();
     EXPECT_EQ(global_ws_scl->size(), nb_total_scalars);
 }
 
@@ -300,9 +300,9 @@ TEST_F(KDBScalarsTest, Merge)
     std::string pattern = "a*";
 
     // create deep copies kdb
-    KDBScalars* kdb0 = new KDBScalars(global_ws_scl.get(), pattern, true);
-    KDBScalars* kdb1 = new KDBScalars(global_ws_scl.get(), pattern, true);
-    KDBScalars* kdb_to_merge = new KDBScalars(global_ws_scl.get(), pattern, true);
+    std::shared_ptr<KDBScalars> kdb0 = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, true);
+    std::shared_ptr<KDBScalars> kdb1 = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, true);
+    std::shared_ptr<KDBScalars> kdb_to_merge = std::make_shared<KDBScalars>(global_ws_scl.get(), pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "new_scalar";

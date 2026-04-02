@@ -70,7 +70,7 @@ public:
 
 protected:
 	KDBVariables*  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
-	KDBScalars*    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
+	std::shared_ptr<KDBScalars>    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
 	std::shared_ptr<KDBEquations>  KSIM_DBE; 	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
@@ -210,12 +210,12 @@ public:
     }
 
 	/* k_sim_main.c */
-	int simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+	int simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, 
 		char** endo_exo, const std::vector<std::string>& eqs = std::vector<std::string>());
 
 	/* k_sim_scc.c */
 	int calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post);
-	int simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, 
+	int simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, 
 		             char** pre, char** inter, char** post);
 
 protected:
@@ -324,5 +324,5 @@ private:
 	int find_path(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl);
+	int simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl);
 };

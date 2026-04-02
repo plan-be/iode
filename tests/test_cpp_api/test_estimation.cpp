@@ -161,7 +161,7 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
-    KDBScalars* kdb_scl_res = est_new_coeffs.get_scalars();;
+    std::shared_ptr<KDBScalars> kdb_scl_res = est_new_coeffs.get_scalars();;
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").value, 0.9);
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").relax, 1.0);
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").value, 0.9);
@@ -278,7 +278,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("dpuh_1").value) / 1e6, 0.010986);
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("dpuh_2").value) / 1e6, 0.057489);
 
-    KDBScalars* kdb_scl_res = est.get_scalars();
+    std::shared_ptr<KDBScalars> kdb_scl_res = est.get_scalars();
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").value) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").value) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").value) / 1e6, -0.008503);
@@ -444,7 +444,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
 
     // DO NOT CALL est.update_scalars() to test that the estimation 
     // can be done without updating scalars before
-    KDBScalars* kdb_scl = est.get_scalars();
+    std::shared_ptr<KDBScalars> kdb_scl = est.get_scalars();
     EXPECT_EQ(kdb_scl->size(), 0);
 
     // Estimates the block ACAF;DPUH
@@ -574,7 +574,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
     // no drift, no trend
     drift = false;
     trend = false;
-    KDBScalars* kdb_res = dickey_fuller_test(var_name, drift, trend, order);
+    std::shared_ptr<KDBScalars> kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
     std::set<std::string> names = kdb_res->get_names();
 
@@ -583,7 +583,8 @@ TEST_F(EstimationTest, DickeyFullerTest)
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.053847);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.053847);
 
-    delete kdb_res;
+    kdb_res->clear();
+    kdb_res.reset();
 
     // drift, no trend
     drift = true;
@@ -600,7 +601,8 @@ TEST_F(EstimationTest, DickeyFullerTest)
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 1.588698);
 
-    delete kdb_res;
+    kdb_res->clear();
+    kdb_res.reset();
 
     // drift, trend
     drift = true;
@@ -622,5 +624,6 @@ TEST_F(EstimationTest, DickeyFullerTest)
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->relax) / 1e6, 0.1596);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->std) / 1e6, 0.1596);
 
-    delete kdb_res;
+    kdb_res->clear();
+    kdb_res.reset();
 }

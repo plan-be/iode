@@ -29,7 +29,7 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
  * 
  * @return double 
  */
-KDBScalars* dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
+std::shared_ptr<KDBScalars> dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order);
 
 
 class CorrelationMatrix
@@ -98,7 +98,7 @@ class EditAndEstimateEquations
     std::set<std::string>::iterator current_eq;
 
     std::shared_ptr<KDBEquations> kdb_eqs;
-    KDBScalars* kdb_scl;
+    std::shared_ptr<KDBScalars> kdb_scl;
     std::shared_ptr<CorrelationMatrix> m_corr_ptr;
     Estimation* estimation;
 
@@ -271,7 +271,7 @@ public:
         return v_equations;
     }
 
-    KDBScalars* get_scalars() { return kdb_scl; }
+    std::shared_ptr<KDBScalars> get_scalars() { return kdb_scl; }
 
     /**
      * @brief update the local Scalars workspace 'kdb_scl'.
