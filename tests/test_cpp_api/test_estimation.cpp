@@ -190,7 +190,7 @@ TEST_F(EstimationTest, Estimate)
     std::string block = est.get_block();
     EXPECT_EQ(block, "ACAF;DPUH");
 
-    KDBEquations* kdb_eqs = est.get_equations();
+    std::shared_ptr<KDBEquations> kdb_eqs = est.get_equations();
     
     eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");
@@ -432,7 +432,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     std::string block = est.get_block();
     EXPECT_EQ(block, "ACAF;DPUH");
 
-    KDBEquations* kdb_eqs = est.get_equations();
+    std::shared_ptr<KDBEquations> kdb_eqs = est.get_equations();
     
     eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");

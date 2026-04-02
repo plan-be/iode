@@ -31,7 +31,7 @@
  *  @return     int             0 if ok, -1 if dbe is empty    
  *  
  */
-int CSimulation::calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* inter, char* post)
+int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post)
 {
     int opasses = KSIM_PASSES;
     int osort = KSIM_SORT;
@@ -44,9 +44,11 @@ int CSimulation::calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* int
     }
 
     KSIM_DBE = dbe;
-    KSIM_DBV = (KDBVariables*) dbe;    // Pour reconstruire les listes dans build_lists_order via KSIM_NAME
     KSIM_MAXDEPTH = dbe->size();
     KSIM_PASSES = tris;
+
+    // Pour reconstruire les listes dans build_lists_order via KSIM_NAME
+    KSIM_DBV = (KDBVariables*) dbe.get();
 
     if(tris > 0) 
         KSIM_SORT = SORT_BOTH;
@@ -102,7 +104,7 @@ int CSimulation::calculate_SCC(KDBEquations* dbe, int tris, char* pre, char* int
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::simulate_SCC_init(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
+int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -193,7 +195,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::simulate_SCC(KDBEquations* dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 
