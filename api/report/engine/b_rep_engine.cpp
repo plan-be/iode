@@ -744,8 +744,8 @@ double RP_evallec(char* lec)
             error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
-        if(clec != 0 && !L_link(global_ws_var.get(), global_ws_scl.get(), clec))
-            x = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, RP_T);
+        if(clec != 0 && !L_link(global_ws_var.get(), global_ws_scl, clec))
+            x = L_exec(global_ws_var.get(), global_ws_scl, clec, RP_T);
         SW_nfree(clec);
     }
 

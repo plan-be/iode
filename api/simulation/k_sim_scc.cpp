@@ -104,7 +104,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl)
+int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -195,7 +195,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 

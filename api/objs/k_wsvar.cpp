@@ -819,10 +819,10 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	CLEC* clec = L_cc(c_lec);
 	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
 	// The CLEC object is modified (inplace) by L_link()
-	if (clec != NULL && L_link(global_ws_var.get(), global_ws_scl.get(), clec) == 0)
+	if(clec != NULL && L_link(global_ws_var.get(), global_ws_scl, clec) == 0)
 	{
 		for (int t = t_first; t <= t_last; t++) 
-			var.push_back(L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t));
+			var.push_back(L_exec(global_ws_var.get(), global_ws_scl, clec, t));
 		SW_nfree(clec);
 		return var;
 	}

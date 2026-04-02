@@ -120,7 +120,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
 
     int rc = -1;
     if(list_eqs.empty())
-        rc = simulate(global_ws_eqs, global_ws_var.get(), global_ws_scl.get(), 
+        rc = simulate(global_ws_eqs, global_ws_var.get(), global_ws_scl, 
                      sample, KSIM_EXO);
     else 
     {
@@ -130,7 +130,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
             if(tdbe->size() > 0)
             {
                 std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
-                rc = simulate(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+                rc = simulate(tdbe, global_ws_var.get(), global_ws_scl, sample, 
                                 KSIM_EXO, v_eqs);
             }
         }
@@ -312,7 +312,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     {
         std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), list_eqs, false);
         if(tdbe->size() > 0)
-            rc = simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl.get(), sample, 
+            rc = simulate_SCC(tdbe, global_ws_var.get(), global_ws_scl, sample, 
                              c_pre, c_inter, c_post);
     }
     catch(const std::exception& e)

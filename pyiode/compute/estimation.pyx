@@ -22,12 +22,11 @@ def cython_dynamic_adjustment(method: int, eqs: str, c1: str, c2: str) -> str:
 
 
 def cython_dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalars:
-    # NOTE: cpp_dickey_fuller_test allocates a new KDBScalars* pointer
-    cdef KDBScalars* cpp_scalars
-    cpp_scalars = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
-    if cpp_scalars is NULL:
+    # NOTE: cpp_dickey_fuller_test return a new shared pointer of type KDBScalars
+    cdef shared_ptr[KDBScalars] scalars_ptr
+    scalars_ptr = cpp_dickey_fuller_test(lec.encode(), <bint>drift, <bint>trend, order)
+    if scalars_ptr.get() is NULL:
         return None
-    cdef shared_ptr[KDBScalars] scalars_ptr = shared_ptr[KDBScalars](cpp_scalars)
     scalars_db = Scalars._from_ptr(scalars_ptr)
     return scalars_db
 
@@ -141,17 +140,10 @@ cdef class CythonEditAndEstimateEquations:
         self.c_estimation_ptr.update_scalars()
 
     def get_scalars_db(self) -> Scalars:
-        cdef KDBScalars* c_scalars_ptr = self.c_estimation_ptr.get_scalars()
-        if c_scalars_ptr is NULL:
+        cdef shared_ptr[KDBScalars] scalars_ptr = self.c_estimation_ptr.get_scalars()
+        if scalars_ptr.get() is NULL:
             return None
-        # TODO : remove lines below when self.c_estimation_ptr.get_scalars() will return 
-        #        a shared_ptr<KDBScalars> instead of a raw pointer KDBScalars*
-        cdef shared_ptr[KDBScalars] scalars_ptr = make_shared[KDBScalars](<bint>False)
         scalars_db = Scalars._from_ptr(scalars_ptr)
-        scalars_db.database = c_scalars_ptr
-        scalars_db.abstract_database = c_scalars_ptr
-        # ---- END TODO ----
-        # scalars_db = Scalars._from_ptr(scalars_ptr)
         return scalars_db
 
     def get_equations_list(self) -> List[str]:

@@ -532,9 +532,9 @@ Implemention of the LEC library virtual functions for Scalar and VAR references.
 |Syntax|Description|
 |:---|:---|
 |`double *L_getvar(KDBVariables* kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
-|`double L_getscl(KDBScalars* kdb, int pos)`|Retrieves a scalar value.|
+|`double L_getscl(std::shared_ptr<KDBScalars> kdb, int pos)`|Retrieves a scalar value.|
 |`Sample *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
-|`int L_findscl(KDBScalars* kdb, char *name)`|Retrieves a scalar position.|
+|`int L_findscl(std::shared_ptr<KDBScalars> kdb, char *name)`|Retrieves a scalar position.|
 |`int L_findvar(KDBVariables* kdb, char* name)`|Retrieves a variable position.|
 
 ## Group "Basic functions" {#T54}

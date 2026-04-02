@@ -268,15 +268,15 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         if(clec == NULL)
             return false;
 
-        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
+        L_link(global_ws_var.get(), global_ws_scl, clec);
         // Newton-Raphson method
-        res = L_zero(global_ws_var.get(), global_ws_scl.get(), clec, period_pos, var_pos, var_pos);
+        res = L_zero(global_ws_var.get(), global_ws_scl, clec, period_pos, var_pos, var_pos);
     }
     else
     {
         // inverse formula
-        L_link(global_ws_var.get(), global_ws_scl.get(), clec);
-        res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, period_pos);
+        L_link(global_ws_var.get(), global_ws_scl, clec);
+        res = L_exec(global_ws_var.get(), global_ws_scl, clec, period_pos);
     }
 
     SW_nfree(clec);

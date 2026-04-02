@@ -535,7 +535,7 @@ int CSimulation::sub_simulate(int t)
  *        the simulation order is left untouched before starting the Gauss-Seidel iterations.
  *
  */
-int CSimulation::simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, KDBScalars* dbs, 
+int CSimulation::simulate(std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, 
     Sample* smpl, char** endo_exo, const std::vector<std::string>& eqs)
 {
     int     i, t, bt, at, j, k, res, endo_exonb,

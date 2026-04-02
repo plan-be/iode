@@ -4,9 +4,9 @@
  * Functions implementing the interface between the LEC functions and the IODE KDB's.
  *  
  *      double *L_getvar(KDBVariables* kdb, int pos)    Retrieves a pointer to the first element of a VAR.
- *      double L_getscl(KDBScalars* kdb, int pos)       Retrieves a scalar value.
+ *      double L_getscl(std::shared_ptr<KDBScalars> kdb, int pos)       Retrieves a scalar value.
  *      Sample *L_getsmpl(KDBVariables* kdb)            Retrieves the sample of a KDB.
- *      int L_findscl(KDBScalars* kdb, char *name)      Retrieves a scalar position.
+ *      int L_findscl(std::shared_ptr<KDBScalars> kdb, char *name)      Retrieves a scalar position.
  *      int L_findvar(KDBVariables* kdb, char* name)    Retrieves a variable position.
  */
 
@@ -42,7 +42,7 @@ double* L_getvar(KDBVariables* kdb, int pos)
  *  @return             IODE_READ   value of the scalar
  *  
  */
-double L_getscl(KDBScalars* kdb, int pos)
+double L_getscl(std::shared_ptr<KDBScalars> kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
     std::shared_ptr<Scalar> scl = kdb->get_obj_ptr(name);
@@ -72,7 +72,7 @@ Sample *L_getsmpl(KDBVariables* kdb)
  *  @return             int         position of name in KDB 
  *  
  */
-int L_findscl(KDBScalars* kdb, char *name)
+int L_findscl(std::shared_ptr<KDBScalars> kdb, char *name)
 {
     return kdb->index_of(name);
 }

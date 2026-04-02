@@ -261,9 +261,9 @@ public:
 	
 	    clec = L_cc(lec);
         EXPECT_TRUE(clec != NULL);
-	    rc = L_link(global_ws_var.get(), global_ws_scl.get(), clec);
+	    rc = L_link(global_ws_var.get(), global_ws_scl, clec);
 	    EXPECT_EQ(rc, 0);
-	    calc_val = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
+	    calc_val = L_exec(global_ws_var.get(), global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
@@ -275,8 +275,8 @@ public:
 	
 	    clec = L_cc(lec);
 	    if(clec == NULL) return(IODE_NAN);
-	    if(L_link(global_ws_var.get(), global_ws_scl.get(), clec)) return(IODE_NAN);
-	    res = L_exec(global_ws_var.get(), global_ws_scl.get(), clec, t);
+	    if(L_link(global_ws_var.get(), global_ws_scl, clec)) return(IODE_NAN);
+	    res = L_exec(global_ws_var.get(), global_ws_scl, clec, t);
 	    SCR_free(clec);
 	    return res;
 	}
@@ -479,7 +479,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -554,7 +554,7 @@ public:
         int nb_periods = global_ws_var->get_nb_periods();
 	    // Create ACAF = 0 1 2...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
         for(int t = 0; t < 21; t++)
             var[t] = ACAF[t];
         global_ws_var->add("ACAF", var);
@@ -600,7 +600,7 @@ public:
 	
 	    // Create ACAF = 0 1 IODE_NAN...
         Variable var(nb_periods, IODE_NAN);
-	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl.get());
+	    ACAF = L_cc_link_exec("t", global_ws_var.get(), global_ws_scl);
         for(int t = 0; t < 11; t++)
             var[t] = ACAF[t];
         var[7] = IODE_NAN;
@@ -624,7 +624,7 @@ public:
             return false;
         
 	    nb = global_ws_var->sample->nb_periods;
-	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl.get());
+	    A = L_cc_link_exec(lec, global_ws_var.get(), global_ws_scl);
 	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
 	    return true;
@@ -1096,7 +1096,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 {
     KDBVariables* kdbv;
     std::shared_ptr<KDBEquations> kdbe;
-    KDBScalars*   kdbs;
+    std::shared_ptr<KDBScalars>   kdbs;
     Sample* smpl;
     char*   filename = "fun";
     U_ch**  endo_exo;
@@ -1112,7 +1112,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     // Check
     kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
     kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
@@ -2263,7 +2263,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // Check
     KDBVariables* kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    KDBScalars* kdbs = global_ws_scl.get();
+    std::shared_ptr<KDBScalars> kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
     std::shared_ptr<KDBEquations> kdbe = global_ws_eqs;
     EXPECT_NE(kdbe.get(), nullptr);
@@ -2298,7 +2298,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // Check
     kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
     kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);
@@ -2344,7 +2344,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // Check
     kdbv = global_ws_var.get();
     EXPECT_NE(kdbv, nullptr);
-    kdbs = global_ws_scl.get();
+    kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
     kdbe = global_ws_eqs;
     EXPECT_NE(kdbe, nullptr);

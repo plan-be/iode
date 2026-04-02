@@ -429,7 +429,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
 
     // ==== subset of global KDB ====
     copy = false;    // shallow copy
-    KDBScalars* subset = new KDBScalars(global_ws_scl.get(), "s*", copy);
+    std::shared_ptr<KDBScalars> subset = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
     scl_ptr = std::make_shared<Scalar>(value, relax);
     scl_ptr_one = subset->set_obj_ptr("scl_subset", scl_ptr);
     scl_ptr_bis = subset->set_obj_ptr("scl_subset_bis", scl_ptr);
@@ -460,7 +460,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
     scl_ptr_2 = std::make_shared<Scalar>(value, relax);
     subset->set_obj_ptr("scl_common", scl_ptr_2);
     copy = true;    // deep copy
-    KDBScalars* standalone_db = new KDBScalars(global_ws_scl.get(), "s*", copy);
+    std::shared_ptr<KDBScalars> standalone_db = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
     EXPECT_TRUE(standalone_db->contains("scl_common"));
     EXPECT_TRUE(global_ws_scl->contains("scl_common"));
     EXPECT_TRUE(subset->contains("scl_common"));
@@ -549,13 +549,13 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));
 
     copy = false;    // shallow copy
-    subset = new KDBScalars(global_ws_scl.get(), "s*", copy);
+    subset = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
     scl_ptr = std::make_shared<Scalar>(value, relax);
     subset->set_obj_ptr("scl_subset", scl_ptr);
     EXPECT_TRUE(subset->contains("scl_subset"));
 
     copy = true;    // deep copy
-    standalone_db = new KDBScalars(global_ws_scl.get(), "s*", copy);
+    standalone_db = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
     scl_ptr_2 = std::make_shared<Scalar>(value, relax);
     standalone_db->set_obj_ptr("scl_standalone", scl_ptr_2);
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));
