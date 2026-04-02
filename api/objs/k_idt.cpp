@@ -223,7 +223,6 @@ bool KDBIdentities::print_obj_def(const std::string& name)
 
 void KDBIdentities::update_reference_db()
 {
-    if(global_ref_idt[0]) 
-        delete global_ref_idt[0];
-    global_ref_idt[0] = new KDBIdentities(this, "*", false);      
+    global_ref_idt[0].reset();
+    global_ref_idt[0] = std::make_shared<KDBIdentities>(this, "*", false);      
 }
