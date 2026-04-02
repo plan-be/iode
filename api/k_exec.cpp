@@ -115,12 +115,12 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  *  @param [in] KDB*    dbi     KDB of identities
  *  @return     KDB*            KDB of all vars found in dbi. All vars are initialised to L_NaN
  */
-static KDBVariables* KI_series_list(const KDBIdentities& dbi)
+static std::shared_ptr<KDBVariables> KI_series_list(const KDBIdentities& dbi)
 {
     int     nb_names;
     LNAME   *lname;
     CLEC    *clec;
-    KDBVariables* dbv;
+    std::shared_ptr<KDBVariables> dbv;
     
     // Creates a list with all variable names encountered
     // (without checking for duplicates)
@@ -143,7 +143,7 @@ static KDBVariables* KI_series_list(const KDBIdentities& dbi)
     }
 
     // Create a new KDB of vars with all the names in tbl
-    dbv = new KDBVariables(false);
+    dbv = std::make_shared<KDBVariables>(false);
     Variable new_var;
     for(const std::string& name : vars_to_compute)
         dbv->set(name, new_var);
@@ -739,7 +739,7 @@ static int KI_read_scls(KDBScalars& dbs, const KDBScalars& dbs_ws, int nb, char*
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, KDBIdentities& dbi, 
+static int KI_execute(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, KDBIdentities& dbi, 
     int* order, Sample* smpl)
 {
     int     tot_lg, start;
@@ -790,7 +790,7 @@ static int KI_execute(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, KDBIde
  *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfiles[], KDBScalars& dbs, 
+std::shared_ptr<KDBVariables> KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfiles[], KDBScalars& dbs, 
     int ns, char* sfiles[], Sample* in_smpl)
 {
     int* order;
@@ -847,7 +847,7 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
         return nullptr;
     }
 
-    KDBVariables* dbv_i = KI_series_list(dbi);
+    std::shared_ptr<KDBVariables> dbv_i = KI_series_list(dbi);
     if(var_sample) 
         dbv_i->sample = new Sample(*var_sample);
     else  
@@ -866,8 +866,6 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
     if(res != 0) 
     {
         SW_nfree(order);
-        delete dbv_i;
-        dbv_i = nullptr;
         delete exec_sample;
         return nullptr;
     }
@@ -879,8 +877,6 @@ KDBVariables* KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfile
     if(res != 0) 
     {
         SW_nfree(order);
-        delete dbv_i;
-        dbv_i = nullptr;
         delete exec_sample;
         return nullptr;
     }

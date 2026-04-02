@@ -10,8 +10,8 @@ void load_reference_kdb(const int ref, std::string& filepath)
 void clear_reference_kdb(const int ref)
 {
     if(global_ref_var[ref - 1])
-        delete global_ref_var[ref - 1];
-    global_ref_var[ref - 1] = nullptr;
+        global_ref_var[ref - 1]->clear();
+    global_ref_var[ref - 1].reset();
 }
 
 void clear_all_reference_kdbs()

@@ -69,7 +69,7 @@ protected:
     int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
     std::shared_ptr<KDBEquations>  E_DBE;    // KDB of equations used for the estimation
     std::shared_ptr<KDBScalars>    E_DBS;    // KDB of scalars used for the estimation
-    KDBVariables*  E_DBV;    // KDB of variables used for the estimation 
+    std::shared_ptr<KDBVariables>  E_DBV;    // KDB of variables used for the estimation 
     Sample    *E_SMPL;        // Current estimation sample
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
@@ -151,7 +151,7 @@ public:
      *  @param [in] int     maxit           max number of iterations
      *  @param [in] double  eps             convergence threshold
      */
-    Estimation(char* endos, std::shared_ptr<KDBEquations> dbe = nullptr, KDBVariables* dbv = nullptr, 
+    Estimation(char* endos, std::shared_ptr<KDBEquations> dbe = nullptr, std::shared_ptr<KDBVariables> dbv = nullptr, 
                std::shared_ptr<KDBScalars> dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
@@ -179,7 +179,7 @@ public:
         smpl = nullptr;
     }
 
-    Estimation(char** endos, std::shared_ptr<KDBEquations> dbe = nullptr, KDBVariables* dbv = nullptr, 
+    Estimation(char** endos, std::shared_ptr<KDBEquations> dbe = nullptr, std::shared_ptr<KDBVariables> dbv = nullptr, 
                std::shared_ptr<KDBScalars> dbs = nullptr, Sample* smpl = NULL, int method = -1, 
                int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
@@ -277,7 +277,7 @@ public:
     }
 
 private:
-    void initialize(char** endos, std::shared_ptr<KDBEquations> dbe, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, 
+    void initialize(char** endos, std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, 
         Sample* smpl, int method, int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)
@@ -299,7 +299,7 @@ private:
         E_MAXIT = maxit;
 
         E_DBE  = (dbe.get() != nullptr) ? dbe : global_ws_eqs;
-        E_DBV  = (dbv != nullptr) ? dbv : global_ws_var.get();
+        E_DBV  = (dbv.get() != nullptr) ? dbv : global_ws_var;
         E_DBS  = (dbs.get() != nullptr) ? dbs : global_ws_scl;
 
         if(smpl != nullptr)

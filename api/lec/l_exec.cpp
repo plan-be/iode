@@ -4,7 +4,7 @@
  * Functions to evaluate a compiled and linked LEC expression. 
  *  
  *   - L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)     Execution of a CLEC sub expression.
- *   - L_REAL L_exec(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* expr, int t)                     Execution of a compiled and linked CLEC expression.
+ *   - L_REAL L_exec(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* expr, int t)                     Execution of a compiled and linked CLEC expression.
  *   - L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
  */
 
@@ -282,7 +282,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
  *  @return          L_REAL     result of the calculation 
  *                              IODE_NAN on error (and L_errno is set)
  */
-L_REAL L_exec(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* expr, int t)
+L_REAL L_exec(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* expr, int t)
 {
     int	pos; //short   pos;
     L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
@@ -372,7 +372,7 @@ void L_tfn_args(int t, L_REAL* stack, int nargs, int* from, int* to)
  *  @return     double*          calculated lec expression on the whole dbv sample    
  *                                  NULL on error (error can be retrieved via a call to L_error()
  */
-L_REAL* L_cc_link_exec(char* lec, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs)
+L_REAL* L_cc_link_exec(char* lec, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs)
 {
     int      t, nb;
     CLEC     *clec = 0;

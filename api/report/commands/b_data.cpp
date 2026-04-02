@@ -238,7 +238,7 @@ int B_DataRasVar(char* arg, int unused)
 int B_DataCalcVar(char* arg, int unused)
 {
     char name[K_MAX_NAME + 1];
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
     int nb_periods = kdb->get_nb_periods();
 
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);

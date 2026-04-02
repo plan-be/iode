@@ -23,10 +23,10 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for CSV output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
- *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
+ *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
  *      int write_header(KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
- *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
+ *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */

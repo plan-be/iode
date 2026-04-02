@@ -7,8 +7,8 @@
  * -------
  * global_ref_var = table of max 5 KDB* per object type, used for ws comparison, for printing...
  * Only used for Vars at the moment (print vars, print tables with comparison)
- *     - global_ref_var[6][0] = first WS of VARS for comparison (ws)  
- *     - global_ref_var[6][1] = second WS of VARS for comparison (file 1)
+ *     - global_ref_var[0] = first WS of VARS for comparison (ws)  
+ *     - global_ref_var[1] = second WS of VARS for comparison (file 1)
  *     - ...
  *
  * 
@@ -110,23 +110,19 @@ int K_load_RWS(int ref, char *filename)
     
     if(filename == NULL) 
     {
-        if(global_ref_var[ref - 1])
-            delete global_ref_var[ref - 1];
-        global_ref_var[ref - 1] = nullptr;
+        global_ref_var[ref - 1].reset();
         std::string msg = "Filepath for the Variables 'reference file' number " + 
                           std::to_string(ref) + " is empty";
         kwarning(msg.c_str());
         return 0;
     }
 
-    if(global_ref_var[ref - 1])
-        delete global_ref_var[ref - 1];
-    global_ref_var[ref - 1] = new KDBVariables(false);
+    global_ref_var[ref - 1].reset();
+    global_ref_var[ref - 1] = std::make_shared<KDBVariables>(false);
     bool success = global_ref_var[ref - 1]->load(std::string(filename));
     if(!success)
     {
-        delete global_ref_var[ref - 1];
-        global_ref_var[ref - 1] = nullptr;
+        global_ref_var[ref - 1].reset();
         std::string msg = "Error loading the variables file '";
         msg += std::string(filename) + "' required to compute the table";
         kwarning(msg.c_str());

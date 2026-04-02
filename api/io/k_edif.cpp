@@ -49,7 +49,7 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the DIF export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for DIF output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for DIF output. 
- *      char *get_variable_value(KDBVariables* dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
+ *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in DIF format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the DIF export file.
  *  
  */

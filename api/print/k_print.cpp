@@ -294,7 +294,6 @@ char **T_find_files(COLS* cls)
     COL     *cl;
     int     files[K_MAX_FREF + 1];
     char    **names = 0, buf[K_MAX_FILE + 10];
-    KDB     *kdb;
 
     memset(files, 0, (K_MAX_FREF + 1) * sizeof(int));
     for(i = 0; i < cls->cl_nb; i++) 
@@ -304,13 +303,14 @@ char **T_find_files(COLS* cls)
         files[cl->cl_fnb[1]] = 1;
     }
 
+    std::shared_ptr<KDBVariables> kdb;
     for(i = 1; i < K_MAX_FREF + 1; i++) 
     {
         if(files[i] == 0) 
             continue;
         
         kdb = global_ref_var[i - 1];
-        if(!kdb) 
+        if(kdb.get() == nullptr)
         {
             std::string error_msg = "File " + std::to_string(i) + " not present";
             error_manager.append_error(error_msg);
@@ -326,7 +326,7 @@ char **T_find_files(COLS* cls)
     }
     
     SCR_add_ptr((unsigned char***) &names, &nf, 0L);
-    return(names);
+    return names;
 }
 
 /**

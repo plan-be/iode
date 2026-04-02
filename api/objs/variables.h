@@ -282,7 +282,7 @@ private:
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
 inline std::shared_ptr<KDBVariables> global_ws_var = std::make_shared<KDBVariables>(true);
-inline std::array<KDBVariables*, 5> global_ref_var = { nullptr };
+inline std::array<std::shared_ptr<KDBVariables>, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -328,5 +328,5 @@ int KV_add(KDBVariables& kdb, char* varname);
 double KV_get(const KDBVariables& kdb, const std::string& name, int t, int mode);
 void KV_set(KDBVariables& kdb, const std::string& name, int t, int mode, double value);
 int KV_extrapolate(KDBVariables& dbv, int method, Sample* smpl, char* pattern);
-KDBVariables* KV_aggregate(KDBVariables* dbv, int method, char* pattern, char* filename);
+std::shared_ptr<KDBVariables> KV_aggregate(std::shared_ptr<KDBVariables> dbv, int method, char* pattern, char* filename);
 void KV_init_values_1(double* val, int t, int method);

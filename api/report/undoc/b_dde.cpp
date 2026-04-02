@@ -194,7 +194,7 @@ char *IodeDdeCreateSeries(int objnb, int bt)
     int     t;
     double  x;
     
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
     if(!kdb)
         return NULL;
 
@@ -221,7 +221,7 @@ char *IodeDdeCreatePer(int bt)
 {
     char *res;
     int t;
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
     if(!kdb)
         return NULL;
 

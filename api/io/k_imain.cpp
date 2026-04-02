@@ -72,7 +72,7 @@ static int compare(const void *a, const void *b)
  *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl)
+std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     bool    found;
     int     i, nb, size, shift = 0, cmpt = 0, rc;
@@ -81,13 +81,13 @@ KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef,
     double  *vector = NULL, value;
     YYFILE  *yy;
     std::string var_name;
-    KDBVariables* kdb = nullptr;
+    std::shared_ptr<KDBVariables> kdb = nullptr;
 
     if(!smpl)
-        return nullptr;
+        return kdb;
 
     if(IMP_readrule(rulefile) < 0) 
-        return nullptr;
+        return kdb;
 
     YY_CASE_SENSITIVE = 1;
     if(impdef->imp_keys != NULL) 
@@ -103,14 +103,14 @@ KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef,
     if(yy == 0) 
     {
         kerror(0,"Cannot open '%s'", vecfile);
-        return nullptr;
+        return kdb;
     }
 
     rc = impdef->read_header(yy, smpl);
     if(rc < 0) 
         goto err;
 
-    kdb = new KDBVariables(false);
+    kdb = std::make_shared<KDBVariables>(false);
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
@@ -169,7 +169,8 @@ KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef,
                 }
                 catch(const std::exception& e) 
                 {
-                    delete kdb;
+                    kdb->clear();
+                    kdb.reset();
                     YY_close(yy);
                     SW_nfree(vector);
                     throw std::runtime_error("Unable to create '" + var_name + "':\n" + 
@@ -190,12 +191,12 @@ KDBVariables* IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef,
     return kdb;
 
 err:
-    delete kdb;
-    kdb = nullptr;
+    kdb->clear();
+    kdb.reset();
     kerror(0, "%s : incorrect filter (%s : offending entry)", YY_error(yy), yy->yy_text);
     YY_close(yy);
     SW_nfree(vector);
-    return nullptr;
+    return kdb;
 }
 
 
@@ -371,13 +372,9 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     }
     
     int rc = 0;
-    KDBVariables* kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
+    std::shared_ptr<KDBVariables> kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb) 
-    {
         kdb->save_binary(ode);
-        delete kdb;
-        kdb = nullptr;
-    }
     else 
         rc = -1;
 

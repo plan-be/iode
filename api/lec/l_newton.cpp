@@ -107,9 +107,9 @@
  *  List of functions
  *  ----------------- 
  *
- *      double L_zero(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
+ *      double L_zero(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
  *                                                                                      If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
- *      double L_newton(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
+ *      double L_newton(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
 #include <math.h>
@@ -133,7 +133,7 @@ static double  L_newton_1();
  *  @return     double          root of the equation (varnb value that solves the equation)
  *  
  */
-double L_zero(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_zero(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     double x = L_newton(dbv, dbs, clec, t, varnb, eqvarnb);
     if(!IODE_IS_A_NUMBER(x)) 
@@ -162,7 +162,7 @@ double L_zero(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, in
  *  See L_zero() for the description of the other parameters.
  *  
  */
-static double L_newton_1(int algo, KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, 
+static double L_newton_1(int algo, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, 
     int varnb, int eqvarnb)
 {
     double  oldx, x, fx, fxh, ax, afx, dx = 0.0, ox;
@@ -263,7 +263,7 @@ err:
  *  See L_zero() for the parameter description.
  *    
  */
-double L_newton(KDBVariables* dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_newton(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)
 {
     double x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
     if(!IODE_IS_A_NUMBER(x)) 

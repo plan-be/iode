@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
 
     if(!kdb) 
         return res;
@@ -1168,7 +1168,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    KDBVariables* kdb = global_ws_var.get();
+    std::shared_ptr<KDBVariables> kdb = global_ws_var;
     char     what = 'F';
 
     smpl = kdb->sample;
