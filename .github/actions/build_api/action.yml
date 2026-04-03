@@ -5,10 +5,14 @@
 name: build_api
 description: 'Build SCR4 lib and the C and C++ API'
 inputs:
-  cmake-config:
+  os-env:
     description: 'CMake build config'
     required: true
-    default: 'windows-debug'
+    default: 'windows'
+  build-config:
+    description: 'CMake build mode'
+    required: true
+    default: 'debug'
 runs:
   using: 'composite'
   steps:
@@ -16,10 +20,10 @@ runs:
       shell: bash
       # cmake --build --verbose --preset <buildPreset> where <buildPreset> is the name of the active Build Preset.
       # see CMakePresets.json file
-      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_scr4 
+      run: cmake --build --verbose --preset ${{ inputs.os-env }}-${{ inputs.build-config }} --target iode_scr4 
     - name: Build C IODE API
       shell: bash
-      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_c_api 
+      run: cmake --build --verbose --preset ${{ inputs.os-env }}-${{ inputs.build-config }} --target iode_c_api 
     - name: Build C++ IODE API
       shell: bash
-      run: cmake --build --verbose --preset ${{ inputs.cmake-config }} --target iode_cpp_api 
+      run: cmake --build --verbose --preset ${{ inputs.os-env }}-${{ inputs.build-config }} --target iode_cpp_api 

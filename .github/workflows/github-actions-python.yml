@@ -80,12 +80,14 @@ jobs:
           - name: Build the SCR4, C and C++ API libs
             uses: ./.github/actions/build_api
             with:
-              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
-          - name: Test the C and C++ APIs
+              os-env: ${{ env.os }}
+              build-config: ${{ inputs.build-config }}
+          - name: Test the C/C++ APIs
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             uses: ./.github/actions/test_api
             with:
-              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
+              os-env: ${{ env.os }}
+              build-config: ${{ inputs.build-config }}
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v3
             with:
@@ -146,7 +148,8 @@ jobs:
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             uses: ./.github/actions/test_big_files
             with:
-              cmake-config: ${{ env.os }}-${{ inputs.build-config }}
+              os-env: ${{ env.os }}
+              build-config: ${{ inputs.build-config }}
           - name: Test iode Python
             if: runner.os == 'Windows'
             shell: bash -el {0}
