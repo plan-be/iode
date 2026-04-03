@@ -175,8 +175,10 @@ cdef extern from "api/b_errors.h":
 cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
         # Constructor
+        KDBComments(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBComments(shared_ptr[KDBComments] db_parent, string pattern, bool copy) 
+        shared_ptr[KDBComments] get_subset(string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
@@ -192,8 +194,10 @@ cdef extern from "api/objs/comments.h":
 cdef extern from "api/objs/equations.h":
     cdef cppclass KDBEquations(KDB):
         # Constructor
+        KDBEquations(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBEquations(KDBEquations* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBEquations] get_subset(string pattern, bool copy) 
 
         # Public methods
         CEquation get(string& name) except +
@@ -215,8 +219,10 @@ cdef extern from "api/objs/equations.h":
 cdef extern from "api/objs/identities.h":
     cdef cppclass KDBIdentities(KDB):
         # Constructor
+        KDBIdentities(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBIdentities(KDBIdentities* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBIdentities] get_subset(string pattern, bool copy) 
 
         # Public methods
         CIdentity get(string& name) except +
@@ -241,8 +247,10 @@ cdef extern from "api/objs/identities.h":
 cdef extern from "api/objs/lists.h":
     cdef cppclass KDBLists(KDB):
         # Constructor
+        KDBLists(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBLists(KDBLists* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBLists] get_subset(string pattern, bool copy) 
 
         # Public methods
         string get(string& name) except +
@@ -258,8 +266,10 @@ cdef extern from "api/objs/lists.h":
 cdef extern from "api/objs/scalars.h":
     cdef cppclass KDBScalars(KDB):
         # Constructor
+        KDBScalars(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBScalars(KDBScalars* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBScalars] get_subset(string pattern, bool copy) 
 
         # Public methods
         CScalar get(string& name) except +
@@ -277,8 +287,10 @@ cdef extern from "api/objs/scalars.h":
 cdef extern from "api/objs/tables.h":
     cdef cppclass KDBTables(KDB):
         # Constructor
+        KDBTables(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBTables(KDBTables* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBTables] get_subset(string pattern, bool copy) 
 
         # Public methods
         CTable get(string& name) except +
@@ -309,8 +321,10 @@ cdef extern from "api/objs/tables.h":
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
         # Constructor
+        KDBVariables(bool is_global)
+
         # subset (shallow or deep copy) 
-        KDBVariables(KDBVariables* db_parent, string pattern, bool copy) 
+        shared_ptr[KDBVariables] get_subset(string pattern, bool copy) 
 
         # Public methods
         vector[double]* get_obj_ptr(string& name) except +

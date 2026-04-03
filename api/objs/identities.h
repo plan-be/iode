@@ -90,15 +90,11 @@ public:
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBIdentities : public KDBTemplate<Identity>
+struct KDBIdentities : public KDBTemplate<KDBIdentities, Identity>
 {
 public:
     // global or standalone database
     KDBIdentities(const bool is_global) : KDBTemplate(IDENTITIES, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBIdentities(KDBIdentities* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBIdentities(const KDBIdentities& other): KDBTemplate(other) {}

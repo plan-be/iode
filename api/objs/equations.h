@@ -568,14 +568,10 @@ inline std::size_t hash_value(const Equation& equation)
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBEquations : public KDBTemplate<Equation>
+struct KDBEquations : public KDBTemplate<KDBEquations, Equation>
 {
     // global or standalone database
     KDBEquations(const bool is_global) : KDBTemplate(EQUATIONS, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBEquations(KDBEquations* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBEquations(const KDBEquations& other): KDBTemplate(other) {}

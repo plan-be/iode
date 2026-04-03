@@ -46,7 +46,7 @@ TEST_F(SubsetsTest, Subset)
 
     // ==== STANDALONE KDB -> DEEP COPY SUBSET ====
 
-    std::shared_ptr<KDBComments> standalone_db = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern, true);
+    std::shared_ptr<KDBComments> standalone_db = global_ws_cmt->get_subset(pattern, true);
     EXPECT_EQ(standalone_db->size(), names.size());
     EXPECT_EQ(standalone_db->get_names(), expected_names);
     EXPECT_TRUE(standalone_db->is_detached_database());
@@ -138,7 +138,7 @@ TEST_F(SubsetsTest, Subset)
     ref_db_cmt = ref_db_cmt_ptr.get();
     EXPECT_TRUE(global_ws_cmt->children_db.contains(ref_db_cmt));
 
-    std::shared_ptr<KDBComments> subset_shallow_copy = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern, false);
+    std::shared_ptr<KDBComments> subset_shallow_copy = global_ws_cmt->get_subset(pattern, false);
     EXPECT_EQ(subset_shallow_copy->size(), names.size());
     EXPECT_EQ(subset_shallow_copy->get_names(), expected_names);
     EXPECT_TRUE(subset_shallow_copy->is_subset_database());
@@ -249,7 +249,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if (name.front() == 'A' || name.front() == 'B' || name.back() == '_')
             expected_names_0.insert(name);
 
-    std::shared_ptr<KDBComments> subset_0 = std::make_shared<KDBComments>(global_ws_cmt.get(), pattern_0, false);
+    std::shared_ptr<KDBComments> subset_0 = global_ws_cmt->get_subset(pattern_0, false);
     EXPECT_EQ(subset_0->size(), names_0.size());
     EXPECT_EQ(subset_0->get_names(), expected_names_0);
     EXPECT_TRUE(subset_0->is_subset_database());
@@ -269,7 +269,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.back() == '_')
             expected_names_1.insert(name);
 
-    std::shared_ptr<KDBComments> subset_1 = std::make_shared<KDBComments>(subset_0.get(), pattern_1, false);
+    std::shared_ptr<KDBComments> subset_1 = subset_0->get_subset(pattern_1, false);
     EXPECT_EQ(subset_1->size(), names_1.size());
     EXPECT_EQ(subset_1->get_names(), expected_names_1);
     EXPECT_TRUE(subset_1->is_subset_database());
@@ -290,7 +290,7 @@ TEST_F(SubsetsTest, MultiSubsets)
         if(name.front() == 'B' || name.front() == 'C')
             expected_names_2.insert(name);
 
-    std::shared_ptr<KDBComments> subset_2 = std::make_shared<KDBComments>(subset_1.get(), pattern_2, false);
+    std::shared_ptr<KDBComments> subset_2 = subset_1->get_subset(pattern_2, false);
     EXPECT_EQ(subset_2->size(), names_2.size());
     EXPECT_EQ(subset_2->get_names(), expected_names_2);
     EXPECT_TRUE(subset_2->is_subset_database());
@@ -429,7 +429,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
 
     // ==== subset of global KDB ====
     copy = false;    // shallow copy
-    std::shared_ptr<KDBScalars> subset = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
+    std::shared_ptr<KDBScalars> subset = global_ws_scl->get_subset("s*", copy);
     scl_ptr = std::make_shared<Scalar>(value, relax);
     scl_ptr_one = subset->set_obj_ptr("scl_subset", scl_ptr);
     scl_ptr_bis = subset->set_obj_ptr("scl_subset_bis", scl_ptr);
@@ -460,7 +460,7 @@ TEST_F(SubsetsTest, AddDeletePtr)
     scl_ptr_2 = std::make_shared<Scalar>(value, relax);
     subset->set_obj_ptr("scl_common", scl_ptr_2);
     copy = true;    // deep copy
-    std::shared_ptr<KDBScalars> standalone_db = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
+    std::shared_ptr<KDBScalars> standalone_db = global_ws_scl->get_subset("s*", copy);
     EXPECT_TRUE(standalone_db->contains("scl_common"));
     EXPECT_TRUE(global_ws_scl->contains("scl_common"));
     EXPECT_TRUE(subset->contains("scl_common"));
@@ -549,13 +549,13 @@ TEST_F(SubsetsTest, AddDeletePtr)
     EXPECT_TRUE(global_ws_scl->contains("scl_global"));
 
     copy = false;    // shallow copy
-    subset = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
+    subset = global_ws_scl->get_subset("s*", copy);
     scl_ptr = std::make_shared<Scalar>(value, relax);
     subset->set_obj_ptr("scl_subset", scl_ptr);
     EXPECT_TRUE(subset->contains("scl_subset"));
 
     copy = true;    // deep copy
-    standalone_db = std::make_shared<KDBScalars>(global_ws_scl.get(), "s*", copy);
+    standalone_db = global_ws_scl->get_subset("s*", copy);
     scl_ptr_2 = std::make_shared<Scalar>(value, relax);
     standalone_db->set_obj_ptr("scl_standalone", scl_ptr_2);
     EXPECT_TRUE(standalone_db->contains("scl_standalone"));

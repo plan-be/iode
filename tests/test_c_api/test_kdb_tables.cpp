@@ -38,7 +38,7 @@ TEST_F(KDBTablesTest, Subset)
     std::set<std::string> names = global_ws_tbl->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    std::shared_ptr<KDBTables> kdb_subset_deep_copy = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, true);
+    std::shared_ptr<KDBTables> kdb_subset_deep_copy = global_ws_tbl->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("C8_1", table);
@@ -46,7 +46,7 @@ TEST_F(KDBTablesTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get_title("C8_1"), new_title);
 
     // SHALLOW COPY SUBSET
-    std::shared_ptr<KDBTables> kdb_subset_shallow_copy = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, false);
+    std::shared_ptr<KDBTables> kdb_subset_shallow_copy = global_ws_tbl->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("C8_1", table);
@@ -317,7 +317,7 @@ TEST_F(KDBTablesTest, Filter)
             expected_names.insert(name);
 
     // create a subset (shallow copy)
-    kdb_subset = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, false);
+    kdb_subset = global_ws_tbl->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -363,7 +363,7 @@ TEST_F(KDBTablesTest, Filter)
 
     // wrong pattern
     pattern = "anjfks";
-    EXPECT_THROW(KDBTables(global_ws_tbl.get(), pattern, false), std::runtime_error);
+    EXPECT_THROW(global_ws_tbl->get_subset(pattern, false), std::runtime_error);
 }
 
 TEST_F(KDBTablesTest, DeepCopy)
@@ -390,7 +390,7 @@ TEST_F(KDBTablesTest, DeepCopy)
             expected_names.insert(name);
 
     // create a subset (deep copy)
-    kdb_subset = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, true);
+    kdb_subset = global_ws_tbl->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset->size(), expected_names.size());
     EXPECT_EQ(kdb_subset->get_names(), expected_names);
 
@@ -457,9 +457,9 @@ TEST_F(KDBTablesTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    std::shared_ptr<KDBTables> kdb0 = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, true);
-    std::shared_ptr<KDBTables> kdb1 = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, true);
-    std::shared_ptr<KDBTables> kdb_to_merge = std::make_shared<KDBTables>(global_ws_tbl.get(), pattern, true);
+    std::shared_ptr<KDBTables> kdb0 = global_ws_tbl->get_subset(pattern, true);
+    std::shared_ptr<KDBTables> kdb1 = global_ws_tbl->get_subset(pattern, true);
+    std::shared_ptr<KDBTables> kdb_to_merge = global_ws_tbl->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_TABLE";
@@ -541,7 +541,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
     std::string ref_file = str_input_test_dir + "ref2.av";
     global_ws_var->load(str_input_test_dir + "fun.av");
-    std::shared_ptr<KDBVariables> kdb_ref = std::make_shared<KDBVariables>(global_ws_var.get(), pattern, true);
+    std::shared_ptr<KDBVariables> kdb_ref = global_ws_var->get_subset(pattern, true);
 
     double value;
     for(int t=0; t < kdb_ref->get_nb_periods(); t++)

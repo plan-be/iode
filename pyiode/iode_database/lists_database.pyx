@@ -42,7 +42,7 @@ cdef class Lists(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Lists:
-        cdef shared_ptr[KDBLists] subset_db_ptr = make_shared[KDBLists](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBLists] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Lists._from_ptr(subset_db_ptr)
         return subset
 

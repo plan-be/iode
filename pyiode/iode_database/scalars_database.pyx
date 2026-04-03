@@ -42,7 +42,7 @@ cdef class Scalars(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Scalars:
-        cdef shared_ptr[KDBScalars] subset_db_ptr = make_shared[KDBScalars](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBScalars] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Scalars._from_ptr(subset_db_ptr)
         return subset
 

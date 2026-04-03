@@ -979,11 +979,11 @@ int template_data_scan(const int type, const std::string& objs, const std::strin
         // create a temporary subset with only the selected objects
         bool copy = false;
         T* global_kdb_ptr = dynamic_cast<T*>(&global_kdb);
-        T kdb(global_kdb_ptr, objs, copy);
-        if(kdb.size() == 0)
+        std::shared_ptr<T> kdb_ptr = global_kdb_ptr->get_subset(objs, copy);
+        if(kdb_ptr->size() == 0)
             return -1;
         
-        int rc = K_scan(kdb, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
+        int rc = K_scan(*kdb_ptr, (char*) var_list_name.c_str(), (char*) scl_list_name.c_str());
         return rc;
     }
     catch (const std::runtime_error& e) 

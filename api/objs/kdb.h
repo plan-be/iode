@@ -216,12 +216,6 @@ protected:
 public:
     // global or standalone database
     KDB(const IodeType type, const bool is_global) : KDBInfo(type, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDB(KDB* db_parent, const bool copy) : KDBInfo((IodeType) db_parent->k_type, false)
-    {
-        k_db_type = copy ? DB_STANDALONE : DB_SUBSET;
-    }
     
     // copy constructor
     // NOTE: new database is a 'deep copy' of the passed database
@@ -412,7 +406,7 @@ public:
 };
 
 
-template<class T> struct KDBTemplate: public KDB
+template<class D, class T> struct KDBTemplate: public KDB
 {
 #ifndef SKBUILD
     FRIEND_TEST(SubsetsTest, Subset);
@@ -529,66 +523,6 @@ public:
     // global or standalone database
     KDBTemplate(const IodeType type, const bool is_global) : KDB(type, is_global) {}
 
-    // subset (shallow or deep copy) 
-    KDBTemplate(KDBTemplate* db_parent, const std::string& pattern, const bool copy) 
-        : KDB(db_parent, copy)
-    {
-        std::string error_msg;
-        if(!db_parent)
-        {
-            error_msg = "Cannot create a subset database: parent database is null";
-            throw std::invalid_argument(error_msg);
-        }
-
-        error_msg = "Cannot create a subset the database of type '";
-        error_msg += v_iode_types[this->k_type] + "' using the pattern '";
-        error_msg += pattern + "'";
-
-        std::set<std::string> subset_keys;
-        try
-        {
-            subset_keys = db_parent->filter_names(pattern);
-        }
-        catch(const std::exception& e)
-        {
-            subset_keys.clear();
-            error_msg += std::string(e.what()) + " in the parent database";
-            throw std::runtime_error(error_msg);
-        }
-
-        KDBTemplate* true_db_parent = db_parent;
-        // case where we create a subset of a subset
-        if(db_parent->k_db_type == DB_SUBSET)
-            true_db_parent = db_parent->db_parent;
-        // normal case (global/standalone -> subset)
-        else
-            true_db_parent = db_parent;
-
-        if(true_db_parent->sample)
-            this->sample = new Sample(*true_db_parent->sample);
-        this->description = true_db_parent->description;
-        this->k_compressed = true_db_parent->k_compressed;
-        this->filepath = true_db_parent->filepath;
-
-        if(this->k_db_type == DB_SUBSET)
-        {
-            bool success = shallow_copy(*true_db_parent, subset_keys);
-            if(!success)
-                throw std::runtime_error(error_msg);
-            
-            true_db_parent->children_db.insert(this);
-            this->db_parent = true_db_parent;
-        }
-        else
-        {
-            bool success = deep_copy(*true_db_parent, subset_keys);
-            if(!success)
-                throw std::runtime_error(error_msg);
-            
-            this->db_parent = nullptr;
-        }
-    }
-
     // copy constructor
     KDBTemplate(const KDBTemplate& other): KDB(other) 
     {
@@ -656,21 +590,57 @@ public:
         KDBInfo::clear();
     }
 
-    std::shared_ptr<KDBTemplate> get_subset(const std::string& pattern, const bool copy)
+    std::shared_ptr<D> get_subset(const std::string& pattern, const bool copy)
     {
+        std::string error_msg = "Cannot create a subset the database of type '";
+        error_msg += v_iode_types[this->k_type] + "' using the pattern '";
+        error_msg += pattern + "'";
+    
+        std::set<std::string> subset_keys;
         try
         {
-            std::shared_ptr<KDBTemplate> subset_ptr = std::make_shared<KDBTemplate>(this, pattern, copy);
-            return subset_ptr;
+            subset_keys = this->filter_names(pattern);
         }
         catch(const std::exception& e)
         {
-            std::string error_msg = "Cannot create a subset of the database of type '";
-            error_msg += v_iode_types[this->k_type] + "' using the pattern '";
-            error_msg += pattern + "':\n" + std::string(e.what());
+            subset_keys.clear();
+            error_msg += std::string(e.what()) + " in the parent database";
             throw std::runtime_error(error_msg);
         }
-    } 
+    
+        // NOTE : if the parent database is already a subset, we need to get 
+        //        the top-level database
+        KDBTemplate* true_parent = this->get_top_level_db();
+
+        std::shared_ptr<D> subset_ptr = std::make_shared<D>(false);
+        if(true_parent->sample)
+            subset_ptr->sample = new Sample(*(true_parent->sample));
+        subset_ptr->description = true_parent->description;
+        subset_ptr->k_compressed = true_parent->k_compressed;
+        subset_ptr->filepath = true_parent->filepath;
+    
+        if(copy)
+        {
+            subset_ptr->k_db_type = DB_STANDALONE;
+            bool success = subset_ptr->deep_copy(*true_parent, subset_keys);
+            if(!success)
+                throw std::runtime_error(error_msg);
+            
+            subset_ptr->db_parent = nullptr;
+        }
+        else
+        {
+            subset_ptr->k_db_type = DB_SUBSET;
+            bool success = subset_ptr->shallow_copy(*true_parent, subset_keys);
+            if(!success)
+                throw std::runtime_error(error_msg);
+            
+            true_parent->children_db.insert(subset_ptr.get());
+            subset_ptr->db_parent = true_parent;
+        }
+
+        return subset_ptr;
+    }
 
     int size() const override
     { 
