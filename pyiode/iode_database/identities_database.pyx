@@ -42,7 +42,7 @@ cdef class Identities(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Identities:
-        cdef shared_ptr[KDBIdentities] subset_db_ptr = make_shared[KDBIdentities](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBIdentities] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Identities._from_ptr(subset_db_ptr)
         return subset
 

@@ -85,5 +85,5 @@ bool KDBScalars::print_obj_def(const std::string& name)
 void KDBScalars::update_reference_db()
 {
     global_ref_scl[0].reset();
-    global_ref_scl[0] = std::make_shared<KDBScalars>(this, "*", false);      
+    global_ref_scl[0] = this->get_subset("*", false);      
 }

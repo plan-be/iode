@@ -11,14 +11,10 @@ using Comment = std::string;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBComments : public KDBTemplate<Comment>
+struct KDBComments : public KDBTemplate<KDBComments, Comment>
 {
     // global or standalone database
     KDBComments(const bool is_global) : KDBTemplate(COMMENTS, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBComments(KDBComments* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBComments(const KDBComments& other): KDBTemplate(other) {}

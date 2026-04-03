@@ -441,5 +441,5 @@ bool KDBLists::print_obj_def(const std::string& name)
 void KDBLists::update_reference_db()
 {
     global_ref_lst[0].reset();
-    global_ref_lst[0] = std::make_shared<KDBLists>(this, "*", false);      
+    global_ref_lst[0] = this->get_subset("*", false);      
 }

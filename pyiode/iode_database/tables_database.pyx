@@ -46,7 +46,7 @@ cdef class Tables(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Tables:
-        cdef shared_ptr[KDBTables] subset_db_ptr = make_shared[KDBTables](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBTables] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Tables._from_ptr(subset_db_ptr)
         return subset
 

@@ -4,14 +4,10 @@
 #include "api/objs/kdb.h"
 
 
-struct KDBMacros : public KDBTemplate<std::string>
+struct KDBMacros : public KDBTemplate<KDBMacros, std::string>
 {
     // global or standalone database
     KDBMacros(const bool is_global) : KDBTemplate(OBJECTS, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBMacros(KDBMacros* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBMacros(const KDBMacros& other): KDBTemplate(other) {}
