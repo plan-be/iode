@@ -82,14 +82,10 @@ struct std::hash<Scalar>
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBScalars : public KDBTemplate<Scalar>
+struct KDBScalars : public KDBTemplate<KDBScalars, Scalar>
 {
     // global or standalone database
     KDBScalars(const bool is_global) : KDBTemplate(SCALARS, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBScalars(KDBScalars* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBScalars(const KDBScalars& other): KDBTemplate(other) {}

@@ -114,7 +114,7 @@ cdef class Variables(CythonIodeDatabase):
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
         cdef CSample* c_sample
         
-        cdef shared_ptr[KDBVariables] subset_db_ptr = make_shared[KDBVariables](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBVariables] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Variables._from_ptr(subset_db_ptr)
 
         subset.mode_ = IodeVarMode.VAR_MODE_LEVEL

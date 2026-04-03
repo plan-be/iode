@@ -43,7 +43,7 @@ cdef class Comments(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Comments:
-        cdef shared_ptr[KDBComments] subset_db_ptr = make_shared[KDBComments](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBComments] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Comments._from_ptr(subset_db_ptr)
         return subset
 

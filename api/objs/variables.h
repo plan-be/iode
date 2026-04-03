@@ -61,7 +61,7 @@ enum IodeLowToHigh
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBVariables : public KDBTemplate<Variable>
+struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
 {
     /**
      *  Parameters specific to csv output files. 
@@ -101,10 +101,6 @@ private:
 public:
     // global or standalone database
     KDBVariables(const bool is_global) : KDBTemplate(VARIABLES, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBVariables(KDBVariables* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) {}

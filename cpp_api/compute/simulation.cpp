@@ -62,9 +62,9 @@ bool Simulation::model_compile(const std::string& list_eqs)
         {
             try
             {
-                KDBEquations tdbe(global_ws_eqs.get(), list_eqs, false);
-                if(tdbe.size() > 0)
-                    rc = KE_compile(tdbe);
+                std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
+                if(tdbe->size() > 0)
+                    rc = KE_compile(*tdbe);
             }
             catch(const std::exception& e)
             {
@@ -126,7 +126,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     {
         try
         {
-            std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), list_eqs, false);
+            std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
             if(tdbe->size() > 0)
             {
                 std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
@@ -210,7 +210,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     {
         try
         {
-            tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), list_eqs, false);
+            tdbe = global_ws_eqs->get_subset(list_eqs, false);
             if(tdbe->size() > 0)
                 rc = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
         }
@@ -310,7 +310,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     int rc = -1;
     try
     {
-        std::shared_ptr<KDBEquations> tdbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), list_eqs, false);
+        std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
         if(tdbe->size() > 0)
             rc = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, 
                              c_pre, c_inter, c_post);

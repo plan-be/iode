@@ -18,14 +18,10 @@ using List = std::string;
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBLists : public KDBTemplate<List>
+struct KDBLists : public KDBTemplate<KDBLists, List>
 {
     // global or standalone database
     KDBLists(const bool is_global) : KDBTemplate(LISTS, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBLists(KDBLists* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBLists(const KDBLists& other): KDBTemplate(other) {}

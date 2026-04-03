@@ -906,14 +906,10 @@ std::size_t hash_value(const Table& table);
 
 /*----------------------- STRUCTS ----------------------------*/
 
-struct KDBTables : public KDBTemplate<Table>
+struct KDBTables : public KDBTemplate<KDBTables, Table>
 {
     // global or standalone database
     KDBTables(const bool is_global) : KDBTemplate(TABLES, is_global) {}
-
-    // subset (shallow or deep copy) 
-    KDBTables(KDBTables* db_parent, const std::string& pattern, const bool copy) 
-        : KDBTemplate(db_parent, pattern, copy) {}
 
     // copy constructor
     KDBTables(const KDBTables& other): KDBTemplate(other) {}

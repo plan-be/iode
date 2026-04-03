@@ -47,7 +47,7 @@ cdef class Equations(CythonIodeDatabase):
             self.database.load(filepath.encode())
 
     def initialize_subset(self, pattern: str, copy: bool) -> Equations:
-        cdef shared_ptr[KDBEquations] subset_db_ptr = make_shared[KDBEquations](self.database, pattern.encode(), <bint>copy)
+        cdef shared_ptr[KDBEquations] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
         subset = Equations._from_ptr(subset_db_ptr)
         return subset
 

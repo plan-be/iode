@@ -1278,5 +1278,5 @@ bool KDBTables::print_obj_def(const std::string& name)
 void KDBTables::update_reference_db()
 {
     global_ref_tbl[0].reset();
-    global_ref_tbl[0] = std::make_shared<KDBTables>(this, "*", false);      
+    global_ref_tbl[0] = this->get_subset("*", false);      
 }

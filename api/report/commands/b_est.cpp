@@ -83,7 +83,7 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
     {
         try
         {
-            std::shared_ptr<KDBEquations> dbe = std::make_shared<KDBEquations>(global_ws_eqs.get(), std::string(pattern), false);
+            std::shared_ptr<KDBEquations> dbe = global_ws_eqs->get_subset(std::string(pattern), false);
             if(dbe->size() > 0)
             {
                 std::string from_period = smpl->start_period.to_string();
