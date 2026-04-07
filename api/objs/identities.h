@@ -144,6 +144,8 @@ private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
 
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
+
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;
     

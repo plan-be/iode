@@ -1410,20 +1410,16 @@ done:
 
 int RP_ReportExec_1(char* file)
 {
-    char                filename[K_MAX_FILE + 1], file1[K_MAX_FILE + 1];
-    unsigned char       **tbl;
-    int                 rc;
-    REPFILE             *rf;
-
-    strcpy(file1, file);                // For Sanitizer
-    K_set_ext(filename, file1, FILE_REP);  // For Sanitizer
-    tbl = RP_read_file(filename);
-    if(tbl == 0) {
-        error_manager.append_error("Cannot open file '" + std::string(filename) + "'");
+    std::string filename = set_file_extension(std::string(file), FILE_REP);
+    unsigned char** tbl = RP_read_file((char*) filename.c_str());
+    if(!tbl) 
+    {
+        error_manager.append_error("Cannot open file '" + filename + "'");
         return -1;
     }
-    rf = RP_create_repfile(filename, tbl);
-    rc = RP_ReportExec_tbl(rf);
+
+    REPFILE* rf = RP_create_repfile((char*) filename.c_str(), tbl);
+    int rc = RP_ReportExec_tbl(rf);
     RP_free_repfile(rf);
     CUR_REPFILE = 0;
     return rc;

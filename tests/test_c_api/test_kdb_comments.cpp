@@ -178,9 +178,9 @@ TEST_F(KDBCommentsTest, GetNames)
         }
     expected_list_names.pop_back();     // remove trailing ';'
 
-    std::set<std::string> set_names = global_ws_cmt->filter_names(pattern);
+    std::set<std::string> update_filenames = global_ws_cmt->filter_names(pattern);
     std::set<std::string> set_expected_names(expected_names.begin(), expected_names.end());
-    EXPECT_EQ(set_names, set_expected_names);
+    EXPECT_EQ(update_filenames, set_expected_names);
 }
 
 TEST_F(KDBCommentsTest, CreateRemove)

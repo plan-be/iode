@@ -14,22 +14,11 @@ inline char K_LABELD[] = "KOBJS 504d\032";  // Version 2
 inline char K_LABELX[] = "KOBJS 564A\032";  // Version 3 
 inline char K_LABEL[]  = "KOBJS 564A\032";  // Version 0 = Current version = Version 3
 
-/* k_objvers.c */
-int K_calcvers(char* label);
-char* convert_obj_version(const std::string& name, const int type, char* opack, 
-                          const int vers, const Sample* sample);
+// k_objvers.cpp
+int get_version(char* label);
 
-/* k_objfile.c */
-char *K_add_ext(char* filename, char* ext);
-int K_get_ext(char* filename, char* ext, int max_ext_len);
-int K_has_ext(char* filename);
-char *K_set_ext(char* res, char* fname, int type);
-char *K_set_ext_asc(char* res, char* fname, int type);
-void K_strip(char* filename);
-int K_set_backup_on_save(int take_backup);
-int K_get_backup_on_save();
-int K_backup(char* filename);
-int K_setname(char* from, char* to);
-int K_findtype(char* filename, int type);
-int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl);
+// k_objfile.cpp
+std::string set_file_extension(const std::string& filepath, const int file_type);
+int get_file_type_from_file(const std::string& filepath, int file_type);
+bool update_filename(const std::string& from, const std::string& to);
 int X_findtype(char* arg);

@@ -41,7 +41,6 @@ struct KDBInfo
     short       k_mode = (short) ASIS_CASE; // case of the object name: UPPER_CASE, LOWER_CASE or ASIS_CASE 
     std::string k_arch = std::string(ARCH); // processor architecture on which the file has been created/saved/loaded
     std::string description = "";           // short description of the content of the database
-    Sample*     sample = nullptr;           // Sample if Variables database
     char        k_compressed = 0;           // are the objects compressed in the file ? (LZH method, slow)
     std::string filepath = std::string(I_DEFAULT_FILENAME);     // filepath to the database file
 
@@ -77,6 +76,14 @@ protected:
         }
     }
 
+    std::pair<int, char[64]> _preload_(FILE *fd, const std::string& filepath, const int vers);
+    
+    virtual size_t _predump_(char** data)
+    { 
+        *data = NULL; 
+        return 0; 
+    }
+
 public:
     KDBInfo(const IodeType type, const bool is_global)
     {
@@ -94,19 +101,9 @@ public:
         this->description = other.description;
         this->k_compressed = other.k_compressed;
         this->filepath = other.filepath;
-
-        if(other.sample)
-            this->sample = new Sample(*(other.sample));
-        else
-            this->sample = nullptr;
     }
 
-    ~KDBInfo()
-    {
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
-    }
+    ~KDBInfo() {}
 
     int get_iode_type() const 
     { 
@@ -128,17 +125,14 @@ public:
         return k_db_type == DB_SUBSET; 
     }
 
-    int preload(FILE *fd, const std::string& filepath, const int vers);
+    virtual int preload(FILE *fd, const std::string& filepath, const int vers);
+    virtual bool predump(FILE* fd, const std::string& filepath, const int nb_objs);
 
     virtual void clear()
     {        
         this->description.clear();
         this->k_compressed = 0;
         this->filepath = I_DEFAULT_FILENAME;
-
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
     }
 
     /**
@@ -202,6 +196,9 @@ public:
 // NOTE: intermediate base class to expose to Cython
 struct KDB: public KDBInfo 
 {
+    // Save a backup file ".??$" before saving a WS
+    static bool backup_enabled;
+
 protected:
     virtual bool binary_to_obj(const std::string& name, char* pack) = 0;
     virtual bool obj_to_binary(char** pack, const std::string& name) = 0;
@@ -212,6 +209,11 @@ protected:
     virtual char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) = 0;
 
     virtual void update_reference_db() = 0;
+
+    char* convert_obj_version(const std::string& name, char* opack, const int vers);
+    virtual char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) = 0;
+
+    bool take_backup(const std::string& filepath);
 
 public:
     // global or standalone database
@@ -385,8 +387,7 @@ public:
     // load
 
     virtual bool load_asc(const std::string& filename) = 0;
-    bool load_binary(const int file_type, const std::string& filename, 
-                        const std::vector<std::string>& objs=std::vector<std::string>());
+    bool load_binary(const std::string& filename, const std::vector<std::string>& objs=std::vector<std::string>());
     bool load(const std::string& filename);
 
     // save
@@ -420,35 +421,11 @@ public:
 
 private:
     // only used by subsets ('shallow copies')
-    KDBTemplate* db_parent = nullptr;
+    D* db_parent = nullptr;
     // only used by global or standalone databases
-    std::set<KDBTemplate*> children_db;
+    std::set<D*> children_db;
 
 private:
-    KDBTemplate* get_top_level_db()
-    {
-        if(k_db_type != DB_SUBSET)
-            return this;
-        else
-        {
-            if(!db_parent)
-            {
-                std::string error_msg = "Internal error: subset database of type '";
-                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
-                throw std::runtime_error(error_msg);
-            }
-            return db_parent;
-        }
-    }
-
-    std::set<KDBTemplate*> get_children_db() const
-    {
-        if(k_db_type != DB_SUBSET)
-            return children_db; 
-        else
-            return db_parent->children_db;
-    }
-
     bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
     {
         std::shared_ptr<T> obj_ptr;
@@ -499,7 +476,7 @@ private:
 
     virtual void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
     {
-        KDBTemplate* top_db = get_top_level_db();
+        D* top_db = get_top_level_db();
 
         // Both the passed obj_ptr and k_objs[key] will point to the same object
         this->k_objs[key] = obj_ptr;
@@ -511,12 +488,46 @@ private:
 
         // if this is a top-level database, we also need to set the object in all 
         // subset instances
-        for(KDBTemplate* subset : get_children_db())
+        for(D* subset : get_children_db())
         {
             if(!subset->contains(key))
                 continue;
             subset->k_objs[key] = obj_ptr;
         }
+    }
+
+protected:
+    D* get_top_level_db()
+    {
+        if(k_db_type != DB_SUBSET)
+            return (D*) this;
+        else
+        {
+            if(!db_parent)
+            {
+                std::string error_msg = "Internal error: subset database of type '";
+                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
+                throw std::runtime_error(error_msg);
+            }
+            return db_parent;
+        }
+    }
+
+    std::set<D*> get_children_db() const
+    {
+        if(k_db_type != DB_SUBSET)
+            return children_db; 
+        else
+            return db_parent->children_db;
+    }
+
+    virtual std::shared_ptr<D> initialize_subset(const D* true_parent)
+    {
+        std::shared_ptr<D> subset_ptr = std::make_shared<D>(false);
+        subset_ptr->description = true_parent->description;
+        subset_ptr->k_compressed = true_parent->k_compressed;
+        subset_ptr->filepath = true_parent->filepath;
+        return subset_ptr;
     }
 
 public:
@@ -553,7 +564,7 @@ public:
     {
         if(k_db_type != DB_SUBSET)
         {
-            for(KDBTemplate* child_db : children_db)
+            for(D* child_db : children_db)
             {
                 child_db->k_objs.clear();
                 child_db->db_parent = nullptr;
@@ -563,7 +574,7 @@ public:
 
         if(db_parent)
         {
-            db_parent->children_db.erase(this);
+            db_parent->children_db.erase((D*) this);
             db_parent = nullptr;
         }
 
@@ -576,7 +587,7 @@ public:
         // then clear the objects
         if(k_db_type != DB_SUBSET)
         {
-            for(KDBTemplate* child_db : children_db)
+            for(D* child_db : children_db)
             {
                 child_db->k_objs.clear();
                 child_db->db_parent = nullptr;
@@ -590,7 +601,7 @@ public:
         KDBInfo::clear();
     }
 
-    std::shared_ptr<D> get_subset(const std::string& pattern, const bool copy)
+    virtual std::shared_ptr<D> get_subset(const std::string& pattern, const bool copy)
     {
         std::string error_msg = "Cannot create a subset the database of type '";
         error_msg += v_iode_types[this->k_type] + "' using the pattern '";
@@ -610,15 +621,14 @@ public:
     
         // NOTE : if the parent database is already a subset, we need to get 
         //        the top-level database
-        KDBTemplate* true_parent = this->get_top_level_db();
+        D* true_parent = this->get_top_level_db();
+        if(!true_parent)
+        {
+            error_msg += ":\nCannot find the parent database or is not defined";
+            throw std::runtime_error(error_msg);
+        }
 
-        std::shared_ptr<D> subset_ptr = std::make_shared<D>(false);
-        if(true_parent->sample)
-            subset_ptr->sample = new Sample(*(true_parent->sample));
-        subset_ptr->description = true_parent->description;
-        subset_ptr->k_compressed = true_parent->k_compressed;
-        subset_ptr->filepath = true_parent->filepath;
-    
+        std::shared_ptr<D> subset_ptr = initialize_subset(true_parent);
         if(copy)
         {
             subset_ptr->k_db_type = DB_STANDALONE;
@@ -735,7 +745,7 @@ public:
         }
 
         // rename in top-level database
-        KDBTemplate* top_db = get_top_level_db();
+        D* top_db = get_top_level_db();
         if(!overwrite)
         {
             if(top_db->contains(new_key))
@@ -751,7 +761,7 @@ public:
         top_db->k_objs[new_key] = obj_ptr;
 
         // rename in all subset instances (including 'this' if 'this' is a subset)
-        for(KDBTemplate* subset : get_children_db())
+        for(D* subset : get_children_db())
         {
             if(!subset->contains(old_key))
                 continue;
@@ -765,7 +775,7 @@ public:
     bool remove(const std::string& name) override
     {
         std::string key = to_key(name);
-        KDBTemplate* top_db = get_top_level_db();
+        D* top_db = get_top_level_db();
         if(!(this->contains(key) && top_db->contains(key)))
         {
             std::string str_type = v_iode_types[this->k_type];
@@ -780,7 +790,7 @@ public:
         top_db->k_objs.erase(key);
 
         // remove from all subset instances (including 'this' if 'this' is a subset)
-        for(KDBTemplate* subset : get_children_db())
+        for(D* subset : get_children_db())
             subset->k_objs.erase(key);
 
         return true;
@@ -849,7 +859,7 @@ public:
     bool copy_from_file(KDBTemplate& from, const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {   
-        bool success = from.load_binary(this->k_type, file);
+        bool success = from.load_binary(file);
         if(!success)
             return false;
     
@@ -998,7 +1008,7 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        KDBTemplate* top_db = get_top_level_db();
+        D* top_db = get_top_level_db();
 
         if(this->k_db_type == DB_SUBSET)
         {

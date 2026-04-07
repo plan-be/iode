@@ -18,14 +18,18 @@
  *  ---------
  *  Determine IODE object file version and convert an object to the current IODE version.
  *  
- *     int K_calcvers(char* label): returns the current object version (0-2) from an IODE file header. 
+ *     int get_version(char* label): returns the current object version (0-2) from an IODE file header. 
  */
 #include "scr4/s_swap.h"        // SWHDL
 
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
+#include "api/objs/comments.h"
 #include "api/objs/equations.h"
+#include "api/objs/identities.h"
+#include "api/objs/lists.h"
+#include "api/objs/scalars.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
 
@@ -44,11 +48,20 @@
  *                                  2 for format of IODE 5.04d
  *                                  -1 if not recognized
  */
- int K_calcvers(char* label)
+int get_version(char* label)
 {
-    if(memcmp(label, K_LABEL, strlen(K_LABEL)) == 0) return 0;     // Current version (5.64)
-    if(memcmp(label, K_LABELS, strlen(K_LABELS)) == 0) return(1);
-    if(memcmp(label, K_LABELD, strlen(K_LABELD)) == 0) return(2);
+    // version >= 5.64
+    if(memcmp(label, K_LABEL, strlen(K_LABEL)) == 0) 
+        return 0;
+    
+    // version >= 4.02
+    if(memcmp(label, K_LABELS, strlen(K_LABELS)) == 0) 
+        return 1;
+    
+    // version >= 5.04d
+    if(memcmp(label, K_LABELD, strlen(K_LABELD)) == 0) 
+        return 2;
+    
     return -1;
 }
 
@@ -62,7 +75,7 @@
  *  TODO: reuse the function in K_repack() => duplicate code.
  */
 
-static char *Pack16To32(char* opack)
+static char* Pack16To32(char* opack)
 {
     OSIZE   *ptr;
     U_sh    *old_ptr = (U_sh *)opack;
@@ -112,7 +125,7 @@ static bool K_lec_pack(char** pack, char* lec)
  *  @return                char*        pointer to pack with the cell appended
  *  
  */
-static char *T_cell_repack(char* pack, TableCell* cell)
+static char* T_cell_repack(char* pack, TableCell* cell)
 {
     char* ipack = NULL;
     char* opack = NULL;
@@ -153,7 +166,7 @@ static char *T_cell_repack(char* pack, TableCell* cell)
  *  
  */
 
-static char *K_repack_tbl(Table *tbl)
+static char* K_repack_tbl(Table *tbl)
 {
     char* pack = (char*) P_create();
     if(tbl == NULL) 
@@ -202,91 +215,114 @@ static char *K_repack_tbl(Table *tbl)
  *  @param [in]         vers    int     IODE objects version to convert to
  *  @return                     char*   packed IODE object in version 0 or 3 (current version)
  */
-char* convert_obj_version(const std::string& name, const int type, char* opack, const int vers, 
-    const Sample* sample)
-{    
+char* KDB::convert_obj_version(const std::string& name, char* opack, const int vers)
+{
     // nothing to do
     if(vers == 0 || vers == 3) 
         return opack;
 
-    char *pack = 0;
-    char buf[512];
     char* npack = Pack16To32(opack);
-    switch(type) 
-    {
-        case VARIABLES :
-        {
-            if(vers == 2) 
-                return npack;
-            
-            Variable var;
-            int nb = sample->nb_periods;
-            float* f = (float*) P_get_ptr(npack, 0);
 
-            double value;
-            for(int j = 0 ; j < nb ; j++) 
-            {
-                sprintf(buf, "%.8g", f[j]);
-                value = atof(buf);
-                if(IODE_IS_0(value)) 
-                    value = 0.0;
-                var.push_back(value);
-            }
-            var_to_binary(&pack, var);
-            break;
-        }
-        case SCALARS :
-        {
-            if(vers == 2) 
-                return npack;
-            
-            Scalar scl;
-            int nb = 3;
-            float* f = (float*) P_get_ptr(npack, 0);
+    npack = sub_convert_obj_version(npack, name, vers);
+    return npack;
+}
 
-            double value;
-            for(int j = 0 ; j < 3 ; j++) 
-            {
-                value = (double) f[j];
-                sprintf(buf, "%.8lg", value);
-                value = atof(buf);
-                if(IODE_IS_0(value)) 
-                    value = 0.0;
-                
-                if(j == 0) 
-                    scl.value = value;
-                else if(j == 1) 
-                    scl.relax = value;
-                else if(j == 2) 
-                    scl.std = value;
-            }
-            scl.to_binary(&pack);
-            break;
-        }
-        case IDENTITIES :
-        {
-            char* lec = (char*) P_get_ptr(npack, 0);
-            K_lec_pack(&pack, lec);
-            break;
-        }
-        case EQUATIONS :
-        {
-            Equation* eq = binary_to_eqs(npack, name);
-            eq->to_binary(&pack);
-            delete eq;
-            break;
-        }
-        case TABLES :
-        {
-            Table* tbl = binary_to_tbl(npack);
-            pack = K_repack_tbl(tbl);
-            delete tbl;
-            break;
-        }
-        default :
-            break;
-    }
+char* KDBComments::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    return npack;
+}
+
+char* KDBEquations::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    char *pack = NULL;
+
+    Equation* eq = binary_to_eqs(npack, name);
+    eq->to_binary(&pack);
+    delete eq;
 
     return pack;
 }
 
+char* KDBIdentities::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    char *pack = NULL;
+
+    char* lec = (char*) P_get_ptr(npack, 0);
+    K_lec_pack(&pack, lec);
+
+    return pack;
+}
+
+char* KDBLists::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    return npack;
+}
+
+char* KDBScalars::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    char *pack = NULL;
+
+    if(vers == 2) 
+        return npack;
+            
+    int nb = 3;
+    float* f = (float*) P_get_ptr(npack, 0);
+
+    Scalar scl;
+    double value;
+    char buf[512];
+    for(int j = 0 ; j < 3 ; j++) 
+    {
+        value = (double) f[j];
+        sprintf(buf, "%.8lg", value);
+        value = atof(buf);
+        if(IODE_IS_0(value)) 
+            value = 0.0;
+        
+        if(j == 0) 
+            scl.value = value;
+        else if(j == 1) 
+            scl.relax = value;
+        else if(j == 2) 
+            scl.std = value;
+    }
+
+    scl.to_binary(&pack);
+    return pack;
+}
+
+char* KDBTables::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{
+    char *pack = NULL;
+
+    Table* tbl = binary_to_tbl(npack);
+    pack = K_repack_tbl(tbl);
+    delete tbl;
+
+    return pack;
+}
+
+char* KDBVariables::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+{   
+    if(vers == 2) 
+        return npack;
+
+    int nb = sample->nb_periods;
+    float* f = (float*) P_get_ptr(npack, 0);
+    
+    Variable var;
+    double value;
+    char buf[512];
+    for(int j = 0 ; j < nb ; j++) 
+    {
+        sprintf(buf, "%.8g", f[j]);
+        value = atof(buf);
+        if(IODE_IS_0(value)) 
+            value = 0.0;
+        var.push_back(value);
+    }
+
+    char *pack = NULL;
+    var_to_binary(&pack, var);
+    return pack;
+}

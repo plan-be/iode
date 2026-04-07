@@ -77,19 +77,31 @@ static bool load_global_database(std::shared_ptr<T>& global_ptr,
  *  @param [in] char*   arg     parameters if the command on the report line
  *  @param [in] int     type    object type
  *  @return     int             0 on success, -1 on error
- *  
- *
  */
-
 int B_WsLoad(char* arg, int type)
 {
-    char buf[K_MAX_FILE + 1];
+    if(!arg) 
+    {
+        kwarning("Syntax error: no argument passed to $WsLoad<type>");
+        return -1;
+    }
 
-    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
-    K_strip(buf);
-    if(buf[0] == 0) 
+    std::string buf(arg);
+    if(buf.empty())
+    {
+        kwarning("Syntax error: no argument passed to $WsLoad<type>");
         return 0;
-    std::string filepath = std::string(buf);
+    }
+
+    std::string filepath = trim(buf);
+
+    if(filepath.length() >= K_MAX_FILE) 
+    {
+        std::string error_msg = "Syntax error: filename too long in $WsLoad<type> ";
+        error_msg += "(max length is " + std::to_string(K_MAX_FILE - 1) + " characters)";
+        kwarning(error_msg.c_str());
+        return -1;
+    }
 
     bool success;
     switch(type) 
@@ -738,33 +750,31 @@ int B_StatUnitRoot(char* arg, int unused)
  */
 int B_CsvSave(char* arg, int type)
 {
-    int     lg, shift = 0;
-    char    file[K_MAX_FILE + 1], file_ext[K_MAX_FILE + 1];
-    char    **data0, *lst;
-    Sample  *smpl = nullptr;
-    char    *oldseps = A_SEPS; // JMP 27/09/2022
-
     if(type != VARIABLES)
         return -1;
 
     // filename
-    lg = B_get_arg0(file, arg, K_MAX_FILE);
-    K_set_ext(file_ext, file, FILE_CSV);
+    char c_file[K_MAX_FILE + 1];
+    int lg = B_get_arg0(c_file, arg, K_MAX_FILE);
+    std::string filepath = std::string(c_file);
+    filepath = set_file_extension(filepath, FILE_CSV);
 
     // [sample] [vars]
-    //A_SEPS = " ;\t\n"; // JMP 27/09/2022
-    A_SEPS = " ,;\t\n"; // JMP 25/04/2023
-    lst = K_expand(type, NULL, arg + lg, '*');
-    data0 = B_ainit_chk(lst, NULL, 0);
+    char* old_seps = A_SEPS;
+    A_SEPS = " ,;\t\n";
+    char* lst = K_expand(type, NULL, arg + lg, '*');
+    char** data0 = B_ainit_chk(lst, NULL, 0);
     SCR_free(lst);
-    A_SEPS = oldseps; // JMP 27/09/2022   
+    A_SEPS = old_seps;   
     
     if(SCR_tbl_size((unsigned char**) data0) == 0) 
     {
         SCR_free_tbl((unsigned char**) data0);
-        data0 = 0;
+        data0 = NULL;
     }
 
+    int shift = 0;
+    Sample* smpl = nullptr;
     if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
     {
         // check if from to passed as arguments
@@ -802,7 +812,7 @@ int B_CsvSave(char* arg, int type)
     try
     {
         KDB& kdb = get_global_db(type);
-        kdb.save_csv(file_ext, vars, smpl);
+        kdb.save_csv(filepath, vars, smpl);
     }
     catch(const std::runtime_error& e)
     {

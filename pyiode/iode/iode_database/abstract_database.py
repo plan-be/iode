@@ -1171,6 +1171,7 @@ class IodeDatabase:
         
         Examples
         --------
+        >>> from pathlib import Path
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import comments
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")         # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1178,9 +1179,15 @@ class IodeDatabase:
         317 objects loaded 
         >>> len(comments)
         317
+        >>> # remove file if it already exists
+        >>> file_to_save = Path(f"{SAMPLE_DATA_DIR}/fun2.cmt")
+        >>> if file_to_save.exists():
+        ...     file_to_save.unlink()
+        >>> # save the current Comments database into a new file
         >>> comments.save(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Saving fun2.cmt
         317 objects saved
+        >>> # reload the database from the saved file
         >>> comments.clear()
         >>> comments.load(f"{SAMPLE_DATA_DIR}/fun2.cmt")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun2.cmt

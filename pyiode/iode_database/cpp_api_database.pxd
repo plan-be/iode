@@ -62,7 +62,6 @@ cdef extern from "api/all.h":
         short               k_mode
         string              k_arch
         string              description
-        CSample*            sample
         char                k_compressed
         char                k_db_type
         string              filepath
@@ -84,7 +83,7 @@ cdef extern from "api/all.h":
 
         # object names
         string get_name(const int pos) except +
-        bool set_name(const int pos, const string& new_name) except +
+        bool update_filename(const int pos, const string& new_name) except +
         bool rename(const string& old_name, const string& new_name, const bool overwrite) except +
         string expand(const string& pattern, const char ch_all) except +
         set[string] filter_names(const string& pattern, const bool must_exist) except +
@@ -320,6 +319,8 @@ cdef extern from "api/objs/tables.h":
 
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
+        CSample* sample
+
         # Constructor
         KDBVariables(bool is_global)
 

@@ -65,7 +65,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
     char* c_lec = NULL;
     std::string lec_oem;
     std::string lec_utf8;
-    this->set_fullpath(c_filename);
+    this->set_fullpath(trim_filename);
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -73,8 +73,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    char asc_filename[1024];
-                    K_set_ext_asc(asc_filename, c_filename, IDENTITIES);
+                    std::string asc_filename = set_file_extension(trim_filename, ASCII_IDENTITIES);
                     this->set_fullpath(asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

@@ -1073,7 +1073,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     std::set<std::string>& v_found, const Sample* copy_sample)
 {    
     KDBVariables from(false);
-    bool success = from.load_binary(this->k_type, file);
+    bool success = from.load_binary(file);
     if(!success)
         return false;
 

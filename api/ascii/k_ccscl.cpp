@@ -114,7 +114,7 @@ bool KDBScalars::load_asc(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */ 
-    this->set_fullpath(c_filename);
+    this->set_fullpath(trim_filename);
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -122,8 +122,7 @@ bool KDBScalars::load_asc(const std::string& filename)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    char asc_filename[1024];
-                    K_set_ext_asc(asc_filename, c_filename, SCALARS);
+                    std::string asc_filename = set_file_extension(trim_filename, ASCII_SCALARS);
                     this->set_fullpath(asc_filename);
                 }            
                 YY_close(yy);

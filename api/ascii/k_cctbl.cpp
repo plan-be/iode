@@ -419,8 +419,7 @@ bool KDBTables::load_asc(const std::string& filename)
     clear();  /* clear current KDB */
 
     /* READ FILE */
-    this->set_fullpath(c_filename);
-    char asc_filename[1024];
+    this->set_fullpath(trim_filename);
     while(1) 
     {
         switch(YY_lex(yy)) 
@@ -428,7 +427,7 @@ bool KDBTables::load_asc(const std::string& filename)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    K_set_ext_asc(asc_filename, c_filename, TABLES);
+                    std::string asc_filename = set_file_extension(trim_filename, ASCII_TABLES);
                     this->set_fullpath(asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

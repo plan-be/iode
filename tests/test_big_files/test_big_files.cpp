@@ -58,7 +58,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ---- GLOBAL ----
         kdb_var = std::make_shared<KDBVariables>(true);
         auto start = std::chrono::high_resolution_clock::now();
-        kdb_var->load_binary(VARIABLES, fullfilename);
+        kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -79,7 +79,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ---- STANDALONE ----
         kdb_var = std::make_shared<KDBVariables>(false);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var->load_binary(VARIABLES, fullfilename);
+        kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -97,7 +97,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ---- GLOBAL ----
         kdb_var = std::make_shared<KDBVariables>(true);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var->load_binary(VARIABLES, fullfilename, v_objs);
+        kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
@@ -113,7 +113,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ---- STANDALONE ----
         kdb_var = std::make_shared<KDBVariables>(false);
         start = std::chrono::high_resolution_clock::now();
-        kdb_var->load_binary(VARIABLES, fullfilename, v_objs);
+        kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
         EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
