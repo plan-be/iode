@@ -350,8 +350,8 @@ int B_DataCreate_1(char* arg, int* ptype)
             }
             case VARIABLES :
             {
-                Sample* sample = kdb.sample;
-                if(sample == nullptr) 
+                Sample* sample = global_ws_var->sample;
+                if(!sample) 
                     throw std::runtime_error("No sample defined in the Variables database");
                 Variable var(sample->nb_periods, IODE_NAN);
                 global_ws_var->set(name, var);

@@ -121,8 +121,7 @@ bool KDBComments::load_asc(const std::string& filename)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    char asc_filename[1024];
-                    K_set_ext_asc(asc_filename, c_filename, COMMENTS);
+                    std::string asc_filename = set_file_extension(trim_filename, ASCII_COMMENTS);
                     this->set_fullpath(asc_filename);
                 }
                 YY_close(yy);

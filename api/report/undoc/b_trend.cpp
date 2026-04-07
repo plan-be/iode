@@ -81,11 +81,11 @@ static int B_WsTrendAll(char* arg, int std)
     for(int i = 0; i < nb; i++) 
         v_data.push_back(std::string(data[i]));
         
-    file_type = K_findtype(file, VARIABLES);
+    file_type = get_file_type_from_file(file, VARIABLES);
     if(file_type < 0) 
         from->load_asc(file);
     else
-        from->load_binary(file_type, file, v_data);
+        from->load_binary(file, v_data);
     if(!from) 
     {
         rc = -1;

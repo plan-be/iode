@@ -59,11 +59,11 @@ int B_season(char* arg)
         nb --;
     }
 
-    file_type = K_findtype(name, VARIABLES);
+    file_type = get_file_type_from_file(name, VARIABLES);
     if(file_type < 0) 
         from->load_asc(name);
     else
-        from->load_binary(file_type, name, v_data);
+        from->load_binary(name, v_data);
     if(!from || nb != from->size()) 
     {
         error_manager.append_error("Empty data set or inexistent variable");

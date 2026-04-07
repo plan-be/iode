@@ -71,13 +71,15 @@ struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
      *    - $csvdec
      *    - $csvnan
      *    - $csvaxes
-     *  
      */
     static char* CSV_SEP;
     static char* CSV_DEC;
     static char* CSV_NAN;
     static char* CSV_AXES;
     static int   CSV_NBDEC;
+
+    // periods of the Variables database
+    Sample* sample = nullptr;
 
 private:
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
@@ -98,12 +100,59 @@ private:
 
     bool load_asc_type_ask(const std::string& file_or_string, int type, int ask);
 
+    size_t _predump_(char** data)
+    {
+        if(this->sample)
+        {
+            char* c_smpl = (char*) this->sample; 
+            *data = c_smpl;
+            return sizeof(Sample);
+        }
+        else
+        {
+            *data = NULL;
+            return 0;
+        }
+    }
+
 public:
     // global or standalone database
     KDBVariables(const bool is_global) : KDBTemplate(VARIABLES, is_global) {}
 
     // copy constructor
-    KDBVariables(const KDBVariables& other): KDBTemplate(other) {}
+    KDBVariables(const KDBVariables& other): KDBTemplate(other) 
+    {
+        if(other.sample)
+            this->sample = new Sample(*(other.sample));
+        else
+            this->sample = nullptr;
+    }
+
+    ~KDBVariables() 
+    {
+        if(this->sample)
+            delete this->sample;
+        this->sample = nullptr;
+    }
+
+    void clear() override
+    {
+        if(this->sample)
+            delete this->sample;
+        this->sample = nullptr;
+
+        KDBTemplate::clear();
+    }
+
+    int preload(FILE *fd, const std::string& filepath, const int vers) override;
+
+    std::shared_ptr<KDBVariables> initialize_subset(const KDBVariables* true_parent) override
+    {
+        std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::initialize_subset(true_parent);
+        if(true_parent->sample)
+            subset_ptr->sample = new Sample(*(true_parent->sample));
+        return subset_ptr;
+    }
 
     double get_value(const std::string& name, const int t) const
     {
@@ -267,6 +316,8 @@ public:
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
+
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
 
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;

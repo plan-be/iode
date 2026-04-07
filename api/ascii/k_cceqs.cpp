@@ -328,8 +328,7 @@ bool KDBEquations::load_asc(const std::string& filename)
             case YY_EOF :
                 if(cmpt) 
                 {
-                    char asc_filename[1024];
-                    K_set_ext_asc(asc_filename, c_filename, EQUATIONS);
+                    std::string asc_filename = set_file_extension(trim_filename, ASCII_EQUATIONS);
                     this->set_fullpath(asc_filename); // JMP 03/12/2022
                 }
                 YY_close(yy);

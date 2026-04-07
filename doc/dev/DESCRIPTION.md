@@ -330,7 +330,7 @@ Functions to detect IODE object file version and to convert an object to the cur
 
 |Syntax|Description|
 |:---|:---|
-|`int K_calcvers(char* label):`|returns the current object version (0\-2) from an IODE file header.|
+|`int get_version(char* label):`|returns the current object version (0\-2) from an IODE file header.|
 
 ### k\_pack.c {#T28}
 
@@ -390,27 +390,6 @@ Functions to search strings in KDB objects.
 |`std::vector<std::string> KDB::grep(std::string& pattern, bool ecase, bool names, bool forms, bool texts, char all)`|Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...|
 |`char *K_expand(int type, char* file, char* pattern, int all)`|Retrieves all object names matching one or more patterns in a workspace or an object file.|
 |`int K_aggr(char* pattern, char* ename, char* nname) *`|Transforms a variable name based on an "aggregation" pattern.|
-
-## Group "IODE file management" {#T38}
-
-### k\_objfile.c {#T39}
-
-Functions to manipulate IODE object files.
-
-|Syntax|Description|
-|:---|:---|
-|`int K_get_ext(char* filename, char* ext, int max_ext_len)`|gets a filename extension.|
-|`int K_has_ext(char* filename)`|indicates if a filename contains an extension.|
-|`char *K_set_ext(char* res, char* fname, int type)`|deletes left and right spaces in a filename and changes its extension according to the given type.|
-|`char *K_set_ext_asc(char* res, char* fname, int type)`|trims a filename then changes its extension to the ascii extension according to the given type.|
-|`void K_strip(char* filename)`|deletes left and right spaces in a filename. Keeps the space inside the filename.|
-|`int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)`|retrieves infos on an IODE file: type, number of objects, Sample|
-|`int X_findtype(char* filename)`|Returns the type of content of filename according to its extension|
-|\`cint K\_set\_backup\_on\_save(int take\_backup)|sets the backup choice before saving a kdb.|
-|\`cint K\_get\_backup\_on\_save()|indicates if a backup must be taken before saving a kdb.|
-|`int K_backup(char* filename)`|takes a backup of a file by renaming the file: filename.xxx => filename.xx$.|
-
-## Group "IODE big\- and little\-endian conversion" {#T40}
 
 ### k\_xdr.c {#T41}
 

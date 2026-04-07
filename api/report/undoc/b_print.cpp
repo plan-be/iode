@@ -234,7 +234,7 @@ int B_PrintObjDef_1(char* arg, int* type)
                 W_flush();
             }
     
-            Sample* smpl = kdb.sample;
+            Sample* smpl = global_ws_var->sample;
             if(!smpl || smpl->nb_periods == 0) 
             {
                 std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";

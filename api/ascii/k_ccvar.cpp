@@ -218,14 +218,11 @@ bool KDBVariables::load_asc_type_ask(const std::string& file_or_string, int type
  *  
  */
 bool KDBVariables::load_asc(const std::string& filename)
-{   
-    char asc_filename[1024];
-
+{
     std::string trim_filename = trim(filename);
-    char* c_filename = (char*) trim_filename.c_str();
-    K_set_ext_asc(asc_filename, c_filename, VARIABLES);
+    std::string asc_filename = set_file_extension(trim_filename, ASCII_VARIABLES);
 
-    bool success = load_asc_type_ask(std::string(asc_filename), 0, 0);
+    bool success = load_asc_type_ask(asc_filename, 0, 0);
 
     if(success)
         this->set_fullpath(asc_filename);

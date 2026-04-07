@@ -1,24 +1,7 @@
-/**
- * @header4iode
- *
- * IODE object file management
- * ---------------------------
- *      char *K_add_ext(char* filename, char* ext)                                      sets the extension of a filename.
- *      int K_get_ext(char* filename, char* ext, int max_ext_len)                       gets a filename extension.
- *      int K_has_ext(char* filename)                                                   indicates if a filename contains an extension.
- *      char *K_set_ext(char* res, char* fname, int type)                               deletes left and right spaces in a filename and changes its extension according to the given type.
- *      char *K_set_ext_asc(char* res, char* fname, int type)                           trims a filename then changes its extension to the ascii extension according to the given type).
- *      void K_strip(char* filename)                                                    deletes left and right spaces in a filename. Keeps the space inside the filename.
- *      int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)           retrieves infos on an IODE file: type, number of objects, Sample
- *      int X_findtype(char* filename)                                                  returns the type of content of filename according to its extension
- *      int K_set_backup_on_save(int take_backup)                                       sets the backup choice before saving a kdb. 
- *      int K_get_backup_on_save()                                                      indicates if a backup must be taken before saving a kdb. 
- *      int K_backup(char* filename)                                                    takes a backup of a file by renaming the file: filename.xxx => filename.xx$.
- *      int K_setname(char* from, char* to)                                             replaces kdb->filepath in an IODE object file.
- */
 #ifndef UNIX
 #include <io.h>
 #endif
+#include <filesystem>   // requires C++17 
 
 #include "scr4/s_swap.h"        // SWHDL
 #include "scr4/s_prodir.h"
@@ -43,158 +26,14 @@
 #include "api/objs/structs_32.h"
 
 
+bool KDB::backup_enabled = true;
+
 // required to read old binary files
 struct KOBJ 
 {
     SWHDL o_val;    // Handle of the object in the scr4/swap memory -> to be passed to SW_getptr()
     ONAME o_name;   // name of the object
 };
-
-
-// UTILITIES FOR STANDARDISING/MODIFYING FILENAMES AND EXTENSIONS
-// --------------------------------------------------------------
-
-/**
- *  Forces the extension of a filename. Filename must be large enough to include the extension.
- *   
- *  @param [in, out]    filename    char*   source / target filename
- *  @param [in]         ext         char*   new extension
- *  @return                         char*   filename modified (same pointer)
- *  
- *  @example : 
- *      strcpy(filename, "example");
- *      K_add_ext(filename, "var");
- *      printf("'%s'\n", filename);  // 'example.var'
- */
-char *K_add_ext(char* filename, char* ext)
-{
-    char    buf[512];
-    
-    if(filename == 0 ||strlen(filename) > 511) return(NULL);
-    SCR_change_ext(buf, filename, ext); // Force the replacement extension of filename by ext (see http://xon.be/scr4/libs1/libs1172.htm)
-    strcpy(filename, buf);              
-    return(filename); 
-}
-
-
-/**
- *  Gets a filename extension.
- *   
- *  @param [in]    filename      char*   filename
- *  @param [out]   ext           char*   filename extension
- *  @param [in]    max_ext_len   int     ext max length
- *  @return                      int     ext length (0 if no extension, -1 if filename == NULL)
- */
-int K_get_ext(char* filename, char* ext, int max_ext_len)
-{
-    int     i, len;
-
-    if(filename == 0) return 0;
-
-    len = (int)strlen(filename);
-    for(i = len - 1 ; i >= 0 ; i--) {
-        if(filename[i] == ':' || filename[i] == '!' ||        /* JMP 23-06-02 */
-           filename[i] == '.' || filename[i] == '\\' ||
-           filename[i] == '/') break;
-    }
-
-    if(ext) ext[0] = 0;
-
-    if(i >= 0 && filename[i] == '.') {
-        if(ext && max_ext_len >= len - i)    // var.ac => len = 5, i = 3
-            strcpy(ext, filename + i + 1);
-        return(len - i - 1);
-    }
-    else 
-        return 0;
-}
-
-
-/**
- *  Indicates if a filename contains an extension.
- *   
- *  @param [in]    filename    char*   source / target filename
- *  @return                    int     1 if an extension is detected, 0 otherwise
- *  
- *  @example : 
- *      strcpy(filename, "example");
- *      K_add_ext(filename, "var");
- *      printf("'%s'\n", filename);  // 'example.var'
- */
-
-int K_has_ext(char* filename)
-{
-    int     i;
-
-    if(filename == 0) return 0;
-    for(i = (int)strlen(filename) - 1 ; i >= 0 ; i--) {
-        if(filename[i] == ':' || filename[i] == '!' ||        /* JMP 23-06-02 */
-           filename[i] == '.' || filename[i] == '\\' ||
-           filename[i] == '/') break;
-    }
-    if(i >= 0 && filename[i] == '.') return(1);
-    else return 0;
-}
-
-
-/**
- *  Trims a filename then changes its extension according to the given type.
- *   
- *  @param [out]    res   char*   resulting filename
- *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between FILE_COMMENTS and FILE_CSV) 
- *  @return               char*   res (same pointer)
- *  
- *  @example : 
- *      char buf[256];
- *  
- *      strcpy(filename, "example.xxx      ");
- *      K_set_ext(buf, filename, VARIABLES);
- *      printf("'%s'\n", buf);  // 'example.var'
- *      K_set_ext(buf, filename, FILE_CSV);
- *      printf("'%s'\n", buf);  // 'example.csv'
- */
-char *K_set_ext(char* res, char* fname, int type)
-{
-    strcpy(res, fname);
-    K_strip(res); /* JMP 19-04-98 */
-    return(K_add_ext(res, k_ext[type]));
-}
-
-/**
- *  Trims a filename then changes its extension to the ascii extension (according to the given type).
- *   
- *  @param [out]    res   char*   resulting filename
- *  @param [in]     fname char*   input filename
- *  @param [in]     type  int     file type (value defined in iode.h between FILE_COMMENTS and FILE_CSV) 
- *  @return               char*   res (same pointer)
- *  
- *  @example : 
- *      char buf[256];
- *  
- *      strcpy(filename, "example.xxx      ");
- *      K_set_ext_asc(buf, filename, VARIABLES);
- *      printf("'%s'\n", buf);  // 'example.av'
- */
-char *K_set_ext_asc(char* res, char* fname, int type)
-{
-    strcpy(res, fname);
-    K_strip(res); /* JMP 19-04-98 */
-    return(K_add_ext(res, k_ext[ASCII_COMMENTS + type]));
-}
-
-
-/**
- *  Left and right trims a filename. Keeps the space inside the filename.
- *  
- *  @param [in, out]    filename  char*   string containing a filename
- */
-void K_strip(char* filename)
-{
-    U_ljust_text((unsigned char*) filename);
-    SCR_strip((unsigned char*) filename);
-}
-
 
 
 // UTILITIES FOR READING / WRITING IODE FILES
@@ -274,9 +113,8 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
 // ------------------------
 
 /**
- *  Reads a KDB struct from an IODE object file and modify the read KDB struct 
- *  according to the current IODE object version (0, 1 or 2) and 32 or 64 bits 
- *  current architecture. 
+ *  Reads the header information of an IODE file and fills the KDBInfo attributes with 
+ *  this information. The number of objects and the 64 bytes 'data' are returned as a pair. 
  *  
  *  @note The previous versions of the KDB struct are OKDB and OKDB643.
  *        The 32 bit version of KDB (when in 64 bits executable) is KDB32.
@@ -285,19 +123,18 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
  *  TODO: implement version 1 and 2 in 64 bits.
  *  
  *  @param [in]  fd       FILE*   IO stream
- *  @param [in]  vers     int     version of IODE objects (0-2 ?)
- *  @return               int     number of IODE objects to load
+ *  @param [in]  vers     int     version of IODE objects
  */
-int KDBInfo::preload(FILE *fd, const std::string& filepath, const int vers)
+std::pair<int, char[64]> KDBInfo::_preload_(FILE *fd, const std::string& filepath, const int vers)
 {
-    int     nb_objs = -1;
-    OKDB643 *okdb643, kdb643;
+    int nb_objs = -1;
+    char data[64] = {0};
+    OKDB643 kdb643;
     KDB32   kdb32;
-    Sample* smpl;
     bool    success;
 
-    okdb643 = &kdb643;
-    memset((char*) &kdb643, 0, sizeof(kdb643)); // JMP 28/10/2016 correction plantage fichier 2000 de PV
+    OKDB643* okdb643 = &kdb643;
+    memset((char*) &kdb643, 0, sizeof(kdb643));
 
     std::string error_msg = "preload(): Could not read header from input file '" + filepath + "'. ";
     switch(vers) 
@@ -329,12 +166,7 @@ int KDBInfo::preload(FILE *fd, const std::string& filepath, const int vers)
                 this->k_arch = std::string(kdb32.k_arch);
                 this->description = std::string(kdb32.k_desc);
                 if(kdb32.k_data != NULL && kdb32.k_data[0] != 0)
-                {
-                    smpl = (Sample*) kdb32.k_data;
-                    this->sample = new Sample(*smpl);
-                }
-                else
-                    this->sample = nullptr;
+                    memcpy(data, kdb32.k_data, 64);
             }
             else
                 success = kread((char *) this, sizeof(KDB), 1, fd);
@@ -384,18 +216,35 @@ int KDBInfo::preload(FILE *fd, const std::string& filepath, const int vers)
         this->k_arch = std::string(okdb643->k_arch);
         this->description = std::string(okdb643->k_desc);
         if(okdb643->k_data != NULL && okdb643->k_data[0] != 0)
-        {
-            smpl = (Sample*) okdb643->k_data;
-            this->sample = new Sample(*smpl);
-        }
-        else
-            this->sample = nullptr;
-
+            memcpy(data, okdb643->k_data, 64);
         if(vers == 2 || vers == 3) 
             this->k_compressed = okdb643->k_compressed;
     }
 
-    return nb_objs;
+    std::pair<int, char[64]> res;
+    res.first = nb_objs;
+    memcpy(res.second, data, 64);
+    return res;
+}
+
+int KDBInfo::preload(FILE *fd, const std::string& filepath, const int vers)
+{
+    std::pair<int, char[64]> res = _preload_(fd, filepath, vers);
+    return res.first;
+}
+
+int KDBVariables::preload(FILE *fd, const std::string& filepath, const int vers)
+{
+    std::pair<int, char[64]> res = _preload_(fd, filepath, vers);
+
+    char* data = res.second;
+    if(data[0] != 0)
+    {
+        Sample* smpl = (Sample*) data;
+        this->sample = new Sample(*smpl);
+    }
+
+    return res.first;
 }
 
 
@@ -418,24 +267,18 @@ static int index_of_name(const std::vector<std::string>& vec, const std::string&
  *      - uncompresses the file
  *      - transposes objects to 64 bits 
  *      - converts to the current IODE object version.
- *  
- * @param [in]   ftype      int     file type (FILE_COMMENTS -> FILE_VARIABLES)
- * @param [in]   fname      FNAME   filename
- * @param [in]   load_all   int     0 for loading all objects, 1 for loading the list objs 
- * @param [in]   objs       char**  null or list of objects to load
- * @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
- * @return                  KDB*    KDB with the content of filename restricted to objs if objs is not null
- *                                  NULL on error
+ * 
+ * @param [in]   filename   string   filename
+ * @param [in]   objs       char**   null or list of objects to load
  *  
  * @note Messages are sent to the user via calls to 2 functions which must be defined 
  *       according to the context (console app, window app, Qt app...) : 
  *          - kmsg() for notifications
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)                                 
  */
-bool KDB::load_binary(const int file_type, const std::string& filename, 
-                      const std::vector<std::string>& objs)
+bool KDB::load_binary(const std::string& filename, const std::vector<std::string>& objs)
 {
-    int     pos, nf, vers;
+    int     pos, nf;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
     OSIZE   len, clen;
     KDB*    tkdb = nullptr;
@@ -452,23 +295,14 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     // avoid runtime error 'i is not set' in line 'if(i == 0) delete kdb;' below
     int i = 0;
 
-    std::string filename_trim = trim(filename);
-    char* fname = const_cast<char*>(filename_trim.c_str());
-    K_set_ext(file, fname, file_type);
-
     std::string prefix_error_msg = "Error when loading binary file " + std::string(file) + ":\n";
 
-    if(!this)
-    {
-        error_msg = prefix_error_msg + "Constructor of '" + v_iode_types[file_type]; 
-        error_msg += "' must be called first";
-        kwarning(error_msg.c_str());
-        return false;
-    }
+    std::string filename_trim = trim(filename);
+    std::string file_ext = set_file_extension(filename_trim, (int) this->k_type);
+    strcpy(file, file_ext.c_str());
 
     fd = fopen(file, "rb");
-
-    if(fd == NULL) 
+    if(!fd) 
     {
         error_msg = prefix_error_msg + "File does not exist.";
         kwarning(error_msg.c_str());
@@ -486,8 +320,8 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
         return false;
     }
 
-    vers = K_calcvers(label);
-    if(vers < 0 || vers > 2) 
+    int version = get_version(label);
+    if(version < 0 || version > 2) 
     {
         fclose(fd);
         error_msg = prefix_error_msg + "Unrecognized IODE file version.";
@@ -496,14 +330,13 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     }
 
     // Read kdb struct from open file (fd) and transpose into kdb 64 if X64
-    nb_objs = this->preload(fd, std::string(file), vers);
+    nb_objs = this->preload(fd, std::string(file), version);
     this->xdr(NULL);
 
-    if(file_type != this->k_type || this->k_arch != ARCH) 
+    if(this->k_arch != ARCH) 
     {
         fclose(fd);
-        error_msg = prefix_error_msg + "Unvalid type (" + std::string(k_ext[this->k_type]) + ") or wrong ";
-        error_msg += "CPU architecture (" + this->k_arch + ")";
+        error_msg = prefix_error_msg + "Wrong CPU architecture (" + this->k_arch + ")";
         kwarning(error_msg.c_str());
         return false;
     }
@@ -523,7 +356,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
     // -------- load names --------
     // check binary file version (1 and 2 -> old versions with short names)
     error_msg = prefix_error_msg + "Could not read object names";
-    if(vers == 1 || vers == 2) 
+    if(version == 1 || version == 2) 
     {
         // OKOBJ -> short names
         OKOBJ* okobj = (OKOBJ *) SW_nalloc(sizeof(OKOBJ) * nb_objs);
@@ -569,7 +402,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
         else 
         {
             // get the size (length) of the object in the file (compressed or not)
-            if(K_read_len(fd, vers, &len))
+            if(K_read_len(fd, version, &len))
             {
                 fclose(fd);
                 SW_nfree(k_objs);
@@ -619,7 +452,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             error_msg = prefix_error_msg + "Could not read object '" + name + "'";
 
             // get the size (length) of the object in the file (compressed or not)
-            if(K_read_len(fd, vers, &len)) 
+            if(K_read_len(fd, version, &len)) 
                 goto error;
 
             if(len < 0) 
@@ -649,7 +482,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
                     goto error;
             }
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            ptr = convert_obj_version(name, (int) this->k_type, ptr, vers, this->sample);
+            ptr = convert_obj_version(name, ptr, version);
             this->binary_to_obj(name, ptr);
             SW_nfree(ptr);
         }
@@ -671,7 +504,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
         // ???
         if(this->k_type == VARIABLES || this->k_type == SCALARS)
         {
-            if(K_read_len(fd, vers, &len))
+            if(K_read_len(fd, version, &len))
             {
                 error_msg = prefix_error_msg + "Could not read object values";
                 goto error;
@@ -705,7 +538,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             {
                 for(j = 0; j < pos - lpos; j++) 
                 {
-                    if(K_read_len(fd, vers, &len)) 
+                    if(K_read_len(fd, version, &len)) 
                         goto error;
                     // zipped file
                     if(len < 0) 
@@ -719,7 +552,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             // read next object
 
             // get the size (length) of the object in the file (compressed or not)
-            if(K_read_len(fd, vers, &len)) 
+            if(K_read_len(fd, version, &len)) 
                 goto error;
             
             // zipped file
@@ -754,7 +587,7 @@ bool KDB::load_binary(const int file_type, const std::string& filename,
             }
 
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            ptr = convert_obj_version(name, (int) this->k_type, ptr, vers, this->sample);
+            ptr = convert_obj_version(name, ptr, version);
             this->binary_to_obj(name, ptr);
             SW_nfree(ptr);
 
@@ -781,74 +614,38 @@ error:
 
 
 /**
- *  Retrieves infos on an IODE file: type, number of objects and, if defined, 
- *  the file description (free info on the file contents) and Sample (for var files only).
+ *  Retrieves infos on an IODE file
  *  
- *  @note: opens the IODE file to retrieve these informations from the file header, but does not 
- *  read the objects themselves.
- *  
- *  @param [in]  filename   char*   file to analyze
- *  @param [out] descr      char*   NULL or pointer to copy the description of the file
- *  @param [out] nobjs      int*    NULL or pointer to the number of objs in the file
- *  @param [out] smpl       Sample* NULL or pointer to the sample of the file (for VARIABLES only)
- *  @return                 int     on success: file type (FILE_COMMENTS...)
- *                                  on error: 
- *                                      -1 if filename is empty 
- *                                      -1 if IODE object version is < 0 or > 3
- *                                      -2 if file cannot be opened
- *  
- *  descr, nobjs and smpl may be NULL. In this case, nothing is copied.
+ *  @param [in]  filename   const std::string&   file containing an IODE database
+ *  @return                 int                  on success: file type (FILE_COMMENTS...)
+ *                                               on error: 
+ *                                                   -1 if filename is empty 
+ *                                                   -1 if IODE object version is < 0 or > 3
+ *                                                   -2 if file cannot be opened
  */
-int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
-{
-    FILE*   fd;
-    int     vers;
-    FNAME   file;
-    char    label[80];
-    int     nb_objs;
+static int sub_file_type_from_file(const std::string& filepath)
+{   
+    FILE* fd = fopen(filepath.c_str(), "rb");
+    if(!fd)
+        return -2;
 
-    if (descr) descr[0] = 0;
-    if (nobjs) *nobjs = 0;
-    if (smpl) memset(smpl, 0, sizeof(Sample));
-    if (filename == 0 || filename[0] == 0 || filename[0] == '-') 
-        return -1;
-
-    strcpy(file, filename);
-    K_strip(file);
-    fd = fopen(file, "rb");
-    if (fd == 0) 
-        return(-2);
-
+    char label[80];
+    memset(label, 0, 80);
     fread(label, strlen(K_LABEL), 1, fd);
-    vers = K_calcvers(label);
-    if (vers < 0 || vers > 3) 
+    int version = get_version(label);
+    // NOTE: return -1 if the file is an ASCII file (not an IODE binary file) 
+    if(version < 0 || version > 3) 
     {
         fclose(fd);
         return -1;
     }
 
-    KDBInfo* kdb_info = new KDBInfo(OBJECTS, false);
-    nb_objs = kdb_info->preload(fd, std::string(file), vers);
+    KDBInfo kdb_info(OBJECTS, false);
+    kdb_info.preload(fd, filepath, version);
     fclose(fd);
 
-    if(descr) 
-        strcpy(descr, (char*) kdb_info->description.c_str());
-    if(nobjs) 
-        *nobjs = nb_objs;
-    if(smpl != NULL && kdb_info->k_type == VARIABLES)
-    {
-        if(kdb_info->sample)
-            smpl = new Sample(*kdb_info->sample);
-        else
-        {
-            delete smpl;
-            smpl = nullptr;
-        }
-    }
-
-    int type = kdb_info->k_type;
-    delete kdb_info;
-    return type;
+    int iode_type = (int) kdb_info.k_type;
+    return iode_type;
 }
 
 
@@ -860,41 +657,36 @@ int K_filetype(char* filename, char* descr, int* nobjs, Sample* smpl)
  *  UPDATE 6.64: if the filename contains an extension and the file cannot be opened, the standard iode extension
  *  is not added. 
  *  
- *  @param [in] filename    char*   file to "inspect"
- *  @param [in] type        int     type expected
- *  @return                 int     on success file type (FILE_COMMENTS...)
- *                                  on error : -2 if file and file.ext cannot be opened
- *                                             -1 if the file type or the object version is not recognized 
- *  
- *  TODO: review this function! 
+ *  @param [in] filename    const std::string&   file to "inspect"
+ *  @param [in] iode_type   int                  type expected
+ *  @return                 int                  on success file type (FILE_COMMENTS...)
+ *                                               on error : -2 if file and file.ext cannot be opened
+ *                                                          -1 if the file type or the object version is not recognized 
  */
-int K_findtype(char* filename, int type)
+int get_file_type_from_file(const std::string& filepath, int iode_type)
 {
-    int     ftype;
-    char    buf[1024];
+    if(filepath.empty())
+    {
+        kwarning("Empty filepath");
+        return -2;
+    }
 
-    ftype = K_filetype(filename, 0L, 0L, 0L); // Open the file to retrieve its content type
-    
-    if(type == VARIABLES && U_is_in('!', filename)) 
-        return(type); /* Give ODBC a try */
+    // file without extension => try a standard IODE extension
+    std::string filepath_with_ext = filepath;
+    if(!has_extension(filepath))
+    {
+        std::string ext = "." + std::string(k_ext[iode_type]);
+        filepath_with_ext = add_file_extension(filepath, ext);
+    }
 
-    if(ftype != -2) 
-        return(ftype); // -2 => file cannot be opened
-    
-    // Try the filename + std extension (e.g.: .var) 
-    
-    // old version before 6.64: replacement extension even if an extension is present
-    // strcpy(buf, filename);
-    // K_add_ext(buf, k_ext[type]);
-    // return(K_filetype(buf, 0L, 0L, 0L));
-    
-    // Change JMP 30/11/2022: try to add extension **only** if there is no extension in filename
-    if(K_has_ext(filename)) 
-        return(-2); // file with extension (and not found)
-    // file w/o extension => try a standard IODE extension
-    strcpy(buf, filename);
-    K_add_ext(buf, k_ext[type]);
-    return(K_filetype(buf, 0L, 0L, 0L));
+    std::filesystem::path p_filepath(filepath_with_ext);
+    if(!std::filesystem::exists(p_filepath))
+        return -2;
+
+    // Open the file to retrieve its content type
+    // NOTE: if ASCII file -> sub_file_type_from_file() returns -1
+    int file_type = sub_file_type_from_file(filepath_with_ext);
+    return file_type;
 }
 
 
@@ -918,10 +710,6 @@ int K_findtype(char* filename, int type)
  */
 bool KDB::load(const std::string& filename)
 {
-    int   ftype;
-    char  ext[10];
-    bool  success = false;
-
     if(this->k_db_type == DB_SUBSET)
     {
         kwarning("Cannot load file into a shallow copy of a database");
@@ -932,12 +720,14 @@ bool KDB::load(const std::string& filename)
 
     this->clear();
 
-    ftype = K_findtype((char*) filename.c_str(), this->k_type);
-    if(ftype == -1) 
+    bool success = false;
+    int file_type = get_file_type_from_file(filename, (int) this->k_type);
+    if(file_type == -1) 
     {   
         // test if correct ascii extension
-        int ext_length = K_get_ext((char*) filename.c_str(), ext, 3);
-        if(ext_length > 0 && strcmp(ext, k_ext[this->k_type + ASCII_COMMENTS]) == 0) 
+        std::string expected_ext = "." + std::string(k_ext[this->k_type + ASCII_COMMENTS]);
+        std::string file_ext = get_file_extension(filename);
+        if(!file_ext.empty() && file_ext == expected_ext) 
             success = this->load_asc(filename);
         
         if(success) 
@@ -945,8 +735,8 @@ bool KDB::load(const std::string& filename)
     }
     
     // NOTE: this->filepath updated in load_binary() 
-    if(this->k_type == ftype) 
-        success = this->load_binary(this->k_type, filename);
+    if(this->k_type == file_type) 
+        success = this->load_binary(filename);
 
     if(success)
     {
@@ -1108,52 +898,65 @@ bool KDB::save(const std::string& filename, const bool compress)
     return success;
 }
 
-
-static int K_BACKUP_ON_SAVE = 1; // Save a backup file ".??$" before saving a WS
-
-/**
- *  Sets the backup choice before saving a kdb. 
- *  The backup file has the form "*.??$", e.g. "test.va$" for "test.var".
- *   
- *  @param [in] take_backup     int     0 if a backup should NOT be taken, any other value indicates that a backup is required
- *  @return                     int     0 for no backup, -1 for backup
- */
-int K_set_backup_on_save(int take_backup) 
+std::string set_file_extension(const std::string& filepath, const int file_type)
 {
-    K_BACKUP_ON_SAVE = (take_backup != 0);
-    return(K_BACKUP_ON_SAVE);
+    if(filepath.empty())
+    {
+        kwarning("Empty filepath");
+        return "";
+    }
+
+    std::string ext = "." + std::string(k_ext[file_type]);
+    std::string new_filepath = add_file_extension(filepath, ext);
+    return new_filepath;
 }
 
-
 /**
- *  Indicates if a backup must be taken before saving a kdb. 
- *  The backup file has the form "*.??$", e.g. "test.va$" for "test.var".
+ *  Takes a backup of a file by renaming the file: filename.xxx => filename.xx$. 
+ *  Function called before saving an IODE object file.
  *   
- *  @return                     int     0 for no backup, -1 for backup
+ *  @param [in] filename    const std::string&   file to backup
+ *  @return                 bool    
  */
-int K_get_backup_on_save() 
+bool KDB::take_backup(const std::string& filepath) 
 {
-    return(K_BACKUP_ON_SAVE);
-}
+    if(filepath.empty())
+    {
+        kwarning("Cannot take backup: filename is empty");
+        return false;
+    }
+
+    std::filesystem::path p_filepath = check_file(filepath, "take_backup", false);
+    
+    // NOTE: no need to create a copy backup if the original file does not exist
+    if(!std::filesystem::exists(p_filepath))
+        return false;
+    
+    // filename.xxx -> filename.xx$
+    std::string backup_ext = p_filepath.extension().string();
+    backup_ext[backup_ext.size() - 1] = '$';
 
 
-/**
- *  Takes a backup of a file by renaming the file: filename.xxx => filename.xx$. Function called before saving 
- *  an IODE object file.
- *   
- *  @param [in] filename    char*   file to backup
- *  @return                 int     0 on success, -1 on error    
- *  
- */
-int K_backup(char* filename) 
-{
-    FNAME   backname;
-
-    if(_access(filename, 0)) return 0;     
-    strcpy(backname, filename);
-    backname[strlen(backname) - 1] = '$';
-    _unlink(backname);                      // JMP 15/5/2022 => Posix
-    return(SCR_rename(filename, backname));
+    // create a copy of p_filepath with the backup extension
+    try
+    {
+        std::filesystem::path p_filepath_backup = p_filepath;
+        p_filepath_backup.replace_extension(backup_ext);
+        std::filesystem::copy_file(p_filepath, p_filepath_backup, std::filesystem::copy_options::overwrite_existing);
+        
+        std::string msg = "A backup of the file '" + p_filepath.filename().string() + "' has been created: '";
+        msg += p_filepath_backup.filename().string() + "'";
+        kmsg(msg.c_str());
+        return true;
+    }
+    catch(const std::filesystem::filesystem_error& e)
+    {
+        std::string filename = p_filepath.filename().string();
+        std::string error_msg = "Failed to take backup of file '" + filename + "':\n";
+        error_msg += e.what();
+        kwarning(error_msg.c_str());
+        return false;
+    }
 }
 
 /**
@@ -1216,6 +1019,65 @@ static int K_cwrite(int method, char* buf, OSIZE len, int nb, FILE* fd, int minl
 }
 
 
+bool KDBInfo::predump(FILE* fd, const std::string& filepath, const int nb_objs)
+{
+    bool success;
+    KDB32 kdb32;
+
+    /* XDR KDB */
+    KDBInfo* xdr_kdb = nullptr;
+    this->xdr(&xdr_kdb);
+
+    std::string error_msg = "Failed to save database '" + v_iode_types[this->k_type] + "' ";
+    error_msg += "to the file '" + filepath + "'";
+
+    // Dump KDB struct
+    if(X64) 
+    {
+        /* convert to x64 if needed */
+        memset(&kdb32, 0, sizeof(KDB32));
+        kdb32.k_nb = nb_objs;
+        kdb32.k_type = xdr_kdb->k_type;
+        kdb32.k_mode = xdr_kdb->k_mode;
+        kdb32.k_compressed = xdr_kdb->k_compressed;
+        memset(kdb32.k_arch, 0, LMAGIC);
+        std::strncpy(kdb32.k_arch, xdr_kdb->k_arch.c_str(), xdr_kdb->k_arch.size());
+        memset(kdb32.k_desc, 0, K_MAX_DESC);
+        std::strncpy(kdb32.k_desc, (char*) xdr_kdb->description.c_str(), xdr_kdb->description.size());
+        
+        // NOTE: KDBInfo does not have a sample member, but KDBVariables does. 
+        //       If the current KDB is a KDBVariables, copy the sample data into 
+        //       kdb32.k_data to be able to save it in the binary file.
+        char* data = NULL;
+        size_t size_of_data = _predump_(&data);
+        if(data != NULL)
+            memcpy(kdb32.k_data, data, size_of_data);
+
+        success = kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
+        if(!success)
+        {
+            fclose(fd);
+            error_msg += ":\nCannot write IODE file header";
+            kwarning(error_msg.c_str());
+        }
+    }
+    else
+    {
+        success = kwrite(xdr_kdb, sizeof(KDB), 1, fd);
+        if(!success)
+        {
+            fclose(fd);
+            error_msg += ":\nCannot write IODE file header";
+            kwarning(error_msg.c_str());
+        }
+    }
+
+    delete xdr_kdb;
+    xdr_kdb = nullptr;
+    return success;
+}
+
+
 /**
  *  Save a KDB in an IODE object file. The extension of filename is replaced by the standard one (.cmt, .eqs...).
  *  
@@ -1240,24 +1102,23 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
 {
     int     i, len, res;
     char    *ptr, *xdr_ptr = NULL;
-    KDB32   kdb32;
-    FNAME   file;
-    FILE*   fd;
     KOBJ*   k_objs;
     bool    success;
 
-    strcpy(file, filename.c_str());
-    K_strip(file);
-    K_add_ext(file, k_ext[this->k_type]);
+    std::string ext = "." + std::string(k_ext[this->k_type]);
+    std::string tmp = trim(filename);
+    std::string file_str = add_file_extension(tmp, ext);
 
     std::string error_msg = "Failed to save database '" + v_iode_types[this->k_type] + "' ";
-    error_msg += "to the file '" + std::string(file) + "'";
+    error_msg += "to the file '" + file_str + "'";
 
-    if(K_get_backup_on_save()) 
-        K_backup(file);
+    if(KDB::backup_enabled) 
+        take_backup(file_str);
     
-    fd = fopen(file, "wb+");
-    if(fd == NULL)
+    FNAME file;
+    strcpy(file, file_str.c_str());
+    FILE* fd = fopen(file, "wb+");
+    if(!fd)
     {
         error_msg += ":\nCannot open file for writing";
         kwarning(error_msg.c_str());
@@ -1280,52 +1141,12 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
 
     this->k_compressed = K_LZH;
     
-    /* XDR  KDB */
-    KDBInfo* xdr_kdb = nullptr;
-    this->xdr(&xdr_kdb);
-
-    // Dump KDB struct
-    if(X64) 
+    success = this->predump(fd, file_str, this->size());
+    if(!success) 
     {
-        /* convert to x64 if needed */
-        memset(&kdb32, 0, sizeof(KDB32));
-        kdb32.k_nb = this->size();
-        kdb32.k_type = xdr_kdb->k_type;
-        kdb32.k_mode = xdr_kdb->k_mode;
-        kdb32.k_compressed = xdr_kdb->k_compressed;
-        memset(kdb32.k_arch, 0, LMAGIC);
-        std::strncpy(kdb32.k_arch, xdr_kdb->k_arch.c_str(), xdr_kdb->k_arch.size());
-        memset(kdb32.k_desc, 0, K_MAX_DESC);
-        std::strncpy(kdb32.k_desc, (char*) xdr_kdb->description.c_str(), xdr_kdb->description.size());
-        if(xdr_kdb->sample)
-        {
-            char* c_smpl = (char*) xdr_kdb->sample; 
-            memcpy(kdb32.k_data, c_smpl, sizeof(Sample));
-        }
-
-        success = kwrite((char *) &kdb32, sizeof(KDB32), 1, fd);
-        if(!success)
-        {
-            fclose(fd);
-            error_msg += ":\nCannot write IODE file header";
-            kwarning(error_msg.c_str());
-            return false;
-        }
+        fclose(fd);
+        return false;
     }
-    else
-    {
-        success = kwrite(xdr_kdb, sizeof(KDB), 1, fd);
-        if(!success)
-        {
-            fclose(fd);
-            error_msg += ":\nCannot write IODE file header";
-            kwarning(error_msg.c_str());
-            return false;
-        }
-    }
-
-    delete xdr_kdb;
-    xdr_kdb = nullptr;
 
     // prepare KOBJ table
     i = 0;
@@ -1388,68 +1209,95 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
  *  
  *  Only used when renaming or copying a file.
  *  
- *  @param [in] from    char*   iode file name 
- *  @param [in] to      char*   new filename to put in the file from
- *  @return             int     0 on success
- *                              -1 on error (file not found, invalid IODE file)
+ *  @param [in] from    const std::string&   iode file name 
+ *  @param [in] to      const std::string&   new filename to put in the file from
+ *  @return             int                  0 on success
+ *                                           -1 on error (file not found, invalid IODE file)
  *  
  *  TODO: check if not obsolete.
  */
- 
-int K_setname(char* from, char* to)
+bool update_filename(const std::string& from, const std::string& to)
 {
-    char  label[512];
-    FILE* fd;
-    KDB*  kdb = nullptr;
-    bool  success;
+    bool success = false;
+    std::string error_msg = "Failed to update the 'filename' in IODE file " + from + ":\n";
 
-    fd = fopen(from, "rb+");
-    if(fd == NULL)  
-        return -1;
+    if(from.empty())
+    {
+        error_msg += "'from' filename is empty";
+        kwarning(error_msg.c_str());
+        return false;
+    }
 
-    std::string error_msg = "Failed to update the 'filename' in IODE file " + std::string(from);
+    if(to.empty())
+    {
+        error_msg += "'to' filename is empty";
+        kwarning(error_msg.c_str());
+        return false;
+    }
 
+    std::filesystem::path p_filepath(from);
+    if(!std::filesystem::exists(p_filepath))
+    {
+        error_msg += "'from' file '" + from + "' not found";
+        kwarning(error_msg.c_str());
+        return false;
+    }
+    
+    FILE* fd = fopen(from.c_str(), "rb+");
+    if(!fd)
+    {
+        error_msg += "Cannot open 'from' file '" + from + "' for reading/writing";
+        kwarning(error_msg.c_str());
+        return false;
+    }  
+
+    char label[512];
     success = kread(label, strlen(K_LABEL), 1, fd);
     if(!success) 
     {
-        error_msg += ": cannot read IODE file version";
+        error_msg += "cannot read the IODE file version";
         kwarning(error_msg.c_str());
         fclose(fd);
-        return -1;
+        return false;
     }
 
-    if(K_calcvers(label) < 0) 
+    if(get_version(label) < 0) 
     {
-        error_msg += ": cannot read IODE file version";
+        error_msg += "cannot read the IODE file version";
         kwarning(error_msg.c_str());
         fclose(fd);
-        return -1;
+        return false;
     }
 
-    error_msg = "Failed to update the 'filename' in IODE file " + std::string(from);
-
+    KDB* kdb = nullptr;
     success = kread((char *) kdb, sizeof(KDB), 1, fd);
     if(!success) 
     {
+        error_msg += "cannot read the IODE file header";
         kwarning(error_msg.c_str());
         fclose(fd);
-        return -1;
+        return false;
     }
 
-    kdb->filepath = std::string(to);
+    kdb->filepath = to;
 
     success = kseek(fd, (long) (-1 * sizeof(KDB)), 1);
     if(!success)
-        return -1;
+    {
+        error_msg += "cannot update the IODE file header";
+        kwarning(error_msg.c_str());
+        return false;
+    }
     
     success = kwrite((char *) kdb, sizeof(KDB), 1, fd);
     if(!success)
     {
+        error_msg += "cannot update the IODE file header";
         kwarning(error_msg.c_str());
         fclose(fd);
-        return -1;
+        return false;
     }
 
     fclose(fd);
-    return 0;
+    return true;
 }

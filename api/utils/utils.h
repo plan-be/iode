@@ -368,6 +368,40 @@ inline void check_name(const std::string name, const int type)
         v_iode_types[type] + " name must only contains " + nre.type + " letters, digits and underscore");
 }
 
+inline bool has_extension(const std::string& filepath)
+{
+    if(filepath.empty())
+        return false;
+
+    std::filesystem::path p_filepath(filepath);
+    return p_filepath.has_extension();
+}
+
+inline std::string get_file_extension(const std::string& filepath)
+{
+    if(filepath.empty())
+        throw std::invalid_argument("Empty filepath");
+
+    std::string ext; 
+    std::filesystem::path p_filepath(filepath);
+    if(p_filepath.has_extension())
+        ext = p_filepath.extension().string();
+    return ext; 
+}
+
+inline std::string add_file_extension(const std::string& filepath, const std::string& ext)
+{
+    if(filepath.empty())
+        throw std::invalid_argument("Empty filepath");
+
+    if(filepath.length() > 511)
+        throw std::invalid_argument("Filepath too long (> 511 characters)");
+
+    std::filesystem::path p_filepath(filepath);
+    p_filepath = p_filepath.replace_extension(ext);
+    return p_filepath.string();
+}
+
 inline IodeFileType get_iode_file_type(const std::string& filepath)
 {
     if (filepath.empty()) return FILE_ANY;

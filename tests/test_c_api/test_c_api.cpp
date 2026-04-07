@@ -1062,7 +1062,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     // load (binary files)
     // load all objects
     kdb_var = std::make_shared<KDBVariables>(true);
-    kdb_var->load_binary(VARIABLES, in_filename);
+    kdb_var->load_binary(in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1078,7 +1078,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     SCR_free_tbl((unsigned char**) objs);
 
     kdb_var = std::make_shared<KDBVariables>(true);
-    kdb_var->load_binary(VARIABLES, in_filename, v_objs);
+    kdb_var->load_binary(in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
