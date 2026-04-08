@@ -13,7 +13,7 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the wks export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for wks output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for wks output. 
- *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
+ *      char *get_variable_value(KDBVariablesPtr dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in wks format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the wks export file.
  */
 #include "api/objs/kdb.h"
@@ -24,13 +24,13 @@
 #include "api/io/export.h"
 
 
-int ExportObjsWKS:: write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsWKS:: write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     int dim, nb, i;
 
     WKS_COL = 1, WKS_ROW = 1;
-    dim = dbv.sample->nb_periods;
-    nb = dbv.size();
+    dim = dbv_ptr->sample->nb_periods;
+    nb = dbv_ptr->size();
 
     wks_init(outfile, dim + 2, nb + 1);
     wks_cwidth(2, 20);
@@ -38,7 +38,7 @@ int ExportObjsWKS:: write_header(const KDBVariables& dbv, const KDBComments& dbc
     std::string period_str;
     for(i = 0, WKS_COL = 3; i < dim; i++, WKS_COL++)
     {
-        Period period = dbv.sample->start_period.shift(i);
+        Period period = dbv_ptr->sample->start_period.shift(i);
         period_str = period.to_string();
         wks_string((char*) period_str.c_str(), WKS_COL, WKS_ROW);
     }
@@ -47,7 +47,7 @@ int ExportObjsWKS:: write_header(const KDBVariables& dbv, const KDBComments& dbc
     return 0;
 }
 
-int ExportObjsWKS::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsWKS::close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     wks_end();
     return 0;
@@ -61,11 +61,11 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
     return(*code);
 }
 
-char* ExportObjsWKS::extract_comment(const KDBComments& dbc, char* name, char** cmt)
+char* ExportObjsWKS::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt)
 {
-    if(dbc.contains(name))
+    if(dbc_ptr->contains(name))
     {
-        std::shared_ptr<Comment> cmt_ptr = dbc.get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
         Comment cmt_utf8 = *cmt_ptr;
         Comment cmt_oem = utf8_to_oem(cmt_utf8);
         wks_string((char*) cmt_oem.c_str(), WKS_COL, WKS_ROW);
@@ -78,12 +78,12 @@ char* ExportObjsWKS::extract_comment(const KDBComments& dbc, char* name, char** 
     return *cmt;
 }
 
-char* ExportObjsWKS::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
+char* ExportObjsWKS::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
 {
     char* buf = NULL;
 
-    std::string name = dbv.get_name(nb);
-    double value = dbv.get_var(name, t);
+    std::string name = dbv_ptr->get_name(nb);
+    double value = dbv_ptr->get_var(name, t);
     wks_value(value, WKS_COL, WKS_ROW);
     WKS_COL++;
 

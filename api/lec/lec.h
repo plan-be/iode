@@ -284,8 +284,8 @@ inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (m
 inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
 inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
-inline std::shared_ptr<KDBVariables> L_EXEC_DBV = nullptr;   
-inline std::shared_ptr<KDBScalars>   L_EXEC_DBS = nullptr; 
+inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
+inline KDBScalarsPtr   L_EXEC_DBS = nullptr; 
 
 // --- PRIORITY OF OPERATORS  and number of functions args ---
 // See iode.h FOR POSITIONS in the vectors
@@ -525,7 +525,7 @@ CLEC *L_cc_stream(void);
 CLEC *L_cc(char* lec);
 
 /* l_link.c */
-int L_link(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* cl);
+int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER
@@ -543,9 +543,9 @@ int L_link(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, C
         int matherr(struct exception *e);
 #endif
 void L_fperror(int sig);
-double L_exec(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* expr, int t);
+double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t);
 double L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack);
-L_REAL* L_cc_link_exec(char* lec, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs);
+L_REAL* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 int L_intlag(L_REAL lag);
 double L_uminus(double* stack, int nbargs=-1);
 double L_uplus(double* stack, int nbargs=-1);
@@ -633,11 +633,11 @@ CLEC *L_solve(char* eq, char* endo);
 int L_split_eq(char* eq);
 
 /* l_newton.c */
-double L_zero(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb);
-double L_newton(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
 
 /* l_secant.c */
-double L_secant(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
 
 /* l_debug.c */
 void L_debug(char*, ...);
@@ -645,11 +645,11 @@ void L_debug(char*, ...);
 /* k_lec.c */
 inline char *(*L_expand_super)(char* list_name) = nullptr;
 
-double *L_getvar(std::shared_ptr<KDBVariables> kdb, int pos);
-double L_getscl(std::shared_ptr<KDBScalars> kdb, int pos);
-Sample *L_getsmpl(std::shared_ptr<KDBVariables> kdb);
-int L_findscl(std::shared_ptr<KDBScalars> kdb, char* name);
-int L_findvar(std::shared_ptr<KDBVariables> kdb, char* name);
+double *L_getvar(KDBVariablesPtr kdb, int pos);
+double L_getscl(KDBScalarsPtr kdb, int pos);
+Sample *L_getsmpl(KDBVariablesPtr kdb);
+int L_findscl(KDBScalarsPtr kdb, char* name);
+int L_findvar(KDBVariablesPtr kdb, char* name);
 char* L_expand(char* list_name);
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
                           CLEC* eqclec, int coefs);

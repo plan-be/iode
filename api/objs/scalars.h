@@ -84,11 +84,32 @@ struct std::hash<Scalar>
 
 struct KDBScalars : public KDBTemplate<KDBScalars, Scalar>
 {
+private:
+    // Constructors are private - use Create() factory method instead
     // global or standalone database
     KDBScalars(const bool is_global) : KDBTemplate(SCALARS, is_global) {}
 
     // copy constructor
     KDBScalars(const KDBScalars& other): KDBTemplate(other) {}
+
+public:
+    /**
+     * Factory method to create a managed instance with std::shared_ptr
+     * 
+     * Usage: auto db = KDB[...]::Create(is_global);
+     * 
+     * This ensures the instance is managed by shared_ptr, preventing bad_weak_ptr errors
+     * when using get_subset() or other methods that rely on std::enable_shared_from_this.
+     * 
+     * Note: KDB[...] classes should also use KDB[...]::Create(...) for creation.
+     * 
+     * @param is_global Whether to create a global database (true) or standalone (false)
+     * @return          std::shared_ptr<KDB[...]> pointing to the newly created instance
+     */
+    static std::shared_ptr<KDBScalars> Create(const bool is_global)
+    {
+        return std::shared_ptr<KDBScalars>(new KDBScalars(is_global));
+    }
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
@@ -96,19 +117,6 @@ struct KDBScalars : public KDBTemplate<KDBScalars, Scalar>
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
 
     bool print_obj_def(const std::string& name) override;
-
-    void merge_from(const std::string& input_file) override
-    {
-        KDBScalars from(false);  
-        KDBTemplate::merge_from(from, input_file);
-    }
-
-    bool copy_from_file(const std::string& file, const std::string& objs_names, 
-        std::set<std::string>& v_found)
-    {
-        KDBScalars from(false);
-        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
-    }
 
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
@@ -123,10 +131,13 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
+
+using KDBScalarsPtr = std::shared_ptr<KDBScalars>;
+
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::shared_ptr<KDBScalars> global_ws_scl = std::make_shared<KDBScalars>(true);
-inline std::array<std::shared_ptr<KDBScalars>, 5> global_ref_scl = { nullptr };
+inline KDBScalarsPtr global_ws_scl = KDBScalars::Create(true);
+inline std::array<KDBScalarsPtr, 5> global_ref_scl = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
 

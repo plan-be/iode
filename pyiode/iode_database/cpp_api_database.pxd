@@ -94,7 +94,6 @@ cdef extern from "api/all.h":
         void remove(const string& name) except +
 
         # Other methods
-        void merge(const KDB& other, const bool overwrite, const bool clear_source) except +
         void copy_from(const string& input_files, const string objects_names) except +
         void merge_from(const string& input_file) except +
         vector[string] search(const string& pattern, const bool word, const bool case_sensitive, 
@@ -109,9 +108,9 @@ cdef extern from "api/all.h":
     char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
 
     # see k_wsvar.c
-    int KV_add(KDBVariables& kdb, char* varname)
-    double KV_get(KDBVariables& kdb, const string& name, int t, int mode)
-    void KV_set(KDBVariables& kdb, const string& name, int t, int mode, double value)
+    int KV_add(shared_ptr[KDBVariables] kdb, char* varname)
+    double KV_get(shared_ptr[KDBVariables] kdb, const string& name, int t, int mode)
+    void KV_set(shared_ptr[KDBVariables] kdb, const string& name, int t, int mode, double value)
 
 
 # C++ classes
@@ -173,8 +172,8 @@ cdef extern from "api/b_errors.h":
 
 cdef extern from "api/objs/comments.h":
     cdef cppclass KDBComments(KDB):
-        # Constructor
-        KDBComments(bool is_global)
+        # factory method
+        shared_ptr[KDBComments] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBComments] get_subset(string pattern, bool copy) 
@@ -182,6 +181,8 @@ cdef extern from "api/objs/comments.h":
         # Public methods
         string get(string& name) except +
         void set(string& name, string& value) except +
+
+        void merge(shared_ptr[KDBComments] other_ptr, const bool overwrite, const bool clear_source) except +
 
     size_t hash_value(KDBComments&) except +
 
@@ -192,8 +193,8 @@ cdef extern from "api/objs/comments.h":
 
 cdef extern from "api/objs/equations.h":
     cdef cppclass KDBEquations(KDB):
-        # Constructor
-        KDBEquations(bool is_global)
+        # factory method
+        shared_ptr[KDBEquations] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBEquations] get_subset(string pattern, bool copy) 
@@ -208,6 +209,8 @@ cdef extern from "api/objs/equations.h":
         bool add(string& name, string& lec) except +
         void update(string& name, string& lec) except +
 
+        void merge(shared_ptr[KDBEquations] other_ptr, const bool overwrite, const bool clear_source) except +
+
     size_t hash_value(KDBEquations&) except +
 
     # Define the global Equations instance
@@ -217,8 +220,8 @@ cdef extern from "api/objs/equations.h":
 
 cdef extern from "api/objs/identities.h":
     cdef cppclass KDBIdentities(KDB):
-        # Constructor
-        KDBIdentities(bool is_global)
+        # factory method
+        shared_ptr[KDBIdentities] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBIdentities] get_subset(string pattern, bool copy) 
@@ -235,6 +238,7 @@ cdef extern from "api/objs/identities.h":
 
         bool execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bool trace) except +
+        void merge(shared_ptr[KDBIdentities] other_ptr, const bool overwrite, const bool clear_source) except +
 
     size_t hash_value(KDBIdentities&) except +
 
@@ -245,8 +249,8 @@ cdef extern from "api/objs/identities.h":
 
 cdef extern from "api/objs/lists.h":
     cdef cppclass KDBLists(KDB):
-        # Constructor
-        KDBLists(bool is_global)
+        # factory method
+        shared_ptr[KDBLists] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBLists] get_subset(string pattern, bool copy) 
@@ -254,6 +258,8 @@ cdef extern from "api/objs/lists.h":
         # Public methods
         string get(string& name) except +
         void set(string& name, string& value) except +
+
+        void merge(shared_ptr[KDBLists] other_ptr, const bool overwrite, const bool clear_source) except +
 
     size_t hash_value(KDBLists&) except +
 
@@ -264,8 +270,8 @@ cdef extern from "api/objs/lists.h":
 
 cdef extern from "api/objs/scalars.h":
     cdef cppclass KDBScalars(KDB):
-        # Constructor
-        KDBScalars(bool is_global)
+        # factory method
+        shared_ptr[KDBScalars] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBScalars] get_subset(string pattern, bool copy) 
@@ -276,6 +282,8 @@ cdef extern from "api/objs/scalars.h":
         shared_ptr[CScalar] set_obj_ptr(string& name, shared_ptr[CScalar] scl) except +
         void set(string& name, CScalar& scl) except +
 
+        void merge(shared_ptr[KDBScalars] other_ptr, const bool overwrite, const bool clear_source) except +
+
     size_t hash_value(KDBScalars&) except +
 
     # Define the global Scalars instance
@@ -285,8 +293,8 @@ cdef extern from "api/objs/scalars.h":
 
 cdef extern from "api/objs/tables.h":
     cdef cppclass KDBTables(KDB):
-        # Constructor
-        KDBTables(bool is_global)
+        # factory method
+        shared_ptr[KDBTables] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBTables] get_subset(string pattern, bool copy) 
@@ -309,6 +317,7 @@ cdef extern from "api/objs/tables.h":
             
         void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
                            char format_) except +
+        void merge(shared_ptr[KDBTables] other_ptr, const bool overwrite, const bool clear_source) except +
 
     size_t hash_value(KDBTables&) except +
 
@@ -321,8 +330,8 @@ cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
         CSample* sample
 
-        # Constructor
-        KDBVariables(bool is_global)
+        # factory method
+        shared_ptr[KDBVariables] Create(bool is_global)
 
         # subset (shallow or deep copy) 
         shared_ptr[KDBVariables] get_subset(string pattern, bool copy) 
@@ -351,6 +360,7 @@ cdef extern from "api/objs/variables.h":
         vector[float] get_list_periods_as_float(string& from_period, string& to_period) except +
 
         void copy_from(string& input_files, string& from_period, string& to_period, string objects_names) except +
+        void merge(shared_ptr[KDBVariables] other_ptr, const bool overwrite, const bool clear_source) except +
 
         void extrapolate(VariablesInitialization method, string& from_period, string& to, string& variables_list) except +
         void seasonal_adjustment(string& input_file, string& series, double eps_test) except +

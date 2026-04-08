@@ -113,7 +113,7 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
     sprintf(varname, "%s%d", name, eqnb);
     
     // create varname with NaN 
-    KV_add(*global_ws_var, varname);
+    KV_add(global_ws_var, varname);
     double* var = global_ws_var->get_var_ptr(varname);
     if(var == NULL) 
         return;

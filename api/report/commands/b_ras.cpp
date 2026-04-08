@@ -160,7 +160,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     double  *row = NULL;
     double  *col = NULL;
     double  var, fvar;
-    std::shared_ptr<KDBVariables> kdb = global_ws_var;
+    KDBVariablesPtr kdb = global_ws_var;
 
     if(rper != NULL && cper != NULL) 
     {

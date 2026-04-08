@@ -63,7 +63,7 @@ void ComputedTable::initialize()
         files_usage[column.cl_fnb[1]] = 1;
     }
 
-    std::shared_ptr<KDBVariables> kdb = nullptr;
+    KDBVariablesPtr kdb = nullptr;
     for(int ref=1; ref < K_MAX_FREF + 1; ref++) 
     {
         if(files_usage.test(ref))
@@ -285,7 +285,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         return false;
 
     // update the variable var_name in the database
-    KV_set(*global_ws_var, var_name, period_pos, 0, res);
+    KV_set(global_ws_var, var_name, period_pos, 0, res);
 
     return true;
 }

@@ -328,8 +328,8 @@ static int B_ltoh(int type, char* arg)
     int file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    std::shared_ptr<KDBVariables> to = nullptr;
-    std::shared_ptr<KDBVariables> from = std::make_shared<KDBVariables>(false);
+    KDBVariablesPtr to = nullptr;
+    KDBVariablesPtr from = KDBVariables::Create(false);
 
     int lg = B_get_arg0(method, arg, 80);
     U_sqz_text((unsigned char*) method);
@@ -368,7 +368,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    to = std::make_shared<KDBVariables>(false);
+    to = KDBVariables::Create(false);
     to->sample = new Sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
@@ -401,7 +401,7 @@ static int B_ltoh(int type, char* arg)
         to->set(from_name, to_var);
     }
 
-    KV_merge(*global_ws_var, *to, 1);
+    KV_merge(global_ws_var, to, 1);
 
 done:
     to->clear();

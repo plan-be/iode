@@ -72,7 +72,7 @@ static int compare(const void *a, const void *b)
  *  @param [in] Sample* smpl        output Sample (required)
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl)
+KDBVariablesPtr IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impdef, char* rulefile, char* vecfile, Sample* smpl)
 {
     bool    found;
     int     i, nb, size, shift = 0, cmpt = 0, rc;
@@ -81,7 +81,7 @@ std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFr
     double  *vector = NULL, value;
     YYFILE  *yy;
     std::string var_name;
-    std::shared_ptr<KDBVariables> kdb = nullptr;
+    KDBVariablesPtr kdb = nullptr;
 
     if(!smpl)
         return kdb;
@@ -110,7 +110,7 @@ std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFr
     if(rc < 0) 
         goto err;
 
-    kdb = std::make_shared<KDBVariables>(false);
+    kdb = KDBVariables::Create(false);
     kdb->sample = new Sample(*smpl);
     nb = smpl->nb_periods;
 
@@ -178,7 +178,7 @@ std::shared_ptr<KDBVariables> IMP_InterpretVar(const std::unique_ptr<ImportVarFr
                 }
             }
 
-            KV_set(*kdb, var_name, shift, VAR_MODE_LEVEL, value);
+            KV_set(kdb, var_name, shift, VAR_MODE_LEVEL, value);
         }
     }
 
@@ -211,13 +211,13 @@ err:
  *  @param [in] int     lang        0=English, 1=French , 2=Dutch 
  *  @return     KDB*                new KDB containing the read variables or NULL on error    
  */
-std::shared_ptr<KDBComments> IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang)
+KDBCommentsPtr IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef, char* rulefile, char* cfile, int lang)
 {
     int          size, cmpt = 0, rc;
     char         iname[256], *cmt = NULL;
     ONAME        oname;
     std::string  cmt_name;
-    std::shared_ptr<KDBComments> kdb = nullptr;
+    KDBCommentsPtr kdb = nullptr;
 
     if(IMP_readrule(rulefile) < 0) 
         return kdb;
@@ -235,7 +235,7 @@ std::shared_ptr<KDBComments> IMP_InterpretCmt(const std::unique_ptr<ImportCmtFro
     if(rc < 0) 
         return kdb;
 
-    kdb = std::make_shared<KDBComments>(false);
+    kdb = KDBComments::Create(false);
 
     while(1) 
     {
@@ -310,7 +310,7 @@ static int IMP_RuleImportCmt(char* trace, char* rule, char* ode, char* asc, int 
     int rc = 0;
     if(impdef)
     {
-        std::shared_ptr<KDBComments> kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
+        KDBCommentsPtr kdb = IMP_InterpretCmt(impdef, rule, asc, lang);
         if(kdb) 
             kdb->save_binary(ode);
         else
@@ -372,7 +372,7 @@ static int IMP_RuleImportVar(char* trace, char* rule, char* ode, char* asc, char
     }
     
     int rc = 0;
-    std::shared_ptr<KDBVariables> kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
+    KDBVariablesPtr kdb = IMP_InterpretVar(impdef, rule, asc, smpl);
     if(kdb) 
         kdb->save_binary(ode);
     else 

@@ -66,7 +66,7 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
         rc = simu.simulate(global_ws_eqs, global_ws_var, global_ws_scl, smpl, CSimulation::KSIM_EXO);
     else 
     {
-        std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(s_eqs, false);
+        KDBEquationsPtr tdbe = global_ws_eqs->get_subset(s_eqs, false);
         if(tdbe->size() > 0)
             rc = simu.simulate(tdbe, global_ws_var, global_ws_scl, smpl, 
                                 CSimulation::KSIM_EXO, v_eqs);
@@ -237,7 +237,7 @@ int B_ModelCompile(char* arg, int unused)
             rc = KE_compile(*global_ws_eqs);
         else 
         {
-            std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(eqs, false);
+            KDBEquationsPtr tdbe = global_ws_eqs->get_subset(eqs, false);
             if(tdbe->size() > 0)
                 rc = KE_compile(*tdbe);
         }
@@ -275,7 +275,7 @@ int B_ModelCalcSCC(char *const_arg, int unused)
         return -1;
     } 
 
-    std::shared_ptr<KDBEquations> tdbe = nullptr;
+    KDBEquationsPtr tdbe = nullptr;
     std::string list_eqs = std::string(arg + lg1);
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
@@ -358,7 +358,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         eqs += std::string(c_eqs[i]) + ";";
     SCR_free_tbl((unsigned char**) c_eqs);
 
-    std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(eqs, false);
+    KDBEquationsPtr tdbe = global_ws_eqs->get_subset(eqs, false);
 
     // Lance la simulation
     CSimulation simu;

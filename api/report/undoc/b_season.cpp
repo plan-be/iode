@@ -38,8 +38,8 @@ int B_season(char* arg)
     int     file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    std::shared_ptr<KDBVariables> to = nullptr;
-    std::shared_ptr<KDBVariables> from = std::make_shared<KDBVariables>(false);
+    KDBVariablesPtr to = nullptr;
+    KDBVariablesPtr from = KDBVariables::Create(false);
 
     int lg = B_get_arg0(name, arg, 80);
     char** data = B_ainit_chk(arg + lg, NULL, 0);
@@ -74,7 +74,7 @@ int B_season(char* arg)
     if(nbper < 0 || t_smpl == nullptr) 
         goto done;
     
-    to = std::make_shared<KDBVariables>(false);
+    to = KDBVariables::Create(false);
     to->sample = new Sample(*t_smpl);
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
@@ -115,7 +115,7 @@ int B_season(char* arg)
         to->set(name, i_var);
     }
     
-    KV_merge(*global_ws_var, *to, 1);
+    KV_merge(global_ws_var, to, 1);
     rc = 0;
 
 done:

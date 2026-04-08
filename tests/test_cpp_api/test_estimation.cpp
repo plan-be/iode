@@ -161,7 +161,7 @@ TEST_F(EstimationTest, SetBlock)
     v_expected_coeffs = {"acaf1", "acaf2", "acaf4", "dpuh_1", "dpuh_2"};
     EXPECT_EQ(v_coeffs, v_expected_coeffs);
 
-    std::shared_ptr<KDBScalars> kdb_scl_res = est_new_coeffs.get_scalars();;
+    KDBScalarsPtr kdb_scl_res = est_new_coeffs.get_scalars();;
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").value, 0.9);
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_1").relax, 1.0);
     EXPECT_DOUBLE_EQ(kdb_scl_res->get("dpuh_2").value, 0.9);
@@ -190,7 +190,7 @@ TEST_F(EstimationTest, Estimate)
     std::string block = est.get_block();
     EXPECT_EQ(block, "ACAF;DPUH");
 
-    std::shared_ptr<KDBEquations> kdb_eqs = est.get_equations();
+    KDBEquationsPtr kdb_eqs = est.get_equations();
     
     eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");
@@ -278,7 +278,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("dpuh_1").value) / 1e6, 0.010986);
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("dpuh_2").value) / 1e6, 0.057489);
 
-    std::shared_ptr<KDBScalars> kdb_scl_res = est.get_scalars();
+    KDBScalarsPtr kdb_scl_res = est.get_scalars();
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf1").value) / 1e6, 0.01577);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf2").value) / 1e6, -8.e-06);
     EXPECT_DOUBLE_EQ(round(1e6 * kdb_scl_res->get("acaf4").value) / 1e6, -0.008503);
@@ -432,7 +432,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     std::string block = est.get_block();
     EXPECT_EQ(block, "ACAF;DPUH");
 
-    std::shared_ptr<KDBEquations> kdb_eqs = est.get_equations();
+    KDBEquationsPtr kdb_eqs = est.get_equations();
     
     eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");
@@ -444,7 +444,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
 
     // DO NOT CALL est.update_scalars() to test that the estimation 
     // can be done without updating scalars before
-    std::shared_ptr<KDBScalars> kdb_scl = est.get_scalars();
+    KDBScalarsPtr kdb_scl = est.get_scalars();
     EXPECT_EQ(kdb_scl->size(), 0);
 
     // Estimates the block ACAF;DPUH
@@ -574,7 +574,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
     // no drift, no trend
     drift = false;
     trend = false;
-    std::shared_ptr<KDBScalars> kdb_res = dickey_fuller_test(var_name, drift, trend, order);
+    KDBScalarsPtr kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
     std::set<std::string> names = kdb_res->get_names();
 

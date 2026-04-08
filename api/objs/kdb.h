@@ -9,10 +9,9 @@
 #include <string>
 #include <set>
 #include <map>
-#include <memory>               // std::shared_ptr
 #include <vector>
 #include <array>
-#include <memory>               // std::shared_ptr, std::shared_ptr
+#include <memory>               // std::shared_ptr, std::shared_ptr, std::shared_from_this
 #include <stdexcept>            // std::invalid_argument, std::out_of_range, std::runtime_error
 
 #ifndef SKBUILD
@@ -369,10 +368,7 @@ public:
     char* dde_create_obj(int objnb, int* nc, int* nl);
 
     virtual bool copy_from_file(const std::string& file, const std::string& objs_names, 
-        std::set<std::string>& v_found) 
-    { 
-        return false; 
-    }
+        std::set<std::string>& v_found) = 0;
 
     bool copy_from(const std::vector<std::string>& input_files, const std::string& objects_names);
     bool copy_from(const std::string& input_files, const std::string& objects_names = "*");
@@ -407,32 +403,32 @@ public:
 };
 
 
-template<class D, class T> struct KDBTemplate: public KDB
+template<class D, class T> struct KDBTemplate: public KDB, public std::enable_shared_from_this<D>
 {
 #ifndef SKBUILD
     FRIEND_TEST(SubsetsTest, Subset);
     FRIEND_TEST(SubsetsTest, MultiSubsets);
 #endif
 
-public:
+public:    
     // NOTE: if an IODE object is added/removed/updated from the current database,
     //       it must also done in all subset instances ('shallow copies')
     std::map<std::string, std::shared_ptr<T>> k_objs;
 
 private:
     // only used by subsets ('shallow copies')
-    D* db_parent = nullptr;
+    std::weak_ptr<D> db_parent;
     // only used by global or standalone databases
-    std::set<D*> children_db;
+    std::set<std::shared_ptr<D>> children_db;
 
 private:
-    bool shallow_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
+    bool shallow_copy(const std::shared_ptr<D> other_ptr, const std::set<std::string>& subset_keys)
     {
         std::shared_ptr<T> obj_ptr;
         bool success = true;
         for(const std::string& name : subset_keys)
         {
-            if(!other.contains(name))
+            if(!other_ptr->contains(name))
             {
                 std::string error_msg = v_iode_types[this->k_type];
                 error_msg += " with '" + name + "' not found in the source database";
@@ -441,7 +437,7 @@ private:
                 continue;
             }
 
-            obj_ptr = other.get_obj_ptr(name);
+            obj_ptr = other_ptr->get_obj_ptr(name);
             this->k_objs[name] = obj_ptr;
         }
 
@@ -451,12 +447,12 @@ private:
         return success;
     }
 
-    bool deep_copy(const KDBTemplate& other, const std::set<std::string>& subset_keys)
+    bool deep_copy(const std::shared_ptr<D> other_ptr, const std::set<std::string>& subset_keys)
     {
         bool success = true;
         for(const std::string& name : subset_keys) 
         {
-            if(!other.contains(name))  
+            if(!other_ptr->contains(name))  
             {
                 std::string error_msg = v_iode_types[this->k_type];
                 error_msg += " with '" + name + "' not found in the source database";
@@ -465,7 +461,7 @@ private:
                 continue;
             }
 
-            this->copy_obj_from(other, name, name);
+            this->copy_obj_from(other_ptr, name, name);
         }
 
         if(!success)
@@ -476,7 +472,7 @@ private:
 
     virtual void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
     {
-        D* top_db = get_top_level_db();
+        std::shared_ptr<D> top_db = get_top_level_db();
 
         // Both the passed obj_ptr and k_objs[key] will point to the same object
         this->k_objs[key] = obj_ptr;
@@ -488,7 +484,7 @@ private:
 
         // if this is a top-level database, we also need to set the object in all 
         // subset instances
-        for(D* subset : get_children_db())
+        for(std::shared_ptr<D> subset : get_children_db())
         {
             if(!subset->contains(key))
                 continue;
@@ -497,44 +493,64 @@ private:
     }
 
 protected:
-    D* get_top_level_db()
+    std::shared_ptr<D> get_top_level_db()
     {
         if(k_db_type != DB_SUBSET)
-            return (D*) this;
+        {
+            try
+            {
+                return this->shared_from_this();
+            }
+            catch(const std::bad_weak_ptr&)
+            {
+                std::string error_msg = "Internal error: top-level database of type '";
+                error_msg += v_iode_types[this->k_type] + "' is not managed by a shared_ptr";
+                throw std::runtime_error(error_msg);
+            }
+        }
         else
         {
-            if(!db_parent)
+            std::shared_ptr<D> parent_ptr = db_parent.lock();
+            if(!parent_ptr)
             {
                 std::string error_msg = "Internal error: subset database of type '";
                 error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
                 throw std::runtime_error(error_msg);
             }
-            return db_parent;
+            return parent_ptr;
         }
     }
 
-    std::set<D*> get_children_db() const
+    std::set<std::shared_ptr<D>> get_children_db() const
     {
         if(k_db_type != DB_SUBSET)
             return children_db; 
         else
-            return db_parent->children_db;
+        {
+            std::shared_ptr<D> parent_ptr = db_parent.lock();
+            if(parent_ptr)
+                return parent_ptr->children_db;
+            else
+                return std::set<std::shared_ptr<D>>();
+        }
     }
 
-    virtual std::shared_ptr<D> initialize_subset(const D* true_parent)
+    virtual std::shared_ptr<D> initialize_subset(const std::shared_ptr<D> true_parent)
     {
-        std::shared_ptr<D> subset_ptr = std::make_shared<D>(false);
+        std::shared_ptr<D> subset_ptr = D::Create(false);
         subset_ptr->description = true_parent->description;
         subset_ptr->k_compressed = true_parent->k_compressed;
         subset_ptr->filepath = true_parent->filepath;
         return subset_ptr;
     }
 
-public:
-    // global or standalone database
+protected:
+    // Constructor is protected and not private to allow derived classes to create instances.
+    // Instances MUST be created through std::make_shared or the Create() factory method
+    // to ensure they are managed by shared_ptr and avoid bad_weak_ptr exceptions.
     KDBTemplate(const IodeType type, const bool is_global) : KDB(type, is_global) {}
 
-    // copy constructor
+    // Copy constructor (protected)
     KDBTemplate(const KDBTemplate& other): KDB(other) 
     {
         if(other.size() == 0)
@@ -555,47 +571,80 @@ public:
             throw std::runtime_error(error_msg);
         }
 
-        bool success = deep_copy(other, subset_keys);
+        bool success = true;
+        for(const std::string& name : subset_keys) 
+        {
+            if(!other.contains(name))  
+            {
+                std::string error_msg = v_iode_types[this->k_type];
+                error_msg += " with '" + name + "' not found in the source database";
+                kwarning(error_msg.c_str());
+                success = false;
+                continue;
+            }
+            std::shared_ptr<T> obj_ptr = other.get_obj_ptr(name);
+            this->set_obj_ptr(name, obj_ptr);
+        }
+
         if(!success)
+        {
+            this->clear();
             throw std::runtime_error(error_msg);
+        }
     }
 
+public:
     ~KDBTemplate()
     {
-        if(k_db_type != DB_SUBSET)
-        {
-            for(D* child_db : children_db)
-            {
-                child_db->k_objs.clear();
-                child_db->db_parent = nullptr;
-            }
-            children_db.clear();
-        }
-
-        if(db_parent)
-        {
-            db_parent->children_db.erase((D*) this);
-            db_parent = nullptr;
-        }
-
         this->clear();
     }
 
     void clear() override
     {
-        // if this is a top-level database, we clear all subset instances and 
-        // then clear the objects
-        if(k_db_type != DB_SUBSET)
+        // NOTE: subset databases have no children, only top-level databases can have 
+        //       subsets (shallow copies)
+        if(this->k_db_type != DB_SUBSET)
         {
-            for(D* child_db : children_db)
+            // NOTE: create a copy of the children_db set to avoid modifying it while 
+            //       iterating over it -> the original children_db is modified in the 
+            //       clear() method when doing children_db.erase(this_ptr) below
+            std::set<std::shared_ptr<D>> children_db_copy = children_db;
+            for(std::shared_ptr<D> child_db : children_db_copy)
             {
-                child_db->k_objs.clear();
-                child_db->db_parent = nullptr;
+                // clear() breaks the link between a subset and its parent database
+                // (see else block below)
+                child_db->clear();
+                // after clear(), the child database is now a standalone database since 
+                // it has no parent anymore
+                child_db->k_db_type = DB_STANDALONE;
             }
-
             children_db.clear();
         }
-        
+        // NOTE: only subset databases have a parent, top-level databases have no parent
+        else
+        {
+            std::shared_ptr<D> parent_ptr = db_parent.lock();
+            if(parent_ptr)
+            {                
+                // search if this subset instance is still in the parent children_db set (as wrapped in a shared pointer).
+                // If a child shared pointer handling 'this' is found, we remove the shared pointer from the parent 
+                // children_db set to break the link between this subset and its parent database.
+                for(const std::shared_ptr<D>& child_db : parent_ptr->children_db)
+                {
+                    // WARNING: WE DO NOT call this->shared_from_this() in this method since the clear() method is called 
+                    //          in the destructor. If this->shared_from_this() is called after the parent database has 
+                    //          been already cleared, it will throw a bad_weak_ptr exception because the shared_ptr 
+                    //          managing the parent database will have been destroyed. 
+                    if(child_db.get() == this)
+                    {
+                        parent_ptr->children_db.erase(child_db);
+                        break;
+                    }
+                }
+                parent_ptr = nullptr;
+            }
+        }
+
         this->k_objs.clear();
 
         KDBInfo::clear();
@@ -621,7 +670,8 @@ public:
     
         // NOTE : if the parent database is already a subset, we need to get 
         //        the top-level database
-        D* true_parent = this->get_top_level_db();
+        std::shared_ptr<D> true_parent = this->get_top_level_db();
+        
         if(!true_parent)
         {
             error_msg += ":\nCannot find the parent database or is not defined";
@@ -632,20 +682,18 @@ public:
         if(copy)
         {
             subset_ptr->k_db_type = DB_STANDALONE;
-            bool success = subset_ptr->deep_copy(*true_parent, subset_keys);
+            bool success = subset_ptr->deep_copy(true_parent, subset_keys);
             if(!success)
                 throw std::runtime_error(error_msg);
-            
-            subset_ptr->db_parent = nullptr;
         }
         else
         {
             subset_ptr->k_db_type = DB_SUBSET;
-            bool success = subset_ptr->shallow_copy(*true_parent, subset_keys);
+            bool success = subset_ptr->shallow_copy(true_parent, subset_keys);
             if(!success)
                 throw std::runtime_error(error_msg);
             
-            true_parent->children_db.insert(subset_ptr.get());
+            true_parent->children_db.insert(subset_ptr);
             subset_ptr->db_parent = true_parent;
         }
 
@@ -665,10 +713,14 @@ public:
 
     bool parent_contains(const std::string& name) const
     {
-        if(k_db_type != DB_SUBSET || !db_parent)
+        if(k_db_type != DB_SUBSET)
             return false;
 
-        return db_parent->contains(name);
+        std::shared_ptr<D> parent_ptr = db_parent.lock();
+        if(!parent_ptr)
+            return false;
+
+        return parent_ptr->contains(name);
     }
 
     int index_of(const std::string& name) const override
@@ -722,8 +774,7 @@ public:
         return names;
     }
 
-    bool rename(const std::string& old_name, const std::string& new_name,
-        const bool overwrite = false) override
+    bool rename(const std::string& old_name, const std::string& new_name, const bool overwrite = false) override
     {
         std::string old_key = to_key(old_name);
         std::string new_key = to_key(new_name);
@@ -745,7 +796,7 @@ public:
         }
 
         // rename in top-level database
-        D* top_db = get_top_level_db();
+        std::shared_ptr<D> top_db = get_top_level_db();
         if(!overwrite)
         {
             if(top_db->contains(new_key))
@@ -761,7 +812,7 @@ public:
         top_db->k_objs[new_key] = obj_ptr;
 
         // rename in all subset instances (including 'this' if 'this' is a subset)
-        for(D* subset : get_children_db())
+        for(std::shared_ptr<D> subset : get_children_db())
         {
             if(!subset->contains(old_key))
                 continue;
@@ -775,7 +826,7 @@ public:
     bool remove(const std::string& name) override
     {
         std::string key = to_key(name);
-        D* top_db = get_top_level_db();
+        std::shared_ptr<D> top_db = get_top_level_db();
         if(!(this->contains(key) && top_db->contains(key)))
         {
             std::string str_type = v_iode_types[this->k_type];
@@ -790,7 +841,7 @@ public:
         top_db->k_objs.erase(key);
 
         // remove from all subset instances (including 'this' if 'this' is a subset)
-        for(D* subset : get_children_db())
+        for(std::shared_ptr<D> subset : get_children_db())
             subset->k_objs.erase(key);
 
         return true;
@@ -802,31 +853,31 @@ public:
         return T(obj);
     }
 
-    void copy_obj_to(KDBTemplate& dest, const std::string& source_key,
+    void copy_obj_to(std::shared_ptr<D> dest_ptr, const std::string& source_key,
         const std::string& dest_key) const
     {
         std::shared_ptr<T> obj_ptr = this->get_obj_ptr(source_key);
-        dest.set_obj_ptr(dest_key, obj_ptr);
+        dest_ptr->set_obj_ptr(dest_key, obj_ptr);
     }
 
-    void copy_obj_from(const KDBTemplate& other, const std::string& source_key,
+    void copy_obj_from(const std::shared_ptr<D> other_ptr, const std::string& source_key,
         const std::string& dest_key)
     {
-        std::shared_ptr<T> obj_ptr = other.get_obj_ptr(source_key);
+        std::shared_ptr<T> obj_ptr = other_ptr->get_obj_ptr(source_key);
         this->set_obj_ptr(dest_key, obj_ptr);
     }
 
-    bool duplicate(const KDBTemplate& other, const std::string& old_name, const std::string& new_name)
+    bool duplicate(const std::shared_ptr<D> other_ptr, const std::string& old_name, const std::string& new_name)
     {
         std::string error_msg = "Cannot duplicate object '" + old_name + "' as '" + new_name + "': ";
-        if(this == &other && old_name == new_name)
+        if(this == other_ptr.get() && old_name == new_name)
         {
             error_msg += "source and destination are identical.";
             kwarning(error_msg.c_str());
             return false;
         } 
     
-        if(!other.contains(old_name))
+        if(!other_ptr->contains(old_name))
         {
             error_msg += "object '" + old_name + "' does not exist in the source database";
             kwarning(error_msg.c_str());
@@ -838,35 +889,37 @@ public:
         if(this->contains(new_name))
             this->remove(new_key);
         
-        if(!other.contains(old_name))
+        if(!other_ptr->contains(old_name))
         {
-            error_msg += "Could not retrieve the " + v_iode_types[other.k_type];
+            error_msg += "Could not retrieve the " + v_iode_types[other_ptr->k_type];
             error_msg += " named '" + old_key + "' in the source database.";
             kwarning(error_msg.c_str());
             return false;
         } 
     
-        this->copy_obj_from(other, old_key, new_key);
+        this->copy_obj_from(other_ptr, old_key, new_key);
     
         return true;
     }
 
     bool duplicate(const std::string& old_name, const std::string& new_name)
     {
-        return duplicate(*this, old_name, new_name);
+        return duplicate(this->shared_from_this(), old_name, new_name);
     }
 
-    bool copy_from_file(KDBTemplate& from, const std::string& file, const std::string& objs_names, 
+    bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found)
     {   
-        bool success = from.load_binary(file);
+        std::shared_ptr<D> from_ptr = D::Create(false);
+
+        bool success = from_ptr->load_binary(file);
         if(!success)
             return false;
     
         std::set<std::string> s_objs;
         try
         {
-            s_objs = from.filter_names(objs_names);
+            s_objs = from_ptr->filter_names(objs_names);
         }
         catch(const std::exception& e)
         {
@@ -878,12 +931,12 @@ public:
         std::vector<std::string> objs_to_copy;
         for(const std::string& name : s_objs)
         {
-            if(!from.contains(name)) 
+            if(!from_ptr->contains(name)) 
                 continue;
             
             // if already found in previous files -> remove from "from"
             if(v_found.contains(name)) 
-                from.remove(name);
+                from_ptr->remove(name);
             // object to be copied
             else
                 objs_to_copy.push_back(name);
@@ -901,7 +954,7 @@ public:
                 this->remove(name);
 
             // copy the object from "from" to "this"
-            this->copy_obj_from(from, name, name);
+            this->copy_obj_from(from_ptr, name, name);
     
             v_found.insert(name);
         }
@@ -909,15 +962,15 @@ public:
         return true;
     }
 
-    void merge(KDBTemplate& other, const bool overwrite, const bool clear_source)
+    void merge(std::shared_ptr<D> other_ptr, const bool overwrite, const bool clear_source)
     {
-        if(other.size() == 0) 
+        if(other_ptr->size() == 0) 
             return;
     
         bool found = false;
-        for(const std::string& name : other.get_names()) 
+        for(const std::string& name : other_ptr->get_names()) 
         {
-            if(!other.contains(name)) 
+            if(!other_ptr->contains(name)) 
                 continue;
     
             found = this->contains(name);
@@ -931,36 +984,37 @@ public:
                 this->remove(name);
             }
             
-            this->copy_obj_from(other, name, name);
+            this->copy_obj_from(other_ptr, name, name);
         }
     
         if(clear_source)
-            other.clear();
+            other_ptr->clear();
     }
 
     // NOTE: see KDBVariables::merge_from(const std::string& filename) for the 
-    // specific implementation for IODE Variables (to handle the sample)
-    // TODO JMP: please provide input values to test B_WsMerge()
-    void merge_from(KDBTemplate& from, const std::string& filename)
+    //       specific implementation for IODE Variables (to handle the sample)
+    void merge_from(const std::string& filename)
     {
         if(this->k_type == VARIABLES)
             return;
+
+        std::shared_ptr<D> from_ptr = D::Create(false);
 
         // throw an error if the passed filepath is not valid
         IodeFileType file_type = (IodeFileType) this->k_type;
         std::string input_file = check_filepath(filename, file_type, "merge_from", true);
         
-        bool success = from.load(input_file);
+        bool success = from_ptr->load(input_file);
         if(!success)
             return;
     
         if(this->size() == 0) 
         {
-            this->description = from.description;
-            this->filepath = from.filepath;
+            this->description = from_ptr->description;
+            this->filepath = from_ptr->filepath;
         }
      
-        this->merge(from, true, true);
+        this->merge(from_ptr, true, true);
     }
 
     // NOTE: get_obj_ptr() and set_obj_ptr() methods to be replaced by operator[] when
@@ -1008,7 +1062,7 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        D* top_db = get_top_level_db();
+        std::shared_ptr<D> top_db = get_top_level_db();
 
         if(this->k_db_type == DB_SUBSET)
         {

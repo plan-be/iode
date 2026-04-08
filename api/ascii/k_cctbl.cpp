@@ -258,7 +258,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 line = &(tbl->lines.back());
                 line->set_graph_type(T_GRAPHDEFAULT);
                 line->cells.clear();
-                for(int i = 0; i < T_NC(tbl); i++)
+                for(int i = 0; i < tbl->nb_columns; i++)
                 {
                     cell = read_cell(yy, 0);
                     line->cells.push_back(*cell);
@@ -606,7 +606,7 @@ static void print_cell(FILE *fd, const TableCell* cell)
 static void print_tbl(FILE* fd, std::shared_ptr<Table> tbl)
 {
     /* tbl */
-    fprintf(fd, "\nDIM %d\n", T_NC(tbl));
+    fprintf(fd, "\nDIM %d\n", tbl->nb_columns);
     K_wrdef(fd, TABLE, (int) tbl->get_language());
     /* GB 2/3/00 */
     fprintf(fd, "\nBOX %d AXIS %d XGRID %d YGRID %d ", tbl->chart_box, 
@@ -619,7 +619,7 @@ static void print_tbl(FILE* fd, std::shared_ptr<Table> tbl)
 
     fprintf(fd, "\nDIV ");
     /* div */
-    for(int i = 0; i < T_NC(tbl); i++)
+    for(int i = 0; i < tbl->nb_columns; i++)
         print_cell(fd, &(tbl->divider_line.cells[i]));
 
     /* lines */

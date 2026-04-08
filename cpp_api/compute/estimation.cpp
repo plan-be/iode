@@ -37,7 +37,7 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
 }
 
 // Note: +/- the same as E_SclToReal()
-static void add_df_test_coeff(std::shared_ptr<KDBScalars> kdb, const std::string& coeff_name, double* res, const int pos)
+static void add_df_test_coeff(KDBScalarsPtr kdb, const std::string& coeff_name, double* res, const int pos)
 {
     Scalar scl;
     scl.value = res[pos];
@@ -49,7 +49,7 @@ static void add_df_test_coeff(std::shared_ptr<KDBScalars> kdb, const std::string
 // QUESTION FOR JMP : Why E_UnitRoot does not return a new KDB of scalars ? 
 //                    In E_UnitRoot, you first create new scalars then you delete them after computation of DF test.
 //                    Then, why not working on a local KDB of scalars ?
-std::shared_ptr<KDBScalars> dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
+KDBScalarsPtr dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
 {
     double* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
     if(!res)
@@ -68,7 +68,7 @@ std::shared_ptr<KDBScalars> dickey_fuller_test(const std::string& lec, bool drif
     }
 
     int pos = 0;
-    std::shared_ptr<KDBScalars> kdb_res = std::make_shared<KDBScalars>(false);
+    KDBScalarsPtr kdb_res = KDBScalars::Create(false);
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
@@ -99,8 +99,8 @@ EditAndEstimateEquations::EditAndEstimateEquations(const std::string& from, cons
     : estimation_done(false), sample(nullptr), method(EQ_LSQ), current_eq(v_equations.end())
 {
     set_sample(from, to);
-    kdb_eqs = std::make_shared<KDBEquations>(false);
-    kdb_scl = std::make_shared<KDBScalars>(false);
+    kdb_eqs = KDBEquations::Create(false);
+    kdb_scl = KDBScalars::Create(false);
 }
 
 EditAndEstimateEquations::~EditAndEstimateEquations()
@@ -326,7 +326,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
     int i_method = (int) method;
-    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
+    KDBVariablesPtr kdb_var = global_ws_var;
     estimation = new Estimation(c_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
                                 i_method, maxit, eps);
     int res = estimation->estimate();
@@ -412,7 +412,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     }
 
     // merge the local Scalars into the global Scalars database
-    global_ws_scl->merge(*kdb_scl, true, false);
+    global_ws_scl->merge(kdb_scl, true, false);
 
     return v_new_eqs;
 }

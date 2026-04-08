@@ -64,6 +64,5 @@ bool KDBComments::print_obj_def(const std::string& name)
 
 void KDBComments::update_reference_db()
 {
-    global_ref_cmt[0].reset();
-    global_ref_cmt[0] = this->get_subset("*", false);      
+    global_ref_cmt[0] = this->get_subset("*", false);
 }

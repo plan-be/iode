@@ -18,9 +18,9 @@ protected:
 
 TEST_F(KDBCommentsTest, Load)
 {
-    KDBComments kdb(false);
-    kdb.load(str_input_test_dir + prefix_filename + "fun.cmt");
-    EXPECT_EQ(kdb.size(), 317);
+    auto kdb_ptr = KDBComments::KDBComments::Create(false);
+    kdb_ptr->load(str_input_test_dir + prefix_filename + "fun.cmt");
+    EXPECT_EQ(kdb_ptr->size(), 317);
 }
 
 TEST_F(KDBCommentsTest, Subset)
@@ -35,7 +35,7 @@ TEST_F(KDBCommentsTest, Subset)
     std::set<std::string> names = global_ws_cmt->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    std::shared_ptr<KDBComments> kdb_subset_deep_copy = global_ws_cmt->get_subset(pattern, true);
+    KDBCommentsPtr kdb_subset_deep_copy = global_ws_cmt->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", modified);
@@ -43,7 +43,7 @@ TEST_F(KDBCommentsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), modified);
 
     // SHALLOW COPY SUBSET
-    std::shared_ptr<KDBComments> kdb_subset_shallow_copy = global_ws_cmt->get_subset(pattern, false);
+    KDBCommentsPtr kdb_subset_shallow_copy = global_ws_cmt->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", modified);
@@ -224,7 +224,7 @@ TEST_F(KDBCommentsTest, Filter)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBComments> kdb_subset;
+    KDBCommentsPtr kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_cmt->size(); p++) 
@@ -298,7 +298,7 @@ TEST_F(KDBCommentsTest, Filter)
         if(name.front() == 'B') 
             expected_names_subset_subset.insert(name);
 
-    std::shared_ptr<KDBComments> kdb_subset_subset = kdb_subset->get_subset(pattern_subset_subset, false);
+    KDBCommentsPtr kdb_subset_subset = kdb_subset->get_subset(pattern_subset_subset, false);
     EXPECT_EQ(kdb_subset_subset->size(), expected_names_subset_subset.size());
     EXPECT_EQ(kdb_subset_subset->get_names(), expected_names_subset_subset);
     kdb_subset->clear();
@@ -309,7 +309,7 @@ TEST_F(KDBCommentsTest, DeepCopy)
 {
     std::string pattern = "A*;*_";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBComments> kdb_subset;
+    KDBCommentsPtr kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_cmt->size(); p++) 
@@ -393,9 +393,9 @@ TEST_F(KDBCommentsTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    std::shared_ptr<KDBComments> kdb0 = global_ws_cmt->get_subset(pattern, true);
-    std::shared_ptr<KDBComments> kdb1 = global_ws_cmt->get_subset(pattern, true);
-    std::shared_ptr<KDBComments> kdb_to_merge = global_ws_cmt->get_subset(pattern, true);
+    KDBCommentsPtr kdb0 = global_ws_cmt->get_subset(pattern, true);
+    KDBCommentsPtr kdb1 = global_ws_cmt->get_subset(pattern, true);
+    KDBCommentsPtr kdb_to_merge = global_ws_cmt->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_COMMENT";
@@ -409,7 +409,7 @@ TEST_F(KDBCommentsTest, Merge)
     kdb_to_merge->update(name, modified_comment);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true, false);
+    kdb0->merge(kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_comment);
@@ -417,7 +417,7 @@ TEST_F(KDBCommentsTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_comment); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false, false);
+    kdb1->merge(kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_comment);
 }

@@ -8,7 +8,7 @@
 
 
 // KDB containing the macros during a report execution
-inline KDBMacros* RP_MACRO = nullptr;
+inline KDBMacrosPtr RP_MACRO = nullptr;
 
 /* b_rep_utils.c */
 int RP_alloc_ptrs();

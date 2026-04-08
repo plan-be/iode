@@ -66,8 +66,8 @@ cdef class Scalars(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Scalars, overwrite: bool=True):        
-        cdef KDBScalars* other_database = other.database
-        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
+        cdef shared_ptr[KDBScalars] other_database = other.database_ptr
+        self.database.merge(other_database, <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database))

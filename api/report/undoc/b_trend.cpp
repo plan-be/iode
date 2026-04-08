@@ -66,8 +66,8 @@ static int B_WsTrendAll(char* arg, int std)
     int     file_type;
     Sample* t_smpl = nullptr;
     std::vector<std::string> v_data;
-    std::shared_ptr<KDBVariables> to = nullptr;
-    std::shared_ptr<KDBVariables> from = std::make_shared<KDBVariables>(false);
+    KDBVariablesPtr to = nullptr;
+    KDBVariablesPtr from = KDBVariables::Create(false);
     std::shared_ptr<Variable> var_ptr;
 
     int lg = B_get_arg0(file, arg, 80);
@@ -102,7 +102,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    to = std::make_shared<KDBVariables>(false);
+    to = KDBVariables::Create(false);
     nb = t_smpl->nb_periods;
     to->sample = new Sample(*t_smpl);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
@@ -117,7 +117,7 @@ static int B_WsTrendAll(char* arg, int std)
         to->set(from_name, var);
     }
 
-    KV_merge(*global_ws_var, *to, 1);
+    KV_merge(global_ws_var, to, 1);
 
 done:
     to->clear();

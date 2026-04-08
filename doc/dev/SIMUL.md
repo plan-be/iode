@@ -282,7 +282,7 @@ Main functions for model simulations.
 
 |Syntax|Description|
 |:---|:---|
-|`int simulate(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
+|`int simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void clear()`|Frees all temporary allocated memory for the simulation.|
 |`double calculate_CLEC(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
@@ -292,9 +292,9 @@ Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 
 |Syntax|Description|
 |:---|:---|
-|`int order(std::shared_ptr<KDBEquations> dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
+|`int order(KDBEquationsPtr dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
 |`int get_eq_position(int posendo)`|Searches the equation whose endogenous is the variable posendo.|
-|`void compute_tri(std::shared_ptr<KDBEquations> dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
+|`void compute_tri(KDBEquationsPtr dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
 #### k\_sim\_scc.c {#T13}
 
@@ -304,8 +304,8 @@ The reordering algorithm being CPU intensive for very large models, it is better
 
 |Syntax|Description|
 |:---|:---|
-|`int model_calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
-|`int simulate_SCC(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
+|`int model_calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
+|`int simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}
 
@@ -327,13 +327,13 @@ Two methods are used: a simple Newton\-Raphson method or a secant method in case
 
 |Syntax|Description|
 |:---|:---|
-|`double L_zero(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
-|`double L_newton(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
+|`double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
+|`double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
 
 #### l\_secant.c {#T17}
 
 |Syntax|Description|
 |:---|:---|
 |`static double L_fx(double x, int t)`|Computes the value of f(x) in time t|
-|`double L_secant(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
+|`double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
 

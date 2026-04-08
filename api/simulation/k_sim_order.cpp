@@ -12,9 +12,9 @@
  *  
  * List of functions 
  * -----------------
- *      int order(std::shared_ptr<KDBEquations> dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
+ *      int order(KDBEquationsPtr dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
  *      int get_eq_position(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
- *      void compute_tri(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
+ *      void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
 #include "api/constants.h"
 #include "api/k_super.h"
@@ -81,7 +81,7 @@ int CSimulation::add_post(std::vector<std::vector<int>>& successors, int i, int 
  *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
  *  
  */
-int CSimulation::build_pre_post_list(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, int from)
+int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int from)
 {
     int nb = 0;
     int nb_predecessors = 0;
@@ -148,7 +148,7 @@ int CSimulation::build_pre_post_list(std::shared_ptr<KDBEquations> dbe, std::vec
  *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
  *  
  */
-int CSimulation::build_inter_list(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors)
+int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors)
 {
     int nb = 0;
     for(int i = 0; i < dbe->size(); i++) 
@@ -169,7 +169,7 @@ int CSimulation::build_inter_list(std::shared_ptr<KDBEquations> dbe, std::vector
  *  @param [in, out]    int**   successors      see pre_order()
  *  
  */
-int CSimulation::post_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
+int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
     SW_nfree(KSIM_ORDERED);
     return 0;
@@ -200,7 +200,7 @@ int CSimulation::post_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::
  *                                              -> Note that KSIM_ORDER is not calculated here, only allocated 
  *  
  */
-int CSimulation::pre_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
+int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
     int     pos, posj, nb;
     CLEC    *clec;
@@ -277,7 +277,7 @@ int CSimulation::pre_order(std::shared_ptr<KDBEquations> dbe, std::vector<std::v
  *  @global [out]   int  KSIM_POST   number of equations in the "epilog"
  *  
  */
-void CSimulation::order(std::shared_ptr<KDBEquations> dbe, const std::vector<std::string>& eqs)
+void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs)
 {
     int  *tmp2, i, k;
     long cpu_order = 0; 
@@ -381,7 +381,7 @@ int CSimulation::get_eq_position(int posendo)
  *  @global [out]   int*    KSIM_PERM   vector of equations permutations. Filled with -1 at start.
  *  
  */
-int CSimulation::compute_tri_begin(std::shared_ptr<KDBEquations> dbe)
+int CSimulation::compute_tri_begin(KDBEquationsPtr dbe)
 {
     int nb = dbe->size();
     KSIM_PERM = (int *) SW_nalloc(sizeof(int) * nb);
@@ -403,7 +403,7 @@ int CSimulation::compute_tri_begin(std::shared_ptr<KDBEquations> dbe)
  *  @global [out]   int*    KSIM_PERM   vector of equations permutations.
  *  
  */
-int CSimulation::compute_tri_end(std::shared_ptr<KDBEquations> dbe)
+int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
 {
     for(int i = 0 ; i < dbe->size() ; i++)
         if(KSIM_PERM[i] >= 0)
@@ -429,7 +429,7 @@ int CSimulation::compute_tri_end(std::shared_ptr<KDBEquations> dbe)
  *  @global [in, out]   int*    KSIM_PERM   vector of equations permutations. 
  *  
  */
-void CSimulation::compute_tri_perm1(std::shared_ptr<KDBEquations> dbe, int i, std::vector<int>& vars)
+void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& vars)
 {
     int m = -1;
 
@@ -474,7 +474,7 @@ void CSimulation::compute_tri_perm1(std::shared_ptr<KDBEquations> dbe, int i, st
  *  @global [in, out]   int*    KSIM_PERM vector of equation positions after pseudo-triangulation
  *  
  */
-void CSimulation::compute_tri(std::shared_ptr<KDBEquations> dbe, std::vector<std::vector<int>>& predecessors, int passes)
+void CSimulation::compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)
 {   
     int cpu_sort = WscrGetMS();
 

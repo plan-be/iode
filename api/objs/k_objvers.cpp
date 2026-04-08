@@ -177,21 +177,21 @@ static char* K_repack_tbl(Table *tbl)
 
     /* div */
     TableCell* cells = tbl->divider_line.cells.data();
-    pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) T_NC(tbl));
+    pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) tbl->nb_columns);
     for(TableCell& cell: tbl->divider_line.cells)
         pack = T_cell_repack(pack, &cell);
 
     /* lines */
     TableCell* cell;
     TableLine* lines = tbl->lines.data();
-    pack = (char*) P_add(pack, (char *) lines, sizeof(TableLine) * (int) T_NL(tbl));
-    for(int i = 0; i < T_NL(tbl); i++) 
+    pack = (char*) P_add(pack, (char *) lines, sizeof(TableLine) * (int) tbl->lines.size());
+    for(int i = 0; i < tbl->lines.size(); i++) 
     {
         switch(tbl->lines[i].get_type()) 
         {
             case TABLE_LINE_CELL :
                 cells = tbl->lines[i].cells.data();
-                pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) T_NC(tbl));
+                pack = (char*) P_add(pack, (char *) cells, sizeof(TableCell) * (int) tbl->nb_columns);
                 for(TableCell& cell: tbl->lines[i].cells)
                     pack = T_cell_repack(pack, &cell);
                 break;

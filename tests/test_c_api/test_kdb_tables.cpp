@@ -19,9 +19,9 @@ protected:
 
 TEST_F(KDBTablesTest, Load)
 {
-    KDBTables kdb(false);
-    kdb.load(str_input_test_dir + prefix_filename + "fun.tbl");
-    EXPECT_EQ(kdb.size(), 46);
+    auto kdb_ptr = KDBTables::KDBTables::Create(false);
+    kdb_ptr->load(str_input_test_dir + prefix_filename + "fun.tbl");
+    EXPECT_EQ(kdb_ptr->size(), 46);
 }
 
 TEST_F(KDBTablesTest, Subset)
@@ -38,7 +38,7 @@ TEST_F(KDBTablesTest, Subset)
     std::set<std::string> names = global_ws_tbl->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    std::shared_ptr<KDBTables> kdb_subset_deep_copy = global_ws_tbl->get_subset(pattern, true);
+    KDBTablesPtr kdb_subset_deep_copy = global_ws_tbl->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("C8_1", table);
@@ -46,7 +46,7 @@ TEST_F(KDBTablesTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get_title("C8_1"), new_title);
 
     // SHALLOW COPY SUBSET
-    std::shared_ptr<KDBTables> kdb_subset_shallow_copy = global_ws_tbl->get_subset(pattern, false);
+    KDBTablesPtr kdb_subset_shallow_copy = global_ws_tbl->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("C8_1", table);
@@ -297,7 +297,7 @@ TEST_F(KDBTablesTest, Filter)
 {
     std::string pattern = "A*;*2";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBTables> kdb_subset;
+    KDBTablesPtr kdb_subset;
 
     global_ws_var->load(str_input_test_dir + "fun.av");
     global_ws_lst->load(str_input_test_dir + "fun.al");
@@ -370,7 +370,7 @@ TEST_F(KDBTablesTest, DeepCopy)
 {
     std::string pattern = "A*;*2";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBTables> kdb_subset;
+    KDBTablesPtr kdb_subset;
 
     global_ws_var->load(str_input_test_dir + "fun.av");
     global_ws_lst->load(str_input_test_dir + "fun.al");
@@ -457,9 +457,9 @@ TEST_F(KDBTablesTest, Merge)
     std::string pattern = "A*";
 
     // create deep copies kdb
-    std::shared_ptr<KDBTables> kdb0 = global_ws_tbl->get_subset(pattern, true);
-    std::shared_ptr<KDBTables> kdb1 = global_ws_tbl->get_subset(pattern, true);
-    std::shared_ptr<KDBTables> kdb_to_merge = global_ws_tbl->get_subset(pattern, true);
+    KDBTablesPtr kdb0 = global_ws_tbl->get_subset(pattern, true);
+    KDBTablesPtr kdb1 = global_ws_tbl->get_subset(pattern, true);
+    KDBTablesPtr kdb_to_merge = global_ws_tbl->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "NEW_TABLE";
@@ -479,7 +479,7 @@ TEST_F(KDBTablesTest, Merge)
     kdb_to_merge->update(name, modified_table);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true, false);
+    kdb0->merge(kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_table);
@@ -487,7 +487,7 @@ TEST_F(KDBTablesTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_table); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false, false);
+    kdb1->merge(kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_table);
 }
@@ -541,7 +541,7 @@ TEST_F(KDBTablesTest, PrintToFile)
     std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
     std::string ref_file = str_input_test_dir + "ref2.av";
     global_ws_var->load(str_input_test_dir + "fun.av");
-    std::shared_ptr<KDBVariables> kdb_ref = global_ws_var->get_subset(pattern, true);
+    KDBVariablesPtr kdb_ref = global_ws_var->get_subset(pattern, true);
 
     double value;
     for(int t=0; t < kdb_ref->get_nb_periods(); t++)

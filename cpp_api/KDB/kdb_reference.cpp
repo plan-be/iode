@@ -11,7 +11,7 @@ void clear_reference_kdb(const int ref)
 {
     if(global_ref_var[ref - 1])
         global_ref_var[ref - 1]->clear();
-    global_ref_var[ref - 1].reset();
+    global_ref_var[ref - 1] = nullptr;
 }
 
 void clear_all_reference_kdbs()

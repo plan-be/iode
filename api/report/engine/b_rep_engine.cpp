@@ -699,7 +699,7 @@ int RP_evaltime()
     if(RP_PER.year == 0) 
         return 0;
     
-    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
+    KDBVariablesPtr kdb_var = global_ws_var;
     if(!kdb_var)
         return 0;
     Sample* sample = kdb_var->sample;
@@ -1480,8 +1480,7 @@ done:
     // When exiting the top level report, all $defines are deleted
     if(RP_DEPTH == 0) 
     {
-        delete RP_MACRO;
-        RP_MACRO = nullptr;
+        RP_MACRO.reset();
         W_close(); // TODO: check this !!
     }
 
@@ -1553,10 +1552,7 @@ done:
 
     // Si fin des rapports vide les macros
     if(RP_DEPTH == 0 && cleanup) 
-    {
-        delete RP_MACRO; // Macros ($define) are saved in the KDB RP_MACROS
-        RP_MACRO = nullptr;
-    }
+        RP_MACRO.reset();   // Macros ($define) are saved in the KDB RP_MACROS
 
     return rc;
 }

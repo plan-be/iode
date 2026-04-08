@@ -58,8 +58,8 @@ cdef class Lists(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Lists, overwrite: bool=True):        
-        cdef KDBLists* other_database = other.database
-        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
+        cdef shared_ptr[KDBLists] other_database = other.database_ptr
+        self.database.merge(other_database, <bint>overwrite, <bint>False)
 
     def __hash__(self) -> int:
         return hash_value(dereference(self.database))

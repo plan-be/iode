@@ -32,7 +32,7 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the tsp export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for tsp output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for tsp output. 
- *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
+ *      char *get_variable_value(KDBVariablesPtr dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in tsp format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the tsp export file.
  */
 #include "api/objs/kdb.h"
@@ -43,13 +43,13 @@
 #include "api/io/export.h"
 
 
-int ExportObjsTSP::write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsTSP::write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
-    int freq = get_nb_periods_per_year(dbv.sample->start_period.periodicity);
-    std::string start_period_year = std::to_string((dbv.sample->start_period).year);
-    std::string end_period_year   = std::to_string((dbv.sample->end_period).year);
-    std::string start_period_step = std::to_string((dbv.sample->start_period).step);
-    std::string end_period_step   = std::to_string((dbv.sample->end_period).step);
+    int freq = get_nb_periods_per_year(dbv_ptr->sample->start_period.periodicity);
+    std::string start_period_year = std::to_string((dbv_ptr->sample->start_period).year);
+    std::string end_period_year   = std::to_string((dbv_ptr->sample->end_period).year);
+    std::string start_period_step = std::to_string((dbv_ptr->sample->start_period).step);
+    std::string end_period_step   = std::to_string((dbv_ptr->sample->end_period).step);
 
     file_descriptor.open(outfile);
 
@@ -78,7 +78,7 @@ int ExportObjsTSP::write_header(const KDBVariables& dbv, const KDBComments& dbc,
     return 0;
 }
 
-int ExportObjsTSP::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsTSP::close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     file_descriptor.close();
     return 0;
@@ -89,11 +89,11 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
     return(write_pre_post("LOAD ", " ;\n", name, code));
 }
 
-char* ExportObjsTSP::extract_comment(const KDBComments& dbc, char* name, char** cmt)
+char* ExportObjsTSP::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt)
 {
-    if(dbc.contains(name))
+    if(dbc_ptr->contains(name))
     {
-        std::shared_ptr<Comment> cmt_ptr = dbc.get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
         Comment cmt_utf8 = *cmt_ptr;
         Comment cmt_oem = utf8_to_oem(cmt_utf8);
         *cmt = (char*) SCR_stracpy((unsigned char*) cmt_oem.c_str());
@@ -104,13 +104,13 @@ char* ExportObjsTSP::extract_comment(const KDBComments& dbc, char* name, char** 
     return(*cmt);
 }
 
-char* ExportObjsTSP::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
+char* ExportObjsTSP::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    std::string name = dbv.get_name(nb);
-    double value = dbv.get_var(name, t);
+    std::string name = dbv_ptr->get_name(nb);
+    double value = dbv_ptr->get_var(name, t);
     write_value(tmp, value);
     write_pre_post("", " ", tmp, &buf);
     lg = (int) strlen(buf) + 1;
