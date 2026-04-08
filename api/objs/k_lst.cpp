@@ -45,21 +45,21 @@ int K_scan(const KDB& kdb, char* l_var, char* l_scal)
         return -1;
     }
 
-    KDBVariables exo(false);
-    KDBScalars scal(false);
+    auto exo_ptr = KDBVariables::KDBVariables::Create(false);
+    auto scal_ptr = KDBScalars::KDBScalars::Create(false);
 
     for(int i = 0; i < kdb.size(); i++) 
     {
         switch(kdb.k_type) 
         {
             case IDENTITIES :
-                KI_scan(kdb, i, exo, scal);
+                KI_scan(kdb, i, *exo_ptr, *scal_ptr);
                 break;
             case EQUATIONS :
-                KE_scan(kdb, i, exo, scal);
+                KE_scan(kdb, i, *exo_ptr, *scal_ptr);
                 break;
             case TABLES :
-                KT_scan(kdb, i, exo, scal);
+                KT_scan(kdb, i, *exo_ptr, *scal_ptr);
                 break;
         }
     }
@@ -68,12 +68,12 @@ int K_scan(const KDB& kdb, char* l_var, char* l_scal)
     char** c_lst;
     std::vector<std::string> lst;
 
-    lst = scal.grep("*", true, true, false, false, '*');
+    lst = scal_ptr->grep("*", true, true, false, false, '*');
     c_lst = vector_to_double_char(lst);
     rc =  KL_lst(l_scal, c_lst, 200);
     SCR_free_tbl((unsigned char**) c_lst);
 
-    lst = exo.grep("*", true, true, false, false, '*');
+    lst = exo_ptr->grep("*", true, true, false, false, '*');
     c_lst = vector_to_double_char(lst);
     rc = KL_lst(l_var, c_lst, 200);
     SCR_free_tbl((unsigned char**) c_lst);
@@ -189,8 +189,8 @@ void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal)
     std::shared_ptr<Table> tbl = reinterpret_cast<const KDBTables&>(dbt).get_obj_ptr(name);
 
     CLEC* clec = NULL;
-    KDBTables kdb_empty(false);
-    for(int k = 0; k < T_NL(tbl); k++)   
+    auto kdb_empty_ptr = KDBTables::KDBTables::Create(false);
+    for(int k = 0; k < tbl->lines.size(); k++)   
     {
         if(tbl->lines[k].get_type() != TABLE_LINE_CELL) 
             continue;
@@ -201,7 +201,7 @@ void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal)
                 continue;
 
             clec = cell.get_compiled_lec();
-            K_clecscan(kdb_empty, clec, exo, scal);
+            K_clecscan(*kdb_empty_ptr, clec, exo, scal);
         }
     }
 }
@@ -440,6 +440,5 @@ bool KDBLists::print_obj_def(const std::string& name)
 
 void KDBLists::update_reference_db()
 {
-    global_ref_lst[0].reset();
-    global_ref_lst[0] = this->get_subset("*", false);      
+    global_ref_lst[0] = this->get_subset("*", false);
 }

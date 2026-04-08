@@ -238,7 +238,7 @@ int B_DataRasVar(char* arg, int unused)
 int B_DataCalcVar(char* arg, int unused)
 {
     char name[K_MAX_NAME + 1];
-    std::shared_ptr<KDBVariables> kdb = global_ws_var;
+    KDBVariablesPtr kdb = global_ws_var;
     int nb_periods = kdb->get_nb_periods();
 
     int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
@@ -711,7 +711,7 @@ int B_DataUpdate(char* arg, int type)
                         var = (double) atof(args[i + nb_p]);
                         if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                             var = IODE_NAN;
-                        KV_set(*global_ws_var, var_name, shift + i, mode, var);
+                        KV_set(global_ws_var, var_name, shift + i, mode, var);
                     }
                     success = true;
                 }
@@ -1189,12 +1189,12 @@ std::vector<std::string> template_data_list(const std::string& filename, const s
 {
     std::vector<std::string> lst;
 
-    T kdb(false);
-    kdb.load(filename);
-    if(kdb.size() == 0)
+    std::shared_ptr<T> kdb_ptr = T::Create(false);
+    kdb_ptr->load(filename);
+    if(kdb_ptr->size() == 0)
         return lst;
 
-    lst = kdb.grep(pattern, false, true, false, false, '*');
+    lst = kdb_ptr->grep(pattern, false, true, false, false, '*');
     return lst;
 }
 
@@ -1477,9 +1477,9 @@ template<typename T>
 int template_data_compare(const std::string& filename, const std::string& one, const std::string& two, 
     const std::string& three, const std::string& four)
 {
-    T kdb2(false);
-    kdb2.load(filename);
-    if(kdb2.size() == 0)
+    std::shared_ptr<T> kdb2_ptr = T::Create(false);
+    kdb2_ptr->load(filename);
+    if(kdb2_ptr->size() == 0)
         return -1;
 
     int rc = 0;
@@ -1489,7 +1489,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
 
     try
     {
-        int type = (int) kdb2.k_type;
+        int type = (int) kdb2_ptr->k_type;
         KDB& kdb1 = get_global_db(type);
     
         // K_compare() return codes:
@@ -1503,7 +1503,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         {
             name = kdb1.get_name(i);
             c_name = (char*) name.c_str();
-            rc = K_compare(c_name, kdb1, kdb2);
+            rc = K_compare(c_name, kdb1, *kdb2_ptr);
             switch(rc)
             {
             // name neither in global_db nor in file
@@ -1528,7 +1528,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
             }
     
             if(rc > 2) 
-                kdb2.remove(name);
+                kdb2_ptr->remove(name);
         }
     }
     catch (const std::runtime_error& e) 
@@ -1537,9 +1537,9 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         return -1;
     }
 
-    for(int i = 0; i < kdb2.size(); i++)
+    for(int i = 0; i < kdb2_ptr->size(); i++)
     {
-        c_name = (char*) kdb2.get_name(i).c_str();
+        c_name = (char*) kdb2_ptr->get_name(i).c_str();
         SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
     }
 

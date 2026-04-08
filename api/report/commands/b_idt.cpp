@@ -95,12 +95,12 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
     int nb_idts = SCR_tbl_size((unsigned char**) c_idts);
 
-    std::shared_ptr<KDBVariables> kdb_var = nullptr;
+    KDBVariablesPtr kdb_var = nullptr;
     if(c_idts == NULL || nb_idts == 0)
     {
-        kdb_var = KI_exec(*global_ws_idt,
-                          *global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          *global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+        kdb_var = KI_exec(global_ws_idt,
+                          global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }
     else 
@@ -109,10 +109,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
         for(int i = 0; i < nb_idts; i++)
             idts += std::string(c_idts[i]) + ";";
 
-        std::shared_ptr<KDBIdentities> kdb_idt = global_ws_idt->get_subset( idts, false);
-        kdb_var = KI_exec(*kdb_idt,
-                          *global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          *global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
+        KDBIdentitiesPtr kdb_idt = global_ws_idt->get_subset( idts, false);
+        kdb_var = KI_exec(kdb_idt,
+                          global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
+                          global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
                           smpl);
     }
 
@@ -131,10 +131,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     if(!kdb_var) 
         return -1;
     
-    KV_sample(*kdb_var, smpl);
+    KV_sample(kdb_var, smpl);
 
     if(global_ws_var) 
-        KV_merge_del(*global_ws_var, *kdb_var, 1);
+        KV_merge_del(global_ws_var, kdb_var, 1);
     else
         global_ws_var = kdb_var;
 

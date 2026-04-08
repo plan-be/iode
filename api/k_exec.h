@@ -6,5 +6,5 @@
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 
-std::shared_ptr<KDBVariables> KI_exec(KDBIdentities& dbi, KDBVariables& dbv, int nv, char* vfiles[], 
-    KDBScalars& dbs, int ns, char* sfiles[], Sample* in_smpl);
+KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int nv, char* vfiles[], 
+    KDBScalarsPtr dbs_ptr, int ns, char* sfiles[], Sample* in_smpl);

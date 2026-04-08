@@ -369,12 +369,14 @@ int B_ViewTblFile(char* arg, int unused)
             goto err;
         }
 
-        global_ref_var[ref - 1].reset();
-        global_ref_var[ref - 1] = std::make_shared<KDBVariables>(false);
+        if(global_ref_var[ref - 1])
+            global_ref_var[ref - 1]->clear();
+        global_ref_var[ref - 1] = KDBVariables::Create(false);
         success = global_ref_var[ref - 1]->load(std::string((char*) args[1]));
         if(!success) 
         {
-            global_ref_var[ref - 1].reset();
+            global_ref_var[ref - 1]->clear();
+            global_ref_var[ref - 1] = nullptr;
             std::string msg = "Error loading the variables file '";
             msg += std::string((char*) args[1]) + "'";
             kwarning(msg.c_str());
@@ -392,8 +394,12 @@ err:
 // Close a Print tables or Print variables session.
 int B_ViewTblEnd()
 {
-    for(int i = 1; i < 5; i++) 
-        global_ref_var[i].reset();
+    for(int i = 1; i < 5; i++)
+    {
+        if(global_ref_var[i])
+            global_ref_var[i]->clear();
+        global_ref_var[i] = nullptr;
+    }
     
     ODE_VIEW = 0;
     ODE_SMPL[0] = '\0';

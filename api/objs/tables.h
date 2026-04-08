@@ -906,13 +906,35 @@ std::size_t hash_value(const Table& table);
 
 /*----------------------- STRUCTS ----------------------------*/
 
+
 struct KDBTables : public KDBTemplate<KDBTables, Table>
 {
+private:
+    // Constructors are private - use Create() factory method instead
     // global or standalone database
     KDBTables(const bool is_global) : KDBTemplate(TABLES, is_global) {}
 
     // copy constructor
     KDBTables(const KDBTables& other): KDBTemplate(other) {}
+
+public:
+    /**
+     * Factory method to create a managed instance with std::shared_ptr
+     * 
+     * Usage: auto db = KDB[...]::Create(is_global);
+     * 
+     * This ensures the instance is managed by shared_ptr, preventing bad_weak_ptr errors
+     * when using get_subset() or other methods that rely on std::enable_shared_from_this.
+     * 
+     * Note: KDB[...] classes should also use KDB[...]::Create(...) for creation.
+     * 
+     * @param is_global Whether to create a global database (true) or standalone (false)
+     * @return          std::shared_ptr<KDB[...]> pointing to the newly created instance
+     */
+    static std::shared_ptr<KDBTables> Create(const bool is_global)
+    {
+        return std::shared_ptr<KDBTables>(new KDBTables(is_global));
+    }
 
     std::string get_title(const std::string& name) const;
 
@@ -967,19 +989,6 @@ struct KDBTables : public KDBTemplate<KDBTables, Table>
 
     bool print_obj_def(const std::string& name) override;
 
-    void merge_from(const std::string& input_file) override
-    {
-        KDBTables from(false);
-        KDBTemplate::merge_from(from, input_file);
-    }
-
-    bool copy_from_file(const std::string& file, const std::string& objs_names, 
-        std::set<std::string>& v_found)
-    {
-        KDBTables from(false);
-        return KDBTemplate::copy_from_file(from, file, objs_names, v_found);
-    }
-
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
@@ -993,10 +1002,13 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
+
+using KDBTablesPtr = std::shared_ptr<KDBTables>;
+
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::shared_ptr<KDBTables> global_ws_tbl = std::make_shared<KDBTables>(true);
-inline std::array<std::shared_ptr<KDBTables>, 5> global_ref_tbl = { nullptr };
+inline KDBTablesPtr global_ws_tbl = KDBTables::Create(true);
+inline std::array<KDBTablesPtr, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -1014,11 +1026,3 @@ inline std::size_t hash_value(KDBTables const& cpp_kdb)
 
     return seed;
 }
-
-/*----------------------- MACROS ----------------------------*/
-
-#define T_NC(tbl)           (tbl->nb_columns)
-#define T_NL(tbl)           (tbl->lines.size())
-#define T_LANG(tbl)         (tbl->get_language())
-#define T_L(tbl)            (tbl->lines)
-#define T_C(tbl, i, j)      ((tbl->lines[i]).cells[j])

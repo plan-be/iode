@@ -57,15 +57,15 @@ template<typename T>
 static bool load_global_database(std::shared_ptr<T>& global_ptr, 
         const std::string& filepath)
 {
-    T* kdb = new T(true);
-    bool success = kdb->load(filepath);
+    std::shared_ptr<T> global_kdb_ptr = T::Create(true);
+    bool success = global_kdb_ptr->load(filepath);
     if(!success)
     {
-        delete kdb;
+        global_kdb_ptr.reset();
         return false;
     }
 
-    global_ptr.reset(kdb); 
+    global_ptr = global_kdb_ptr; 
     return true;
 }
 
@@ -293,7 +293,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    if(KV_sample(*global_ws_var, new_smpl) < 0)
+    if(KV_sample(global_ws_var, new_smpl) < 0)
     {
         error_manager.append_error("New sample invalid");
         goto err;
@@ -578,7 +578,7 @@ int B_WsExtrapolate(char* arg, int unused)
     }
     SCR_free_tbl((unsigned char**) args);
 
-    rc = KV_extrapolate(*global_ws_var, method, smpl, (char*) pattern.c_str());
+    rc = KV_extrapolate(global_ws_var, method, smpl, (char*) pattern.c_str());
 
 done:
     if(smpl) 
@@ -600,8 +600,8 @@ int B_WsAggr(int method, char* arg)
 {
     int     rc = -1;
     char    *pattern = NULL;
-    std::shared_ptr<KDBVariables> kdb = global_ws_var;
-    std::shared_ptr<KDBVariables> nkdb = NULL;
+    KDBVariablesPtr kdb = global_ws_var;
+    KDBVariablesPtr nkdb = NULL;
 
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);
@@ -614,7 +614,7 @@ int B_WsAggr(int method, char* arg)
     nkdb = KV_aggregate(kdb, method, pattern, args[1]);
     if(nkdb) 
     {
-        KV_merge_del(*kdb, *nkdb, 1);
+        KV_merge_del(kdb, nkdb, 1);
         rc = 0;
     }    
     

@@ -442,6 +442,5 @@ bool KDBEquations::print_obj_def(const std::string& name)
 
 void KDBEquations::update_reference_db()
 {
-    global_ref_eqs[0].reset();
-    global_ref_eqs[0] = this->get_subset("*", false);      
+    global_ref_eqs[0] = this->get_subset("*", false);
 }

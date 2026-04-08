@@ -205,7 +205,7 @@ char *write_separator(char* src, char** tg)
  *  @return     int                 0 on success, -1 on error
  *  
  */
-int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv, const KDBComments& dbc, char* rulefile, 
+int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* rulefile, 
            char* outfile, char* na, char* sep)
 {
     int     i, j, dim, rc;
@@ -218,23 +218,23 @@ int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv,
     if(IMP_readrule(rulefile) < 0) 
         goto err;
 
-    rc = expdef->write_header(dbv, dbc, outfile);
+    rc = expdef->write_header(dbv_ptr, dbc_ptr, outfile);
     if(rc < 0)
         goto err;
 
-    dim = dbv.sample->nb_periods;
-    for(i = 0; i < dbv.size(); i++) 
+    dim = dbv_ptr->sample->nb_periods;
+    for(i = 0; i < dbv_ptr->size(); i++) 
     {
-        strcpy(iname, (char*) dbv.get_name(i).c_str());
+        strcpy(iname, (char*) dbv_ptr->get_name(i).c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
             continue;
 
         expdef->write_object_name(oname, &code);
 
-        expdef->extract_comment(dbc, iname, &cmt) ;
+        expdef->extract_comment(dbc_ptr, iname, &cmt) ;
 
         for(j = 0; j < dim; j++)
-            expdef->get_variable_value(dbv, i, j, &vec);
+            expdef->get_variable_value(dbv_ptr, i, j, &vec);
 
         expdef->write_variable_and_comment(code, cmt, vec);
 
@@ -246,7 +246,7 @@ int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv,
         vec = NULL;
     }
 
-    rc = expdef->close(dbv, dbc, outfile);
+    rc = expdef->close(dbv_ptr, dbc_ptr, outfile);
     if(rc < 0) 
         goto err;
 
@@ -261,7 +261,7 @@ err:
  *  Same as EXP_Ws() but the output is "rotated", i.e each column is a VAR and each line a period.
  *  
  */
-int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& dbv, const KDBComments& dbc, char* rulefile, 
+int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* rulefile, 
                char* outfile, char* na, char* sep)
 {
     int     i, j, nl, nc, rc;
@@ -274,18 +274,18 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& 
     if(IMP_readrule(rulefile) < 0) 
         goto err;
 
-    rc = expdef->write_header(dbv, dbc, outfile);
+    rc = expdef->write_header(dbv_ptr, dbc_ptr, outfile);
     if(rc < 0) 
         goto err;
 
-    nl = dbv.sample->nb_periods;
-    nc = dbv.size();
+    nl = dbv_ptr->sample->nb_periods;
+    nc = dbv_ptr->size();
 
     expdef->write_variable_and_comment(EXP_SEP, 0, 0);
 
     for(i = 0; i < nc; i++) 
     {
-        strcpy(iname, (char*) dbv.get_name(i).c_str());
+        strcpy(iname, (char*) dbv_ptr->get_name(i).c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
             continue;
         expdef->write_object_name(oname, &code);
@@ -298,16 +298,16 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& 
 
     for(j = 0; j < nl; j++) 
     {
-        Period per = dbv.sample->start_period.shift(j);
+        Period per = dbv_ptr->sample->start_period.shift(j);
         sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(oname, 0, 0);
 
         for(i = 0; i < nc; i++) 
         {
-            strcpy(iname, (char*) dbv.get_name(i).c_str());
+            strcpy(iname, (char*) dbv_ptr->get_name(i).c_str());
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
-            expdef->get_variable_value(dbv, i, j, &code);
+            expdef->get_variable_value(dbv_ptr, i, j, &code);
             expdef->write_variable_and_comment(code, 0, 0);
             SW_nfree(code);
             code = NULL;
@@ -315,7 +315,7 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariables& 
         expdef->write_variable_and_comment(0, 0, 0);
     }
 
-    rc = expdef->close(dbv, dbc, outfile); 
+    rc = expdef->close(dbv_ptr, dbc_ptr, outfile); 
     if (rc < 0) 
         goto err;
 
@@ -386,24 +386,24 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     // Get the ExportToFile handler for the requested format
     std::unique_ptr<ExportToFile>& expdef = export_handlers[fmt];
 
-    KDBVariables dbv(false);
+    auto dbv_ptr = KDBVariables::KDBVariables::Create(false);
     if(vfile && vfile[0] != 0) 
     {
-        success = dbv.load(std::string(vfile));
+        success = dbv_ptr->load(std::string(vfile));
         if(!success) 
             return -1;
         if(smpl) 
-            KV_sample(dbv, smpl);
+            KV_sample(dbv_ptr, smpl);
     }
 
-    KDBComments dbc(false);
+    auto dbc_ptr = KDBComments::KDBComments::Create(false);
     if(cfile && cfile[0] != 0)
-        success = dbc.load(std::string(cfile)); 
+        success = dbc_ptr->load(std::string(cfile)); 
     
     if(fmt < 4)
-        rc = EXP_Ws(expdef, dbv, dbc, rule, out, na, sep);
+        rc = EXP_Ws(expdef, dbv_ptr, dbc_ptr, rule, out, na, sep);
     else
-        rc = EXP_Rev_Ws(expdef, dbv, dbc, rule, out, na, sep);
+        rc = EXP_Rev_Ws(expdef, dbv_ptr, dbc_ptr, rule, out, na, sep);
     
     if(rc)
         error_manager.display_last_error(); 

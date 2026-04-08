@@ -752,7 +752,7 @@ U_ch *RPF_ttitle(U_ch** args)
 U_ch *RPF_cvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    std::shared_ptr<KDBComments> kdb = global_ws_cmt;
+    KDBCommentsPtr kdb = global_ws_cmt;
 
     if(!kdb) 
         return res;
@@ -793,7 +793,7 @@ U_ch *RPF_vvalue(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     double  *val;
-    std::shared_ptr<KDBVariables> kdb = global_ws_var;
+    KDBVariablesPtr kdb = global_ws_var;
 
     if(!kdb) 
         return res;
@@ -842,7 +842,7 @@ U_ch *RPF_vvalue(U_ch** args)
 U_ch *RPF_lvalue(U_ch** args)
 {
     U_ch *res = 0, buf[128];
-    std::shared_ptr<KDBLists> kdb = global_ws_lst;
+    KDBListsPtr kdb = global_ws_lst;
 
     if(!kdb) 
         return res;
@@ -885,7 +885,7 @@ U_ch *RPF_lvalue(U_ch** args)
 U_ch *RPF_ivalue(U_ch** args)                
 {
     U_ch    *res = 0, buf[128];
-    std::shared_ptr<KDBIdentities> kdb = global_ws_idt;
+    KDBIdentitiesPtr kdb = global_ws_idt;
 
     if(!kdb) 
         return res;
@@ -930,7 +930,7 @@ U_ch *RPF_ivalue(U_ch** args)
 U_ch *RPF_evalue(U_ch** args)                
 {
     U_ch* res = 0, buf[128];
-    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
+    KDBEquationsPtr kdb = global_ws_eqs;
 
     if(!kdb) 
         return res;
@@ -971,7 +971,7 @@ U_ch *RPF_evalue(U_ch** args)
 U_ch *RPF_eqsample(U_ch** args)            
 {
     U_ch* res = 0;
-    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
+    KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1009,7 +1009,7 @@ U_ch *RPF_eqsample(U_ch** args)
 U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
 {
     U_ch* res = 0;
-    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
+    KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1082,7 +1082,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
 {
     U_ch* eq = 0, *rhs;
     int poscolon;
-    std::shared_ptr<KDBEquations> kdb = global_ws_eqs;
+    KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
     if(!kdb) 
@@ -1168,7 +1168,7 @@ U_ch *RPF_sample(U_ch** args)
 {
     U_ch    *res = 0, buf[128];
     Sample  *smpl;
-    std::shared_ptr<KDBVariables> kdb = global_ws_var;
+    KDBVariablesPtr kdb = global_ws_var;
     char     what = 'F';
 
     smpl = kdb->sample;

@@ -62,7 +62,7 @@ bool Simulation::model_compile(const std::string& list_eqs)
         {
             try
             {
-                std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
+                KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
                 if(tdbe->size() > 0)
                     rc = KE_compile(*tdbe);
             }
@@ -126,7 +126,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     {
         try
         {
-            std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
+            KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
             if(tdbe->size() > 0)
             {
                 std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
@@ -200,7 +200,7 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     char* c_post = to_char_array(post_name);
 
     int rc = -1;
-    std::shared_ptr<KDBEquations> tdbe = nullptr;
+    KDBEquationsPtr tdbe = nullptr;
     if(list_eqs.empty())
     {
         tdbe = global_ws_eqs;
@@ -310,7 +310,7 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
     int rc = -1;
     try
     {
-        std::shared_ptr<KDBEquations> tdbe = global_ws_eqs->get_subset(list_eqs, false);
+        KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
         if(tdbe->size() > 0)
             rc = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, 
                              c_pre, c_inter, c_post);

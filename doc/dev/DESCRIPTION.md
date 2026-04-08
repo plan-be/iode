@@ -304,11 +304,11 @@ Functions acting on workspaces of variables.
 |`int KV_sample(KDB* kdb, Sample *nsmpl)`|Changes the Sample of a KDB of variables.|
 |`int KV_merge(KDB* kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
-|`int KV_add(std::shared_ptr<KDBVariables> kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
+|`int KV_add(KDBVariablesPtr kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
 |`double KV_get(KDB* kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB* kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB* dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|
-|`KDB *KV_aggregate(std::shared_ptr<KDBVariables>dbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
+|`KDB *KV_aggregate(KDBVariablesPtrdbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
 |`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 
 ## Group "Object management" {#T24}
@@ -510,11 +510,11 @@ Implemention of the LEC library virtual functions for Scalar and VAR references.
 
 |Syntax|Description|
 |:---|:---|
-|`double *L_getvar(std::shared_ptr<KDBVariables> kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
-|`double L_getscl(std::shared_ptr<KDBScalars> kdb, int pos)`|Retrieves a scalar value.|
+|`double *L_getvar(KDBVariablesPtr kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
+|`double L_getscl(KDBScalarsPtr kdb, int pos)`|Retrieves a scalar value.|
 |`Sample *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
-|`int L_findscl(std::shared_ptr<KDBScalars> kdb, char *name)`|Retrieves a scalar position.|
-|`int L_findvar(std::shared_ptr<KDBVariables> kdb, char* name)`|Retrieves a variable position.|
+|`int L_findscl(KDBScalarsPtr kdb, char *name)`|Retrieves a scalar position.|
+|`int L_findvar(KDBVariablesPtr kdb, char* name)`|Retrieves a variable position.|
 
 ## Group "Basic functions" {#T54}
 

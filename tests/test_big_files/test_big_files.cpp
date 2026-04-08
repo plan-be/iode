@@ -14,8 +14,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
     int all_nb_names = 0;
     char fullfilename[256];
     char out_filename[256];
-    std::shared_ptr<KDBVariables> kdb_var = nullptr;
-    std::shared_ptr<KDBVariables> kdb_shallow_copy = nullptr;
+    KDBVariablesPtr kdb_var = nullptr;
+    KDBVariablesPtr kdb_shallow_copy = nullptr;
     std::chrono::duration<double> elapsed;
 
     kpause_continue = 1;
@@ -56,7 +56,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ==== Load all variables from big.var in GLOBAL and STANDALONE modes ====
 
         // ---- GLOBAL ----
-        kdb_var = std::make_shared<KDBVariables>(true);
+        kdb_var = KDBVariables::Create(true);
         auto start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -77,7 +77,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var.reset();
 
         // ---- STANDALONE ----
-        kdb_var = std::make_shared<KDBVariables>(false);
+        kdb_var = KDBVariables::Create(false);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -95,7 +95,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         // ==== Load list of variables from big.var in GLOBAL and STANDALONE modes ====
 
         // ---- GLOBAL ----
-        kdb_var = std::make_shared<KDBVariables>(true);
+        kdb_var = KDBVariables::Create(true);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
@@ -111,7 +111,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var.reset();
 
         // ---- STANDALONE ----
-        kdb_var = std::make_shared<KDBVariables>(false);
+        kdb_var = KDBVariables::Create(false);
         start = std::chrono::high_resolution_clock::now();
         kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);

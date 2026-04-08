@@ -67,9 +67,9 @@ protected:
     int       E_FROM;         // Position in E_DBV of the first period in the estimation sample
     int       E_MAXIT;        // Max number of iterations for the estimation
     int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
-    std::shared_ptr<KDBEquations>  E_DBE;    // KDB of equations used for the estimation
-    std::shared_ptr<KDBScalars>    E_DBS;    // KDB of scalars used for the estimation
-    std::shared_ptr<KDBVariables>  E_DBV;    // KDB of variables used for the estimation 
+    KDBEquationsPtr  E_DBE;    // KDB of equations used for the estimation
+    KDBScalarsPtr    E_DBS;    // KDB of scalars used for the estimation
+    KDBVariablesPtr  E_DBV;    // KDB of variables used for the estimation 
     Sample    *E_SMPL;        // Current estimation sample
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
@@ -151,8 +151,8 @@ public:
      *  @param [in] int     maxit           max number of iterations
      *  @param [in] double  eps             convergence threshold
      */
-    Estimation(char* endos, std::shared_ptr<KDBEquations> dbe = nullptr, std::shared_ptr<KDBVariables> dbv = nullptr, 
-               std::shared_ptr<KDBScalars> dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
+    Estimation(char* endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
+               KDBScalarsPtr dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         est_endos = NULL;
@@ -179,8 +179,8 @@ public:
         smpl = nullptr;
     }
 
-    Estimation(char** endos, std::shared_ptr<KDBEquations> dbe = nullptr, std::shared_ptr<KDBVariables> dbv = nullptr, 
-               std::shared_ptr<KDBScalars> dbs = nullptr, Sample* smpl = NULL, int method = -1, 
+    Estimation(char** endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
+               KDBScalarsPtr dbs = nullptr, Sample* smpl = NULL, int method = -1, 
                int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         est_endos = NULL;
@@ -277,7 +277,7 @@ public:
     }
 
 private:
-    void initialize(char** endos, std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, 
+    void initialize(char** endos, KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         Sample* smpl, int method, int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)

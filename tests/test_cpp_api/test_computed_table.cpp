@@ -18,7 +18,7 @@ protected:
         std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
         ref_file = input_test_dir + "ref2.av";
         global_ws_var->load(input_test_dir + "fun.av");
-        std::shared_ptr<KDBVariables> kdb_ref = global_ws_var->get_subset(pattern, true);
+        KDBVariablesPtr kdb_ref = global_ws_var->get_subset(pattern, true);
         
         double value;
         for(int t=0; t < kdb_ref->get_nb_periods(); t++)
@@ -876,7 +876,7 @@ TEST_F(ComputedTableTest, PrintToFile)
 
     // ---- binary table files ----
 
-    std::shared_ptr<KDBTables> bin_kdb_tables = std::make_shared<KDBTables>(false);
+    KDBTablesPtr bin_kdb_tables = KDBTables::Create(false);
     bin_kdb_tables->load(input_test_dir + "fun.tbl");
     
     std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);

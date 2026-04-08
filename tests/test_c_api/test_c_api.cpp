@@ -168,8 +168,8 @@ public:
 	    std::string lst;
 	    static int  done = 0;
 
-        std::shared_ptr<KDBLists>     kdb_lst = global_ws_lst;
-        std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
+        KDBListsPtr     kdb_lst = global_ws_lst;
+        KDBVariablesPtr kdb_var = global_ws_var;
 	
 	    // Create or update lists
         if(kdb_lst->contains("LST1"))
@@ -188,7 +188,7 @@ public:
 
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
-	    KV_sample(*kdb_var, smpl);
+	    KV_sample(kdb_var, smpl);
 	    EXPECT_TRUE(kdb_var->sample != nullptr);
 	
 	    // Creates or update new vars
@@ -787,7 +787,7 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
 
     // Test KV_sample()
     std::string asmpl1 = global_ws_var->sample->to_string();
-    KV_sample(*global_ws_var, NULL);
+    KV_sample(global_ws_var, NULL);
     std::string asmpl2 = global_ws_var->sample->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
@@ -1052,7 +1052,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
 
-    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(false);
+    KDBVariablesPtr kdb_var = KDBVariables::Create(false);
     bool success = kdb_var->load(std::string(in_filename));
     EXPECT_TRUE(success);
     EXPECT_EQ(kdb_var->size(), 394);
@@ -1061,7 +1061,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 
     // load (binary files)
     // load all objects
-    kdb_var = std::make_shared<KDBVariables>(true);
+    kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1077,7 +1077,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
         v_objs.push_back(std::string(objs[i]));
     SCR_free_tbl((unsigned char**) objs);
 
-    kdb_var = std::make_shared<KDBVariables>(true);
+    kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
     EXPECT_NE(kdb_var->sample, nullptr);
@@ -1090,9 +1090,9 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 
 TEST_F(LegacyAPITest, Tests_Simulation)
 {
-    std::shared_ptr<KDBVariables> kdbv;
-    std::shared_ptr<KDBEquations> kdbe;
-    std::shared_ptr<KDBScalars>   kdbs;
+    KDBVariablesPtr kdb_var;
+    KDBEquationsPtr kdbe;
+    KDBScalarsPtr   kdbs;
     Sample* smpl;
     char*   filename = "fun";
     U_ch**  endo_exo;
@@ -1106,8 +1106,8 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var;
-    EXPECT_NE(kdbv, nullptr);
+    kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var, nullptr);
     kdbs = global_ws_scl;
     EXPECT_NE(kdbs, nullptr);
     kdbe = global_ws_eqs;
@@ -1134,7 +1134,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Test simulation : divergence
     CSimulation::KSIM_MAXIT = 2;
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL);
+    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, NULL);
     EXPECT_NE(rc, 0);
 
     // Check _PRE list after simulation (prolog)
@@ -1151,7 +1151,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Test with with convergence (increase MAXIT)
     CSimulation::KSIM_MAXIT = 100;
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, NULL);
+    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, NULL);
     EXPECT_EQ(rc, 0);
 
     // Test Endo-exo
@@ -1164,7 +1164,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
 
     // Simulate with exchange UY - XNATY
     endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
-    rc = simu.simulate(kdbe, kdbv, kdbs, smpl, (char**) endo_exo);
+    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, (char**) endo_exo);
 
     // Check result
     EXPECT_EQ(rc, 0);
@@ -1184,8 +1184,6 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     char    **varlist;
     Sample  *smpl;
     int     rc;
-    std::shared_ptr<KDBTables>    kdbt;
-    std::shared_ptr<KDBVariables> kdbv; 
 
     U_test_suppress_a2m_msgs();
 
@@ -1193,15 +1191,11 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
-    kdbv = global_ws_var;
-    global_ref_var[0] = std::make_shared<KDBVariables>(*kdbv);
-    EXPECT_NE(kdbv, nullptr);
+    EXPECT_NE(global_ws_var.get(), nullptr);
 
     // Load the Table workspace
     U_test_load(TABLES, "fun.at");
-    kdbt = global_ws_tbl;
-    global_ref_tbl[0] = std::make_shared<KDBTables>(*kdbt);
-    EXPECT_NE(kdbt, nullptr);
+    EXPECT_NE(global_ws_tbl.get(), nullptr);
 
     // Load a second VAR workspace in global_ref_var[2]
     sprintf(fullfilename, "%s%s", input_test_dir, "fun.av");
@@ -1562,13 +1556,13 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     U_test_print_title("Tests B_DATA");
 
-    std::shared_ptr<KDBComments> kdb_cmt = global_ws_cmt;
-    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
-    std::shared_ptr<KDBIdentities> kdb_idt = global_ws_idt;
-    std::shared_ptr<KDBLists> kdb_lst = global_ws_lst;
-    std::shared_ptr<KDBScalars> kdb_scl = global_ws_scl;
-    std::shared_ptr<KDBTables> kdb_tbl = global_ws_tbl;
-    std::shared_ptr<KDBVariables> kdb_var = global_ws_var;
+    KDBCommentsPtr kdb_cmt = global_ws_cmt;
+    KDBEquationsPtr kdb_eqs = global_ws_eqs;
+    KDBIdentitiesPtr kdb_idt = global_ws_idt;
+    KDBListsPtr kdb_lst = global_ws_lst;
+    KDBScalarsPtr kdb_scl = global_ws_scl;
+    KDBTablesPtr kdb_tbl = global_ws_tbl;
+    KDBVariablesPtr kdb_var = global_ws_var;
 
     // Clear WS, then loads 3 WS and check ok
     //K_end_ws(0);
@@ -1773,7 +1767,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
 
-    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
+    KDBEquationsPtr kdb_eqs = global_ws_eqs;
     std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
     eq_ptr->reset_tests();
     EXPECT_DOUBLE_EQ(eq_ptr->get_test_r2(), 0.0);
@@ -2074,7 +2068,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     rc = IMP_RuleImport(VARIABLES, trace, NULL, outfile, reffile, "2000Y1", "2010Y1", IMPORT_ASCII, 0);
     EXPECT_EQ(rc, 0);
 
-    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(true);
+    KDBVariablesPtr kdb_var = KDBVariables::Create(true);
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var = kdb_var;
@@ -2089,7 +2083,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
 
     if(rc == 0) 
     {
-        std::shared_ptr<KDBComments> kdb_cmt = std::make_shared<KDBComments>(true);
+        KDBCommentsPtr kdb_cmt = KDBComments::Create(true);
         success = kdb_cmt->load(std::string(outfile));
         EXPECT_TRUE(success);
         global_ws_cmt = kdb_cmt;
@@ -2121,7 +2115,7 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     rc = B_FileImportVar(cmd);
     EXPECT_EQ(rc, 0);
 
-    std::shared_ptr<KDBVariables> kdb_var = std::make_shared<KDBVariables>(true);
+    KDBVariablesPtr kdb_var = KDBVariables::Create(true);
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var = kdb_var;
@@ -2145,7 +2139,7 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2010Q1", "2020Q4");
-    KV_sample(*global_ws_var, smpl);
+    KV_sample(global_ws_var, smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun.av", input_test_dir);
@@ -2207,7 +2201,7 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2000Y1", "2020Y1");
-    KV_sample(*global_ws_var, smpl);
+    KV_sample(global_ws_var, smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun_q.var", input_test_dir);
@@ -2257,11 +2251,11 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    std::shared_ptr<KDBVariables> kdbv = global_ws_var;
-    EXPECT_NE(kdbv.get(), nullptr);
-    std::shared_ptr<KDBScalars> kdbs = global_ws_scl;
+    KDBVariablesPtr kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
+    KDBScalarsPtr kdbs = global_ws_scl;
     EXPECT_NE(kdbs.get(), nullptr);
-    std::shared_ptr<KDBEquations> kdbe = global_ws_eqs;
+    KDBEquationsPtr kdbe = global_ws_eqs;
     EXPECT_NE(kdbe.get(), nullptr);
 
     // B_ModelSimulateParms()
@@ -2292,8 +2286,8 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var;
-    EXPECT_NE(kdbv.get(), nullptr);
+    kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
     kdbs = global_ws_scl;
     EXPECT_NE(kdbs.get(), nullptr);
     kdbe = global_ws_eqs;
@@ -2338,8 +2332,8 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     U_test_load_fun_esv(filename);
 
     // Check
-    kdbv = global_ws_var;
-    EXPECT_NE(kdbv.get(), nullptr);
+    kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
     kdbs = global_ws_scl;
     EXPECT_NE(kdbs.get(), nullptr);
     kdbe = global_ws_eqs;
@@ -2987,7 +2981,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
     out_filepath = str_output_test_dir + "fun2.ae";
     _unlink((char*) out_filepath.c_str());
-    std::shared_ptr<KDBEquations> kdb_eqs = global_ws_eqs;
+    KDBEquationsPtr kdb_eqs = global_ws_eqs;
     rc = B_WsSave((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     B_WsClear("", EQUATIONS);
@@ -3945,72 +3939,72 @@ TEST_F(LegacyAPITest, Tests_RAS_EXECUTE)
     B_WsClear("Var", VARIABLES);
     B_WsSample("2000Y1 2001Y1");
 
-    KV_add(*global_ws_var, "R1C1");
+    KV_add(global_ws_var, "R1C1");
     global_ws_var->get_var_ptr("R1C1")[0] = 5.0;
-    KV_add(*global_ws_var, "R1C2");
+    KV_add(global_ws_var, "R1C2");
     global_ws_var->get_var_ptr("R1C2")[0] = 3.0;
-    KV_add(*global_ws_var, "R1C3");
+    KV_add(global_ws_var, "R1C3");
     global_ws_var->get_var_ptr("R1C3")[0] = 5.0;
-    KV_add(*global_ws_var, "R1C4");
+    KV_add(global_ws_var, "R1C4");
     global_ws_var->get_var_ptr("R1C4")[0] = 7.0;
     global_ws_var->get_var_ptr("R1C4", 1)[0] = 5.0;
-    KV_add(*global_ws_var, "R1CT");
+    KV_add(global_ws_var, "R1CT");
     global_ws_var->get_var_ptr("R1CT")[0] = 20.0;
     global_ws_var->get_var_ptr("R1CT", 1)[0] = 20.0;
 
-    KV_add(*global_ws_var, "R2C1");
+    KV_add(global_ws_var, "R2C1");
     global_ws_var->get_var_ptr("R2C1")[0] = 1.0;
-    KV_add(*global_ws_var, "R2C2");
+    KV_add(global_ws_var, "R2C2");
     global_ws_var->get_var_ptr("R2C2")[0] = 1.0;
     global_ws_var->get_var_ptr("R2C2", 1)[0] = 2.0;
-    KV_add(*global_ws_var, "R2C3");
+    KV_add(global_ws_var, "R2C3");
     global_ws_var->get_var_ptr("R2C3")[0] = 4.0;
-    KV_add(*global_ws_var, "R2C4");
+    KV_add(global_ws_var, "R2C4");
     global_ws_var->get_var_ptr("R2C4")[0] = 4.0;
-    KV_add(*global_ws_var, "R2CT");
+    KV_add(global_ws_var, "R2CT");
     global_ws_var->get_var_ptr("R2CT")[0] = 10.0;
     global_ws_var->get_var_ptr("R2CT", 1)[0] = 10.0;
 
-    KV_add(*global_ws_var, "R3C1");
+    KV_add(global_ws_var, "R3C1");
     global_ws_var->get_var_ptr("R3C1")[0] = 3.0;
-    KV_add(*global_ws_var, "R3C2");
+    KV_add(global_ws_var, "R3C2");
     global_ws_var->get_var_ptr("R3C2")[0] = 1.0;
-    KV_add(*global_ws_var, "R3C3");
+    KV_add(global_ws_var, "R3C3");
     global_ws_var->get_var_ptr("R3C3")[0] = 3.0;
     global_ws_var->get_var_ptr("R3C3", 1)[0] = 2.0;
-    KV_add(*global_ws_var, "R3C4");
+    KV_add(global_ws_var, "R3C4");
     global_ws_var->get_var_ptr("R3C4")[0] = 3.0;
-    KV_add(*global_ws_var, "R3CT");
+    KV_add(global_ws_var, "R3CT");
     global_ws_var->get_var_ptr("R3CT")[0] = 10.0;
     global_ws_var->get_var_ptr("R3CT", 1)[0] = 10.0;
 
-    KV_add(*global_ws_var, "R4C1");
+    KV_add(global_ws_var, "R4C1");
     global_ws_var->get_var_ptr("R4C1")[0] = 1.0;
     global_ws_var->get_var_ptr("R4C1", 1)[0] = 0.0;
-    KV_add(*global_ws_var, "R4C2");
+    KV_add(global_ws_var, "R4C2");
     global_ws_var->get_var_ptr("R4C2")[0] = 2.0;
-    KV_add(*global_ws_var, "R4C3");
+    KV_add(global_ws_var, "R4C3");
     global_ws_var->get_var_ptr("R4C3")[0] = 1.0;
-    KV_add(*global_ws_var, "R4C4");
+    KV_add(global_ws_var, "R4C4");
     global_ws_var->get_var_ptr("R4C4")[0] = 1.0;
-    KV_add(*global_ws_var, "R4CT");
+    KV_add(global_ws_var, "R4CT");
     global_ws_var->get_var_ptr("R4CT")[0] = 5.0;
     global_ws_var->get_var_ptr("R4CT", 1)[0] = 5.0;
 
-    KV_add(*global_ws_var, "RTC1");
+    KV_add(global_ws_var, "RTC1");
     global_ws_var->get_var_ptr("RTC1")[0] = 10.0;
     global_ws_var->get_var_ptr("RTC1", 1)[0] = 10.0;
-    KV_add(*global_ws_var, "RTC2");
+    KV_add(global_ws_var, "RTC2");
     global_ws_var->get_var_ptr("RTC2")[0] = 7.0;
     global_ws_var->get_var_ptr("RTC2", 1)[0] = 7.0;
-    KV_add(*global_ws_var, "RTC3");
+    KV_add(global_ws_var, "RTC3");
     global_ws_var->get_var_ptr("RTC3")[0] = 13.0;
     global_ws_var->get_var_ptr("RTC3", 1)[0] = 13.0;
-    KV_add(*global_ws_var, "RTC4");
+    KV_add(global_ws_var, "RTC4");
     global_ws_var->get_var_ptr("RTC4")[0] = 15.0;
     global_ws_var->get_var_ptr("RTC4", 1)[0] = 15.0;
 
-    KV_add(*global_ws_var, "RTCT");
+    KV_add(global_ws_var, "RTCT");
     global_ws_var->get_var_ptr("RTCT")[0] = 90.0;
     global_ws_var->get_var_ptr("RTCT", 1)[0] = 90.0;
 

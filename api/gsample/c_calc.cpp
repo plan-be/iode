@@ -74,7 +74,7 @@ static CLEC *COL_cp_clec(CLEC* clec)
  */
 static int COL_link(int i, CLEC* clec)
 {
-    std::shared_ptr<KDBVariables> kdbv = (std::shared_ptr<KDBVariables>) global_ref_var[i - 1];
+    KDBVariablesPtr kdbv = (KDBVariablesPtr) global_ref_var[i - 1];
     if(!kdbv) 
     {
         kmsg("File [%d] not present", i);
@@ -106,7 +106,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
 {
     int     i, j, t[2], tmp, per;
     double  vy[2], vf[2], div, mant, sign;
-    std::shared_ptr<KDBVariables> kdb = nullptr;
+    KDBVariablesPtr kdb = nullptr;
 
     /* deux fichiers */
     for(i = 0; i < 2; i++) 
@@ -121,7 +121,7 @@ static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
         if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
             return -1;
         
-        kdb = (std::shared_ptr<KDBVariables>) global_ref_var[cl->cl_fnb[i] - 1];
+        kdb = (KDBVariablesPtr) global_ref_var[cl->cl_fnb[i] - 1];
 
         for(j = 0 ; j < 2 ; j++) 
         {
@@ -320,7 +320,7 @@ void COL_clear(COLS* cls)
  
 int COL_exec(Table* tbl, int i, COLS* cls)
 {
-    int lg = cls->cl_nb / T_NC(tbl);
+    int lg = cls->cl_nb / tbl->nb_columns;
 
     COL*    cl;
     TableLine&  line = tbl->lines[i];
@@ -329,7 +329,7 @@ int COL_exec(Table* tbl, int i, COLS* cls)
     TableCell*  cell = nullptr;
     TableCell*  dcell = nullptr;
     
-    for(int d = 0; d < T_NC(tbl); d++) 
+    for(int d = 0; d < tbl->nb_columns; d++) 
     {
         cell = &line.cells[d];
 
@@ -349,7 +349,7 @@ int COL_exec(Table* tbl, int i, COLS* cls)
 
         for(int j = 0; j < lg; j++) 
         {
-            cl = cls->cl_cols + d + (j * T_NC(tbl));
+            cl = cls->cl_cols + d + (j * tbl->nb_columns);
             if(COL_calc(cl, aclec, adclec) < 0) 
                 return -1;
             debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 

@@ -689,9 +689,8 @@ int get_file_type_from_file(const std::string& filepath, int iode_type)
     return file_type;
 }
 
-
 /**
- *  Generalization of load() : interprets the content of a file, ascii files included, 
+ *  Interprets the content of a file, ascii files included, 
  *  and tries to load its content into a KDB.
  *
  *  If the file is an ascii file (.ac, .ae... or .csv), the corresponding function 

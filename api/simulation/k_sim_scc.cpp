@@ -31,7 +31,7 @@
  *  @return     int             0 if ok, -1 if dbe is empty    
  *  
  */
-int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char* pre, char* inter, char* post)
+int CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)
 {
     int opasses = KSIM_PASSES;
     int osort = KSIM_SORT;
@@ -49,7 +49,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
 
     // to build the PRE, INTER and POST lists in build_lists_order() via KSIM_NAME
     std::shared_ptr<Variable> var_ptr;
-    KSIM_DBV = std::make_shared<KDBVariables>(false);
+    KSIM_DBV = KDBVariables::Create(false);
     for(const std::string& var_name : dbe->get_names())
         KSIM_DBV->k_objs[var_name] = var_ptr;
 
@@ -75,7 +75,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
         eq_ptr = dbe->get_obj_ptr(eq_name); 
-        L_link_endos(*dbe, eq_ptr->clec);
+        L_link_endos(dbe, eq_ptr->clec);
     }
 
     /* ORDERING EQUATIONS */
@@ -105,7 +105,7 @@ int CSimulation::calculate_SCC(std::shared_ptr<KDBEquations> dbe, int tris, char
  *                                                              the simulation does not succeed
  *  
  */
-int CSimulation::simulate_SCC_init(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl)
+int CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl)
 {
     int     i, t, at, rc = 0;
 
@@ -196,7 +196,7 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-int CSimulation::simulate_SCC(std::shared_ptr<KDBEquations> dbe, std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, Sample* smpl, char** pre, char** inter, char** post)
+int CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** pre, char** inter, char** post)
 {
     int     i, t, j, rc = -1;
 

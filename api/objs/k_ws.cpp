@@ -110,19 +110,18 @@ int K_load_RWS(int ref, char *filename)
     
     if(filename == NULL) 
     {
-        global_ref_var[ref - 1].reset();
+        global_ref_var[ref - 1] = nullptr;
         std::string msg = "Filepath for the Variables 'reference file' number " + 
                           std::to_string(ref) + " is empty";
         kwarning(msg.c_str());
         return 0;
     }
 
-    global_ref_var[ref - 1].reset();
-    global_ref_var[ref - 1] = std::make_shared<KDBVariables>(false);
+    global_ref_var[ref - 1] = KDBVariables::Create(false);
     bool success = global_ref_var[ref - 1]->load(std::string(filename));
     if(!success)
     {
-        global_ref_var[ref - 1].reset();
+        global_ref_var[ref - 1] = nullptr;
         std::string msg = "Error loading the variables file '";
         msg += std::string(filename) + "' required to compute the table";
         kwarning(msg.c_str());

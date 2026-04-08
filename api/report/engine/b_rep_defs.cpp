@@ -41,7 +41,7 @@ int RP_macro_createdb()
     if(RP_MACRO) 
         return 0;
 
-    RP_MACRO = new KDBMacros(true);
+    RP_MACRO = KDBMacros::Create(true);
     if(!RP_MACRO) 
     {
         error_manager.append_error("Report : Memory Full");
@@ -62,8 +62,7 @@ int RP_macro_deletedb()
     if(!RP_MACRO) 
         return 0;
     
-    delete RP_MACRO;
-    RP_MACRO = nullptr;
+    RP_MACRO.reset();
     return 0;
 }
 

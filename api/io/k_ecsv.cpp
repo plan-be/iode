@@ -23,10 +23,10 @@
  *      int close(KDB* dbv, KDB* dbc)                     Saves the footer and closes the CSV export files.
  *      char *write_object_name(char* name, char** code)                             Variable name translation for CSV output.
  *      char *extract_comment(KDB* dbc, char* name, char**cmt)                      Creates the CMT text + separator for CSV output. 
- *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
+ *      char *get_variable_value(KDBVariablesPtr dbv, int nb, int t, char** vec)                 Adds one element of a VAR (KDB[nb][t]) to the export vector in CSV format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)       Saves one VAR in the csv export file.
  *      int write_header(KDB* dbv, KDB* dbc, char*outfile)       Opens and initialise a rotated CSV export file.
- *      char *get_variable_value(std::shared_ptr<KDBVariables> dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
+ *      char *get_variable_value(KDBVariablesPtr dbv, int nb, int t, char** vec)                Adds one element of a VAR (KDB[nb][t]) to the export vector in rotated CSV format.
  *      int write_variable_and_comment(char* code, char* cmt, char* vec)      Saves one VAR in the rotated csv export file.
  *  
  */
@@ -47,7 +47,7 @@
  *  @param [in] char*   outfile     output filename
  *  @return     int                 0 on success, -1 if outfile cannot be created  
  */
-int ExportObjsCSV::write_header(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsCSV::write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     int dim, i;
 
@@ -60,11 +60,11 @@ int ExportObjsCSV::write_header(const KDBVariables& dbv, const KDBComments& dbc,
     }
 
     file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
-    dim = dbv.sample->nb_periods;
+    dim = dbv_ptr->sample->nb_periods;
     std::string str_period;
     for(i = 0; i < dim; i++) 
     {
-        Period period = dbv.sample->start_period.shift(i);
+        Period period = dbv_ptr->sample->start_period.shift(i);
         str_period = period.to_string();
         file_descriptor << str_period << EXP_SEP;
     }
@@ -79,7 +79,7 @@ int ExportObjsCSV::write_header(const KDBVariables& dbv, const KDBComments& dbc,
  *  @param [in] KDB*    dbc         CMT KDB
  *  @return     int                 0 always
  */
-int ExportObjsCSV::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsCSV::close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     // No footer needed for CSV output
     file_descriptor.close();
@@ -105,13 +105,13 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  *  @param [out] char**  code    allocated string with the comment + sep
  *  @return      char*           pointer to *code
  */
-char* ExportObjsCSV::extract_comment(const KDBComments& dbc, char* name, char**cmt)
+char* ExportObjsCSV::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char**cmt)
 {
-    if(!dbc.contains(name)) 
+    if(!dbc_ptr->contains(name)) 
         return write_separator("", cmt);
     else
     {
-        std::shared_ptr<Comment> cmt_ptr = dbc.get_obj_ptr(name);
+        std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
         Comment cmt_utf8 = *cmt_ptr;
         Comment cmt_oem = utf8_to_oem(cmt_utf8);
         U_ch* c_cmt = (unsigned char*) cmt_oem.c_str();
@@ -129,13 +129,13 @@ char* ExportObjsCSV::extract_comment(const KDBComments& dbc, char* name, char**c
  *  @param [in, out] char** vec     (re-)allocated vector of the VAR values in CSV format
  *  @return          char*          *vec
  */
-char* ExportObjsCSV::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
+char* ExportObjsCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
 {
     int     lg, olg;
     char    tmp[81], *buf = NULL;
 
-    std::string name = dbv.get_name(nb);
-    double value = dbv.get_var(name, t);
+    std::string name = dbv_ptr->get_name(nb);
+    double value = dbv_ptr->get_var(name, t);
     write_value(tmp, value);
     write_separator(tmp, &buf);
     lg = (int) strlen(buf) + 1;
@@ -171,7 +171,7 @@ int ExportObjsCSV::write_variable_and_comment(char* code, char* cmt, char* vec)
 
 // Same functions as for normal CSV export. See above for details.
 
-int ExportObjsRevertCSV::write_header(const KDBVariables& dbv, const KDBComments& dbc, char*outfile)
+int ExportObjsRevertCSV::write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char*outfile)
 {
     file_descriptor.open(outfile);
     if((file_descriptor.rdstate() & std::ofstream::failbit ) != 0) 
@@ -188,13 +188,13 @@ char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
     return(write_separator(name, code));
 }
 
-char* ExportObjsRevertCSV::get_variable_value(const KDBVariables& dbv, int nb, int t, char** vec)
+char* ExportObjsRevertCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
 {
     char  tmp[81]; 
     char* buf = NULL;
 
-    std::string name = dbv.get_name(nb);
-    double value = dbv.get_var(name, t);
+    std::string name = dbv_ptr->get_name(nb);
+    double value = dbv_ptr->get_var(name, t);
     write_value(tmp, value);
     write_separator(tmp, &buf);
     if(vec) 
@@ -213,7 +213,7 @@ int ExportObjsRevertCSV::write_variable_and_comment(char* code, char* cmt, char*
     return 0;
 }
 
-int ExportObjsRevertCSV::close(const KDBVariables& dbv, const KDBComments& dbc, char* outfile)
+int ExportObjsRevertCSV::close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
     // No footer needed for CSV output
     file_descriptor.close();

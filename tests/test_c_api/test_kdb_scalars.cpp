@@ -18,9 +18,9 @@ protected:
 
 TEST_F(KDBScalarsTest, Load)
 {
-    KDBScalars kdb(false);
-    kdb.load(str_input_test_dir + prefix_filename + "fun.scl");
-    EXPECT_EQ(kdb.size(), 161);
+    auto kdb_ptr = KDBScalars::KDBScalars::Create(false);
+    kdb_ptr->load(str_input_test_dir + prefix_filename + "fun.scl");
+    EXPECT_EQ(kdb_ptr->size(), 161);
 }
 
 TEST_F(KDBScalarsTest, Subset)
@@ -38,7 +38,7 @@ TEST_F(KDBScalarsTest, Subset)
     std::set<std::string> names = global_ws_scl->filter_names(pattern);
 
     // DEEP COPY SUBSET
-    std::shared_ptr<KDBScalars> kdb_subset_deep_copy = global_ws_scl->get_subset(pattern, true);
+    KDBScalarsPtr kdb_subset_deep_copy = global_ws_scl->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("acaf1", new_scalar);
@@ -46,7 +46,7 @@ TEST_F(KDBScalarsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->get("acaf1"), new_scalar);
 
     // SHALLOW COPY SUBSET
-    std::shared_ptr<KDBScalars> kdb_subset_shallow_copy = global_ws_scl->get_subset(pattern, false);
+    KDBScalarsPtr kdb_subset_shallow_copy = global_ws_scl->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("acaf1", new_scalar);
@@ -117,7 +117,7 @@ TEST_F(KDBScalarsTest, Filter)
 {
     std::string pattern = "a*;*_";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBScalars> kdb_subset;
+    KDBScalarsPtr kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_scl->size(); p++) 
@@ -200,7 +200,7 @@ TEST_F(KDBScalarsTest, DeepCopy)
 {
     std::string pattern = "a*;*_";
     std::set<std::string> expected_names;
-    std::shared_ptr<KDBScalars> kdb_subset;
+    KDBScalarsPtr kdb_subset;
 
     std::set<std::string> all_names;
     for (int p = 0; p < global_ws_scl->size(); p++) 
@@ -300,9 +300,9 @@ TEST_F(KDBScalarsTest, Merge)
     std::string pattern = "a*";
 
     // create deep copies kdb
-    std::shared_ptr<KDBScalars> kdb0 = global_ws_scl->get_subset(pattern, true);
-    std::shared_ptr<KDBScalars> kdb1 = global_ws_scl->get_subset(pattern, true);
-    std::shared_ptr<KDBScalars> kdb_to_merge = global_ws_scl->get_subset(pattern, true);
+    KDBScalarsPtr kdb0 = global_ws_scl->get_subset(pattern, true);
+    KDBScalarsPtr kdb1 = global_ws_scl->get_subset(pattern, true);
+    KDBScalarsPtr kdb_to_merge = global_ws_scl->get_subset(pattern, true);
 
     // add an element to the KDB to be merged
     std::string new_name = "new_scalar";
@@ -322,7 +322,7 @@ TEST_F(KDBScalarsTest, Merge)
     kdb_to_merge->update(name, modified_scalar);
 
     // merge (overwrite)
-    kdb0->merge(*kdb_to_merge, true, false);
+    kdb0->merge(kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
     EXPECT_EQ(kdb0->get(new_name), new_scalar);
@@ -330,7 +330,7 @@ TEST_F(KDBScalarsTest, Merge)
     EXPECT_EQ(kdb0->get(name), modified_scalar); 
 
     // merge (NOT overwrite)
-    kdb1->merge(*kdb_to_merge, false, false);
+    kdb1->merge(kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
     EXPECT_EQ(kdb1->get(name), unmodified_scalar);
 }

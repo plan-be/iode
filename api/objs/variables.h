@@ -115,7 +115,8 @@ private:
         }
     }
 
-public:
+private:
+    // Constructors are private - use Create() factory method instead
     // global or standalone database
     KDBVariables(const bool is_global) : KDBTemplate(VARIABLES, is_global) {}
 
@@ -126,6 +127,25 @@ public:
             this->sample = new Sample(*(other.sample));
         else
             this->sample = nullptr;
+    }
+
+public:
+    /**
+     * Factory method to create a managed instance with std::shared_ptr
+     * 
+     * Usage: auto db = KDB[...]::Create(is_global);
+     * 
+     * This ensures the instance is managed by shared_ptr, preventing bad_weak_ptr errors
+     * when using get_subset() or other methods that rely on std::enable_shared_from_this.
+     * 
+     * Note: KDB[...] classes should also use KDB[...]::Create(...) for creation.
+     * 
+     * @param is_global Whether to create a global database (true) or standalone (false)
+     * @return          std::shared_ptr<KDB[...]> pointing to the newly created instance
+     */
+    static std::shared_ptr<KDBVariables> Create(const bool is_global)
+    {
+        return std::shared_ptr<KDBVariables>(new KDBVariables(is_global));
     }
 
     ~KDBVariables() 
@@ -146,7 +166,7 @@ public:
 
     int preload(FILE *fd, const std::string& filepath, const int vers) override;
 
-    std::shared_ptr<KDBVariables> initialize_subset(const KDBVariables* true_parent) override
+    std::shared_ptr<KDBVariables> initialize_subset(const std::shared_ptr<KDBVariables> true_parent) override
     {
         std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::initialize_subset(true_parent);
         if(true_parent->sample)
@@ -326,10 +346,13 @@ private:
 };
 
 /*----------------------- GLOBALS ----------------------------*/
+
+using KDBVariablesPtr = std::shared_ptr<KDBVariables>;
+
 // shared_ptr -> automatic memory management
 //            -> no need to delete KDB workspaces manually
-inline std::shared_ptr<KDBVariables> global_ws_var = std::make_shared<KDBVariables>(true);
-inline std::array<std::shared_ptr<KDBVariables>, 5> global_ref_var = { nullptr };
+inline KDBVariablesPtr global_ws_var = KDBVariables::Create(true);
+inline std::array<KDBVariablesPtr, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
@@ -368,12 +391,12 @@ inline bool var_to_binary(char** pack, const Variable& var)
 // TODO : make functions below methods of KDBVariables
 
 /* k_wsvar.c */
-int KV_sample(KDBVariables& kdb, Sample* new_sample);
-int KV_merge(KDBVariables& kdb1, KDBVariables& kdb2, int replace);
-void KV_merge_del(KDBVariables& kdb1, KDBVariables& kdb2, int replace);
-int KV_add(KDBVariables& kdb, char* varname);
-double KV_get(const KDBVariables& kdb, const std::string& name, int t, int mode);
-void KV_set(KDBVariables& kdb, const std::string& name, int t, int mode, double value);
-int KV_extrapolate(KDBVariables& dbv, int method, Sample* smpl, char* pattern);
-std::shared_ptr<KDBVariables> KV_aggregate(std::shared_ptr<KDBVariables> dbv, int method, char* pattern, char* filename);
+int KV_sample(KDBVariablesPtr kdb, Sample* new_sample);
+int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
+void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
+int KV_add(KDBVariablesPtr kdb, char* varname);
+double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mode);
+void KV_set(KDBVariablesPtr kdb, const std::string& name, int t, int mode, double value);
+int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample* smpl, char* pattern);
+KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char* pattern, char* filename);
 void KV_init_values_1(double* val, int t, int method);

@@ -60,7 +60,7 @@ cdef class Comments(CythonIodeDatabase):
 
     def merge(self, other: Comments, overwrite: bool=True):        
         cdef shared_ptr[KDBComments] other_database = other.database_ptr
-        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
+        self.database.merge(other_database, <bint>overwrite, <bint>False)
 
     @classmethod
     def convert_file(cls, args: str) -> int:

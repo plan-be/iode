@@ -178,7 +178,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
                     (int) tbl->get_text_alignment(), tbl->chart_box, 50 * tbl->chart_shadow);
 
     std::string content;
-    for(i = 0; i < T_NL(tbl) && w >= 0; i++) 
+    for(i = 0; i < tbl->lines.size() && w >= 0; i++) 
     {
         line = &tbl->lines[i];
         cells = line->cells.data();
@@ -486,7 +486,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, Sample* smpl, int dt, int nt, std::shared_ptr<KDBVariables> kdb, 
+           double ymin, double ymax, Sample* smpl, int dt, int nt, KDBVariablesPtr kdb, 
            char* names, int mode)
 {
     char    *buf, **vars;
@@ -527,7 +527,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         }
 
         for(t = 0; t < nt; t++) 
-            y[t] = (double ) KV_get(*kdb, var_name, dt + t, mode);
+            y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
 
         T_GraphLegend(0, "LSBL"[type], vars[i], NULL);
         T_GraphTimeData(smpl, y);
@@ -552,7 +552,7 @@ fin:
  */
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, Sample* smpl, std::shared_ptr<KDBVariables> kdb, char** names, int mode)
+    double ymin, double ymax, Sample* smpl, KDBVariablesPtr kdb, char** names, int mode)
 {
     int i, ng;
 
@@ -952,11 +952,11 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     for(i = 1; i < smpl.nb_periods; i++) 
         x[i] = x[i - 1] + step;
     y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
-    hdl = APIChartAlloc((int) T_NL(tbl));
+    hdl = APIChartAlloc((int) tbl->lines.size());
     w = 1;
 
     std::string content;
-    for(i = 0; i < T_NL(tbl) && w > 0; i++) 
+    for(i = 0; i < tbl->lines.size() && w > 0; i++) 
     {
         line = &tbl->lines[i];
         switch(line->get_type()) 

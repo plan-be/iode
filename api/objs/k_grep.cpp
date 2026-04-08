@@ -89,12 +89,12 @@ std::vector<std::string> KDB::grep(const std::string& pattern, const bool ecase,
 template<typename T>
 std::string template_expand(const std::string& filename, const std::string& pattern, const char all)
 {
-    T kdb(false);
-    bool success = kdb.load(filename);
+    std::shared_ptr<T> kdb_ptr = T::Create(false);
+    bool success = kdb_ptr->load(filename);
     if(!success) 
         return "";
     
-    std::string lst = kdb.expand(pattern, all);
+    std::string lst = kdb_ptr->expand(pattern, all);
     return lst;
 }
 

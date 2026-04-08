@@ -390,8 +390,8 @@ static void K_xdrTable(unsigned char* pack, int mode)
 
     /* Table:0 */
     tbl = P_get_ptr(pack, 0);
-    nc = T_NC(tbl);
-    nl = T_NL(tbl);
+    nc = tbl->nb_columns;
+    nl = tbl->lines.size();
     if(mode == 0) { /* intel read */
         K_xdrSHORT(&nc);
         K_xdrSHORT(&nl);

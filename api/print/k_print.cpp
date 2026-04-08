@@ -263,7 +263,7 @@ int T_print_line(Table* tbl, int i, COLS* cls)
 
     for(int j = 0; j < cls->cl_nb; j++) 
     {
-        d = j % T_NC(tbl);
+        d = j % tbl->nb_columns;
         if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
             continue;
         if(line.cells.size() > d)
@@ -303,7 +303,7 @@ char **T_find_files(COLS* cls)
         files[cl->cl_fnb[1]] = 1;
     }
 
-    std::shared_ptr<KDBVariables> kdb;
+    KDBVariablesPtr kdb;
     for(i = 1; i < K_MAX_FREF + 1; i++) 
     {
         if(files[i] == 0) 
@@ -444,7 +444,7 @@ std::string T_get_title(Table* tbl)
 {   
     // get the first line of type TABLE_LINE_TITLE
     int k = 0;
-    for(k = 0; k < T_NL(tbl); k++)
+    for(k = 0; k < tbl->lines.size(); k++)
         if(tbl->lines[k].get_type() == TABLE_LINE_TITLE) 
             break;
 
@@ -452,7 +452,7 @@ std::string T_get_title(Table* tbl)
     TableCell cell = line.cells[0];
     std::string title = cell.get_content(false);
 
-    if(k == T_NL(tbl) || title.empty())
+    if(k == tbl->lines.size() || title.empty())
         title = "No title";
 
     return title;
@@ -491,7 +491,7 @@ int T_print_tbl(Table* tbl, char* smpl)
     
     TableLine* line;
     TableCell* cell;
-    for(i = 0; rc == 0 && i < T_NL(tbl); i++) 
+    for(i = 0; rc == 0 && i < tbl->lines.size(); i++) 
     {
         line = &tbl->lines[i];
         switch(line->get_type()) 

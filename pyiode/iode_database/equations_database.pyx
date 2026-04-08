@@ -103,8 +103,8 @@ cdef class Equations(CythonIodeDatabase):
         self.database.copy_from(input_files.encode(), names.encode())
 
     def merge(self, other: Equations, overwrite: bool=True):        
-        cdef KDBEquations* other_database = other.database
-        self.database.merge(dereference(other_database), <bint>overwrite, <bint>False)
+        cdef shared_ptr[KDBEquations] other_database = other.database_ptr
+        self.database.merge(other_database, <bint>overwrite, <bint>False)
 
     # Information detail to print (for equations)
     #    0: equation only 

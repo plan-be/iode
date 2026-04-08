@@ -9,8 +9,8 @@
  *   
  *  Main functions
  * 
- *      int L_link(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
- *      void L_link_endos(const KDBEquations& dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
+ *      int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
+ *      void L_link_endos(const KDBEquationsPtr dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -30,7 +30,7 @@
  * @param [in, out] cl      CLEC*   Compiled LEC
  * @return                  int     0 on success,  L_NOT_FOUND_ERR on error
 */
-static int L_link_names(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* cl)
+static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
 {
     int     i;
 
@@ -65,7 +65,7 @@ static int L_link_names(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBSc
  * 
  * TODO: not implemented for MTFN's ???
 */
-static void L_link_sample_expr(std::shared_ptr<KDBVariables> dbv, char* expr, short lg)
+static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
 {
     int     j, keyw;
     short   len, s;
@@ -136,7 +136,7 @@ static void L_link_sample_expr(std::shared_ptr<KDBVariables> dbv, char* expr, sh
  * @param [in]      dbv     KDB*    KDB of variables
  * @param [in, out] cl      CLEC*   Compiled LEC
  */
-static void L_link_sample(std::shared_ptr<KDBVariables> dbv, CLEC* cl)
+static void L_link_sample(KDBVariablesPtr dbv, CLEC* cl)
 {
     int     pos;
 
@@ -158,7 +158,7 @@ static void L_link_sample(std::shared_ptr<KDBVariables> dbv, CLEC* cl)
  * @param [in, out] cl   CLEC*       CLEC expression whose content must be linked to dbv and dbs
  * @return               int         0 on success, L_errno on error
 */
-int L_link(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, CLEC* cl)
+int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
 {
     if(!cl) 
         return 0;
@@ -180,14 +180,14 @@ int L_link(std::shared_ptr<KDBVariables> dbv, std::shared_ptr<KDBScalars> dbs, C
  * @param [in, out] cl      CLEC*    Compiled lec
  *
  */
-static void L_link1_endos(const KDBEquations& dbe, CLEC* cl)
+static void L_link1_endos(const KDBEquationsPtr dbe, CLEC* cl)
 {
     for(int i = 0; i < cl->nb_names; i++) 
     {
         if (is_coefficient(cl->lnames[i].name))
             cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
-            cl->lnames[i].pos = dbe.index_of(cl->lnames[i].name);
+            cl->lnames[i].pos = dbe->index_of(cl->lnames[i].name);
 
         if (cl->lnames[i].pos < 0)  // Not found => exogenous var
             cl->lnames[i].pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
@@ -207,7 +207,7 @@ static void L_link1_endos(const KDBEquations& dbe, CLEC* cl)
  * 
  * @author JMP 16/3/2012
  */
-void L_link_endos(const KDBEquations& dbe, CLEC *cl)
+void L_link_endos(const KDBEquationsPtr dbe, CLEC *cl)
 {
     if (cl == NULL) 
         return;
