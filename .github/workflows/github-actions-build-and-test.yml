@@ -77,11 +77,11 @@ jobs:
         with:
           os-env: ${{ env.os }}
           build-config: ${{ inputs.build-config }}
-      - name: Install Python 3.12
+      - name: Install Python 3.14
         if: runner.os == 'Windows'
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12' 
+          python-version: '3.14' 
       # required to run the Python script tests/generate_big_vars_ws.py
       # called the test functions Tests_BIG_WS
       - name: Install Python packages numpy, pandas, matplotlib and iode
