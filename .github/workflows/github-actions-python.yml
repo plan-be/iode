@@ -119,27 +119,37 @@ jobs:
             run: | 
               cmake --version
               cmake --preset ${{ env.os }}-${{ inputs.build-config }}
-          - name: Build target iode_cython before pip wheel to make sure it compiles
+          - name: Build target iode_cython
             shell: bash -el {0}
             run: | 
               cython --version
               mypy --version
               cmake --build --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cython
-          - name: Build iode wheel file
+          # - name: Build iode wheel file
+          #   shell: bash -el {0}
+          #   run: |
+          #     cd pyiode 
+          #     cython --version
+          #     mypy --version
+          #     pip wheel --verbose .
+          # - name: Install iode package
+          #   shell: bash -el {0}
+          #   run: | 
+          #     cd pyiode
+          #     filename=$(ls iode*.whl) 
+          #     echo $filename 
+          #     pip install $filename
+          - name: Test iode Python API
+            if: runner.os == 'Windows'
             shell: bash -el {0}
             run: |
               cd pyiode 
-              cython --version
-              mypy --version
-              pip wheel --verbose .
-          - name: Install iode package
-            shell: bash -el {0}
-            run: | 
-              cd pyiode
-              filename=$(ls iode*.whl) 
-              echo $filename 
-              pip install $filename
+              pytest
           # requires Python + numpy, pandas and iode packages installed
+          - name: Install stable version of iode package from PyPI
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
+            shell: bash -el {0}
+            run: pip install iode
           - name: Generate big.var and big.av test files
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell:  bash -el {0}
@@ -150,9 +160,3 @@ jobs:
             with:
               os-env: ${{ env.os }}
               build-config: ${{ inputs.build-config }}
-          - name: Test iode Python
-            if: runner.os == 'Windows'
-            shell: bash -el {0}
-            run: |
-              cd pyiode 
-              pytest
