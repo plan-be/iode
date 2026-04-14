@@ -21,6 +21,8 @@ except ImportError:
     qtconsole_available = False
 
 from iode import IodeType, comments, equations, identities, lists, scalars, tables, variables
+
+import sys
 from typing import List, Union, Dict, Any, Optional
 from pathlib import Path
 
@@ -897,9 +899,20 @@ class MainWindow(AbstractMainWindow):
 
     @Slot()
     def about(self):
+        from qtpy import __version__ as qtpy_version
+        from qtpy import API_NAME
+        from qtpy import QT_VERSION
+        import numpy as np
+        import pandas as pd
+        import matplotlib
+        import qtconsole
+        import IPython
+
         msg = f"""
 <style>
-* {{text-align: center;}}
+h1, h2, h3 {{text-align: center}}
+p {{text-align: center}}
+ul {{text-align: left; margin-left: auto; margin-right: auto; display: inline-block}}
 </style>
 
 <h1>Welcome to IODE</h1>
@@ -908,21 +921,37 @@ class MainWindow(AbstractMainWindow):
 
 <h3>Developed by the {ORGANIZATION_NAME}</h3>
 <p>
+
+<h3>Authors</h3>
+<p>
 <ul> 
-    <li>Geert Bryon &nbsp;&nbsp;&nbsp;&nbsp;  
+    <li>Geert Bryon  
     <li>Jean-Marc Paul
     <li>Alix Damman 
-    <li>Yannick Van den Abbeel &nbsp;&nbsp;&nbsp;   
+    <li>Yannick Van den Abbeel   
 </ul>
 </p>
 
-<h3>Tools</h3>         
+<h3>Python Libraries</h3>
+<p>
+<ul>
+    <li>Python {sys.version.split()[0]}
+    <li>qtpy: {qtpy_version} ({API_NAME} {QT_VERSION})
+    <li>numpy: {np.__version__}
+    <li>pandas: {pd.__version__}
+    <li>matplotlib: {matplotlib.__version__}
+    <li>qtconsole: {qtconsole.__version__}
+    <li>IPython: {IPython.__version__}
+</ul>
+</p>
+
+<h3>C/C++ Tools</h3>         
 <p>SCR/AL1(c) 1986-2020, JM.B.Paul</p>
 
 <h3>Website</h3>       
 <p><a href='{URL_HOMEPAGE.toString()}'>{URL_HOMEPAGE.toString()}</a></p>
 """
-        QMessageBox.about(self, "About IODE", msg)
+        QMessageBox.information(self, "About IODE", msg)
  
     @Slot()
     def open_release_notes(self):

@@ -3,10 +3,36 @@ import sys
 import inspect
 import traceback
 
+# test required dependencies before importing the main_window module
 try:
     import qtpy
 except ImportError:
     raise ImportError("qtpy is not installed. Please install qtpy to run the IODE GUI")
+
+try:
+    import numpy as np
+except ImportError:
+    raise ImportError("numpy is not installed. Please install numpy to run the IODE GUI")
+
+try:
+    import pandas as pd
+except ImportError:
+    raise ImportError("pandas is not installed. Please install pandas to run the IODE GUI")
+
+try:
+    import matplotlib
+except ImportError:
+    raise ImportError("matplotlib is not installed. Please install matplotlib to run the IODE GUI")
+
+try:
+    import qtconsole
+except ImportError:
+    raise ImportError("qtconsole is not installed. Please install qtconsole to run the IODE GUI")
+
+try:
+    import IPython
+except ImportError:
+    raise ImportError("ipython is not installed. Please install ipython to run the IODE GUI")
 
 from qtpy.QtWidgets import QMessageBox
 
