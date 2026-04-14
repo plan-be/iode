@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.utils import NAN_REP
 from iode_gui.settings import MixinSettingsDialog
@@ -14,6 +15,7 @@ class UnitRootDialog(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_UnitRootDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.precision = precision
 
     def compute_tstat(self, scalar: Scalar) -> str:

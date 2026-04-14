@@ -1,6 +1,6 @@
 from qtpy.QtCore import Slot, QSettings
 from qtpy.QtWidgets import QWidget, QMessageBox, QDialog
-from qtpy.QtGui import QCloseEvent, QTextDocument
+from qtpy.QtGui import QCloseEvent, QTextDocument, QIcon
 from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.utils import TMP_FILENAME
@@ -23,6 +23,7 @@ class MenuPrintVariables(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuPrintVariables()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.ui.textEdit_variable_names.setup_completer(iode_types=IodeType.VARIABLES)

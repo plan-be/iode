@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>COMPILE MODEL</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" rowspan="3" colspan="2">
     <widget class="QFrame" name="frame">

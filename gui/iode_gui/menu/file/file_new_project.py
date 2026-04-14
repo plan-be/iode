@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot, QSettings, QDir
 from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
@@ -15,6 +16,7 @@ class MenuFileNewProject(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuFileNewProject()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
         
         self.ui.fileChooser_new_project.enum_file_type = IodeFileType.DIRECTORY

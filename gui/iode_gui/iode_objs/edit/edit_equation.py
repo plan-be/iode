@@ -1,6 +1,6 @@
 from qtpy.QtCore import Qt, Signal, Slot
 from qtpy.QtWidgets import QPlainTextEdit, QMessageBox, QDialog
-from qtpy.QtGui import QShortcut, QKeySequence
+from qtpy.QtGui import QShortcut, QKeySequence, QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -28,6 +28,7 @@ class EditEquationDialog(MixinSettingsDialog):
 
         self.ui = Ui_EditEquationDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         self.database = database
         self.main_window = main_window

@@ -1,6 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QMessageBox
-from qtpy.QtGui import QCloseEvent
+from qtpy.QtGui import QCloseEvent, QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
@@ -18,6 +18,7 @@ class MenuDataEditTables(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuDataEditTables()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.ui.textEdit_table_names.setup_completer(iode_types=IodeType.TABLES) 

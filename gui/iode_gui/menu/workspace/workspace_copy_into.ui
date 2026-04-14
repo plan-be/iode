@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>COPY OBJECTS INTO WORKSPACE</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
@@ -185,7 +181,7 @@
   <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header location="global">iode_gui/util/widgets/file_chooser.h</header>
+   <header>iode_gui/util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

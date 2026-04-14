@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
@@ -14,6 +15,7 @@ class MenuFileImportComments(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuFileImportComments()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.v_import_formats = list(ImportFormats)

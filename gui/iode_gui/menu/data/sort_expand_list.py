@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
@@ -14,6 +15,7 @@ class MenuDataSortExpandList(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuDataSortExpandList()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.ui.lineEdit_sort.setup_completer(iode_types=IodeType.LISTS)
