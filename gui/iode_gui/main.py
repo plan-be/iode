@@ -1,6 +1,7 @@
 import os
 import sys
 import inspect
+import traceback
 
 try:
     import qtpy
@@ -28,6 +29,30 @@ from iode_gui.super import gui_assign_super
 
 _iode_databases_names = {'comments', 'equations', 'identities', 'lists', 
                          'scalars', 'tables', 'variables'}
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    """
+    Global exception handler that displays errors in a QMessageBox.
+    
+    This handler is called for any uncaught exception in the GUI.
+    It displays the error message and full traceback in a critical QMessageBox.
+    """
+    if issubclass(exc_type, KeyboardInterrupt):
+        # Allow KeyboardInterrupt to be handled normally
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    
+    # Format the exception traceback
+    error_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    
+    # Display the error in a QMessageBox
+    QMessageBox.critical(
+        None,
+        f"{exc_type.__name__}",
+        f"An error occurred:\n\n{error_message}",
+        QMessageBox.StandardButton.Ok
+    )
 
 
 def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Union[str, Path]]=None, 
@@ -67,6 +92,9 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         app.setOrganizationName(ORGANIZATION_NAME)
         app.setApplicationName("IODE")
         app.setStyle('Fusion')
+    
+    # Install the global exception handler
+    sys.excepthook = handle_exception
 
     pixmap = QPixmap("images:iode_splash_screen.png")
     splash = QSplashScreen(pixmap)
@@ -105,7 +133,15 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
     gui_assign_super(main_window)
     main_window.show()
     splash.finish(main_window)
-    exit_code = app.exec()
+    
+    try:
+        exit_code = app.exec()
+    except Exception as e:
+        # Catch any exception that occurs in the event loop
+        error_message = traceback.format_exc()
+        QMessageBox.critical(None, f"{type(e).__name__}", 
+                            f"An error occurred:\n\n{error_message}")
+        exit_code = 1
 
     # NOTE: pull modified or reassigned variables from the IPython kernel back to 
     #       the caller frame
