@@ -80,7 +80,7 @@ class BaseDelegate(QStyledItemDelegate):
         :return: True if the event was handled, False otherwise.
         """
         if event.type() == QEvent.Type.KeyPress:
-            keyEvent = QKeyEvent(event)
+            keyEvent = event  # Already a QKeyEvent, just cast it
             if keyEvent.key() == Qt.Key.Key_Enter or keyEvent.key() == Qt.Key.Key_Return:
                 # commit changes and close editor
                 if keyEvent.modifiers() == Qt.KeyboardModifier.NoModifier:
