@@ -145,6 +145,7 @@ class PlotDialog(QDialog):
         self.canvas.draw()
 
     @Slot()
+    @Slot(bool)
     def update_scale(self, draw: bool=True):
         ax = self.figure.gca()
         index_graph_type = self.graph_type_combo.currentIndex()
@@ -160,6 +161,7 @@ class PlotDialog(QDialog):
             self.canvas.draw()
 
     @Slot()
+    @Slot(bool)
     def update_grid(self, draw: bool=True):
         ax = self.figure.gca()
         index_grid = self.grid_combo.currentIndex()
@@ -176,6 +178,7 @@ class PlotDialog(QDialog):
             self.canvas.draw()
 
     @Slot()
+    @Slot(bool)
     def update_y_limits(self, draw: bool=True):
         ax = self.figure.gca()
         y_min = self.y_min_input.text()

@@ -33,7 +33,7 @@ class EditTableView(QTableView):
         self.setItemDelegate(EditTableDelegate())
         model.display_data.connect(self.update_row)
 
-    @Slot()
+    @Slot(int, int, int)
     def update_row(self, row: int, line_type: int, nb_columns: int):
         if line_type != TableLineType.CELL:
             self.setSpan(row, 0, 1, nb_columns)

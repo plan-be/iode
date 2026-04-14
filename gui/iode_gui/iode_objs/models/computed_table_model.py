@@ -32,7 +32,7 @@ class ComputedTableModel(QAbstractTableModel, IodeNumericalTableModel):
         if self.table_name in tables:
             del tables[self.table_name]
 
-    @Slot()
+    @Slot(int)
     def update_nb_decimals(self, nb_decimals: int):
         self.computed_table.nb_decimals = nb_decimals
         self.update_display_values()
