@@ -124,10 +124,14 @@ class MainWindow(AbstractMainWindow):
             self._setup_ipython_console()
 
             # ---- restore geometry and state ----
-            self.restoreGeometry(self.user_settings.value("geometry"))
-            self.restoreState(self.user_settings.value("windowState"))
-            self.ui.dockWidget_file_explorer.restoreGeometry(self.user_settings.value("dockWidget_file_explorer_geometry"))
-            self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
+            if self.user_settings.contains("geometry"):
+                self.restoreGeometry(self.user_settings.value("geometry"))
+            if self.user_settings.contains("windowState"):
+                self.restoreState(self.user_settings.value("windowState"))
+            if self.user_settings.contains("dockWidget_file_explorer_geometry"):
+                self.ui.dockWidget_file_explorer.restoreGeometry(self.user_settings.value("dockWidget_file_explorer_geometry"))
+            if self.user_settings.contains("dockWidget_tools_geometry"):
+                self.ui.dockWidget_tools.restoreGeometry(self.user_settings.value("dockWidget_tools_geometry"))
 
             # ---- open file(s) passed as files_to_load argument ----
             if files_to_load is None:
