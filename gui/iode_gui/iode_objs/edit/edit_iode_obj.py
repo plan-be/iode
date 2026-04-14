@@ -1,6 +1,6 @@
 from qtpy.QtCore import Qt, Signal, Slot
 from qtpy.QtWidgets import QDialog, QPlainTextEdit, QMessageBox
-from qtpy.QtGui import QDesktopServices, QShortcut, QKeySequence
+from qtpy.QtGui import QDesktopServices, QShortcut, QKeySequence, QIcon
 
 
 from iode_gui.utils import URL_MANUAL
@@ -77,6 +77,7 @@ class EditCommentDialog(AbstractEditObjDialog):
         super().__init__(name, database, comments, parent)
         self.ui = Ui_EditObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         self.ui.lineEdit_name.setText(name)
         self.ui.lineEdit_name.setReadOnly(True)
@@ -97,6 +98,7 @@ class EditIdentityDialog(AbstractEditObjDialog):
         super().__init__(name, database, identities, parent)
         self.ui = Ui_EditObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         self.ui.lineEdit_name.setText(name)
         self.ui.lineEdit_name.setReadOnly(True)
@@ -119,6 +121,7 @@ class EditListDialog(AbstractEditObjDialog):
         super().__init__(name, database, lists, parent)
         self.ui = Ui_EditObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         self.ui.lineEdit_name.setText(name)
         self.ui.lineEdit_name.setReadOnly(True)

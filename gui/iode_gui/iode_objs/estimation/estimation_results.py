@@ -2,7 +2,7 @@ from qtpy.QtCore import Qt, Signal, Slot, QAbstractTableModel
 from qtpy.QtWidgets import QDialog, QMessageBox, QHeaderView
 from qtpy.QtGui import (QKeySequence, QShortcut, QTextCursor, QTextCharFormat, 
                            QFont, QTextTableFormat, QTextFrameFormat, QTextDocument, 
-                           QDesktopServices)
+                           QDesktopServices, QIcon)
 from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -28,6 +28,7 @@ class EstimationResultsDialog(QDialog):
 
         self.ui = Ui_EstimationResultsDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         # Set up the header view style
         self.stylesheet_header = "QHeaderView::section { background-color: lightGray font: bold border: 0.5px solid }"

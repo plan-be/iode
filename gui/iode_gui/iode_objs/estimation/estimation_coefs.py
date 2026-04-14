@@ -1,6 +1,6 @@
 from qtpy.QtCore import Qt, Signal, Slot
 from qtpy.QtWidgets import QDialog
-from qtpy.QtGui import QKeySequence, QShortcut
+from qtpy.QtGui import QKeySequence, QShortcut, QIcon
 
 from iode_gui.color_theme import ColorTheme
 from iode_gui.settings import get_color_theme
@@ -27,6 +27,7 @@ class EstimationCoefsDialog(QDialog):
         super().__init__(parent)
         self.ui = Ui_EstimationCoefsDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         # Set up the table view
         self.update_colors()

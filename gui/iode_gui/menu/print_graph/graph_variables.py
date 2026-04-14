@@ -1,6 +1,6 @@
 from qtpy.QtCore import Slot, Signal, QLocale
 from qtpy.QtWidgets import QWidget, QMessageBox, QDialog
-from qtpy.QtGui import QDoubleValidator
+from qtpy.QtGui import QDoubleValidator, QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.text_edit.completer import IodeCompleter
@@ -23,6 +23,7 @@ class MenuGraphVariables(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuGraphVariables()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
  
         self.ui.textEdit_variables.setup_completer(iode_types=IodeType.VARIABLES)

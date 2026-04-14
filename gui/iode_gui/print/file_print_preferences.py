@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from .ui_file_print_preferences import Ui_FilePrintPreferences
@@ -14,6 +15,7 @@ class FilePrintPreferences(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_FilePrintPreferences()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.ui.comboBox_font_family.addItems(IODE_FONTS)

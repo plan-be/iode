@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>LOW TO HIGH</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>

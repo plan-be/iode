@@ -1,6 +1,7 @@
 from qtpy.QtCore import Qt, Slot, QSettings
 from qtpy.QtWidgets import QWidget, QApplication, QColorDialog, QMessageBox
-from qtpy.QtGui import QStyleHints, QColor
+from qtpy.QtGui import QStyleHints, QColor, QIcon
+
 from qtpy import __version__ as pyside_version
 v_major, v_minor, v_patch = map(int, pyside_version.split('.'))
 pyside6_68_or_higher = (v_major, v_minor) >= (6, 8)
@@ -29,6 +30,7 @@ class MenuFileSettings(MixinSettingsDialog):
         # Initialize UI components
         self.ui = Ui_MenuFileSettings()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         document = self.ui.plainTextEdit_report_example.document()

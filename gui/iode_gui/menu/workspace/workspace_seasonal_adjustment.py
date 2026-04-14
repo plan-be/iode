@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QMessageBox
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
@@ -14,6 +15,7 @@ class MenuWorkspaceSeasonalAdjustment(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuWorkspaceSeasonalAdjustment()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
 
         self.ui.fileChooser_input_file.enum_file_type = IodeFileType.FILE_VARIABLES

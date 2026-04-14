@@ -1,6 +1,6 @@
 from qtpy.QtCore import Slot, QLocale
 from qtpy.QtWidgets import QWidget, QMessageBox
-from qtpy.QtGui import QDoubleValidator
+from qtpy.QtGui import QDoubleValidator, QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -16,6 +16,7 @@ class MenuComputeSCCSimulation(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_MenuComputeSCCSimulation()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)  
 
         self.v_simulation_initialization = list(SimulationInitialization)

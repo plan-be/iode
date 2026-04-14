@@ -1,6 +1,6 @@
 from qtpy.QtCore import Qt, Signal, Slot, QModelIndex
 from qtpy.QtWidgets import QDialog, QMessageBox
-from qtpy.QtGui import QShortcut, QKeySequence
+from qtpy.QtGui import QShortcut, QKeySequence, QIcon
 
 from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
@@ -26,6 +26,7 @@ class EditTableDialog(AbstractEditObjDialog):
         super().__init__(name, database, tables, parent)
         self.ui = Ui_EditTableDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.settings_group = "EDIT_TABLE"
 
         try:

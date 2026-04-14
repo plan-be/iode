@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>EXPORT  FILE  BY  RULE (VARIABLES)</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <widget class="QFrame" name="frame_top">
    <property name="geometry">
     <rect>

@@ -1,6 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QDialog, QMessageBox
-from qtpy.QtGui import QDesktopServices
+from qtpy.QtGui import QDesktopServices, QIcon
 
 from .ui_edit_vars_sample import Ui_EditIodeSampleDialog
 from iode_gui.utils import URL_MANUAL
@@ -13,6 +13,7 @@ class EditIodeSampleDialog(QDialog):
         super().__init__(parent)
         self.ui = Ui_EditIodeSampleDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         sample = variables.sample
         if sample.nb_periods:

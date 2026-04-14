@@ -1,5 +1,6 @@
 from qtpy.QtWidgets import QMessageBox
 from qtpy.QtCore import Slot
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from .ui_dyn_adjustment import Ui_DynAdjustmentDialog
@@ -15,6 +16,7 @@ class DynAdjustmentDialog(MixinSettingsDialog):
 
         self.ui = Ui_DynAdjustmentDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
         self.ui.textEdit_equation.setText(lec)
         self.v_adjustment_methods = list(AdjustmentMethod)

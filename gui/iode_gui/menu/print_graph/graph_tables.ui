@@ -28,10 +28,6 @@
   <property name="windowTitle">
    <string>DISPLAY AND PRINT GRAPHICS</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label_table_names">
@@ -280,7 +276,7 @@
   <customwidget>
    <class>IodeFileChooser</class>
    <extends>QWidget</extends>
-   <header location="global">iode_gui/util/widgets/file_chooser.h</header>
+   <header>iode_gui/util/widgets/file_chooser.h</header>
    <container>1</container>
    <slots>
     <slot>updateFileType(QString)</slot>

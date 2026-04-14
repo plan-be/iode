@@ -28,10 +28,6 @@
   <property name="windowTitle">
    <string>EXECUTE IDENTITIES</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>icons/Iodenew.ico</normaloff>icons/Iodenew.ico</iconset>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label_execute">

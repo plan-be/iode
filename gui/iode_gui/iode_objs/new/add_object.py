@@ -1,6 +1,6 @@
 from qtpy.QtCore import Signal, Slot, QLocale
 from qtpy.QtWidgets import QDialog, QMessageBox
-from qtpy.QtGui import QDesktopServices, QDoubleValidator
+from qtpy.QtGui import QDesktopServices, QDoubleValidator, QIcon
 
 from iode_gui.text_edit.completer import IodeCompleter
 from .ui_add_object import Ui_AddObjectDialog
@@ -59,6 +59,7 @@ class AddCommentDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.COMMENTS
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
     @Slot()
     def add(self):
@@ -73,6 +74,7 @@ class AddIdentityDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.IDENTITIES
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
     @Slot()
     def add(self):
@@ -87,6 +89,7 @@ class AddListDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.LISTS
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
     @Slot()
     def add(self):
@@ -101,6 +104,8 @@ class AddScalarDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.SCALARS
         self.ui = Ui_AddScalarDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
+
         validator = QDoubleValidator(parent)
         # set the locale for the validator to ensure dot as decimal separator
         validator.setLocale(QLocale("C"))
@@ -120,6 +125,8 @@ class AddTableDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.TABLES
         self.ui = Ui_AddTableDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
+        
         self.ui.textEdit_lec.setup_completer(iode_types=[IodeType.SCALARS, IodeType.VARIABLES])
 
     @Slot()
@@ -142,6 +149,7 @@ class AddVariableDialog(AbstractAddDialog):
         assert database.iode_type == IodeType.VARIABLES
         self.ui = Ui_AddObjectDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
 
     @Slot()
     def add(self):

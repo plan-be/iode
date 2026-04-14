@@ -1,5 +1,6 @@
 from qtpy.QtCore import Slot
 from qtpy.QtWidgets import QWidget, QGridLayout, QLayoutItem
+from qtpy.QtGui import QIcon
 
 from iode_gui.settings import MixinSettingsDialog
 from iode_gui.util.widgets.file_chooser import EnumFileMode
@@ -19,7 +20,9 @@ class PrintFileDialog(MixinSettingsDialog):
         super().__init__(parent)
         self.ui = Ui_PrintFileDialog()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("icons:iode_icon.png"))
         self.prepare_settings(self.ui)
+        
         if iode_type is not None:
             self.menu_class_name += f"_{iode_type.name.upper()}"
 
