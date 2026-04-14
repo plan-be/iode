@@ -23,6 +23,8 @@ Fixed Bugs
 - PYTHON : fixed reading IODE equations, identities, lists or tables files if they 
   contain any LEC expression with non-ASCII characters (closes :issue:`1157`)
 
+- GUI: fixed application crashing when trying to edit an IODE table (closes :issue:`1175`)
+
 Miscellaneous 
 -------------
 
