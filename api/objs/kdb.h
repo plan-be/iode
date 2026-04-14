@@ -904,7 +904,19 @@ public:
 
     bool duplicate(const std::string& old_name, const std::string& new_name)
     {
-        return duplicate(this->shared_from_this(), old_name, new_name);
+        std::shared_ptr<D> this_ptr;
+        try
+        {
+            this_ptr = this->shared_from_this();
+        }
+        catch(const std::bad_weak_ptr&)
+        {
+            std::string error_msg = "Internal error: top-level database of type '";
+            error_msg += v_iode_types[this->k_type] + "' is not managed by a shared_ptr";
+            throw std::runtime_error(error_msg);
+        }
+        
+        return duplicate(this_ptr, old_name, new_name);
     }
 
     bool copy_from_file(const std::string& file, const std::string& objs_names, 
