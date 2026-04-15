@@ -664,7 +664,7 @@ public:
         catch(const std::exception& e)
         {
             subset_keys.clear();
-            error_msg += std::string(e.what()) + " in the parent database";
+            error_msg += ":\n" + std::string(e.what()) + " in the parent database";
             throw std::runtime_error(error_msg);
         }
     
@@ -1225,7 +1225,7 @@ inline char k_ext[][4] =
     "ps",
     "asc",
     "txt",
-    "csv",  // 26 = FILE_CSV // JMP 2-3-2016  -> TODO: pas très propre, à modifier
+    "csv",  // 26 = FILE_CSV
 
     "xxx"
 };
