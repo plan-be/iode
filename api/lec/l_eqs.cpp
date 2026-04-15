@@ -35,7 +35,8 @@
 /**
  * Struct specific for equation compilation.
 */
-typedef struct _slec {
+struct SLEC 
+{
     ALEC*   sl_expr[2];     // Tables of ALEC's for LHS and RHS equations  members 
     int     sl_lg[2];       // Length of each sl_expr table
     int     sl_mbr;         // member containing sl_endo (will be inverted if possible)
@@ -43,37 +44,107 @@ typedef struct _slec {
     int     sl_op;          // last operator|function
     int     sl_nargs;       // number of args of the last op|fn
     char*   sl_endo;        // name of the endogenous variable
-} SLEC;
+};
 
-// Static functions declarations
-static ALEC* L_cc1_alloc(char* lec, int nb_names);
-static int L_cc1_eq(SLEC* sl, char* eq);
-static void L_append(SLEC* sl, int mbr);
-static void L_front(SLEC* sl, int mbr);
-static void L_append_op(int op);
-static void L_append_fn(int op, int nargs);
-static void L_append_const(int a);
-static int L_invert(char* eq, char* endo, int *dupendo);
-CLEC* L_solve(char* eq, char* endo);
-int L_split_eq(char* eq);
-static int L_count_endo(ALEC* al, int lg, char* endo);
-static int L_split_expr(SLEC* sl);
 
-// Defines
+/**
+ * Counts the number of occurences of a variable in a ALEC table of atomic expressions (result of l_cc1()).
+ * The lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
+ * 
+ * @param [in]  al      ALEC*   table of ALEC elements
+ * @param [in]  lg      int     nb of elements in al
+ * @param [in]  endo    char*   name of the variable to search
+ * @return              int     number of occurence of endo in ALEC
+*/
+static int L_count_endo(ALEC* al, int lg, char* endo)
+{
+    int count, i;
+    for(count = 0, i = 0; i < lg; i++, al++)
+    {
+        if(al->al_type == L_VAR &&
+           al->al_val.v_var.per.step == 0 &&
+           al->al_val.v_var.lag == 0 &&
+           strcmp(L_NAMES[al->al_val.v_var.pos], endo) == 0)
+                count++;
+    }
 
-#define EXPR        (sl)->sl_expr
-#define LG          (sl)->sl_lg
-#define MBR         (sl)->sl_mbr
-#define NMBR        (sl)->sl_nmbr
-#define ENDO        (sl)->sl_endo
-#define OP          (sl)->sl_op
-#define NARGS       (sl)->sl_nargs
-#define APP(x)      L_append(sl, x)
-#define FRT(x)      L_front(sl, x)
-#define APP_OP(x)   L_append_op(x)
-#define APP_FN(x,y) L_append_fn(x, y)
-#define APP_VAL(y)  L_append_const(y)
+    return count;
+}
 
+/**
+ * If sl->sl_expr[sl->sl_mbr] is not trivial, splits sl->sl_expr[sl->sl_mbr] into two parts and replaces sl->sl_expr[sl->sl_mbr] and sl->sl_expr[sl->sl_nmbr] by these 2 expressions.
+ * 
+ * ------------------------------------------------------
+ * Example: 
+ *
+ * Expression containing the endogenous : "EXO + ln ENDO"
+ * 
+ * At the beginning of the function:
+ * 
+ *  sl->sl_expr[sl->sl_mbr]:  | EXO  |
+ *              | (    |
+ *              | ENDO |
+ *              | )    |
+ *              | ln   |
+ *              | +    |
+ * 
+ *  At the end of the function:
+ *     sl->sl_expr[0] =   EXO
+ *     sl->sl_expr[1] =  | (    |
+ *                | ENDO |
+ *                | )    |
+ *                | ln   |
+ *     sl->sl_mbr = 1
+ *     sl->sl_nmbr = 0
+ * -------------------------------------------------------
+ * 
+ * @param [in, out]     sl  SLEC*   current state of the equation
+ * @return                  int     0 on success, L_DUP_ERR if the sub expression cannot be determined
+*/
+static int L_split_expr(SLEC* sl)
+{
+    ALEC    *al;
+    int     lg, pos;
+
+    al = sl->sl_expr[sl->sl_mbr];     // ALEC containing the sl->sl_endo
+    lg = sl->sl_lg[sl->sl_mbr] - 1;   // size of al
+ag:
+    sl->sl_op = al[lg].al_type;                // Last element (operator or L_VAR ...) in al. In example, '+'
+    sl->sl_nargs = al[lg].al_val.v_nb_args;    
+    switch(sl->sl_op) 
+    {
+        case L_VAR :                    // if the last element is L_VAR, we have only one item and the process is termined (?)
+            return(1);                  
+        case L_CLOSEP :                 // if the last element is L_CLOSEP, the first on must be L_OPENP (?)
+            al++ ;                      // we drop the first and last elements of al
+            lg -= 2;
+            goto ag;                    // we try the next element                       
+    }
+    pos = L_sub_expr(al, lg - 1);               // Search the beginning of the sub expression ending at pos lg-1. In example : 1
+    if(pos < 0)
+    {
+        L_errno = L_DUP_ERR;
+        return L_errno; 
+    }
+       
+    sl->sl_expr[0] = al;                               // We move the elements before the sub expression to sl->sl_expr[0]
+    sl->sl_lg[0] = pos;
+    sl->sl_expr[1] = al + pos;                         // and the sub expression to sl->sl_expr[1]
+    sl->sl_lg[1] = lg - pos;
+
+    // Find the member where endo is present
+    if(L_count_endo(al, pos, sl->sl_endo) > 0) 
+    {       
+        sl->sl_mbr = 0 ;                                   
+        sl->sl_nmbr = 1;                               
+    }
+    else 
+    {
+        sl->sl_mbr = 1 ;
+        sl->sl_nmbr = 0;
+    }
+    return 0;
+}
 
 /**
  * Compiles a LEC expression and allocates the ALEC table resulting from the compilation. 
@@ -92,12 +163,15 @@ static int L_split_expr(SLEC* sl);
 */
 static ALEC* L_cc1_alloc(char* lec, int nb_names)
 {
-    ALEC    *alec = 0;
-
-    if(L_open_string(lec)) return(alec);
-    if(L_cc1(nb_names) != 0) return(alec);
+    if(L_open_string(lec)) 
+        return NULL;
+    
+    if(L_cc1(nb_names) != 0) 
+        return NULL;
+    
     L_close();
-    alec = (ALEC *)L_malloc(L_NB_EXPR * sizeof(ALEC));
+
+    ALEC* alec = (ALEC *) malloc(L_NB_EXPR * sizeof(ALEC));
     memcpy(alec, L_EXPR, L_NB_EXPR * sizeof(ALEC));
     return(alec);
 }
@@ -117,27 +191,32 @@ static ALEC* L_cc1_alloc(char* lec, int nb_names)
 */
 static int L_cc1_eq(SLEC* sl, char* eq)
 {
-    int     pos;
-
     /* SLIT EQ AND COMPILE EACH MEMBER */
-    pos = L_split_eq(eq);
-    if(pos < 0) return(L_errno = L_ASSIGN_ERR);
+    int pos = L_split_eq(eq);
+    if(pos < 0)
+    {
+        L_errno = L_ASSIGN_ERR;
+        return L_errno;
+    }
 
     // Compiles left member
     eq[pos] = 0;        // close the left member
-    EXPR[0] = L_cc1_alloc(eq, 0);
-    LG[0]   = L_NB_EXPR - 1;
+    sl->sl_expr[0] = L_cc1_alloc(eq, 0);
+    sl->sl_lg[0]   = L_NB_EXPR - 1;
     L_alloc_expr(-1);   // Clean up L_EXPR
     eq[pos] = ':';      // Reset the original text
 
     // Compiles the right member
-    if(EXPR[0] == 0) return(L_errno);
-    EXPR[1] = L_cc1_alloc(eq + pos + 2, L_NB_NAMES);
-    LG[1]   = L_NB_EXPR - 1;
+    if(sl->sl_expr[0] == 0) 
+        return L_errno;
+    
+    sl->sl_expr[1] = L_cc1_alloc(eq + pos + 2, L_NB_NAMES);
+    sl->sl_lg[1]   = L_NB_EXPR - 1;
     L_alloc_expr(-1);
-    if(EXPR[1] == 0) {
-        L_free(EXPR[0]);
-        return(L_errno);
+    if(sl->sl_expr[1] == 0) 
+    {
+        free(sl->sl_expr[0]);
+        return L_errno;
     }
     return 0;
 }
@@ -151,9 +230,9 @@ static int L_cc1_eq(SLEC* sl, char* eq)
 */
 static void L_append(SLEC* sl, int mbr)
 {
-    L_alloc_expr(L_NB_EXPR + LG[mbr]);
-    memcpy(L_EXPR + L_NB_EXPR, EXPR[mbr], sizeof(ALEC) * LG[mbr]);
-    L_NB_EXPR += LG[mbr];
+    L_alloc_expr(L_NB_EXPR + sl->sl_lg[mbr]);
+    memcpy(L_EXPR + L_NB_EXPR, sl->sl_expr[mbr], sizeof(ALEC) * sl->sl_lg[mbr]);
+    L_NB_EXPR += sl->sl_lg[mbr];
 }
 
 
@@ -166,10 +245,10 @@ static void L_append(SLEC* sl, int mbr)
 static void L_front(SLEC* sl, int mbr)
 {
 
-    L_alloc_expr(L_NB_EXPR + LG[mbr]);
-    L_move_arg((char *)(L_EXPR + LG[mbr]), (char *)(L_EXPR), sizeof(ALEC) * L_NB_EXPR);
-    memcpy(L_EXPR, EXPR[mbr], sizeof(ALEC) * LG[mbr]);
-    L_NB_EXPR += LG[mbr];
+    L_alloc_expr(L_NB_EXPR + sl->sl_lg[mbr]);
+    L_move_arg((char *)(L_EXPR + sl->sl_lg[mbr]), (char *)(L_EXPR), sizeof(ALEC) * L_NB_EXPR);
+    memcpy(L_EXPR, sl->sl_expr[mbr], sizeof(ALEC) * sl->sl_lg[mbr]);
+    L_NB_EXPR += sl->sl_lg[mbr];
 }
 
 
@@ -221,11 +300,11 @@ static void L_append_const(int a)
  * 
  * The result is stored in L_EXPR (table of ALEC's).
  * 
- * If the endogenous variable is found more than once, the equation (say "LHS := RHS") is replaced by "0 := LHS - RHS" and dupendo is set to 1.
+ * If the endogenous variable is found more than once, the equation (say "LHS := RHS") is replaced by "0 := LHS - RHS" and duplicated_endo is set to 1.
  *
  * For example,
- *   L_invert("ln X := a + b * ln Y", "X", &dupendo) => "exp(a + b * ln Y)"    with dupendo = 0
- *   L_invert("ln X := a + b * X ",   "X", &dupendo) => "ln X - (a + b * X)"   with dupendo = 1
+ *   L_invert("ln X := a + b * ln Y", "X", &duplicated_endo) => "exp(a + b * ln Y)"    with duplicated_endo = 0
+ *   L_invert("ln X := a + b * X ",   "X", &duplicated_endo) => "ln X - (a + b * X)"   with duplicated_endo = 1
  * 
  * 
  * L_errno can take the values below:
@@ -236,191 +315,197 @@ static void L_append_const(int a)
  *    
  * @param [in]   eq         char*   text of the LEC equation
  * @param [in]   endo       char*   name of the endogenous variable 
- * @param [out]  dupendo    int*    0 if the equation has been inverted, 1 if endo is present more than once.
+ * @param [out]  duplicated_endo    int*    0 if the equation has been inverted, 1 if endo is present more than once.
  * @return                  int     0 on success and L_errno on error
 */
-static int L_invert(char* eq, char* endo, int *dupendo)
+static int L_invert(char* eq, char* endo, int *duplicated_endo)
 {
     SLEC    slec, *sl = &slec;
     ALEC    *expr;
     int     count0, count1;
 
     // Compiles the 2 members of eq and put the result in slec
-    if(L_cc1_eq(sl, eq)) return(L_errno);
+    if(L_cc1_eq(sl, eq)) 
+        return L_errno;
 
     /* FIND MEMBER CONTAINING ENDO AND SET INFO IN sl */
-    *dupendo = 0;
-    ENDO = endo;
-    count0 = L_count_endo(EXPR[0], LG[0], ENDO);
-    count1 = L_count_endo(EXPR[1], LG[1], ENDO);
-    if(count0 + count1 == 0) {
-        L_free(EXPR[0]);
-        L_free(EXPR[1]);
+    *duplicated_endo = 0;
+    sl->sl_endo = endo;
+    count0 = L_count_endo(sl->sl_expr[0], sl->sl_lg[0], sl->sl_endo);
+    count1 = L_count_endo(sl->sl_expr[1], sl->sl_lg[1], sl->sl_endo);
+    if(count0 + count1 == 0) 
+    {
+        free(sl->sl_expr[0]);
+        free(sl->sl_expr[1]);
         return(L_errno = L_DUP_ERR);
     }
-    if(count0 + count1 >= 2) {
-        // Result = {EXPR[0], EXPR[1], L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
-        *dupendo = 1;
+    if(count0 + count1 >= 2) 
+    {
+        // Result = {sl->sl_expr[0], sl->sl_expr[1], L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
+        *duplicated_endo = 1;
         L_NB_EXPR = 0;
         L_append(sl, 0);    
         L_append(sl, 1);
-        APP_OP(L_MINUS);
-        APP_OP(L_EOE);
-        L_free(EXPR[0]);
-        L_free(EXPR[1]);
+        L_append_op(L_MINUS);
+        L_append_op(L_EOE);
+        free(sl->sl_expr[0]);
+        free(sl->sl_expr[1]);
         return 0;
     }
-    if(count0 == 0) {
+    if(count0 == 0) 
+    {
         // If endo not present in LHS, set mbr to 1 and nmbr to 0
-        MBR = 1;
-        NMBR = 0;
+        sl->sl_mbr = 1;
+        sl->sl_nmbr = 0;
     }
-    else {
+    else 
+    {
         // Else set mbr to 0 and nmbr to 1
-        MBR = 0;
-        NMBR = 1;
+        sl->sl_mbr = 0;
+        sl->sl_nmbr = 1;
     }
 
     // Create an empty L_EXPR and move the member nmbr into L_EXPR
     L_NB_EXPR = 0;
-    L_append(sl, NMBR);
-    L_free(EXPR[NMBR]);
+    L_append(sl, sl->sl_nmbr);
+    free(sl->sl_expr[sl->sl_nmbr]);
 
-    // EXPR[MBR] is the expression containing endo and must thus be inverted
-    expr = EXPR[MBR];
+    // sl->sl_expr[sl->sl_mbr] is the expression containing endo and must thus be inverted
+    expr = sl->sl_expr[sl->sl_mbr];
 
     /* LOOP ON OPERATORS */
     while(L_split_expr(sl) == 0)
-        switch(OP) {
+        switch(sl->sl_op) 
+        {
             case L_PLUS   :             
-                APP(NMBR);              // Appends EXPR[NMBR] to L_EXPR
-                APP_OP(L_MINUS);        // Appends + to L_EXPR
+                L_append(sl, sl->sl_nmbr);              // Appends sl->sl_expr[sl->sl_nmbr] to L_EXPR
+                L_append_op(L_MINUS);        // Appends + to L_EXPR
                 break;
             case L_TIMES  :
-                APP(NMBR);
-                APP_OP(L_DIVIDE);
+                L_append(sl, sl->sl_nmbr);
+                L_append_op(L_DIVIDE);
                 break;
             case L_MINUS  :
-                if(MBR == 1) {
-                    FRT(NMBR);
-                    APP_OP(L_MINUS);
+                if(sl->sl_mbr == 1) {
+                    L_front(sl, sl->sl_nmbr);
+                    L_append_op(L_MINUS);
                 }
                 else {
-                    APP(NMBR);
-                    APP_OP(L_PLUS);
+                    L_append(sl, sl->sl_nmbr);
+                    L_append_op(L_PLUS);
                 }
                 break;
             case L_DIVIDE :
-                if(MBR == 1) {
-                    FRT(NMBR);
-                    APP_OP(L_DIVIDE);
+                if(sl->sl_mbr == 1) {
+                    L_front(sl, sl->sl_nmbr);
+                    L_append_op(L_DIVIDE);
                 }
                 else {
-                    APP(NMBR);
-                    APP_OP(L_TIMES);
+                    L_append(sl, sl->sl_nmbr);
+                    L_append_op(L_TIMES);
                 }
                 break;
             case L_LN     :
-                APP_FN(L_EXPN, 1);
+                L_append_fn(L_EXPN, 1);
                 break;
             case L_EXPN   :
-                APP_FN(L_LN, 1);
+                L_append_fn(L_LN, 1);
                 break;
             case L_UPLUS  :
                 break;
             case L_UMINUS :
-                APP_FN(L_UMINUS, 1);
+                L_append_fn(L_UMINUS, 1);
                 break;
             case L_COS    :
-                APP_FN(L_ACOS, 1);
+                L_append_fn(L_ACOS, 1);
                 break;
             case L_ACOS   :
-                APP_FN(L_COS, 1);
+                L_append_fn(L_COS, 1);
                 break;
             case L_SIN    :
-                APP_FN(L_ASIN, 1);
+                L_append_fn(L_ASIN, 1);
                 break;
             case L_ASIN   :
-                APP_FN(L_SIN, 1);
+                L_append_fn(L_SIN, 1);
                 break;
             case L_TAN    :
-                APP_FN(L_ATAN, 1);
+                L_append_fn(L_ATAN, 1);
                 break;
             case L_ATAN   :
-                APP_FN(L_TAN, 1);
+                L_append_fn(L_TAN, 1);
                 break;
             case L_SQRT   :
-                APP_VAL(2);
-                APP_FN(L_EXP, 2);
+                L_append_const(2);
+                L_append_fn(L_EXP, 2);
                 break;
             case L_EXP    :
-                if(MBR == 0) {
-                    APP_FN(L_LN, 1);
-                    APP(NMBR);
-                    APP_OP(L_DIVIDE);
-                    APP_FN(L_EXPN, 1);
+                if(sl->sl_mbr == 0) {
+                    L_append_fn(L_LN, 1);
+                    L_append(sl, sl->sl_nmbr);
+                    L_append_op(L_DIVIDE);
+                    L_append_fn(L_EXPN, 1);
                 }
                 else {
-                    FRT(NMBR);
-                    APP_FN(L_LOG, 2);
+                    L_front(sl, sl->sl_nmbr);
+                    L_append_fn(L_LOG, 2);
                 }
                 break;
             /*
-            case L_LOG    : if(MBR == 0) {
+            case L_LOG    : if(sl->sl_mbr == 0) {
             		}
             	    else {
-            		FRT(NMBR); APP_OP(L_EXP);
+            		L_front(sl, sl->sl_nmbr); L_append_op(L_EXP);
             		}
             	    break;
             /* JMP 22-06-00 */
             case L_LOG    :
-                APP_FN(L_EXP, 1);
+                L_append_fn(L_EXP, 1);
                 break; /* JMP 22-06-00 */
             case L_DIFF   :
-                if(NARGS == 2) APP(NMBR);
-                APP(MBR);
-                APP_FN(L_LAG, NARGS);
-                APP_OP(L_PLUS);
+                if(sl->sl_nargs == 2) L_append(sl, sl->sl_nmbr);
+                L_append(sl, sl->sl_mbr);
+                L_append_fn(L_LAG, sl->sl_nargs);
+                L_append_op(L_PLUS);
                 break;
             case L_DLN    :
-                if(NARGS == 2) APP(NMBR);
-                APP(MBR);
-                APP_FN(L_LAG, NARGS);
-                APP_FN(L_LN, 1);
-                APP_OP(L_PLUS);
-                APP_FN(L_EXPN, 1);
+                if(sl->sl_nargs == 2) L_append(sl, sl->sl_nmbr);
+                L_append(sl, sl->sl_mbr);
+                L_append_fn(L_LAG, sl->sl_nargs);
+                L_append_fn(L_LN, 1);
+                L_append_op(L_PLUS);
+                L_append_fn(L_EXPN, 1);
                 break;
             case L_GRT    :
-                APP_VAL(100);
-                APP_OP(L_DIVIDE);
-                APP_VAL(1);
-                APP_OP(L_PLUS);
-                if(NARGS == 2) APP(NMBR);
-                APP(MBR);
-                APP_FN(L_LAG, NARGS);
-                APP_OP(L_TIMES);
+                L_append_const(100);
+                L_append_op(L_DIVIDE);
+                L_append_const(1);
+                L_append_op(L_PLUS);
+                if(sl->sl_nargs == 2) L_append(sl, sl->sl_nmbr);
+                L_append(sl, sl->sl_mbr);
+                L_append_fn(L_LAG, sl->sl_nargs);
+                L_append_op(L_TIMES);
                 break;
             case L_RAPP   :
-                if(NARGS == 2) APP(NMBR);
-                APP(MBR);
-                APP_FN(L_LAG, NARGS);
-                APP_OP(L_TIMES);
+                if(sl->sl_nargs == 2) L_append(sl, sl->sl_nmbr);
+                L_append(sl, sl->sl_mbr);
+                L_append_fn(L_LAG, sl->sl_nargs);
+                L_append_op(L_TIMES);
                 break;
             default :
-                L_free(expr);
+                free(expr);
                 return(L_errno = L_INVERT_ERR);
         }
 
-    APP_OP(L_EOE);
-    L_free(expr);
-    return(L_errno);
+    L_append_op(L_EOE);
+    free(expr);
+    return L_errno;
 }
 
 
 /**
  * Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
  * 
- * Generates a CLEC form with the result and set clec->dupendo to 1 if the
+ * Generates a CLEC form with the result and set clec->duplicated_endo to 1 if the
  * generated form is of the form "0 := LHS - RHS")
  * 
  * @param [in] eq       char*
@@ -429,23 +514,25 @@ static int L_invert(char* eq, char* endo, int *dupendo)
 */
 CLEC* L_solve(char* eq, char* endo)
 {
-    CLEC    *clec = 0;
-    int     dupendo = 0;
+    CLEC* clec = nullptr;
+    int duplicated_endo = 0;
+    std::string lec = std::string(eq);
 
-    L_invert(eq, endo, &dupendo);
-    switch(L_errno) {
+    L_invert(eq, endo, &duplicated_endo);
+    switch(L_errno) 
+    {
         case 0              :
-            clec = L_cc2(L_EXPR);
-            if(clec != 0) clec->dupendo = dupendo;
+            clec = L_cc2(L_EXPR, lec);
+            if(clec) 
+                clec->duplicated_endo = (char) duplicated_endo;
             break;
-
         case L_DUP_ERR      :
         case L_INVERT_ERR   :
         default             :
             break;
     }
     L_alloc_expr(-1);
-    return(clec);
+    return clec;
 }
 
 
@@ -458,107 +545,11 @@ CLEC* L_solve(char* eq, char* endo)
 */
 int L_split_eq(char* eq)
 {
-    int i;
-
-    for(i = 0 ; eq[i] != 0 ; i++)
-        if(eq[i] == ':' && eq[i + 1] == '=') return(i);
+    for(int i = 0 ; eq[i] != 0 ; i++)
+    {
+        if(eq[i] == ':' && eq[i + 1] == '=') 
+            return(i);
+    }
 
     return -1;
 }
-
-
-/**
- * Counts the number of occurences of a variable in a ALEC table of atomic expressions (result of l_cc1()).
- * The lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
- * 
- * @param [in]  al      ALEC*   table of ALEC elements
- * @param [in]  lg      int     nb of elements in al
- * @param [in]  endo    char*   name of the variable to search
- * @return              int     number of occurence of endo in ALEC
-*/
-static int L_count_endo(ALEC* al, int lg, char* endo)
-{
-    int     count, i;
-
-    for(count = 0, i = 0; i < lg; i++, al++)
-        if(al->al_type == L_VAR &&
-                al->al_val.v_var.per.step == 0 &&
-                al->al_val.v_var.lag == 0 &&
-                strcmp(L_NAMES[al->al_val.v_var.pos], endo) == 0)
-            count++;
-
-    return(count);
-}
-
-
-/**
- * If EXPR[MBR] is not trivial, splits EXPR[MBR] into two parts and replaces EXPR[MBR] and EXPR[NMBR] by these 2 expressions.
- * 
- * ------------------------------------------------------
- * Example: 
- *
- * Expression containing the endogenous : "EXO + ln ENDO"
- * 
- * At the beginning of the function:
- * 
- *  EXPR[MBR]:  | EXO  |
- *              | (    |
- *              | ENDO |
- *              | )    |
- *              | ln   |
- *              | +    |
- * 
- *  At the end of the function:
- *     EXPR[0] =   EXO
- *     EXPR[1] =  | (    |
- *                | ENDO |
- *                | )    |
- *                | ln   |
- *     MBR = 1
- *     NMBR = 0
- * -------------------------------------------------------
- * 
- * @param [in, out]     sl  SLEC*   current state of the equation
- * @return                  int     0 on success, L_DUP_ERR if the sub expression cannot be determined
-*/
-static int L_split_expr(SLEC* sl)
-{
-    ALEC    *al;
-    int     lg, pos;
-
-    al = EXPR[MBR];     // ALEC containing the ENDO
-    lg = LG[MBR] - 1;   // size of al
-ag:
-    OP = al[lg].al_type;                // Last element (operator or L_VAR ...) in al. In example, '+'
-    NARGS = al[lg].al_val.v_nb_args;    
-    switch(OP) {
-        case L_VAR :                    // if the last element is L_VAR, we have only one item and the process is termined (?)
-            return(1);                  
-        case L_CLOSEP :                 // if the last element is L_CLOSEP, the first on must be L_OPENP (?)
-            al++ ;                      // we drop the first and last elements of al
-            lg -= 2;
-            goto ag;                    // we try the next element
-                                        
-    }
-    pos = L_sub_expr(al, lg - 1);               // Search the beginning of the sub expression ending at pos lg-1. In example : 1
-    if(pos < 0) return(L_errno = L_DUP_ERR);    
-    EXPR[0] = al;                               // We move the elements before the sub expression to EXPR[0]
-    LG[0] = pos;
-    EXPR[1] = al + pos;                         // and the sub expression to EXPR[1]
-    LG[1] = lg - pos;
-
-    // Find the member where endo is present
-    if(L_count_endo(al, pos, ENDO) > 0) {       
-        MBR = 0 ;                                   
-        NMBR = 1;                               
-    }
-    else {
-        MBR = 1 ;
-        NMBR = 0;
-    }
-    return 0;
-}
-
-
-
-

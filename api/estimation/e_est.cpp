@@ -268,10 +268,11 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
     CLEC* clec = E_CRHS[eq_nb];
 
-    for(int j = 0 ; j < clec->nb_names ; j++)
-        if(is_coefficient(clec->lnames[j].name) &&
-                E_C_NBS[coef_nb] == clec->lnames[j].pos) 
-                    return(1);
+    for(auto& [name, pos]: clec->objs)
+    {
+        if(is_coefficient(name) && E_C_NBS[coef_nb] == pos) 
+            return 1;
+    }
 
     return 0;
 }

@@ -81,7 +81,7 @@
  */
 int CSimulation::find_path(int posendo, int posexo, int* depth)
 {
-    int j, poseq, posseq, posvar, rc = -1;
+    int poseq, posseq, posvar, rc = -1;
 
     if(posexo < 0 || *depth > KSIM_MAXDEPTH) 
         return -1;
@@ -95,12 +95,12 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
     eq_name = KSIM_DBV->get_name(posendo);
     eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
     CLEC* clec = eq_ptr->clec;
-    for(j = 0; j < clec->nb_names; j++) 
+    for(auto& [name, pos]: clec->objs) 
     {
-        coef_name = std::string(clec->lnames[j].name);
-        if(is_coefficient(coef_name)) 
+        if(is_coefficient(name)) 
             continue;
-        if((clec->lnames[j]).pos == posexo) 
+        
+        if(pos == posexo) 
         {
             KSIM_POSXK[poseq] = posexo;
             KSIM_POSXK_REV[posexo] = poseq;
@@ -111,17 +111,17 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
     CLEC* eclec = nullptr;
-    for(j = 0; j < clec->nb_names; j++) 
+    for(auto& [name, pos]: clec->objs) 
     {
         eq_name = KSIM_DBE->get_name(poseq);
         eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
         eclec = eq_ptr->clec;            
-        clec = (CLEC *)SW_nalloc(eclec->tot_lg);
-        memcpy(clec, eclec, eclec->tot_lg);
-        coef_name = std::string(clec->lnames[j].name);
-        if(is_coefficient(coef_name)) 
+        clec = new CLEC(*eclec);
+        
+        if(is_coefficient(name)) 
             continue;
-        posseq = get_eq_position((clec->lnames[j]).pos);
+        
+        posseq = get_eq_position(pos);
 
         /* if same endo, variable exo or endo already exchanged continue */
         if(poseq == posseq || posseq < 0) 
@@ -134,7 +134,7 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
             KSIM_PATH[posseq] = 1;
 
         (*depth) ++;
-        rc = find_path((clec->lnames[j]).pos, posexo, depth);
+        rc = find_path(pos, posexo, depth);
         // If not found, try the next variable in clec
         if(rc < 0) 
         {
@@ -142,10 +142,9 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
             continue;
         }
 
-        /*      fprintf(stdout, "%s <- ", clec->lnames[j].name); */
         // Path found
         // Replace the endo of the KSIM_POSXK[poseq] by the j'd varname in current clec
-        posvar = (clec->lnames[j]).pos;
+        posvar = pos;
         KSIM_POSXK[poseq] = posvar;
         KSIM_POSXK_REV[posvar] = poseq;
         
@@ -153,12 +152,12 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
         (*depth) --;
         
         // Free the current clec
-        SW_nfree(clec);
+        delete clec;
         
         return rc;
     }
 
-    SW_nfree(clec);
+    delete clec;
     return -1;
 }
 

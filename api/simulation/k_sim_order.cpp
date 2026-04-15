@@ -202,43 +202,46 @@ int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& 
  */
 int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
-    int     pos, posj, nb;
+    int     posj, eq_pos, nb;
     CLEC    *clec;
 
     nb = dbe->size();
     KSIM_ORDER    = (int *)  SW_nalloc(sizeof(int) * nb);
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
 
-    int i = 0;
-    for(const auto& [name, eq] : dbe->k_objs) 
+    int i = 0, j = 0;
+    for(const auto& [_, eq] : dbe->k_objs) 
     {
         clec = eq->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.resize(clec->nb_names + 1, 0);
+        eq_predecessors.resize(clec->objs.size() + 1, 0);
 
         /* LOG NB AND POS OF ENDO VARS */
         // eq_predecessors[0] = (maximum) nb of (possible) predecessors of the ith equation
-        eq_predecessors[0] = clec->nb_names;
-        for(int j = 0; j < clec->nb_names; j++) 
+        eq_predecessors[0] = (int) clec->objs.size();
+
+        j = 1;
+        eq_pos = -1;
+        for(const auto& [name, pos]: clec->objs) 
         {
-            if(is_coefficient(clec->lnames[j].name)) 
+            if(is_coefficient(name)) 
                 continue;
             
             // Recherche l'eq dont la variable j est endo
-            posj = (clec->lnames[j]).pos;
+            posj = pos;
             
             if(KSIM_POSXK[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
-                pos = -1; // Endo de l'eq courante
+                eq_pos = -1; // Endo de l'eq courante
             else 
             {
-                pos = get_eq_position(posj);
+                eq_pos = get_eq_position(posj);
                 // si var pos est l'endogène => -1
-                if(pos >= 0 && pos == i) 
-                    pos = -1;
+                if(eq_pos >= 0 && eq_pos == i) 
+                    eq_pos = -1;
             }
-            eq_predecessors[j + 1] = pos;
-            if(pos >= 0) 
-                add_post(successors, i, pos);
+            eq_predecessors[j++] = eq_pos;
+            if(eq_pos >= 0) 
+                add_post(successors, i, eq_pos);
         }
         i++;
     }
@@ -284,7 +287,7 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
 
     KSIM_CPU_SORT = 0;
     KSIM_CPU_SCC = 0;
-    
+
     int nb = dbe->size();
     
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
@@ -313,7 +316,7 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     pre_order(dbe, predecessors, successors);
     KSIM_PRE = build_pre_post_list(dbe, predecessors, 0);
     KSIM_POST = build_pre_post_list(dbe, successors, KSIM_PRE);
-    
+
     /* REVERSE FOR EXECUTION PURPOSE */
     for(i = 0; i < KSIM_POST / 2; i++) 
     {
@@ -323,6 +326,7 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     }
 
     KSIM_INTER = build_inter_list(dbe, predecessors);
+
     KSIM_CPU_SCC = WscrGetMS() - cpu_order;
     kmsg("Calculating SCC... %ld ms -> #PRE %d - #INTER %d - #POST %d", 
             KSIM_CPU_SCC, 
@@ -343,7 +347,7 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
         compute_tri(dbe, predecessors, KSIM_PASSES);
         kmsg("Reordering interdependent block... %ld ms", KSIM_CPU_SORT);
     }
-    
+
     post_order(dbe, predecessors, successors);
 }
 

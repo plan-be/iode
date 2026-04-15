@@ -198,12 +198,9 @@ bool Equation::print_definition() const
         W_printf((char*) "Log Likelihood              : %f\n\n", tests[EQ_LOGLIK]);
         W_printf((char*) ".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
         
-        std::string sname;
-        CLEC* copy_clec = (CLEC *) SW_nalloc(clec->tot_lg + 1);
-        memcpy(copy_clec, clec, clec->tot_lg);
-        for(int j = 0 ; j < copy_clec->nb_names ; j++) 
+        CLEC* copy_clec = new CLEC(*clec);
+        for(auto& [sname, _]: copy_clec->objs) 
         {
-            sname = std::string(copy_clec->lnames[j].name);
             if(is_coefficient(sname)) 
             {
                 if(!global_ws_scl->contains(sname))
@@ -225,7 +222,7 @@ bool Equation::print_definition() const
                 }
             }
         }
-        SW_nfree(copy_clec);
+        delete copy_clec;
     }
 
     W_printf((char*) "\n");
@@ -254,7 +251,8 @@ bool Equation::to_binary(char** pack) const
     *pack = (char*) P_create();
 
     *pack = (char*) P_add(*pack, c_lec, (int) this->lec.size() + 1);
-    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
+    // for backward compatibility with old binary files
+    *pack = (char*) P_add(*pack, NULL, 0);
     *pack = (char*) P_add(*pack, (char*) &(this->solved), 1);
     *pack = (char*) P_add(*pack, (char*) &(this->method), 1);
     *pack = (char*) P_add(*pack, (char*) &(this->sample), sizeof(Sample));
@@ -277,7 +275,7 @@ bool Equation::to_binary(char** pack) const
     *pack = (char*) P_add(*pack, (char*)&(this->date), sizeof(long));                     /* date */
     *pack = (char*) P_add(*pack, (char*)&(this->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
 
-    SW_nfree(clec);
+    delete clec;
     return true;
 }
 

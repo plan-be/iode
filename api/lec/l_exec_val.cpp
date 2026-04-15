@@ -7,17 +7,17 @@
  *
  * Function signatures:
  *
- *      L_REAL  <fnname>(int t);
+ *      double  <fnname>(int t);
  *  or
- *      L_REAL  <fnname>(void);
+ *      double  <fnname>(void);
  *  
  *  List of functions
  *  -----------------
- *      L_REAL L_pi ()
- *      L_REAL L_euro()
- *      L_REAL L_e ()
- *      L_REAL L_time(int t)
- *      L_REAL L_i(int t)
+ *      double L_pi ()
+ *      double L_euro()
+ *      double L_e ()
+ *      double L_time(int t)
+ *      double L_i(int t)
  *     
  */
 
@@ -26,8 +26,8 @@
 
 /*---------- L_VAL_FN ---------------*/
 
-L_REAL L_pi  (int t) { return((L_REAL) M_PI); }
-L_REAL L_euro(int t) { return((L_REAL) 40.3399); }
-L_REAL L_e   (int t) { return((L_REAL) M_E); }
-L_REAL L_time(int t) { return((L_REAL) t); }
-L_REAL L_i(int t)    { return((L_REAL) t - (L_REAL) L_curt); }
+double L_pi  (int t) { return((double) M_PI); }
+double L_euro(int t) { return((double) 40.3399); }
+double L_e   (int t) { return((double) M_E); }
+double L_time(int t) { return((double) t); }
+double L_i(int t)    { return((double) t - (double) L_curt); }

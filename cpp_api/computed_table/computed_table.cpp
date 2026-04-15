@@ -255,10 +255,10 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used
-    if(clec == NULL || clec->dupendo)
+    if(clec == NULL || clec->duplicated_endo)
     {
-        if(clec != NULL && clec->dupendo) 
-            SW_nfree(clec);
+        if(clec != NULL && clec->duplicated_endo) 
+            delete clec;
         
         oss.clear();
         oss << std::fixed << std::setprecision(15) << value;
@@ -279,7 +279,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         res = L_exec(global_ws_var, global_ws_scl, clec, period_pos);
     }
 
-    SW_nfree(clec);
+    delete clec;
 
     if(!IODE_IS_A_NUMBER(res))
         return false;

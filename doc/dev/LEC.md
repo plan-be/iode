@@ -101,7 +101,7 @@ Finally, the CLEC \*struct\* regroups the following data:
 - total length of the CLEC struct
 - length of executable expression
 - nb of names
-- dupendo (reserved for equations)
+- duplicated_endo (reserved for equations)
 - table of LNAME's
 - executable expression described above
 
@@ -199,10 +199,10 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`CLEC *L_cc2(ALEC* expr)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
+|`CLEC *L_cc2(ALEC* expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
 |`void L_move_arg(char *s1, char *s2, int lg)`|Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.|
-|`CLEC *L_cc_stream()`|Compiles L\_YY, the open YY stream containing a LEC expression.|
-|`CLEC *L_cc(char* lec)`|Compiles a LEC string.|
+|`CLEC *L_cc_stream(const std::string& lec)`|Compiles L\_YY, the open YY stream containing a LEC expression.|
+|`CLEC *L_cc(const std::string& lec)`|Compiles a LEC string.|
 
 ### l\_eqs.c {#T18}
 
@@ -240,9 +240,9 @@ Functions to evaluate a compiled and linked LEC expression.
 
 |Syntax|Description|
 |:---|:---|
-|`L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)`|Execution of a CLEC sub expression.|
-|`L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t)`|Execution of a compiled and linked CLEC expression.|
-|`L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
+|`double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)`|Execution of a CLEC sub expression.|
+|`double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)`|Execution of a compiled and linked CLEC expression.|
+|`double* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
 ### l\_exec\_var.c {#T23}
 
@@ -250,11 +250,11 @@ Functions to evaluate LEC constants:
 
 |Syntax|Description|
 |:---|:---|
-|`static L_REAL L_pi ()`||
-|`static L_REAL L_euro()`||
-|`static L_REAL L_e ()`||
-|`static L_REAL L_time(int t)`||
-|`static L_REAL L_i(int t)`||
+|`static double L_pi ()`||
+|`static double L_euro()`||
+|`static double L_e ()`||
+|`static double L_time(int t)`||
+|`static double L_i(int t)`||
 
 ### l\_exec\_ops.c {#T24}
 
@@ -262,19 +262,19 @@ Functions to evaluate LEC "operators".
 
 |Syntax|Description|
 |:---|:---|
-|`static L_REAL L_or (L_REAL a, L_REAL b)`||
-|`static L_REAL L_and (L_REAL a, L_REAL b)`||
-|`static L_REAL L_ge (L_REAL a, L_REAL b)`||
-|`static L_REAL L_gt (L_REAL a, L_REAL b)`||
-|`static L_REAL L_le (L_REAL a, L_REAL b)`||
-|`static L_REAL L_lt (L_REAL a, L_REAL b)`||
-|`static L_REAL L_eq (L_REAL a, L_REAL b)`||
-|`static L_REAL L_ne (L_REAL a, L_REAL b)`||
-|`static L_REAL L_plus (L_REAL a, L_REAL b)`||
-|`static L_REAL L_minus(L_REAL a, L_REAL b)`||
-|`static L_REAL L_times(L_REAL a, L_REAL b)`||
-|` L_REAL L_divide(L_REAL a, L_REAL b)`||
-|` L_REAL L_exp(L_REAL a, L_REAL b)`||
+|`static double L_or (double a, double b)`||
+|`static double L_and (double a, double b)`||
+|`static double L_ge (double a, double b)`||
+|`static double L_gt (double a, double b)`||
+|`static double L_le (double a, double b)`||
+|`static double L_lt (double a, double b)`||
+|`static double L_eq (double a, double b)`||
+|`static double L_ne (double a, double b)`||
+|`static double L_plus (double a, double b)`||
+|`static double L_minus(double a, double b)`||
+|`static double L_times(double a, double b)`||
+|` double L_divide(double a, double b)`||
+|` double L_exp(double a, double b)`||
 
 ### l\_exec\_fns.c {#T25}
 
@@ -282,44 +282,44 @@ Functions to evaluate LEC "functions".
 
 |Syntax|Description|
 |:---|:---|
-|`L_REAL L_logn(L_REAL v)`||
-|`static L_REAL L_uminus(L_REAL* stack)`||
-|`static L_REAL L_uplus (L_REAL* stack)`||
-|`static L_REAL L_log(L_REAL* stack, int nargs)`||
-|`static L_REAL L_ln(L_REAL* stack)`||
-|`static L_REAL L_not(L_REAL* stack)`||
-|`static L_REAL L_expn(L_REAL* stack, int nargs)`||
-|`static L_REAL L_max(L_REAL* stack, int nargs)`||
-|`static L_REAL L_min(L_REAL* stack, int nargs)`||
-|`static L_REAL L_sin (L_REAL* stack)`||
-|`static L_REAL L_cos (L_REAL* stack)`||
-|`static L_REAL L_acos (L_REAL* stack)`||
-|`static L_REAL L_asin (L_REAL* stack)`||
-|`static L_REAL L_tan (L_REAL* stack)`||
-|`static L_REAL L_atan (L_REAL* stack)`||
-|`static L_REAL L_tanh (L_REAL* stack)`||
-|`static L_REAL L_sinh (L_REAL* stack)`||
-|`static L_REAL L_cosh (L_REAL* stack)`||
-|`static L_REAL L_abs (L_REAL* stack)`||
-|`static L_REAL L_sqrt (L_REAL* stack)`||
-|`static L_REAL L_int (L_REAL* stack)`||
-|`static L_REAL L_rad (L_REAL* stack)`||
-|`static L_REAL L_if(L_REAL* stack, int nargs)`||
-|`static L_REAL L_lsum(L_REAL* stack, int nargs)`||
-|`static L_REAL L_lmean(L_REAL* stack, int nargs)`||
-|`static L_REAL L_fnisan(L_REAL* stack, int nargs)`||
-|`static L_REAL L_lcount(L_REAL* stack, int nargs)`||
-|`static L_REAL L_lprod(L_REAL* stack, int nargs)`||
-|`static L_REAL L_sign(L_REAL* stack)`||
-|`static L_REAL L_lstderr(L_REAL* stack, int nargs)`||
-|`static L_REAL L_random(L_REAL* stack)`||
-|`static L_REAL L_floor(L_REAL* stack)`||
-|`static L_REAL L_ceil (L_REAL* stack)`||
-|`static L_REAL L_round(L_REAL* stack, int nargs)`||
-|`static L_REAL L_urandom(L_REAL* stack)`||
-|`static L_REAL L_grandom(L_REAL* stack)`||
-|`static L_REAL L_gamma(L_REAL* stack)`||
-|`static L_REAL L_div0(L_REAL *stack, int nargs)`||
+|`double L_logn(double v)`||
+|`static double L_uminus(double* stack)`||
+|`static double L_uplus (double* stack)`||
+|`static double L_log(double* stack, int nargs)`||
+|`static double L_ln(double* stack)`||
+|`static double L_not(double* stack)`||
+|`static double L_expn(double* stack, int nargs)`||
+|`static double L_max(double* stack, int nargs)`||
+|`static double L_min(double* stack, int nargs)`||
+|`static double L_sin (double* stack)`||
+|`static double L_cos (double* stack)`||
+|`static double L_acos (double* stack)`||
+|`static double L_asin (double* stack)`||
+|`static double L_tan (double* stack)`||
+|`static double L_atan (double* stack)`||
+|`static double L_tanh (double* stack)`||
+|`static double L_sinh (double* stack)`||
+|`static double L_cosh (double* stack)`||
+|`static double L_abs (double* stack)`||
+|`static double L_sqrt (double* stack)`||
+|`static double L_int (double* stack)`||
+|`static double L_rad (double* stack)`||
+|`static double L_if(double* stack, int nargs)`||
+|`static double L_lsum(double* stack, int nargs)`||
+|`static double L_lmean(double* stack, int nargs)`||
+|`static double L_fnisan(double* stack, int nargs)`||
+|`static double L_lcount(double* stack, int nargs)`||
+|`static double L_lprod(double* stack, int nargs)`||
+|`static double L_sign(double* stack)`||
+|`static double L_lstderr(double* stack, int nargs)`||
+|`static double L_random(double* stack)`||
+|`static double L_floor(double* stack)`||
+|`static double L_ceil (double* stack)`||
+|`static double L_round(double* stack, int nargs)`||
+|`static double L_urandom(double* stack)`||
+|`static double L_grandom(double* stack)`||
+|`static double L_gamma(double* stack)`||
+|`static double L_div0(double *stack, int nargs)`||
 
 ### l\_exec\_tfn.c {#T26}
 
@@ -327,19 +327,19 @@ Functions to evaluate LEC "time functions".
 
 |Syntax|Description|
 |:---|:---|
-|`static L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|` L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
+|`static double L_lag(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_diff(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_rapp(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_dln(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_grt(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_mavg(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_vmax(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_vmin(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_sum(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_prod(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|` double L_mean(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_stderr(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_lastobs(unsigned char* expr, short len, int t, double* stack, int nargs)`||
 
 ### l\_exec\_mtfn.c {#T27}
 
@@ -347,22 +347,22 @@ Functions to evaluate LEC "time functions" with possibly multiple arguments.
 
 |Syntax|Description|
 |:---|:---|
-|`static L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs, int orig)`||
-|`static L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)`||
-|`static L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, int std)`||
-|`static L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
-|`static L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)`||
+|`static double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs)`||
+|`static double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig)`||
+|`static double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static int L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)`||
+|`static double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
+|`static double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)`||
+|`static double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)`||
 
 ### l\_hodrick.c {#T28}
 

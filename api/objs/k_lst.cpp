@@ -99,15 +99,11 @@ int K_scan(const KDB& kdb, char* l_var, char* l_scal)
  */
 static void K_clecscan(const KDB& kdb, CLEC* cl, KDBVariables& exo, KDBScalars& scal)
 {
-    if(cl == NULL) 
+    if(!cl) 
         return;
 
-    char* c_name;
-    std::string name;
-    for(int j = 0 ; j < cl->nb_names ; j++) 
+    for(auto& [name, _] : cl->objs) 
     {
-        c_name = cl->lnames[j].name;
-        name = std::string(c_name);
         if(is_coefficient(name))
             // add dummy value for the scalar. The value is not relevant 
             // as only the name will be used in the list of scalars.
@@ -160,14 +156,11 @@ void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal)
 {
     std::string name = dbi.get_name(i);
     std::shared_ptr<Identity> idt = reinterpret_cast<const KDBIdentities&>(dbi).get_obj_ptr(name);
+    
     CLEC* cl_idt = idt->get_compiled_lec();
-
-    int lg = cl_idt->tot_lg;
-    CLEC* cl = (CLEC *) SW_nalloc(lg);
-    memcpy(cl, cl_idt, lg);
-
-    K_clecscan(dbi, cl, exo, scal);
-    SW_nfree(cl);
+    CLEC* cl_copy = new CLEC(*cl_idt);
+    K_clecscan(dbi, cl_copy, exo, scal);
+    delete cl_copy;
 }
 
 
