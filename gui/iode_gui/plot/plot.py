@@ -58,20 +58,20 @@ class PlotDialog(QDialog):
         self.grid_combo = QComboBox()
         self.grid_combo.addItems(v_chart_grid_names)
         self.grid_combo.setCurrentIndex(self.v_chart_grid.index(grid))
-        self.grid_combo.currentIndexChanged.connect(self.update_grid)
+        self.grid_combo.currentIndexChanged.connect(self.slot_update_grid)
         controls_layout.addWidget(self.grid_combo)
 
         # Log scale checkbox
         self.log_scale_checkbox = QCheckBox("Log Scale (Y Axis)")
         self.log_scale_checkbox.setChecked(log_scale)
-        self.log_scale_checkbox.stateChanged.connect(self.update_scale)
+        self.log_scale_checkbox.stateChanged.connect(self.slot_update_scale)
         controls_layout.addWidget(self.log_scale_checkbox)
 
         # Y-axis range inputs
         controls_layout.addWidget(QLabel("Y Min:"))
         self.y_min_input = QLineEdit()
         self.y_min_input.setPlaceholderText("Min")
-        self.y_min_input.editingFinished.connect(self.update_y_limits)
+        self.y_min_input.editingFinished.connect(self.slot_update_y_limits)
         y_min_validator = QDoubleValidator(self.y_min_input)
         # set the locale for the validator to ensure dot as decimal separator
         y_min_validator.setLocale(QLocale("C"))
@@ -83,7 +83,7 @@ class PlotDialog(QDialog):
         controls_layout.addWidget(QLabel("Y Max:"))
         self.y_max_input = QLineEdit()
         self.y_max_input.setPlaceholderText("Max")
-        self.y_max_input.editingFinished.connect(self.update_y_limits)
+        self.y_max_input.editingFinished.connect(self.slot_update_y_limits)
         y_max_validator = QDoubleValidator(self.y_max_input)
         # set the locale for the validator to ensure dot as decimal separator
         y_max_validator.setLocale(QLocale("C"))
@@ -144,9 +144,7 @@ class PlotDialog(QDialog):
         self.update_scale(False)
         self.canvas.draw()
 
-    @Slot()
-    @Slot(bool)
-    def update_scale(self, draw: bool=True):
+    def update_scale(self, draw: bool):
         ax = self.figure.gca()
         index_graph_type = self.graph_type_combo.currentIndex()
         graph_type: TableGraphType = self.v_chart_types[index_graph_type]
@@ -160,9 +158,11 @@ class PlotDialog(QDialog):
         if draw:
             self.canvas.draw()
 
-    @Slot()
-    @Slot(bool)
-    def update_grid(self, draw: bool=True):
+    @Slot(int)
+    def slot_update_scale(self, state: int):
+        self.update_scale(True)
+
+    def update_grid(self, draw: bool):
         ax = self.figure.gca()
         index_grid = self.grid_combo.currentIndex()
         grid: TableGraphGrid = self.v_chart_grid[index_grid]
@@ -177,9 +177,11 @@ class PlotDialog(QDialog):
         if draw:
             self.canvas.draw()
 
-    @Slot()
-    @Slot(bool)
-    def update_y_limits(self, draw: bool=True):
+    @Slot(int)
+    def slot_update_grid(self, state: int):
+        self.update_grid(True)
+
+    def update_y_limits(self, draw: bool):
         ax = self.figure.gca()
         y_min = self.y_min_input.text()
         y_max = self.y_max_input.text()
@@ -193,3 +195,7 @@ class PlotDialog(QDialog):
 
         if draw:
             self.canvas.draw()
+
+    @Slot()
+    def slot_update_y_limits(self):
+        self.update_y_limits(True)
