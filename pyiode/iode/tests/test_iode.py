@@ -174,6 +174,20 @@ def test_type_copy_iode_objects():
     table_C8_1 = tables["C8_1"]
     assert isinstance(table_C8_1.copy(), Table)
 
+def test_wrong_pattern_subset():
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    
+    with pytest.raises(KeyError, match=r"Name 'A' not found in the Comments workspace"):
+        comments["A"]
+
+    with pytest.raises(KeyError, match=r"Name 'A' not found in the Comments workspace"):
+        comments._get_object('A')
+
+    with pytest.raises(RuntimeError, match=r"Cannot create a subset the database of type 'Comment' "
+                                           r"using the pattern 'A':\n'Comment': no names found " 
+                                           r"matching the pattern 'A' in the parent database"):
+        comments._subset('A', copy=False)
+
 def test_database_delete():
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
     equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
