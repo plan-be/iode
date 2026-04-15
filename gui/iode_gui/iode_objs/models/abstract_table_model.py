@@ -435,7 +435,9 @@ class IodeAbstractTableModel(QAbstractTableModel):
             if self.iode_type == IodeType.VARIABLES:
                 # key = pattern (names)
                 if isinstance(key, str):
-                    self._displayed_database = self._database._subset(pattern=key, copy=False)
+                    self._displayed_database = self._database[key]
+                    return
+                
                 # key = pattern, periods
                 elif isinstance(key, tuple):
                     if not len(key) == 2:
@@ -450,27 +452,23 @@ class IodeAbstractTableModel(QAbstractTableModel):
 
                     if isinstance(pattern, str) and not len(pattern):
                         pattern = '*'
-                    if isinstance(periods, str) and len(periods):
-                        if not ":" in periods:
-                            first_period = last_period = periods
-                        else:
-                            first_period, last_period = periods.split(":")
-                        if first_period == "":
-                            first_period = None
-                        if last_period == "":
-                            last_period = None
-                    else:
-                        first_period = None
-                        last_period = None
-                    self._displayed_database = self._database._subset(pattern=pattern, first_period=first_period,
-                                                                      last_period=last_period, copy=False)
+
+                    if isinstance(periods, str) and not len(periods):
+                        periods = None
+
+                    if not periods:
+                        self._displayed_database = self._database[pattern]
+                        return
+                    
+                    periods = str(periods)
+                    self._displayed_database = self._database[pattern, periods]
                 else:
                     raise TypeError(f"Invalid type for the 'key' for filtering variables.\n"
                                     f"Expected a 'key' of type str or tuple(str, str).\n"
                                     f"Got 'key' of type {type(key).__name__} instead.\n"
                                     f"The passed value for 'key' is: {key}.")
             else:
-                self._displayed_database = self._database._subset(pattern=key, copy=False)
+                self._displayed_database = self._database[key]
         except Exception as e:
             self._displayed_database = self._database
             if not silent:
