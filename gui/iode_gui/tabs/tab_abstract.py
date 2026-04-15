@@ -29,7 +29,7 @@ class IodeAbstractWidget(QWidget):
         self.forced_as_text: bool = False
         self.saving_file: bool = False
         self.splitted: bool = False
-        self.splitter: QSplitter = None
+        self.splitter: QSplitter = QSplitter()
         self.file_filter: str = ""
         self.project_dir: QDir = QDir.home()
 
