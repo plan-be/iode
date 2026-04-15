@@ -170,11 +170,11 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     std::cout << "  clec  -> ";
     if(clec)
     {
-        std::cout << "tot_lg: " << clec->tot_lg << ", exec_lg: " << clec->exec_lg 
-                  << ", nb_names: " << clec->nb_names << ", lnames: ";
-        for(int n = 0; n < clec->nb_names; n++)
-            std::cout << clec->lnames[n].name << ", ";
-        std::cout << ", dupendo: " << clec->dupendo << std::endl;
+        std::cout << "expression: " << std::string((char*) clec->expression);
+        std::cout << " , nb_names: " << clec->objs.size() << ", v_names: ";
+        for(auto& [name, _]: clec->objs)
+            std::cout << name << ", ";
+        std::cout << ", duplicated_endo: " << clec->duplicated_endo << std::endl;
     }
     else
         std::cout << "NULL" << std::endl;
@@ -182,11 +182,11 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     std::cout << "  dclec -> ";
     if(dclec)
     {
-        std::cout << "tot_lg: " << dclec->tot_lg << ", exec_lg: " << dclec->exec_lg 
-                  << ", nb_names: " << dclec->nb_names << ", lnames: ";
-        for(int n = 0; n < dclec->nb_names; n++)
-            std::cout << dclec->lnames[n].name << ", ";
-        std::cout << ", dupendo: " << dclec->dupendo << std::endl;
+        std::cout << "expression: " << std::string((char*) dclec->expression);
+        std::cout << " , nb_names: " << dclec->objs.size() << ", v_names: ";
+        for(auto& [name, _]: dclec->objs)
+            std::cout << name << ", ";
+        std::cout << ", duplicated_endo: " << dclec->duplicated_endo << std::endl;
     }
     else
         std::cout << "NULL" << std::endl;

@@ -20,7 +20,7 @@
 
 /**
  * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
- * and their positions are saved in CLEC->lnames.
+ * and their positions are saved in CLEC->objs.
  *
  * If a name is not found, an error message is added to the stack via IodeErrorManager::append_error 
  * and L_errno is set to L_NOT_FOUND_ERR.
@@ -32,21 +32,21 @@
 */
 static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
 {
-    int     i;
-
-    for (i = 0; i < cl->nb_names; i++) 
+    for(auto& [name, pos] : cl->objs) 
     {
-        if (is_coefficient(cl->lnames[i].name))
-            cl->lnames[i].pos = L_findscl(dbs, cl->lnames[i].name);
+        if(is_coefficient(name))
+            pos = L_findscl(dbs, name);
         else
-            cl->lnames[i].pos = L_findvar(dbv, cl->lnames[i].name);
-        if(cl->lnames[i].pos < 0) 
+            pos = L_findvar(dbv, name);
+        if(pos < 0) 
         {
-            std::string msg = "linking LEC failed: '" + std::string(cl->lnames[i].name) + "' not found";
+            std::string msg = "linking LEC failed: '" + name + "' not found";
             error_manager.append_error(msg);
-            return(L_errno = L_NOT_FOUND_ERR);
+            L_errno = L_NOT_FOUND_ERR;
+            return L_errno;
         }
     }
+
     return 0;
 }
 
@@ -56,8 +56,8 @@ static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
  * 
  * For example, assume dbv's sample is 2000Y1:2030Y1. 
  * In the LEC expression "A[2001Y1] + 2002Y1":
- *      A[2001Y1] will be interpreted as the value of the 2d element of A
- *      2002Y1 will be replaced by 2 (2000Y1 == 0, 2001Y1 == 1,...)
+ *      - A[2001Y1] will be interpreted as the value of the 2d element of A
+ *      - 2002Y1 will be replaced by 2 (2000Y1 == 0, 2001Y1 == 1,...)
  * 
  * @param [in]      dbv     KDB*    KDB of variables (only its Sample is needed here)
  * @param [in, out] expr    char*   pointer to the CLEC (sub-)expression
@@ -138,11 +138,10 @@ static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
  */
 static void L_link_sample(KDBVariablesPtr dbv, CLEC* cl)
 {
-    int     pos;
+    if(!cl) 
+        return;
 
-    if (cl == 0) return;
-    pos = sizeof(CLEC) + (cl->nb_names - 1) * sizeof(LNAME);
-    L_link_sample_expr(dbv, (char*)cl + pos, (short)(cl->tot_lg - pos));
+    L_link_sample_expr(dbv, (char*) cl->expression, (short) cl->len_expr);
     return;
 }
 
@@ -164,7 +163,7 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
         return 0;
     
     if(L_link_names(dbv, dbs, cl)) 
-        return(L_errno);
+        return L_errno;
     
     L_link_sample(dbv, cl);
     return 0;
@@ -174,7 +173,7 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
 /*---- PSEUDO LINKING FOR THE CONSTRUCTION OF THE MODEL SCC ----*/
 
 /**
- * For each variable in CLEC (lnames) that exists as equation in dbe, set its position (lnames.pos) to the position in dbe.
+ * For each variable in CLEC (v_names) that exists as equation in dbe, set its position (v_names.pos) to the position in dbe.
  *
  * @param [in]      dbe     KDB*     KDB of equations
  * @param [in, out] cl      CLEC*    Compiled lec
@@ -182,15 +181,15 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
  */
 static void L_link1_endos(const KDBEquationsPtr dbe, CLEC* cl)
 {
-    for(int i = 0; i < cl->nb_names; i++) 
+    for(auto& [name, pos] : cl->objs) 
     {
-        if (is_coefficient(cl->lnames[i].name))
-            cl->lnames[i].pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
+        if(is_coefficient(name))
+            pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
         else
-            cl->lnames[i].pos = dbe->index_of(cl->lnames[i].name);
+            pos = dbe->index_of(name);
 
-        if (cl->lnames[i].pos < 0)  // Not found => exogenous var
-            cl->lnames[i].pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
+        if(pos < 0)  // Not found => exogenous var
+            pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
     }
 }
 

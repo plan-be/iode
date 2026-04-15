@@ -134,7 +134,7 @@ public:
     Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method, const std::string& from, 
         const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
     {
-        this->clec = NULL;
+        this->clec = nullptr;
         this->date = 0L;
         this->solved = '\0';
 
@@ -154,7 +154,7 @@ public:
     Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
         const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
     {
-        this->clec = NULL;
+        this->clec = nullptr;
         this->date = 0L;
         this->solved = '\0';
 
@@ -175,9 +175,7 @@ public:
     {
         this->endo = other.endo; 
         this->lec = other.lec;
-        // NOTE : we do not use memcpy() because memcpy() actually makes  
-        //        a shallow copy of a struct instead of a deep copy
-        this->clec = clec_deep_copy(other.clec);
+        this->clec = new CLEC(*other.clec);
         this->solved = other.solved;
         this->method = other.method;
         if(this->method < 0 || this->method >= IODE_NB_EQ_METHODS)
@@ -192,8 +190,8 @@ public:
 
     ~Equation()
     {
-        if(this->clec != NULL)
-            SW_nfree(this->clec);
+        if(this->clec)
+            delete this->clec;
     }
 
     // required to be used in std::map
@@ -224,15 +222,15 @@ public:
         
         // check if LEC expression is valid
         CLEC* new_clec = L_solve((char*) this->lec.c_str(), (char*) this->endo.c_str());
-        if(new_clec == NULL)
+        if(!new_clec)
         {
             std::string error_msg = "Cannot compile the LEC expression '" + lec + "' "; 
             error_msg += "of the equation named '" + endo + "'";
             throw std::invalid_argument(error_msg);
         }
 
-        if(this->clec != NULL)
-            SW_nfree(this->clec);
+        if(this->clec)
+            delete this->clec;
 
         this->clec = new_clec;
     }
@@ -511,15 +509,23 @@ public:
 
     bool operator==(const Equation& other) const
     {
-        /* same unlinked CLEC, method, sample, cmt, instr, blk, --plus tests -- */
+        if(this->endo != other.endo)
+            return false;
+
+        if(this->lec != other.lec)
+            return false;
+
+        // recompile the LEC expression of both equations
         char* name = (char*) this->endo.c_str();
         CLEC* cl1 = L_solve((char*) this->lec.c_str(), name);
         CLEC* cl2 = L_solve((char*) other.lec.c_str(), name);
 
-        if(cl1 == NULL || cl2 == NULL
-            || cl1->tot_lg != cl2->tot_lg
-            || memcmp(cl1, cl2, cl1->tot_lg) != 0) 
-                return false;
+        // compilation failed for at least one of the two LEC expressions
+        if(cl1 == nullptr || cl2 == nullptr)
+            return false;
+
+        if(*cl1 != *cl2) 
+            return false;
 
         if(this->method != other.method) 
             return false;

@@ -21,12 +21,10 @@ cdef extern from "api/all.h":
         long  pos
 
     cdef struct CLEC:
-        long  tot_lg
-        long  exec_lg
-        short nb_names
-        char  dupendo
-        char  pad
-        LNAME lnames[1]
+        char duplicated_endo
+        int len_expr
+        unsigned char* expression
+        map[string, int] objs
 
     int B_EqsStepWise(char* arg)    
     double estimate_step_wise(CSample* smpl, char* eqname, char* cond, char* test);    

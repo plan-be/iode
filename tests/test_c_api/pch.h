@@ -16,6 +16,21 @@
 #include <algorithm> 	// for std::min, std::max
 
 
+inline bool lec_contains(CLEC* clec, const std::string& name)
+{
+    bool found = false;
+    for(const auto& [obj_name, _]: clec->objs)
+    {
+        if(obj_name == name)
+        {
+            found = true;
+            break;
+        }
+    }
+    return found;
+} 
+
+
 class TestAbstract
 {
 protected:

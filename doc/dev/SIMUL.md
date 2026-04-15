@@ -180,7 +180,7 @@ If its endogenous variable is Y, it will be translated internally by IODE as fol
 
 When simulating the model, this formula is calculated and the result is stored in Y.
 
-In the code below, this is the case where clec\->dupendo is zero AND varnb == eqvarnb (dupendo == 0 means that the equation contains exactly one occurence of Y).
+In the code below, this is the case where clec\->duplicated_endo is zero AND varnb == eqvarnb (duplicated_endo == 0 means that the equation contains exactly one occurence of Y).
 
 #### Case 2: the equation must be numerically solved {#T6}
 
@@ -200,7 +200,7 @@ Note that the result of this formula is 0, and not Y, unlike case 1.
 
 When calculating the model, this equation must be solved numerically with respect to Y before storing the result in Y.
 
-In the code, this is the case where clec\->dupendo is non\-zero (Y appears more than once).
+In the code, this is the case where clec\->duplicated_endo is non\-zero (Y appears more than once).
 
 #### Case 3: ENDO\-EXO exchanges {#T7}
 

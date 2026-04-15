@@ -317,29 +317,18 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
 /**
  *  Translates a CLEC struct from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    expr    CLEC*   Compiled LEC expression
+ *  @param [in, out]    clec    CLEC*   Compiled LEC expression
  *  @param [in]         mode    int     0: if CLEC is in little-endian format
  */
 
-static void K_xdrCLEC(CLEC* expr, int mode)
+static void K_xdrCLEC(CLEC* clec, int mode)
 {
-    long    tot_lg;
-    short   nb_names;
-    int     pos;
+    long len_expr = clec->len_expr;
+    if(mode == 0)
+        K_xdrLONG(len_expr);
 
-    nb_names = expr->nb_names;
-    tot_lg =   expr->tot_lg;
-    if(mode == 0) {
-        K_xdrLONG(&tot_lg);
-        K_xdrSHORT(&nb_names);
-    }
-
-    XDR_rev(&(expr->tot_lg), 1, sizeof(long));
-    XDR_rev(&(expr->exec_lg), 1, sizeof(long));
-    XDR_rev(&(expr->nb_names), 1, sizeof(short));
-
-    pos = sizeof(CLEC) + (nb_names - 1) * sizeof(LNAME);
-    K_xdrCLEC_sub((char *) expr + pos, tot_lg - pos, mode);
+    XDR_rev(&(clec->len_expr), 1, sizeof(int));
+    K_xdrCLEC_sub((char *) clec->expression, len_expr, mode);
 }
 
 

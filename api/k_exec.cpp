@@ -111,9 +111,7 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  */
 static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
 {
-    int     nb_names;
-    LNAME   *lname;
-    CLEC    *clec;
+    CLEC* clec;
     
     // Creates a list with all variable names encountered
     // (without checking for duplicates)
@@ -123,12 +121,8 @@ static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
-        lname = &(clec->lnames[0]);
-        nb_names = clec->nb_names;
-
-        for(int j = 0; j < nb_names; j++) 
+        for(auto [name, _]: clec->objs) 
         {
-            name = std::string(lname[j].name);
             if(is_coefficient(name)) 
                 continue;
             vars_to_compute.insert(name);
@@ -153,9 +147,8 @@ static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
  */
 static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
 {
-    int     nb_names;
-    LNAME   *lname;
-    CLEC    *clec, *tclec;
+    CLEC* clec;
+    CLEC* tclec;
 
     Scalar new_scl;
     std::string name;
@@ -163,18 +156,14 @@ static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
     for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
     {
         clec = idt->get_compiled_lec();
-        tclec = (CLEC*) SW_nalloc(clec->tot_lg);
-        memcpy(tclec, clec, clec->tot_lg);
-        lname    = &(tclec->lnames[0]);
-        nb_names = tclec->nb_names;
-        for(int j = 0 ; j < nb_names ; j++) 
+        tclec = new CLEC(*clec);
+        for(auto& [name, _]: tclec->objs) 
         {
-            name = std::string(lname[j].name);
             if(!is_coefficient(name)) 
                 continue;
             dbs->set(name, new_scl);
         }
-        SW_nfree(tclec);
+        delete tclec;
     }
 
     return dbs;
@@ -229,79 +218,82 @@ static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_
 
 static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
 {
-    int     nb, *order,
-            nb_order = 0,
-            nb_names, mod, pos;
-    char    *mark;
-    LNAME   *lname;
-    CLEC    *clec;
+    int nb_ordered = 0;
+    int nb_identities = dbi_ptr->size();
+    int* order = (int*) malloc(sizeof(int) * nb_identities);
+    std::vector<bool> mark(nb_identities, false);
 
-    nb = dbi_ptr->size();
-    order = (int *)SW_nalloc(sizeof(int) * nb);
-    mark  = SW_nalloc(nb);
-
-    int i, j;
+    int i, pos;
     std::string name;
-    while(nb_order < nb) 
+    CLEC* clec = nullptr;
+    while(nb_ordered < nb_identities) 
     {
         i = 0;
-        mod = 0;
+        bool success = false;
         for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
         {
             if(mark[i]) 
                 continue;
             
             clec = idt->get_compiled_lec();
-            lname = clec->lnames;
-            nb_names = clec->nb_names;
 
-            for(j = 0 ; j < nb_names ; j++) 
+            bool break_reached = false;
+            for(auto& [name, _]: clec->objs) 
             {
-                name = std::string(lname[j].name);
+                // name represents a coefficient -> continue looping
+                if(is_coefficient(name)) 
+                    continue;
+                // identity name == variable name -> continue looping
                 if(idt_name == name) 
                     continue;
+                // variable name not found in dbi -> continue looping
                 pos = dbi_ptr->index_of(name);
                 if(pos < 0) 
                     continue;
+                // identity already marked for execution -> continue looping
                 if(mark[pos]) 
                     continue;
+                // variable name found in dbi and not marked for execution -> break
+                break_reached = true;
                 break;
             }
 
-            if(j == nb_names) 
+            // add identity to execution order + mark it
+            if(!break_reached) 
             {
-                mark[i] = mod = 1;
-                order[nb_order++] = i;
+                success = true;
+                mark[i] = true;
+                order[nb_ordered] = i;
+                nb_ordered++;
             }
 
             i++;
         }
 
-        if(mod == 0) 
+        if(!success) 
         {
             /* IDENTITIES LOOP */
-            if(KEXEC_TRACE) { /* GB TRACE */
-                for(i = 0; i < nb; i++) 
+            if(KEXEC_TRACE) 
+            {
+                for(int j = 0; j < nb_identities; j++) 
                 {
-                    if(mark[i])
-                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi_ptr->get_name(i));
+                    if(mark[j])
+                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi_ptr->get_name(j));
                     else
-                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi_ptr->get_name(i));
+                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi_ptr->get_name(j));
                 }
             }
-            SW_nfree(order);
-            SW_nfree(mark);
+            free(order);
             return (int*) 0;
         }
     }
 
-    SW_nfree(mark);
     return order;
 }
 
 
 /**
- *  Copies VARS from the KDB dbv_tmp the KDB dbv_ptr->
+ *  Copies VARS from the dbv_tmp KDB to the dbv KDB
  *  The output sample is dbv's.
  *  
  *  @param [in] KDB*    dbv         KDB of vars to read
@@ -411,7 +403,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     if(KEXEC_TRACE) 
         W_printf((char*) "\n");
     
-    return(nb_found);
+    return nb_found;
 }
 
 
@@ -428,7 +420,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
 static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
 {
     char    **vars = NULL;
-    int     nbv = 0, nbf;
+    int     nbv = 0, nb_found;
 
     std::set<std::string> vars_to_read;
     for(const auto& [name, var_ptr] : dbv_ptr->k_objs) 
@@ -466,9 +458,8 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
         return -1;
     }
 
-    nbf = KI_read_vars_db(dbv_ptr, dbv_tmp_ptr, file);
-
-    return nbf;
+    nb_found = KI_read_vars_db(dbv_ptr, dbv_tmp_ptr, file);
+    return nb_found;
 }
 
 
@@ -487,38 +478,39 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
  *                                  -2 if some vars are not found in the files
  */
 static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_ws, 
-    int nb, char* files[])
+    int nb_files, char* files[])
 {
-    int i, j, dim, nbf, nb_found = 0;
+    int i, j, dim, nb_found, nb_found_total = 0;
 
-    if(nb == 0) 
+    int nb = 0;
+    if(nb_files == 0) 
     {
         // No filename given => read in dbv_ws (normally global_ws_var)
-        nbf = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
-        if(nbf < 0)
+        nb_found = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
+        if(nb_found < 0)
             return -1;
-        nb_found += nbf;
+        nb_found_total += nb_found;
     }
     else 
     {
         // Files given, search in files in the same order as they are listed
-        for(i = 0;  i < nb && nb_found < dbv_ptr->size(); i++) 
+        for(i = 0;  i < nb_files && nb_found_total < dbv_ptr->size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
-                nbf = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
+                nb_found = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
             else
                 // Regular VAR file
-                nbf = KI_read_vars_file(dbv_ptr, files[i]);
+                nb_found = KI_read_vars_file(dbv_ptr, files[i]);
             
-            if(nbf < 0)
+            if(nb_found < 0)
                 return -1;
-            nb_found += nbf;
+            nb_found_total += nb_found;
         }
     }
 
     // If all target VARs are not found, creates them with NaN values
-    if(nb_found < dbv_ptr->size()) 
+    if(nb_found_total < dbv_ptr->size()) 
     {
         j = 0;
         dim = dbv_ptr->sample->nb_periods;
@@ -564,8 +556,9 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
         if(j == 10) 
             error_manager.append_error("... others skipped"); 
         
-        return(-2);
+        return -2;
     }
+
     return 0;
 }
 
@@ -605,6 +598,7 @@ static int KI_read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, 
 
     if(KEXEC_TRACE) 
         W_printf((char*) "\n");
+
     return nb_found;
 }
 
@@ -621,7 +615,7 @@ static int KI_read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, 
 static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
 {
     char    **scls = NULL;
-    int     nbs = 0, nbf;
+    int     nbs = 0, nb_found;
 
     std::set<std::string> scls_to_read;
     for(const auto& [name, scl_ptr] : dbs_ptr->k_objs) 
@@ -646,8 +640,8 @@ static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
         return -1;
     }
 
-    nbf = KI_read_scls_db(dbs_ptr, kdb_tmp_ptr, file);
-    return nbf;
+    nb_found = KI_read_scls_db(dbs_ptr, kdb_tmp_ptr, file);
+    return nb_found;
 }
 
 
@@ -667,32 +661,32 @@ static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
 
 static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int nb, char* files[])
 {
-    int nbf;
-    int nb_found = 0;
+    int nb_found;
+    int nb_found_total = 0;
     if(nb == 0) 
     {
-        nbf = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
-        if(nbf < 0) 
+        nb_found = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
+        if(nb_found < 0) 
             return -1;
-        nb_found += nbf;
+        nb_found_total += nb_found;
     }
     else 
     {
-        for(int i = 0;  i < nb && nb_found < dbs_ptr->size(); i++) 
+        for(int i = 0;  i < nb && nb_found_total < dbs_ptr->size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
-                nbf = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
+                nb_found = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
             else
-                nbf = KI_read_scls_file(dbs_ptr, files[i]);
+                nb_found = KI_read_scls_file(dbs_ptr, files[i]);
 
-            if(nbf < 0) 
+            if(nb_found < 0) 
                 return -1;
-            nb_found += nbf;
+            nb_found_total += nb_found;
         }
     }
 
     int j = 0;
-    if(nb_found < dbs_ptr->size()) 
+    if(nb_found_total < dbs_ptr->size()) 
     {
         for(const auto& [name, scl_ptr] : dbs_ptr->k_objs) 
         {
@@ -735,32 +729,28 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
 static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
     int* order, Sample* smpl)
 {
-    int     tot_lg, start;
-    char    *tmp;
-    double  d;
-
-    start = smpl->start_period.difference(dbv_ptr->sample->start_period);
+    int start = smpl->start_period.difference(dbv_ptr->sample->start_period);
     if(start < 0) 
         start = 0;
 
+    double d;
     std::string idt_name;
-    CLEC* idt_clec;
+    CLEC* idt_clec = nullptr;
     for(int i = 0; i < dbi_ptr->size(); i++) 
     {
         idt_name = dbi_ptr->get_name(order[i]);
         idt_clec = dbi_ptr->get_obj_ptr(idt_name)->get_compiled_lec();
-        tot_lg = idt_clec->tot_lg;
-        tmp = SW_nalloc(tot_lg);
-        memcpy(tmp, idt_clec, tot_lg);
-        if(L_link(dbv_ptr, dbs_ptr, (CLEC*) tmp)) 
+        CLEC* tmp = new CLEC(*idt_clec);
+        if(L_link(dbv_ptr, dbs_ptr, tmp)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(dbv_ptr, dbs_ptr, (CLEC*) tmp, t);
+            d = L_exec(dbv_ptr, dbs_ptr, tmp, t);
             dbv_ptr->get_var_ptr(idt_name)[t] = d;
         }
-        SW_nfree(tmp);
+        
+        delete tmp;
     }
 
     return 0;
@@ -833,7 +823,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     }
 
     order = KI_reorder(dbi_ptr);
-    if(order == 0) 
+    if(!order) 
     {
         delete exec_sample;
         error_manager.append_error("Circular identity definition");
@@ -858,7 +848,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
     if(res != 0) 
     {
-        SW_nfree(order);
+        free(order);
         delete exec_sample;
         return nullptr;
     }
@@ -869,7 +859,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     res = KI_read_scls(dbs_i, dbs_ptr, ns, sfiles);
     if(res != 0) 
     {
-        SW_nfree(order);
+        free(order);
         delete exec_sample;
         return nullptr;
     }
@@ -879,7 +869,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
 
     KI_execute(dbv_i_ptr, dbs_i, dbi_ptr, order, exec_sample);
     KI_quick_extract(dbv_i_ptr, dbi_ptr);
-    SW_nfree(order);
+    free(order);
     delete exec_sample;
     return dbv_i_ptr;
 }

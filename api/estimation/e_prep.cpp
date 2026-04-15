@@ -137,7 +137,7 @@ int Estimation::E_prep_lecs(char** lecs)
 
         if(L_link(E_DBV, E_DBS, clec) != 0) 
         {
-            SW_nfree(clec); // GB 14/11/2012
+            delete clec; // GB 14/11/2012
             error_manager.append_error("Estimation: Link Error");
             return -1;
         }
@@ -147,13 +147,13 @@ int Estimation::E_prep_lecs(char** lecs)
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
-                SW_nfree(clec); // GB 14/11/2012
+                delete clec; // GB 14/11/2012
                 error_manager.append_error("Estimation: NaN Generated");
                 return -1;
             }
             MATE(E_LHS, i, t) = x;
         }
-        SW_nfree(clec); // GB 14/11/2012
+        delete clec; // GB 14/11/2012
         lecs[i][pos] = ':';
 
         E_CRHS[i] = L_cc(lecs[i] + pos + 2);
@@ -190,13 +190,10 @@ int Estimation::E_prep_lecs(char** lecs)
  */
 int Estimation::E_add_scls(CLEC* clec, KDBScalars& dbs)
 {
-    char* c_name;
     std::string name;
     Scalar scl(0.9, 1.0);
-    for(int j = 0 ; j < clec->nb_names ; j++) 
+    for(auto& [name, _]: clec->objs) 
     {
-        c_name = clec->lnames[j].name;
-        name = std::string(c_name);
         if(is_coefficient(name) && !dbs.contains(name))
             dbs.add(name, scl);
     }
@@ -258,7 +255,7 @@ int Estimation::E_prep_instrs(char** instrs)
 
         if(L_link(E_DBV, E_DBS, clec) != 0) 
         {
-            SW_nfree(clec);
+            delete clec;
             error_manager.append_error("Estimation: Link Error");
             goto fin;
         }
@@ -268,13 +265,13 @@ int Estimation::E_prep_instrs(char** instrs)
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
-                SW_nfree(clec);
+                delete clec;
                 error_manager.append_error("Estimation: NaN Generated");
                 goto fin;
             }
             MATE(minstr, t, i + 1) = x;
         }
-        SW_nfree(clec);
+        delete clec;
     }
 
     M_xprimx(miip, minstr);
@@ -319,14 +316,11 @@ fin:
  */
 int Estimation::E_prep_coefs()
 {
-    CLEC    *clec;
-    int     i, j, pos, k;
-
     E_NC = E_NCE = 0;
     
     // Compute the nb of coefficients E_NC
-    for(i = 0 ; i < E_NEQ ; i++) 
-        E_NC += E_CRHS[i]->nb_names;
+    for(int i = 0 ; i < E_NEQ ; i++) 
+        E_NC += (int) E_CRHS[i]->objs.size();
     
     // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
     E_C_NBS = (int *) SW_nalloc(E_NC * sizeof(int));
@@ -340,24 +334,29 @@ int Estimation::E_prep_coefs()
     E_NC = 0;
     E_NBCE = M_alloc(1, E_NEQ);
     std::string scl_name;
-    for(i = 0 ; i < E_NEQ ; i++) 
+    CLEC* clec = nullptr;
+    for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = E_CRHS[i];                                   // linked before
-        for(j = 0 ; j < clec->nb_names ; j++) 
+        for(auto& [name, pos]: clec->objs) 
         {
-            if(is_coefficient(clec->lnames[j].name)) 
+            if(is_coefficient(name)) 
             {
-                pos = clec->lnames[j].pos;
+                int k = 0;
+
                 for(k = 0 ; k < E_NC ; k++)
                     if(E_C_NBS[k] == pos) 
                         break;                              // Coef already found in E_C_NBS
+                
                 scl_name = E_DBS->get_name(pos);
+                
                 if(k == E_NC) 
                 {
                     E_C_NBS[E_NC++] = pos;                  // Add a coefficient in E_C_NBS
                     if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
                         E_NCE++;
                 }
+                
                 if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
                     MATE(E_NBCE, 0, i)++;                   // relax > 0 => estimation coef
             }

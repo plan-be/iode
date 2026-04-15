@@ -38,7 +38,7 @@
  *      
  *  When simulating the model, this formula is calculated and the result is stored in Y.
  *  
- *  In the code below, this is the case where clec->dupendo is zero AND varnb == eqvarnb.
+ *  In the code below, this is the case where clec->duplicated_endo is zero AND varnb == eqvarnb.
  *  
  *  Case 2: the equation must be numerically solved
  *  -----------------------------------------------
@@ -54,7 +54,7 @@
  *  
  *  When calculating the model, this equation must be solved numerically with respect to Y before storing the result in Y.
  *  
- *  In the code, this is the case where clec->dupendo is non-zero.
+ *  In the code, this is the case where clec->duplicated_endo is non-zero.
  *  
  *  Case 3: ENDO-EXO exchanges
  *  -------------------------
@@ -180,7 +180,7 @@ static double L_newton_1(int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC*
 
     // Case 1: equation Y : = f(X) analytically solved
     // or Case 3 (endo-exo)
-    if(varnb == eqvarnb || clec->dupendo) {   /* JMP 13-12-01 */
+    if(varnb == eqvarnb || clec->duplicated_endo) {   /* JMP 13-12-01 */
         shift = 0.0;
         ax = fabs(x);
     }

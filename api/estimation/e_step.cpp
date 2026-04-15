@@ -44,12 +44,10 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
 static std::vector<std::string> E_GetScls(CLEC* clec)                                            
 {
     std::vector<std::string> v_scalar_names;
-    std::string name;
-    if(clec != 0) 
+    if(clec) 
     {
-        for(int j = 0 ; j < clec->nb_names ; j++) 
+        for(auto& [name, _]: clec->objs) 
         {
-            name = std::string(clec->lnames[j].name);
             if(is_coefficient(name) && global_ws_scl->get_obj_ptr(name)->relax != 0)
                 v_scalar_names.push_back(name);
         }
@@ -108,7 +106,7 @@ double C_evallec(char* lec, int t)
         }
         if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, t);
-        SW_nfree(clec);
+        delete clec;
     }
 
     return x;

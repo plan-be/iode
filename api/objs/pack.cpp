@@ -86,12 +86,14 @@
 */
 void *P_create()
 {
-    U_sh    *ptr;
+    U_sh* ptr;
 
-    ptr = (U_sh *)SW_nalloc(2 * sizeof(OSIZE));     
-    if(ptr == NULL) return(NULL);
+    ptr = (U_sh *) SW_nalloc(2 * sizeof(OSIZE));     
+    if(!ptr) 
+        return NULL;
+    
     ptr[0] = 2 * sizeof(OSIZE);                     
-    return(ptr);
+    return ptr;
 }
 
 
@@ -104,7 +106,7 @@ void *P_create()
 
 int P_free(char *ptr)
 {
-    return(SW_nfree(ptr));
+    return SW_nfree(ptr);
 }
 
 
@@ -132,43 +134,53 @@ void *P_add(void *vptr1, void *vptr2, int lg)
     // lg2 = real length that will be allocated to insure alignment on P_ALIGN (4) bytes 
     lg2 = lg + P_ALIGN - lg % P_ALIGN;
     
-    /* pos = tot_lg, n, pos1, pos2, ...., posn, char1, char2 ... */
+    /* pos = tot_lg (for OLD CLEC), n, pos1, pos2, ...., posn, char1, char2 ... */
     pos = (OSIZE *) ptr1;
     
     // The number of elements must be even (alignment again ?)
-    if(pos[1] % 2 == 0)  n_p = 2 * sizeof(OSIZE);
+    if(pos[1] % 2 == 0)  
+        n_p = 2 * sizeof(OSIZE);
 
     // add lg2 + n_p to the buffer
     ptr1 = (char*) SW_nrealloc(ptr1, (int) pos[0], (int) pos[0] + lg2 + n_p);
     pos = (OSIZE *) ptr1; // new pointer to the first long 
 
-    if(pos[1] == 0) { // No element in the pack
+    // No element in the pack
+    if(pos[1] == 0) 
+    { 
         pos = (OSIZE *) ptr1;
         pos[0] += lg2 + n_p;        // new len
         pos[1] = 1;                 //1 element
         pos[2] = 2 * sizeof(OSIZE) + n_p; // pos of element = 2 longs + 2 longs
-        if(lg != 0) {
-            if(ptr2 != NULL) memcpy(ptr1 + pos[2], ptr2, lg);
-            else memset(ptr1 + pos[2], 0, lg2);
+        if(lg != 0) 
+        {
+            if(ptr2 != NULL) 
+                memcpy(ptr1 + pos[2], ptr2, lg);
+            else 
+                memset(ptr1 + pos[2], 0, lg2);
         }
-        return(ptr1);
+        return ptr1;
     }
 
     // At least one existing element before adding the new one
     dif = pos[0] - pos[2];  // current size of the data
     BUF_alloc(dif + lg2);   // Temp buffer for the old+new data
     memcpy(BUF_DATA, ptr1 + pos[2], dif); // copy old data into buffer
-    if(lg != 0) {
-        if(ptr2 != NULL) memcpy(BUF_DATA + dif, ptr2, lg);  // append new data to buffer
-        else memset(BUF_DATA + dif, 0, lg2);                // or set 0s 
+    if(lg != 0) 
+    {
+        if(ptr2 != NULL) 
+            memcpy(BUF_DATA + dif, ptr2, lg);  // append new data to buffer
+        else 
+            memset(BUF_DATA + dif, 0, lg2);    // or set 0s 
     }
 
-    for(i = 0; i < pos[1]; i++) pos[i + 2] += n_p;  // shift old positions from n_p bytes */
+    for(i = 0; i < pos[1]; i++) 
+        pos[i + 2] += n_p;                          // shift old positions from n_p bytes
     pos[pos[1] + 2] = pos[0] + n_p;                 // pos of the new element = old size + n_p (shift if odd number of elements)
-    pos[0] += lg2 + n_p;                            // new tot_lg */
-    pos[1] ++;                                      // new nb of elements */
+    pos[0] += lg2 + n_p;                            // new tot_lg (for OLD CLEC)
+    pos[1] ++;                                      // new nb of elements
     memcpy(ptr1 + pos[2], BUF_DATA, pos[0] - pos[2]); // copy buffer to pack
-    return(ptr1);
+    return ptr1;
 }
 
 /**
@@ -179,15 +191,19 @@ void *P_add(void *vptr1, void *vptr2, int lg)
  * @return      char *  pointer to the ith element or NULL if vptr is NULL or i > nb of elements in the pack
  */
 
-void *P_get_ptr(void *vptr, int i)
+void* P_get_ptr(void *vptr, int i)
 {
     char    *ptr = (char*) vptr;
     OSIZE   *pos = (OSIZE *) ptr;
 
 
-    if(ptr == 0) return(NULL);  /* JMP 08-09-99 */
-    if(i < 0 || i > pos[1] - 1) return(NULL);
-    return((char *) ptr + pos[i + 2]);
+    if(!ptr) 
+        return NULL;
+    
+    if(i < 0 || i > pos[1] - 1) 
+        return NULL ;
+    
+    return ((char *) ptr + pos[i + 2]);
 }
 
 
@@ -206,19 +222,27 @@ OSIZE P_get_len(void *vptr, int i)
     OSIZE   len, *pos;
     char    *ptr = (char*) vptr;
 
-    if(ptr == 0) return 0;
+    if(!ptr) 
+        return 0;
+    
     pos = (OSIZE *) ptr;
 
-    /* GB 02/98 */
-    if(pos[0] <= 0) return 0;
+    if(pos[0] <= 0) 
+        return 0;
 
-    if(i < 0) return(pos[0]); /* i == -1 returns full lg */
+    // i == -1 returns full lg
+    if(i < 0) 
+        return pos[0];
 
-    if(i > pos[1] - 1) return -1;
-    if(i == pos[1] - 1) len = pos[0] - pos[i + 2];
-    else len = pos[i + 3] - pos[i + 2];
+    if(i > pos[1] - 1) 
+        return -1;
+    
+    if(i == pos[1] - 1) 
+        len = pos[0] - pos[i + 2];
+    else 
+        len = pos[i + 3] - pos[i + 2];
 
-    return(len);
+    return len;
 }
 
 
@@ -236,10 +260,12 @@ void *P_alloc_get_ptr(void *ptr, int p)
     char    *val;
 
     len = P_get_len(ptr, p);
-    if(len <= 0) return(NULL);              // JMP 6/10/2021
+    if(len <= 0) 
+        return NULL;
+    
     val = SW_nalloc(len);
-    memcpy(val, P_get_ptr(ptr, p), len);    // plus de pointeur
-    return(val);
+    memcpy(val, P_get_ptr(ptr, p), len);
+    return val;
 }
 
 /**
@@ -251,9 +277,11 @@ void *P_alloc_get_ptr(void *ptr, int p)
 
 int P_nb(char *ptr)
 {
-    OSIZE   *pos;
+    OSIZE* pos;
 
-    if(ptr == 0) return 0;          // JMP 6/10/2021
+    if(!ptr) 
+        return 0;
+    
     pos = (OSIZE *) ptr;
-    return(pos[1]);
+    return pos[1];
 }

@@ -193,12 +193,14 @@ enum LecMultiTimeFunction
 // LEC atomic element
 struct ALEC 
 {
-    int     al_type;        // type : L_VAR, L_COEF, L_CONST ...
-    union {
+    int al_type;        // type : L_VAR, L_COEF, L_CONST ...
+    union 
+    {
         LECREAL v_real;         // constant value (float)
         long    v_long;         // constant values (integer)
         int     v_nb_args;      // nb of args for functions
-        struct {
+        struct 
+        {
             short   pos;        // coef or series pos in ??
             Period  per;        // Period if any
             short   lag;        // lag if any
@@ -234,50 +236,11 @@ struct LSTACK
     unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
 };
 
-struct LNAME 
-{
-    ONAME   name;   // scalar or variable name
-    char    pad[3];
-    long    pos;
-};
-
-struct CLEC 
-{
-    long    tot_lg,      
-            exec_lg;       
-    short   nb_names;   // number of scalar and variables names
-    char    dupendo;    // duplicate endogenous variable in the LEC expression
-    char    pad;
-    LNAME   lnames[1];  // list of of scalar and variable names
-};
-
-/*---------------- MACROS ------------------------*/
-
-#define s_dbl   sizeof(LECREAL)
-#define s_ptr   sizeof(double *)
-#define s_short sizeof(short)
-#define s_long  sizeof(long)
-
-#define L_open_file(filename)   L_open_all(filename, YY_FILE)
-#define L_open_string(str)      L_open_all(str, YY_MEM)
-#define L_open_stdin()          L_open_all((char *)0, YY_STDIN)
-
-#define is_fn(op)       ((op) >= L_FN  && (op) < L_OP)
-#define is_op(op)       ((op) >= L_OP  && (op) < L_TFN)
-#define is_tfn(op)      ((op) >= L_TFN && (op) < L_VAL)
-#define is_val(op)      ((op) >= L_VAL && (op) < L_MTFN)  /* JMP 20-04-98 */
-#define is_mtfn(op)     ((op) >= L_MTFN)                  /* JMP 20-04-98 */
-
-#define LYYTEXT   (L_YY->yy_text)
-#define LYYLONG   (L_YY->yy_long)
-#define LYYREAD   (L_YY->yy_type)
-#define LYYDOUBLE (L_YY->yy_double)
-
 /*----------------- GLOBALS ----------------------*/
 
 inline int      L_curt = 0;         // current value of t
 inline int      L_errno = 0;        // LEC error number (during compilation)
-inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements (see iode.h)
+inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements
 inline char     **L_NAMES = 0;      // Table of names encountered in the current LEC expression (vars and scalars)
 inline int      L_NB_EXPR = 0;      // Current number of elements (ALEC) in L_EXPR
 inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
@@ -404,6 +367,118 @@ inline char    **KEXEC_VFILES = NULL;
 inline char    **KEXEC_SFILES = NULL;
 inline int     KEXEC_TRACE = 0;
 
+/*---------------- STRUCTS ------------------------*/
+
+struct CLEC 
+{
+    // duplicate endogenous variable in the LEC expression
+    char duplicated_endo = 0;
+
+    // original LEC expression as a string (for debugging purposes)
+    std::string lec;
+
+    // 'executable' LEC expression
+    int len_expr = 0;
+    unsigned char* expression = NULL;
+
+    // list of pairs <scalar and variable name, positions in database>
+    // NOTE: we don't use a std::map as we need to keep the order of the 
+    //       names as they appear in the expression (for the link step) 
+    std::vector<std::pair<std::string, int>> objs;
+
+public:
+    CLEC(const std::string& lec, unsigned char* expr, int len) 
+    {
+        this->lec = lec;
+
+        len_expr = len;
+
+        expression = new unsigned char[len];
+        memset(expression, 0, len);
+        if(expr)
+            memcpy(expression, expr, len);
+
+        // initialize all names with position -1 (not found)
+        std::string name;
+        for(int j = 0; j < L_NB_NAMES; j++)
+        {
+            name = std::string(L_NAMES[j]);
+            objs.push_back({name, -1});
+        }
+    }
+
+    CLEC(const CLEC& other) 
+    {
+        this->duplicated_endo = other.duplicated_endo;
+
+        this->lec = other.lec;
+
+        if(other.expression)
+        {
+            this->len_expr = other.len_expr;
+            this->expression = new unsigned char[this->len_expr];
+            memset(this->expression, 0, this->len_expr);
+            memcpy(this->expression, other.expression, this->len_expr);
+        }
+        else
+        {
+            this->len_expr = 0;
+            this->expression = nullptr;
+        }
+
+        this->objs = other.objs;
+    }
+
+    ~CLEC() 
+    { 
+        if(expression) 
+            delete[] expression; 
+    }
+
+    // NOTE: wedon't compare the lec attributes as they can be different but lead to the  
+    // same executable expression (e.g. "D*2+ACAF" and "D * 2 + ACAF" are the same) 
+    bool operator==(const CLEC& other) const
+    {
+        if(this->duplicated_endo != other.duplicated_endo)
+            return false;
+
+        if(this->len_expr != other.len_expr)
+            return false;
+
+        if(this->expression && other.expression)
+        {
+            if(memcmp(this->expression, other.expression, this->len_expr) != 0)
+                return false;
+        }
+        else if(this->expression || other.expression) // only one of the two is null
+            return false;
+
+        return this->objs == other.objs;
+    }
+};
+
+/*---------------- MACROS ------------------------*/
+
+#define s_dbl   sizeof(LECREAL)
+#define s_ptr   sizeof(double *)
+#define s_short sizeof(short)
+#define s_long  sizeof(long)
+
+#define L_open_file(filename)   L_open_all(filename, YY_FILE)
+#define L_open_string(str)      L_open_all(str, YY_MEM)
+#define L_open_stdin()          L_open_all((char *)0, YY_STDIN)
+
+#define is_fn(op)       ((op) >= L_FN  && (op) < L_OP)
+#define is_op(op)       ((op) >= L_OP  && (op) < L_TFN)
+#define is_tfn(op)      ((op) >= L_TFN && (op) < L_VAL)
+#define is_val(op)      ((op) >= L_VAL && (op) < L_MTFN)  /* JMP 20-04-98 */
+#define is_mtfn(op)     ((op) >= L_MTFN)                  /* JMP 20-04-98 */
+
+#define LYYTEXT   (L_YY->yy_text)
+#define LYYLONG   (L_YY->yy_long)
+#define LYYREAD   (L_YY->yy_type)
+#define LYYDOUBLE (L_YY->yy_double)
+
 /* ---------------------- FUNCS ---------------------- */
 
 inline int YY_compare(const void *a, const void *b)
@@ -411,71 +486,17 @@ inline int YY_compare(const void *a, const void *b)
     return YY_strcmp((const char*) a, (const char*) b);
 }
 
-inline CLEC* clec_deep_copy(const CLEC* other)
-{
-    if(other == NULL) 
-        return NULL;
-    
-    CLEC* copy = NULL;
-    if(other->tot_lg == 0)
-    {
-        copy = (CLEC*) SW_nalloc(sizeof(CLEC));
-        copy->tot_lg = 0;
-        copy->exec_lg = 0;
-        copy->nb_names = 0;
-        copy->dupendo = 0;
-        copy->pad = '\0';    
-    }
-    else
-    {
-        // NOTE : see end of function L_cc2() from l_cc2.c to calculate tot_lg (= len)
-        copy = (CLEC*) SW_nalloc(other->tot_lg);
-    
-        copy->tot_lg = other->tot_lg,      
-        copy->exec_lg = other->exec_lg;       
-        copy->nb_names = other->nb_names;
-        copy->dupendo = other->dupendo;
-        copy->pad = '\0';
-        for(int i = 0; i < other->nb_names; i++)
-        {
-            strncpy(copy->lnames[i].name, other->lnames[i].name, sizeof(ONAME) / sizeof(char));
-            memset(copy->lnames[i].pad, '\0', sizeof(LNAME::pad) / sizeof(char));
-            copy->lnames[i].pos = other->lnames[i].pos;
-        }
-    }
-    
-    return copy;
-}
-
-inline bool clec_equal(const CLEC* clec_1, const CLEC* clec_2)
-{
-    if(clec_1->tot_lg != clec_2->tot_lg) return false;
-    if(clec_1->exec_lg != clec_2->exec_lg) return false;
-    if(clec_1->nb_names != clec_2->nb_names) return false;
-    if(clec_1->dupendo != clec_2->dupendo) return false;
-    if(clec_1->pad != clec_2->pad) return false;
-    for(int i = 0; i < clec_1->nb_names; i++)
-    {
-        if(strcmp(clec_1->lnames[i].name, clec_2->lnames[i].name)) return false;
-        if(strcmp(clec_1->lnames[i].pad, clec_2->lnames[i].pad)) return false;
-        if(clec_1->lnames[i].pos, clec_2->lnames[i].pos) return false;
-    }
-    return true;
-}
-
 inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
 {
     std::vector<std::string> list;
 
-    if(clec == NULL)
+    if(!clec)
         throw std::runtime_error("Cannot get list of scalars.\nClec structure not defined.");
     
-    char* item_name;
-    for(int i = 0; i < clec->nb_names; i++)
-    { 
-        item_name = clec->lnames[i].name;
-        if(is_coefficient(item_name))
-            list.push_back(std::string(item_name));
+    for(auto& [name, _] : clec->objs)
+    {
+        if(is_coefficient(name))
+            list.push_back(name);
     }
 
     return list;
@@ -485,15 +506,13 @@ inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
 {
     std::vector<std::string> list;
 
-    if(clec == NULL)
+    if(!clec)
         throw std::runtime_error("Cannot get list of variables.\nClec structure not defined.");
     
-    char* item_name;
-    for(int i = 0; i < clec->nb_names; i++)
+    for(auto& [name, _] : clec->objs)
     {
-        item_name = clec->lnames[i].name;
-        if(!is_coefficient(item_name))
-            list.push_back(std::string(item_name));
+        if(!is_coefficient(name))
+            list.push_back(name);
     }
 
     return list;
@@ -511,18 +530,14 @@ int L_cc1(int nb_names);
 void L_free_anames(void);
 int L_sub_expr(ALEC* al, int i);
 
-/* l_alloc.c */
-char *L_malloc(int lg);
-void L_free(void* ptr);
-
 /* l_err.c */
 char *L_error(void);
 
 /* l_cc2.c */
-CLEC *L_cc2(ALEC* expr);
+CLEC* L_cc2(ALEC* expr, const std::string& lec);
 void L_move_arg(char* s1, char* s2, int lg);
-CLEC *L_cc_stream(void);
-CLEC *L_cc(char* lec);
+CLEC* L_cc_stream(const std::string& lec);
+CLEC* L_cc(const std::string& lec);
 
 /* l_link.c */
 int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
@@ -543,7 +558,7 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
         int matherr(struct exception *e);
 #endif
 void L_fperror(int sig);
-double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t);
+double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t);
 double L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack);
 L_REAL* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 int L_intlag(L_REAL lag);
@@ -629,7 +644,7 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
 void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
-CLEC *L_solve(char* eq, char* endo);
+CLEC* L_solve(char* eq, char* endo);
 int L_split_eq(char* eq);
 
 /* l_newton.c */
@@ -648,8 +663,8 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 double *L_getvar(KDBVariablesPtr kdb, int pos);
 double L_getscl(KDBScalarsPtr kdb, int pos);
 Sample *L_getsmpl(KDBVariablesPtr kdb);
-int L_findscl(KDBScalarsPtr kdb, char* name);
-int L_findvar(KDBVariablesPtr kdb, char* name);
+int L_findscl(KDBScalarsPtr kdb, const std::string& name);
+int L_findvar(KDBVariablesPtr kdb, const std::string& name);
 char* L_expand(char* list_name);
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
                           CLEC* eqclec, int coefs);

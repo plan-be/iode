@@ -51,15 +51,13 @@ bool debug_calc = false;
  *  @return     CLEC*           allocated copy of clec or NULL if clec is empty
  *  
  */
-static CLEC *COL_cp_clec(CLEC* clec)
+static CLEC* COL_cp_clec(CLEC* clec)
 {
-    CLEC    *aclec;
+    if(clec == nullptr) 
+        return nullptr;
 
-    /* GB 19/09/96 */
-    if(clec == 0 || clec->tot_lg == 0) return((CLEC *)0);
-    aclec = (CLEC *) SW_nalloc(clec->tot_lg);
-    memcpy(aclec, clec, clec->tot_lg);
-    return(aclec);
+    CLEC* aclec = new CLEC(*clec);
+    return aclec;
 }
 
 

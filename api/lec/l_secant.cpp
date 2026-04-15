@@ -149,7 +149,7 @@ double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int v
 
     // if endogenous is not changed and endo appears more than once in clec,
     // clec is of the form 0 := lhx - rhs. Hence, shift = 0 instead of endo(t)
-    if(varnb == eqvarnb || clec->dupendo) {   /* JMP 13-12-01 */
+    if(varnb == eqvarnb || clec->duplicated_endo) {   /* JMP 13-12-01 */
         LN_SHIFT = 0.0;
         x1 = fabs(x1);
     }

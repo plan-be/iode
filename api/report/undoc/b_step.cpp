@@ -42,26 +42,22 @@ static int check_scl_var(char *eqs)
         return -1;
 
     CLEC* cl = eq_ptr->clec;
-
-    char* c_name;
-    for(int j = 0 ; j < cl->nb_names ; j++) 
+    for(auto& [cl_name, _]: cl->objs) 
     {
-        c_name = cl->lnames[j].name;
-        name = std::string(c_name);
-        if(is_coefficient(c_name)) 
+        if(is_coefficient(cl_name)) 
         {
             // create scalar with default value 0.9 if not existing
-            if(!global_ws_scl->contains(name))
+            if(!global_ws_scl->contains(cl_name))
             {
-                sprintf(buf, "%s 0.9 1", c_name);
+                sprintf(buf, "%s 0.9 1", cl_name.c_str());
                 B_DataUpdate(buf, SCALARS);
             }
         }
         else 
         {
-            if(!global_ws_var->contains(name))
+            if(!global_ws_var->contains(cl_name))
             {
-                kerror(0,"Var %s from %s not found", c_name, eqs);
+                kerror(0, "Var %s from %s not found", cl_name.c_str(), eqs);
                 return -1;
             }
         }

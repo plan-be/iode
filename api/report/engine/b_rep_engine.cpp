@@ -746,7 +746,7 @@ double RP_evallec(char* lec)
         }
         if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, RP_T);
-        SW_nfree(clec);
+        delete clec;
     }
 
     return(x);

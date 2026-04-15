@@ -93,19 +93,22 @@ TEST_F(KDBIdentitiesTest, Get)
     Identity identity = global_ws_idt->get(name);
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
     EXPECT_EQ(identity.get_lec(), expected_lec);
+    
     clec = identity.get_compiled_lec();
     expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
-    EXPECT_EQ(clec->tot_lg, expected_clec->tot_lg);
-    EXPECT_EQ(clec->exec_lg, expected_clec->exec_lg);
-    EXPECT_EQ(clec->nb_names, expected_clec->nb_names);
-    EXPECT_EQ(clec->dupendo, expected_clec->dupendo);
-    for(int i = 0; i < expected_clec->nb_names; i++)
+
+    EXPECT_EQ(clec->duplicated_endo, expected_clec->duplicated_endo);
+    EXPECT_EQ(clec->len_expr, expected_clec->len_expr);
+    EXPECT_EQ(memcmp(clec->expression, expected_clec->expression, clec->len_expr), 0);
+    EXPECT_EQ(clec->objs.size(), expected_clec->objs.size());
+    auto it_clec = clec->objs.begin();
+    auto it_expected_clec = expected_clec->objs.begin();    
+    for(int i = 0; i < clec->objs.size(); i++, it_clec++, it_expected_clec++)
     {
-        EXPECT_EQ(std::string(clec->lnames[i].name), std::string(expected_clec->lnames[i].name));
-        EXPECT_EQ(std::string(clec->lnames[i].pad), std::string(expected_clec->lnames[i].pad));
-        EXPECT_EQ(clec->lnames[i].pos, expected_clec->lnames[i].pos);
+        EXPECT_EQ(it_clec->first, it_expected_clec->first);
+        EXPECT_EQ(it_clec->second, it_expected_clec->second);
     }
-    EXPECT_TRUE(clec_equal(clec, expected_clec));
+    EXPECT_TRUE(*clec == *expected_clec);
 
     // with non-ASCII characters
     name = "PROD";

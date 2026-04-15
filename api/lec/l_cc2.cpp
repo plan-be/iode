@@ -22,9 +22,9 @@
  * 
  * Main functions:
  * 
- *      CLEC *L_cc2(ALEC* expr)                          Second stage of LEC compilation. Generates an "executable" LEC expression.
+ *      CLEC *L_cc2(ALEC* expr, std::string& lec)        Second stage of LEC compilation. Generates an "executable" LEC expression.
  *      void L_move_arg(char *s1, char *s2, int lg)      Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
- *      CLEC *L_cc_stream()                              Compiles L_YY, the open YY stream containing a LEC expression.
+ *      CLEC *L_cc_stream(std::string& lec)              Compiles L_YY, the open YY stream containing a LEC expression.
  *      CLEC *L_cc(char* lec)                            Compiles a LEC string. 
  */
 
@@ -44,10 +44,14 @@ static int L_calc_len(ALEC* expr, int from, int to)
     int     lg = 0, i;
     ALEC    *al;
 
-    if(expr == 0) return 0;
-    for(al = expr + from, i = from ; i < to ; al++, i++) {
+    if(!expr) 
+        return 0;
+    
+    for(al = expr + from, i = from ; i < to ; al++, i++) 
+    {
         lg ++;
-        switch(al->al_type) {
+        switch(al->al_type) 
+        {
             case L_COEF:
             case L_VAR:
                 lg += sizeof(CVAR);
@@ -74,39 +78,43 @@ static int L_calc_len(ALEC* expr, int from, int to)
                 break;
         }
     }
-    return(lg);
+    
+    return lg;
 }
 
 
 /**
- * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogeous container).
+ * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogenous container).
  * 
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC *L_cc2(ALEC* expr) 
+CLEC* L_cc2(ALEC* expr, const std::string& lec) 
 {
-    unsigned char    *ll = 0, *tmp;
-    CLEC    *ptr = 0;
-    int     lg = 0, i, pos, pos1, alg = 0, j, nvargs;
-    //Period  *per;
-    //long    l;
-    //short   lag; // GB 11/12/12
-    long    len, len1; // GB 11/12/12
+    unsigned char *ll = 0, *tmp;
+    int     lg = 0, pos, pos1, alg = 0, j, nvargs;
+    long    len, len1;
     ALEC    *al;
     CVAR    cvar;
 
-    if(expr == 0) return(ptr);
-    for(al = expr, i = 0 ; al->al_type != L_EOE ; al++, i++) {
-        if(lg + 30 >= alg) {
+    if(!expr) 
+        return nullptr;
+    
+    int i = 0;
+    for(al = expr, i = 0; al->al_type != L_EOE; al++, i++) 
+    {
+        if(lg + 30 >= alg) 
+        {
             ll = (unsigned char*) SW_nrealloc(ll, alg, alg + 512);
             alg += 512;
         }
+        
         ll[lg++] = al->al_type;
-        switch(al->al_type) {
+        switch(al->al_type) 
+        {
             case L_VAR:
             case L_COEF:
-                cvar.pad = 0; // JMP 11/9/2015
+                cvar.pad = 0;
                 cvar.pos = al->al_val.v_var.pos;
                 cvar.lag = al->al_val.v_var.lag;
                 cvar.per = al->al_val.v_var.per;
@@ -134,7 +142,8 @@ CLEC *L_cc2(ALEC* expr)
                 if(is_fn(al->al_type))
                     ll[lg++] = al->al_val.v_nb_args;
 
-                if(is_tfn(al->al_type)) {
+                if(is_tfn(al->al_type)) 
+                {
                     pos = L_sub_expr(expr, i - 1);
                     len = L_calc_len(expr, pos, i);
                     /* Move last arg */
@@ -146,11 +155,13 @@ CLEC *L_cc2(ALEC* expr)
                     lg += sizeof(short) + 1;
                 }
 
-                if(is_mtfn(al->al_type)) {
+                if(is_mtfn(al->al_type)) 
+                {
                     nvargs = L_MIN_MTARGS[al->al_type - L_MTFN];
                     len = 0;
                     pos = i - 1;
-                    for(j = 0 ; j < nvargs ; j++) {
+                    for(j = 0 ; j < nvargs ; j++) 
+                    {
                         pos1 = L_sub_expr(expr, pos);
                         len1 = L_calc_len(expr, pos1, pos + 1);
                         len += len1;
@@ -168,31 +179,20 @@ CLEC *L_cc2(ALEC* expr)
                     len += nvargs * sizeof(short);
                     memcpy(tmp + 3, &len, sizeof(short));
                 }
-
                 break;
         }
     }
 
-    /* Create the compiled form CLEC* :
-        - (short) exec form lenght
-        - (short) nb variables
-        - (LNAME) variable names
-        - executable form
-    */
-
-    if(lg == 0) goto fin;
-    len = sizeof(CLEC) + (L_NB_NAMES - 1) * sizeof(LNAME) + lg;
-    ptr = (CLEC *) L_malloc(len);
-    ptr->tot_lg  = len;
-    ptr->exec_lg  = lg;
-    ptr->nb_names = L_NB_NAMES;
-    for(i = 0 ; i < L_NB_NAMES ; i++)
-        strcpy(ptr->lnames[i].name, L_NAMES[i]);
-    tmp = (unsigned char *) ptr;
-    memcpy(tmp + len - lg, ll, lg);
-fin:
+    if(lg == 0)
+    {
+        SW_nfree(ll);
+        return nullptr;
+    }
+    
+    CLEC* clec = new CLEC(lec, ll, lg);
     SW_nfree(ll);
-    return(ptr);
+
+    return clec;
 }
 
 /**
@@ -216,15 +216,16 @@ void L_move_arg(char *s1, char *s2, int lg)
  *  
  * @return  CLEC*  compiled and serialized LEC expression.
  */
-CLEC *L_cc_stream()
+CLEC* L_cc_stream(const std::string& lec)
 {
-    CLEC    *cl;
+    CLEC* cl;
 
     if(L_cc1(0) != 0)
-        return((CLEC *)0);
-    cl = L_cc2(L_EXPR);
+        return NULL;
+    
+    cl = L_cc2(L_EXPR, lec);
     L_alloc_expr(-1);       // Frees L_EXPR
-    return(cl);
+    return cl;
 }
 
 
@@ -235,13 +236,13 @@ CLEC *L_cc_stream()
  *  @return                 CLEC*   compiled and serialized LEC expression
  *  
  */
-CLEC *L_cc(char* lec)
+CLEC *L_cc(const std::string& lec)
 {
-    CLEC    *clec = 0;
+    if(L_open_string((char*) lec.c_str())) 
+        return nullptr;
 
-    if(L_open_string(lec)) return(clec);
-    clec = L_cc_stream();
+    CLEC* clec = L_cc_stream(lec);
     L_close();
-    return(clec);
+    return clec;
 }
 

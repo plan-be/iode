@@ -101,7 +101,7 @@ Finally, the CLEC \*struct\* regroups the following data:
 - total length of the CLEC struct
 - length of executable expression
 - nb of names
-- dupendo (reserved for equations)
+- duplicated_endo (reserved for equations)
 - table of LNAME's
 - executable expression described above
 
@@ -199,10 +199,10 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`CLEC *L_cc2(ALEC* expr)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
+|`CLEC *L_cc2(ALEC* expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
 |`void L_move_arg(char *s1, char *s2, int lg)`|Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.|
-|`CLEC *L_cc_stream()`|Compiles L\_YY, the open YY stream containing a LEC expression.|
-|`CLEC *L_cc(char* lec)`|Compiles a LEC string.|
+|`CLEC *L_cc_stream(const std::string& lec)`|Compiles L\_YY, the open YY stream containing a LEC expression.|
+|`CLEC *L_cc(const std::string& lec)`|Compiles a LEC string.|
 
 ### l\_eqs.c {#T18}
 
@@ -241,7 +241,7 @@ Functions to evaluate a compiled and linked LEC expression.
 |Syntax|Description|
 |:---|:---|
 |`L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)`|Execution of a CLEC sub expression.|
-|`L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t)`|Execution of a compiled and linked CLEC expression.|
+|`L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)`|Execution of a compiled and linked CLEC expression.|
 |`L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
 ### l\_exec\_var.c {#T23}

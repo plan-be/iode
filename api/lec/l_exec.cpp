@@ -4,7 +4,7 @@
  * Functions to evaluate a compiled and linked LEC expression. 
  *  
  *   - L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)     Execution of a CLEC sub expression.
- *   - L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t)                     Execution of a compiled and linked CLEC expression.
+ *   - L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)                     Execution of a compiled and linked CLEC expression.
  *   - L_REAL* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
  */
 
@@ -39,9 +39,9 @@
  */  
 
 // Globals
-static LNAME    *L_EXEC_NAMES;
-static int      L_SIG = 0;
-static jmp_buf  L_JMP;
+static std::vector<int> V_EXEC_POS;
+static int L_SIG = 0;
+static jmp_buf L_JMP;
 
 // Math exceptions trap
 #ifdef _MSC_VER
@@ -135,7 +135,7 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  */
 L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
 {
-    double    *d_ptr;
+    double* d_ptr;
     LECREAL r;
     int     j, nargs, keyw, nvargs;
     long    l;
@@ -146,15 +146,16 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
     {
         keyw = expr[j++];
 
+        // key = variable or variable[period] 
         if(keyw == L_VAR || keyw == L_VART) 
         {
             memcpy(&cvar, expr + j, sizeof(CVAR));
-            d_ptr = L_getvar(L_EXEC_DBV, L_EXEC_NAMES[cvar.pos].pos);
+            d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[cvar.pos]);
             if(d_ptr == nullptr) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
                 kerror(0, (char*) error_msg.c_str());
-                return((double)IODE_NAN);
+                return (double) IODE_NAN;
             }
             j += sizeof(CVAR);
             len = cvar.ref;
@@ -166,8 +167,8 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
             else 
                 *stack = d_ptr[len];
         }
-
-        else switch(keyw) 
+        else 
+            switch(keyw) 
             {
                 case L_PLUS  :
                     if(L_stackna(&stack, 2)) break;
@@ -199,7 +200,7 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                 case L_COEF :
                     stack++;
                     memcpy(&cvar, expr + j, sizeof(CVAR));
-                    *stack = L_getscl(L_EXEC_DBS, L_EXEC_NAMES[cvar.pos].pos);
+                    *stack = L_getscl(L_EXEC_DBS, V_EXEC_POS[cvar.pos]);
                     j += sizeof(CVAR);
                     break;
                 case L_Period :
@@ -210,13 +211,15 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                     j += s_short;
                     break;
                 default :
-                    if(is_op(keyw)) {
+                    if(is_op(keyw)) 
+                    {
                         if(L_stackna(&stack, 2)) break;
                         stack--;
                         *stack = (L_OPS_FN[keyw - L_OP])(*stack, *(stack + 1));
                         break;
                     }
-                    if(is_fn(keyw)) {
+                    if(is_fn(keyw)) 
+                    {
                         nargs = expr[j];
                         j++;
                         if(keyw != L_IF && keyw != L_FNISAN &&
@@ -227,8 +230,8 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         stack -= nargs - 1;
                         break;
                     }
-
-                    if(is_tfn(keyw)) {
+                    if(is_tfn(keyw)) 
+                    {
                         nargs = expr[j];
                         memcpy(&len, expr + j + 1, sizeof(short));
                         j += 1 + sizeof(short);
@@ -239,8 +242,8 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         stack -= nargs - 2;
                         break;
                     }
-
-                    if(is_mtfn(keyw)) {
+                    if(is_mtfn(keyw)) 
+                    {
                         nargs = expr[j];
                         nvargs = expr[j + 1];
                         memcpy(&len, expr + j + 2, sizeof(short));
@@ -252,19 +255,19 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
                         stack -= nargs - nvargs - 1;
                         break;
                     }
-
-                    if(is_val(keyw)) {
+                    if(is_val(keyw)) 
+                    {
                         stack++;
                         *stack = (L_VAL_FN[keyw - L_VAL])(t);
                         break;
                     }
-
                     std::string error_msg = get_l_exec_sub_error_message(expr, t);
                     kerror(0, (char*) error_msg.c_str());
-                    return((double)IODE_NAN);
+                    return (double) IODE_NAN;
             }
     }
-    return((double)*stack);
+
+    return (double) *stack;
 }
 
 
@@ -282,36 +285,43 @@ L_REAL L_exec_sub(unsigned char* expr, int lg, int t, L_REAL* stack)
  *  @return          L_REAL     result of the calculation 
  *                              IODE_NAN on error (and L_errno is set)
  */
-L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* expr, int t)
+L_REAL L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)
 {
-    int	pos; //short   pos;
-    L_REAL  stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
+    L_REAL stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
+
+    if(!clec) 
+        return (double) IODE_NAN;
+
+    // leave if empty CLEC expression
+    if(clec->expression == nullptr || clec->len_expr == 0)
+        return (double) IODE_NAN;
 
     // Use globals to limit the number of parameters in function calls
     L_EXEC_DBV = dbv;   
     L_EXEC_DBS = dbs;
-    L_EXEC_NAMES = &(expr->lnames[0]);
+
+    V_EXEC_POS.clear();
+    for(const auto& [_, pos] : clec->objs)
+        V_EXEC_POS.push_back(pos);
+    
     L_curt = t;         // Global with the current t of execution
     
     // Reset _errno
     L_errno = 0;
     
-    // Leave if empty CLEC
-    if(expr == 0) return((double)IODE_NAN);
-    
     // Set the handle on floating point exception to L_fperror
-    if(L_SIG == 0) {
+    if(L_SIG == 0) 
+    {
         signal(SIGFPE, L_fperror);
         L_SIG = 1;
     }
     
     // Set the point of return on FPE
     if(setjmp(L_JMP))
-        return((double)IODE_NAN); // On FPE, return IODE_NAN
+        return (double) IODE_NAN; // On FPE, return IODE_NAN
     
-    pos = sizeof(CLEC) + (expr->nb_names - 1) * sizeof(LNAME);
-    
-    return(L_exec_sub((unsigned char*) expr + pos, expr->tot_lg - pos, t, stack));
+    double value = L_exec_sub(clec->expression, clec->len_expr, t, stack);
+    return value;
 }
 
 
@@ -390,6 +400,6 @@ L_REAL* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             vec[t] = L_exec(dbv, dbs, clec, t);
     }
 
-    SW_nfree(clec);
+    delete clec;
     return(vec);
 }

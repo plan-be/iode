@@ -956,7 +956,6 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     global_ws_tbl->remove(name);
 }
 
-
 TEST_F(LegacyAPITest, Tests_LEC)
 {
     U_test_print_title("Tests LEC");
@@ -982,25 +981,70 @@ TEST_F(LegacyAPITest, Tests_LEC)
     lst = global_ws_lst->get("LST2");
     EXPECT_EQ(lst, "A,B,A");
 
-    // Using macros in LEC
-    CLEC* clec = L_cc("1 + vmax($LST1)");
-    EXPECT_TRUE(clec != NULL);
-    EXPECT_EQ(clec->nb_names, 2);
-    EXPECT_STREQ(clec->lnames[0].name, "A");
-    EXPECT_STREQ(clec->lnames[1].name, "B");
-    SCR_free(clec);
-
-    clec = L_cc("1 + vmax($LST2)");
-    EXPECT_TRUE(clec != NULL);
-    EXPECT_EQ(clec->nb_names, 2);
-    EXPECT_STREQ(clec->lnames[0].name, "A");
-    EXPECT_STREQ(clec->lnames[1].name, "B");
-    SCR_free(clec);
-
     U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
     U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);
 }
 
+TEST_F(LegacyAPITest, Tests_CLEC_Compile)
+{
+    U_test_print_title("Tests CLEC compile");
+
+    std::string lec = "A + 1";
+    CLEC* clec = nullptr;
+    
+    U_test_CreateObjects();
+
+    Variable A = global_ws_var->get("A");
+    Variable B = global_ws_var->get("B");
+
+    clec = L_cc((char*) lec.c_str());
+    EXPECT_TRUE(clec != nullptr);
+    EXPECT_EQ(clec->duplicated_endo, 0);
+    EXPECT_EQ(clec->len_expr, 27);
+    EXPECT_EQ(clec->objs.size(), 1);
+    EXPECT_TRUE(lec_contains(clec, "A"));
+    delete clec;
+    
+    // Using macros in LEC
+    clec = L_cc("1 + vmax($LST1)");
+    EXPECT_TRUE(clec != NULL);
+    EXPECT_EQ(clec->objs.size(), 2);
+    EXPECT_TRUE(lec_contains(clec, "A"));
+    EXPECT_TRUE(lec_contains(clec, "B"));
+    delete clec;
+
+    clec = L_cc("1 + vmax($LST2)");
+    EXPECT_TRUE(clec != NULL);
+    EXPECT_EQ(clec->objs.size(), 2);
+    EXPECT_TRUE(lec_contains(clec, "A"));
+    EXPECT_TRUE(lec_contains(clec, "B"));
+    delete clec;
+}
+
+TEST_F(LegacyAPITest, Tests_CLEC_Copy)
+{
+    U_test_print_title("Tests CLEC copy");
+
+    std::string lec = "A + 1";
+    CLEC* clec = L_cc((char*) lec.c_str());
+    CLEC* copy_clec = new CLEC(*clec);
+
+    EXPECT_TRUE(copy_clec != nullptr);
+    EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
+    EXPECT_EQ(copy_clec->len_expr, clec->len_expr);
+    EXPECT_EQ(memcmp(copy_clec->expression, clec->expression, clec->len_expr), 0);
+    EXPECT_EQ(copy_clec->objs.size(), clec->objs.size());
+    auto it_clec = clec->objs.begin();
+    auto it_copy_clec = copy_clec->objs.begin();
+    for(int i = 0; i < clec->objs.size(); i++, it_clec++, it_copy_clec++)
+    {
+        EXPECT_EQ(it_clec->first, it_copy_clec->first);
+        EXPECT_EQ(it_clec->second, it_copy_clec->second);
+    }
+
+    delete clec;
+    delete copy_clec;
+}
 
 TEST_F(LegacyAPITest, Tests_ARGS)
 {
@@ -1945,9 +1989,12 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     global_ws_lst->clear();
     global_ws_tbl->clear();
 
-    U_test_CreateObjects(); // Create vars on 2000Y1:2010Y1 => A=[0, 1...], B=[0, 2, 4...], BC...
-    std::shared_ptr<Identity> idt_ptr_C = std::make_shared<Identity>("D*2+ACAF");
-    std::shared_ptr<Identity> idt_ptr_D = std::make_shared<Identity>("A+B");
+    // Create vars on 2000Y1:2020Y1 
+    //  => A = [0, 1...], B = [0, 2, 4...], AB = AC = BB = BC = B
+    U_test_CreateObjects();
+
+    std::shared_ptr<Identity> idt_ptr_C = std::make_shared<Identity>("D * 2 + ACAF");
+    std::shared_ptr<Identity> idt_ptr_D = std::make_shared<Identity>("A + B");
     global_ws_idt->set_obj_ptr("C", idt_ptr_C);
     global_ws_idt->set_obj_ptr("D", idt_ptr_D);
 
@@ -1961,8 +2008,8 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
-    // C = "D*2+ACAF"
-    // D = "A+B"
+    // C = "D * 2 + ACAF"
+    // D = "A + B"
     char idtexec[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec);
     EXPECT_NE(rc, 0);
@@ -1978,8 +2025,8 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     EXPECT_EQ(rc, 0);
 
     // Compute the idts of a partial sample
-    // C = "D*2+ACAF"
-    // D = "A+B"
+    // C = "D * 2 + ACAF"
+    // D = "A + B"
     char idtexec2[] = "2002Y1 2007Y1 C D";
     rc = B_IdtExecute(idtexec2);
     EXPECT_EQ(rc, 0);

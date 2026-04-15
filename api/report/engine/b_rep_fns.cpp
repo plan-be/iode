@@ -1210,14 +1210,26 @@ U_ch *RPF_sample(U_ch** args)
  */
 int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
 {
-    int     j, k;
 
-    for(j = 0 ; j < cl->nb_names ; j++) {
-        if(is_coefficient(cl->lnames[j].name) && type != 'S') continue;
-        if(!is_coefficient(cl->lnames[j].name) && type != 'V') continue;
+    int k;
+    std::string tbl_name;
+    for(auto& [name, _]: cl->objs) 
+    {
+        if(is_coefficient(name) && type != 'S') 
+            continue;
+        
+        if(!is_coefficient(name) && type != 'V') 
+            continue;
+        
         for(k = 0 ; k < *nb ; k++)
-            if(strcmp(cl->lnames[j].name, (char*) (*tbl)[k]) == 0) break;
-        if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, (unsigned char*) cl->lnames[j].name);
+        {
+            tbl_name = std::string((char*) (*tbl)[k]);
+            if(name != tbl_name) 
+                break;
+        }
+        
+        if(*nb == 0 || k == *nb) 
+            SCR_add_ptr(tbl, nb, (unsigned char*) name.c_str());
     }
 
     return 0;
