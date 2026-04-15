@@ -738,11 +738,9 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     std::string eq_name = KSIM_DBE->get_name(eqnb);
     std::shared_ptr<Equation> eq = KSIM_DBE->get_obj_ptr(eq_name);
     CLEC* eq_clec = eq->clec;
-    int lg = eq_clec->tot_lg;
-    CLEC* clec = (CLEC*) SW_nalloc(lg);
-    memcpy(clec, eq_clec, lg);
+    CLEC* clec = new CLEC(*eq_clec);
     eqvarnb = KSIM_DBV->index_of(eq_name);
-    if(clec->dupendo || varnb != eqvarnb)
+    if(clec->duplicated_endo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
     else
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
@@ -752,11 +750,11 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
         kerror(0, "%s : becomes unavailable at %s%s",
                KSIM_DBV->get_name(varnb), /* JMP 16-06-99 a la place de eqvarnb */
                (char*) period.to_string().c_str(),
-               ((clec->dupendo || varnb != eqvarnb) ? "(Newton)" : "")
+               ((clec->duplicated_endo || varnb != eqvarnb) ? "(Newton)" : "")
               );
     }
-    SW_nfree(clec);
-    return(x);
+    delete clec;
+    return x;
 }
 
 

@@ -1210,14 +1210,26 @@ U_ch *RPF_sample(U_ch** args)
  */
 int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
 {
-    int     j, k;
 
-    for(j = 0 ; j < cl->nb_names ; j++) {
-        if(is_coefficient(cl->lnames[j].name) && type != 'S') continue;
-        if(!is_coefficient(cl->lnames[j].name) && type != 'V') continue;
+    int k;
+    std::string tbl_name;
+    for(auto& [name, _]: cl->objs) 
+    {
+        if(is_coefficient(name) && type != 'S') 
+            continue;
+        
+        if(!is_coefficient(name) && type != 'V') 
+            continue;
+        
         for(k = 0 ; k < *nb ; k++)
-            if(strcmp(cl->lnames[j].name, (char*) (*tbl)[k]) == 0) break;
-        if(*nb == 0 || k == *nb) SCR_add_ptr(tbl, nb, (unsigned char*) cl->lnames[j].name);
+        {
+            tbl_name = std::string((char*) (*tbl)[k]);
+            if(name == tbl_name) 
+                break;
+        }
+        
+        if(*nb == 0 || k == *nb) 
+            SCR_add_ptr(tbl, nb, (unsigned char*) name.c_str());
     }
 
     return 0;
@@ -1233,15 +1245,15 @@ int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
  */
 U_ch *RPF_vsliste(U_ch** args, int type)
 {
-    U_ch  **tbl = 0, *res;
-    int i, nb = 0;
-
     if(SCR_tbl_size(args) < 1) 
         return NULL;
 
+    U_ch** tbl = 0;
+    int nb = 0;
+
     std::string name;
     std::shared_ptr<Equation> eq_ptr;
-    for(i = 0 ; args[i] ; i++) 
+    for(int i = 0; args[i]; i++) 
     {
         name = std::string((char*) args[i]);
         if(!global_ws_eqs->contains(name)) 
@@ -1252,7 +1264,7 @@ U_ch *RPF_vsliste(U_ch** args, int type)
 
     SCR_add_ptr(&tbl, &nb, 0L);
 
-    res = SCR_mtov(tbl, ';');
+    U_ch* res = SCR_mtov(tbl, ';');
     SCR_free_tbl(tbl);
     return res;
 }
@@ -1320,13 +1332,14 @@ U_ch *RPF_sliste(U_ch** args)
  */
 U_ch *RPF_expand(U_ch** args, int type)
 {
-    U_ch        *res, *tmp, **tbl = 0, **tbl2;
-    int         nb = 0, i;
+    U_ch *res, *tmp, **tbl = 0, **tbl2;
+    int  nb = 0;
 
-
-    for(i = 0 ; args[i] ; i++) {
+    for(int i = 0; args[i]; i++) 
+    {
         tmp = (unsigned char*) K_expand(type, 0L, (char*) args[i], (int) '*');
-        if(tmp) SCR_add_ptr(&tbl, &nb, tmp);
+        if(tmp) 
+            SCR_add_ptr(&tbl, &nb, tmp);
         SCR_free(tmp);
     }
     SCR_add_ptr(&tbl, &nb, 0L);
@@ -1338,7 +1351,8 @@ U_ch *RPF_expand(U_ch** args, int type)
     SCR_free_tbl(tbl);
     res = SCR_mtov(tbl2, ';');
     SCR_free_tbl(tbl2);
-    if(res == 0) res = SCR_stracpy((unsigned char*) ""); // JMP 04/11/2022 
+    if(res == 0) 
+        res = SCR_stracpy((unsigned char*) "");
     return res;
 }
 

@@ -96,22 +96,16 @@ static char* Pack16To32(char* opack)
     return((char *)ptr);
 }
 
-static bool K_lec_pack(char** pack, char* lec)
+static bool lec_repack(char** pack, char* lec)
 {
-    CLEC* clec;
-
     *pack = 0;
-    if(lec == NULL) 
-        return false;
-    
-    clec = L_cc(lec);
-    if(clec == 0)  
+    if(!lec) 
         return false;
     
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, lec, (int) strlen(lec) + 1);
-    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
-    SW_nfree(clec);
+    // for backward compatibility with old binary files
+    *pack = (char*) P_add(*pack, NULL, 0);
 
     return true;
 }
@@ -137,10 +131,10 @@ static char* T_cell_repack(char* pack, TableCell* cell)
         std::string lec = cell->get_content();
         char* c_lec = (char*) lec.c_str();
 
-        K_lec_pack(&opack, c_lec);
+        lec_repack(&opack, c_lec);
         char* npack = Pack16To32(opack);
         c_lec = (char*) P_get_ptr(npack, 0);
-        K_lec_pack(&ipack, c_lec);
+        lec_repack(&ipack, c_lec);
 
         pack = (char*) P_add(pack, ipack, P_len(ipack));
         SW_nfree(npack);
@@ -153,7 +147,7 @@ static char* T_cell_repack(char* pack, TableCell* cell)
         pack = (char*) P_add(pack, (void*) text.c_str(), (int) text.size() + 1);
     }
 
-    return(pack);
+    return pack;
 }
 
 
@@ -248,7 +242,7 @@ char* KDBIdentities::sub_convert_obj_version(char* npack, const std::string& nam
     char *pack = NULL;
 
     char* lec = (char*) P_get_ptr(npack, 0);
-    K_lec_pack(&pack, lec);
+    lec_repack(&pack, lec);
 
     return pack;
 }

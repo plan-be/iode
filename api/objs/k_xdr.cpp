@@ -243,73 +243,78 @@ static void K_xdrMTFN(unsigned char* expr, int mode, int nvargs)
 
 static void K_xdrCLEC_sub(char* expr, int lg, int mode)
 {
-    int     j, keyw, nvargs;
+    int     keyw, nvargs;
     short   len, s;
 
-    for(j = 0 ; j < lg ;) {
+    for(int j = 0; j < lg;) 
+    {
         keyw = expr[j++];
-        if(keyw == L_VAR || keyw == L_VART) {
+        if(keyw == L_VAR || keyw == L_VART) 
+        {
             K_xdrCVAR(expr + j);
             j += sizeof(CVAR);
         }
-        else switch(keyw) {
-                case L_PLUS  :
-                case L_MINUS :
-                case L_TIMES :
+        else switch(keyw) 
+        {
+            case L_PLUS  :
+            case L_MINUS :
+            case L_TIMES :
+                break;
+            case L_DCONST    :
+                XDR_rev(expr + j, 1, sizeof(float));
+                j += s_dbl;
+                break;
+            case L_LCONST    :
+                XDR_rev(expr + j, 1, sizeof(long));
+                j += s_long;
+                break;
+            case L_COEF :
+                K_xdrCVAR(expr + j);
+                j += sizeof(CVAR);
+                break;
+            case L_Period :
+                K_xdrPeriod(expr + j);
+                j += sizeof(Period);
+                K_xdrSHORT(expr + j);
+                j += s_short;
+                break;
+            default :
+                if(is_op(keyw) || is_val(keyw)) 
                     break;
-                case L_DCONST    :
-                    K_xdrREAL(expr + j);
-                    j += s_dbl;
+                if(is_fn(keyw)) 
+                {
+                    /* nargs  = char */
+                    j++;
                     break;
-                case L_LCONST    :
-                    K_xdrLONG(expr + j);
-                    j += s_long;
-                    break;
-                case L_COEF :
-                    K_xdrCVAR(expr + j);
-                    j += sizeof(CVAR);
-                    break;
-                case L_Period :
-                    K_xdrPeriod(expr + j);
-                    j += sizeof(Period);
-                    K_xdrSHORT(expr + j);
-                    j += s_short;
-                    break;
-                default :
-                    if(is_op(keyw) || is_val(keyw)) {
-                        break;
-                    }
-                    if(is_fn(keyw)) {
-                        /* nargs  = char */
-                        j++;
-                        break;
-                    }
-                    if(is_tfn(keyw)) {
-                        /* nargs  = char */
-                        memcpy(&len, expr + j + 1, sizeof(short));
-                        if(mode == 0) K_xdrSHORT(&len); /* intel read */
-                        K_xdrSHORT(expr + j + 1);
+                }
+                if(is_tfn(keyw)) 
+                {
+                    /* nargs  = char */
+                    memcpy(&len, expr + j + 1, sizeof(short));
+                    if(mode == 0) K_xdrSHORT(&len); /* intel read */
+                    K_xdrSHORT(expr + j + 1);
 
-                        j += 1 + sizeof(short);
-                        K_xdrTFN(expr + j, len, mode);
+                    j += 1 + sizeof(short);
+                    K_xdrTFN(expr + j, len, mode);
 
-                        j += len;
-                        break;
-                    }
-                    if(is_mtfn(keyw)) {
-                        /* nargs  = char */
-                        /* nvargs  = char */
-                        nvargs = expr[j + 1];
-                        memcpy(&len, expr + j + 2, sizeof(short));
-                        if(mode == 0) K_xdrSHORT(&len); /* intel read */
-                        K_xdrSHORT(expr + j + 2);
+                    j += len;
+                    break;
+                }
+                if(is_mtfn(keyw)) 
+                {
+                    /* nargs  = char */
+                    /* nvargs  = char */
+                    nvargs = expr[j + 1];
+                    memcpy(&len, expr + j + 2, sizeof(short));
+                    if(mode == 0) K_xdrSHORT(&len); /* intel read */
+                    K_xdrSHORT(expr + j + 2);
 
-                        j += 2 + sizeof(short);
-                        K_xdrMTFN(expr + j, mode, nvargs);
+                    j += 2 + sizeof(short);
+                    K_xdrMTFN(expr + j, mode, nvargs);
 
-                        j += len;
-                        break;
-                    }
+                    j += len;
+                    break;
+                }
             }
     }
 }
@@ -317,29 +322,18 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
 /**
  *  Translates a CLEC struct from little-endian to big-endian or the other way round.
  *  
- *  @param [in, out]    expr    CLEC*   Compiled LEC expression
+ *  @param [in, out]    clec    CLEC*   Compiled LEC expression
  *  @param [in]         mode    int     0: if CLEC is in little-endian format
  */
 
-static void K_xdrCLEC(CLEC* expr, int mode)
+static void K_xdrCLEC(CLEC* clec, int mode)
 {
-    long    tot_lg;
-    short   nb_names;
-    int     pos;
+    int len_expr = clec->len_expr;
+    if(mode == 0)
+        XDR_rev(&len_expr, 1, sizeof(int));
 
-    nb_names = expr->nb_names;
-    tot_lg =   expr->tot_lg;
-    if(mode == 0) {
-        K_xdrLONG(&tot_lg);
-        K_xdrSHORT(&nb_names);
-    }
-
-    XDR_rev(&(expr->tot_lg), 1, sizeof(long));
-    XDR_rev(&(expr->exec_lg), 1, sizeof(long));
-    XDR_rev(&(expr->nb_names), 1, sizeof(short));
-
-    pos = sizeof(CLEC) + (nb_names - 1) * sizeof(LNAME);
-    K_xdrCLEC_sub((char *) expr + pos, tot_lg - pos, mode);
+    XDR_rev(&(clec->len_expr), 1, sizeof(int));
+    K_xdrCLEC_sub((char *) clec->expression, len_expr, mode);
 }
 
 

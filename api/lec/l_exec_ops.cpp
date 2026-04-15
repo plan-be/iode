@@ -7,7 +7,7 @@
  *
  * Function signature:
  *
- *      L_REAL  <fnname>(L_REAL value1, L_REAL value2);
+ *      double  <fnname>(double value1, double value2);
  *  
  *  where value1 and value2 are the parameters that have been passed to the function in the LEC expression.
  *  
@@ -19,19 +19,19 @@
  *  
  *  List of functions
  *  -----------------
- *      L_REAL L_or (L_REAL a, L_REAL b)
- *      L_REAL L_and (L_REAL a, L_REAL b)
- *      L_REAL L_ge (L_REAL a, L_REAL b)
- *      L_REAL L_gt (L_REAL a, L_REAL b)
- *      L_REAL L_le (L_REAL a, L_REAL b)
- *      L_REAL L_lt (L_REAL a, L_REAL b)
- *      L_REAL L_eq (L_REAL a, L_REAL b)
- *      L_REAL L_ne (L_REAL a, L_REAL b)
- *      L_REAL L_plus (L_REAL a, L_REAL b)
- *      L_REAL L_minus(L_REAL a, L_REAL b)
- *      L_REAL L_times(L_REAL a, L_REAL b)
- *             L_REAL L_divide(L_REAL a, L_REAL b)
- *             L_REAL L_exp(L_REAL a, L_REAL b)
+ *      double L_or (double a, double b)
+ *      double L_and (double a, double b)
+ *      double L_ge (double a, double b)
+ *      double L_gt (double a, double b)
+ *      double L_le (double a, double b)
+ *      double L_lt (double a, double b)
+ *      double L_eq (double a, double b)
+ *      double L_ne (double a, double b)
+ *      double L_plus (double a, double b)
+ *      double L_minus(double a, double b)
+ *      double L_times(double a, double b)
+ *             double L_divide(double a, double b)
+ *             double L_exp(double a, double b)
  *  
  */
 #include <math.h>
@@ -41,29 +41,29 @@
     #define _isnan isnan
 #endif
 
-L_REAL L_or   (L_REAL a, L_REAL b) {return((a || b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_and  (L_REAL a, L_REAL b) {return((a && b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_ge   (L_REAL a, L_REAL b) {return((a >= b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_gt   (L_REAL a, L_REAL b) {return((a > b)  ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_le   (L_REAL a, L_REAL b) {return((a <= b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_lt   (L_REAL a, L_REAL b) {return((a < b)  ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_eq   (L_REAL a, L_REAL b) {return((a == b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_ne   (L_REAL a, L_REAL b) {return((a != b) ? (L_REAL)1.0 : (L_REAL)0.0);}
-L_REAL L_plus (L_REAL a, L_REAL b) {return(a + b);}
-L_REAL L_minus(L_REAL a, L_REAL b) {return(a - b);}
-L_REAL L_times(L_REAL a, L_REAL b) {return(a * b);}
+double L_or   (double a, double b) {return((a || b) ? (double)1.0 : (double)0.0);}
+double L_and  (double a, double b) {return((a && b) ? (double)1.0 : (double)0.0);}
+double L_ge   (double a, double b) {return((a >= b) ? (double)1.0 : (double)0.0);}
+double L_gt   (double a, double b) {return((a > b)  ? (double)1.0 : (double)0.0);}
+double L_le   (double a, double b) {return((a <= b) ? (double)1.0 : (double)0.0);}
+double L_lt   (double a, double b) {return((a < b)  ? (double)1.0 : (double)0.0);}
+double L_eq   (double a, double b) {return((a == b) ? (double)1.0 : (double)0.0);}
+double L_ne   (double a, double b) {return((a != b) ? (double)1.0 : (double)0.0);}
+double L_plus (double a, double b) {return(a + b);}
+double L_minus(double a, double b) {return(a - b);}
+double L_times(double a, double b) {return(a * b);}
 
 /*  Note: L_divide() and L_exp() are used by other functions and must therefore be global. */
 
-L_REAL L_divide(L_REAL a, L_REAL b) 
+double L_divide(double a, double b) 
 {
     if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a) || b == 0) {
-        return((L_REAL)IODE_NAN);
+        return((double)IODE_NAN);
     }
     return(a / b);
 }
 
-L_REAL L_exp(L_REAL a, L_REAL b)
+double L_exp(double a, double b)
 {
     double x, ib;
 
@@ -77,5 +77,5 @@ L_REAL L_exp(L_REAL a, L_REAL b)
     else
         x = pow((double)a, (double)b);
     if(_isnan(x)) x = IODE_NAN; /* JMP 18-01-02 */
-    return((L_REAL)x);
+    return((double)x);
 }

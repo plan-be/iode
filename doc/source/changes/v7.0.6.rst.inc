@@ -32,7 +32,11 @@ Miscellaneous
   and ``dir(iode)``. Deprecated functionality remains accessible via explicit 
   imports from ``iode.deprecated`` (closes :issue:`1144`) 
 
-- The memory management of the IODE objects in the IODE workspaces the C/C++ API has been 
+- C API: The memory management of the IODE objects in the IODE workspaces has been 
   delegated to C++ std containers (in place of the SCR4 library previously). 
   That should not impact the output of estimations or simulations. 
   Closes :issue:`1012`
+
+- C API: The structure handling the *compiled LEC* objects (present in IODE *equations*, 
+  *identities* and *tables*) has been rewritten. That should not impact the output of 
+  estimations or simulations. 

@@ -14,7 +14,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      L_REAL <fnname>(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ *      double <fnname>(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -28,21 +28,21 @@
  *  -----------------
  *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
  *  
- *      L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs, int orig)
- *      L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      int    L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)
- *      L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
- *      L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, int std)
- *      L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig)
+ *      double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      int    L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)
+ *      double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)
+ *      double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)
  */
 #include <math.h>
 #include "api/lec/lec.h"
@@ -65,14 +65,14 @@
  *  @param [in] expr2   unsigned char*  second CLEC sub-expression
  *  @param [in] len2    short           length of expr2
  *  @param [in] t       int             time of of the returned value
- *  @param [in] stack   L_REAL*         pointer to the top of the stack of intermediate values / results
+ *  @param [in] stack   double*         pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
  *  @return         
  *  
  */
-L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs) 
+double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs) 
 {
-    L_REAL  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
+    double  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
     int     from, to, j;
 
     meanx = L_mean(expr1, len1, t, stack, nargs - 1);
@@ -119,13 +119,13 @@ L_REAL L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short 
  *  @param [in] expr   unsigned char*   CLEC sub-expression
  *  @param [in] nvargs short            number of variables arguments (unused)
  *  @param [in] t      int              time of calculation
- *  @param [in] stack  L_REAL*          pointer to the top of the stack of intermediate values / results
+ *  @param [in] stack  double*          pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs  int              number of arguments of the calling function that determines the calculation interval.
  *
- *  @return            L_REAL           computed correlation 
+ *  @return            double           computed correlation 
  *  
  */
-L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)  /* JMP 17-04-98 */
+double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)  /* JMP 17-04-98 */
 {
     short   len1, len2;
 
@@ -154,15 +154,15 @@ L_REAL L_corr(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
  *  @param [in] expr2   unsigned char*  second CLEC sub-expression
  *  @param [in] len2    short           length of expr2
  *  @param [in] t       int             time of of the returned value
- *  @param [in] stack   L_REAL*         pointer to the top of the stack of intermediate values / results
+ *  @param [in] stack   double*         pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
- *  @return             L_REAL          computed covariance.
+ *  @return             double          computed covariance.
  *  
  */
 
-L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, L_REAL* stack, int nargs, int orig) 
+double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig) 
 {
-    L_REAL  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
+    double  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
     int     from, to, j, n;
 
     L_tfn_args(t, stack, nargs - 1, &from, &to);
@@ -195,12 +195,12 @@ L_REAL L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short
  *      - the second sub expression starts at the position expr + length of the first sub expression.
  *  
  *
- *  @return            L_REAL           computed covariance
+ *  @return            double           computed covariance
  *
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
+double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs) 
 {
     short   len1, len2;
 
@@ -220,7 +220,7 @@ L_REAL L_covar(unsigned char* expr, short nvargs, int t, L_REAL* stack, int narg
  *  @see L_calccovar() for the formulas.
  *  
  */
-L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) 
+double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs) 
 {
     short   len1, len2;
 
@@ -248,7 +248,7 @@ L_REAL L_covar0(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
  *  @see L_covar() for more details.
  *  
  */
-L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
 {
     short   len1;
 
@@ -269,9 +269,9 @@ L_REAL L_var(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
  *  @see L_calccovar() for the formula.
  *  
  */
-L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
 {
-    L_REAL  v1;
+    double  v1;
 
     v1 = L_var(expr, nvargs, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(v1) || v1 < 0) return(IODE_NAN);
@@ -304,15 +304,15 @@ L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
  *  
  *  @see L_corr() for the parameter definition
  *
- *  @return            L_REAL           computed covariance
+ *  @return            double           computed covariance
  */  
 
- L_REAL L_index(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+ double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
 {
     char    *expr1, *expr2;
     short   len1, len2;
     int     from, to, j, n;
-    L_REAL  vx, vy;
+    double  vx, vy;
 
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
@@ -330,7 +330,7 @@ L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
         vy = L_exec_sub((unsigned char*) expr2, len2, j, stack);
         if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
 
-        if(fabs(vx - vy) < 1e-30) return((L_REAL)j);
+        if(fabs(vx - vy) < 1e-30) return((double)j);
     }
 
     return(IODE_NAN);
@@ -351,12 +351,12 @@ L_REAL L_stddev(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nar
  *  
  *  @see L_corr() for the parameter definition
  */
-L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* JMP 17-04-98 */
+double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
 {
     char    *expr1, *expr2;
     short   len1, len2;
     int     from, to, j, n, k;
-    L_REAL  vx, vy, meanx, sxy = 0.0, sxy0 = 0.0;
+    double  vx, vy, meanx, sxy = 0.0, sxy0 = 0.0;
 
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
@@ -402,15 +402,15 @@ L_REAL L_acf(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
  *  @param [in]  expr1  unsigned char*   CLEC sub-expression (heterogeous container)
  *  @param [in]  len1   short            length of expr1 in bytes
  *  @param [in]  t      int              time of calculation
- *  @param [in]  stack  L_REAL*          pointer to the top of the stack of intermediate values / results
- *  @param [out] vt     L_REAL*          
- *  @param [out] vy     L_REAL* 
+ *  @param [in]  stack  double*          pointer to the top of the stack of intermediate values / results
+ *  @param [out] vt     double*          
+ *  @param [out] vy     double* 
  *  @param [in]  notnul 
- *  @return             L_REAL           computed correlation 
+ *  @return             double           computed correlation 
  *  
  */
  
-int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, L_REAL* vy, int notnul)
+int L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)
 {
     int     nobs;
 
@@ -463,15 +463,15 @@ int L_calcvals(unsigned char* expr1, short len1, int t, L_REAL* stack, int* vt, 
  *  
  *  @see L_corr() for the parameter definition
  *  
- *  @return     L_REAL  value of expr[t] or interpolated value
+ *  @return     double  value of expr[t] or interpolated value
  *  
  */
-L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* JMP 17-04-98 */
+double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
 {
     char    *expr1;
     short   len1;
     int     nobs, vt[2];
-    L_REAL  vx, vy[2], itc;
+    double  vx, vy[2], itc;
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = ((char*) expr) + sizeof(short);
@@ -492,12 +492,12 @@ L_REAL L_interpol(unsigned char* expr, short nvargs, int t, L_REAL* stack, int n
     return(itc + t * (vy[1] - vy[0]) / (vt[1] - vt[0]));
 }
 
-L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs) /* JMP 17-04-98 */
+double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
 {
     char    *expr1, *expr2;
     short   len1, len2;
     int     j, nobs, vt[2];
-    L_REAL  vx, vy[2], ayt, ay[2], delta;
+    double  vx, vy[2], ayt, ay[2], delta;
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = ((char*) expr) + sizeof(short);
@@ -555,12 +555,12 @@ L_REAL L_app(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
     return(IODE_NAN);
 }
 
-L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs)
+double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
 {
     char    *expr1, *expr2;
     short   len1, len2;
     int     j, nobs, vt[2];
-    L_REAL  vx, vy[2], ayt, ay[2], delta;
+    double  vx, vy[2], ayt, ay[2], delta;
 
     memcpy(&len1, expr, sizeof(short));
     expr1 = ((char*) expr) + sizeof(short);
@@ -602,7 +602,7 @@ L_REAL L_dapp(unsigned char* expr, short nvargs, int t, L_REAL* stack, int nargs
     return(IODE_NAN);
 }
 
-L_REAL L_hpall(unsigned char* expr, short len, int t, L_REAL* stack, int nargs, int std)
+double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)
 {
     char    *expr1, *expr2;
     short   len1, len2;
@@ -657,13 +657,13 @@ err:
     return(IODE_NAN);
 }
 
-L_REAL L_hp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
     return(L_hpall(expr, len, t, stack, nargs, 0));
 }
 
 
-L_REAL L_hpstd(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
     return(L_hpall(expr, len, t, stack, nargs, 1));
 }

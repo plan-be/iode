@@ -68,14 +68,15 @@ bool Identity::to_binary(char** pack) const
         return false;
 
     CLEC* clec = L_cc(c_lec);
-    if(clec == NULL)  
+    if(!clec)  
         return false;
     
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, c_lec, (int) strlen(c_lec) + 1);
-    *pack = (char*) P_add(*pack, (char*) clec, clec->tot_lg);
+    // for backward compatibility with old binary files
+    *pack = (char*) P_add(*pack, NULL, 0);
 
-    SW_nfree(clec);
+    delete clec;
     return true;
 }
 

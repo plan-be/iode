@@ -68,19 +68,13 @@ static int E_GetSmpl(Sample* smpl, char* c_name)
  */
 int E_GetLecName(char* lec, char* name)
 {
-    int     j;
-    CLEC    *clec = 0;
-
     name[0] = 0;
-    clec = L_cc(lec);
-    if(clec == 0) 
+    CLEC* clec = L_cc(lec);
+    if(!clec) 
         return -1;
-    
-    std::string obj_name;
-    for(j = 0 ; j < clec->nb_names ; j++) 
-    {
-        obj_name = std::string(clec->lnames[j].name);
-        
+
+    for(auto& [obj_name, _]: clec->objs) 
+    {   
         // skip "_DF" 
         if(obj_name == "_DF")
             continue;
@@ -93,7 +87,7 @@ int E_GetLecName(char* lec, char* name)
         } 
     }
 
-    SW_nfree(clec);
+    delete clec;
     return 0;
 }
 

@@ -16,7 +16,7 @@
  *
  * Function signature:
  *
- *      L_REAL <fnname>(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      double <fnname>(unsigned char* expr, short len, int t, double* stack, int nargs)
  *  
  *  where:
  *      - expr points to the current position in the CLEC expression (in "sum(A + B))", expr points to "A + B")
@@ -47,18 +47,18 @@
  *  -----------------
  *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
  *  
- *      L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *             L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
- *      L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+ *      double L_diff(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_rapp(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_dln(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_grt(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_mavg(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_vmax(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_vmin(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_sum(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_prod(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *             double L_mean(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_stderr(unsigned char* expr, short len, int t, double* stack, int nargs)
+ *      double L_lastobs(unsigned char* expr, short len, int t, double* stack, int nargs)
  *  
  */
 #include <math.h>
@@ -75,13 +75,13 @@
  *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
  *  @param [in] len     short           length of expr
  *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
- *  @param [in] stack   L_REAL*         top of the stack of values
+ *  @param [in] stack   double*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (1 or 2)
- *  @return             L_REAL          result of "expr in t"
+ *  @return             double          result of "expr in t"
  *  
  */
 
-L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_lag(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
     int     lag = 1;
 
@@ -97,9 +97,9 @@ L_REAL L_lag(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_lag() for more details on parameters.
  */
-L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_diff(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1, v2;
+    double  v1, v2;
     int     lag = 1;
 
     if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
@@ -117,9 +117,9 @@ L_REAL L_diff(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_lag() for more details on parameters.
  */
-L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_rapp(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1, v2;
+    double  v1, v2;
     int     lag = 1;
 
     if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
@@ -137,9 +137,9 @@ L_REAL L_rapp(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_lag() for more details on parameters.
  */
-L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_dln(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1, v2;
+    double  v1, v2;
     int     lag = 1;
 
     if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
@@ -157,13 +157,13 @@ L_REAL L_dln(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_lag() for more details on parameters.
  */
-L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_grt(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1;
+    double  v1;
 
     v1 = L_rapp(expr, len, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(v1)) return(IODE_NAN);
-    return((L_REAL)((v1 - 1.0) * 100.0));
+    return((double)((v1 - 1.0) * 100.0));
 }
 
 
@@ -173,9 +173,9 @@ L_REAL L_grt(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_lag() for more details on parameters.
  */
-L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_mavg(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1 = 0.0, tmp;
+    double  v1 = 0.0, tmp;
     int     n = 1, j;
 
     if(nargs == 2) n = L_intlag(*stack); /* JMP38 27-10-92 */
@@ -185,7 +185,7 @@ L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
         if(!IODE_IS_A_NUMBER(tmp)) return(IODE_NAN);
         v1 += tmp;
     }
-    return((L_REAL)(v1 / n));
+    return((double)(v1 / n));
 }
 
 
@@ -199,14 +199,14 @@ L_REAL L_mavg(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
  *  @param [in] len     short           length of expr
  *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
- *  @param [in] stack   L_REAL*         top of the stack of values
+ *  @param [in] stack   double*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (2 or 3)
- *  @return             L_REAL          the maximum of expr on the period [p1, p2]
+ *  @return             double          the maximum of expr on the period [p1, p2]
  *  
  */
-L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_vmax(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1, v2;
+    double  v1, v2;
     int     from, to, j;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -226,9 +226,9 @@ L_REAL L_vmax(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_vmax() for more details.
  */
-L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_vmin(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1, v2;
+    double  v1, v2;
     int     from, to, j;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -247,9 +247,9 @@ L_REAL L_vmin(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_vmax() for more details.
  */
-L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_sum(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL    v1 = 0.0, tmp;
+    double    v1 = 0.0, tmp;
     int     from, to, j;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -267,9 +267,9 @@ L_REAL L_sum(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  
  *  @see L_vmax() for more details.
  */
-L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_prod(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1 = 1.0, tmp;
+    double  v1 = 1.0, tmp;
     int     from, to, j;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -290,9 +290,9 @@ L_REAL L_prod(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  @note not a function because it is also used by MTFN functions
  */
 
-L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_mean(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  v1;
+    double  v1;
     int     from, to;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -309,9 +309,9 @@ L_REAL L_mean(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  @see L_vmax() for more details.
  *  
  */
-L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_stderr(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  s = 0.0, s2 = 0.0, v1;
+    double  s = 0.0, s2 = 0.0, v1;
     int     from, to, j, n;
 
     L_tfn_args(t, stack, nargs, &from, &to);
@@ -335,9 +335,9 @@ L_REAL L_stderr(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
  *  @see L_vmax() for more details.
  *  
  */
-L_REAL L_lastobs(unsigned char* expr, short len, int t, L_REAL* stack, int nargs)
+double L_lastobs(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
-    L_REAL  tmp;
+    double  tmp;
     int     from, to, j;
 
     L_tfn_args(t, stack, nargs, &from, &to);

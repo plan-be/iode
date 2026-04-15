@@ -18,23 +18,20 @@ class Identity
 public:
     Identity(const std::string& lec)
     {
+        this->clec = nullptr;
         set_lec(lec);
     }
 
     Identity(const Identity& other)
     {
         this->lec = other.lec;
-        // NOTE : we do not use memcpy() because memcpy() actually makes  
-        //        a shallow copy of a struct instead of a deep copy
-        this->clec = clec_deep_copy(other.clec);
+        this->clec = new CLEC(*other.clec);
     }
 
     ~Identity()
     {
-        this->lec.clear();
-
         if(this->clec)
-            SW_nfree(this->clec);
+            delete this->clec;
     }
 
     std::string get_lec() const 
@@ -45,15 +42,21 @@ public:
     void set_lec(const std::string& lec) 
     {
         this->lec = lec;
+        
         // L_cc returns an allocated CLEC struct pointer.
+        if(this->clec)
+            delete this->clec;
+        // compile the LEC expression
         this->clec = L_cc((char*) lec.c_str());
     }
 
     CLEC* get_compiled_lec()
     {
         if(this->clec)
-            SW_nfree(this->clec);
+            delete this->clec;
+        // recompile the LEC expression
         this->clec = L_cc((char*) lec.c_str());
+
         return this->clec;
     }
 
@@ -63,25 +66,36 @@ public:
     Identity& operator=(const Identity& other)
     {
         this->lec = other.lec;
-        // NOTE : we do not use memcpy() because memcpy() actually makes  
-        //        a shallow copy of a struct instead of a deep copy
-        this->clec = clec_deep_copy(other.clec);
+
+        if(this->clec)
+            delete this->clec;
+        this->clec = new CLEC(*other.clec);
+
         return *this;
     }
 
     bool operator==(const Identity& other) const
     {
+        if(this->lec != other.lec)
+            return false;
+
+        // recompile the LEC expression of both identities 
         CLEC* cl1 = L_cc((char*) this->lec.c_str());
         CLEC* cl2 = L_cc((char*) other.lec.c_str());
 
-        if(cl1 == NULL || cl2 == NULL)
+        // compilation failed for at least one of the two LEC expressions
+        if(cl1 == nullptr || cl2 == nullptr)
+        {
+            if(cl1) delete cl1;
+            if(cl2) delete cl2;
             return false;
-        if(cl1->tot_lg != cl2->tot_lg)
-            return false;
-        if(memcmp(cl1, cl2, cl1->tot_lg) != 0) 
-            return false;
+        }
         
-        return true;
+        bool equal = *cl1 == *cl2;
+        delete cl1;
+        delete cl2;
+        
+        return equal;
     }
 
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true);

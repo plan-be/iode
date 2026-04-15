@@ -274,11 +274,11 @@ int B_DataCalcVar(char* arg, int unused)
                 d = L_exec(kdb, global_ws_scl, clec, t);
                 kdb->get_var_ptr(name)[t] = d;
             }
-            SW_nfree(clec);
+            delete clec;
         }
         else 
         {
-            SW_nfree(clec);
+            delete clec;
             std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
             kwarning(error_msg.c_str());
             return -1;

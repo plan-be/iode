@@ -44,17 +44,34 @@ struct OKDB643
 
 struct OLNAME 
 {
-    OONAME   name;
+    OONAME  name;
     char    pad[3];
     short   pos;
 };
 
-struct OCLEC 
+struct OOCLEC 
 {
-    short   tot_lg,     // SWHDL
-	        exec_lg,
-	        nb_names;
-    char    dupendo;
+    short   tot_lg;
+	short   exec_lg;
+	short   nb_names;
+    char    duplicated_endo;
     char    pad;
     OLNAME  lnames[1];
+};
+
+struct LNAME 
+{
+    ONAME   name;   // scalar or variable name
+    char    pad[3];
+    long    pos;
+};
+
+struct OCLEC
+{
+    long    tot_lg;      
+    long    exec_lg;       
+    short   nb_names;   // number of scalar and variables names
+    char    dupendo;    // duplicate endogenous variable in the LEC expression
+    char    pad;
+    LNAME   lnames[1];  // list of of scalar and variable names
 };

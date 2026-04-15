@@ -2,31 +2,21 @@
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from libcpp.map cimport map
 from libcpp.pair cimport pair
+from libcpp.map cimport map
 from libcpp cimport bool
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.time.sample cimport CSample
-from pyiode.iode_database.cpp_api_database cimport KDB
 
 
 cdef extern from "api/all.h":
-    ctypedef char ONAME[21]
-    int EQS_NBTESTS
-
-    cdef struct LNAME:
-        ONAME name
-        char  pad[3]
-        long  pos
-
     cdef struct CLEC:
-        long  tot_lg
-        long  exec_lg
-        short nb_names
-        char  dupendo
-        char  pad
-        LNAME lnames[1]
+        char duplicated_endo
+        string lec
+        int len_expr
+        unsigned char* expression
+        vector[pair[string, int]] objs
 
     int B_EqsStepWise(char* arg)    
     double estimate_step_wise(CSample* smpl, char* eqname, char* cond, char* test);    

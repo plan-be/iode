@@ -848,12 +848,12 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	{
 		for (int t = t_first; t <= t_last; t++) 
 			var.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
-		SW_nfree(clec);
+		delete clec;
 		return var;
 	}
 	else 
 	{
-		SW_nfree(clec);
+		delete clec;
 		throw std::runtime_error("Calculate variable values: Cannot compute LEC expressions: '" + lec + "'");
 	}
 }

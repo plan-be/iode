@@ -19,6 +19,7 @@
 
 #include <algorithm>    // for std::max
 
+
 /**
  *  Implementation of L_getvar() in the context of IODE objects. Retrieves a pointer to the first element of a VAR.
  *  
@@ -72,7 +73,7 @@ Sample *L_getsmpl(KDBVariablesPtr kdb)
  *  @return             int         position of name in KDB 
  *  
  */
-int L_findscl(KDBScalarsPtr kdb, char *name)
+int L_findscl(KDBScalarsPtr kdb, const std::string& name)
 {
     return kdb->index_of(name);
 }
@@ -86,7 +87,7 @@ int L_findscl(KDBScalarsPtr kdb, char *name)
  *  @return             int         position of name in KDB 
  *  
  */
-int L_findvar(KDBVariablesPtr kdb, char* name)
+int L_findvar(KDBVariablesPtr kdb, const std::string& name)
 {
     return kdb->index_of(name);
 }
@@ -133,8 +134,7 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec, CLE
     strcpy(c_lec, eqlec.c_str());
     
     // create a copy of the CLEC* eqclec
-    CLEC* clec = (CLEC*) SCR_malloc(eqclec->tot_lg + 1);
-    memcpy(clec, eqclec, eqclec->tot_lg);
+    CLEC* clec = new CLEC(*eqclec);
 
     char buf[80];
     sprintf(buf, "%cb%s%cB", A2M_ESCCH, name.c_str(), A2M_ESCCH);
@@ -144,9 +144,8 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec, CLE
     std::string sname;
     std::shared_ptr<Scalar> scl = nullptr;
     char tcoef[128], ttest[128];
-    for(int j = 0 ; j < clec->nb_names ; j++) 
+    for(const auto& [sname, _] : clec->objs) 
     {
-        sname = std::string(clec->lnames[j].name);
         buf[0] = 0;
         if(coefs && is_coefficient(sname)) 
         {
