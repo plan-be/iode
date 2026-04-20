@@ -114,23 +114,23 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
         {
             case L_VAR:
             case L_COEF:
-                cvar.pos = al->content.v_var.pos;
-                cvar.lag = al->content.v_var.lag;
-                cvar.per = al->content.v_var.per;
+                cvar.pos = al->content.variable.pos;
+                cvar.lag = al->content.variable.lag;
+                cvar.per = al->content.variable.per;
                 cvar.ref = 0;
                 memcpy(ll + lg, &cvar, sizeof(CVAR));
                 lg += sizeof(CVAR);
                 break;
             case L_Period:
-                memcpy(ll + lg, &(al->content.v_per), sizeof(Period));
+                memcpy(ll + lg, &(al->content.period), sizeof(Period));
                 lg += sizeof(Period) + s_short;
                 break;
             case L_DCONST:
-                memcpy(ll + lg, &(al->content.v_real), sizeof(float)); /* FLOAT 11-04-98 */
+                memcpy(ll + lg, &(al->content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
                 lg += sizeof(float); /* FLOAT 11-04-98 */
                 break;
             case L_LCONST:
-                memcpy(ll + lg, &(al->content.v_long), sizeof(long));
+                memcpy(ll + lg, &(al->content.const_long), sizeof(long));
                 lg += sizeof(long);
                 break;
             case L_OPENP:
@@ -139,7 +139,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                 break;
             default:
                 if(is_fn(al->type))
-                    ll[lg++] = al->content.v_nb_args;
+                    ll[lg++] = al->content.func_nb_args;
 
                 if(is_tfn(al->type)) 
                 {
@@ -150,7 +150,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                     L_move_arg((char*) tmp + 2 + sizeof(short), (char*) tmp, len);
                     memcpy(tmp + 2, &len, sizeof(short));
                     tmp[0] = al->type;
-                    tmp[1] = al->content.v_nb_args;
+                    tmp[1] = al->content.func_nb_args;
                     lg += sizeof(short) + 1;
                 }
 
@@ -173,7 +173,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
 
                     lg += 2 + (1 + nvargs) * sizeof(short);
                     tmp[0] = al->type;
-                    tmp[1] = al->content.v_nb_args;
+                    tmp[1] = al->content.func_nb_args;
                     tmp[2] = nvargs;
                     len += nvargs * sizeof(short);
                     memcpy(tmp + 3, &len, sizeof(short));

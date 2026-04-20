@@ -218,12 +218,12 @@ struct ALEC
     int type;        // type : L_VAR, L_COEF, L_CONST ...
     union 
     {
-        float   v_real;         // constant value (float)
-        long    v_long;         // constant values (integer)
-        int     v_nb_args;      // nb of args for functions
-        CVAR    v_var;          // variable (position, lag, period)
-        short   v_coef;         // coefficient (scalar) position
-        Period  v_per;          // period
+        float   const_float;    // constant value (float)
+        long    const_long;     // constant values (integer)
+        int     func_nb_args;   // nb of args for functions
+        CVAR    variable;       // variable (position, lag, period)
+        short   coefficient;    // coefficient (scalar) position
+        Period  period;         // period
     } content;
 };
 

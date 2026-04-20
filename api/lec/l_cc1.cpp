@@ -109,23 +109,23 @@ static int L_save_var()
     switch(L_TOKEN.tk_def) 
     {
         case L_Period :     // Period
-            al->content.v_per.year = L_TOKEN.tk_period.year;
-            al->content.v_per.periodicity = L_TOKEN.tk_period.periodicity;
-            al->content.v_per.step = L_TOKEN.tk_period.step;
+            al->content.period.year = L_TOKEN.tk_period.year;
+            al->content.period.periodicity = L_TOKEN.tk_period.periodicity;
+            al->content.period.step = L_TOKEN.tk_period.step;
             break;
         case L_DCONST:      // double constant
-            al->content.v_real = L_TOKEN.tk_real;
+            al->content.const_float = L_TOKEN.tk_real;
             break;
         case L_LCONST:      // long constant
-            al->content.v_long = L_TOKEN.tk_long;
+            al->content.const_long = L_TOKEN.tk_long;
             break;
         default :           // Variable or Scalar
             if(is_val(L_TOKEN.tk_def)) break;
-            al->content.v_var.pos = L_add_new_series(L_TOKEN.tk_name);
-            al->content.v_var.lag  = 0;
-            al->content.v_var.per.year = 0;
-            al->content.v_var.per.periodicity= 0;
-            al->content.v_var.per.step = 0;
+            al->content.variable.pos = L_add_new_series(L_TOKEN.tk_name);
+            al->content.variable.lag  = 0;
+            al->content.variable.per.year = 0;
+            al->content.variable.per.periodicity= 0;
+            al->content.variable.per.step = 0;
             break;
     }
 
@@ -193,7 +193,7 @@ static int L_save_op()
             return(L_errno = L_ARGS_ERR);
     }
     al->type = op;
-    al->content.v_nb_args = last_ls.ls_nb_args;
+    al->content.func_nb_args = last_ls.ls_nb_args;
     L_NB_EXPR ++;
     L_NB_OPS--;
     return 0;
@@ -306,8 +306,8 @@ static int L_lag_expr(int lag)
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
         if(al->type != L_VAR) continue;
-        if(al->content.v_var.per.step != 0) continue;
-        al->content.v_var.lag += lag;
+        if(al->content.variable.per.step != 0) continue;
+        al->content.variable.lag += lag;
     }
     return 0;
 }
@@ -334,8 +334,8 @@ static int L_time_expr()
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
         if(al->type != L_VAR) continue;
-        if(al->content.v_var.per.step != 0) continue;
-        memcpy(&(al->content.v_var.per), &(L_TOKEN.tk_period), sizeof(Period));
+        if(al->content.variable.per.step != 0) continue;
+        memcpy(&(al->content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
     return 0;
 }
