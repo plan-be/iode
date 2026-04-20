@@ -187,32 +187,11 @@ enum LecMultiTimeFunction
 
 /*---------------- STRUCTS ------------------------*/
 
-// LEC atomic element
-struct ALEC 
-{
-    int al_type;        // type : L_VAR, L_COEF, L_CONST ...
-    union 
-    {
-        float   v_real;         // constant value (float)
-        long    v_long;         // constant values (integer)
-        int     v_nb_args;      // nb of args for functions
-        struct 
-        {
-            short   pos;        // coef or series pos in ??
-            Period  per;        // Period if any
-            short   lag;        // lag if any
-        } v_var;                // variable
-        short   v_coef;         // coef number
-        Period  v_per;          // period
-    } al_val;
-};
-
 struct CVAR 
 {
-    short   pos,
-            lag,
-            ref,
-            pad;
+    short   pos;
+    short   lag;
+    short   ref;
     Period  per;
 };
 
@@ -231,6 +210,21 @@ struct LSTACK
     unsigned ls_op      : 8;    // operator 
     //unsigned ls_nb_args : 8;  // nb of arguments 
     unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
+};
+
+// LEC atomic element
+struct ALEC 
+{
+    int al_type;        // type : L_VAR, L_COEF, L_CONST ...
+    union 
+    {
+        float   v_real;         // constant value (float)
+        long    v_long;         // constant values (integer)
+        int     v_nb_args;      // nb of args for functions
+        CVAR    v_var;          // variable (position, lag, period)
+        short   v_coef;         // coefficient (scalar) position
+        Period  v_per;          // period
+    } al_val;
 };
 
 /*----------------- GLOBALS ----------------------*/

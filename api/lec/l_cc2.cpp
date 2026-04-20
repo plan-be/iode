@@ -114,7 +114,6 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
         {
             case L_VAR:
             case L_COEF:
-                cvar.pad = 0;
                 cvar.pos = al->al_val.v_var.pos;
                 cvar.lag = al->al_val.v_var.lag;
                 cvar.per = al->al_val.v_var.per;
