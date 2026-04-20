@@ -11,6 +11,7 @@
 #include "api/utils/utils.h"
 
 #include <algorithm>            // for std::min, std::max
+#include <variant>              // for std::variant (= type-safe union)
 
 /* ---------------------- DEFINE ---------------------- */
 
@@ -34,9 +35,9 @@ enum LecError
     L_ARGS_ERR,
     L_STACK_ERR,
     L_MEMORY_ERR,
-    L_Period_ERR,
+    L_PERIOD_ERR,
     L_LAG_ERR,
-    L_PeriodY_ERR,
+    L_PERIODY_ERR,
     L_BOUNDS_ERR,
     L_LINK_ERR,
     L_DIVIDE_ERR,
@@ -61,7 +62,7 @@ enum LecSpecial
     L_CLOSEB,
     L_COMMA,
     L_OCPAR,  /* () */
-    L_Period,
+    L_PERIOD,
     L_VART,   /* VARIABLE [time] */
     L_COLON,
     L_LCONST,
@@ -187,17 +188,9 @@ enum LecMultiTimeFunction
 
 /*---------------- STRUCTS ------------------------*/
 
-struct CVAR 
-{
-    short   pos;
-    short   lag;
-    short   ref;
-    Period  per;
-};
-
 struct TOKEN 
 {
-    float   tk_real;
+    double  tk_real;
     long    tk_long;
     Period  tk_period;
     int     tk_def;
@@ -207,34 +200,96 @@ struct TOKEN
 // stack of operators used by L_analyse 
 struct LSTACK 
 {        
-    unsigned ls_op      : 8;    // operator 
-    //unsigned ls_nb_args : 8;  // nb of arguments 
-    unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
+    unsigned int ls_op : 8;     // operator 
+    unsigned int ls_nb_args;    // nb of arguments
 };
 
-// LEC atomic element
-struct ALEC 
+
+struct ALEC_ABSTRACT
 {
-    int type;        // type : L_VAR, L_COEF, L_CONST ...
-    union 
-    {
-        float   const_float;    // constant value (float)
-        long    const_long;     // constant values (integer)
-        int     func_nb_args;   // nb of args for functions
-        CVAR    variable;       // variable (position, lag, period)
-        short   coefficient;    // coefficient (scalar) position
-        Period  period;         // period
-    } content;
+    int type;       // L_VAR, L_COEF, L_PERIOD, L_LCONST, L_DCONST, ...
+
+protected:
+    ALEC_ABSTRACT(const int type) : type(type) {}
+};
+
+struct ALEC_CONST_REAL: public ALEC_ABSTRACT
+{
+    double value;
+
+public:
+    ALEC_CONST_REAL(const double value) : ALEC_ABSTRACT(L_DCONST), value(value) {}
+};
+
+struct ALEC_CONST_LONG: public ALEC_ABSTRACT
+{ 
+    long value;
+
+public:
+    ALEC_CONST_LONG(const long value) : ALEC_ABSTRACT(L_LCONST), value(value) {}
+};
+
+struct ALEC_COEF: public ALEC_ABSTRACT
+{
+    int pos;          // position of the coefficient in L_NAMES
+
+public:
+    ALEC_COEF(const int pos) : ALEC_ABSTRACT(L_COEF), pos(pos) {}
+};
+
+struct ALEC_VAR: public ALEC_ABSTRACT
+{
+    int pos;            // position of the variable in L_NAMES
+    short lag;          // lag of the variable (0 if current value, 1 if t-1...)
+    short ref;
+    Period per;         // period of the variable (if any)
+
+public:
+    // type = L_VAR or L_VART (variable with time) 
+    ALEC_VAR(const int type, const int pos, const short lag, const Period& per)
+        : ALEC_ABSTRACT(type), pos(pos), lag(lag), ref(0), per(per) {}
+};
+
+struct ALEC_PERIOD: public ALEC_ABSTRACT
+{
+    short ?;
+    Period period;
+
+public:
+    ALEC_PERIOD(const short ?, const Period& period) : 
+        ALEC_ABSTRACT(L_PERIOD), ?(?) period(period) {}
+};
+
+struct ALEC_OPERATOR: public ALEC_ABSTRACT
+{
+public:
+    ALEC_OPERATOR(const int type) : ALEC_ABSTRACT(type) {}
+};
+
+struct ALEC_FUNC: public ALEC_ABSTRACT
+{
+    int nb_args;        // number of arguments of the function
+
+public:
+    ALEC_FUNC(const int type, const int nb_args) : ALEC_ABSTRACT(type), nb_args(nb_args) {}
 };
 
 /*----------------- GLOBALS ----------------------*/
 
 inline int      L_curt = 0;         // current value of t
 inline int      L_errno = 0;        // LEC error number (during compilation)
-inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements
-inline char     **L_NAMES = 0;      // Table of names encountered in the current LEC expression (vars and scalars)
-inline int      L_NB_EXPR = 0;      // Current number of elements (ALEC) in L_EXPR
-inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
+
+// Table of all ALEC atomic elements
+using ATOMIC_LEC = std::variant<ALEC_CONST_REAL, ALEC_CONST_LONG, ALEC_COEF, ALEC_VAR, 
+                                ALEC_PERIOD, ALEC_OPERATOR, ALEC_FUNC>;
+inline std::vector<ATOMIC_LEC> L_EXPR;
+
+inline int get_alec_type(const ATOMIC_LEC& al) 
+{
+    return std::visit([](const auto& x) { return x.type; }, al);
+}
+
+inline char**   L_NAMES = 0;        // Table of names encountered in the current LEC expression (vars and scalars)
 inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
 inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
 
@@ -368,9 +423,9 @@ struct CLEC
     // original LEC expression as a string (for debugging purposes)
     std::string lec;
 
-    // 'executable' LEC expression
-    int len_expr = 0;
-    unsigned char* expression = NULL;
+    // 'executable' LEC expression as a vector of ATOMIC_LEC 
+    // (heterogeneous container of all possible LEC elements)
+    std::vector<ATOMIC_LEC> v_lec_elems;
 
     // list of pairs <scalar and variable name, positions in database>
     // NOTE: we don't use a std::map as we need to keep the order of the 
@@ -378,16 +433,11 @@ struct CLEC
     std::vector<std::pair<std::string, int>> objs;
 
 public:
-    CLEC(const std::string& lec, unsigned char* expr, int len) 
+    CLEC(const std::string& lec, std::vector<ATOMIC_LEC>& v_lec_elems) 
     {
         this->lec = lec;
 
-        len_expr = len;
-
-        expression = new unsigned char[len];
-        memset(expression, 0, len);
-        if(expr)
-            memcpy(expression, expr, len);
+        this->v_lec_elems = v_lec_elems;
 
         // initialize all names with position -1 (not found)
         std::string name;
@@ -546,16 +596,15 @@ void L_close(void);
 int L_get_token(void);
 
 /* l_cc1.c */
-void L_alloc_expr(int nb);
 int L_cc1(int nb_names);
 void L_free_anames(void);
-int L_sub_expr(ALEC* al, int i);
+int L_sub_expr(const std::vector<ATOMIC_LEC>& expr, const int close_pos);
 
 /* l_err.c */
 char *L_error(void);
 
 /* l_cc2.c */
-CLEC* L_cc2(ALEC* expr, const std::string& lec);
+CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec);
 void L_move_arg(char* s1, char* s2, int lg);
 CLEC* L_cc_stream(const std::string& lec);
 CLEC* L_cc(const std::string& lec);
@@ -568,19 +617,20 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
         int matherr(struct _exception *e);
 #else
         // Define the exception structure
-        struct exception {
-        int type;       // Type of error
-        char *name;     // Name of the function where the error occurred
-        double arg1;    // First argument to the function
-        double arg2;    // Second argument to the function (if applicable)
-        double retval;  // Return value
+        struct exception 
+        {
+            int type;       // Type of error
+            char *name;     // Name of the function where the error occurred
+            double arg1;    // First argument to the function
+            double arg2;    // Second argument to the function (if applicable)
+            double retval;  // Return value
         };
         
         int matherr(struct exception *e);
 #endif
 void L_fperror(int sig);
 double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t);
-double L_exec_sub(unsigned char* expr, int lg, int t, double* stack);
+double L_exec_sub(const std::vector<ATOMIC_LEC>& expr, int t, double* stack);
 double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 int L_intlag(double lag);
 double L_uminus(double* stack, int nbargs=-1);
@@ -655,7 +705,7 @@ double L_var(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_stddev(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_index(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_acf(unsigned char* expr, short lg, int t, double* stack, int nargs);
-int L_stackna(double** p_stack, int nargs);
+int L_stack_is_nan(double** p_stack, int nargs);
 int L_calcvals(unsigned char* expr, short lg, int t, double* stack, int* p_nargs, double* res, int nbvals);
 double L_interpol(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_app(unsigned char* expr, short lg, int t, double* stack, int nargs);

@@ -104,7 +104,7 @@ static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
             case L_LCONST    :
                 j += s_long;
                 break;
-            case L_Period    :
+            case L_PERIOD    :
                 memcpy(&per, expr + j, sizeof(Period));
                 s = per.difference(smpl->start_period);
                 memcpy(expr + j + sizeof(Period), &s, sizeof(short));

@@ -30,58 +30,6 @@
 
 #include "api/lec/lec.h"
 
-/**
- * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
- * adding the size reclaimed by each ALEC atomic expression.
- * 
- * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
- * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
- * @param [in] to       int     ending position in ALEC of that expression
- * @return              int     size in bytes of the expression in CLEC form
-*/
-static int L_calc_len(ALEC* expr, int from, int to)
-{
-    int     lg = 0, i;
-    ALEC    *al;
-
-    if(!expr) 
-        return 0;
-    
-    for(al = expr + from, i = from ; i < to ; al++, i++) 
-    {
-        lg ++;
-        switch(al->type) 
-        {
-            case L_COEF:
-            case L_VAR:
-                lg += sizeof(CVAR);
-                break;
-            case L_Period:
-                lg += sizeof(Period) + s_short;
-                break;
-            case L_DCONST:
-                lg += sizeof(float);
-                break; /* FLOAT 11-04-98 */
-            case L_LCONST:
-                lg += sizeof(long);
-                break;
-            case L_OPENP:
-            case L_CLOSEP:
-                lg--;
-                break;
-            default:
-                if(is_fn(al->type)) lg++;
-                if(is_tfn(al->type)) lg += 1 + sizeof(short);
-                if(is_mtfn(al->type))
-                    lg += 2 + (sizeof(short) *
-                               (1 + L_MIN_MTARGS[al->type - L_MTFN])); /* JMP 17-04-98 */
-                break;
-        }
-    }
-    
-    return lg;
-}
-
 
 /**
  * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogenous container).
@@ -89,13 +37,11 @@ static int L_calc_len(ALEC* expr, int from, int to)
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC* L_cc2(ALEC* expr, const std::string& lec) 
+CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
 {
     unsigned char *ll = 0, *tmp;
     int     lg = 0, pos, pos1, alg = 0, j, nvargs;
     long    len, len1;
-    ALEC    *al;
-    CVAR    cvar;
 
     if(!expr) 
         return nullptr;
@@ -121,12 +67,12 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                 memcpy(ll + lg, &cvar, sizeof(CVAR));
                 lg += sizeof(CVAR);
                 break;
-            case L_Period:
+            case L_PERIOD:
                 memcpy(ll + lg, &(al->content.period), sizeof(Period));
                 lg += sizeof(Period) + s_short;
                 break;
             case L_DCONST:
-                memcpy(ll + lg, &(al->content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
+                memcpy(ll + lg, &(al->content.const_double), sizeof(float)); /* FLOAT 11-04-98 */
                 lg += sizeof(float); /* FLOAT 11-04-98 */
                 break;
             case L_LCONST:

@@ -1,13 +1,3 @@
-/**
- * @header4iode
- *
- * Functions to evaluate a compiled and linked LEC expression. 
- *  
- *   - double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)     Execution of a CLEC sub expression.
- *   - double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)                     Execution of a compiled and linked CLEC expression.
- *   - double* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
- */
-
 #include <setjmp.h>
 #include <signal.h>
 #include <time.h>
@@ -75,26 +65,26 @@ void L_fperror(int)
  *  If it is the case, go back nargs-1 steps on the stack and set IODE_NAN on the new top of the stack
  *  Ex.: 
  *      if the stack is {IODE_NAN, 2, 3...}
- *  after the call to L_stackna(&stack, 2)
+ *  after the call to L_stack_is_nan(&stack, 2)
  *      the stack will be {IODE_NAN, 3...}
  *      
  *  @param [in, out] p_stack     double**    pointer to the pointer to the stack
  *  @param [in]      nargs       int         number of arguments
- *  @return                      int         1 if IODE_NAN has been found and the stack is modified
- *                                           0 otherwise
  */
-int L_stackna(double** p_stack, int nargs)
+bool L_stack_is_nan(double** p_stack, int nargs)
 {
-    int     i;
-    double  *stack = *p_stack;
-
-    for(i = 0 ; i < nargs ; i++)
-        if(!IODE_IS_A_NUMBER(*(stack - i))) {
+    double* stack = *p_stack;
+    for(int i = 0; i < nargs; i++)
+    {
+        if(!IODE_IS_A_NUMBER(*(stack - i))) 
+        {
             (*p_stack) -= nargs - 1;
             **p_stack = IODE_NAN;
-            return(1);
+            return true;
         }
-    return 0;
+    }
+
+    return false;
 }
 
 
@@ -122,66 +112,66 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  *      SMPL*       L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
- *      - the first byte (keyw) is an identifier (+, ln, VAR, ...)
+ *      - the first byte (type) is an identifier (+, ln, VAR, ...)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
  *      
- *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeneous container)
- *  @param [in] lg      int             length of the sub expression
+ *  @param [in] expr    ATOMIC_LEC*     vector of ATOMIC LEC of the sub expression
  *  @param [in] t       int             time (index in dbv) of execution
  *  @param [in] stack   double*         execution stack
  *  @return             double          result of the computation
  *  
  */
-double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
+double L_exec_sub(const std::vector<ATOMIC_LEC>& expr, int t, double* stack)
 {
-    double* d_ptr;
-    float r;
-    int     j, nargs, keyw, nvargs;
-    long    l;
-    short   len, s;
-    CVAR    cvar;
+    int type;
 
-    for(j = 0 ; j < lg ;) 
+    for(int j = 0; j < expr.size(); j++)
     {
-        keyw = expr[j++];
+        const ATOMIC_LEC& al = expr[j];
+        type = get_alec_type(al);
 
         // key = variable or variable[period] 
-        if(keyw == L_VAR || keyw == L_VART) 
+        if(type == L_VAR || type == L_VART) 
         {
-            memcpy(&cvar, expr + j, sizeof(CVAR));
-            d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[cvar.pos]);
-            if(d_ptr == nullptr) 
+            // extract the Variable values 
+            ALEC_VAR al_var = std::get<ALEC_VAR>(al);
+            d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[al_var.pos]);
+            if(!d_ptr) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
-            j += sizeof(CVAR);
-            len = cvar.ref;
-            if(cvar.per.year == 0)  
-                len += t;
+
+            // get the true position of the period to process
+            int period_pos = al_var.ref;
+            if(al_var.per.year == 0)
+                period_pos += t;
+            
+            // push the variable value on the stack
             stack++;
-            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) 
+            int nb_periods = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+            if(period_pos < 0 || period_pos >= nb_periods) 
                 *stack = IODE_NAN;
             else 
-                *stack = d_ptr[len];
+                *stack = d_ptr[period_pos];
         }
         else 
-            switch(keyw) 
+            switch(type) 
             {
                 case L_PLUS  :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack--;
                     *stack += *(stack + 1);
                     break;
                 case L_MINUS :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack --;
                     *stack -= *(stack + 1);
                     break;
                 case L_TIMES :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack --;
                     *stack *= *(stack + 1);
                     break;
@@ -198,69 +188,83 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                     j += s_long;
                     break;
                 case L_COEF :
+                {
+                    ALEC_COEF al_coef = std::get<ALEC_COEF>(al);
+
+                    // push the coefficient value on the stack
                     stack++;
-                    memcpy(&cvar, expr + j, sizeof(CVAR));
-                    *stack = L_getscl(L_EXEC_DBS, V_EXEC_POS[cvar.pos]);
-                    j += sizeof(CVAR);
+                    *stack = L_getscl(L_EXEC_DBS, V_EXEC_POS[al_coef.pos]);
                     break;
-                case L_Period :
-                    j += sizeof(Period);
+                }
+                case L_PERIOD :
+                {
+                    ALEC_PERIOD al_per = std::get<ALEC_PERIOD>(al);
+
+                    /* 
+                    ???
+                    // push the period value on the stack
                     stack++;
                     memcpy(&s, expr + j, sizeof(short));
                     *stack = s;
-                    j += s_short;
+                    */
                     break;
+                }
                 default :
-                    if(is_op(keyw)) 
+                    // operator (+, -, *, /, and, or, ...)
+                    if(is_op(type)) 
                     {
-                        if(L_stackna(&stack, 2)) break;
+                        if(L_stack_is_nan(&stack, 2)) break;
                         stack--;
-                        *stack = (L_OPS_FN[keyw - L_OP])(*stack, *(stack + 1));
+                        int op_pos = type - L_OP;
+                        *stack = (L_OPS_FN[op_pos])(*stack, *(stack + 1));
                         break;
                     }
-                    if(is_fn(keyw)) 
+                    // not time function (ln, exp, sin, ...)
+                    if(is_fn(type)) 
                     {
-                        nargs = expr[j];
-                        j++;
-                        if(keyw != L_IF && keyw != L_FNISAN &&
-                                keyw != L_LMEAN && keyw != L_LSTDERR &&  /* JMP 03-03-99 */
-                                keyw != L_LCOUNT && L_stackna(&stack, nargs))
+                        ALEC_FUNC al_func = std::get<ALEC_FUNC>(al);
+                        int nb_args = al_func.nb_args;
+                        bool is_nan = L_stack_is_nan(&stack, nb_args);
+                        if(type != L_IF && type != L_FNISAN && type != L_LMEAN && 
+                           type != L_LSTDERR && type != L_LCOUNT && is_nan)
                             break;
-                        *(stack - nargs + 1) = (L_FNS_FN[keyw - L_FN])(stack, nargs);
-                        stack -= nargs - 1;
+                        int fn_pos = type - L_FN;
+                        *(stack - nb_args + 1) = (L_FNS_FN[fn_pos])(stack, nb_args);
+                        stack -= nb_args - 1;
                         break;
                     }
-                    if(is_tfn(keyw)) 
+                    // time function (lag, diff, dln, grt, mavg, ...)
+                    if(is_tfn(type)) 
                     {
-                        nargs = expr[j];
-                        memcpy(&len, expr + j + 1, sizeof(short));
-                        j += 1 + sizeof(short);
-                        *(stack - nargs + 2) =
-                            (L_TFN_FN[keyw - L_TFN])(expr + j,
-                                                     len, t, stack, nargs);
-                        j += len;
-                        stack -= nargs - 2;
+                        ALEC_FUNC al_func = std::get<ALEC_FUNC>(al);
+                        int nb_args = al_func.nb_args;
+                        int fn_pos = type - L_TFN;
+                        *(stack - nb_args + 2) = (L_TFN_FN[fn_pos])(expr + j, len, t, stack, nb_args);
+                        stack -= nb_args - 2;
                         break;
                     }
-                    if(is_mtfn(keyw)) 
+                    // multi-args time function
+                    if(is_mtfn(type)) 
                     {
-                        nargs = expr[j];
-                        nvargs = expr[j + 1];
-                        memcpy(&len, expr + j + 2, sizeof(short));
-                        j += 2 + sizeof(short);
-                        *(stack - nargs + nvargs + 1) =
-                            (L_MTFN_FN[keyw - L_MTFN])(expr + j,
-                                                       nvargs, t, stack, nargs);
-                        j += len;
-                        stack -= nargs - nvargs - 1;
+                        ALEC_FUNC al_func = std::get<ALEC_FUNC>(al);
+                        int nb_args = al_func.nb_args;
+
+                        const ATOMIC_LEC& nex_al = expr[j + 1];
+                        int nvargs = ?nex_al?;
+                        int fn_pos = type - L_MTFN;
+                        *(stack - nb_args + nvargs + 1) = (L_MTFN_FN[fn_pos])(expr + j, nvargs, t, stack, nargs);
+                        stack -= nb_args - nvargs - 1;
                         break;
                     }
-                    if(is_val(keyw)) 
+                    // value function (pi, e, time, i, euro)
+                    if(is_val(type)) 
                     {
                         stack++;
-                        *stack = (L_VAL_FN[keyw - L_VAL])(t);
+                        int fn_pos = type - L_VAL;
+                        *stack = (L_VAL_FN[fn_pos])(t);
                         break;
                     }
+                    // wrong type
                     std::string error_msg = get_l_exec_sub_error_message(expr, t);
                     kerror(0, (char*) error_msg.c_str());
                     return (double) IODE_NAN;

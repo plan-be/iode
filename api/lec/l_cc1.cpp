@@ -18,7 +18,7 @@
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
  *      - void L_alloc_expr(int nb)         Allocates or reallocates L_EXPR by blocks of 100 elements.
- *      - int L_sub_expr(ALEC* al, int i)   Computes the position of the beginning of a sub-expression
+ *      - int L_sub_expr(const ATOMIC_LEC& al, const int i)   Computes the position of the beginning of a sub-expression
  *  
  */
 
@@ -36,29 +36,6 @@ int     L_NB_OPS = 0,       // Current operator stack depth
 
 
 /**
- *  Allocates or reallocates L_EXPR by blocks of 100 elements.
- *  
- *  @param [in] nb      int     if > 0: number of elements required in L_EXPR.
- *                              if <= 0: frees L_EXPR and reset L_EXPR and L_NB_EXPR to 0.
- */
-void L_alloc_expr(int nb)
-{
-    if(nb <= 0) {
-        SW_nfree(L_EXPR);
-        L_NB_AEXPR = L_NB_EXPR = 0;
-        L_EXPR = 0;
-        return; // JMP 1/12/2021
-    }
-    if(L_NB_AEXPR >= nb) return;
-    nb = 100 * (1 + nb / 100);
-    L_EXPR = (ALEC *) SW_nrealloc(L_EXPR,
-                                  sizeof(ALEC) * L_NB_AEXPR,
-                                  sizeof(ALEC) * nb);
-    L_NB_AEXPR = nb;
-}
-
-
-/**
  *  Adds a series or scalar name in L_NAMES.
  *  
  *  If necessary, reallocates L_NAMES by blocks of 10 elements at a time.
@@ -67,18 +44,20 @@ void L_alloc_expr(int nb)
  *  @return                 int     position of name in L_NAMES
  *  
  */
-static int L_add_new_series(char* name)
+static int L_add_coef_or_var_name(char* name)
 {
-    int     i, j;
-
+    int i;
     for(i = 0 ; i < L_NB_NAMES ; i++)
-        if(strcmp(name, L_NAMES[i]) == 0) return(i);
+    {
+        if(strcmp(name, L_NAMES[i]) == 0) 
+            return i;
+    }
 
     if(L_NB_NAMES >= L_NB_ANAMES) 
     {
         L_NAMES = (char **) SCR_realloc(L_NAMES, sizeof(char *),
                                         L_NB_ANAMES, L_NB_ANAMES + 10);
-        for(j = 0 ; j < 10 ; j++)
+        for(int j = 0 ; j < 10 ; j++)
             L_NAMES[L_NB_ANAMES + j] = SCR_malloc(L_MAX_NAME + 1);
 
         L_NB_ANAMES += 10;
@@ -86,13 +65,13 @@ static int L_add_new_series(char* name)
 
     strcpy(L_NAMES[i], name);
     L_NB_NAMES++;
-    return(i);
+    return i;
 }
 
 
 /**
- *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name but also 
- *  a Scalar, a Period or a numerical constant.
+ *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name +
+ *  but also a Scalar, a Period or a numerical constant.
  *  
  *  The token is saved in the union al_val (see iode.h).
  *  
@@ -101,35 +80,48 @@ static int L_add_new_series(char* name)
  */
 static int L_save_var()
 {
-    ALEC    *al;
-
-    L_alloc_expr(L_NB_EXPR + 1);
-    al = L_EXPR + L_NB_EXPR;
-    al->type = L_TOKEN.tk_def;
-    switch(L_TOKEN.tk_def) 
+    int type = L_TOKEN.tk_def;
+    switch(type) 
     {
-        case L_Period :     // Period
-            al->content.period.year = L_TOKEN.tk_period.year;
-            al->content.period.periodicity = L_TOKEN.tk_period.periodicity;
-            al->content.period.step = L_TOKEN.tk_period.step;
+        case L_PERIOD :     // Period
+        {
+            Period period(L_TOKEN.tk_period.year, L_TOKEN.tk_period.periodicity, 
+                          L_TOKEN.tk_period.step);
+            ALEC_PERIOD al(period);
+            L_EXPR.push_back(al);
             break;
-        case L_DCONST:      // double constant
-            al->content.const_float = L_TOKEN.tk_real;
+        }
+        case L_DCONST:      // constant double
+        {
+            ALEC_CONST_REAL al(L_TOKEN.tk_real);
+            L_EXPR.push_back(al);
             break;
-        case L_LCONST:      // long constant
-            al->content.const_long = L_TOKEN.tk_long;
+        }
+        case L_LCONST:      // constant long
+        {
+            ALEC_CONST_LONG al(L_TOKEN.tk_long);
+            L_EXPR.push_back(al);
             break;
-        default :           // Variable or Scalar
-            if(is_val(L_TOKEN.tk_def)) break;
-            al->content.variable.pos = L_add_new_series(L_TOKEN.tk_name);
-            al->content.variable.lag  = 0;
-            al->content.variable.per.year = 0;
-            al->content.variable.per.periodicity= 0;
-            al->content.variable.per.step = 0;
+        }
+        default :           // scalar or variable
+        {
+            int pos = L_add_coef_or_var_name(L_TOKEN.tk_name);
+            // if represents a value -> coefficient
+            if(is_val(type))
+            {
+                ALEC_COEF al(pos);
+                L_EXPR.push_back(al);
+            }
+            // else it is a variable
+            {
+                short lag = 0;
+                ALEC_VAR al(type, pos, lag, Period());
+                L_EXPR.push_back(al);
+            }
             break;
+        }
     }
 
-    L_NB_EXPR++;
     return 0;
 }
 
@@ -145,10 +137,18 @@ static int L_save_var()
  */
 static int L_priority_sup(int op)
 {
-    if(L_NB_OPS <= 0) return 0;
-    if(last_op == L_OPENP) return 0;
-    if(!is_op(last_op)) return(1);
-    if(L_PRIOR[op - L_OP] <= L_PRIOR[last_op - L_OP]) return(1);
+    if(L_NB_OPS <= 0) 
+        return 0;
+    
+    if(last_op == L_OPENP) 
+        return 0;
+    
+    if(!is_op(last_op)) 
+        return 1;
+    
+    if(L_PRIOR[op - L_OP] <= L_PRIOR[last_op - L_OP]) 
+        return 1;
+    
     return 0;
 }
 
@@ -167,35 +167,53 @@ static int L_priority_sup(int op)
  */
 static int L_save_op()
 {
-    int     op, pos;
-    ALEC    *al;
+    int pos;
+    int op = last_op;
+    int type = op;
+    int nb_args = (int) last_ls.ls_nb_args;
 
-    L_alloc_expr(L_NB_EXPR + 1);
-    al = L_EXPR + L_NB_EXPR;
-
-    op = last_op;
-    if(is_fn(op)) {
+    if(is_fn(op)) 
+    {
         pos = op - L_FN;
-        if(L_MAX_FARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_FARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_FARGS[pos] < nb_args || L_MIN_FARGS[pos] > nb_args)
+        {
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
+
+        ALEC_FUNC al(type, nb_args);
+        L_EXPR.push_back(al);
+        return 0;
     }
-    if(is_tfn(op)) {
+
+    if(is_tfn(op)) 
+    {
         pos = op - L_TFN;
-        if(L_MAX_TARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_TARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_TARGS[pos] < nb_args || L_MIN_TARGS[pos] > nb_args)
+        {
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
+
+        ALEC_FUNC al(type, nb_args);
+        L_EXPR.push_back(al);
+        return 0;
     }
-    if(is_mtfn(op)) {
+
+    if(is_mtfn(op)) 
+    {
         pos = op - L_MTFN;
-        if(L_MAX_MTARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_MTARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_MTARGS[pos] < nb_args || L_MIN_MTARGS[pos] > nb_args)
+        {
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
+
+        ALEC_FUNC al(type, nb_args);
+        L_EXPR.push_back(al);
+        return 0;
     }
-    al->type = op;
-    al->content.func_nb_args = last_ls.ls_nb_args;
-    L_NB_EXPR ++;
-    L_NB_OPS--;
+
     return 0;
 }
 
@@ -218,12 +236,20 @@ static int L_save_op()
  */
 static int L_add_stack(int op_group)
 {
-    if(L_NB_OPS >= L_MAX_STACK) return(L_errno = L_STACK_ERR);
+    if(L_NB_OPS >= L_MAX_STACK)
+    {
+        L_errno = L_STACK_ERR;
+        return L_errno;
+    } 
 
-    switch(op_group) {
+    switch(op_group) 
+    {
         case L_OP :
             while(L_priority_sup(L_TOKEN.tk_def))
-                if(L_save_op() != 0) return(L_errno);
+            {
+                if(L_save_op() != 0) 
+                    return L_errno;
+            }
             // NO BREAK!
         case L_FN :
         case L_TFN :
@@ -234,28 +260,40 @@ static int L_add_stack(int op_group)
         case L_OPENP :
             L_PAR++;
             L_OPS[L_NB_OPS++].ls_op = L_OPENP;
-            if(L_save_op() != 0) return(L_errno);
+            if(L_save_op() != 0) 
+                return L_errno;
             L_OPS[L_NB_OPS].ls_op = L_OPENP;
             break;
         case L_CLOSEP :
             L_PAR--;
-            while(L_NB_OPS > 0) {
-                if(last_op == L_OPENP) {
+            while(L_NB_OPS > 0) 
+            {
+                if(last_op == L_OPENP) 
+                {
                     last_op = L_CLOSEP;
-                    return(L_save_op());
+                    return L_save_op();
                 }
-                if(L_save_op() != 0) return(L_errno);
+                if(L_save_op() != 0) 
+                    return L_errno;
             }
-            return(L_errno = L_PAR_ERR);
+            L_errno = L_PAR_ERR;
+            return L_errno;
         case L_COMMA :
-            if(L_add_stack(L_CLOSEP)) return(L_errno);
-            if(L_NB_OPS <= 0 ||
-                    !(is_fn(last_op) || is_tfn(last_op) || is_mtfn(last_op)))
-                return(L_errno = L_SYNTAX_ERR);
+            if(L_add_stack(L_CLOSEP)) 
+                return L_errno;
+            if(L_NB_OPS <= 0 || !(is_fn(last_op) || is_tfn(last_op) || is_mtfn(last_op)))
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
             last_ls.ls_nb_args++;
-            return(L_add_stack(L_OPENP));
+            return L_add_stack(L_OPENP);
         case L_OCPAR :
-            if(L_NB_OPS <= 0 || !is_fn(last_op)) return(L_errno = L_SYNTAX_ERR);
+            if(L_NB_OPS <= 0 || !is_fn(last_op))
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
             last_ls.ls_nb_args = 0;
             return 0;
         default :
@@ -277,20 +315,24 @@ static int L_add_stack(int op_group)
 static int L_empty_ops_stack()
 {
     while(L_NB_OPS > 0)
-        if(L_save_op() != 0) return(L_errno);
-    L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR++].type = L_EOE;
+    {
+        if(L_save_op() != 0) 
+            return L_errno;
+    }
+    
+    ALEC_OPERATOR al(L_EOE);
+    L_EXPR.push_back(al);
     return 0;
 }
 
 
 /**
- *  Applies a lag on each variable in the last sub expression. The last expression on L_EXPR
- *  is either an atomic expression (e.g. "A" or "A[1960Y1]") or 
- *  an expression between parentheses (e.g. "(A+B+2)").
+ *  Applies a lag on each variable in the last sub expression. 
+ *  The last expression on L_EXPR is either an atomic expression (e.g. "A" or "A[1960Y1]") 
+ *  or an expression between parentheses (e.g. "(A+B+2)").
  *  
  *  Ex. 
- *       (A1+A2[-1])[-2]             == A1[-2]+A2[-3]
+ *       (A1+A2[-1])[-2]             == A1[-2] + A2[-3]
  *       A1[1965Y1][-2]              == A1[1965Y1] 
  *  
  *  @param [in]  lag int    lag to add to each var (for ex when treating an sub- sub- expression).
@@ -298,17 +340,27 @@ static int L_empty_ops_stack()
  */
 static int L_lag_expr(int lag)
 {
-    int     pos;
-    ALEC    *al;
+    int start_pos = L_sub_expr(L_EXPR, (int) L_EXPR.size() - 1);
+    if(start_pos < 0) 
+        return L_errno;
 
-    pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) return(L_errno);
-    al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->type != L_VAR) continue;
-        if(al->content.variable.per.step != 0) continue;
-        al->content.variable.lag += lag;
+    int type;
+    for(int pos = start_pos; pos < L_EXPR.size(); pos++) 
+    {
+        ATOMIC_LEC al = L_EXPR[pos];
+        type = get_alec_type(al);
+
+        if(type != L_VAR) 
+            continue;
+
+        ALEC_VAR al_var = std::get<ALEC_VAR>(al);
+        if(al_var.per.step != 0) 
+            continue;
+        
+        al_var.lag += lag;
+        L_EXPR[start_pos] = al_var;
     }
+
     return 0;
 }
 
@@ -326,17 +378,27 @@ static int L_lag_expr(int lag)
  */
 static int L_time_expr()
 {
-    int     pos;
-    ALEC    *al;
+    int start_pos = L_sub_expr(L_EXPR, (int) L_EXPR.size() - 1);
+    if(start_pos < 0) 
+        return L_errno;
+    
+    int type;
+    for(int pos = start_pos; pos < L_EXPR.size(); pos++) 
+    {
+        ATOMIC_LEC al = L_EXPR[pos];
+        type = get_alec_type(al);
 
-    pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) return(L_errno);
-    al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->type != L_VAR) continue;
-        if(al->content.variable.per.step != 0) continue;
-        memcpy(&(al->content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
+        if(type != L_VAR) 
+            continue;
+        
+        ALEC_VAR al_var = std::get<ALEC_VAR>(al);
+        if(al_var.per.step != 0) 
+            continue;
+
+        al_var.per = L_TOKEN.tk_period;
+        L_EXPR[start_pos] = al_var;
     }
+
     return 0;
 }
 
@@ -349,7 +411,7 @@ static int L_time_expr()
  *  
  *  The expression preceding the lag is modified by the function. 
  *  The variables that are fixed in the time (A[2000Y1] for ex.) remain untouched, like a scalar.
- *  Other variables, including thoses already lagged, are "moved" accordingly.
+ *  Other variables, including those already lagged, are "moved" accordingly.
  *  
  *  Ex.
  *      (A1[2000Y1] + A2[-1] + A3)[-2] => (A[2000Y1] + B[-3] + C[-2])
@@ -360,32 +422,56 @@ static int L_time_expr()
  */
 static int L_anal_lag()
 {
-    int     op, lag;
-
-    switch(L_get_token()) {
+    int type = L_get_token();
+    switch(type) 
+    {
+        // case 1: lag or lead like in A[-2]
         case L_OP :
-            op = L_TOKEN.tk_def;
-            if(op != L_MINUS && op != L_PLUS) goto err;
-            if(L_get_token() != L_LCONST) goto err;
-            lag = LYYLONG;
-            if(op == L_MINUS) lag = -lag;
+        {
+            // check that the operator is a '+' or a '-'
+            int op = L_TOKEN.tk_def;
+            if(op != L_MINUS && op != L_PLUS)
+            {
+                L_errno = L_LAG_ERR;
+                return L_errno;
+            }
+
+            // check that the next token is a long constant (the lag)
+            if(L_get_token() != L_LCONST)
+            {
+                L_errno = L_LAG_ERR;
+                return L_errno;
+            }
+            
+            // apply the lag
+            int lag = LYYLONG;
+            if(op == L_MINUS) 
+                lag = -lag;
             L_lag_expr(lag);
             break;
-
-        case L_Period :
+        }  
+        // case 2: time expression like in A[2000Y1]
+        case L_PERIOD :
+            // apply the time expression
             L_time_expr();
             break;
-
+        // default: error
         default :
-            goto err;
+            L_errno = L_LAG_ERR;
+            return L_errno;
     }
 
-    if(L_errno != 0) return(L_errno);
-    if(L_get_token() == L_CLOSEB) return 0;
+    // return the error if any
+    if(L_errno != 0) 
+        return L_errno;
+    
+    // check that the lag expression is closed by a ']'
+    type = L_get_token();
+    if(type == L_CLOSEB) 
+        return 0;
 
-err:
     L_errno = L_LAG_ERR;
-    return(L_errno);
+    return L_errno;
 }
 
 
@@ -404,30 +490,36 @@ err:
  */
 int L_cc1(int nb_names)
 {
-    int     keyw,
-            start = 1,
-            beg = 1;    /* indicate if next token is an oper or an expr */
+    int type;
+    int start = 1;
+    int beg = 1;    /* indicate if next token is an oper or an expr */
 
-    L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
+    L_NB_OPS = L_PAR = L_errno = 0;
     L_NB_NAMES = nb_names;
-    L_alloc_expr(1);
 
     /* LOOP ON TOKEN */
-    while(1) 
+    while(true) 
     {
-        keyw = L_get_token(); // Group of operators, not the operator itself
-        if(L_errno) goto ended;
+        type = L_get_token();       // Group of operators, not the operator itself
+        if(L_errno) 
+            return L_errno;
+        
 again:
-        switch(keyw) 
+        switch(type) 
         {
-            case L_Period:      // Period
-            case L_LCONST :     // Long constant
-            case L_DCONST :     // Double constant
-            case L_VAR :        // Variable
-            case L_VAL :        // ??
-            case L_COEF :       // Coefficient (scalar)
-                if(beg == 0) goto err;
-                if(L_save_var()) goto ended;
+            case L_PERIOD:      // period
+            case L_LCONST :     // long constant
+            case L_DCONST :     // double constant
+            case L_VAR :        // variable
+            case L_COEF :       // coefficient (scalar)
+            case L_VAL :        // value function (pi, e, time...)
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_save_var()) 
+                    return L_errno;
                 beg = 0;
                 break;
             case L_OP :         // Operator
@@ -438,69 +530,101 @@ again:
                         case L_MINUS :
                             L_TOKEN.tk_def = L_UMINUS;
                             break;
-                        case L_PLUS  :
+                        case L_PLUS :
                             L_TOKEN.tk_def = L_UPLUS;
                             break;
-                        default      :
-                            goto err;
+                        default :
+                        {
+                            L_errno = L_SYNTAX_ERR;
+                            return L_errno;
+                        }
                     }
-                    keyw = L_FN;
+                    type = L_FN;
                     goto again;
                 }
                 beg = 1;
-                if(L_add_stack(keyw)) goto ended;
+                if(L_add_stack(keyw)) 
+                    return L_errno;
                 break;
-            case L_FN :         // Function
-            case L_TFN:         // Time function
-            case L_MTFN:        // ?? function
-            case L_OPENP :      // Open parenthesis
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
+            case L_FN :         // not time function
+            case L_TFN:         // time function
+            case L_MTFN:        // multi-args time function
+            case L_OPENP :      // open parenthesis
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 break;
             case L_OCPAR :      // ??
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 beg = 0;
                 break;
             case L_CLOSEP :     // Close parenthesis
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 break;
             case L_COMMA :      // Comma
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 beg = 1;
+                break;
+            case L_OPENB:
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_anal_lag()) 
+                    return L_errno;
+                beg = 0;
                 break;
             case YY_EOF:
             case L_EOE :        // End of expression
                 if(start) 
                 {
-                    L_alloc_expr(1);
-                    L_EXPR[0].type = L_EOE;
-                    L_NB_EXPR++;
-                    goto ended;
+                    L_EXPR.clear();
+                    L_EXPR.push_back(ALEC_OPERATOR(L_EOE));
+                    return L_errno;
                 }
-                if(beg == 1) goto err;
-                if(L_PAR != 0) L_errno = L_PAR_ERR;
-                else L_empty_ops_stack();
-                goto ended;
-            case L_OPENB:
-                if(beg == 1) goto err;
-                if(L_anal_lag()) goto ended;
-                beg = 0;
-                break;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_PAR != 0) 
+                    L_errno = L_PAR_ERR;
+                else 
+                    L_empty_ops_stack();
+                return L_errno;
             case YY_ERROR :
-                goto ended;
+                return L_errno;
             default :
-                goto err;
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
         }
         start = 0;
     }
-
-err :
-    L_errno = L_SYNTAX_ERR;
-ended:
-    return(L_errno);
 }
 
 
@@ -524,38 +648,54 @@ void L_free_anames()
 
 
 /**
- *  Computes the position of the beginning of the sub-expression starting at ALEC al + i (al comes from L_EXPR).
+ *  Computes the position of the beginning of the sub-expression starting at expr[i] (expr comes from L_EXPR).
  *  Browses backwards all elements of the expression until having reached a level 0 of parentheses or 
  *  all arguments of an operator or function.
  *    
- *  @param [in] al  ALEC*   pointer to an element of L_EXPR
- *  @param [in] i   int     position in al of the element where the expression is "closed"
- *  @return                 position in al of the element where the expression starts
+ *  @param [in] expr        ALEC*   pointer to an element of L_EXPR
+ *  @param [in] close_pos   int     position in expr of the element where the expression is "closed"
+ *  @return                         position in expr of the element where the expression starts
  */
-int L_sub_expr(ALEC* al, int i)
+int L_sub_expr(const std::vector<ATOMIC_LEC>& expr, const int close_pos)
 {
-    int     nb_par = 0,
-            keyw;
+    int type;
+    int nb_parents = 0;
 
-    for(; i >= 0 ; i--) {
-        keyw = al[i].type;
-        switch(keyw) {
+    // browse backwards all elements of the expression
+    for(int pos = close_pos; pos >= 0; pos--) 
+    {
+        ATOMIC_LEC& al = expr[pos];
+        type = get_alec_type(al);
+
+        // if open or close parenthesis, update the number of parents
+        switch(type) 
+        {
+            // open parenthesis -> decrease number of parents
             case L_OPENP  :
-                nb_par--;
+                nb_parents--;
                 break;
+            // close parenthesis -> increase number of parents
             case L_CLOSEP :
-                nb_par++;
+                nb_parents++;
                 break;
             default :
                 break;
         }
-        if(nb_par > 0) continue;
-        if(is_op(keyw)) {
-            i = L_sub_expr(al, i - 1);
-            i = L_sub_expr(al, i - 1);
-            return(i);
+
+        if(nb_parents > 0) 
+            continue;
+        
+        // QUESTION: why calling L_sub_expr twice ?
+        if(is_op(type)) 
+        {
+            pos = L_sub_expr(expr, pos - 1);
+            pos = L_sub_expr(expr, pos - 1);
+            return pos;
         }
-        if(!is_fn(keyw) && !is_tfn(keyw) && !is_mtfn(keyw)) return(i);
+
+        // if not a function, we have reached the beginning of the expression
+        if(!is_fn(type) && !is_tfn(type) && !is_mtfn(type)) 
+            return pos;
     }
 
     L_errno = L_LAG_ERR;

@@ -272,7 +272,7 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
                 K_xdrCVAR(expr + j);
                 j += sizeof(CVAR);
                 break;
-            case L_Period :
+            case L_PERIOD :
                 K_xdrPeriod(expr + j);
                 j += sizeof(Period);
                 K_xdrSHORT(expr + j);

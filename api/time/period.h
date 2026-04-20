@@ -31,7 +31,7 @@ const static std::map<char, int> map_periodicities =
 	{'D', 365}
 };
 
-inline std::array<int, 6> L_Period_NB = {1, 2, 4, 12, 52, 365};
+inline std::array<int, 6> PERIOD_NB = {1, 2, 4, 12, 52, 365};
 
 /**
  *  Gives the nbr of periods in one year for the periodicity ch.

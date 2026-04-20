@@ -85,16 +85,18 @@ int L_nb_tokens()
  */
 int L_open_all(char* filename, int type)
 {
-    static int  sorted = 0;
+    static int sorted = 0;
 
     YY_CASE_SENSITIVE = 1;
-    if(sorted == 0) {
+    if(sorted == 0) 
+    {
         qsort(L_TABLE, sizeof(L_TABLE) / sizeof(YYKEYS), sizeof(YYKEYS), YY_compare);
         sorted = 1;
     }
 
     L_YY = YY_open(filename, L_TABLE, sizeof(L_TABLE) / sizeof(YYKEYS), type);
-    if(L_YY == 0) return -1;
+    if(L_YY == 0) 
+        return -1;
     return 0;
 }
 
@@ -104,7 +106,9 @@ int L_open_all(char* filename, int type)
  */
 void L_close()
 {
-    if(L_YY == 0) return;
+    if(L_YY == 0) 
+        return;
+    
     YY_close(L_YY);
     L_YY = 0;
 }
@@ -124,8 +128,11 @@ void L_close()
  */
 static int L_lex()
 {
-    if(L_YY == 0) return(YY_EOF);
-    return(YY_lex(L_YY));
+    if(L_YY == 0) 
+        return YY_EOF;
+    
+    int res = YY_lex(L_YY);
+    return res;
 }
 
 
@@ -142,8 +149,11 @@ static int L_lex()
  */
 static int L_read()
 {   
-    if(L_YY == 0) return(YY_EOF);
-    return(YY_read(L_YY));
+    if(L_YY == 0) 
+        return YY_EOF;
+    
+    int res = YY_read(L_YY);
+    return res;
 }
 
 
@@ -175,15 +185,20 @@ static void L_unread()
  */
 static int L_macro()
 {
-    char    *ptr;
+    char* ptr;
 
-    if(L_read() != YY_WORD) return(L_errno = L_MACRO_ERR);
+    if(L_read() != YY_WORD)
+    {
+        L_errno = L_MACRO_ERR;
+        return L_errno;
+    }
+
     ptr = L_expand((char*) LYYTEXT);
-    if(ptr == 0) return(L_errno = L_MACRO_ERR);
-    /*    YY_record(L_YY, ")"); */  /* JMP 25-09-98 */
-    SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ","); /* JMP 25-09-98 */
+    if(!ptr) 
+        return(L_errno = L_MACRO_ERR);
+    
+    SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ",");
     YY_record(L_YY, (unsigned char*) ptr);
-    /*    YY_record(L_YY, "("); */  /* JMP 25-09-98 */
 
     return 0;
 }
@@ -198,20 +213,21 @@ static int L_macro()
  */
 static int L_read_string()
 {
-    int     i = 0;
-    int     ch = 0;
+    int i = 0;
+    int ch = 0;
 
-    while(1) {
+    while(1) 
+    {
         ch = YY_getc(L_YY);
-        switch(ch) {
+        switch(ch) 
+        {
             case '\'' :
-            case YY_EOF   :
+            case YY_EOF :
                 YY_add_to_text(L_YY, i, 0);
                 YY_add_to_text(L_YY, i + 1, 0);
                 L_YY->yy_lg = i;
-                return(i);
-
-            default    :
+                return i;
+            default :
                 break;
         }
 
@@ -227,8 +243,11 @@ static int L_read_string()
  */
 static int L_getc()
 {
-    if(L_YY == 0) return(YY_EOF);
-    return(YY_getc(L_YY));
+    if(L_YY == 0) 
+        return YY_EOF;
+    
+    int ch = YY_getc(L_YY);
+    return ch;
 }
 
 
@@ -239,7 +258,9 @@ static int L_getc()
  */
 static void L_ungetc(int ch)
 {
-    if(L_YY == 0) return;
+    if(L_YY == 0) 
+        return;
+    
     YY_ungetc(ch, L_YY);
 }
 
@@ -249,42 +270,43 @@ static void L_ungetc(int ch)
  *
  * After having read a integer on L_YY (stored in LYYLONG), tries to read a Period (yyyyPppp) on the stream L_YY.
  * If the next character is invalid for a Period, unreads it and returns L_LCONST. Otherwise, reads the second part of the Period and
- * return L_Period. 
+ * return L_PERIOD. 
  *
  * @return     int     L_LCONST: value in L_TOKEN.tk_long
- *                     L_Period: value in L_TOKEN.tk_period
+ *                     L_PERIOD: value in L_TOKEN.tk_period
  *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
  *
- * On error L_errno is set to L_Period_ERR.
+ * On error L_errno is set to L_PERIOD_ERR.
  */   
 static int L_get_int()
 {
-    int     nb_per,
-            ch;
-    long    l;
-
-    l = LYYLONG;
-    ch = L_getc();
-    nb_per = get_pos_in_char_array((char*) periodicities.c_str(), toupper(ch));
-    if(nb_per < 0) {
+    long l = LYYLONG;
+    int ch = L_getc();
+    int nb_per = get_pos_in_char_array((char*) periodicities.c_str(), toupper(ch));
+    if(nb_per < 0) 
+    {
         L_ungetc(ch);
         L_TOKEN.tk_long = LYYLONG;
-        return(L_LCONST);
+        return L_LCONST;
     }
 
-    if(L_read() != YY_LONG || L_Period_NB[nb_per] < LYYLONG || LYYLONG == 0) {
+    if(L_read() != YY_LONG || PERIOD_NB[nb_per] < LYYLONG || LYYLONG == 0) 
+    {
         L_unread();
-        L_errno = L_Period_ERR;
-        return(YY_ERROR);
+        L_errno = L_PERIOD_ERR;
+        return YY_ERROR;
     }
 
-    if(l < 50) l+= 2000;
-    else if(l < 200) l+= 1900;
+    if(l < 50) 
+        l+= 2000;
+    else if(l < 200) 
+        l+= 1900;
+
     L_TOKEN.tk_period.year = l;
     L_TOKEN.tk_period.periodicity = toupper(ch);
     L_TOKEN.tk_period.step = LYYLONG;
 
-    return(L_Period);
+    return L_PERIOD;
 }
 
 
@@ -299,11 +321,15 @@ static int L_get_int()
  */
 static int L_string()
 {
-    char    *ptr;
-
     L_read_string();
-    ptr = K_expand(VARIABLES, NULL, (char*) LYYTEXT, '*');
-    if(ptr == 0) return(L_errno = L_MACRO_ERR);
+
+    char* ptr = K_expand(VARIABLES, NULL, (char*) LYYTEXT, '*');
+    if(!ptr)
+    {
+        L_errno = L_MACRO_ERR;
+        return L_errno;
+    }
+
     SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ",");
     YY_record(L_YY, (unsigned char*) ptr);
     SCR_free(ptr);
@@ -318,11 +344,14 @@ static int L_string()
 
 static void L_skip()
 {
-    int     type;
-
-    if(L_YY == 0) return;
+    if(L_YY == 0) 
+        return;
+    
     L_unread();
-    do type = L_lex();
+
+    int type;
+    do 
+        type = L_lex();
     while(type != L_EOE && type != YY_EOF);
 }
 
@@ -335,27 +364,32 @@ static void L_skip()
  *  - stores the real value, if any, in L_TOKEN.tk_real
  * 
  * @return     int     - group the token read belongs to (L_FN, L_OP...) or 
- *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_Period...)
+ *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_PERIOD...)
  *                     - L_SYNTAX_ERR if the token is not valid.
  *                     - L_MACRO_ERR if the next token was a incorrect macro or if an expand cannot be done
  */ 
 int L_get_token()
 {
-    int     keyw;
-    int     ch;
+    int type;
+    int ch;
 
-    while(1) {
+    while(1) 
+    {
         ch = L_getc();
-        if(!SCR_is_space(ch)) break; /* JMP 20-10-11 */
+        if(!SCR_is_space(ch)) 
+            break;
     }
 
-    switch(ch) {
+    switch(ch) 
+    {
         case '$' :
-            if(L_macro()) return(L_errno);
+            if(L_macro()) 
+                return L_errno;
             break;
 
         case '\'' :
-            if(L_string()) return(L_errno);
+            if(L_string()) 
+                return L_errno;
             break;
 
         default :
@@ -363,90 +397,54 @@ int L_get_token()
             break;
     }
 
-    keyw = L_lex();
+    type = L_lex();
 
-    L_TOKEN.tk_def = keyw;
-    if(is_op(keyw))   return(L_OP);
-    if(is_fn(keyw))   return(L_FN);
-    if(is_tfn(keyw))  return(L_TFN);
-    if(is_val(keyw))  return(L_VAL);
-    if(is_mtfn(keyw))  return(L_MTFN)/* JMP 20-04-98 */;
-    if(keyw >= 0)     return(keyw);
-    if(LYYTEXT) SCR_strlcpy((unsigned char*) L_TOKEN.tk_name, LYYTEXT, L_MAX_NAME);
-    switch(keyw) {
-        case YY_EOF     :
-            keyw = YY_EOF;
+    L_TOKEN.tk_def = type;
+
+    if(is_op(type))   
+        return L_OP;
+    
+    if(is_fn(type))   
+        return L_FN;
+    
+    if(is_tfn(type))  
+        return L_TFN;
+    
+    if(is_val(type))  
+        return L_VAL;
+    
+    if(is_mtfn(type))  
+        return L_MTFN;
+    
+    if(type >= 0)     
+        return type;
+    
+    if(LYYTEXT) 
+        SCR_strlcpy((unsigned char*) L_TOKEN.tk_name, LYYTEXT, L_MAX_NAME);
+    
+    switch(type) 
+    {
+        case YY_EOF :
+            type = YY_EOF;
             break;
-        case YY_WORD    :
-            if(is_coefficient((char*) LYYTEXT)) keyw = L_COEF;
-            else keyw = L_VAR;
+        case YY_WORD :
+            if(is_coefficient((char*) LYYTEXT)) 
+                type = L_COEF;
+            else 
+                type = L_VAR;
             break;
-        case YY_LONG    :
-            keyw = L_get_int();
+        case YY_LONG :
+            type = L_get_int();
             break;
-        case YY_DOUBLE  :
-            keyw = L_DCONST;
-            L_TOKEN.tk_real = (float)(LYYDOUBLE);
+        case YY_DOUBLE :
+            type = L_DCONST;
+            L_TOKEN.tk_real = (float) LYYDOUBLE;
             break;
         default :
             L_errno = L_SYNTAX_ERR;
             break;
     }
 
-    L_TOKEN.tk_def = keyw;
-    return(keyw);
+    L_TOKEN.tk_def = type;
+    return type;
 }
-
-
-
-/* ==+==== L_INCLUDE ========================
-    Check if all elements of a are in b
-    Return 1 if YES, 0 if NO
-    ========================================= 
-static int L_include(a, b)
-char    *a, *b;
-{
-    int     i;
-
-    for(; *a; a++) {
-        for(i = 0 ; b[i] ; i++)
-            if(*a == b[i]) break;
-        if(b[i] == 0) return 0;
-    }
-    return(1);
-}
-*/
-
-
-/*
-    Reads a period from a opened file (yy)
-
-static int L_get_period(YYFILE* yy, Period* per)
-{
-    int     l, ch, nb_per;
-
-    if(YY_lex(yy) != YY_LONG) {
-        YY_unread(yy);
-        return -1;
-    }
-    l = yy->yy_long;
-    if(l < 50) l+= 2000;
-    else if(l < 200) l+= 1900;
-    ch = YY_getc(yy);
-    nb_per = get_pos_in_char_array(periodicities, toupper(ch));
-    if(nb_per < 0) {
-        YY_ungetc(ch, yy);
-        YY_unread(yy);
-        return -1;
-    }
-    if(YY_lex(yy) != YY_LONG || L_Period_NB[nb_per] < yy->yy_long) {
-        YY_unread(yy);
-        return -1;
-    }
-    per->year = l;
-    per->periodicity = toupper(ch);
-    per->step = yy->yy_long;
-
-    return 0;
-}
-*/

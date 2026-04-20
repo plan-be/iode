@@ -613,7 +613,7 @@ static int COL_read_per(YYFILE* yy, Period* per)
             return -1;
         
         per->step = yy->yy_long;
-        if(per->step < 1 || per->step > L_Period_NB[pos]) 
+        if(per->step < 1 || per->step > PERIOD_NB[pos]) 
             return -1;
         
         YY_skip_spaces(yy);
