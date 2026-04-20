@@ -62,9 +62,9 @@ static int L_count_endo(ALEC* al, int lg, char* endo)
     for(count = 0, i = 0; i < lg; i++, al++)
     {
         if(al->type == L_VAR &&
-           al->content.v_var.per.step == 0 &&
-           al->content.v_var.lag == 0 &&
-           strcmp(L_NAMES[al->content.v_var.pos], endo) == 0)
+           al->content.variable.per.step == 0 &&
+           al->content.variable.lag == 0 &&
+           strcmp(L_NAMES[al->content.variable.pos], endo) == 0)
                 count++;
     }
 
@@ -110,7 +110,7 @@ static int L_split_expr(SLEC* sl)
     lg = sl->sl_lg[sl->sl_mbr] - 1;   // size of al
 ag:
     sl->sl_op = al[lg].type;                // Last element (operator or L_VAR ...) in al. In example, '+'
-    sl->sl_nargs = al[lg].content.v_nb_args;    
+    sl->sl_nargs = al[lg].content.func_nb_args;    
     switch(sl->sl_op) 
     {
         case L_VAR :                    // if the last element is L_VAR, we have only one item and the process is termined (?)
@@ -275,7 +275,7 @@ static void L_append_fn(int op, int nargs)
 {
     L_alloc_expr(L_NB_EXPR + 1);
     L_EXPR[L_NB_EXPR].type = op;
-    L_EXPR[L_NB_EXPR].content.v_nb_args = nargs;
+    L_EXPR[L_NB_EXPR].content.func_nb_args = nargs;
     L_NB_EXPR++;
 }
 
@@ -289,7 +289,7 @@ static void L_append_const(int a)
 {
     L_alloc_expr(L_NB_EXPR + 1);
     L_EXPR[L_NB_EXPR].type = L_LCONST;
-    L_EXPR[L_NB_EXPR].content.v_long = a;
+    L_EXPR[L_NB_EXPR].content.const_long = a;
     L_NB_EXPR++;
 }
 
