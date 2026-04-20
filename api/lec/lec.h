@@ -215,7 +215,7 @@ struct LSTACK
 // LEC atomic element
 struct ALEC 
 {
-    int al_type;        // type : L_VAR, L_COEF, L_CONST ...
+    int type;        // type : L_VAR, L_COEF, L_CONST ...
     union 
     {
         float   v_real;         // constant value (float)
@@ -224,7 +224,7 @@ struct ALEC
         CVAR    v_var;          // variable (position, lag, period)
         short   v_coef;         // coefficient (scalar) position
         Period  v_per;          // period
-    } al_val;
+    } content;
 };
 
 /*----------------- GLOBALS ----------------------*/
