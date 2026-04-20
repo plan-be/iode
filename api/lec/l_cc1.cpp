@@ -105,27 +105,27 @@ static int L_save_var()
 
     L_alloc_expr(L_NB_EXPR + 1);
     al = L_EXPR + L_NB_EXPR;
-    al->al_type = L_TOKEN.tk_def;
+    al->type = L_TOKEN.tk_def;
     switch(L_TOKEN.tk_def) 
     {
         case L_Period :     // Period
-            al->al_val.v_per.year = L_TOKEN.tk_period.year;
-            al->al_val.v_per.periodicity = L_TOKEN.tk_period.periodicity;
-            al->al_val.v_per.step = L_TOKEN.tk_period.step;
+            al->content.v_per.year = L_TOKEN.tk_period.year;
+            al->content.v_per.periodicity = L_TOKEN.tk_period.periodicity;
+            al->content.v_per.step = L_TOKEN.tk_period.step;
             break;
         case L_DCONST:      // double constant
-            al->al_val.v_real = L_TOKEN.tk_real;
+            al->content.v_real = L_TOKEN.tk_real;
             break;
         case L_LCONST:      // long constant
-            al->al_val.v_long = L_TOKEN.tk_long;
+            al->content.v_long = L_TOKEN.tk_long;
             break;
         default :           // Variable or Scalar
             if(is_val(L_TOKEN.tk_def)) break;
-            al->al_val.v_var.pos = L_add_new_series(L_TOKEN.tk_name);
-            al->al_val.v_var.lag  = 0;
-            al->al_val.v_var.per.year = 0;
-            al->al_val.v_var.per.periodicity= 0;
-            al->al_val.v_var.per.step = 0;
+            al->content.v_var.pos = L_add_new_series(L_TOKEN.tk_name);
+            al->content.v_var.lag  = 0;
+            al->content.v_var.per.year = 0;
+            al->content.v_var.per.periodicity= 0;
+            al->content.v_var.per.step = 0;
             break;
     }
 
@@ -157,7 +157,7 @@ static int L_priority_sup(int op)
  *  Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters (in last_ls.ls_nb_args). 
  *  Checks if the number of arguments are in line with the definitions.
  *  
- *  The operator is saved in al_type. 
+ *  The operator is saved in type. 
  *  The nb_args is saved in the union al_val (see iode.h).
  *  
  *  @return     int     0 on success
@@ -192,8 +192,8 @@ static int L_save_op()
                 L_MIN_MTARGS[pos] > (int)last_ls.ls_nb_args)
             return(L_errno = L_ARGS_ERR);
     }
-    al->al_type = op;
-    al->al_val.v_nb_args = last_ls.ls_nb_args;
+    al->type = op;
+    al->content.v_nb_args = last_ls.ls_nb_args;
     L_NB_EXPR ++;
     L_NB_OPS--;
     return 0;
@@ -279,7 +279,7 @@ static int L_empty_ops_stack()
     while(L_NB_OPS > 0)
         if(L_save_op() != 0) return(L_errno);
     L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR++].al_type = L_EOE;
+    L_EXPR[L_NB_EXPR++].type = L_EOE;
     return 0;
 }
 
@@ -305,9 +305,9 @@ static int L_lag_expr(int lag)
     if(pos < 0) return(L_errno);
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->al_type != L_VAR) continue;
-        if(al->al_val.v_var.per.step != 0) continue;
-        al->al_val.v_var.lag += lag;
+        if(al->type != L_VAR) continue;
+        if(al->content.v_var.per.step != 0) continue;
+        al->content.v_var.lag += lag;
     }
     return 0;
 }
@@ -333,9 +333,9 @@ static int L_time_expr()
     if(pos < 0) return(L_errno);
     al = L_EXPR + pos;
     for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->al_type != L_VAR) continue;
-        if(al->al_val.v_var.per.step != 0) continue;
-        memcpy(&(al->al_val.v_var.per), &(L_TOKEN.tk_period), sizeof(Period));
+        if(al->type != L_VAR) continue;
+        if(al->content.v_var.per.step != 0) continue;
+        memcpy(&(al->content.v_var.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
     return 0;
 }
@@ -476,7 +476,7 @@ again:
                 if(start) 
                 {
                     L_alloc_expr(1);
-                    L_EXPR[0].al_type = L_EOE;
+                    L_EXPR[0].type = L_EOE;
                     L_NB_EXPR++;
                     goto ended;
                 }
@@ -538,7 +538,7 @@ int L_sub_expr(ALEC* al, int i)
             keyw;
 
     for(; i >= 0 ; i--) {
-        keyw = al[i].al_type;
+        keyw = al[i].type;
         switch(keyw) {
             case L_OPENP  :
                 nb_par--;
