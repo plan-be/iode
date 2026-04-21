@@ -75,7 +75,7 @@ void L_fperror(int)
  *  If it is the case, go back nargs-1 steps on the stack and set IODE_NAN on the new top of the stack
  *  Ex.: 
  *      if the stack is {IODE_NAN, 2, 3...}
- *  after the call to L_stackna(&stack, 2)
+ *  after the call to L_stack_is_nan(&stack, 2)
  *      the stack will be {IODE_NAN, 3...}
  *      
  *  @param [in, out] p_stack     double**    pointer to the pointer to the stack
@@ -83,18 +83,21 @@ void L_fperror(int)
  *  @return                      int         1 if IODE_NAN has been found and the stack is modified
  *                                           0 otherwise
  */
-int L_stackna(double** p_stack, int nargs)
+bool L_stack_is_nan(double** p_stack, int nargs)
 {
-    int     i;
     double  *stack = *p_stack;
 
-    for(i = 0 ; i < nargs ; i++)
-        if(!IODE_IS_A_NUMBER(*(stack - i))) {
+    for(int i = 0; i < nargs; i++)
+    {
+        if(!IODE_IS_A_NUMBER(*(stack - i))) 
+        {
             (*p_stack) -= nargs - 1;
             **p_stack = IODE_NAN;
-            return(1);
+            return true;
         }
-    return 0;
+    }
+
+    return false;
 }
 
 
@@ -171,17 +174,17 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
             switch(keyw) 
             {
                 case L_PLUS  :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack--;
                     *stack += *(stack + 1);
                     break;
                 case L_MINUS :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack --;
                     *stack -= *(stack + 1);
                     break;
                 case L_TIMES :
-                    if(L_stackna(&stack, 2)) break;
+                    if(L_stack_is_nan(&stack, 2)) break;
                     stack --;
                     *stack *= *(stack + 1);
                     break;
@@ -213,7 +216,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                 default :
                     if(is_op(keyw)) 
                     {
-                        if(L_stackna(&stack, 2)) break;
+                        if(L_stack_is_nan(&stack, 2)) break;
                         stack--;
                         *stack = (L_OPS_FN[keyw - L_OP])(*stack, *(stack + 1));
                         break;
@@ -224,7 +227,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                         j++;
                         if(keyw != L_IF && keyw != L_FNISAN &&
                                 keyw != L_LMEAN && keyw != L_LSTDERR &&  /* JMP 03-03-99 */
-                                keyw != L_LCOUNT && L_stackna(&stack, nargs))
+                                keyw != L_LCOUNT && L_stack_is_nan(&stack, nargs))
                             break;
                         *(stack - nargs + 1) = (L_FNS_FN[keyw - L_FN])(stack, nargs);
                         stack -= nargs - 1;

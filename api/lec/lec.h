@@ -207,8 +207,7 @@ struct TOKEN
 // stack of operators used by L_analyse 
 struct LSTACK 
 {        
-    unsigned ls_op      : 8;    // operator 
-    //unsigned ls_nb_args : 8;  // nb of arguments 
+    unsigned ls_op : 8;         // operator 
     unsigned ls_nb_args;        // nb of arguments : 16 bits instead of 8 to allow checking max 255 args
 };
 
@@ -655,7 +654,7 @@ double L_var(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_stddev(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_index(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_acf(unsigned char* expr, short lg, int t, double* stack, int nargs);
-int L_stackna(double** p_stack, int nargs);
+bool L_stack_is_nan(double** p_stack, int nargs);
 int L_calcvals(unsigned char* expr, short lg, int t, double* stack, int* p_nargs, double* res, int nbvals);
 double L_interpol(unsigned char* expr, short lg, int t, double* stack, int nargs);
 double L_app(unsigned char* expr, short lg, int t, double* stack, int nargs);
