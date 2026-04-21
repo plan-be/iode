@@ -505,30 +505,37 @@ static int L_analyze_lag()
  */
 int L_cc1(int nb_names)
 {
-    int     keyw,
-            start = 1,
-            beg = 1;    /* indicate if next token is an oper or an expr */
+    int type;
+    int start = 1;
+    int beg = 1;    /* indicate if next token is an oper or an expr */
 
     L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
     L_NB_NAMES = nb_names;
     L_alloc_expr(1);
 
     /* LOOP ON TOKEN */
-    while(1) 
+    while(true) 
     {
-        keyw = L_get_token(); // Group of operators, not the operator itself
-        if(L_errno) goto ended;
+        type = L_get_token();       // Group of operators, not the operator itself
+        if(L_errno) 
+            return L_errno;
+        
 again:
-        switch(keyw) 
+        switch(type) 
         {
-            case L_PERIOD:      // Period
-            case L_LCONST :     // Long constant
-            case L_DCONST :     // Double constant
-            case L_VAR :        // Variable
-            case L_VAL :        // ??
-            case L_COEF :       // Coefficient (scalar)
-                if(beg == 0) goto err;
-                if(L_save_var()) goto ended;
+            case L_PERIOD:      // period
+            case L_LCONST :     // long constant
+            case L_DCONST :     // double constant
+            case L_VAR :        // variable
+            case L_COEF :       // coefficient (scalar)
+            case L_VAL :        // value function (pi, e, time...)
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_save_var()) 
+                    return L_errno;
                 beg = 0;
                 break;
             case L_OP :         // Operator
@@ -539,38 +546,72 @@ again:
                         case L_MINUS :
                             L_TOKEN.tk_def = L_UMINUS;
                             break;
-                        case L_PLUS  :
+                        case L_PLUS :
                             L_TOKEN.tk_def = L_UPLUS;
                             break;
-                        default      :
-                            goto err;
+                        default :
+                        {
+                            L_errno = L_SYNTAX_ERR;
+                            return L_errno;
+                        }
                     }
-                    keyw = L_FN;
+                    type = L_FN;
                     goto again;
                 }
                 beg = 1;
-                if(L_add_stack(keyw)) goto ended;
+                if(L_add_stack(type)) 
+                    return L_errno;
                 break;
-            case L_FN :         // Function
-            case L_TFN:         // Time function
-            case L_MTFN:        // ?? function
-            case L_OPENP :      // Open parenthesis
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
+            case L_FN :         // not time function
+            case L_TFN:         // time function
+            case L_MTFN:        // multi-args time function
+            case L_OPENP :      // open parenthesis
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 break;
             case L_OCPAR :      // ??
-                if(beg == 0) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 0) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 beg = 0;
                 break;
             case L_CLOSEP :     // Close parenthesis
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 break;
             case L_COMMA :      // Comma
-                if(beg == 1) goto err;
-                if(L_add_stack(keyw)) goto ended;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_add_stack(type)) 
+                    return L_errno;
                 beg = 1;
+                break;
+            case L_OPENB:
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_analyze_lag()) 
+                    return L_errno;
+                beg = 0;
                 break;
             case YY_EOF:
             case L_EOE :        // End of expression
@@ -579,29 +620,28 @@ again:
                     L_alloc_expr(1);
                     L_EXPR[0].type = L_EOE;
                     L_NB_EXPR++;
-                    goto ended;
+                    return L_errno;
                 }
-                if(beg == 1) goto err;
-                if(L_PAR != 0) L_errno = L_PAR_ERR;
-                else L_empty_ops_stack();
-                goto ended;
-            case L_OPENB:
-                if(beg == 1) goto err;
-                if(L_analyze_lag()) goto ended;
-                beg = 0;
-                break;
+                if(beg == 1) 
+                {
+                    L_errno = L_SYNTAX_ERR;
+                    return L_errno;
+                }
+                if(L_PAR != 0) 
+                    L_errno = L_PAR_ERR;
+                else 
+                    L_empty_ops_stack();
+                return L_errno;
             case YY_ERROR :
-                goto ended;
+                return L_errno;
             default :
-                goto err;
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
         }
         start = 0;
     }
-
-err :
-    L_errno = L_SYNTAX_ERR;
-ended:
-    return L_errno;
 }
 
 
