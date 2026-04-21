@@ -43,13 +43,17 @@ int     L_NB_OPS = 0,       // Current operator stack depth
  */
 void L_alloc_expr(int nb)
 {
-    if(nb <= 0) {
+    if(nb <= 0) 
+    {
         SW_nfree(L_EXPR);
         L_NB_AEXPR = L_NB_EXPR = 0;
         L_EXPR = 0;
-        return; // JMP 1/12/2021
+        return;
     }
-    if(L_NB_AEXPR >= nb) return;
+
+    if(L_NB_AEXPR >= nb) 
+        return;
+    
     nb = 100 * (1 + nb / 100);
     L_EXPR = (ALEC *) SW_nrealloc(L_EXPR,
                                   sizeof(ALEC) * L_NB_AEXPR,
@@ -67,18 +71,20 @@ void L_alloc_expr(int nb)
  *  @return                 int     position of name in L_NAMES
  *  
  */
-static int L_add_new_series(char* name)
+static int L_add_coef_or_var_name(char* name)
 {
-    int     i, j;
-
+    int i;
     for(i = 0 ; i < L_NB_NAMES ; i++)
-        if(strcmp(name, L_NAMES[i]) == 0) return(i);
+    {
+        if(strcmp(name, L_NAMES[i]) == 0) 
+            return i;
+    }
 
     if(L_NB_NAMES >= L_NB_ANAMES) 
     {
         L_NAMES = (char **) SCR_realloc(L_NAMES, sizeof(char *),
                                         L_NB_ANAMES, L_NB_ANAMES + 10);
-        for(j = 0 ; j < 10 ; j++)
+        for(int j = 0 ; j < 10 ; j++)
             L_NAMES[L_NB_ANAMES + j] = SCR_malloc(L_MAX_NAME + 1);
 
         L_NB_ANAMES += 10;
@@ -86,13 +92,13 @@ static int L_add_new_series(char* name)
 
     strcpy(L_NAMES[i], name);
     L_NB_NAMES++;
-    return(i);
+    return i;
 }
 
 
 /**
- *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name but also 
- *  a Scalar, a Period or a numerical constant.
+ *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name 
+ *  but also a Scalar, a Period or a numerical constant.
  *  
  *  The token is saved in the union al_val (see iode.h).
  *  
@@ -101,14 +107,14 @@ static int L_add_new_series(char* name)
  */
 static int L_save_var()
 {
-    ALEC    *al;
+    ALEC* al;
 
     L_alloc_expr(L_NB_EXPR + 1);
     al = L_EXPR + L_NB_EXPR;
     al->type = L_TOKEN.tk_def;
     switch(L_TOKEN.tk_def) 
     {
-        case L_Period :     // Period
+        case L_PERIOD :     // Period
             al->content.period.year = L_TOKEN.tk_period.year;
             al->content.period.periodicity = L_TOKEN.tk_period.periodicity;
             al->content.period.step = L_TOKEN.tk_period.step;
@@ -119,9 +125,13 @@ static int L_save_var()
         case L_LCONST:      // long constant
             al->content.const_long = L_TOKEN.tk_long;
             break;
-        default :           // Variable or Scalar
-            if(is_val(L_TOKEN.tk_def)) break;
-            al->content.variable.pos = L_add_new_series(L_TOKEN.tk_name);
+        default :
+            // if special constant (pi, e, etc.) -> nothing to do
+            if(is_val(L_TOKEN.tk_def)) 
+                break;
+            
+            // Variable or Scalar
+            al->content.variable.pos = L_add_coef_or_var_name(L_TOKEN.tk_name);
             al->content.variable.lag  = 0;
             al->content.variable.per.year = 0;
             al->content.variable.per.periodicity= 0;
@@ -143,13 +153,21 @@ static int L_save_var()
  *                              0 if priority(op) > priority(last_op) 
  *                              0 if there is no op on the stack or if the last op is an open parenthesis
  */
-static int L_priority_sup(int op)
+static bool L_priority_sup(int op)
 {
-    if(L_NB_OPS <= 0) return 0;
-    if(last_op == L_OPENP) return 0;
-    if(!is_op(last_op)) return(1);
-    if(L_PRIOR[op - L_OP] <= L_PRIOR[last_op - L_OP]) return(1);
-    return 0;
+    if(L_NB_OPS <= 0) 
+        return false;
+    
+    if(last_op == L_OPENP) 
+        return false;
+    
+    if(!is_op(last_op)) 
+        return true;
+    
+    if(L_PRIOR[op - L_OP] <= L_PRIOR[last_op - L_OP]) 
+        return true;
+    
+    return false;
 }
 
 
@@ -167,33 +185,44 @@ static int L_priority_sup(int op)
  */
 static int L_save_op()
 {
-    int     op, pos;
-    ALEC    *al;
-
     L_alloc_expr(L_NB_EXPR + 1);
-    al = L_EXPR + L_NB_EXPR;
+    ALEC* al = L_EXPR + L_NB_EXPR;
 
-    op = last_op;
-    if(is_fn(op)) {
+    int pos;
+    int op = last_op;
+    int nb_args = (int) last_ls.ls_nb_args;
+    if(is_fn(op)) 
+    {
         pos = op - L_FN;
-        if(L_MAX_FARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_FARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_FARGS[pos] < nb_args || L_MIN_FARGS[pos] > nb_args)
+        {            
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
     }
-    if(is_tfn(op)) {
+
+    if(is_tfn(op)) 
+    {
         pos = op - L_TFN;
-        if(L_MAX_TARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_TARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_TARGS[pos] < nb_args || L_MIN_TARGS[pos] > nb_args)
+        {            
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
     }
-    if(is_mtfn(op)) {
+
+    if(is_mtfn(op)) 
+    {
         pos = op - L_MTFN;
-        if(L_MAX_MTARGS[pos] < (int)last_ls.ls_nb_args ||
-                L_MIN_MTARGS[pos] > (int)last_ls.ls_nb_args)
-            return(L_errno = L_ARGS_ERR);
+        if(L_MAX_MTARGS[pos] < nb_args || L_MIN_MTARGS[pos] > nb_args)
+        {            
+            L_errno = L_ARGS_ERR;
+            return L_errno;
+        }
     }
+
     al->type = op;
-    al->content.func_nb_args = last_ls.ls_nb_args;
+    al->content.func_nb_args = nb_args;
     L_NB_EXPR ++;
     L_NB_OPS--;
     return 0;
@@ -218,12 +247,20 @@ static int L_save_op()
  */
 static int L_add_stack(int op_group)
 {
-    if(L_NB_OPS >= L_MAX_STACK) return(L_errno = L_STACK_ERR);
+    if(L_NB_OPS >= L_MAX_STACK)
+    {
+        L_errno = L_STACK_ERR;
+        return L_errno;
+    }
 
-    switch(op_group) {
+    switch(op_group) 
+    {
         case L_OP :
             while(L_priority_sup(L_TOKEN.tk_def))
-                if(L_save_op() != 0) return(L_errno);
+            {
+                if(L_save_op() != 0) 
+                    return L_errno;
+            }
             // NO BREAK!
         case L_FN :
         case L_TFN :
@@ -231,33 +268,51 @@ static int L_add_stack(int op_group)
             L_OPS[L_NB_OPS].ls_nb_args = 1;
             L_OPS[L_NB_OPS].ls_op = L_TOKEN.tk_def;
             break;
+
         case L_OPENP :
             L_PAR++;
             L_OPS[L_NB_OPS++].ls_op = L_OPENP;
-            if(L_save_op() != 0) return(L_errno);
+            if(L_save_op() != 0) 
+                return L_errno;
             L_OPS[L_NB_OPS].ls_op = L_OPENP;
             break;
+
         case L_CLOSEP :
             L_PAR--;
-            while(L_NB_OPS > 0) {
-                if(last_op == L_OPENP) {
+            while(L_NB_OPS > 0) 
+            {
+                if(last_op == L_OPENP) 
+                {
                     last_op = L_CLOSEP;
-                    return(L_save_op());
+                    return L_save_op();
                 }
-                if(L_save_op() != 0) return(L_errno);
+
+                if(L_save_op() != 0) 
+                    return L_errno;
             }
-            return(L_errno = L_PAR_ERR);
+            L_errno = L_PAR_ERR;
+            return L_errno;
+
         case L_COMMA :
-            if(L_add_stack(L_CLOSEP)) return(L_errno);
-            if(L_NB_OPS <= 0 ||
-                    !(is_fn(last_op) || is_tfn(last_op) || is_mtfn(last_op)))
-                return(L_errno = L_SYNTAX_ERR);
+            if(L_add_stack(L_CLOSEP)) 
+                return L_errno;
+            if(L_NB_OPS <= 0 || !(is_fn(last_op) || is_tfn(last_op) || is_mtfn(last_op)))
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
             last_ls.ls_nb_args++;
-            return(L_add_stack(L_OPENP));
+            return L_add_stack(L_OPENP);
+
         case L_OCPAR :
-            if(L_NB_OPS <= 0 || !is_fn(last_op)) return(L_errno = L_SYNTAX_ERR);
+            if(L_NB_OPS <= 0 || !is_fn(last_op))
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
             last_ls.ls_nb_args = 0;
             return 0;
+
         default :
             break;
     }
@@ -277,7 +332,11 @@ static int L_add_stack(int op_group)
 static int L_empty_ops_stack()
 {
     while(L_NB_OPS > 0)
-        if(L_save_op() != 0) return(L_errno);
+    {
+        if(L_save_op() != 0) 
+            return L_errno;
+    }
+
     L_alloc_expr(L_NB_EXPR + 1);
     L_EXPR[L_NB_EXPR++].type = L_EOE;
     return 0;
@@ -285,12 +344,12 @@ static int L_empty_ops_stack()
 
 
 /**
- *  Applies a lag on each variable in the last sub expression. The last expression on L_EXPR
- *  is either an atomic expression (e.g. "A" or "A[1960Y1]") or 
- *  an expression between parentheses (e.g. "(A+B+2)").
+ *  Applies a lag on each variable in the last sub expression. 
+ *  The last expression on L_EXPR is either an atomic expression (e.g. "A" or "A[1960Y1]") 
+ *  or an expression between parentheses (e.g. "(A + B + 2)").
  *  
  *  Ex. 
- *       (A1+A2[-1])[-2]             == A1[-2]+A2[-3]
+ *       (A1 + A2[-1])[-2]           == A1[-2] + A2[-3]
  *       A1[1965Y1][-2]              == A1[1965Y1] 
  *  
  *  @param [in]  lag int    lag to add to each var (for ex when treating an sub- sub- expression).
@@ -298,17 +357,26 @@ static int L_empty_ops_stack()
  */
 static int L_lag_expr(int lag)
 {
-    int     pos;
-    ALEC    *al;
+    int pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
+    if(pos < 0) 
+        return L_errno;
 
-    pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) return(L_errno);
-    al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->type != L_VAR) continue;
-        if(al->content.variable.per.step != 0) continue;
+    ALEC* al = L_EXPR + pos;
+    for(; pos < L_NB_EXPR ; pos++, al++) 
+    {
+        // only applies lag to non-timed variables. 
+        if(al->type != L_VAR) 
+            continue;
+
+        // skip if a period is associated to the variable (ex. A[1960Y1]) because 
+        // in that case, the variable is fixed in time and cannot be lagged.
+        if(al->content.variable.per.step != 0) 
+            continue;
+        
+        // applies lag
         al->content.variable.lag += lag;
     }
+
     return 0;
 }
 
@@ -316,27 +384,36 @@ static int L_lag_expr(int lag)
 /**
  *  Applies a time expression (for ex. "1960Y1") on each variable in the last sub expression. 
  *  The last expression on L_EXPR is either an atomic expression (e.g. "A" or "A[1960Y1]") or 
- *  an expression between parentheses (e.g. "(A+B+2)").
+ *  an expression between parentheses (e.g. "(A + B + 2)").
  *  
  *  Ex. 
- *       (A1+A2[1965Y1])[1962Y1]     == A1[1962Y1] + A2[1965Y1]
- *       (A1[-2]+1)[1965Y1]          == A1[1963Y1]+1
+ *       (A1 + A2[1965Y1])[1962Y1]     == A1[1962Y1] + A2[1965Y1]
+ *       (A1[-2] + 1)[1965Y1]          == A1[1963Y1] + 1
  *  
  *  @return          int    0 on success, L_errno if the sub expression cannot be identified          
  */
 static int L_time_expr()
 {
-    int     pos;
-    ALEC    *al;
+    int pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
+    if(pos < 0) 
+        return L_errno;
+    
+    ALEC* al = L_EXPR + pos;
+    for(; pos < L_NB_EXPR ; pos++, al++) 
+    {
+        // only applies lag to non-timed variables.
+        if(al->type != L_VAR) 
+            continue;
 
-    pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) return(L_errno);
-    al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) {
-        if(al->type != L_VAR) continue;
-        if(al->content.variable.per.step != 0) continue;
+        // skip if a period is associated to the variable (ex. A[1960Y1]) because 
+        // in that case, the variable is fixed in time and cannot be lagged.
+        if(al->content.variable.per.step != 0) 
+            continue;
+        
+        // applies time expression
         memcpy(&(al->content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
+
     return 0;
 }
 
@@ -358,34 +435,58 @@ static int L_time_expr()
  *                      L_LAG_ERR on error
  *  
  */
-static int L_anal_lag()
+static int L_analyze_lag()
 {
-    int     op, lag;
-
-    switch(L_get_token()) {
+    int type = L_get_token();
+    switch(type) 
+    {
+        // case 1: lag or lead like in A[-2]
         case L_OP :
-            op = L_TOKEN.tk_def;
-            if(op != L_MINUS && op != L_PLUS) goto err;
-            if(L_get_token() != L_LCONST) goto err;
-            lag = LYYLONG;
-            if(op == L_MINUS) lag = -lag;
+        {
+            // check that the operator is a '+' or a '-'
+            int op = L_TOKEN.tk_def;
+            if(op != L_MINUS && op != L_PLUS)
+            {
+                L_errno = L_LAG_ERR;
+                return L_errno;
+            }
+
+            // check that the next token is a long constant (the lag)
+            if(L_get_token() != L_LCONST)
+            {
+                L_errno = L_LAG_ERR;
+                return L_errno;
+            }
+            
+            // apply the lag
+            int lag = L_YY->yy_long;
+            if(op == L_MINUS) 
+                lag = -lag;
             L_lag_expr(lag);
             break;
-
-        case L_Period :
+        }  
+        // case 2: time expression like in A[2000Y1]
+        case L_PERIOD :
+            // apply the time expression
             L_time_expr();
             break;
-
+        // default: error
         default :
-            goto err;
+            L_errno = L_LAG_ERR;
+            return L_errno;
     }
 
-    if(L_errno != 0) return(L_errno);
-    if(L_get_token() == L_CLOSEB) return 0;
+    // return the error if any
+    if(L_errno != 0) 
+        return L_errno;
+    
+    // check that the lag expression is closed by a ']'
+    type = L_get_token();
+    if(type == L_CLOSEB) 
+        return 0;
 
-err:
     L_errno = L_LAG_ERR;
-    return(L_errno);
+    return L_errno;
 }
 
 
@@ -420,7 +521,7 @@ int L_cc1(int nb_names)
 again:
         switch(keyw) 
         {
-            case L_Period:      // Period
+            case L_PERIOD:      // Period
             case L_LCONST :     // Long constant
             case L_DCONST :     // Double constant
             case L_VAR :        // Variable
@@ -486,7 +587,7 @@ again:
                 goto ended;
             case L_OPENB:
                 if(beg == 1) goto err;
-                if(L_anal_lag()) goto ended;
+                if(L_analyze_lag()) goto ended;
                 beg = 0;
                 break;
             case YY_ERROR :
@@ -500,7 +601,7 @@ again:
 err :
     L_errno = L_SYNTAX_ERR;
 ended:
-    return(L_errno);
+    return L_errno;
 }
 
 

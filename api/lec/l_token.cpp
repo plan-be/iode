@@ -249,13 +249,13 @@ static void L_ungetc(int ch)
  *
  * After having read a integer on L_YY (stored in LYYLONG), tries to read a Period (yyyyPppp) on the stream L_YY.
  * If the next character is invalid for a Period, unreads it and returns L_LCONST. Otherwise, reads the second part of the Period and
- * return L_Period. 
+ * return L_PERIOD. 
  *
  * @return     int     L_LCONST: value in L_TOKEN.tk_long
- *                     L_Period: value in L_TOKEN.tk_period
+ *                     L_PERIOD: value in L_TOKEN.tk_period
  *                     YY_ERROR if the period in invalid (ex 2010Y3 pr 2021M0)
  *
- * On error L_errno is set to L_Period_ERR.
+ * On error L_errno is set to L_PERIOD_ERR.
  */   
 static int L_get_int()
 {
@@ -274,7 +274,7 @@ static int L_get_int()
 
     if(L_read() != YY_LONG || L_Period_NB[nb_per] < LYYLONG || LYYLONG == 0) {
         L_unread();
-        L_errno = L_Period_ERR;
+        L_errno = L_PERIOD_ERR;
         return(YY_ERROR);
     }
 
@@ -284,7 +284,7 @@ static int L_get_int()
     L_TOKEN.tk_period.periodicity = toupper(ch);
     L_TOKEN.tk_period.step = LYYLONG;
 
-    return(L_Period);
+    return(L_PERIOD);
 }
 
 
@@ -335,7 +335,7 @@ static void L_skip()
  *  - stores the real value, if any, in L_TOKEN.tk_real
  * 
  * @return     int     - group the token read belongs to (L_FN, L_OP...) or 
- *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_Period...)
+ *                            specific token type (L_VAR, L_DCONST, L_LCONST, L_PERIOD...)
  *                     - L_SYNTAX_ERR if the token is not valid.
  *                     - L_MACRO_ERR if the next token was a incorrect macro or if an expand cannot be done
  */ 
