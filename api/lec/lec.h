@@ -548,7 +548,7 @@ int L_get_token(void);
 void L_alloc_expr(int nb);
 int L_cc1(int nb_names);
 void L_free_anames(void);
-int L_sub_expr(ALEC* al, int i);
+int L_sub_expr(ALEC* al, int close);
 
 /* l_err.c */
 char *L_error(void);

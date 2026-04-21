@@ -18,7 +18,7 @@
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
  *      - void L_alloc_expr(int nb)         Allocates or reallocates L_EXPR by blocks of 100 elements.
- *      - int L_sub_expr(ALEC* al, int i)   Computes the position of the beginning of a sub-expression
+ *      - int L_sub_expr(ALEC* al, int close)   Computes the position of the beginning of a sub-expression
  *  
  */
 
@@ -644,7 +644,6 @@ again:
     }
 }
 
-
 /**
  *  Resets (frees) L_NAMES.
  */
@@ -661,9 +660,6 @@ void L_free_anames()
     L_NAMES = 0;
 }
 
-
-
-
 /**
  *  Computes the position of the beginning of the sub-expression starting at ALEC al + i (al comes from L_EXPR).
  *  Browses backwards all elements of the expression until having reached a level 0 of parentheses or 
@@ -673,30 +669,45 @@ void L_free_anames()
  *  @param [in] i   int     position in al of the element where the expression is "closed"
  *  @return                 position in al of the element where the expression starts
  */
-int L_sub_expr(ALEC* al, int i)
+int L_sub_expr(ALEC* al, int close)
 {
-    int     nb_par = 0,
-            keyw;
+    int type;
+    int nb_parents = 0;
 
-    for(; i >= 0 ; i--) {
-        keyw = al[i].type;
-        switch(keyw) {
+    // browse backwards all elements of the expression
+    for(int pos = close; pos >= 0; pos--) 
+    {
+        type = al[pos].type;
+
+        // if open or close parenthesis, update the number of parents
+        switch(type) 
+        {
+            // open parenthesis -> decrease number of parents
             case L_OPENP  :
-                nb_par--;
+                nb_parents--;
                 break;
+            // close parenthesis -> increase number of parents
             case L_CLOSEP :
-                nb_par++;
+                nb_parents++;
                 break;
             default :
                 break;
         }
-        if(nb_par > 0) continue;
-        if(is_op(keyw)) {
-            i = L_sub_expr(al, i - 1);
-            i = L_sub_expr(al, i - 1);
-            return(i);
+
+        if(nb_parents > 0) 
+            continue;
+        
+        // QUESTION: why calling L_sub_expr twice ?
+        if(is_op(type)) 
+        {
+            pos = L_sub_expr(al, pos - 1);
+            pos = L_sub_expr(al, pos - 1);
+            return pos;
         }
-        if(!is_fn(keyw) && !is_tfn(keyw) && !is_mtfn(keyw)) return(i);
+
+        // if not a function, we have reached the beginning of the expression
+        if(!is_fn(type) && !is_tfn(type) && !is_mtfn(type)) 
+            return pos;
     }
 
     L_errno = L_LAG_ERR;
