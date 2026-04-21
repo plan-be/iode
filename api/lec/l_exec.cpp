@@ -206,7 +206,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                     *stack = L_getscl(L_EXEC_DBS, V_EXEC_POS[cvar.pos]);
                     j += sizeof(CVAR);
                     break;
-                case L_Period :
+                case L_PERIOD :
                     j += sizeof(Period);
                     stack++;
                     memcpy(&s, expr + j, sizeof(short));

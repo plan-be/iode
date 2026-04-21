@@ -34,9 +34,9 @@ enum LecError
     L_ARGS_ERR,
     L_STACK_ERR,
     L_MEMORY_ERR,
-    L_Period_ERR,
+    L_PERIOD_ERR,
     L_LAG_ERR,
-    L_PeriodY_ERR,
+    L_PERIODY_ERR,
     L_BOUNDS_ERR,
     L_LINK_ERR,
     L_DIVIDE_ERR,
@@ -61,7 +61,7 @@ enum LecSpecial
     L_CLOSEB,
     L_COMMA,
     L_OCPAR,  /* () */
-    L_Period,
+    L_PERIOD,
     L_VART,   /* VARIABLE [time] */
     L_COLON,
     L_LCONST,

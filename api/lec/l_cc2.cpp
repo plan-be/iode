@@ -56,8 +56,8 @@ static int L_calc_len(ALEC* expr, int from, int to)
             case L_VAR:
                 lg += sizeof(CVAR);
                 break;
-            case L_Period:
-                lg += sizeof(Period) + s_short;
+            case L_PERIOD:
+                lg += sizeof(Period) + sizeof(short);
                 break;
             case L_DCONST:
                 lg += sizeof(float);
@@ -121,7 +121,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                 memcpy(ll + lg, &cvar, sizeof(CVAR));
                 lg += sizeof(CVAR);
                 break;
-            case L_Period:
+            case L_PERIOD:
                 memcpy(ll + lg, &(al->content.period), sizeof(Period));
                 lg += sizeof(Period) + s_short;
                 break;
