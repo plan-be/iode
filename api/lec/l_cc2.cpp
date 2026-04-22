@@ -204,9 +204,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
 */
 void L_move_arg(char *s1, char *s2, int lg)
 {
-    int i;
-
-    for(i = lg - 1 ; i >= 0 ; i--)
+    for(int i = lg - 1 ; i >= 0 ; i--)
         s1[i] = s2[i];
 }
 
