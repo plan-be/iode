@@ -178,7 +178,7 @@ static int L_macro()
     char    *ptr;
 
     if(L_read() != YY_WORD) return(L_errno = L_MACRO_ERR);
-    ptr = L_expand((char*) LYYTEXT);
+    ptr = L_expand((char*) L_YY->yy_text);
     if(ptr == 0) return(L_errno = L_MACRO_ERR);
     /*    YY_record(L_YY, ")"); */  /* JMP 25-09-98 */
     SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ","); /* JMP 25-09-98 */
@@ -192,7 +192,7 @@ static int L_macro()
 /**
  *  Reads characters on the L_YY stream until reaching a single quote (') char or EOF.
  *  L_read_string() is called after a single quote is read, indicating the beginning of a string.
- *  The string is saved in L_YY (macro LYYTEXT).
+ *  The string is saved in L_YY (macro L_YY->yy_text).
  *    
  *  @return     int     number of read chars
  */
@@ -247,7 +247,7 @@ static void L_ungetc(int ch)
 /** 
  * Reads an integer or a Period on the stream L_YY.
  *
- * After having read a integer on L_YY (stored in LYYLONG), tries to read a Period (yyyyPppp) on the stream L_YY.
+ * After having read a integer on L_YY (stored in L_YY->yy_long), tries to read a Period (yyyyPppp) on the stream L_YY.
  * If the next character is invalid for a Period, unreads it and returns L_LCONST. Otherwise, reads the second part of the Period and
  * return L_PERIOD. 
  *
@@ -263,16 +263,16 @@ static int L_get_int()
             ch;
     long    l;
 
-    l = LYYLONG;
+    l = L_YY->yy_long;
     ch = L_getc();
     nb_per = get_pos_in_char_array((char*) periodicities.c_str(), toupper(ch));
     if(nb_per < 0) {
         L_ungetc(ch);
-        L_TOKEN.tk_long = LYYLONG;
+        L_TOKEN.tk_long = L_YY->yy_long;
         return(L_LCONST);
     }
 
-    if(L_read() != YY_LONG || L_Period_NB[nb_per] < LYYLONG || LYYLONG == 0) {
+    if(L_read() != YY_LONG || L_Period_NB[nb_per] < L_YY->yy_long || L_YY->yy_long == 0) {
         L_unread();
         L_errno = L_PERIOD_ERR;
         return(YY_ERROR);
@@ -282,7 +282,7 @@ static int L_get_int()
     else if(l < 200) l+= 1900;
     L_TOKEN.tk_period.year = l;
     L_TOKEN.tk_period.periodicity = toupper(ch);
-    L_TOKEN.tk_period.step = LYYLONG;
+    L_TOKEN.tk_period.step = L_YY->yy_long;
 
     return(L_PERIOD);
 }
@@ -302,7 +302,7 @@ static int L_string()
     char    *ptr;
 
     L_read_string();
-    ptr = K_expand(VARIABLES, NULL, (char*) LYYTEXT, '*');
+    ptr = K_expand(VARIABLES, NULL, (char*) L_YY->yy_text, '*');
     if(ptr == 0) return(L_errno = L_MACRO_ERR);
     SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ",");
     YY_record(L_YY, (unsigned char*) ptr);
@@ -372,13 +372,13 @@ int L_get_token()
     if(is_val(keyw))  return(L_VAL);
     if(is_mtfn(keyw))  return(L_MTFN)/* JMP 20-04-98 */;
     if(keyw >= 0)     return(keyw);
-    if(LYYTEXT) SCR_strlcpy((unsigned char*) L_TOKEN.tk_name, LYYTEXT, L_MAX_NAME);
+    if(L_YY->yy_text) SCR_strlcpy((unsigned char*) L_TOKEN.tk_name, L_YY->yy_text, L_MAX_NAME);
     switch(keyw) {
         case YY_EOF     :
             keyw = YY_EOF;
             break;
         case YY_WORD    :
-            if(is_coefficient((char*) LYYTEXT)) keyw = L_COEF;
+            if(is_coefficient((char*) L_YY->yy_text)) keyw = L_COEF;
             else keyw = L_VAR;
             break;
         case YY_LONG    :
@@ -386,7 +386,7 @@ int L_get_token()
             break;
         case YY_DOUBLE  :
             keyw = L_DCONST;
-            L_TOKEN.tk_real = (float)(LYYDOUBLE);
+            L_TOKEN.tk_real = (float) L_YY->yy_double;
             break;
         default :
             L_errno = L_SYNTAX_ERR;
