@@ -479,11 +479,6 @@ public:
 
 /*---------------- MACROS ------------------------*/
 
-#define s_dbl   sizeof(float)
-#define s_ptr   sizeof(double *)
-#define s_short sizeof(short)
-#define s_long  sizeof(long)
-
 #define L_open_file(filename)   L_open_all(filename, YY_FILE)
 #define L_open_string(str)      L_open_all(str, YY_MEM)
 #define L_open_stdin()          L_open_all((char *)0, YY_STDIN)

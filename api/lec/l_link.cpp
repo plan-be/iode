@@ -99,16 +99,16 @@ static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
                 j += sizeof(CVAR);
                 break;
             case L_DCONST    :
-                j += s_dbl;
+                j += sizeof(float);
                 break;
             case L_LCONST    :
-                j += s_long;
+                j += sizeof(long);
                 break;
             case L_PERIOD    :
                 memcpy(&per, expr + j, sizeof(Period));
                 s = per.difference(smpl->start_period);
                 memcpy(expr + j + sizeof(Period), &s, sizeof(short));
-                j += s_short + sizeof(Period);
+                j += sizeof(short) + sizeof(Period);
                 break;
             default :
                 if(is_fn(keyw)) 
@@ -119,8 +119,8 @@ static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
                 if(is_tfn(keyw)) 
                 {
                     memcpy(&len, expr + j + 1, sizeof(short));
-                    L_link_sample_expr(dbv, expr + j + 1 + s_short, len);
-                    j += 1 + s_short + len;
+                    L_link_sample_expr(dbv, expr + j + 1 + sizeof(short), len);
+                    j += 1 + sizeof(short) + len;
                     break;
                 }
                 break;

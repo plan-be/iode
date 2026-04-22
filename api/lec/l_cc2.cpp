@@ -123,7 +123,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                 break;
             case L_PERIOD:
                 memcpy(ll + lg, &(al->content.period), sizeof(Period));
-                lg += sizeof(Period) + s_short;
+                lg += sizeof(Period) + sizeof(short);
                 break;
             case L_DCONST:
                 memcpy(ll + lg, &(al->content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
