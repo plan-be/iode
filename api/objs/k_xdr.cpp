@@ -262,11 +262,11 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
                 break;
             case L_DCONST    :
                 XDR_rev(expr + j, 1, sizeof(float));
-                j += s_dbl;
+                j += sizeof(float);
                 break;
             case L_LCONST    :
                 XDR_rev(expr + j, 1, sizeof(long));
-                j += s_long;
+                j += sizeof(long);
                 break;
             case L_COEF :
                 K_xdrCVAR(expr + j);
@@ -276,7 +276,7 @@ static void K_xdrCLEC_sub(char* expr, int lg, int mode)
                 K_xdrPeriod(expr + j);
                 j += sizeof(Period);
                 K_xdrSHORT(expr + j);
-                j += s_short;
+                j += sizeof(short);
                 break;
             default :
                 if(is_op(keyw) || is_val(keyw)) 

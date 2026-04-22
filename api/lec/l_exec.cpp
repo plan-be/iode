@@ -192,13 +192,13 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                     stack++;
                     memcpy(&r, expr + j, sizeof(float)); /* FLOAT 11-04-98 */
                     *stack = r;
-                    j += s_dbl;
+                    j += sizeof(float);
                     break;
                 case L_LCONST :
                     stack++;
                     memcpy(&l, expr + j, sizeof(long));
                     *stack = l;
-                    j += s_long;
+                    j += sizeof(long);
                     break;
                 case L_COEF :
                     stack++;
@@ -211,7 +211,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
                     stack++;
                     memcpy(&s, expr + j, sizeof(short));
                     *stack = s;
-                    j += s_short;
+                    j += sizeof(short);
                     break;
                 default :
                     if(is_op(keyw)) 
