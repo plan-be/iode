@@ -215,7 +215,7 @@ struct LSTACK
 struct ALEC 
 {
     int type;        // type : L_VAR, L_COEF, L_CONST ...
-    union 
+    union Content 
     {
         float   const_float;    // constant value (float)
         long    const_long;     // constant values (integer)
@@ -223,7 +223,42 @@ struct ALEC
         CVAR    variable;       // variable (position, lag, period)
         short   coefficient;    // coefficient (scalar) position
         Period  period;         // period
+
+        // default constructor to zero-out union bytes
+        Content() { std::memset(this, 0, sizeof(Content)); }
+
+        // copy constructor
+        Content(const Content& other) { std::memcpy(this, &other, sizeof(Content)); }
+
+        // copy assignment operator
+        Content& operator=(const Content& other) 
+        {
+            if(this != &other)
+                std::memcpy(this, &other, sizeof(Content));
+            return *this;
+        }
     } content;
+
+    // Default constructor - initialize type and zero-out union bytes
+    ALEC()  = default;
+
+    // Copy constructor - use memcpy for union with non-trivial members
+    ALEC(const ALEC& other)
+    {
+        type = other.type;
+        memcpy(&content, &other.content, sizeof(content));
+    }
+
+    // Copy assignment operator
+    ALEC& operator=(const ALEC& other)
+    {
+        if(this != &other)
+        {
+            type = other.type;
+            memcpy(&content, &other.content, sizeof(content));
+        }
+        return *this;
+    }
 };
 
 /*----------------- GLOBALS ----------------------*/

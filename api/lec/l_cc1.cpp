@@ -547,7 +547,7 @@ again:
                 if(L_add_stack(type)) 
                     return L_errno;
                 break;
-            case L_OCPAR :      // ??
+            case L_OCPAR :      // open-close parentheses "()""
                 if(beg == 0) 
                 {
                     L_errno = L_SYNTAX_ERR;
