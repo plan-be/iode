@@ -87,15 +87,14 @@ int IodeEnd()
 {
     SW_end();
     W_close();
-    K_end_ws(0);                
-    L_free_anames();            
+    K_end_ws(0);            
     BUF_free();                 
     RP_proc_free_all();         
     RP_free_bufs();             
-    // B_reset_error();  
-    error_manager.clear();      // JMP 16/01/2022 
-    SCR_free(ODE_INIFILE);     // JMP 30/10/2022
+    error_manager.clear();
+    SCR_free(ODE_INIFILE);
     ODE_INIFILE = 0;
+    L_NAMES.clear();
     
     return 0;
 }

@@ -37,13 +37,13 @@
 */
 struct SLEC 
 {
-    ALEC*   sl_expr[2];     // Tables of ALEC's for LHS and RHS equations  members 
-    int     sl_lg[2];       // Length of each sl_expr table
-    int     sl_mbr;         // member containing sl_endo (will be inverted if possible)
-    int     sl_nmbr;        // member not containing sl_endo (will be left unchanged)
-    int     sl_op;          // last operator|function
-    int     sl_nargs;       // number of args of the last op|fn
-    char*   sl_endo;        // name of the endogenous variable
+    ALEC*        sl_expr[2];     // Tables of ALEC's for LHS and RHS equations  members 
+    int          sl_lg[2];       // Length of each sl_expr table
+    int          sl_mbr;         // member containing sl_endo (will be inverted if possible)
+    int          sl_nmbr;        // member not containing sl_endo (will be left unchanged)
+    int          sl_op;          // last operator|function
+    int          sl_nargs;       // number of args of the last op|fn
+    std::string  sl_endo;        // name of the endogenous variable
 };
 
 
@@ -56,7 +56,7 @@ struct SLEC
  * @param [in]  endo    char*   name of the variable to search
  * @return              int     number of occurence of endo in ALEC
 */
-static int L_count_endo(ALEC* al, int lg, char* endo)
+static int L_count_endo(ALEC* al, int lg, const std::string& endo)
 {
     int count, i;
     for(count = 0, i = 0; i < lg; i++, al++)
@@ -64,7 +64,7 @@ static int L_count_endo(ALEC* al, int lg, char* endo)
         if(al->type == L_VAR &&
            al->content.variable.per.step == 0 &&
            al->content.variable.lag == 0 &&
-           strcmp(L_NAMES[al->content.variable.pos], endo) == 0)
+           L_NAMES[al->content.variable.pos] == endo)
                 count++;
     }
 
@@ -158,15 +158,14 @@ ag:
  * L_errno contains 0 or the error number.
  * 
  * @param [in] lec           char*   LEC expression to compile
- * @param [in] nb_names      int     number of names in L_NAMES before compilation
  * @return                   ALEC*   allocated table of ALEC's or NULL on error
 */
-static ALEC* L_cc1_alloc(char* lec, int nb_names)
+static ALEC* L_cc1_alloc(char* lec)
 {
     if(L_open_string(lec)) 
         return NULL;
     
-    if(L_cc1(nb_names) != 0) 
+    if(L_cc1() != 0) 
         return NULL;
     
     L_close();
@@ -191,6 +190,8 @@ static ALEC* L_cc1_alloc(char* lec, int nb_names)
 */
 static int L_cc1_eq(SLEC* sl, char* eq)
 {
+    L_NAMES.clear();
+
     /* SLIT EQ AND COMPILE EACH MEMBER */
     int pos = L_split_eq(eq);
     if(pos < 0)
@@ -201,7 +202,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
 
     // Compiles left member
     eq[pos] = 0;        // close the left member
-    sl->sl_expr[0] = L_cc1_alloc(eq, 0);
+    sl->sl_expr[0] = L_cc1_alloc(eq);
     sl->sl_lg[0]   = L_NB_EXPR - 1;
     L_alloc_expr(-1);   // Clean up L_EXPR
     eq[pos] = ':';      // Reset the original text
@@ -210,7 +211,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
     if(sl->sl_expr[0] == 0) 
         return L_errno;
     
-    sl->sl_expr[1] = L_cc1_alloc(eq + pos + 2, L_NB_NAMES);
+    sl->sl_expr[1] = L_cc1_alloc(eq + pos + 2);
     sl->sl_lg[1]   = L_NB_EXPR - 1;
     L_alloc_expr(-1);
     if(sl->sl_expr[1] == 0) 

@@ -187,7 +187,7 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`int L_cc1(int nb_names)`|Creates L\_EXPR(ordered list of atomic expressions with references to L\_NAMES) and L\_NAMES (list of names in the LEC expression)|
+|`int L_cc1()`|Creates L\_EXPR(ordered list of atomic expressions with references to L\_NAMES) and L\_NAMES (list of names in the LEC expression)|
 |`void L_alloc_expr(int nb)`|Allocates or reallocates L\_EXPR by blocks of 100 elements.|
 |`int L_sub_expr(ALEC* al, int close)`|Computes the position of the beginning of a sub\-expression|
 

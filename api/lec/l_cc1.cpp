@@ -4,8 +4,8 @@
  *  First step of LEC compilation. 
  *  
  *  During this stage, 2 tables, one with atomic expressions (ALEC *L_EXPR) and 
- *  one with names found in the expression (char** L_NAMES) will be
- *  filled. L_EXPR is filled in the order in which the execution must take place. 
+ *  one with names found in the expression (L_NAMES) will be filled. 
+ *  L_EXPR is filled in the order in which the execution must take place. 
  *  
  *  The 2 tables are reallocated by blocks according to the size of the LEC expression. 
  *  
@@ -14,12 +14,11 @@
  *  
  *  Main functions
  * 
- *      - int L_cc1(int nb_names)           First step of LEC compilation: creates 
+ *      - int L_cc1()               First step of LEC compilation: creates 
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
- *      - void L_alloc_expr(int nb)         Allocates or reallocates L_EXPR by blocks of 100 elements.
+ *      - void L_alloc_expr(int nb)             Allocates or reallocates L_EXPR by blocks of 100 elements.
  *      - int L_sub_expr(ALEC* al, int close)   Computes the position of the beginning of a sub-expression
- *  
  */
 
 #include "api/lec/lec.h"
@@ -65,46 +64,24 @@ void L_alloc_expr(int nb)
 /**
  *  Adds a series or scalar name in L_NAMES.
  *  
- *  If necessary, reallocates L_NAMES by blocks of 10 elements at a time.
- *  
  *  @param [in]     name    char*   VAR of Scalar name
  *  @return                 int     position of name in L_NAMES
  *  
  */
-static int L_add_coef_or_var_name(char* name)
+static int L_add_coef_or_var_name(const std::string& name)
 {
-    int i;
-    for(i = 0 ; i < L_NB_NAMES ; i++)
+    // Check if name already exists
+    for(int i = 0; i < (int) L_NAMES.size(); i++)
     {
-        if(strcmp(name, L_NAMES[i]) == 0) 
+        if(L_NAMES[i] == name)
             return i;
     }
 
-    if(L_NB_NAMES >= L_NB_ANAMES) 
-    {
-        L_NAMES = (char **) SCR_realloc(L_NAMES, sizeof(char *),
-                                        L_NB_ANAMES, L_NB_ANAMES + 10);
-        for(int j = 0 ; j < 10 ; j++)
-            L_NAMES[L_NB_ANAMES + j] = SCR_malloc(L_MAX_NAME + 1);
-
-        L_NB_ANAMES += 10;
-    }
-
-    strcpy(L_NAMES[i], name);
-    L_NB_NAMES++;
-    return i;
+    // Add new name to the vector
+    L_NAMES.push_back(name);
+    return (int) L_NAMES.size() - 1;
 }
 
-
-/**
- *  Adds the last read token (in L_TOKEN) in L_EXPR. That token can be a VAR name 
- *  but also a Scalar, a Period or a numerical constant.
- *  
- *  The token is saved in the union al_val (see iode.h).
- *  
- *  @return     int     0 TODO: check if L_alloc_expr() succeeded
- *  
- */
 static int L_save_var()
 {
     ALEC* al;
@@ -493,24 +470,20 @@ static int L_analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analysed LEC expression.
  *  
- *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. They are the input of L_cc2() which will 
- *  serialize L_EXPR into a CLEC (Compiled LEC) structure.
+ *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. 
+ *  They are the input of L_cc2() which will serialize L_EXPR into a CLEC (Compiled LEC) structure.
  *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
  *      - L_NAMES contains the names included in the lec expression
  *  
- *  @param [in] nb_names    int number of variable and/or scalar names already in L_NAMES. 
- *                              Normally 0 but can be > 0 for equations
- *  
- *  @return                 int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
+ *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
-int L_cc1(int nb_names)
+int L_cc1()
 {
     int type;
     int start = 1;
     int beg = 1;    /* indicate if next token is an oper or an expr */
 
     L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
-    L_NB_NAMES = nb_names;
     L_alloc_expr(1);
 
     /* LOOP ON TOKEN */
@@ -642,22 +615,6 @@ again:
         }
         start = 0;
     }
-}
-
-/**
- *  Resets (frees) L_NAMES.
- */
-void L_free_anames()
-{
-    int     j;
-
-
-    for(j = 0 ; j < L_NB_ANAMES ; j++)
-        SCR_free(L_NAMES[j]);
-
-    SCR_free(L_NAMES);
-    L_NB_ANAMES = 0;
-    L_NAMES = 0;
 }
 
 /**

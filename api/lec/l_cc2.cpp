@@ -190,6 +190,7 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
     
     CLEC* clec = new CLEC(lec, ll, lg);
     SW_nfree(ll);
+    L_NAMES.clear();
 
     return clec;
 }
@@ -219,7 +220,7 @@ CLEC* L_cc_stream(const std::string& lec)
 {
     CLEC* cl;
 
-    if(L_cc1(0) != 0)
+    if(L_cc1() != 0)
         return NULL;
     
     cl = L_cc2(L_EXPR, lec);

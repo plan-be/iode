@@ -231,11 +231,9 @@ struct ALEC
 inline int      L_curt = 0;         // current value of t
 inline int      L_errno = 0;        // LEC error number (during compilation)
 inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements
-inline char     **L_NAMES = 0;      // Table of names encountered in the current LEC expression (vars and scalars)
 inline int      L_NB_EXPR = 0;      // Current number of elements (ALEC) in L_EXPR
 inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
-inline int      L_NB_NAMES = 0;     // Current number of names in L_NAMES
-inline int      L_NB_ANAMES = 0;    // Number of allocated names in L_NAMES (multiple of 10) TODO: repl 10 by a define
+inline std::vector<std::string> L_NAMES;  // Table of names encountered in the current LEC expression (vars and scalars)
 
 inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
 inline KDBScalarsPtr   L_EXEC_DBS = nullptr; 
@@ -389,12 +387,8 @@ public:
             memcpy(expression, expr, len);
 
         // initialize all names with position -1 (not found)
-        std::string name;
-        for(int j = 0; j < L_NB_NAMES; j++)
-        {
-            name = std::string(L_NAMES[j]);
+        for(const std::string& name : L_NAMES)
             objs.push_back({name, -1});
-        }
     }
 
     CLEC(const CLEC& other) 
@@ -536,8 +530,7 @@ int L_get_token(void);
 
 /* l_cc1.c */
 void L_alloc_expr(int nb);
-int L_cc1(int nb_names);
-void L_free_anames(void);
+int L_cc1();
 int L_sub_expr(ALEC* al, int close);
 
 /* l_err.c */
