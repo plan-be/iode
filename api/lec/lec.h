@@ -486,13 +486,8 @@ public:
 #define is_fn(op)       ((op) >= L_FN  && (op) < L_OP)
 #define is_op(op)       ((op) >= L_OP  && (op) < L_TFN)
 #define is_tfn(op)      ((op) >= L_TFN && (op) < L_VAL)
-#define is_val(op)      ((op) >= L_VAL && (op) < L_MTFN)  /* JMP 20-04-98 */
-#define is_mtfn(op)     ((op) >= L_MTFN)                  /* JMP 20-04-98 */
-
-#define LYYTEXT   (L_YY->yy_text)
-#define LYYLONG   (L_YY->yy_long)
-#define LYYREAD   (L_YY->yy_type)
-#define LYYDOUBLE (L_YY->yy_double)
+#define is_val(op)      ((op) >= L_VAL && (op) < L_MTFN)
+#define is_mtfn(op)     ((op) >= L_MTFN)
 
 /* ---------------------- FUNCS ---------------------- */
 
