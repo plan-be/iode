@@ -52,21 +52,21 @@ enum LecError
 /* LEC:SPECIAL */
 enum LecSpecial
 {
-    L_EOE = 10,
-    L_OPENP,
-    L_CLOSEP,
-    L_VAR,
-    L_COEF,
-    L_OPENB,
-    L_CLOSEB,
-    L_COMMA,
-    L_OCPAR,  /* () */
-    L_PERIOD,
-    L_VART,   /* VARIABLE [time] */
-    L_COLON,
-    L_LCONST,
-    L_DCONST,
-    L_SQUARE
+    L_EOE = 10,         // end of expression
+    L_OPENP,            // open parenthesis
+    L_CLOSEP,           // close parenthesis
+    L_VAR,              // IODE Variable
+    L_COEF,             // coefficient (IODE Scalar)
+    L_OPENB,            // open bracket
+    L_CLOSEB,           // close bracket
+    L_COMMA,            // comma
+    L_OCPAR,            // open-close parentheses
+    L_PERIOD,           // period
+    L_VART,             // IODE Variable with time expression (ex. A[1960Y1])
+    L_COLON,            // colon (for equations)
+    L_LCONST,           // long constant
+    L_DCONST,           // double constant
+    L_SQUARE            // - not used -
 };
 
 #define L_FN        30
@@ -118,19 +118,19 @@ enum LecFunction
 /* LEC:OPERATORS */
 enum LecOperator
 {
-    L_OR = L_OP,
-    L_AND,
-    L_GE,
-    L_GT,
-    L_LE,
-    L_LT,
-    L_EQ,
-    L_NE,
-    L_PLUS,
-    L_MINUS,
-    L_DIVIDE,
-    L_TIMES,
-    L_EXP   
+    L_OR = L_OP,    // logical OR
+    L_AND,          // logical AND
+    L_GE,           // greater or equal
+    L_GT,           // greater than
+    L_LE,           // less or equal
+    L_LT,           // less than
+    L_EQ,           // equal
+    L_NE,           // not equal
+    L_PLUS,         // addition '+'
+    L_MINUS,        // subtraction '-'
+    L_DIVIDE,       // division '/'
+    L_TIMES,        // multiplication '*'
+    L_EXP           // exponentiation '^'
 };
 
 #define L_TFN       100
@@ -138,20 +138,20 @@ enum LecOperator
 /* LEC:TFN (time related functions) */
 enum LecTimeFunction
 {
-    L_LAG = L_TFN,      /* l    ([n,] expr) */
-    L_DIFF,             /* d    ([n,] expr) */
-    L_RAPP,             /* r    ([n,] expr) */
-    L_DLN,              /* dln  ([n,] expr) */
-    L_GRT,              /* grt  ([n,] expr) */
-    L_MAVG,             /* ma   ([n,] expr) */
-    L_VMAX,             /* vmax ([n,[m,]] expr) */
-    L_VMIN,             /* vmin ([n,[m,]] expr) */
-    L_SUM,              /* sum  ([n,[m,]] expr) */
-    L_PROD,             /* prod ([n,[m,]] expr) */
-    L_MEAN,             /* mean ([n,[m,]] expr) */
-    L_STDERR,           /* stderr([n,[m,]] expr) */
-    L_DLAG,             /* dlag (n, coef, expr) */ /* !! not implemented */
-    L_LASTOBS           /* lastobs([from, [to,]] expr) */
+    L_LAG = L_TFN,      // l([n,] expr)
+    L_DIFF,             // d([n,] expr)
+    L_RAPP,             // r([n,] expr)
+    L_DLN,              // dln([n,] expr)
+    L_GRT,              // grt([n,] expr)
+    L_MAVG,             // ma([n,] expr)
+    L_VMAX,             // vmax([n,[m,]] expr)
+    L_VMIN,             // vmin([n,[m,]] expr)
+    L_SUM,              // sum([n,[m,]] expr)
+    L_PROD,             // prod([n,[m,]] expr)
+    L_MEAN,             // mean([n,[m,]] expr)
+    L_STDERR,           // stderr([n,[m,]] expr)
+    L_DLAG,             // dlag(n, coef, expr)
+    L_LASTOBS           // lastobs([from, [to,]] expr)
 };
 
 #define L_VAL       120
@@ -171,18 +171,18 @@ enum LecConstValue
 /* LEC:MTFN (multiple LEC sub-expr possible in argument list) */
 enum LecMultiTimeFunction
 {
-    L_CORR = L_MTFN,    /* corr([n, [m,]] expr, expr) */
-    L_COVAR,            /* covar([n, [m,]] expr, expr) */
-    L_COVAR0,           /* covar0([n, [m,]] expr, expr) */
-    L_VARIANCE,         /* var([n, [m,]] expr) */
-    L_STDDEV,           /* stddev([n, [m,]] expr) */
-    L_INDEX,            /* index([from, [to,]] expr, expr) */
-    L_ACF,              /* acf([from, [to,]] expr, expr) */
-    L_INTERPOL,         /* mkval(expr) */
-    L_APP,              /* mkval(expr, app) */
-    L_HP,               /* hp(([from, [to,]] lambda, expr) */
-    L_DAPP,             /* hp(([from, [to,]] lambda, expr) */
-    L_HPSTD             /* hpstd(([from, [to,]] lambda, expr) */
+    L_CORR = L_MTFN,    // corr([n, [m,]] expr, expr)
+    L_COVAR,            // covar([n, [m,]] expr, expr)
+    L_COVAR0,           // covar0([n, [m,]] expr, expr)
+    L_VARIANCE,         // var([n, [m,]] expr)
+    L_STDDEV,           // stddev([n, [m,]] expr)
+    L_INDEX,            // index([from, [to,]] expr, expr)
+    L_ACF,              // acf([from, [to,]] expr, expr)
+    L_INTERPOL,         // mkval(expr)
+    L_APP,              // mkval(expr, app)
+    L_HP,               // hp(([from, [to,]] lambda, expr)
+    L_DAPP,             // hp(([from, [to,]] lambda, expr)
+    L_HPSTD             // hpstd(([from, [to,]] lambda, expr)
 };
 
 /*---------------- STRUCTS ------------------------*/
@@ -264,7 +264,6 @@ inline YYKEYS L_TABLE[] =
     (unsigned char*) "/",            L_DIVIDE,
     (unsigned char*) ":",            L_COLON,
     (unsigned char*) ";",            L_EOE,
-    (unsigned char*) /*    ";",            L_COMMA,*/
     (unsigned char*) "<",            L_LT,
     (unsigned char*) ">=",           L_GE,
     (unsigned char*) "<=",           L_LE,
@@ -281,12 +280,12 @@ inline YYKEYS L_TABLE[] =
     (unsigned char*) "appdif",       L_DAPP,
     (unsigned char*) "asin",         L_ASIN,
     (unsigned char*) "atan",         L_ATAN,
-    (unsigned char*) "ceil",         L_CEIL,  /* JMP 18-10-2004 */
+    (unsigned char*) "ceil",         L_CEIL,
     (unsigned char*) "cos",          L_COS,
     (unsigned char*) "cosh",         L_COSH,
-    (unsigned char*) "corr",         L_CORR, /* JMP 17-04-98 */
-    (unsigned char*) "covar",        L_COVAR, /* JMP 17-04-98 */
-    (unsigned char*) "covar0",       L_COVAR0, /* JMP 17-04-98 */
+    (unsigned char*) "corr",         L_CORR,
+    (unsigned char*) "covar",        L_COVAR,
+    (unsigned char*) "covar0",       L_COVAR0,
     (unsigned char*) "d",            L_DIFF,
     (unsigned char*) "dapp",         L_DAPP,
     (unsigned char*) "dlag",         L_DLAG,
@@ -299,13 +298,13 @@ inline YYKEYS L_TABLE[] =
     (unsigned char*) "grandom",      L_GRANDOM,
     (unsigned char*) "grt",          L_GRT,
     (unsigned char*) "hp",           L_HP,
-    (unsigned char*) "hpstd",        L_HPSTD, // JMP 12/4/2019
+    (unsigned char*) "hpstd",        L_HPSTD,
     (unsigned char*) "if",           L_IF,
     (unsigned char*) "index",        L_INDEX,
     (unsigned char*) "int",          L_INT,
     (unsigned char*) "interpol",     L_INTERPOL,
     (unsigned char*) "isan",         L_FNISAN,
-    (unsigned char*) "floor",        L_FLOOR, /* JMP 18-10-2004 */
+    (unsigned char*) "floor",        L_FLOOR,
     (unsigned char*) "l",            L_LAG,
     (unsigned char*) "lastobs",      L_LASTOBS,
     (unsigned char*) "ln",           L_LN,
@@ -327,7 +326,7 @@ inline YYKEYS L_TABLE[] =
     (unsigned char*) "r",            L_RAPP,
     (unsigned char*) "rad",          L_RAD,
     (unsigned char*) "random",       L_RANDOM,
-    (unsigned char*) "round",        L_ROUND, /* JMP 18-10-2004 */
+    (unsigned char*) "round",        L_ROUND,
     (unsigned char*) "sign",         L_SIGN,
     (unsigned char*) "sin",          L_SIN,
     (unsigned char*) "sinh",         L_SINH,
