@@ -39,18 +39,18 @@
  * @param [in] to       int     ending position in ALEC of that expression
  * @return              int     size in bytes of the expression in CLEC form
 */
-static int L_calc_len(ALEC* expr, int from, int to)
+static int L_calc_len(const std::vector<ALEC>& expr, int from, int to)
 {
-    int     lg = 0, i;
-    ALEC    *al;
-
-    if(!expr) 
+    if(expr.empty()) 
         return 0;
     
-    for(al = expr + from, i = from ; i < to ; al++, i++) 
+    int lg = 0;
+    for(int i = from; i < to; i++) 
     {
-        lg ++;
-        switch(al->type) 
+        const ALEC& al = expr[i];
+
+        lg++;   // 1 byte for the type of the expression element
+        switch(al.type) 
         {
             case L_COEF:
             case L_VAR:
@@ -70,11 +70,12 @@ static int L_calc_len(ALEC* expr, int from, int to)
                 lg--;
                 break;
             default:
-                if(is_fn(al->type)) lg++;
-                if(is_tfn(al->type)) lg += 1 + sizeof(short);
-                if(is_mtfn(al->type))
-                    lg += 2 + (sizeof(short) *
-                               (1 + L_MIN_MTARGS[al->type - L_MTFN])); /* JMP 17-04-98 */
+                if(is_fn(al.type)) 
+                    lg++;
+                if(is_tfn(al.type)) 
+                    lg += 1 + sizeof(short);
+                if(is_mtfn(al.type))
+                    lg += 2 + (sizeof(short) * (1 + L_MIN_MTARGS[al.type - L_MTFN]));
                 break;
         }
     }
@@ -89,48 +90,51 @@ static int L_calc_len(ALEC* expr, int from, int to)
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC* L_cc2(ALEC* expr, const std::string& lec) 
+CLEC* L_cc2(const std::vector<ALEC>& expr, const std::string& lec) 
 {
-    unsigned char *ll = 0, *tmp;
-    int     lg = 0, pos, pos1, alg = 0, j, nvargs;
-    long    len, len1;
-    ALEC    *al;
-    CVAR    cvar;
-
-    if(!expr) 
+    if(expr.empty()) 
         return nullptr;
-    
+
     int i = 0;
-    for(al = expr, i = 0; al->type != L_EOE; al++, i++) 
+    int lg = 0;
+    int alg = 0;
+    unsigned char *ll = NULL;
+    for(const ALEC& al : expr) 
     {
+        if(al.type == L_EOE)
+            break;
+
         if(lg + 30 >= alg) 
         {
             ll = (unsigned char*) SW_nrealloc(ll, alg, alg + 512);
             alg += 512;
         }
-        
-        ll[lg++] = al->type;
-        switch(al->type) 
+
+        ll[lg++] = al.type;
+        switch(al.type) 
         {
             case L_VAR:
             case L_COEF:
-                cvar.pos = al->content.variable.pos;
-                cvar.lag = al->content.variable.lag;
-                cvar.per = al->content.variable.per;
+            {
+                CVAR cvar;
+                cvar.pos = al.content.variable.pos;
+                cvar.lag = al.content.variable.lag;
+                cvar.per = al.content.variable.per;
                 cvar.ref = 0;
                 memcpy(ll + lg, &cvar, sizeof(CVAR));
                 lg += sizeof(CVAR);
                 break;
+            }
             case L_PERIOD:
-                memcpy(ll + lg, &(al->content.period), sizeof(Period));
+                memcpy(ll + lg, &(al.content.period), sizeof(Period));
                 lg += sizeof(Period) + sizeof(short);
                 break;
             case L_DCONST:
-                memcpy(ll + lg, &(al->content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
+                memcpy(ll + lg, &(al.content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
                 lg += sizeof(float); /* FLOAT 11-04-98 */
                 break;
             case L_LCONST:
-                memcpy(ll + lg, &(al->content.const_long), sizeof(long));
+                memcpy(ll + lg, &(al.content.const_long), sizeof(long));
                 lg += sizeof(long);
                 break;
             case L_OPENP:
@@ -138,31 +142,33 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                 lg--;
                 break;
             default:
-                if(is_fn(al->type))
-                    ll[lg++] = al->content.func_nb_args;
+                if(is_fn(al.type))
+                    ll[lg++] = al.content.func_nb_args;
 
-                if(is_tfn(al->type)) 
+                if(is_tfn(al.type)) 
                 {
-                    pos = L_sub_expr(expr, i - 1);
-                    len = L_calc_len(expr, pos, i);
+                    int pos = L_sub_expr(expr, i - 1);
+                    long len = L_calc_len(expr, pos, i);
+                    int shift = lg - len - 1;
                     /* Move last arg */
-                    tmp = ll + lg - len - 1;
+                    unsigned char* tmp = ll + lg - len - 1;
                     L_move_arg((char*) tmp + 2 + sizeof(short), (char*) tmp, len);
                     memcpy(tmp + 2, &len, sizeof(short));
-                    tmp[0] = al->type;
-                    tmp[1] = al->content.func_nb_args;
+                    tmp[0] = al.type;
+                    tmp[1] = al.content.func_nb_args;
                     lg += sizeof(short) + 1;
                 }
 
-                if(is_mtfn(al->type)) 
+                if(is_mtfn(al.type)) 
                 {
-                    nvargs = L_MIN_MTARGS[al->type - L_MTFN];
-                    len = 0;
-                    pos = i - 1;
-                    for(j = 0 ; j < nvargs ; j++) 
+                    unsigned char* tmp;
+                    int pos = i - 1;
+                    long len = 0;
+                    int nvargs = L_MIN_MTARGS[al.type - L_MTFN];
+                    for(int j = 0 ; j < nvargs ; j++) 
                     {
-                        pos1 = L_sub_expr(expr, pos);
-                        len1 = L_calc_len(expr, pos1, pos + 1);
+                        int pos1 = L_sub_expr(expr, pos);
+                        long len1 = L_calc_len(expr, pos1, pos + 1);
                         len += len1;
                         pos = pos1 - 1;
                         /* Move arg */
@@ -172,14 +178,15 @@ CLEC* L_cc2(ALEC* expr, const std::string& lec)
                     }
 
                     lg += 2 + (1 + nvargs) * sizeof(short);
-                    tmp[0] = al->type;
-                    tmp[1] = al->content.func_nb_args;
+                    tmp[0] = al.type;
+                    tmp[1] = al.content.func_nb_args;
                     tmp[2] = nvargs;
                     len += nvargs * sizeof(short);
                     memcpy(tmp + 3, &len, sizeof(short));
                 }
                 break;
         }
+        i++;
     }
 
     if(lg == 0)
@@ -222,7 +229,7 @@ CLEC* L_cc_stream(const std::string& lec)
         return NULL;
     
     cl = L_cc2(L_EXPR, lec);
-    L_alloc_expr(-1);       // Frees L_EXPR
+    L_EXPR.clear();
     return cl;
 }
 

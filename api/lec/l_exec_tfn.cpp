@@ -122,12 +122,19 @@ double L_rapp(unsigned char* expr, short len, int t, double* stack, int nargs)
     double  v1, v2;
     int     lag = 1;
 
-    if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
+    if(nargs == 2) 
+        lag = L_intlag(*stack);
+    
     v1 = L_exec_sub(expr, len, t, stack);
-    if(!IODE_IS_A_NUMBER(v1)) return(IODE_NAN);
+    if(!IODE_IS_A_NUMBER(v1)) 
+        return(IODE_NAN);
+    
     v2 = L_exec_sub(expr, len, t - lag, stack);
-    if(!IODE_IS_A_NUMBER(v2)) return(IODE_NAN);
-    return(L_divide(v1, v2));
+    if(!IODE_IS_A_NUMBER(v2)) 
+        return(IODE_NAN);
+
+    double result = L_divide(v1, v2);
+    return result;
 }
 
 
