@@ -141,7 +141,7 @@ ag:
     v_al.pop_back();
 
     // Search the beginning of the sub expression
-    start_sub_expr = L_sub_expr(v_al.data(), (int) v_al.size() - 1);
+    start_sub_expr = L_sub_expr(v_al, (int) v_al.size() - 1);
     if(start_sub_expr < 0)
     {
         L_errno = L_DUP_ERR;
@@ -203,10 +203,7 @@ static std::vector<ALEC> L_cc1_alloc(char* lec)
     
     L_close();
 
-    v_al.reserve(L_NB_EXPR);
-    for(int i = 0; i < L_NB_EXPR; i++)
-        v_al.push_back(L_EXPR[i]);
-    
+    v_al = L_EXPR;
     return v_al;
 }
 
@@ -239,7 +236,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
     eq[pos] = 0;                                // close the left member
     sl->sl_left_expr = L_cc1_alloc(eq);
     sl->sl_left_expr.pop_back();                // drop the last element (L_EOE)        
-    L_alloc_expr(-1);                       // Clean up L_EXPR
+    L_EXPR.clear();                       // Clean up L_EXPR
     eq[pos] = ':';                              // Reset the original text
     if(sl->sl_left_expr.empty()) 
         return L_errno;
@@ -247,7 +244,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
     // Compiles the right member
     sl->sl_right_expr = L_cc1_alloc(eq + pos + 2);
     sl->sl_right_expr.pop_back();               // drop the last element (L_EOE)
-    L_alloc_expr(-1);
+    L_EXPR.clear();
     if(sl->sl_right_expr.empty()) 
         return L_errno;
 
@@ -256,7 +253,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
 
 
 /**
- * Appends to L_EXPR the member mbr (LHS or RHS) contained in sl. 
+ * Appends the member mbr (LHS or RHS) contained in sl to L_EXPR. 
  * 
  * @param [in] sl   SLEC*   
  * @param [in] mbr  int     position of the member to append 
@@ -264,15 +261,12 @@ static int L_cc1_eq(SLEC* sl, char* eq)
 static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
 {
     std::vector<ALEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
-    int sz = (int) v_al.size();
-    L_alloc_expr(L_NB_EXPR + sz);
-    memcpy(L_EXPR + L_NB_EXPR, v_al.data(), sizeof(ALEC) * sz);
-    L_NB_EXPR += sz;
+    L_EXPR.insert(L_EXPR.end(), v_al.begin(), v_al.end());
 }
 
 
 /**
- * Add at the beginning of L_EXPR the member mbr (LHS or RHS) of the SLEC struct sl.
+ * Adds L_EXPR the member mbr (LHS or RHS) contained in sl at the beginning of L_EXPR.
  * 
  * @param [in] sl   SLEC*   container of the compiled equation
  * @param [in] mbr  int     member of sl to copy to L_EXPR
@@ -280,11 +274,7 @@ static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
 static void L_front(SLEC* sl, const EQ_HAND_SIDE mbr)
 {
     std::vector<ALEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
-    int sz = (int) v_al.size();
-    L_alloc_expr(L_NB_EXPR + sz);
-    L_move_arg((char *)(L_EXPR + sz), (char *) (L_EXPR), sizeof(ALEC) * L_NB_EXPR);
-    memcpy(L_EXPR, v_al.data(), sizeof(ALEC) * sz);
-    L_NB_EXPR += sz;
+    L_EXPR.insert(L_EXPR.begin(), v_al.begin(), v_al.end());
 }
 
 
@@ -295,9 +285,9 @@ static void L_front(SLEC* sl, const EQ_HAND_SIDE mbr)
 */
 static void L_append_op(int op)
 {
-    L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR].type = op;
-    L_NB_EXPR++;
+    ALEC al;
+    al.type = op;
+    L_EXPR.push_back(al);
 }
 
 
@@ -309,10 +299,10 @@ static void L_append_op(int op)
 */
 static void L_append_fn(int op, int nargs)
 {
-    L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR].type = op;
-    L_EXPR[L_NB_EXPR].content.func_nb_args = nargs;
-    L_NB_EXPR++;
+    ALEC al;
+    al.type = op;
+    al.content.func_nb_args = nargs;
+    L_EXPR.push_back(al);
 }
 
 
@@ -323,10 +313,10 @@ static void L_append_fn(int op, int nargs)
 */
 static void L_append_const(int a)
 {
-    L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR].type = L_LCONST;
-    L_EXPR[L_NB_EXPR].content.const_long = a;
-    L_NB_EXPR++;
+    ALEC al;
+    al.type = L_LCONST;
+    al.content.const_long = a;
+    L_EXPR.push_back(al);
 }
 
 
@@ -381,7 +371,7 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
     {
         // Result = {sl->sl_left_expr, sl->sl_right_expr, L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
         *duplicated_endo = 1;
-        L_NB_EXPR = 0;
+        L_EXPR.clear();
         L_append(sl, EQ_LHS);    
         L_append(sl, EQ_RHS);
         L_append_op(L_MINUS);
@@ -403,7 +393,7 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
     }
 
     // Create an empty L_EXPR and move the member not containing the endo into L_EXPR
-    L_NB_EXPR = 0;
+    L_EXPR.clear();
     L_append(sl, sl->sl_side_without_endo);
     if(sl->sl_side_without_endo == EQ_LHS) 
         sl->sl_left_expr.clear();
@@ -540,7 +530,7 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
     sl->sl_left_expr.clear();
     sl->sl_right_expr.clear();
     L_append_op(L_EOE);
-
+    
     return L_errno;
 }
 
@@ -574,7 +564,8 @@ CLEC* L_solve(char* eq, char* endo)
         default             :
             break;
     }
-    L_alloc_expr(-1);
+    
+    L_EXPR.clear();
     return clec;
 }
 

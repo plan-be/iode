@@ -17,8 +17,7 @@
  *      - int L_cc1()               First step of LEC compilation: creates 
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
- *      - void L_alloc_expr(int nb)             Allocates or reallocates L_EXPR by blocks of 100 elements.
- *      - int L_sub_expr(ALEC* al, int close)   Computes the position of the beginning of a sub-expression
+ *      - int L_sub_expr(const std::vector<ALEC>& v_alec, int close)   Computes the position of the beginning of a sub-expression
  */
 
 #include "api/lec/lec.h"
@@ -30,35 +29,6 @@
 LSTACK  L_OPS[L_MAX_STACK]; // Stack of operators encountered during compilation process. Limited to a max depth of L_MAX_STACK.
 int     L_NB_OPS = 0,       // Current operator stack depth
         L_PAR = 0;          // Current parenthesis depth
-
-// TODO: move LSTACK here + L_OPS... static
-
-
-/**
- *  Allocates or reallocates L_EXPR by blocks of 100 elements.
- *  
- *  @param [in] nb      int     if > 0: number of elements required in L_EXPR.
- *                              if <= 0: frees L_EXPR and reset L_EXPR and L_NB_EXPR to 0.
- */
-void L_alloc_expr(int nb)
-{
-    if(nb <= 0) 
-    {
-        SW_nfree(L_EXPR);
-        L_NB_AEXPR = L_NB_EXPR = 0;
-        L_EXPR = 0;
-        return;
-    }
-
-    if(L_NB_AEXPR >= nb) 
-        return;
-    
-    nb = 100 * (1 + nb / 100);
-    L_EXPR = (ALEC *) SW_nrealloc(L_EXPR,
-                                  sizeof(ALEC) * L_NB_AEXPR,
-                                  sizeof(ALEC) * nb);
-    L_NB_AEXPR = nb;
-}
 
 
 /**
@@ -84,39 +54,36 @@ static int L_add_coef_or_var_name(const std::string& name)
 
 static int L_save_var()
 {
-    ALEC* al;
+    ALEC al;
+    al.type = L_TOKEN.tk_def;
 
-    L_alloc_expr(L_NB_EXPR + 1);
-    al = L_EXPR + L_NB_EXPR;
-    al->type = L_TOKEN.tk_def;
     switch(L_TOKEN.tk_def) 
     {
-        case L_PERIOD :     // Period
-            al->content.period.year = L_TOKEN.tk_period.year;
-            al->content.period.periodicity = L_TOKEN.tk_period.periodicity;
-            al->content.period.step = L_TOKEN.tk_period.step;
+        case L_PERIOD :     // period
+            al.content.period.year = L_TOKEN.tk_period.year;
+            al.content.period.periodicity = L_TOKEN.tk_period.periodicity;
+            al.content.period.step = L_TOKEN.tk_period.step;
             break;
         case L_DCONST:      // double constant
-            al->content.const_float = L_TOKEN.tk_real;
+            al.content.const_float = L_TOKEN.tk_real;
             break;
         case L_LCONST:      // long constant
-            al->content.const_long = L_TOKEN.tk_long;
+            al.content.const_long = L_TOKEN.tk_long;
             break;
         default :
             // if special constant (pi, e, etc.) -> nothing to do
             if(is_val(L_TOKEN.tk_def)) 
                 break;
-            
             // Variable or Scalar
-            al->content.variable.pos = L_add_coef_or_var_name(L_TOKEN.tk_name);
-            al->content.variable.lag  = 0;
-            al->content.variable.per.year = 0;
-            al->content.variable.per.periodicity= 0;
-            al->content.variable.per.step = 0;
+            al.content.variable.pos = L_add_coef_or_var_name(L_TOKEN.tk_name);
+            al.content.variable.lag  = 0;
+            al.content.variable.per.year = 0;
+            al.content.variable.per.periodicity= 0;
+            al.content.variable.per.step = 0;
             break;
     }
 
-    L_NB_EXPR++;
+    L_EXPR.push_back(al);
     return 0;
 }
 
@@ -157,17 +124,13 @@ static bool L_priority_sup(int op)
  *  
  *  @return     int     0 on success
  *                      L_ARGS_ERR if the number of args does not follow the syntax (L_MAX_* and L_MIN_*).
- *  
- *  TODO: check if L_alloc_expr() succeeded
  */
 static int L_save_op()
 {
-    L_alloc_expr(L_NB_EXPR + 1);
-    ALEC* al = L_EXPR + L_NB_EXPR;
-
     int pos;
     int op = last_op;
     int nb_args = (int) last_ls.ls_nb_args;
+
     if(is_fn(op)) 
     {
         pos = op - L_FN;
@@ -198,9 +161,11 @@ static int L_save_op()
         }
     }
 
-    al->type = op;
-    al->content.func_nb_args = nb_args;
-    L_NB_EXPR ++;
+    ALEC al;
+    al.type = op;
+    al.content.func_nb_args = nb_args;
+    L_EXPR.push_back(al);
+
     L_NB_OPS--;
     return 0;
 }
@@ -314,8 +279,10 @@ static int L_empty_ops_stack()
             return L_errno;
     }
 
-    L_alloc_expr(L_NB_EXPR + 1);
-    L_EXPR[L_NB_EXPR++].type = L_EOE;
+    ALEC al;
+    al.type = L_EOE;
+    L_EXPR.push_back(al);
+
     return 0;
 }
 
@@ -334,24 +301,25 @@ static int L_empty_ops_stack()
  */
 static int L_lag_expr(int lag)
 {
-    int pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) 
+    int start_sub_expr = L_sub_expr(L_EXPR);
+    if(start_sub_expr < 0) 
         return L_errno;
 
-    ALEC* al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) 
+    for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
     {
+        ALEC& al = *it;
+
         // only applies lag to non-timed variables. 
-        if(al->type != L_VAR) 
+        if(al.type != L_VAR) 
             continue;
 
         // skip if a period is associated to the variable (ex. A[1960Y1]) because 
         // in that case, the variable is fixed in time and cannot be lagged.
-        if(al->content.variable.per.step != 0) 
+        if(al.content.variable.per.step != 0) 
             continue;
         
         // applies lag
-        al->content.variable.lag += lag;
+        al.content.variable.lag += lag;
     }
 
     return 0;
@@ -371,24 +339,25 @@ static int L_lag_expr(int lag)
  */
 static int L_time_expr()
 {
-    int pos = L_sub_expr(L_EXPR, L_NB_EXPR - 1);
-    if(pos < 0) 
+    int start_sub_expr = L_sub_expr(L_EXPR);
+    if(start_sub_expr < 0) 
         return L_errno;
-    
-    ALEC* al = L_EXPR + pos;
-    for(; pos < L_NB_EXPR ; pos++, al++) 
+
+    for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
     {
+        ALEC& al = *it;
+
         // only applies lag to non-timed variables.
-        if(al->type != L_VAR) 
+        if(al.type != L_VAR) 
             continue;
 
         // skip if a period is associated to the variable (ex. A[1960Y1]) because 
         // in that case, the variable is fixed in time and cannot be lagged.
-        if(al->content.variable.per.step != 0) 
+        if(al.content.variable.per.step != 0) 
             continue;
         
         // applies time expression
-        memcpy(&(al->content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
+        memcpy(&(al.content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
     }
 
     return 0;
@@ -468,7 +437,7 @@ static int L_analyze_lag()
 
 
 /**
- *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analysed LEC expression.
+ *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
  *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. 
  *  They are the input of L_cc2() which will serialize L_EXPR into a CLEC (Compiled LEC) structure.
@@ -483,8 +452,8 @@ int L_cc1()
     int start = 1;
     int beg = 1;    /* indicate if next token is an oper or an expr */
 
-    L_NB_OPS = L_PAR = L_errno = L_NB_EXPR = L_NB_AEXPR = 0;
-    L_alloc_expr(1);
+    L_EXPR.clear();
+    L_NB_OPS = L_PAR = L_errno = 0;
 
     /* LOOP ON TOKEN */
     while(true) 
@@ -590,9 +559,10 @@ again:
             case L_EOE :        // End of expression
                 if(start) 
                 {
-                    L_alloc_expr(1);
-                    L_EXPR[0].type = L_EOE;
-                    L_NB_EXPR++;
+                    ALEC al;
+                    al.type = L_EOE;
+                    L_EXPR.push_back(al);
+
                     return L_errno;
                 }
                 if(beg == 1) 
@@ -626,15 +596,26 @@ again:
  *  @param [in] i   int     position in al of the element where the expression is "closed"
  *  @return                 position in al of the element where the expression starts
  */
-int L_sub_expr(ALEC* al, int close)
+int L_sub_expr(const std::vector<ALEC>& v_alec, int close)
 {
+    if(v_alec.empty())
+        return -1;
+
+    if(close < -1 || close >= (int) v_alec.size())
+    {
+        std::string error_msg = "Invalid position for close in L_sub_expr: " + std::to_string(close) + ".\n";
+        error_msg += "Valid values are between -1 and " + std::to_string(v_alec.size() - 1) + ".";
+        throw std::out_of_range(error_msg);
+    }
+
     int type;
     int nb_parents = 0;
+    int end = (close >= 0) ? close : (int) v_alec.size() - 1;
 
     // browse backwards all elements of the expression
-    for(int pos = close; pos >= 0; pos--) 
+    for(int pos = end; pos >= 0; pos--) 
     {
-        type = al[pos].type;
+        type = v_alec[pos].type;
 
         // if open or close parenthesis, update the number of parents
         switch(type) 
@@ -657,8 +638,8 @@ int L_sub_expr(ALEC* al, int close)
         // QUESTION: why calling L_sub_expr twice ?
         if(is_op(type)) 
         {
-            pos = L_sub_expr(al, pos - 1);
-            pos = L_sub_expr(al, pos - 1);
+            pos = L_sub_expr(v_alec, pos - 1);
+            pos = L_sub_expr(v_alec, pos - 1);
             return pos;
         }
 

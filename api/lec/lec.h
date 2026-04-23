@@ -265,9 +265,7 @@ struct ALEC
 
 inline int      L_curt = 0;         // current value of t
 inline int      L_errno = 0;        // LEC error number (during compilation)
-inline ALEC     *L_EXPR = 0;        // Table of all ALEC atomic elements
-inline int      L_NB_EXPR = 0;      // Current number of elements (ALEC) in L_EXPR
-inline int      L_NB_AEXPR = 0;     // Number of allocated elements in L_EXPR (multiple of 100) TODO: repl 100 by a define
+inline std::vector<ALEC> L_EXPR;    // Table of all ALEC atomic elements
 inline std::vector<std::string> L_NAMES;  // Table of names encountered in the current LEC expression (vars and scalars)
 
 inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
@@ -563,18 +561,17 @@ void L_close(void);
 int L_get_token(void);
 
 /* l_cc1.c */
-void L_alloc_expr(int nb);
 int L_cc1();
-int L_sub_expr(ALEC* al, int close);
-
-/* l_err.c */
-char *L_error(void);
+int L_sub_expr(const std::vector<ALEC>& v_alec, int close = -1);
 
 /* l_cc2.c */
-CLEC* L_cc2(ALEC* expr, const std::string& lec);
+CLEC* L_cc2(const std::vector<ALEC>& expr, const std::string& lec);
 void L_move_arg(char* s1, char* s2, int lg);
 CLEC* L_cc_stream(const std::string& lec);
 CLEC* L_cc(const std::string& lec);
+
+/* l_err.c */
+char *L_error(void);
 
 /* l_link.c */
 int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);

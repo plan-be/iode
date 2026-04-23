@@ -173,6 +173,7 @@ int CSimulation::prolog(int t)
         x = calculate_CLEC(KSIM_ORDER[i], t, KSIM_POSXK[KSIM_ORDER[i]], 0);
         KSIM_SET_VAL(KSIM_ORDER[i], t, x);
     }
+
     return 0;
 }
 

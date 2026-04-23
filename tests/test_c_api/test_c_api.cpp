@@ -967,7 +967,7 @@ TEST_F(LegacyAPITest, Tests_LEC)
     Variable B = global_ws_var->get("B");
 
     // Tests LEC
-    U_test_lec("LEC", "A+B",  2, A[2]+B[2]);
+    U_test_lec("LEC", "A + B",  2, A[2] + B[2]);
     U_test_lec("LEC", "ln A", 2, log(A[2]));
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
