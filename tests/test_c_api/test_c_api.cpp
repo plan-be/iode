@@ -975,6 +975,8 @@ TEST_F(LegacyAPITest, Tests_LEC)
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
+    U_test_lec("LEC", "r(A)", 2, A[2] / A[1]);
+    U_test_lec("LEC", "r(B)", 2, B[2] / B[1]);
 
     std::string lst = global_ws_lst->get("LST1");
     EXPECT_EQ(lst, "A,B");
