@@ -17,18 +17,23 @@
  *      - int L_cc1()               First step of LEC compilation: creates 
  *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
  *                                              - L_NAMES = list of names in the LEC expression
- *      - int L_sub_expr(const std::vector<ALEC>& v_alec, int close)   Computes the position of the beginning of a sub-expression
+ *      - int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)   Computes the position of the beginning of a sub-expression
  */
 
 #include "api/lec/lec.h"
 
-#define last_ls         (L_OPS[L_NB_OPS - 1])   // Last element on the stack
-#define last_op         (last_ls.ls_op)         // Operator of the last element on the stack
 
-// Global variables
-LSTACK  L_OPS[L_MAX_STACK]; // Stack of operators encountered during compilation process. Limited to a max depth of L_MAX_STACK.
-int     L_NB_OPS = 0,       // Current operator stack depth
-        L_PAR = 0;          // Current parenthesis depth
+// stack of operators used by L_analyse 
+struct LSTACK 
+{        
+    int type;           // operator or function type 
+    int nb_args;        // nb of arguments
+
+public:
+    LSTACK(int type, int nb_args=0) : type(type), nb_args(nb_args) {}
+};
+
+std::vector<LSTACK> L_OPS;      // Stack of operators and functions used by L_analyse
 
 
 /**
@@ -54,53 +59,85 @@ static int L_add_coef_or_var_name(const std::string& name)
 
 static int L_save_var()
 {
-    ALEC al;
-    al.type = L_TOKEN.tk_def;
+    int type = L_TOKEN.tk_def;
+    std::string name(L_TOKEN.tk_name);
 
-    switch(L_TOKEN.tk_def) 
+    bool success = true;
+    switch(type) 
     {
         case L_PERIOD :     // period
-            al.content.period.year = L_TOKEN.tk_period.year;
-            al.content.period.periodicity = L_TOKEN.tk_period.periodicity;
-            al.content.period.step = L_TOKEN.tk_period.step;
+        {
+            Period period(L_TOKEN.tk_period.year, L_TOKEN.tk_period.periodicity, L_TOKEN.tk_period.step);
+            LEC_PERIOD al(period, -1);      // the position of the period will be set later
+            L_EXPR.push_back(al);
             break;
+        }
         case L_DCONST:      // double constant
-            al.content.const_float = L_TOKEN.tk_real;
+        {
+            LEC_CONST_REAL al(L_TOKEN.tk_real);
+            L_EXPR.push_back(al);
             break;
+        }
         case L_LCONST:      // long constant
-            al.content.const_long = L_TOKEN.tk_long;
+        {
+            LEC_CONST_LONG al(L_TOKEN.tk_long);
+            L_EXPR.push_back(al);
             break;
+        }
+        case L_COEF:         // coefficient
+        {
+            int pos = L_add_coef_or_var_name(name);
+            LEC_COEF al(name, pos);
+            L_EXPR.push_back(al);
+            break;
+        }
         default :
-            // if special constant (pi, e, etc.) -> nothing to do
-            if(is_val(L_TOKEN.tk_def)) 
+        {
+            // if special constant (pi, e, etc.)
+            if(is_val(type))
+            {
+                LEC_VAL_FN al(type);
+                L_EXPR.push_back(al);
                 break;
-            // Variable or Scalar
-            al.content.variable.pos = L_add_coef_or_var_name(L_TOKEN.tk_name);
-            al.content.variable.lag  = 0;
-            al.content.variable.per.year = 0;
-            al.content.variable.per.periodicity= 0;
-            al.content.variable.per.step = 0;
+            }
+
+            // IODE Variable
+            if(type == L_VAR || type == L_VART)
+            {
+                int pos = L_add_coef_or_var_name(name);
+                LEC_VAR al(type, name, pos, 0, Period());
+                L_EXPR.push_back(al);
+                break;
+            }
+
+            // if the token is not recognized, return a warning and skip it
+            success = false;
+            std::string msg = "L_save_var(): Unexpected token type '" + std::to_string(type) + "' in LEC expression. ";
+            msg += "This token will be ignored.";
+            kwarning(msg.c_str());
             break;
+        }
     }
 
-    L_EXPR.push_back(al);
-    return 0;
+    return success ? 0 : -1;
 }
 
 
 /**
  *  Check if the operator op has a lower execution priority than the last operator on the stack L_OPS;
  *  
- *  @param [in]     op  int     operator to compare with last_op?
+ *  @param [in]     op  int     operator to compare with last operator in L_OPS
  *  @return             int     1 if last entry in L_OPS is not an operator (parenthesis for ex.)
- *                              1 if priority(op) <= priority(last_op) 
- *                              0 if priority(op) > priority(last_op) 
+ *                              1 if priority(op) <= priority(last op) 
+ *                              0 if priority(op) > priority(last op) 
  *                              0 if there is no op on the stack or if the last op is an open parenthesis
  */
 static bool L_priority_sup(int op)
 {
-    if(L_NB_OPS <= 0) 
+    if(L_OPS.size() <= 0) 
         return false;
+
+    int last_op = L_OPS.back().type;
     
     if(last_op == L_OPENP) 
         return false;
@@ -116,7 +153,7 @@ static bool L_priority_sup(int op)
 
 
 /**
- *  Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters (in last_ls.ls_nb_args). 
+ *  Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters. 
  *  Checks if the number of arguments are in line with the definitions.
  *  
  *  The operator is saved in type. 
@@ -127,9 +164,18 @@ static bool L_priority_sup(int op)
  */
 static int L_save_op()
 {
-    int pos;
-    int op = last_op;
-    int nb_args = (int) last_ls.ls_nb_args;
+    int pos = -1;
+    LSTACK ls = L_OPS.back();
+    L_OPS.pop_back();
+    int op = ls.type;
+    int nb_args = ls.nb_args;
+
+    if(op == L_OPENP || op == L_CLOSEP)
+    {
+        LEC_OTHER al(op);
+        L_EXPR.push_back(al);
+        return 0;
+    }
 
     if(is_fn(op)) 
     {
@@ -139,6 +185,17 @@ static int L_save_op()
             L_errno = L_ARGS_ERR;
             return L_errno;
         }
+
+        LEC_FN al(op, nb_args);
+        L_EXPR.push_back(al);
+        return 0;
+    }
+
+    if(is_op(op)) 
+    {
+        LEC_OP al(op);
+        L_EXPR.push_back(al);
+        return 0;
     }
 
     if(is_tfn(op)) 
@@ -149,6 +206,17 @@ static int L_save_op()
             L_errno = L_ARGS_ERR;
             return L_errno;
         }
+
+        LEC_TFN al(op, nb_args);
+        L_EXPR.push_back(al);
+        return 0;
+    }
+
+    if(is_val(op)) 
+    {
+        LEC_VAL_FN al(op);
+        L_EXPR.push_back(al);
+        return 0;
     }
 
     if(is_mtfn(op)) 
@@ -159,15 +227,17 @@ static int L_save_op()
             L_errno = L_ARGS_ERR;
             return L_errno;
         }
+
+        LEC_MTFN al(op, nb_args, 0);
+        L_EXPR.push_back(al);
+        return 0;
     }
 
-    ALEC al;
-    al.type = op;
-    al.content.func_nb_args = nb_args;
-    L_EXPR.push_back(al);
-
-    L_NB_OPS--;
-    return 0;
+    // if the function/operator is not recognized, return a warning and skip it
+    std::string msg = "L_save_op(): Unexpected function or operator '" + std::to_string(op) + "' in LEC expression. ";
+    msg += "This function or operator will be ignored.";
+    kwarning(msg.c_str());
+    return -1;
 }
 
 
@@ -178,88 +248,108 @@ static int L_save_op()
  *  
  *  First, saves in L_EXPR the operator(s) of lower priorities that are on the top of L_OPS.
  *  
- *  Example: if op is '+' and last_op is '*': 
+ *  Example: if op is '+' and last op is '*': 
  *              '*' if moved to L_EXPR because '+' has a lower priority.
  *              '+' is put on the top of L_OPS
  *  
  *  @param [in] op_group  int   group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
  *                              The operator itself is in L_TOKEN.
+ *  @param [in] L_PAR     int   current parenthesis depth (used for checking balanced parentheses)
  *  @return                     0 on success
  *                              L_errno on error
  */
-static int L_add_stack(int op_group)
+static int L_add_stack(int op_group, int& L_PAR)
 {
-    if(L_NB_OPS >= L_MAX_STACK)
+    int type = L_TOKEN.tk_def;
+
+    if(op_group == L_OP)
     {
-        L_errno = L_STACK_ERR;
-        return L_errno;
+        while(L_priority_sup(type))
+        {
+            if(L_save_op() != 0) 
+                return L_errno;
+        }
     }
 
     switch(op_group) 
     {
         case L_OP :
-            while(L_priority_sup(L_TOKEN.tk_def))
-            {
-                if(L_save_op() != 0) 
-                    return L_errno;
-            }
-            // NO BREAK!
         case L_FN :
         case L_TFN :
         case L_MTFN :
-            L_OPS[L_NB_OPS].ls_nb_args = 1;
-            L_OPS[L_NB_OPS].ls_op = L_TOKEN.tk_def;
+        {
+            LSTACK ls(type, 1);
+            L_OPS.push_back(ls);
             break;
+        }
 
         case L_OPENP :
+        {
             L_PAR++;
-            L_OPS[L_NB_OPS++].ls_op = L_OPENP;
+            L_OPS.push_back(LSTACK(L_OPENP));
             if(L_save_op() != 0) 
                 return L_errno;
-            L_OPS[L_NB_OPS].ls_op = L_OPENP;
+            
+            // NOTE: we put the open parenthesis on L_OPS as a marker to be found in case 
+            // of a closing parenthesis (i.e. next case) and to know when to stop emptying 
+            // the stack of operators
+            L_OPS.push_back(LSTACK(L_OPENP));
             break;
+        }
 
         case L_CLOSEP :
+        {
             L_PAR--;
-            while(L_NB_OPS > 0) 
+            while(L_OPS.size() > 0) 
             {
-                if(last_op == L_OPENP) 
+                LSTACK& last_op = L_OPS.back();
+                if(last_op.type == L_OPENP) 
                 {
-                    last_op = L_CLOSEP;
+                    last_op.type = L_CLOSEP;
                     return L_save_op();
                 }
 
                 if(L_save_op() != 0) 
                     return L_errno;
             }
+
             L_errno = L_PAR_ERR;
             return L_errno;
+        }
 
         case L_COMMA :
-            if(L_add_stack(L_CLOSEP)) 
+        {
+            if(L_add_stack(L_CLOSEP, L_PAR)) 
                 return L_errno;
-            if(L_NB_OPS <= 0 || !(is_fn(last_op) || is_tfn(last_op) || is_mtfn(last_op)))
-            {
-                L_errno = L_SYNTAX_ERR;
-                return L_errno;
-            }
-            last_ls.ls_nb_args++;
-            return L_add_stack(L_OPENP);
 
-        case L_OCPAR :
-            if(L_NB_OPS <= 0 || !is_fn(last_op))
+            LSTACK& last_op = L_OPS.back();
+            if(!(is_fn(last_op.type) || is_tfn(last_op.type) || is_mtfn(last_op.type)))
             {
                 L_errno = L_SYNTAX_ERR;
                 return L_errno;
             }
-            last_ls.ls_nb_args = 0;
+
+            last_op.nb_args++;
+            return L_add_stack(L_OPENP, L_PAR);
+        }
+
+        case L_OCPAR :      // open-close parentheses () 
+        {
+            LSTACK& last_op = L_OPS.back();
+            if(!is_fn(last_op.type))
+            {
+                L_errno = L_SYNTAX_ERR;
+                return L_errno;
+            }
+
+            last_op.nb_args = 0;
             return 0;
+        }
 
         default :
             break;
     }
 
-    L_NB_OPS++;
     return 0;
 }
 
@@ -273,16 +363,14 @@ static int L_add_stack(int op_group)
  */
 static int L_empty_ops_stack()
 {
-    while(L_NB_OPS > 0)
+    while(L_OPS.size() > 0)
     {
         if(L_save_op() != 0) 
             return L_errno;
     }
 
-    ALEC al;
-    al.type = L_EOE;
+    LEC_OTHER al(L_EOE);     // end of expression
     L_EXPR.push_back(al);
-
     return 0;
 }
 
@@ -307,19 +395,24 @@ static int L_lag_expr(int lag)
 
     for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
     {
-        ALEC& al = *it;
+        ATOMIC_LEC& al = *it;
 
-        // only applies lag to non-timed variables. 
-        if(al.type != L_VAR) 
+        // check that the atomic lec represents a variable
+        if(!std::holds_alternative<LEC_VAR>(al)) 
+            continue;
+
+        // only applies lag to non-timed variables.
+        LEC_VAR& lvar = std::get<LEC_VAR>(al);
+        if(lvar.type != L_VAR) 
             continue;
 
         // skip if a period is associated to the variable (ex. A[1960Y1]) because 
         // in that case, the variable is fixed in time and cannot be lagged.
-        if(al.content.variable.per.step != 0) 
+        if(lvar.per.step != 0) 
             continue;
         
         // applies lag
-        al.content.variable.lag += lag;
+        lvar.lag += lag;
     }
 
     return 0;
@@ -345,19 +438,24 @@ static int L_time_expr()
 
     for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
     {
-        ALEC& al = *it;
+        ATOMIC_LEC& al = *it;
+
+        // check that the atomic lec represents a variable
+        if(!std::holds_alternative<LEC_VAR>(al)) 
+            continue;
 
         // only applies lag to non-timed variables.
-        if(al.type != L_VAR) 
+        LEC_VAR& lvar = std::get<LEC_VAR>(al);
+        if(lvar.type != L_VAR) 
             continue;
 
         // skip if a period is associated to the variable (ex. A[1960Y1]) because 
         // in that case, the variable is fixed in time and cannot be lagged.
-        if(al.content.variable.per.step != 0) 
+        if(lvar.per.step != 0) 
             continue;
         
         // applies time expression
-        memcpy(&(al.content.variable.per), &(L_TOKEN.tk_period), sizeof(Period));
+        lvar.per = L_TOKEN.tk_period;
     }
 
     return 0;
@@ -452,8 +550,9 @@ int L_cc1()
     int start = 1;
     int beg = 1;    /* indicate if next token is an oper or an expr */
 
+    L_errno = 0;
     L_EXPR.clear();
-    L_NB_OPS = L_PAR = L_errno = 0;
+    int L_PAR = 0;                      // Current parenthesis depth
 
     /* LOOP ON TOKEN */
     while(true) 
@@ -501,19 +600,19 @@ again:
                     goto again;
                 }
                 beg = 1;
-                if(L_add_stack(type)) 
+                if(L_add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_FN :         // not time function
             case L_TFN:         // time function
-            case L_MTFN:        // multi-args time function
+            case L_MTFN:        // variadic time function
             case L_OPENP :      // open parenthesis
                 if(beg == 0) 
                 {
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type)) 
+                if(L_add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_OCPAR :      // open-close parentheses "()""
@@ -522,7 +621,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type)) 
+                if(L_add_stack(type, L_PAR)) 
                     return L_errno;
                 beg = 0;
                 break;
@@ -532,7 +631,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type)) 
+                if(L_add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_COMMA :      // Comma
@@ -541,7 +640,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type)) 
+                if(L_add_stack(type, L_PAR)) 
                     return L_errno;
                 beg = 1;
                 break;
@@ -559,10 +658,8 @@ again:
             case L_EOE :        // End of expression
                 if(start) 
                 {
-                    ALEC al;
-                    al.type = L_EOE;
+                    LEC_OTHER al(L_EOE);
                     L_EXPR.push_back(al);
-
                     return L_errno;
                 }
                 if(beg == 1) 
@@ -596,7 +693,7 @@ again:
  *  @param [in] i   int     position in al of the element where the expression is "closed"
  *  @return                 position in al of the element where the expression starts
  */
-int L_sub_expr(const std::vector<ALEC>& v_alec, int close)
+int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)
 {
     if(v_alec.empty())
         return -1;
@@ -608,35 +705,31 @@ int L_sub_expr(const std::vector<ALEC>& v_alec, int close)
         throw std::out_of_range(error_msg);
     }
 
-    int type;
     int nb_parents = 0;
     int end = (close >= 0) ? close : (int) v_alec.size() - 1;
 
     // browse backwards all elements of the expression
     for(int pos = end; pos >= 0; pos--) 
     {
-        type = v_alec[pos].type;
+        const ATOMIC_LEC& al = v_alec[pos];
 
         // if open or close parenthesis, update the number of parents
-        switch(type) 
+        if(std::holds_alternative<LEC_OTHER>(al)) 
         {
+            const LEC_OTHER& other = std::get<LEC_OTHER>(al);
             // open parenthesis -> decrease number of parents
-            case L_OPENP  :
+            if(other.type == L_OPENP)
                 nb_parents--;
-                break;
             // close parenthesis -> increase number of parents
-            case L_CLOSEP :
+            if(other.type == L_CLOSEP)
                 nb_parents++;
-                break;
-            default :
-                break;
         }
-
+        
         if(nb_parents > 0) 
             continue;
         
         // QUESTION: why calling L_sub_expr twice ?
-        if(is_op(type)) 
+        if(std::holds_alternative<LEC_OP>(al))
         {
             pos = L_sub_expr(v_alec, pos - 1);
             pos = L_sub_expr(v_alec, pos - 1);
@@ -644,7 +737,10 @@ int L_sub_expr(const std::vector<ALEC>& v_alec, int close)
         }
 
         // if not a function, we have reached the beginning of the expression
-        if(!is_fn(type) && !is_tfn(type) && !is_mtfn(type)) 
+        bool b_is_fn = std::holds_alternative<LEC_FN>(al);
+        bool b_is_tfn = std::holds_alternative<LEC_TFN>(al);
+        bool b_is_mtfn = std::holds_alternative<LEC_MTFN>(al);
+        if(!b_is_fn && !b_is_tfn && !b_is_mtfn) 
             return pos;
     }
 

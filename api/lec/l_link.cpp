@@ -62,18 +62,10 @@ static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
  * @param [in]      dbv     KDB*    KDB of variables (only its Sample is needed here)
  * @param [in, out] expr    char*   pointer to the CLEC (sub-)expression
  * @param [in]      lg      int     length of expr
- * 
- * TODO: not implemented for MTFN's ???
 */
-static void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
+void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
 {
-    int     j, keyw;
-    short   len, s;
-    CVAR    cvar;
-    Sample  *smpl;
-    Period  per;
-
-    smpl = L_getsmpl(dbv);
+    Sample* smpl = L_getsmpl(dbv);
     if(!smpl)
     {
         std::string msg = "Cannot link a LEC sub-expression because the sample ";
@@ -82,48 +74,106 @@ static void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short l
         return;
     }
 
+    int j;
+    int type;
+    int previous_j;
     for(j = 0 ; j < lg ;) 
     {
-        keyw = expr[j++];
-        switch(keyw) 
+        type = expr[j];
+        switch(type) 
         {
-            case L_VAR   :
-                memcpy(&cvar, expr + j, sizeof(CVAR));
-                cvar.ref = cvar.lag;
-                if(cvar.per.step != 0)
-                    cvar.ref += cvar.per.difference(smpl->start_period);
-                memcpy(expr + j, &cvar, sizeof(CVAR));
-                j += sizeof(CVAR);
+            case L_VAR :
+            {
+                // extract LEC Variable from the buffer -> update j
+                LEC_VAR al_var(expr, j);
+                // calculate the reference of the variable
+                al_var.calculate_ref(*smpl);
+                // move back to the beginning of the LEC_VAR in the buffer
+                j -= al_var.get_length();
+                // save the updated LEC Variable back to the buffer
+                al_var.add_to_buffer(expr, j);
                 break;
-            case L_COEF      :
-                j += sizeof(CVAR);
+            }
+            case L_COEF :
+            {
+                // extract LEC Coefficient from the buffer -> update j
+                LEC_COEF al_coef(expr, j);
                 break;
-            case L_DCONST    :
-                j += sizeof(float);
+            }
+            case L_DCONST :
+            {
+                // extract LEC Double Constant from the buffer -> update j
+                LEC_CONST_REAL al_real(expr, j);
                 break;
-            case L_LCONST    :
-                j += sizeof(long);
+            }
+            case L_LCONST :
+            {
+                // extract LEC Long Constant from the buffer -> update j
+                LEC_CONST_LONG al_long(expr, j);
                 break;
-            case L_PERIOD    :
-                memcpy(&per, expr + j, sizeof(Period));
-                s = per.difference(smpl->start_period);
-                memcpy(expr + j + sizeof(Period), &s, sizeof(short));
-                j += sizeof(short) + sizeof(Period);
+            }
+            case L_PERIOD :
+            {
+                // extract LEC Period from the buffer -> update j
+                LEC_PERIOD al_period(expr, j);
+                // calculate the position of the period in the sample
+                al_period.calculate_pos(*smpl);
+                // move back to the beginning of the LEC_PERIOD in the buffer
+                j -= al_period.get_length();
+                // save the updated LEC Period back to the buffer
+                al_period.add_to_buffer(expr, j);
                 break;
+            }
             default :
-                if(is_fn(keyw)) 
+            {
+                if(is_special_lec_elem(type)) 
                 {
                     j++;
-                    break;
+                    break; 
                 }
-                if(is_tfn(keyw)) 
+
+                if(is_fn(type)) 
                 {
-                    memcpy(&len, expr + j + 1, sizeof(short));
-                    L_link_sample_expr(dbv, expr + j + 1 + sizeof(short), len);
-                    j += 1 + sizeof(short) + len;
+                    // extract LEC Function from the buffer -> update j
+                    LEC_FN al_fn(expr, j);
+                    break; 
+                }
+
+                if(is_op(type)) 
+                {
+                    // extract LEC Operator from the buffer -> update j
+                    LEC_OP al_op(expr, j);
+                    break; 
+                }
+
+                if(is_tfn(type)) 
+                {
+                    previous_j = j;
+                    // extract LEC TFN from the buffer -> update j
+                    LEC_TFN al_tfn(expr, j);
+                    // recursive call to L_link_sample_expr()
+                    al_tfn.link_sample_expr(dbv, expr, previous_j);
                     break;
                 }
-                break;
+
+                if(is_val(type)) 
+                {
+                    // extract LEC VAL_FN from the buffer -> update j
+                    LEC_VAL_FN al_val_fn(expr, j);
+                    break; 
+                }
+
+                if(is_mtfn(type)) 
+                {
+                    // extract LEC TFN from the buffer -> update j
+                    LEC_MTFN al_mtfn(expr, j);
+                    // TODO : find a way to link sample in multi-arg functions
+                    // ...
+                    break;
+                }
+
+                throw std::runtime_error("Unexpected type in L_link_sample_expr: " + std::to_string(type));
+            }
         }
     }
 }

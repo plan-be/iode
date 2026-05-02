@@ -23,7 +23,6 @@
  * Main functions:
  * 
  *      CLEC *L_cc2(ALEC* expr, std::string& lec)        Second stage of LEC compilation. Generates an "executable" LEC expression.
- *      void L_move_arg(char *s1, char *s2, int lg)      Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
  *      CLEC *L_cc_stream(std::string& lec)              Compiles L_YY, the open YY stream containing a LEC expression.
  *      CLEC *L_cc(char* lec)                            Compiles a LEC string. 
  */
@@ -39,48 +38,19 @@
  * @param [in] to       int     ending position in ALEC of that expression
  * @return              int     size in bytes of the expression in CLEC form
 */
-static int L_calc_len(const std::vector<ALEC>& expr, int from, int to)
+static int L_calc_len(const std::vector<ATOMIC_LEC>& expr, const int from, const int to)
 {
     if(expr.empty()) 
         return 0;
     
-    int lg = 0;
+    int len = 0;
     for(int i = from; i < to; i++) 
     {
-        const ALEC& al = expr[i];
-
-        lg++;   // 1 byte for the type of the expression element
-        switch(al.type) 
-        {
-            case L_COEF:
-            case L_VAR:
-                lg += sizeof(CVAR);
-                break;
-            case L_PERIOD:
-                lg += sizeof(Period) + sizeof(short);
-                break;
-            case L_DCONST:
-                lg += sizeof(float);
-                break; /* FLOAT 11-04-98 */
-            case L_LCONST:
-                lg += sizeof(long);
-                break;
-            case L_OPENP:
-            case L_CLOSEP:
-                lg--;
-                break;
-            default:
-                if(is_fn(al.type)) 
-                    lg++;
-                if(is_tfn(al.type)) 
-                    lg += 1 + sizeof(short);
-                if(is_mtfn(al.type))
-                    lg += 2 + (sizeof(short) * (1 + L_MIN_MTARGS[al.type - L_MTFN]));
-                break;
-        }
+        const ATOMIC_LEC& al = expr[i];
+        len += std::visit([](auto& arg) { return arg.get_length(); }, al);
     }
     
-    return lg;
+    return len;
 }
 
 
@@ -90,129 +60,128 @@ static int L_calc_len(const std::vector<ALEC>& expr, int from, int to)
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC* L_cc2(const std::vector<ALEC>& expr, const std::string& lec) 
+CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
 {
     if(expr.empty()) 
         return nullptr;
 
-    int i = 0;
-    int lg = 0;
-    int alg = 0;
-    unsigned char *ll = NULL;
-    for(const ALEC& al : expr) 
+    int pos_buffer = 0;             // position (in number of bytes) in the buffer
+    int pos_expr = 0;               // position in the vector of atomic lec elements
+    int alen = 0;                   // current allocated size of the buffer (in bytes)
+    unsigned char* buffer = NULL;   // buffer to save the "executable" expression (will be copied in the CLEC struct at the end)
+    for(const ATOMIC_LEC& al : expr) 
     {
-        if(al.type == L_EOE)
+        // end of expression -> stop
+        if(std::holds_alternative<LEC_OTHER>(al) && std::get<LEC_OTHER>(al).type == L_EOE)
             break;
 
-        if(lg + 30 >= alg) 
+        // if the current size of the buffer is not sufficient to save the next element, 
+        // reallocate it by chunks of 512 bytes
+        if(pos_buffer + 30 >= alen) 
         {
-            ll = (unsigned char*) SW_nrealloc(ll, alg, alg + 512);
-            alg += 512;
+            buffer = (unsigned char*) SW_nrealloc(buffer, alen, alen + 512);
+            alen += 512;
         }
 
-        ll[lg++] = al.type;
-        switch(al.type) 
+        if(std::holds_alternative<LEC_TFN>(al))
         {
-            case L_VAR:
-            case L_COEF:
+            const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+
+            // save the type of the expression element (1 byte)
+            buffer[pos_buffer] = al_tfn.type;
+            pos_buffer++;
+
+            // move function arguments in the buffer to put type and nb of args before them
+            int start_pos = L_sub_expr(expr, pos_expr - 1);
+            long len = L_calc_len(expr, start_pos, pos_expr);
+            if(len < 0) 
             {
-                CVAR cvar;
-                cvar.pos = al.content.variable.pos;
-                cvar.lag = al.content.variable.lag;
-                cvar.per = al.content.variable.per;
-                cvar.ref = 0;
-                memcpy(ll + lg, &cvar, sizeof(CVAR));
-                lg += sizeof(CVAR);
-                break;
+                std::string error_msg = "L_cc2(): Could not compute the length in bytes of ";
+                error_msg += "arguments of function '" + al_tfn.representation + "'.";
+                kwarning(error_msg.c_str());
+                SW_nfree(buffer);
+                return nullptr;
             }
-            case L_PERIOD:
-                memcpy(ll + lg, &(al.content.period), sizeof(Period));
-                lg += sizeof(Period) + sizeof(short);
-                break;
-            case L_DCONST:
-                memcpy(ll + lg, &(al.content.const_float), sizeof(float)); /* FLOAT 11-04-98 */
-                lg += sizeof(float); /* FLOAT 11-04-98 */
-                break;
-            case L_LCONST:
-                memcpy(ll + lg, &(al.content.const_long), sizeof(long));
-                lg += sizeof(long);
-                break;
-            case L_OPENP:
-            case L_CLOSEP:
-                lg--;
-                break;
-            default:
-                if(is_fn(al.type))
-                    ll[lg++] = al.content.func_nb_args;
+            // a) go 'len + 1' bytes backward
+            int new_pos_buffer = pos_buffer - (len + 1);
+            unsigned char* tmp = buffer + new_pos_buffer;
+            // b) move tmp[0:len] to tmp[shift:shift+len] 
+            int shift = 2 + sizeof(short);
+            for(int i = len - 1; i >= 0; i--)
+                tmp[i + shift] = tmp[i];
+            // save the length in bytes of the function arguments
+            memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
 
-                if(is_tfn(al.type)) 
-                {
-                    int pos = L_sub_expr(expr, i - 1);
-                    long len = L_calc_len(expr, pos, i);
-                    int shift = lg - len - 1;
-                    /* Move last arg */
-                    unsigned char* tmp = ll + lg - len - 1;
-                    L_move_arg((char*) tmp + 2 + sizeof(short), (char*) tmp, len);
-                    memcpy(tmp + 2, &len, sizeof(short));
-                    tmp[0] = al.type;
-                    tmp[1] = al.content.func_nb_args;
-                    lg += sizeof(short) + 1;
-                }
-
-                if(is_mtfn(al.type)) 
-                {
-                    unsigned char* tmp;
-                    int pos = i - 1;
-                    long len = 0;
-                    int nvargs = L_MIN_MTARGS[al.type - L_MTFN];
-                    for(int j = 0 ; j < nvargs ; j++) 
-                    {
-                        int pos1 = L_sub_expr(expr, pos);
-                        long len1 = L_calc_len(expr, pos1, pos + 1);
-                        len += len1;
-                        pos = pos1 - 1;
-                        /* Move arg */
-                        tmp = ll + lg - 1 - len;
-                        L_move_arg((char*) tmp + 3 + (nvargs - j + 1) * sizeof(short), (char*) tmp, len1);
-                        memcpy(tmp + 3 + (nvargs - j) * sizeof(short), &len1, sizeof(short));
-                    }
-
-                    lg += 2 + (1 + nvargs) * sizeof(short);
-                    tmp[0] = al.type;
-                    tmp[1] = al.content.func_nb_args;
-                    tmp[2] = nvargs;
-                    len += nvargs * sizeof(short);
-                    memcpy(tmp + 3, &len, sizeof(short));
-                }
-                break;
+            tmp[0] = al_tfn.type;
+            tmp[1] = al_tfn.nb_args;
+            pos_buffer += sizeof(short) + 1;
         }
-        i++;
+        else if(std::holds_alternative<LEC_MTFN>(al))
+        {
+            const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+
+            // save the type of the expression element (1 byte)
+            buffer[pos_buffer] = al_mtfn.type;
+            pos_buffer++;
+
+            long tot_len = 0;
+            int new_pos = pos_expr - 1;
+            unsigned char* tmp = nullptr;
+            int nv_args = L_MIN_MTARGS[al_mtfn.pos];
+            for(int j = 0; j < nv_args; j++) 
+            {
+                // move function ?? arguments in the buffer to put type, nb_args and nv_args before them after the loop
+                int start_pos = L_sub_expr(expr, new_pos);
+                long len = L_calc_len(expr, start_pos, new_pos + 1);
+                if(len < 0) 
+                {
+                    std::string error_msg = "L_cc2(): Could not compute the length in bytes of ";
+                    error_msg += "arguments of function '" + al_mtfn.representation + "'.";
+                    kwarning(error_msg.c_str());
+                    SW_nfree(buffer);
+                    return nullptr;
+                }
+                tot_len += len;
+                new_pos = start_pos - 1;
+                // a) go 'len + 1' bytes backward
+                int new_pos_buffer = pos_buffer - (tot_len + 1);
+                tmp = buffer + new_pos_buffer;
+                // b) move tmp[0:len] to tmp[shift:shift+sub_len] 
+                int shift = 3 + (nv_args - j + 1) * sizeof(short);
+                for(int i = len - 1; i >= 0; i--)
+                    tmp[i + shift] = tmp[i];
+                // save the length in bytes of the function ?? arguments
+                memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
+            }
+
+            tot_len += nv_args * sizeof(short);
+            memcpy(tmp + 3, &tot_len, sizeof(short));
+
+            tmp[0] = al_mtfn.type;
+            tmp[1] = al_mtfn.nb_args;
+            tmp[2] = nv_args;
+            pos_buffer += 2 + (1 + nv_args) * sizeof(short);
+        }
+        else
+        {
+            // for other variant types (LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, LEC_OP, LEC_FN, LEC_VAL_FN)
+            std::visit([&buffer, &pos_buffer](auto& arg) { arg.add_to_buffer(buffer, pos_buffer); }, al);
+        }
+
+        pos_expr++;
     }
 
-    if(lg == 0)
+    if(pos_buffer == 0)
     {
-        SW_nfree(ll);
+        SW_nfree(buffer);
         return nullptr;
     }
     
-    CLEC* clec = new CLEC(lec, ll, lg);
-    SW_nfree(ll);
+    CLEC* clec = new CLEC(lec, buffer, pos_buffer);
+    SW_nfree(buffer);
     L_NAMES.clear();
 
     return clec;
-}
-
-/**
- * Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.
- * 
- * @param [out] s1  char*   output buffer
- * @param [in]  s2  char*   input buffer    
- * @param [in]  lg  int     nb of bytes to copy
-*/
-void L_move_arg(char *s1, char *s2, int lg)
-{
-    for(int i = lg - 1 ; i >= 0 ; i--)
-        s1[i] = s2[i];
 }
 
 

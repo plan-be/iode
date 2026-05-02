@@ -188,7 +188,7 @@ Main functions:
 |Syntax|Description|
 |:---|:---|
 |`int L_cc1()`|Creates L\_EXPR(ordered list of atomic expressions with references to L\_NAMES) and L\_NAMES (list of names in the LEC expression)|
-|`int L_sub_expr(const std::vector<ALEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
+|`int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
 
 ### l\_cc2.c {#T17}
 
@@ -198,8 +198,7 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`CLEC *L_cc2(const std::vector<ALEC>& expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
-|`void L_move_arg(char *s1, char *s2, int lg)`|Copies lg bytes from a buffer to another in reverse order. The 2 buffers may overlap.|
+|`CLEC *L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
 |`CLEC *L_cc_stream(const std::string& lec)`|Compiles L\_YY, the open YY stream containing a LEC expression.|
 |`CLEC *L_cc(const std::string& lec)`|Compiles a LEC string.|
 

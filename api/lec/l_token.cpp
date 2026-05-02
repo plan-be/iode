@@ -49,7 +49,7 @@
  *  
  */
 #include "api/objs/grep.h"
-#include "api/lec/lec.h"
+#include "api/lec/l_token.h"
 
 /* WARNING !!! : IF YOU MODIFY L_TABLE (below), DON'T FORGET TO CHANGE
 		    L_PRIOR,
@@ -175,16 +175,21 @@ static void L_unread()
  */
 static int L_macro()
 {
-    char    *ptr;
+    if(L_read() != YY_WORD)
+    {
+        L_errno = L_MACRO_ERR;
+        return L_errno;
+    }
 
-    if(L_read() != YY_WORD) return(L_errno = L_MACRO_ERR);
-    ptr = L_expand((char*) L_YY->yy_text);
-    if(ptr == 0) return(L_errno = L_MACRO_ERR);
-    /*    YY_record(L_YY, ")"); */  /* JMP 25-09-98 */
+    char* ptr = L_expand((char*) L_YY->yy_text);
+    if(!ptr)
+    {
+        L_errno = L_MACRO_ERR;
+        return L_errno;
+    } 
+
     SCR_replace((unsigned char*) ptr, (unsigned char*) ";", (unsigned char*) ","); /* JMP 25-09-98 */
     YY_record(L_YY, (unsigned char*) ptr);
-    /*    YY_record(L_YY, "("); */  /* JMP 25-09-98 */
-
     return 0;
 }
 
