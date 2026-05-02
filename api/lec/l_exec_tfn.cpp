@@ -85,7 +85,7 @@ double L_lag(unsigned char* expr, short len, int t, double* stack, int nargs)
 {
     int     lag = 1;
 
-    if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
+    if(nargs == 2) lag = L_intlag(*stack);
     return(L_exec_sub(expr, len, t - lag, stack));
 }
 
@@ -102,7 +102,7 @@ double L_diff(unsigned char* expr, short len, int t, double* stack, int nargs)
     double  v1, v2;
     int     lag = 1;
 
-    if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
+    if(nargs == 2) lag = L_intlag(*stack);
     v1 = L_exec_sub(expr, len, t, stack);
     if(!IODE_IS_A_NUMBER(v1)) return(IODE_NAN);
     v2 = L_exec_sub(expr, len, t - lag, stack);
@@ -149,7 +149,7 @@ double L_dln(unsigned char* expr, short len, int t, double* stack, int nargs)
     double  v1, v2;
     int     lag = 1;
 
-    if(nargs == 2) lag = L_intlag(*stack); /* JMP38 27-10-92 */
+    if(nargs == 2) lag = L_intlag(*stack);
     v1 = L_exec_sub(expr, len, t, stack);
     if(!IODE_IS_A_NUMBER(v1)) return(IODE_NAN);
     v2 = L_exec_sub(expr, len, t - lag, stack);
@@ -185,7 +185,7 @@ double L_mavg(unsigned char* expr, short len, int t, double* stack, int nargs)
     double  v1 = 0.0, tmp;
     int     n = 1, j;
 
-    if(nargs == 2) n = L_intlag(*stack); /* JMP38 27-10-92 */
+    if(nargs == 2) n = L_intlag(*stack);
     n = (n < 1) ? 1 : n;
     for(j = 0 ; j < n ; j++) {
         tmp = L_exec_sub(expr, len, t - j, stack);

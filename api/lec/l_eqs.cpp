@@ -43,8 +43,12 @@ enum EQ_HAND_SIDE
 
 struct SLEC 
 {
-    std::vector<ALEC> sl_left_expr;         // Tables of ALEC's for LHS equations members
-    std::vector<ALEC> sl_right_expr;        // Tables of ALEC's for RHS equations members
+    // Tables of ALEC's for LHS equations members
+    std::vector<ATOMIC_LEC> sl_left_expr;
+    
+    // Tables of ALEC's for RHS equations members
+    std::vector<ATOMIC_LEC> sl_right_expr;
+
     EQ_HAND_SIDE    sl_side_with_endo;      // side containing sl_endo (will be inverted if possible)
     EQ_HAND_SIDE    sl_side_without_endo;   // side not containing sl_endo (will be left unchanged)
     int             sl_op;                  // last operator|function
@@ -54,22 +58,30 @@ struct SLEC
 
 
 /**
- * Counts the number of occurences of a variable in a ALEC table of atomic expressions (result of l_cc1()).
+ * Counts the number of occurrences of a variable in a ALEC table of atomic expressions (result of l_cc1()).
  * The lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
  * 
- * @param [in]  v_al    std::vector<ALEC>&   vector of ALEC elements
+ * @param [in]  v_al    std::vector<ATOMIC_LEC>&   vector of ALEC elements
  * @param [in]  last    int     last position in ALEC to take into account in the count
  * @param [in]  endo    char*   name of the variable to search
  * @return              int     number of occurence of endo in ALEC
 */
-static int L_count_endo(const std::vector<ALEC>& v_al, const std::string& endo)
+static int L_count_endo(const std::vector<ATOMIC_LEC>& v_al, const std::string& endo)
 {
     int count = 0;
-    for(const ALEC& al : v_al)
+    for(const ATOMIC_LEC& al : v_al)
     {
-        if(al.type == L_VAR && al.content.variable.per.step == 0 &&
-           al.content.variable.lag == 0 && L_NAMES[al.content.variable.pos] == endo)
-                count++;
+        if(!std::holds_alternative<LEC_VAR>(al))
+            continue;
+
+        const LEC_VAR& al_var = std::get<LEC_VAR>(al);
+
+        // the lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
+        if(al_var.type != L_VAR || al_var.per.step != 0 || al_var.lag != 0)
+            continue;
+
+        if(L_NAMES[al_var.pos] == endo)
+            count++;
     }
 
     return count;
@@ -113,29 +125,49 @@ static int L_split_expr(SLEC* sl)
     int start_sub_expr = -1;
 
     // ALEC containing the sl->sl_endo
-    std::vector<ALEC> v_al;
+    std::vector<ATOMIC_LEC> v_al;
     if(sl->sl_side_with_endo == EQ_LHS)
         v_al = sl->sl_left_expr;
     else
         v_al = sl->sl_right_expr;
     
 ag:
-    const ALEC& al = v_al.back();
-    sl->sl_op = al.type;
-    sl->sl_nargs = al.content.func_nb_args;    
-    switch(sl->sl_op) 
+    if(v_al.size() == 0)
     {
-        // if the last element is L_VAR, we have only one item and the process is terminated (?)
-        case L_VAR :
-            return 1;  
-        // if the last element is L_CLOSEP, the first on must be L_OPENP (?)            
-        case L_CLOSEP :
-            // drop the first element of v_al
-            v_al.erase(v_al.begin());
-            // drop the last element of v_al
-            v_al.pop_back();
-            goto ag;                    // we try the next element                       
+        L_errno = L_DUP_ERR;
+        return L_errno; 
     }
+
+    const ATOMIC_LEC& al = v_al.back();
+
+    int type = std::visit([](auto&& arg) -> int { return arg.type; }, al);
+
+    // if the last element is L_CLOSEP, the first on must be L_OPENP (?)
+    if(type == L_CLOSEP)
+    {
+        // drop the first element of v_al
+        v_al.erase(v_al.begin());
+        // drop the last element of v_al
+        v_al.pop_back();
+        // we try the next element 
+        goto ag;
+    }
+
+    // if the last element is L_VAR, we have only one item and the process is terminated (?)
+    if(type == L_VAR)
+        return 1;
+
+    if(!is_executable(type))
+    {
+        L_errno = L_DUP_ERR;
+        return L_errno; 
+    }
+
+    // cast to LEC_EXECUTABLE to get the number of arguments
+    const LEC_EXECUTABLE& al_exec = reinterpret_cast<const LEC_EXECUTABLE&>(al);
+
+    sl->sl_op = type;
+    sl->sl_nargs = al_exec.nb_args;
 
     // QUESTION: why ?
     v_al.pop_back();
@@ -192,9 +224,9 @@ ag:
  * @param [in] lec           char*   LEC expression to compile
  * @return                   ALEC*   allocated table of ALEC's or NULL on error
 */
-static std::vector<ALEC> L_cc1_alloc(char* lec)
+static std::vector<ATOMIC_LEC> L_cc1_alloc(char* lec)
 {
-    std::vector<ALEC> v_al;
+    std::vector<ATOMIC_LEC> v_al;
     if(L_open_string(lec)) 
         return v_al;
     
@@ -260,7 +292,7 @@ static int L_cc1_eq(SLEC* sl, char* eq)
 */
 static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
 {
-    std::vector<ALEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
+    std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
     L_EXPR.insert(L_EXPR.end(), v_al.begin(), v_al.end());
 }
 
@@ -273,21 +305,27 @@ static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
 */
 static void L_front(SLEC* sl, const EQ_HAND_SIDE mbr)
 {
-    std::vector<ALEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
+    std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
     L_EXPR.insert(L_EXPR.begin(), v_al.begin(), v_al.end());
+}
+
+
+static void L_append_other(int type)
+{
+    LEC_OTHER al_other(type);
+    L_EXPR.push_back(al_other);
 }
 
 
 /**
  * Appends an operator to L_EXPR.
  * 
- * @param [in]  op  int     operator (defined in iode.h)
+ * @param [in]  op  int     operator
 */
 static void L_append_op(int op)
 {
-    ALEC al;
-    al.type = op;
-    L_EXPR.push_back(al);
+    LEC_OP al_op(op);
+    L_EXPR.push_back(al_op);
 }
 
 
@@ -299,10 +337,35 @@ static void L_append_op(int op)
 */
 static void L_append_fn(int op, int nargs)
 {
-    ALEC al;
-    al.type = op;
-    al.content.func_nb_args = nargs;
-    L_EXPR.push_back(al);
+    if(is_fn(op))
+    {
+        LEC_FN al_fn(op, nargs);
+        L_EXPR.push_back(al_fn);
+        return;
+    }
+
+    if(is_tfn(op))
+    {
+        LEC_TFN al_tfn(op, nargs);
+        L_EXPR.push_back(al_tfn);
+        return;
+    }
+
+    if(is_val(op))
+    {
+        LEC_VAL_FN al_val_fn(op);
+        L_EXPR.push_back(al_val_fn);
+        return;
+    }
+
+    if(is_mtfn(op))
+    {
+        LEC_MTFN al_mtfn(op, nargs, 0);
+        L_EXPR.push_back(al_mtfn);
+        return;
+    }
+
+    throw std::invalid_argument("L_append_fn(): Invalid function type for atomic LEC element: " + std::to_string(op));
 }
 
 
@@ -313,9 +376,7 @@ static void L_append_fn(int op, int nargs)
 */
 static void L_append_const(int a)
 {
-    ALEC al;
-    al.type = L_LCONST;
-    al.content.const_long = a;
+    LEC_CONST_LONG al(a);
     L_EXPR.push_back(al);
 }
 
@@ -375,7 +436,7 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
         L_append(sl, EQ_LHS);    
         L_append(sl, EQ_RHS);
         L_append_op(L_MINUS);
-        L_append_op(L_EOE);
+        L_append_other(L_EOE);
         return 0;
     }
 
@@ -529,7 +590,7 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
 
     sl->sl_left_expr.clear();
     sl->sl_right_expr.clear();
-    L_append_op(L_EOE);
+    L_append_other(L_EOE);
     
     return L_errno;
 }

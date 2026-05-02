@@ -15,8 +15,8 @@
 #include "api/constants.h"
 #include "api/b_errors.h"
 #include "api/k_super.h"
-#include "api/lec/lec.h"
 #include "api/objs/variables.h"
+#include "api/lec/lec.h"
 
 #ifdef __GNUC__
     #define _isnan isnan
@@ -34,12 +34,11 @@
  *      - L_OPS_FN[]:  operators                   Syntax: double fn(double val1, double val2)
  *      - L_FNS_FN[]:  simple functions            Syntax: double fn(double *stack, [int nargs])
  *      - L_TFN_FN[]:  time functions              Syntax: double fn(char* expr, short length, int t, double *stack, int nargs)
- *      - L_MTFN_FN[]: multi-args time functions   Syntax: double fn(char* expr, int nvargs, int t, double *stack, int nargs)
+ *      - L_MTFN_FN[]: variadic time functions     Syntax: double fn(char* expr, int nvargs, int t, double *stack, int nargs)
  *      - L_VAL_FN[]:  values                      Syntax: double fn(int t)
  */  
 
 // Globals
-static std::vector<int> V_EXEC_POS;
 static int L_SIG = 0;
 static jmp_buf L_JMP;
 
@@ -72,29 +71,18 @@ void L_fperror(int)
 
 /**
  *  Checks if at least one of the last nargs values on the stack is IODE_NAN.
- *  If it is the case, go back nargs-1 steps on the stack and set IODE_NAN on the new top of the stack
- *  Ex.: 
- *      if the stack is {IODE_NAN, 2, 3...}
- *  after the call to L_stack_is_nan(&stack, 2)
- *      the stack will be {IODE_NAN, 3...}
  *      
  *  @param [in, out] p_stack     double**    pointer to the pointer to the stack
  *  @param [in]      nargs       int         number of arguments
  *  @return                      int         1 if IODE_NAN has been found and the stack is modified
  *                                           0 otherwise
  */
-bool L_stack_is_nan(double** p_stack, int nargs)
+bool L_stack_is_nan(double* stack, const int pos_stack, int nargs)
 {
-    double  *stack = *p_stack;
-
     for(int i = 0; i < nargs; i++)
     {
-        if(!IODE_IS_A_NUMBER(*(stack - i))) 
-        {
-            (*p_stack) -= nargs - 1;
-            **p_stack = IODE_NAN;
+        if(!IODE_IS_A_NUMBER(stack[pos_stack - i])) 
             return true;
-        }
     }
 
     return false;
@@ -125,7 +113,7 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  *      SMPL*       L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
- *      - the first byte (keyw) is an identifier (+, ln, VAR, ...)
+ *      - the first byte (type) is an identifier (+, ln, VAR, ...)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
  *      
@@ -138,139 +126,129 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  */
 double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
 {
-    double* d_ptr;
-    float r;
-    int     j, nargs, keyw, nvargs;
-    long    l;
-    short   len, s;
-    CVAR    cvar;
-
-    for(j = 0 ; j < lg ;) 
+    int j;
+    int type;
+    int previous_j;
+    int pos_stack = 0;  
+    bool done = false;
+    for(j = 0; j < lg ;) 
     {
-        keyw = expr[j++];
+        type = expr[j];
 
-        // key = variable or variable[period] 
-        if(keyw == L_VAR || keyw == L_VART) 
+        if(type == L_LCONST)
         {
-            memcpy(&cvar, expr + j, sizeof(CVAR));
-            d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[cvar.pos]);
-            if(d_ptr == nullptr) 
+            // extract LEC long constant from the buffer -> update j
+            LEC_CONST_LONG al_lconst((unsigned char*) expr, j);
+            // add the constant to the stack
+            al_lconst.add_to_stack(stack, pos_stack);
+            done = true;
+        }
+
+        if(type == L_DCONST)
+        {
+            // extract LEC double constant from the buffer -> update j
+            LEC_CONST_REAL al_dconst((unsigned char*) expr, j);
+            // add the constant to the stack
+            al_dconst.add_to_stack(stack, pos_stack); 
+            done = true;
+        }
+
+        if(type == L_COEF)
+        {
+            // extract LEC coefficient from the buffer -> update j
+            LEC_COEF al_coef((unsigned char*) expr, j);
+            // add the coefficient value to the stack
+            bool ok = al_coef.add_to_stack(stack, pos_stack);
+            if(!ok) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
-            j += sizeof(CVAR);
-            len = cvar.ref;
-            if(cvar.per.year == 0)  
-                len += t;
-            stack++;
-            if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) 
-                *stack = IODE_NAN;
-            else 
-                *stack = d_ptr[len];
+            done = true;
         }
-        else 
-            switch(keyw) 
+
+        if(type == L_PERIOD)
+        {
+            // extract LEC Period from the buffer -> update j
+            LEC_PERIOD al_period((unsigned char*) expr, j);
+            // add the period position to the stack
+            al_period.add_to_stack(stack, pos_stack);
+            done = true;
+        }
+
+        // key = variable or variable[period] 
+        if(type == L_VAR || type == L_VART) 
+        {
+            // extract LEC Variable from the buffer -> update j
+            LEC_VAR al_var((unsigned char*) expr, j);
+            // add the variable value to the stack
+            bool ok = al_var.add_to_stack(stack, pos_stack, t);
+            if(!ok) 
             {
-                case L_PLUS  :
-                    if(L_stack_is_nan(&stack, 2)) break;
-                    stack--;
-                    *stack += *(stack + 1);
-                    break;
-                case L_MINUS :
-                    if(L_stack_is_nan(&stack, 2)) break;
-                    stack --;
-                    *stack -= *(stack + 1);
-                    break;
-                case L_TIMES :
-                    if(L_stack_is_nan(&stack, 2)) break;
-                    stack --;
-                    *stack *= *(stack + 1);
-                    break;
-                case L_DCONST :
-                    stack++;
-                    memcpy(&r, expr + j, sizeof(float)); /* FLOAT 11-04-98 */
-                    *stack = r;
-                    j += sizeof(float);
-                    break;
-                case L_LCONST :
-                    stack++;
-                    memcpy(&l, expr + j, sizeof(long));
-                    *stack = l;
-                    j += sizeof(long);
-                    break;
-                case L_COEF :
-                    stack++;
-                    memcpy(&cvar, expr + j, sizeof(CVAR));
-                    *stack = L_getscl(L_EXEC_DBS, V_EXEC_POS[cvar.pos]);
-                    j += sizeof(CVAR);
-                    break;
-                case L_PERIOD :
-                    j += sizeof(Period);
-                    stack++;
-                    memcpy(&s, expr + j, sizeof(short));
-                    *stack = s;
-                    j += sizeof(short);
-                    break;
-                default :
-                    if(is_op(keyw)) 
-                    {
-                        if(L_stack_is_nan(&stack, 2)) break;
-                        stack--;
-                        *stack = (L_OPS_FN[keyw - L_OP])(*stack, *(stack + 1));
-                        break;
-                    }
-                    if(is_fn(keyw)) 
-                    {
-                        nargs = expr[j];
-                        j++;
-                        if(keyw != L_IF && keyw != L_FNISAN &&
-                                keyw != L_LMEAN && keyw != L_LSTDERR &&  /* JMP 03-03-99 */
-                                keyw != L_LCOUNT && L_stack_is_nan(&stack, nargs))
-                            break;
-                        *(stack - nargs + 1) = (L_FNS_FN[keyw - L_FN])(stack, nargs);
-                        stack -= nargs - 1;
-                        break;
-                    }
-                    if(is_tfn(keyw)) 
-                    {
-                        nargs = expr[j];
-                        memcpy(&len, expr + j + 1, sizeof(short));
-                        j += 1 + sizeof(short);
-                        *(stack - nargs + 2) =
-                            (L_TFN_FN[keyw - L_TFN])(expr + j,
-                                                     len, t, stack, nargs);
-                        j += len;
-                        stack -= nargs - 2;
-                        break;
-                    }
-                    if(is_mtfn(keyw)) 
-                    {
-                        nargs = expr[j];
-                        nvargs = expr[j + 1];
-                        memcpy(&len, expr + j + 2, sizeof(short));
-                        j += 2 + sizeof(short);
-                        *(stack - nargs + nvargs + 1) =
-                            (L_MTFN_FN[keyw - L_MTFN])(expr + j,
-                                                       nvargs, t, stack, nargs);
-                        j += len;
-                        stack -= nargs - nvargs - 1;
-                        break;
-                    }
-                    if(is_val(keyw)) 
-                    {
-                        stack++;
-                        *stack = (L_VAL_FN[keyw - L_VAL])(t);
-                        break;
-                    }
-                    std::string error_msg = get_l_exec_sub_error_message(expr, t);
-                    kerror(0, (char*) error_msg.c_str());
-                    return (double) IODE_NAN;
+                std::string error_msg = get_l_exec_sub_error_message(expr, t);
+                kerror(0, (char*) error_msg.c_str());
+                return (double) IODE_NAN;
             }
+            done = true;
+        }
+
+        if(is_fn(type)) 
+        {
+            // extract LEC function from the buffer -> update j
+            LEC_FN al_fn((unsigned char*) expr, j);
+            // execute the function on the stack
+            al_fn.execute(stack, pos_stack);
+            done = true;
+        }
+
+        if(is_op(type))
+        {
+            // extract LEC operator from the buffer -> update j
+            LEC_OP al_op((unsigned char*) expr, j);
+            // execute the operator on the stack
+            al_op.execute(stack, pos_stack);
+            done = true;
+        }
+
+        if(is_tfn(type)) 
+        {
+            previous_j = j;
+            // extract LEC time function from the buffer -> update j
+            LEC_TFN al_tfn((unsigned char*) expr, j);
+            // execute the time function on the stack
+            al_tfn.execute(expr, previous_j, t, stack, pos_stack);
+            done = true;
+        }
+
+        if(is_val(type)) 
+        {
+            // extract LEC value from the buffer -> update j
+            LEC_VAL_FN al_val((unsigned char*) expr, j);
+            // execute the value function on the stack
+            al_val.execute(t, stack, pos_stack);
+            done = true;
+        }
+
+        if(is_mtfn(type)) 
+        {
+            previous_j = j;
+            // extract LEC multi-time function from the buffer -> update j
+            LEC_MTFN al_mtfn((unsigned char*) expr, j);
+            // execute the multi-time function on the stack
+            al_mtfn.execute(expr, previous_j, t, stack, pos_stack);
+            done = true;
+        }
+
+        if(!done) 
+        {
+            std::string error_msg = "Could not execute compiled LEC sub expression: invalid atomic lec type " + std::to_string(type);
+            kerror(0, (char*) error_msg.c_str());
+            return (double) IODE_NAN;
+        }
     }
 
-    return (double) *stack;
+    return stack[pos_stack];
 }
 
 
