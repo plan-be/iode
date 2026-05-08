@@ -967,16 +967,27 @@ TEST_F(LegacyAPITest, Tests_LEC)
     Variable B = global_ws_var->get("B");
 
     // Tests LEC
-    U_test_lec("LEC", "A + B",  2, A[2] + B[2]);
-    U_test_lec("LEC", "ln A", 2, log(A[2]));
+    // test lag
     U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
     U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
     U_test_lec("LEC", "A[-1]",         2, A[1]);
     U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
+    // test operators (LEC_OP)
+    U_test_lec("LEC", "A + B",  2, A[2] + B[2]);
+    // test no-time functions (LEC_FN)
+    U_test_lec("LEC", "ln A", 2, log(A[2]));
+    // test time functions (LEC_TFN)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
     U_test_lec("LEC", "r(A)", 2, A[2] / A[1]);
     U_test_lec("LEC", "r(B)", 2, B[2] / B[1]);
+    // test variadic time functions (LEC_MTFN)
+    // covar0([from [,to],] X, Y) = sum(Xi * Yi) / n 
+    double covar0 = 0.0;
+    for(int t = 0; t < 11; t++)
+        covar0 += A[t] * B[t];
+    covar0 /= 11.0;
+    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B)", 2, covar0);
 
     std::string lst = global_ws_lst->get("LST1");
     EXPECT_EQ(lst, "A,B");
