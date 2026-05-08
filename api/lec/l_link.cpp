@@ -65,7 +65,7 @@ static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
  * 
  * TODO: not implemented for MTFN's ???
 */
-static void L_link_sample_expr(KDBVariablesPtr dbv, char* expr, short lg)
+static void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
 {
     int     j, keyw;
     short   len, s;
@@ -141,7 +141,7 @@ static void L_link_sample(KDBVariablesPtr dbv, CLEC* cl)
     if(!cl) 
         return;
 
-    L_link_sample_expr(dbv, (char*) cl->expression, (short) cl->len_expr);
+    L_link_sample_expr(dbv, cl->expression, (short) cl->len_expr);
     return;
 }
 
