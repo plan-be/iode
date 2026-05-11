@@ -198,7 +198,7 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`CLEC *L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
+|`CLEC *L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
 |`CLEC *L_cc_stream(const std::string& lec)`|Compiles L\_YY, the open YY stream containing a LEC expression.|
 |`CLEC *L_cc(const std::string& lec)`|Compiles a LEC string.|
 

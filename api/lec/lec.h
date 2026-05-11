@@ -174,7 +174,7 @@ int L_cc1();
 int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
 
 /* l_cc2.c */
-CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
 CLEC* L_cc_stream(const std::string& lec);
 CLEC* L_cc(const std::string& lec);
 

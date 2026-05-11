@@ -48,6 +48,16 @@ static int L_calc_len(const std::vector<ATOMIC_LEC>& expr, const int from, const
     {
         const ATOMIC_LEC& al = expr[i];
         len += std::visit([](auto& arg) { return arg.get_length(); }, al);
+        if(std::holds_alternative<LEC_TFN>(al))
+        {
+            const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            len -= al_tfn.len_args;
+        }
+        if(std::holds_alternative<LEC_MTFN>(al))
+        {
+            const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+            len -= al_mtfn.len_args;
+        }
     }
     
     return len;
@@ -60,7 +70,7 @@ static int L_calc_len(const std::vector<ATOMIC_LEC>& expr, const int from, const
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
+CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
 {
     if(expr.empty()) 
         return nullptr;
@@ -69,7 +79,7 @@ CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)
     int pos_expr = 0;               // position in the vector of atomic lec elements
     int alen = 0;                   // current allocated size of the buffer (in bytes)
     unsigned char* buffer = NULL;   // buffer to save the "executable" expression (will be copied in the CLEC struct at the end)
-    for(const ATOMIC_LEC& al : expr) 
+    for(ATOMIC_LEC& al : expr) 
     {
         // end of expression -> stop
         if(std::holds_alternative<LEC_OTHER>(al) && std::get<LEC_OTHER>(al).type == L_EOE)
@@ -85,16 +95,13 @@ CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)
 
         if(std::holds_alternative<LEC_TFN>(al))
         {
-            const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
 
-            // save the type of the expression element (1 byte)
-            buffer[pos_buffer] = al_tfn.type;
-            pos_buffer++;
-
-            // move function arguments in the buffer to put type and nb of args before them
+            // compute the length in bytes of the function arguments 
+            // (i.e. the sub-expression in the buffer) 
             int start_pos = L_sub_expr(expr, pos_expr - 1);
-            long len = L_calc_len(expr, start_pos, pos_expr);
-            if(len < 0) 
+            short len = (short) L_calc_len(expr, start_pos, pos_expr);
+            if(len < 0 || len > pos_buffer) 
             {
                 std::string error_msg = "L_cc2(): Could not compute the length in bytes of ";
                 error_msg += "arguments of function '" + al_tfn.representation + "'.";
@@ -102,37 +109,25 @@ CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)
                 SW_nfree(buffer);
                 return nullptr;
             }
-            // a) go 'len + 1' bytes backward
-            int new_pos_buffer = pos_buffer - (len + 1);
-            unsigned char* tmp = buffer + new_pos_buffer;
-            // b) move tmp[0:len] to tmp[shift:shift+len] 
-            int shift = 2 + sizeof(short);
-            for(int i = len - 1; i >= 0; i--)
-                tmp[i + shift] = tmp[i];
-            // save the length in bytes of the function arguments
-            memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
 
-            tmp[0] = al_tfn.type;
-            tmp[1] = al_tfn.nb_args;
-            pos_buffer += sizeof(short) + 1;
+            al_tfn.len_args = (short) len;
         }
-        else if(std::holds_alternative<LEC_MTFN>(al))
+        
+        if(std::holds_alternative<LEC_MTFN>(al))
         {
-            const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
 
-            // save the type of the expression element (1 byte)
-            buffer[pos_buffer] = al_mtfn.type;
-            pos_buffer++;
-
-            long tot_len = 0;
-            int new_pos = pos_expr - 1;
-            unsigned char* tmp = nullptr;
             int nv_args = L_MIN_MTARGS[al_mtfn.pos];
+            al_mtfn.nv_args = nv_args;
+
+            al_mtfn.v_len_args.clear();
+            int new_pos = pos_expr - 1;
             for(int j = 0; j < nv_args; j++) 
             {
-                // move function ?? arguments in the buffer to put type, nb_args and nv_args before them after the loop
+                // compute the length in bytes of the function argument 
+                // representing a sub-expression in the buffer 
                 int start_pos = L_sub_expr(expr, new_pos);
-                long len = L_calc_len(expr, start_pos, new_pos + 1);
+                short len = (short) L_calc_len(expr, start_pos, new_pos + 1);
                 if(len < 0) 
                 {
                     std::string error_msg = "L_cc2(): Could not compute the length in bytes of ";
@@ -141,32 +136,14 @@ CLEC* L_cc2(const std::vector<ATOMIC_LEC>& expr, const std::string& lec)
                     SW_nfree(buffer);
                     return nullptr;
                 }
-                tot_len += len;
+                al_mtfn.v_len_args.push_back(len);
                 new_pos = start_pos - 1;
-                // a) go 'len + 1' bytes backward
-                int new_pos_buffer = pos_buffer - (tot_len + 1);
-                tmp = buffer + new_pos_buffer;
-                // b) move tmp[0:len] to tmp[shift:shift+sub_len] 
-                int shift = 3 + (nv_args - j + 1) * sizeof(short);
-                for(int i = len - 1; i >= 0; i--)
-                    tmp[i + shift] = tmp[i];
-                // save the length in bytes of the function ?? arguments
-                memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
             }
-
-            tot_len += nv_args * sizeof(short);
-            memcpy(tmp + 3, &tot_len, sizeof(short));
-
-            tmp[0] = al_mtfn.type;
-            tmp[1] = al_mtfn.nb_args;
-            tmp[2] = nv_args;
-            pos_buffer += 2 + (1 + nv_args) * sizeof(short);
         }
-        else
-        {
-            // for other variant types (LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, LEC_OP, LEC_FN, LEC_VAL_FN)
-            std::visit([&buffer, &pos_buffer](auto& arg) { arg.add_to_buffer(buffer, pos_buffer); }, al);
-        }
+
+        // for each variant type -> save the executable representation of the atomic lec in the buffer 
+        // and update the position in the buffer
+        std::visit([&buffer, &pos_buffer](auto& arg) { arg.add_to_buffer(buffer, pos_buffer); }, al);
 
         pos_expr++;
     }
