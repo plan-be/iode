@@ -122,6 +122,26 @@ public:
         L_link_sample_expr(dbv, buffer + pos_buffer , len_args);
     }
 
+    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
+
+        // move function arguments in the buffer to put type and nb of args before them
+        // a) go 'len_args + 1' bytes backward
+        int new_pos_buffer = pos_buffer - (len_args + 1);
+        unsigned char* tmp = buffer + new_pos_buffer;
+        // b) move tmp[0:len_args] to tmp[shift:shift+len_args] 
+        int shift = 2 + sizeof(short);
+        for(int i = len_args - 1; i >= 0; i--)
+            tmp[i + shift] = tmp[i];
+
+        tmp[0] = type;
+        tmp[1] = nb_args;
+        memcpy(tmp + 2, &len_args, sizeof(short));
+
+        pos_buffer += sizeof(short) + 1;
+    }
+
     int get_length() const override 
     {
         // 2 for type and nb_args + sizeof(short) for len_args + 

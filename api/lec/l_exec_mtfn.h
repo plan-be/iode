@@ -84,6 +84,7 @@ struct LEC_MTFN: public LEC_EXECUTABLE
 {
     int nv_args;        // number of variables arguments (i.e. variadic arguments)
     short len_args;     // length in bytes of the function arguments (i.e. the sub-expression in the buffer)
+    std::vector<short> v_len_args; // length in bytes of each function argument (i.e. the sub-expression in the buffer)
 
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
@@ -111,6 +112,38 @@ public:
 
         pos = type - L_MTFN;
         representation = L_MTFN_NAMES[pos];
+    }
+
+    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
+
+        // move function variadic arguments in the buffer to put type, nb_args 
+        // and nv_args before them after the loop
+        long tot_len = 0;
+        unsigned char* tmp = nullptr;
+        for(int j = 0; j < nv_args; j++) 
+        {
+            long len = v_len_args[j];
+            tot_len += len;
+            // a) go 'len + 1' bytes backward
+            int new_pos_buffer = pos_buffer - (tot_len + 1);
+            tmp = buffer + new_pos_buffer;
+            // b) move tmp[0:len] to tmp[shift:shift+sub_len] 
+            int shift = 3 + (nv_args - j + 1) * sizeof(short);
+            for(int i = len - 1; i >= 0; i--)
+                tmp[i + shift] = tmp[i];
+            // save the length in bytes of the function ?? arguments
+            memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
+        }
+
+        tmp[0] = type;
+        tmp[1] = nb_args;
+        tmp[2] = nv_args;
+        tot_len += nv_args * sizeof(short);
+        memcpy(tmp + 3, &tot_len, sizeof(short));
+
+        pos_buffer += 2 + (1 + nv_args) * sizeof(short);
     }
 
     int get_length() const override 
