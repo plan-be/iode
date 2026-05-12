@@ -979,6 +979,9 @@ TEST_F(LegacyAPITest, Tests_LEC)
     // test time functions (LEC_TFN)
     U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
     U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
+    U_test_lec("LEC", "sum(A)", 2, 3.0);
+    U_test_lec("LEC", "mean(t, t+1, A)", 2, (A[2] + A[3]) / 2.0);
+    U_test_lec("LEC", "B * mean(t, t+1, A)", 2, B[2] * (A[2] + A[3]) / 2.0);
     U_test_lec("LEC", "r(A)", 2, A[2] / A[1]);
     U_test_lec("LEC", "r(B)", 2, B[2] / B[1]);
     // test variadic time functions (LEC_MTFN)
@@ -994,8 +997,10 @@ TEST_F(LegacyAPITest, Tests_LEC)
     lst = global_ws_lst->get("LST2");
     EXPECT_EQ(lst, "A,B,A");
 
-    U_test_lec("LEC-MACRO", "1 + vmax($LST1)", 2, 1+B[2]);
-    U_test_lec("LEC-MACRO", "1 + vmax($LST2)", 2, 1+B[2]);
+    double max_value = (A[2] > B[2]) ? A[2] : B[2];
+    U_test_lec("LEC-MACRO", "1 + max($LST1)", 2, 1.0 + max_value);
+    U_test_lec("LEC-MACRO", "1 + max(60, $LST1)", 2, 61.0);
+    U_test_lec("LEC-MACRO", "1 + max($LST2)", 2, 1.0 + max_value);
 }
 
 TEST_F(LegacyAPITest, Tests_CLEC_Compile)

@@ -1,13 +1,3 @@
-/**
- * @header4iode
- *
- * Functions to evaluate a compiled and linked LEC expression. 
- *  
- *   - double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)     Execution of a CLEC sub expression.
- *   - double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)                     Execution of a compiled and linked CLEC expression.
- *   - double* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)                    Compiles, links and executes a LEC expression.
- */
-
 #include <setjmp.h>
 #include <signal.h>
 #include <time.h>
@@ -72,16 +62,15 @@ void L_fperror(int)
 /**
  *  Checks if at least one of the last nargs values on the stack is IODE_NAN.
  *      
- *  @param [in, out] p_stack     double**    pointer to the pointer to the stack
- *  @param [in]      nargs       int         number of arguments
+ *  @param [in, out] stack       double**    pointer to the pointer to the stack
  *  @return                      int         1 if IODE_NAN has been found and the stack is modified
  *                                           0 otherwise
  */
-bool L_stack_is_nan(double* stack, const int pos_stack, int nargs)
+bool L_stack_is_nan(const std::deque<double>& stack)
 {
-    for(int i = 0; i < nargs; i++)
+    for(const double& value : stack)
     {
-        if(!IODE_IS_A_NUMBER(stack[pos_stack - i])) 
+        if(!IODE_IS_A_NUMBER(value)) 
             return true;
     }
 
@@ -120,17 +109,16 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeneous container)
  *  @param [in] lg      int             length of the sub expression
  *  @param [in] t       int             time (index in dbv) of execution
- *  @param [in] stack   double*         execution stack
  *  @return             double          result of the computation
  *  
  */
-double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
+double L_exec_sub(unsigned char* expr, int lg, int t)
 {
     int j;
     int type;
     int previous_j;
     int pos_stack = 0;  
-    bool done = false;
+    std::deque<double> stack;
     for(j = 0; j < lg ;) 
     {
         type = expr[j];
@@ -140,107 +128,90 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
             // extract LEC long constant from the buffer -> update j
             LEC_CONST_LONG al_lconst((unsigned char*) expr, j);
             // add the constant to the stack
-            al_lconst.add_to_stack(stack, pos_stack);
-            done = true;
+            al_lconst.add_to_stack(stack);
         }
-
-        if(type == L_DCONST)
+        else if(type == L_DCONST)
         {
             // extract LEC double constant from the buffer -> update j
             LEC_CONST_REAL al_dconst((unsigned char*) expr, j);
             // add the constant to the stack
-            al_dconst.add_to_stack(stack, pos_stack); 
-            done = true;
+            al_dconst.add_to_stack(stack); 
         }
-
-        if(type == L_COEF)
+        else if(type == L_COEF)
         {
             // extract LEC coefficient from the buffer -> update j
             LEC_COEF al_coef((unsigned char*) expr, j);
             // add the coefficient value to the stack
-            bool ok = al_coef.add_to_stack(stack, pos_stack);
+            bool ok = al_coef.add_to_stack(stack);
             if(!ok) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
-            done = true;
         }
-
-        if(type == L_PERIOD)
+        else if(type == L_PERIOD)
         {
             // extract LEC Period from the buffer -> update j
             LEC_PERIOD al_period((unsigned char*) expr, j);
             // add the period position to the stack
-            al_period.add_to_stack(stack, pos_stack);
-            done = true;
+            al_period.add_to_stack(stack);
         }
-
         // key = variable or variable[period] 
-        if(type == L_VAR || type == L_VART) 
+        else if(type == L_VAR || type == L_VART) 
         {
             // extract LEC Variable from the buffer -> update j
             LEC_VAR al_var((unsigned char*) expr, j);
             // add the variable value to the stack
-            bool ok = al_var.add_to_stack(stack, pos_stack, t);
+            bool ok = al_var.add_to_stack(stack, t);
             if(!ok) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
-            done = true;
         }
 
-        if(is_fn(type)) 
+        // ---- executable LEC elements ----
+
+        else if(is_fn(type)) 
         {
             // extract LEC function from the buffer -> update j
             LEC_FN al_fn((unsigned char*) expr, j);
             // execute the function on the stack
-            al_fn.execute(stack, pos_stack);
-            done = true;
+            al_fn.execute(stack);
         }
-
-        if(is_op(type))
+        else if(is_op(type))
         {
             // extract LEC operator from the buffer -> update j
             LEC_OP al_op((unsigned char*) expr, j);
             // execute the operator on the stack
-            al_op.execute(stack, pos_stack);
-            done = true;
+            al_op.execute(stack);
         }
-
-        if(is_tfn(type)) 
+        else if(is_tfn(type)) 
         {
             previous_j = j;
             // extract LEC time function from the buffer -> update j
             LEC_TFN al_tfn((unsigned char*) expr, j);
             // execute the time function on the stack
-            al_tfn.execute(expr, previous_j, t, stack, pos_stack);
-            done = true;
+            al_tfn.execute(expr, previous_j, t, stack);
         }
-
-        if(is_val(type)) 
+        else if(is_val(type)) 
         {
             // extract LEC value from the buffer -> update j
             LEC_VAL_FN al_val((unsigned char*) expr, j);
             // execute the value function on the stack
-            al_val.execute(t, stack, pos_stack);
-            done = true;
+            al_val.execute(t, stack);
         }
-
-        if(is_mtfn(type)) 
+        else if(is_mtfn(type)) 
         {
             previous_j = j;
             // extract LEC multi-time function from the buffer -> update j
             LEC_MTFN al_mtfn((unsigned char*) expr, j);
             // execute the multi-time function on the stack
-            al_mtfn.execute(expr, previous_j, t, stack, pos_stack);
-            done = true;
+            al_mtfn.execute(expr, previous_j, t, stack);
         }
-
-        if(!done) 
+        else 
         {
             std::string error_msg = "Could not execute compiled LEC sub expression: invalid atomic lec type " + std::to_string(type);
             kerror(0, (char*) error_msg.c_str());
@@ -248,7 +219,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
         }
     }
 
-    return stack[pos_stack];
+    return stack.back();
 }
 
 
@@ -268,14 +239,12 @@ double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)
  */
 double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)
 {
-    double stack[1000];    // 1000 pour reculer certains plantages (non solutionné...) TODO: manage the stack overflow ?
-
     if(!clec) 
-        return (double) IODE_NAN;
+        return IODE_NAN;
 
     // leave if empty CLEC expression
     if(clec->expression == nullptr || clec->len_expr == 0)
-        return (double) IODE_NAN;
+        return IODE_NAN;
 
     // Use globals to limit the number of parameters in function calls
     L_EXEC_DBV = dbv;   
@@ -301,7 +270,7 @@ double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)
     if(setjmp(L_JMP))
         return (double) IODE_NAN; // On FPE, return IODE_NAN
     
-    double value = L_exec_sub(clec->expression, clec->len_expr, t, stack);
+    double value = L_exec_sub(clec->expression, clec->len_expr, t);
     return value;
 }
 
@@ -316,41 +285,11 @@ double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)
 int L_intlag(double lag)
 {
     int intlag;
-
-    if(lag < 0) intlag = (int)(-0.5 + lag);
-    else        intlag = (int)(0.5 + lag);
-
-    return(intlag);
-}
-
-/**
- *  Utility function to retrieve one or 2 optional time values on the stack.
- *  Ex.: 
- *      vmax(1990Y1, 2000Y1, A+B):  from=1990Y1, to=2000Y1
- *      vmax(1990Y1, A+B):          from=1990Y1, to=t
- *      vmax(A+B):                  from=0,      to=t
- *  
- *  @param [in]  t      int     current value of t (in a simulation loop for example)
- *  @param [in]  stack  double  top of the stack
- *  @param [in]  nargs  int     nb of args passed to the function
- *  @param [out] from   int*    position in the sample of the "from" arg
- *  @param [out] to     int*    position in the sample of the "to" arg
- */
-void L_tfn_args(int t, double* stack, int nargs, int* from, int* to)
-{
-    int     j;
-
-    *from = 0;
-    *to = t;
-    if(nargs == 1) return;
-    *from = L_intlag(*stack);
-    if(nargs == 3) *to = L_intlag(*(stack - 1));
-
-    if(*from > *to) {
-        j = *from;
-        *from = *to;
-        *to = j;
-    }
+    if(lag < 0) 
+        intlag = (int) (-0.5 + lag);
+    else        
+        intlag = (int) (0.5 + lag);
+    return intlag;
 }
 
 
@@ -365,22 +304,19 @@ void L_tfn_args(int t, double* stack, int nargs, int* from, int* to)
  */
 double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    int      t, nb;
-    CLEC     *clec = 0;
-    double   *vec = NULL;
-
-    if(lec == 0 || lec[0] == 0) 
-        return(vec);
+    double* vec = NULL;
+    if(lec == NULL || lec[0] == 0) 
+        return vec;
     
-    clec = L_cc(lec);
+    CLEC* clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) 
     {
-        nb = dbv->sample->nb_periods;
+        int nb = dbv->sample->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
-        for(t = 0 ; t < nb ; t++)
+        for(int t = 0 ; t < nb ; t++)
             vec[t] = L_exec(dbv, dbs, clec, t);
     }
 
     delete clec;
-    return(vec);
+    return vec;
 }

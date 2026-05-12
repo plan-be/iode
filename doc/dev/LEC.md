@@ -238,7 +238,7 @@ Functions to evaluate a compiled and linked LEC expression.
 
 |Syntax|Description|
 |:---|:---|
-|`double L_exec_sub(unsigned char* expr, int lg, int t, double* stack)`|Execution of a CLEC sub expression.|
+|`double L_exec_sub(unsigned char* expr, int lg, int t, std::deque<double> stack)`|Execution of a CLEC sub expression.|
 |`double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)`|Execution of a compiled and linked CLEC expression.|
 |`double* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
@@ -280,43 +280,43 @@ Functions to evaluate LEC "functions".
 
 |Syntax|Description|
 |:---|:---|
-|`double L_logn(double v)`||
-|`static double L_uminus(double* stack)`||
-|`static double L_uplus (double* stack)`||
-|`static double L_log(double* stack, int nargs)`||
-|`static double L_ln(double* stack)`||
-|`static double L_not(double* stack)`||
-|`static double L_expn(double* stack, int nargs)`||
-|`static double L_max(double* stack, int nargs)`||
-|`static double L_min(double* stack, int nargs)`||
-|`static double L_sin (double* stack)`||
-|`static double L_cos (double* stack)`||
-|`static double L_acos (double* stack)`||
-|`static double L_asin (double* stack)`||
-|`static double L_tan (double* stack)`||
-|`static double L_atan (double* stack)`||
-|`static double L_tanh (double* stack)`||
-|`static double L_sinh (double* stack)`||
-|`static double L_cosh (double* stack)`||
-|`static double L_abs (double* stack)`||
-|`static double L_sqrt (double* stack)`||
-|`static double L_int (double* stack)`||
-|`static double L_rad (double* stack)`||
-|`static double L_if(double* stack, int nargs)`||
-|`static double L_lsum(double* stack, int nargs)`||
-|`static double L_lmean(double* stack, int nargs)`||
-|`static double L_fnisan(double* stack, int nargs)`||
-|`static double L_lcount(double* stack, int nargs)`||
-|`static double L_lprod(double* stack, int nargs)`||
-|`static double L_sign(double* stack)`||
-|`static double L_lstderr(double* stack, int nargs)`||
-|`static double L_random(double* stack)`||
-|`static double L_floor(double* stack)`||
-|`static double L_ceil (double* stack)`||
-|`static double L_round(double* stack, int nargs)`||
-|`static double L_urandom(double* stack)`||
-|`static double L_grandom(double* stack)`||
-|`static double L_gamma(double* stack)`||
+|`double L_logn(const double v)`||
+|`static double L_uminus(std::deque<double>& stack)`||
+|`static double L_uplus (std::deque<double>& stack)`||
+|`static double L_log(std::deque<double>& stack, int nargs)`||
+|`static double L_ln(std::deque<double>& stack)`||
+|`static double L_not(std::deque<double>& stack)`||
+|`static double L_expn(std::deque<double>& stack, int nargs)`||
+|`static double L_max(std::deque<double>& stack, int nargs)`||
+|`static double L_min(std::deque<double>& stack, int nargs)`||
+|`static double L_sin (std::deque<double>& stack)`||
+|`static double L_cos (std::deque<double>& stack)`||
+|`static double L_acos (std::deque<double>& stack)`||
+|`static double L_asin (std::deque<double>& stack)`||
+|`static double L_tan (std::deque<double>& stack)`||
+|`static double L_atan (std::deque<double>& stack)`||
+|`static double L_tanh (std::deque<double>& stack)`||
+|`static double L_sinh (std::deque<double>& stack)`||
+|`static double L_cosh (std::deque<double>& stack)`||
+|`static double L_abs (std::deque<double>& stack)`||
+|`static double L_sqrt (std::deque<double>& stack)`||
+|`static double L_int (std::deque<double>& stack)`||
+|`static double L_rad (std::deque<double>& stack)`||
+|`static double L_if(std::deque<double>& stack, int nargs)`||
+|`static double L_lsum(std::deque<double>& stack, int nargs)`||
+|`static double L_lmean(std::deque<double>& stack, int nargs)`||
+|`static double L_fnisan(std::deque<double>& stack, int nargs)`||
+|`static double L_lcount(std::deque<double>& stack, int nargs)`||
+|`static double L_lprod(std::deque<double>& stack, int nargs)`||
+|`static double L_sign(std::deque<double>& stack)`||
+|`static double L_lstderr(std::deque<double>& stack, int nargs)`||
+|`static double L_random(std::deque<double>& stack)`||
+|`static double L_floor(std::deque<double>& stack)`||
+|`static double L_ceil (std::deque<double>& stack)`||
+|`static double L_round(std::deque<double>& stack, int nargs)`||
+|`static double L_urandom(std::deque<double>& stack)`||
+|`static double L_grandom(std::deque<double>& stack)`||
+|`static double L_gamma(std::deque<double>& stack)`||
 |`static double L_div0(double *stack, int nargs)`||
 
 ### l\_exec\_tfn.c {#T26}
@@ -325,19 +325,19 @@ Functions to evaluate LEC "time functions".
 
 |Syntax|Description|
 |:---|:---|
-|`static double L_lag(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_diff(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_rapp(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_dln(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_grt(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_mavg(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_vmax(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_vmin(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_sum(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_prod(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|` double L_mean(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_stderr(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_lastobs(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_lag(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_diff(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_rapp(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_dln(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_grt(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_mavg(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_vmax(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_vmin(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_sum(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_prod(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|` double L_mean(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_stderr(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_lastobs(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
 
 ### l\_exec\_mtfn.c {#T27}
 
@@ -345,22 +345,22 @@ Functions to evaluate LEC "time functions" with possibly multiple arguments.
 
 |Syntax|Description|
 |:---|:---|
-|`static double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs)`||
-|`static double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig)`||
-|`static double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static int L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)`||
-|`static double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)`||
-|`static double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)`||
-|`static double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)`||
-|`static double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)`||
+|`static double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_corr(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, std::deque<double>& stack, int nargs, int orig)`||
+|`static double L_covar(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_covar0(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_var(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_stddev(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_index(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_acf(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)`||
+|`static double L_interpol(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_app(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_dapp(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_hpall(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs, int std)`||
+|`static double L_hp(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_hpstd(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
 
 ### l\_hodrick.c {#T28}
 

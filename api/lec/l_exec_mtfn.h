@@ -32,23 +32,26 @@ inline bool is_mtfn(const int op)
     return op >= L_MTFN; 
 }
 
-double L_calccorr(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int t, double* stack, int nargs);
-double L_corr(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_calccovar(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int t, double* stack, int nargs, int center);
-double L_covar(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_covar0(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_var(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_stddev(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_index(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_acf(unsigned char* expr, short lg, int t, double* stack, int nargs);
-int L_calcvals(unsigned char* expr, short lg, int t, double* stack, int* p_nargs, double* res, int nbvals);
-double L_interpol(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_app(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs);
-double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs);
-double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs);
+int L_calcvals(unsigned char* expr, short lg, int t, std::deque<double>& stack, int* p_nargs, double* res, int nbvals);
+double L_calccorr(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int from, int to, int t, 
+    std::deque<double>& stack, int nargs);
+double L_calccovar(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int from, int to, int t, 
+    std::deque<double>& stack, int nargs, int center);
 
-inline double(*L_MTFN_FN[])(unsigned char* expr, short nvargs, int t, double *stack, int nargs) = 
+double L_corr(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar0(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_var(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_index(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_interpol(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hpstd(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+
+inline double(*L_MTFN_FN[])(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_corr,         // L_CORR      L_M
     L_covar,        // L_COVAR     L_M
@@ -93,7 +96,7 @@ public:
         if(!is_mtfn(type))
             throw std::invalid_argument("Invalid multi-time function type for LEC MULTI-TIME FUNC: " + std::to_string(type));
         pos = type - L_MTFN;
-        representation = L_MTFN_NAMES[pos];
+        fn_name = L_MTFN_NAMES[pos];
         // minimum length in bytes of the function arguments (i.e. the sub-expression in the buffer)
         len_args = (short) (sizeof(short) * L_MIN_MTARGS[pos]);
     }
@@ -154,15 +157,20 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, double* stack, int& pos_stack)
+    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack)
     {
+        int from = -1, to = -1;
+        // NOTE: in function L_extract_time_range():
+        //       - If nargs = 1, 'from' is the beginning of the KDB sample and 'to'=t
+        //       - If nargs = 2, 'from' is on the stack and 'to'=t
+        //       - If nargs = 3, 'from' and 'to' are on the stack
+        if(type != L_INTERPOL && type != L_APP)
+            L_extract_time_range(t, stack, nb_args - 1, from, to);
+
         // NOTE: 'j + 3 + sizeof(short)' corresponds to the position of the sub-expression
         //       in the buffer (after type, nb_args, nv_args and len_args)
         j += 3 + sizeof(short);
- 
-        // QUESTION: why '- nv_args' ?
-        int shift = nb_args - nv_args - 1;
-        stack[pos_stack - shift] = (L_MTFN_FN[pos])(expr + j, nv_args, t, stack + pos_stack, nb_args);
-        pos_stack -= shift;
+        double result = (L_MTFN_FN[pos])(expr + j, nv_args, from, to, t, stack, nb_args);
+        stack.push_back(result);
     }
 };
