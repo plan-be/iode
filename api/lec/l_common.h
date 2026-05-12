@@ -8,8 +8,9 @@
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 #include "api/utils/utils.h"
-
 #include "api/lec/l_err.h"
+
+#include <deque>        // for the execution stack
 
 
 constexpr int L_SPECIAL = 10;
@@ -63,8 +64,8 @@ inline std::vector<int> V_EXEC_POS;
 
 /* l_exec.cpp */
 int L_intlag(double lag);
-bool L_stack_is_nan(double* stack, const int pos_stack, int nargs);
-double L_exec_sub(unsigned char* expr, int lg, int t, double* stack);
+bool L_stack_is_nan(const std::deque<double>& stack);
+double L_exec_sub(unsigned char* expr, int lg, int t);
 
 /* l_debug.cpp */
 void L_debug(char*, ...);
@@ -127,10 +128,9 @@ public:
         representation = std::to_string(value);
     }
 
-    void add_to_stack(double* stack, int& pos_stack) const
+    void add_to_stack(std::deque<double>& stack) const
     {
-        pos_stack++;
-        stack[pos_stack] = value;
+        stack.push_back(value);
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -166,10 +166,9 @@ public:
         representation = std::to_string(value);
     }
 
-    void add_to_stack(double* stack, int& pos_stack) const
+    void add_to_stack(std::deque<double>& stack) const
     {
-        pos_stack++;
-        stack[pos_stack] = (double) value;
+        stack.push_back(static_cast<double>(value));
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -204,14 +203,12 @@ public:
         pos_buffer += sizeof(int);
     }
 
-    bool add_to_stack(double* stack, int& pos_stack) const
+    bool add_to_stack(std::deque<double>& stack) const
     {
         double value = L_getscl(L_EXEC_DBS, V_EXEC_POS[pos]);
         if(!IODE_IS_A_NUMBER(value)) 
             return false;
-
-        pos_stack++;
-        stack[pos_stack] = L_getscl(L_EXEC_DBS, V_EXEC_POS[pos]);
+        stack.push_back(value);
         return true;
     }
 
@@ -267,7 +264,7 @@ public:
             ref += per.difference(sample.start_period);
     }
 
-    bool add_to_stack(double* stack, int& pos_stack, const int t) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const
     {
         double* d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[pos]);
         if(!d_ptr) 
@@ -277,12 +274,10 @@ public:
         if(per.year == 0)  
             len += t;
         
-        pos_stack++;
-        if(len < 0 || len >= (L_getsmpl(L_EXEC_DBV))->nb_periods) 
-            stack[pos_stack] = IODE_NAN;
-        else 
-            stack[pos_stack] = d_ptr[len];
-
+        double value = IODE_NAN;
+        if(len >= 0 && len < (L_getsmpl(L_EXEC_DBV))->nb_periods) 
+            value = d_ptr[len];
+        stack.push_back(value);
         return true;
     }
 
@@ -337,10 +332,9 @@ public:
         pos = period.difference(sample.start_period);
     }
 
-    void add_to_stack(double* stack, int& pos_stack) const
+    void add_to_stack(std::deque<double>& stack) const
     {
-        pos_stack++;
-        stack[pos_stack] = (double) pos;
+        stack.push_back(static_cast<double>(pos));
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -445,6 +439,7 @@ struct LEC_EXECUTABLE: public LEC_ABSTRACT
 {
     int nb_args;        // number of arguments of the function
     int pos;            // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
+    std::string fn_name;    // name of the function (for debugging purposes)
 
 protected:
     LEC_EXECUTABLE(const int type, const int nb_args) : LEC_ABSTRACT(type), nb_args(nb_args), pos(-1) {}

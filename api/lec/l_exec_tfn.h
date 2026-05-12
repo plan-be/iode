@@ -12,12 +12,12 @@ enum LecTimeFunction
     L_DLN,              // dln([n,] expr)
     L_GRT,              // grt([n,] expr)
     L_MAVG,             // ma([n,] expr)
-    L_VMAX,             // vmax([n,[m,]] expr)
-    L_VMIN,             // vmin([n,[m,]] expr)
-    L_SUM,              // sum([n,[m,]] expr)
-    L_PROD,             // prod([n,[m,]] expr)
-    L_MEAN,             // mean([n,[m,]] expr)
-    L_STDERR,           // stderr([n,[m,]] expr)
+    L_VMAX,             // vmax([from, [to,]] expr)
+    L_VMIN,             // vmin([from, [to,]] expr)
+    L_SUM,              // sum([from, [to,]] expr)
+    L_PROD,             // prod([from, [to,]] expr)
+    L_MEAN,             // mean([from, [to,]] expr)
+    L_STDERR,           // stderr([from, [to,]] expr)
     L_DLAG,             // dlag(n, coef, expr)
     L_LASTOBS           // lastobs([from, [to,]] expr)
 };
@@ -35,23 +35,23 @@ inline bool is_tfn(const int op)
     return op >= L_TFN && op <= L_TFN_LAST; 
 }
 
-void L_tfn_args(int nvargs, double* stack, int nargs, int* from, int* to);
+void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from, int& to);
 
-double L_lag(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_diff(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_rapp(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_dln(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_grt(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_mavg(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_vmax(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_vmin(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_sum(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_prod(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_mean(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_stderr(unsigned char* expr, short lg, int t, double* stack, int nargs);
-double L_lastobs(unsigned char* expr, short lg, int t, double* stack, int nargs);
+double L_lag(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_diff(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_rapp(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dln(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_grt(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mavg(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmax(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmin(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_sum(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_prod(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mean(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stderr(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_lastobs(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
 
-inline double(*L_TFN_FN[])(unsigned char* expr, short length, int t, double *stack, int nargs) = 
+inline double(*L_TFN_FN[])(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_lag,          // L_LAG       L_TFN + 0 
     L_diff,         // L_DIFF      L_TFN + 1 
@@ -97,7 +97,7 @@ public:
         if(!is_tfn(type))
             throw std::invalid_argument("Invalid time function type for LEC TIME FUNC: " + std::to_string(type));
         pos = type - L_TFN;
-        representation = L_TFN_NAMES[pos];
+        fn_name = L_TFN_NAMES[pos];
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
@@ -150,15 +150,22 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, double* stack, int& pos_stack)
+    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack)
     {
+        int from = -1, to = -1;
+        // NOTE: for time functions:
+        //       - If nargs = 1, 'from' is the beginning of the KDB sample and 'to'=t
+        //       - If nargs = 2, 'from' is on the stack and 'to'=t
+        //       - If nargs = 3, 'from' and 'to' are on the stack
+        if(type == L_VMAX || type == L_VMIN || type == L_SUM || type == L_PROD || type == L_MEAN || 
+           type == L_STDERR || type == L_LASTOBS)
+            L_extract_time_range(t, stack, nb_args, from, to);
+
         // NOTE: 'j + 2 + sizeof(short)' corresponds to the position of the sub-expression 
         //       in the buffer (after type, nb_args and len_args)
         j += 2 + sizeof(short);
 
-        // QUESTION: why '- 2' ?
-        int shift = nb_args - 2;
-        stack[pos_stack - shift] = (L_TFN_FN[pos])(expr + j, len_args, t, stack + pos_stack, nb_args);
-        pos_stack -= shift;
+        double result = (L_TFN_FN[pos])(expr + j, len_args, from, to, t, stack, nb_args);
+        stack.push_back(result);
     }
 };

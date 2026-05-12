@@ -87,7 +87,7 @@ public:
         if(!is_op(type))
             throw std::invalid_argument("Invalid operator type for LEC OPERATOR: " + std::to_string(type));
         pos = type - L_OP;
-        representation = L_OPS_NAMES[pos];
+        fn_name = L_OPS_NAMES[pos];
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
@@ -105,13 +105,18 @@ public:
     }
 
     // executes the operator with the given arguments on the stack
-    void execute(double* stack, int& pos_stack)
+    void execute(std::deque<double>& stack)
     {
-        if(L_stack_is_nan(stack, pos_stack, 2)) 
-            stack[pos_stack - 1] = IODE_NAN;
+        double b = stack.back();
+        stack.pop_back();
+        double a = stack.back();
+        stack.pop_back();
+
+        double result;
+        if(!IODE_IS_A_NUMBER(a) || !IODE_IS_A_NUMBER(b))
+            result = IODE_NAN;
         else
-            stack[pos_stack - 1] = (L_OPS_FN[pos])(stack[pos_stack - 1], stack[pos_stack]);
-        
-        pos_stack--;
+            result = (L_OPS_FN[pos])(a, b);
+        stack.push_back(result);
     }
 };

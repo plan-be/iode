@@ -61,7 +61,7 @@ public:
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
         pos = type - L_VAL;
-        representation = L_VAL_FN_NAMES[pos];
+        fn_name = L_VAL_FN_NAMES[pos];
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
@@ -79,9 +79,9 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(const int t, double* stack, int& pos_stack)
+    void execute(const int t, std::deque<double>& stack)
     {
-        pos_stack++;
-        stack[pos_stack] = (L_VAL_FN[pos])(t);
+        double value = (L_VAL_FN[pos])(t);
+        stack.push_back(value);
     }
 };

@@ -1,6 +1,4 @@
 /**
- * @header4iode
- *
  * Functions to evaluate LEC "time functions" with possibly **more than one expression** 
  * in the function arguments.
  * 
@@ -14,7 +12,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ *      double <fnname>(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -22,27 +20,6 @@
  *      t      = time of calculation
  *      stack  = pointer to the top of the stack of intermediate values / results
  *      nargs  = number of arguments of the calling function that determines the calculation interval.
- *  
- *  
- *  List of functions
- *  -----------------
- *  Note that these functions are all called by L_exec_sub() (@see l_exec.c).
- *  
- *      double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig)
- *      double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      int    L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)
- *      double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
- *      double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)
- *      double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)
- *      double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)
  */
 #include <math.h>
 #include "api/lec/lec.h"
@@ -70,30 +47,38 @@
  *  @return         
  *  
  */
-double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs) 
+double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, 
+    int from, int to, int t, std::deque<double>& stack, int nargs) 
 {
-    double  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
-    int     from, to, j;
+    double mean_x = L_mean(expr1, len1, from, to, t, stack, nargs - 1);
+    if(!IODE_IS_A_NUMBER(mean_x)) 
+        return IODE_NAN;
+    
+    double mean_y = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    if(!IODE_IS_A_NUMBER(mean_y)) 
+        return IODE_NAN;
 
-    meanx = L_mean(expr1, len1, t, stack, nargs - 1);
-    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
-    meany = L_mean(expr2, len2, t, stack, nargs - 1);
-    if(!IODE_IS_A_NUMBER(meany)) return(IODE_NAN);
+    double x, y;
+    double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
+    for(int j = from; j <= to; j++) 
+    {
+        x = L_exec_sub(expr1, len1, j);
+        if(!IODE_IS_A_NUMBER(x)) 
+            return IODE_NAN;
+        
+        y = L_exec_sub(expr2, len2, j);
+        if(!IODE_IS_A_NUMBER(y)) 
+            return IODE_NAN;
 
-    L_tfn_args(t, stack, nargs - 1, &from, &to);
-    for(j = from ; j <= to ; j++) {
-        vx = L_exec_sub(expr1, len1, j, stack);
-        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
-        vy = L_exec_sub(expr2, len2, j, stack);
-        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
-
-        sxx += (vx - meanx) * (vx - meanx);
-        syy += (vy - meany) * (vy - meany);
-        sxy += (vx - meanx) * (vy - meany);
+        sum_xx += (x - mean_x) * (x - mean_x);
+        sum_yy += (y - mean_y) * (y - mean_y);
+        sum_xy += (x - mean_x) * (y - mean_y);
     }
 
-    if(sxx * syy <= 0) return(IODE_NAN);
-    return(sxy / sqrt(sxx * syy));
+    if(sum_xx * sum_yy <= 0) 
+        return IODE_NAN;
+    
+    return sum_xy / sqrt(sum_xx * sum_yy);
 }
 
 
@@ -125,15 +110,16 @@ double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short 
  *  @return            double           computed correlation 
  *  
  */
-double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs)  /* JMP 17-04-98 */
+double L_corr(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    short   len1, len2;
-
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    return(L_calccorr(expr + sizeof(short), len1,
-                      expr + len1 + 2 * sizeof(short), len2,
-                      t, stack, nargs));
+
+    unsigned char* expr1 = expr + sizeof(short); 
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    double result = L_calccorr(expr1, len1, expr2, len2, from, to, t, stack, nargs);
+    return result;
 }
 
 /**
@@ -159,32 +145,40 @@ double L_corr(unsigned char* expr, short nvargs, int t, double* stack, int nargs
  *  @return             double          computed covariance.
  *  
  */
+double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, 
+    int from, int to, int t, std::deque<double>& stack, int nargs, int orig) 
+{   
+    int nb = 1 + to - from;
+    if(nb == 0) 
+        return IODE_NAN;
+ 
+    double mean_x = L_mean(expr1, len1, from, to, t, stack, nargs - 1);
+    if(!IODE_IS_A_NUMBER(mean_x)) 
+        return IODE_NAN;
+    
+    double mean_y = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    if(!IODE_IS_A_NUMBER(mean_y)) 
+        return IODE_NAN;
 
-double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, double* stack, int nargs, int orig) 
-{
-    double  sxx = 0.0, syy = 0.0, sxy = 0.0, vx, vy, meanx, meany;
-    int     from, to, j, n;
+    double x, y;
+    double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
+    for(int j = from; j <= to; j++) 
+    {
+        x = L_exec_sub(expr1, len1, j);
+        if(!IODE_IS_A_NUMBER(x)) 
+            return IODE_NAN;
+        
+        y = L_exec_sub(expr2, len2, j);
+        if(!IODE_IS_A_NUMBER(y)) 
+            return IODE_NAN;
 
-    L_tfn_args(t, stack, nargs - 1, &from, &to);
-    n = 1 + to - from;
-    if(n == 0) return(IODE_NAN);
-
-    meanx = L_mean(expr1, len1, t, stack, nargs - 1);
-    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
-    meany = L_mean(expr2, len2, t, stack, nargs - 1);
-    if(!IODE_IS_A_NUMBER(meany)) return(IODE_NAN);
-
-    for(j = from ; j <= to ; j++) {
-        vx = L_exec_sub(expr1, len1, j, stack);
-        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
-        vy = L_exec_sub(expr2, len2, j, stack);
-        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
-
-        if(orig) sxy += vx * vy;
-        else     sxy += (vx - meanx) * (vy - meany);
+        if(orig) 
+            sum_xy += x * y;
+        else     
+            sum_xy += (x - mean_x) * (y - mean_y);
     }
 
-    return(sxy / n);
+    return sum_xy / nb;
 }
 
 
@@ -200,15 +194,16 @@ double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int nargs) 
+double L_covar(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) 
 {
-    short   len1, len2;
-
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    return(L_calccovar(expr + sizeof(short), len1,
-                       expr + len1 + 2 * sizeof(short), len2,
-                       t, stack, nargs, 0));
+
+    unsigned char* expr1 = expr + sizeof(short); 
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    double result = L_calccovar(expr1, len1, expr2, len2, from, to, t, stack, nargs, 0);
+    return result;
 }
 
 
@@ -220,15 +215,16 @@ double L_covar(unsigned char* expr, short nvargs, int t, double* stack, int narg
  *  @see L_calccovar() for the formulas.
  *  
  */
-double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nargs) 
+double L_covar0(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) 
 {
-    short   len1, len2;
-
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    return(L_calccovar(expr + sizeof(short), len1,
-                       expr + len1 + 2 * sizeof(short), len2,
-                       t, stack, nargs, 1));
+
+    unsigned char* expr1 = expr + sizeof(short); 
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    double result = L_calccovar(expr1, len1, expr2, len2, from, to, t, stack, nargs, 1);
+    return result;
 }
 
 
@@ -248,14 +244,14 @@ double L_covar0(unsigned char* expr, short nvargs, int t, double* stack, int nar
  *  @see L_covar() for more details.
  *  
  */
-double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+double L_var(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    short   len1;
-
+    short len1;
     memcpy(&len1, expr, sizeof(short));
-    return(L_calccovar(expr + sizeof(short), len1,
-                       expr + sizeof(short), len1,
-                       t, stack, nargs + 1, 0));
+
+    unsigned char* expr1 = expr + sizeof(short); 
+    double result = L_calccovar(expr1, len1, expr1, len1, from, to, t, stack, nargs + 1, 0);
+    return result;
 }
 
 
@@ -269,13 +265,12 @@ double L_var(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
  *  @see L_calccovar() for the formula.
  *  
  */
-double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    double  v1;
-
-    v1 = L_var(expr, nvargs, t, stack, nargs);
-    if(!IODE_IS_A_NUMBER(v1) || v1 < 0) return(IODE_NAN);
-    else return(sqrt(v1));
+    double var = L_var(expr, nvargs, from, to, t, stack, nargs);
+    if(!IODE_IS_A_NUMBER(var) || var < 0.0) 
+        return IODE_NAN;
+    return sqrt(var);
 }
 
 
@@ -307,33 +302,34 @@ double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nar
  *  @return            double           computed covariance
  */  
 
- double L_index(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
+ double L_index(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    char    *expr1, *expr2;
-    short   len1, len2;
-    int     from, to, j, n;
-    double  vx, vy;
-
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
-    expr2 = ((char*) expr) + len1 + 2 * sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
 
-    L_tfn_args(t, stack, nargs - 1, &from, &to);
-    n = 1 + to - from;
-    if(n == 0) return(IODE_NAN);
+    int nb = 1 + to - from;
+    if(nb == 0) 
+        return IODE_NAN;
 
-    vx = L_exec_sub((unsigned char*) expr1, len1, t, stack);
-    if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
+    double x = L_exec_sub(expr1, len1, t);
+    if(!IODE_IS_A_NUMBER(x)) 
+        return IODE_NAN;
 
-    for(j = from ; j <= to ; j++) {
-        vy = L_exec_sub((unsigned char*) expr2, len2, j, stack);
-        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
+    double y;
+    for(int j = from; j <= to; j++) 
+    {
+        y = L_exec_sub(expr2, len2, j);
+        if(!IODE_IS_A_NUMBER(y)) 
+            return IODE_NAN;
 
-        if(fabs(vx - vy) < 1e-30) return((double)j);
+        if(fabs(x - y) < 1e-30) 
+            return (double) j;
     }
 
-    return(IODE_NAN);
+    return IODE_NAN;
 }
 
 
@@ -351,46 +347,55 @@ double L_stddev(unsigned char* expr, short nvargs, int t, double* stack, int nar
  *  
  *  @see L_corr() for the parameter definition
  */
-double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
-{
-    char    *expr1, *expr2;
-    short   len1, len2;
-    int     from, to, j, n, k;
-    double  vx, vy, meanx, sxy = 0.0, sxy0 = 0.0;
-
+double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+{    
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
-    expr2 = ((char*) expr) + len1 + 2 * sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
 
-    L_tfn_args(t, stack, nargs - 1, &from, &to);
-    n = 1 + to - from;
-    if(n == 0) return(IODE_NAN);
+    int nb = 1 + to - from;
+    if(nb == 0) 
+        return IODE_NAN;
 
-    vx = L_exec_sub((unsigned char*) expr1, len1, t, stack);
-    if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
-    k = (int)vx;
-    if(k < 0 || k > n / 4) return(IODE_NAN);
+    double x = L_exec_sub(expr1, len1, t);
+    if(!IODE_IS_A_NUMBER(x)) 
+        return IODE_NAN;
 
-    meanx = L_mean((unsigned char*) expr2, len2, t, stack, nargs - 1);
-    if(!IODE_IS_A_NUMBER(meanx)) return(IODE_NAN);
+    int k = (int) x;
+    if(k < 0 || k > nb / 4) 
+        return IODE_NAN;
 
-    for(j = from ; j <= to - k ; j++) {
-        vx = L_exec_sub((unsigned char*) expr2, len2, j, stack);
-        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
-        vy = L_exec_sub((unsigned char*) expr2, len2, j + k, stack);
-        if(!IODE_IS_A_NUMBER(vy)) return(IODE_NAN);
+    double mean_x = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    if(!IODE_IS_A_NUMBER(mean_x)) 
+        return IODE_NAN;
 
-        sxy += (vx - meanx) * (vy - meanx);
+    double y;
+    double sum_xy = 0.0, sum_xy0 = 0.0;
+    for(int j = from; j <= to - k; j++) 
+    {
+        x = L_exec_sub(expr2, len2, j);
+        if(!IODE_IS_A_NUMBER(x)) 
+            return IODE_NAN;
+        
+        y = L_exec_sub(expr2, len2, j + k);
+        if(!IODE_IS_A_NUMBER(y)) 
+            return IODE_NAN;
+
+        sum_xy += (x - mean_x) * (y - mean_x);
     }
 
-    for(j = from ; j <= to ; j++) {
-        vx = L_exec_sub((unsigned char*) expr2, len2, j, stack);
-        if(!IODE_IS_A_NUMBER(vx)) return(IODE_NAN);
-        sxy0 += (vx - meanx) * (vx - meanx);
+    for(int j = from; j <= to; j++) 
+    {
+        x = L_exec_sub(expr2, len2, j);
+        if(!IODE_IS_A_NUMBER(x)) 
+            return IODE_NAN;
+        
+        sum_xy0 += (x - mean_x) * (x - mean_x);
     }
 
-    return(sxy / sxy0);
+    return sum_xy / sum_xy0;
 }
 
 
@@ -409,48 +414,59 @@ double L_acf(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
  *  @return             double           computed correlation 
  *  
  */
- 
-int L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, double* vy, int notnul)
+int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)
 {
-    int     nobs;
-
-    /* 1. Calc val after t */
     vy[0] = vy[1] = IODE_NAN;
-    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
-    for(vt[1] = t + 1 ; vt[1] < nobs ; vt[1]++) {
-        vy[1] = L_exec_sub(expr1, len1, vt[1], stack);
-        if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) break;
+    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+
+    // 1. Calculate value after t
+    for(vt[1] = t + 1; vt[1] < nb_obs; vt[1]++) 
+    {
+        vy[1] = L_exec_sub(expr1, len1, vt[1]);
+        if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) 
+            break;
     }
 
-    /* 2. Calc val before t */
-    for(vt[0] = t - 1 ; vt[0] >= 0 ; vt[0]--) {
-        vy[0] = L_exec_sub(expr1, len1, vt[0], stack);
-        if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
+    // 2. Calculate value before t
+    for(vt[0] = t - 1; vt[0] >= 0; vt[0]--) 
+    {
+        vy[0] = L_exec_sub(expr1, len1, vt[0]);
+        if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
+            break;
     }
 
-    /* if NO value after AND before t, return IODE_NAN */
-    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return -1;
-    if(IODE_IS_A_NUMBER(vy[0]) && IODE_IS_A_NUMBER(vy[1])) return 0;
+    // if NO value after AND before t, return IODE_NAN
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
+        return -1;
+    
+    // if values found before and after t, return success
+    if(IODE_IS_A_NUMBER(vy[0]) && IODE_IS_A_NUMBER(vy[1])) 
+        return 0;
 
-    /* if no value after, calc before t0 */
-    if(!IODE_IS_A_NUMBER(vy[1])) {
+    // if no value after, calculate before t0
+    if(!IODE_IS_A_NUMBER(vy[1])) 
+    {
         vy[1] = vy[0];
         vt[1] = vt[0];
         vy[0] = IODE_NAN;
-        for(vt[0] = vt[1] - 1 ; vt[0] >= 0 ; vt[0]--) {
-            vy[0] = L_exec_sub(expr1, len1, vt[0], stack);
-            if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) break;
+        for(vt[0] = vt[1] - 1; vt[0] >= 0; vt[0]--) 
+        {
+            vy[0] = L_exec_sub(expr1, len1, vt[0]);
+            if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
+                break;
         }
     }
-
-    /* if no value before, calc after t1 */
-    else {
+    // if no value before, calculate after t1
+    else 
+    {
         vy[0] = vy[1];
         vt[0] = vt[1];
         vy[1] = IODE_NAN;
-        for(vt[1] = vt[0] + 1 ; vt[1] < nobs ; vt[1]++) {
-            vy[1] = L_exec_sub(expr1, len1, vt[1], stack);
-            if(IODE_IS_A_NUMBER(vy[1])) break;
+        for(vt[1] = vt[0] + 1; vt[1] < nb_obs; vt[1]++) 
+        {
+            vy[1] = L_exec_sub(expr1, len1, vt[1]);
+            if(IODE_IS_A_NUMBER(vy[1])) 
+                break;
         }
     }
 
@@ -466,204 +482,233 @@ int L_calcvals(unsigned char* expr1, short len1, int t, double* stack, int* vt, 
  *  @return     double  value of expr[t] or interpolated value
  *  
  */
-double L_interpol(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
-{
-    char    *expr1;
-    short   len1;
-    int     nobs, vt[2];
-    double  vx, vy[2], itc;
-
+double L_interpol(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+{   
+    short len1;
     memcpy(&len1, expr, sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
 
-    /* 1. Calc val in t */
-    vx = L_exec_sub((unsigned char*) expr1, len1, t, stack);
-    if(IODE_IS_A_NUMBER(vx)) return(vx);
+    // 1. Calculate value in t
+    double x = L_exec_sub(expr1, len1, t);
+    if(IODE_IS_A_NUMBER(x)) 
+        return x;
 
-    /* 2. Calc values around t */
-    L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 0);
-    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
-
-    /* 3. Calc result */
-    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
-    if(vt[0] < 0) return(vy[1]);
-    if(vt[1] >= nobs) return(vy[0]);
-    itc = (vy[0] * vt[1] - vy[1] * vt[0]) / (vt[1] - vt[0]);
-    return(itc + t * (vy[1] - vy[0]) / (vt[1] - vt[0]));
+    // 2. Calculate values around t
+    int vt[2];
+    double vy[2];
+    L_calcvals(expr1, len1, t, stack, vt, vy, 0);
+    
+    // if NO value after AND before t, return IODE_NAN
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
+        return IODE_NAN;
+    
+    // 3. Calculate result
+    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    if(vt[0] < 0) 
+        return vy[1];
+    if(vt[1] >= nb_obs) 
+        return vy[0];
+    
+    double interpol = (vy[0] * vt[1] - vy[1] * vt[0]) / (vt[1] - vt[0]);
+    interpol += t * (vy[1] - vy[0]) / (vt[1] - vt[0]);
+    return interpol;
 }
 
-double L_app(unsigned char* expr, short nvargs, int t, double* stack, int nargs) /* JMP 17-04-98 */
-{
-    char    *expr1, *expr2;
-    short   len1, len2;
-    int     j, nobs, vt[2];
-    double  vx, vy[2], ayt, ay[2], delta;
-
+double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+{   
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    expr2 = ((char*) expr) + len1 + 2 * sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
 
-    /* 1. Calc val in t */
-    vx = L_exec_sub((unsigned char*) expr1, len1, t, stack);
-    if(IODE_IS_A_NUMBER(vx)) return(vx);
+    // 1. Calculate value in t
+    double x = L_exec_sub(expr1, len1, t);
+    if(IODE_IS_A_NUMBER(x)) 
+        return x;
 
-    /* 2. Calc values around t */
-    L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 1);
-    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    // 2. Calculate values around t
+    int vt[2];
+    double vy[2];
+    L_calcvals(expr1, len1, t, stack, vt, vy, 1);
+    
+    // if NO value after AND before t, return IODE_NAN
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
+        return IODE_NAN;
+    
+    // ---- Valeurs apparentées ----
+    double ayt = L_exec_sub(expr2, len2, t);
+    if(!IODE_IS_A_NUMBER(ayt)) 
+        return IODE_NAN;
+    
+    double ay[2];
+    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    ay[0] = ay[1] = IODE_NAN;
+    if(vt[0] >= 0)   
+        ay[0] = L_exec_sub(expr2, len2, vt[0]);
+    if(vt[1] < nb_obs) 
+        ay[1] = L_exec_sub(expr2, len2, vt[1]);
 
-    /* if NO value after AND before t, return IODE_NAN */
-    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
-
-    /* Valeurs apparentées */
-    ayt = L_exec_sub((unsigned char*) expr2, len2, t, stack);
-    if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
-    ay[0] = ay[1] = IODE_NAN; /* JMP 19-07-07 */
-    if(vt[0] >= 0)   ay[0] = L_exec_sub((unsigned char*) expr2, len2, vt[0], stack);
-    if(vt[1] < nobs) ay[1] = L_exec_sub((unsigned char*) expr2, len2, vt[1], stack);
-
-    // Deux valeurs trouvées dans la série initiale
+    // ---- Deux valeurs trouvées dans la série initiale ----
     // !! Les deux valeurs doivent exister dans la série apparentée
-    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) {
-        if(vt[0] < t && vt[1] > t) {
-            /*            return(ayt * (vy[0] / ay[0] + vy[1] / ay[1]) / 2); */
-            // delta = (vy[1]/vy[0])/(ay[1]/ay[0]);
-            if(fabs(vy[0] * ay[1]) < 1e-15) return(IODE_NAN);
-            delta = (vy[1] * ay[0]) / (vy[0] * ay[1]);
-            if(delta < 0) return(IODE_NAN);
+    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) 
+    {
+        if(vt[0] < t && vt[1] > t) 
+        {
+            if(fabs(vy[0] * ay[1]) < 1e-15) 
+                return IODE_NAN;
+            
+            double delta = (vy[1] * ay[0]) / (vy[0] * ay[1]);
+            if(delta < 0) 
+                return IODE_NAN;
+            
             delta = pow(delta, 1.0/(vt[1]-vt[0]));
-            if(_isnan(delta)) return(IODE_NAN); /* JMP 18-01-02 */
-            return(vy[0] * (ayt/ay[0] * pow(delta, t - vt[0])));
+            if(_isnan(delta)) 
+                return IODE_NAN;
+            
+            double result = vy[0] * (ayt / ay[0] * pow(delta, t - vt[0]));
+            return result;
         }
-        else {
-            j = 0;
-            if(vt[0] < t) j = 1;
-            if(fabs(ay[j]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
-            return(ayt * (vy[j] / ay[j]));
+        else 
+        {
+            int j = (vt[0] < t) ? 1 : 0;
+            if(fabs(ay[j]) < 1e-15) 
+                return IODE_NAN;
+            
+            return ayt * (vy[j] / ay[j]);
         }
     }
+
     // Seule la valeur en t0 est définie : res(t) <- APP(t) * (ORIG(t0) / APP(t0))
-    if(IODE_IS_A_NUMBER(ay[0])) {
-        if(fabs(ay[0]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
-        return(ayt * (vy[0] / ay[0]));
+    if(IODE_IS_A_NUMBER(ay[0])) 
+    {
+        if(fabs(ay[0]) < 1e-15) 
+            return IODE_NAN;
+        
+        return ayt * (vy[0] / ay[0]);
     }
+
     // Seule la valeur en t1 est définie : res(t) <- APP(t) * (ORIG(t1) / APP(t1))
-    if(IODE_IS_A_NUMBER(ay[1])) {
-        if(fabs(ay[1]) < 1e-15) return(IODE_NAN); /* JMP 19-07-07 */
-        return(ayt * (vy[1] / ay[1]));
+    if(IODE_IS_A_NUMBER(ay[1])) 
+    {
+        if(fabs(ay[1]) < 1e-15) 
+            return IODE_NAN;
+        
+        return ayt * (vy[1] / ay[1]);
     }
-    return(IODE_NAN);
+
+    return IODE_NAN;
 }
 
-double L_dapp(unsigned char* expr, short nvargs, int t, double* stack, int nargs)
-{
-    char    *expr1, *expr2;
-    short   len1, len2;
-    int     j, nobs, vt[2];
-    double  vx, vy[2], ayt, ay[2], delta;
-
+double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+{   
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    expr2 = ((char*) expr) + len1 + 2 * sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
 
-    /* 1. Calc val in t */
-    vx = L_exec_sub((unsigned char*) expr1, len1, t, stack);
-    if(IODE_IS_A_NUMBER(vx)) return(vx);
+    // 1. Calculate value in t
+    double x = L_exec_sub(expr1, len1, t);
+    if(IODE_IS_A_NUMBER(x)) 
+        return x;
 
-    /* 2. Calc values around t */
-    L_calcvals((unsigned char*) expr1, len1, t, stack, vt, vy, 0);
-    nobs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    // 2. Calculate values around t
+    int vt[2];
+    double vy[2];
+    L_calcvals(expr1, len1, t, stack, vt, vy, 0);
 
-    /* if NO value after AND before t, return IODE_NAN */
-    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) return(IODE_NAN);
+    // if NO value after AND before t, return IODE_NAN
+    if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
+        return IODE_NAN;
 
-    /* Valeurs apparentées */
-    ayt = L_exec_sub((unsigned char*)  expr2, len2, t, stack);
-    if(!IODE_IS_A_NUMBER(ayt)) return(IODE_NAN);
-    if(vt[0] >= 0)   ay[0] = L_exec_sub((unsigned char*) expr2, len2, vt[0], stack);
-    if(vt[1] < nobs) ay[1] = L_exec_sub((unsigned char*) expr2, len2, vt[1], stack);
+    // ---- Valeurs apparentées ----
+    double ayt = L_exec_sub(expr2, len2, t);
+    if(!IODE_IS_A_NUMBER(ayt)) 
+        return IODE_NAN;
+    
+    double ay[2];
+    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    ay[0] = ay[1] = IODE_NAN;
+    if(vt[0] >= 0)   
+        ay[0] = L_exec_sub(expr2, len2, vt[0]);
+    if(vt[1] < nb_obs) 
+        ay[1] = L_exec_sub(expr2, len2, vt[1]);
 
-    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) {
-        if(vt[0] < t && vt[1] > t) {
-            delta = (ay[1] - ay[0] + vy[0] - vy[1]) / (vt[1]-vt[0]);
-            return(ayt + vy[0] - ay[0] - (t - vt[0]) * delta);
+    if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) 
+    {
+        if(vt[0] < t && vt[1] > t) 
+        {
+            double delta = (ay[1] - ay[0] + vy[0] - vy[1]) / (vt[1]-vt[0]);
+            return ayt + vy[0] - ay[0] - (t - vt[0]) * delta;
         }
-        else {
-            j = 0;
-            if(vt[0] < t) j = 1;
-            return(ayt + (vy[j] - ay[j]));
+        else 
+        {
+            int j = (vt[0] < t) ? 1 : 0;
+            return ayt + (vy[j] - ay[j]);
         }
     }
+
     if(IODE_IS_A_NUMBER(ay[0]))                
-        return(ayt + (vy[0] - ay[0]));
+        return ayt + (vy[0] - ay[0]);
+    
     if(IODE_IS_A_NUMBER(ay[1]))                
-        return(ayt + (vy[1] - ay[1]));
-    return(IODE_NAN);
+        return ayt + (vy[1] - ay[1]);
+    
+    return IODE_NAN;
 }
 
-double L_hpall(unsigned char* expr, short len, int t, double* stack, int nargs, int std)
-{
-    char    *expr1, *expr2;
-    short   len1, len2;
-    double    v, *itmp = NULL, *otmp = NULL;
-    //int     from, to, j, lg, lambda, nbna, dim;      /* JMP 7-3-2019 */
-    int     from, to, j, lg, nbna, dim;         /* JMP 7-3-2019 */
-    double   lambda;                         /* JMP 7-3-2019 */
-
+double L_hpall(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs, int std)
+{    
+    short len1, len2;
     memcpy(&len1, expr, sizeof(short));
-    expr1 = ((char*) expr) + sizeof(short);
     memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    expr2 = ((char*) expr) + len1 + 2 * sizeof(short);
+    unsigned char* expr1 = expr + sizeof(short);
+    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
 
-    v = L_exec_sub((unsigned char*)  expr1, len1, t, stack);
-    if(!IODE_IS_A_NUMBER(v)) return(IODE_NAN);
-    lambda = v;
+    double value = L_exec_sub(expr1, len1, t);
+    if(!IODE_IS_A_NUMBER(value)) 
+        return IODE_NAN;
 
-    L_tfn_args(t, stack, nargs - 1, &from, &to);
-    if(t < from || t > to) goto err;
-    lg = to - from + 1;
-    if(lg < 5) goto err;
-    itmp = (double *) SCR_malloc(lg * sizeof(double));
-    otmp = (double *) SCR_malloc(lg * sizeof(double));
+    if(t < from || t > to) 
+        return IODE_NAN;
+    int nb = to - from + 1;
+    if(nb < 5) 
+        return IODE_NAN;
+    
+    double* itmp = (double *) SCR_malloc(nb * sizeof(double));
+    double* otmp = (double *) SCR_malloc(nb * sizeof(double));
+    if(itmp == NULL || otmp == NULL) 
+        return IODE_NAN;
+    
+    for(int j = from; j <= to; j++) 
+        itmp[j - from] = L_exec_sub(expr2, len2, j);
 
-    if(itmp == NULL || otmp == NULL) goto err;
-    for(j = from ; j <= to ; j++) {
-        itmp[j - from] = L_exec_sub((unsigned char*) expr2, len2, j, stack);
-        // if(!IODE_IS_A_NUMBER(itmp[j - from])) goto err;            /* JMP 26-07-11 */
+    int nbna, dim;
+    HP_test(itmp, otmp, nb, &nbna, &dim);
+    if(dim < 5) 
+    {
+        SCR_free(itmp);
+        SCR_free(otmp);
+        return IODE_NAN;
     }
-
-    /*
-        for(j = from, nbna = 0 ; j <= to ; j++, nbna++) {
-    	if(IODE_IS_A_NUMBER(itmp[j - from])) break;
-        }
-        if(lg - nbna < 5) goto err;
-    */
-
-    HP_test(itmp, otmp, lg, &nbna, &dim);           /* JMP 26-07-11 */
-    if(dim < 5) goto err;                           /* JMP 26-07-11 */
-    HP_calc(itmp + nbna, otmp + nbna, dim, lambda, std); /* JMP 26-07-11 */ // JMP 12/4/2019
+    
+    double lambda = value;
+    HP_calc(itmp + nbna, otmp + nbna, dim, lambda, std);
 
     SCR_free(itmp);
-    v = otmp[t - from];
+    value = otmp[t - from];
     SCR_free(otmp);
-    //DebugActif = 1;
-    //Debug("t=%d, lambda=%lf, v=%lf, from=%d, to=%d\n", t, lambda, v, from, to);
-    return(v);
-
-err:
-    SCR_free(itmp);
-    SCR_free(otmp);
-    return(IODE_NAN);
+    return value;
 }
 
-double L_hp(unsigned char* expr, short len, int t, double* stack, int nargs)
+double L_hp(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(expr, len, t, stack, nargs, 0));
+    return(L_hpall(expr, len, from, to, t, stack, nargs, 0));
 }
 
 
-double L_hpstd(unsigned char* expr, short len, int t, double* stack, int nargs)
+double L_hpstd(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(expr, len, t, stack, nargs, 1));
+    return(L_hpall(expr, len, from, to, t, stack, nargs, 1));
 }

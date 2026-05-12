@@ -1,39 +1,3 @@
-/**
- * @header4iode
- *
- * Functions to evaluate LEC "operators". 
- * 
- * The table (*L_OPS_FN)[] contains the pointers to the operators from L_OR to L_EXP (see iode.h).
- *
- * Function signature:
- *
- *      double  <fnname>(double value1, double value2);
- *  
- *  where value1 and value2 are the parameters that have been passed to the function in the LEC expression.
- *  
- *  Example: in the LEC expression
- *   
- *      2 < 3
- *  
- *  value1 is 2 and value2 is 3
- *  
- *  List of functions
- *  -----------------
- *      double L_or (double a, double b)
- *      double L_and (double a, double b)
- *      double L_ge (double a, double b)
- *      double L_gt (double a, double b)
- *      double L_le (double a, double b)
- *      double L_lt (double a, double b)
- *      double L_eq (double a, double b)
- *      double L_ne (double a, double b)
- *      double L_plus (double a, double b)
- *      double L_minus(double a, double b)
- *      double L_times(double a, double b)
- *             double L_divide(double a, double b)
- *             double L_exp(double a, double b)
- *  
- */
 #include <math.h>
 #include "api/lec/lec.h"
 
@@ -41,41 +5,52 @@
     #define _isnan isnan
 #endif
 
-double L_or   (double a, double b) {return((a || b) ? (double)1.0 : (double)0.0);}
-double L_and  (double a, double b) {return((a && b) ? (double)1.0 : (double)0.0);}
-double L_ge   (double a, double b) {return((a >= b) ? (double)1.0 : (double)0.0);}
-double L_gt   (double a, double b) {return((a > b)  ? (double)1.0 : (double)0.0);}
-double L_le   (double a, double b) {return((a <= b) ? (double)1.0 : (double)0.0);}
-double L_lt   (double a, double b) {return((a < b)  ? (double)1.0 : (double)0.0);}
-double L_eq   (double a, double b) {return((a == b) ? (double)1.0 : (double)0.0);}
-double L_ne   (double a, double b) {return((a != b) ? (double)1.0 : (double)0.0);}
-double L_plus (double a, double b) {return(a + b);}
-double L_minus(double a, double b) {return(a - b);}
-double L_times(double a, double b) {return(a * b);}
-
-/*  Note: L_divide() and L_exp() are used by other functions and must therefore be global. */
+double L_or   (double a, double b) { return (a || b) ? 1.0 : 0.0; }
+double L_and  (double a, double b) { return (a && b) ? 1.0 : 0.0; }
+double L_ge   (double a, double b) { return (a >= b) ? 1.0 : 0.0; }
+double L_gt   (double a, double b) { return (a > b)  ? 1.0 : 0.0; }
+double L_le   (double a, double b) { return (a <= b) ? 1.0 : 0.0; }
+double L_lt   (double a, double b) { return (a < b)  ? 1.0 : 0.0; }
+double L_eq   (double a, double b) { return (a == b) ? 1.0 : 0.0; }
+double L_ne   (double a, double b) { return (a != b) ? 1.0 : 0.0; }
+double L_plus (double a, double b) { return a + b; }
+double L_minus(double a, double b) { return a - b; }
+double L_times(double a, double b) { return a * b; }
 
 double L_divide(double a, double b) 
 {
-    if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a) || b == 0) {
-        return((double)IODE_NAN);
-    }
-    return(a / b);
+    if(!IODE_IS_A_NUMBER(b) || !IODE_IS_A_NUMBER(a) || b == 0)
+        return IODE_NAN;
+    return a / b;
 }
 
 double L_exp(double a, double b)
 {
-    double x, ib;
+    double x;
 
-    if(a < 0 && b != (int)b) {
-        // test 2018 : si (-a)^0.333 => faire -a^0.333
-        ib = 1 / b;
-        if(fabs(ib - (int) ib) > 1e-8) return(IODE_NAN);
-        if((int)ib % 2 != 1)           return(IODE_NAN);
-        x = -pow((double)-a, (double)b);
+    // a^b for a < 0 and b not an integer
+    if(a < 0 && b != (int) b) 
+    {
+        // check if a^b can be represented as a^(1/c) where 
+        // 1) c is an integer  
+        double c = 1.0 / b;
+        bool is_fraction = fabs(c - (int) c) < 1e-8;
+        if(!is_fraction) 
+            return IODE_NAN;
+        // 2) c is an odd integer 
+        // (ex: (-8)^(1/3) = -(8^(1/3)) = -2, but (-8)^(1/2) is not a real number)
+        bool is_odd_integer = (int) c % 2 == 1;
+        if(!is_odd_integer)
+            return IODE_NAN;
+
+        // a^b = (-x)^b = (-)^b * x^b = -(x^b) if 1/b is an odd integer
+        x = -pow(-a, b);
     }
     else
-        x = pow((double)a, (double)b);
-    if(_isnan(x)) x = IODE_NAN; /* JMP 18-01-02 */
-    return((double)x);
+        x = pow(a, b);
+    
+    if(_isnan(x)) 
+        x = IODE_NAN;
+    
+    return x;
 }
