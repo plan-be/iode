@@ -2338,7 +2338,11 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
     // TODO: check result of one ENDO
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "1999Y1") * 1e6) / 1e6, 13.530405);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2000Y1") * 1e6) / 1e6, 10.046611);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2001Y1") * 1e6) / 1e6, 2.623793);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2003Y1") * 1e6) / 1e6, -6.091565);
 
     // B_ModelExchange()
 
