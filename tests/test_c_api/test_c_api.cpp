@@ -2334,15 +2334,23 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_EQ(CSimulation::KSIM_DEBUG, 0);
     EXPECT_EQ(CSimulation::KSIM_PASSES, 5);
 
+    // TODO: check result of one ENDO
     // B_ModelSimulate()
     rc = B_ModelSimulate("2000Y1 2002Y1");
     EXPECT_EQ(rc, 0);
-    // TODO: check result of one ENDO
+    // --- check one Variable ---
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "1999Y1") * 1e6) / 1e6, 13.530405);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2000Y1") * 1e6) / 1e6, 10.046611);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2001Y1") * 1e6) / 1e6, 2.623793);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2003Y1") * 1e6) / 1e6, -6.091565);
+    // --- check all Variables ---
+    std::string file_expected_output = str_output_test_dir + "test_simu.var";
+    std::string arg = file_expected_output + " WS_ONLY FILE_ONLY BOTH_EQ BOTH_DIFF";
+    B_DataCompare((char*) arg.c_str(), VARIABLES);
+    EXPECT_EQ(global_ws_lst->get("WS_ONLY"), "");
+    EXPECT_EQ(global_ws_lst->get("FILE_ONLY"), "");
+    EXPECT_EQ(global_ws_lst->get("BOTH_DIFF"), "");
 
     // B_ModelExchange()
 
