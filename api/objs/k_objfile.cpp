@@ -298,8 +298,26 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
     std::string prefix_error_msg = "Error when loading binary file " + std::string(file) + ":\n";
 
     std::string filename_trim = trim(filename);
-    std::string file_ext = set_file_extension(filename_trim, (int) this->k_type);
-    strcpy(file, file_ext.c_str());
+    std::string file_with_ext = set_file_extension(filename_trim, (int) this->k_type);
+    strcpy(file, file_with_ext.c_str());
+
+    // check that the file exists and is not a directory
+    if(!std::filesystem::exists(file))
+    {
+        error_msg = prefix_error_msg + "File does not exist.";
+        kwarning(error_msg.c_str());
+        return false;
+    }
+
+    // check that the extension is correct for the type of object we want to load
+    std::string expected_ext = "." + std::string(k_ext[this->k_type + COMMENTS]);
+    std::string ext = get_file_extension(file_with_ext);
+    if(ext != expected_ext)
+    {
+        error_msg = prefix_error_msg + "File extension '" + ext + "' does not match expected extension '" + expected_ext + "'.";
+        kwarning(error_msg.c_str());
+        return false;
+    }
 
     fd = fopen(file, "rb");
     if(!fd) 
