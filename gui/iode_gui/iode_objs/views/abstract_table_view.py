@@ -265,8 +265,16 @@ class IodeAbstractTableView(QTableView):
         """
         if key is None:
             key = self._get_key_filter()
+        
         table_model: IodeAbstractTableModel = self.model()
-        table_model.filter(key, silent)
+        try:
+            table_model.filter(key, silent)
+        except Exception as e:
+            if not silent:
+                QMessageBox.warning(None, "WARNING", str(e))
+            self.filter_line_edit.setText("")
+            table_model.filter("", silent)  
+        
         self.update()
 
     def get_selected_objects_names(self) -> list:
@@ -547,6 +555,12 @@ class IodeAbstractTableView(QTableView):
     @Slot()
     def filter_slot(self):
         """Filters the objects."""
+        self.filter()
+
+    @Slot()
+    def reset_filter(self):
+        """Resets the filter."""
+        self.filter_line_edit.setText("")
         self.filter()
 
     def _open_edit_dialog(self, obj_name: str):

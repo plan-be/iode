@@ -28,6 +28,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
     database_loaded = Signal()
     database_cleared = Signal()
     object_removed = Signal(str)
+    failed_filtering = Signal()
 
     def __init__(self, column_names: List[str], iode_type: IodeType, database=None, parent=None):
         """
@@ -426,7 +427,6 @@ class IodeAbstractTableModel(QAbstractTableModel):
         if key is None or (isinstance(key, str) and not len(key)):
             self._displayed_database = self._database
             return
-        
         try:
             # NOTE: We do not use self._database[key] below. 
             #       If key represents actually a single IODE object, the command 
@@ -435,7 +435,7 @@ class IodeAbstractTableModel(QAbstractTableModel):
             if self.iode_type == IodeType.VARIABLES:
                 # key = pattern (names)
                 if isinstance(key, str):
-                    self._displayed_database = self._database[key]
+                    self._displayed_database = self._database.subset(key, copy=False)
                     return
                 
                 # key = pattern, periods
@@ -457,18 +457,28 @@ class IodeAbstractTableModel(QAbstractTableModel):
                         periods = None
 
                     if not periods:
-                        self._displayed_database = self._database[pattern]
+                        self._displayed_database = self._database.subset(pattern, copy=False)
                         return
                     
                     periods = str(periods)
-                    self._displayed_database = self._database[pattern, periods]
+                    if ':' in periods:
+                        first_period, last_period = periods.split(':')
+                        if not len(first_period):
+                            first_period = None
+                        if not len(last_period):
+                            last_period = None
+                    else:
+                        first_period, last_period = periods, periods
+                    self._displayed_database = self._database.subset(pattern, copy=False, 
+                                                                    first_period=first_period, 
+                                                                    last_period=last_period)
                 else:
                     raise TypeError(f"Invalid type for the 'key' for filtering variables.\n"
                                     f"Expected a 'key' of type str or tuple(str, str).\n"
                                     f"Got 'key' of type {type(key).__name__} instead.\n"
                                     f"The passed value for 'key' is: {key}.")
             else:
-                self._displayed_database = self._database[key]
+                self._displayed_database = self._database.subset(key, copy=False)
         except Exception as e:
             self._displayed_database = self._database
             if not silent:
