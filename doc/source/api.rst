@@ -30,6 +30,7 @@ Comments
    Comments.clear
    Comments.copy
    Comments.new_detached
+   Comments.subset
    Comments.print_to_file
 
    Comments.get_names
@@ -83,6 +84,7 @@ Equations
    Equations.save
    Equations.clear
    Equations.copy
+   Equations.subset
    Equations.new_detached
    Equations.print_to_file
    Equations.print_lec
@@ -145,6 +147,7 @@ Identities
    Identities.save
    Identities.clear
    Identities.copy
+   Identities.subset
    Identities.new_detached
    Identities.print_to_file
 
@@ -201,6 +204,7 @@ Lists
    Lists.save
    Lists.clear
    Lists.copy
+   Lists.subset
    Lists.new_detached
    Lists.print_to_file
 
@@ -253,6 +257,7 @@ Scalars
    Scalars.save
    Scalars.clear
    Scalars.copy
+   Scalars.subset
    Scalars.new_detached
    Scalars.print_to_file
 
@@ -308,6 +313,7 @@ Tables
    Tables.save
    Tables.clear
    Tables.copy
+   Tables.subset
    Tables.new_detached
    Tables.print_to_file
 
@@ -361,6 +367,7 @@ Variables
    Variables.save
    Variables.clear
    Variables.copy
+   Variables.subset
    Variables.new_detached
    Variables.print_to_file
 

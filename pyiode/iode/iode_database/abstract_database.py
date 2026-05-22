@@ -131,7 +131,139 @@ class IodeDatabase:
         """
         return self._cy_database.get_is_detached()
 
-    def _subset(self, Self, pattern: str, copy: bool) -> Self:
+    def subset(self, Self, pattern: str, copy: bool) -> Self:
+        r"""
+        Create a subset of the database filtered by a name pattern.
+
+        This method creates filtered views or independent copies of the database. 
+        It supports two modes of operation controlled by the `copy` parameter:
+        
+        - **View mode** (`copy=False`): Creates a database object that acts as a view of the 
+          global workspace. Any changes made to the view are reflected in the global workspace 
+          and vice versa.
+        - **Copy mode** (`copy=True`): Creates a new detached database containing copies of 
+          the matched objects. Changes made to the copy do not affect the global workspace.
+
+        The `pattern` argument can represent a single object name (e.g. "ACAF") or a list of object 
+        names ("ACAF;ACAG;AOUC") or a pattern (e.g. "A*") or a list of sub-patterns (e.g. "A*;*_").
+        
+        If the `pattern` argument represents a list of object names or of sub-patterns, each name or 
+        sub-pattern is separated by a `separator` character which is either a whitespace ` `, 
+        or a comma `,`, or a semi-colon `;`, or a tabulation `\t`, or a newline `\n`.
+
+        A *(sub-)pattern* is a list of characters representing a group of object names. 
+        It includes some special characters which have a special meaning:
+        
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+        Note that the `pattern` argument can contain references to IODE lists which are prefixed 
+        with the symbol `$`.
+
+        Parameters
+        ----------
+        pattern : str
+            Pattern to filter object names. Syntax is the same as used in `__getitem__` method.
+            It can contain the following special characters:
+            
+            - `*` : any character sequence, even empty
+            - `?` : any character (one and only one)
+            - `@` : any alphanumerical char [A-Za-z0-9]
+            - `&` : any non alphanumerical char
+            - `|` : any alphanumeric character or none at the beginning and end of a string 
+            - `!` : any non-alphanumeric character or none at the beginning and end of a string 
+            - `\` : escape the next character
+
+            Examples:
+            
+            - `"A*"`: All objects whose name starts with 'A'
+            - `"*_"`: All objects whose name ends with '_'
+            - `"A*;*_"`: All objects starting with 'A' or ending with '_'
+            - `"*"`: All objects (match all pattern)
+            - `""`: No objects (empty pattern)
+            
+        copy : bool
+            If `True`, creates a new detached database with independent copies of the 
+            matched objects. Changes to this database will not affect the global workspace.
+            
+            If `False`, creates a view of the global workspace filtered using a pattern. 
+            Changes to this view are reflected in the global workspace.
+
+        Returns
+        -------
+        Database
+            A new database instance of the same type, either as a view or a detached copy 
+            depending on the `copy` parameter.
+
+        See Also
+        --------
+        IodeDatabase.copy : Create a copied subset with pattern filtering
+        IodeDatabase.new_detached : Create a new empty detached database
+        IodeDatabase.__getitem__ : Create a view subset using bracket notation
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR
+        >>> from iode import comments
+        >>> comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.cmt
+        317 objects loaded
+
+        View mode (copy=False) - linked to global workspace
+        
+        >>> # Create a view of objects starting with 'A'
+        >>> cmt_subset = comments.subset("A*", copy=False)
+        >>> cmt_subset.is_detached
+        False
+        >>> # Changes in the view affect the global workspace
+        >>> cmt_subset["ACAF"] = "Modified in view"
+        >>> comments["ACAF"]
+        'Modified in view'
+        >>> # Modifications in global workspace are visible in view
+        >>> comments["ACAF"] = "Modified globally"
+        >>> cmt_subset["ACAF"]
+        'Modified globally'
+
+        Single object view
+        >>> cmt_single_obj_subset = comments.subset("ACAF", copy=False)
+        >>> cmt_single_obj_subset       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Comments
+        nb comments: 1
+        filename: ...fun.cmt
+        <BLANKLINE>
+        name        comments    
+        ACAF        Modified globally
+        <BLANKLINE>
+
+        Copy mode (copy=True) - independent from global workspace
+        
+        >>> # Create a copy of objects starting with 'B'
+        >>> cmt_copy_subset = comments.subset("B*", copy=True)
+        >>> cmt_copy_subset.is_detached
+        True
+        >>> cmt_copy_subset.names
+        ['BENEF', 'BENEF_', 'BQY', 'BVY']
+        >>> # Changes in copy do not affect global workspace
+        >>> cmt_copy_subset["BENEF"] = "Modified only in copy"
+        >>> comments["BENEF"]
+        'Ondernemingen: niet-uitgekeerde winsten.'
+
+        Empty database (new_detached)
+        
+        >>> # Create an empty detached database
+        >>> cmt_empty_subset = comments.subset("", copy=True)
+        >>> cmt_empty_subset.is_detached
+        True
+        >>> cmt_empty_subset.names
+        []
+        >>> len(cmt_empty_subset)
+        0
+        """
         raise NotImplementedError()
 
     def new_detached(self) -> Self:
@@ -164,7 +296,7 @@ class IodeDatabase:
         >>> cmt_detached.names
         []
         """
-        return self._subset("", copy=True)
+        return self.subset("", copy=True)
 
     def copy(self, pattern: str=None) -> Self:
         r"""
@@ -273,7 +405,7 @@ class IodeDatabase:
         """
         if pattern is None:
             pattern = '*'
-        return self._subset(pattern, copy=True)
+        return self.subset(pattern, copy=True)
 
     @property
     def iode_type(self) -> IodeType:
@@ -1368,7 +1500,7 @@ class IodeDatabase:
         # names represents a selection of IODE objects
         else:
             names = ';'.join(names)
-            return self._subset(names, copy=False)
+            return self.subset(names, copy=False)
 
     def _check_same_names(self, left_names, right_names):
         r"""

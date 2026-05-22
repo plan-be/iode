@@ -84,7 +84,7 @@ class Equations(IodeDatabase):
     def _load(self, filepath: str):
         self._cy_database._load(filepath)
 
-    def _subset(self, pattern: str, copy: bool) -> Self:
+    def subset(self, pattern: str, copy: bool) -> Self:
         cy_self = self._cy_database
         cy_subset = cy_self.initialize_subset(pattern, copy)
         subset = Equations.from_cython_obj(cy_subset)
