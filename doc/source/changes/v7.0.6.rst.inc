@@ -27,6 +27,9 @@ Fixed Bugs
 
 - GUI: fixed application crashing when trying to edit an IODE table (closes :issue:`1175`)
 
+- GUI: fixed filtering objects when the pattern represents a unique object 
+  (closes :issue:`1192`)
+
 Miscellaneous 
 -------------
 
