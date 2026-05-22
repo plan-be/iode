@@ -186,7 +186,7 @@ def test_wrong_pattern_subset():
     with pytest.raises(RuntimeError, match=r"Cannot create a subset the database of type 'Comment' "
                                            r"using the pattern 'A':\n'Comment': no names found " 
                                            r"matching the pattern 'A' in the parent database"):
-        comments._subset('A', copy=False)
+        comments.subset('A', copy=False)
 
 def test_database_delete():
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")

@@ -180,7 +180,7 @@ class Variables(IodeDatabase):
     def _load(self, filepath: str):
         self._cy_database._load(filepath)
 
-    def _subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
+    def subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
                 last_period: Union[str, Period]=None) -> Self:
         if isinstance(first_period, str):
             first_period = Period(first_period)
@@ -602,7 +602,7 @@ class Variables(IodeDatabase):
 
         # key_periods represents all periods (of the current subset) -> return a Variables object
         if key_periods is None:
-            db_subset = self._subset(name, copy=False)
+            db_subset = self.subset(name, copy=False)
         # key_periods represents a unique period -> return a float 
         elif isinstance(key_periods, Period):
             db_subset = self._cy_database._get_variable(key_name, key_periods._cy_period)
@@ -615,7 +615,7 @@ class Variables(IodeDatabase):
             if not isinstance(last_period, Period):
                 raise TypeError(f"Expected value of type 'Period' for the last period. "
                                 f"Got value of type {type(last_period).__name__} instead.")
-            db_subset = self._subset(name, copy=False, first_period=first_period, 
+            db_subset = self.subset(name, copy=False, first_period=first_period, 
                                      last_period=last_period)
         # key_periods represents a list of non-contiguous periods -> return a pandas Series
         elif isinstance(key_periods, list):
@@ -883,7 +883,7 @@ class Variables(IodeDatabase):
                     first_period, last_period = key_periods
                 else:
                     first_period = last_period = None
-                db_subset = self._subset(pattern, copy=False, first_period=first_period, 
+                db_subset = self.subset(pattern, copy=False, first_period=first_period, 
                                          last_period=last_period)
                 return db_subset
 
