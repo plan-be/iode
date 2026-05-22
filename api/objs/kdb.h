@@ -924,7 +924,7 @@ public:
     {   
         std::shared_ptr<D> from_ptr = D::Create(false);
 
-        bool success = from_ptr->load_binary(file);
+        bool success = from_ptr->load(file);
         if(!success)
             return false;
     

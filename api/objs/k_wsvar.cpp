@@ -1103,7 +1103,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     std::set<std::string>& v_found, const Sample* copy_sample)
 {    
     auto from_ptr = KDBVariables::Create(false);
-    bool success = from_ptr->load_binary(file);
+    bool success = from_ptr->load(file);
     if(!success)
         return false;
 
