@@ -30,6 +30,14 @@ TEST_F(KDBVariablesTest, Load)
     auto kdb_ptr = KDBVariables::KDBVariables::Create(false);
     kdb_ptr->load(str_input_test_dir + prefix_filename + "fun.var");
     EXPECT_EQ(kdb_ptr->size(), 394);
+
+    kdb_ptr->clear();
+    kdb_ptr->load(str_input_test_dir + prefix_filename + "FUN_UPPERCASE.VAR");
+    EXPECT_EQ(kdb_ptr->size(), 394);
+
+    kdb_ptr->clear();
+    kdb_ptr->load(str_input_test_dir + prefix_filename + "FUN_UPPERCASE.AV");
+    EXPECT_EQ(kdb_ptr->size(), 394);
 }
 
 TEST_F(KDBVariablesTest, Subset)

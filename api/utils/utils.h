@@ -386,6 +386,8 @@ inline std::string get_file_extension(const std::string& filepath)
     std::filesystem::path p_filepath(filepath);
     if(p_filepath.has_extension())
         ext = p_filepath.extension().string();
+    // to lower case to avoid issues with upper case extensions (e.g. .VAR instead of .var)
+    ext = to_lower(ext);
     return ext; 
 }
 
@@ -397,8 +399,12 @@ inline std::string add_file_extension(const std::string& filepath, const std::st
     if(filepath.length() > 511)
         throw std::invalid_argument("Filepath too long (> 511 characters)");
 
+    // If filepath already has an extension, return it as is. 
+    // Otherwise, add the extension
     std::filesystem::path p_filepath(filepath);
-    p_filepath = p_filepath.replace_extension(ext);
+    if(!p_filepath.has_extension())
+        p_filepath = p_filepath.replace_extension(ext);
+    
     return p_filepath.string();
 }
 
