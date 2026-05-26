@@ -65,12 +65,12 @@ cdef extern from "api/all.h":
         char                k_compressed
         char                k_db_type
         string              filepath
+        string              type_name
 
         # ==== methods ====
 
         int size() except +
         int get_iode_type() except +
-        string get_iode_type_str() except +
         bool is_global_database() except +
         bool is_detached_database() except +
         bool is_subset_database() except +

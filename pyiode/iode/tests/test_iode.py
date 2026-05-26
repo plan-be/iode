@@ -174,17 +174,36 @@ def test_type_copy_iode_objects():
     table_C8_1 = tables["C8_1"]
     assert isinstance(table_C8_1.copy(), Table)
 
-def test_wrong_pattern_subset():
+def test_pattern_subset():
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
     
+    # mix upper and lower case in the pattern
+    pattern = "a*;gosh_;Paf_;PC_"
+    expected_names = ["ACAF", "ACAG", "AOUC", "AQC", "GOSH_", "PC_"]
+    cmt_subset = comments[pattern]
+    assert cmt_subset.get_names() == expected_names
+
+    pattern = "a*;gosh_;Paf_;PC_"
+    expected_names = ["ACAF", "ACAG", "AOUC", "GOSH_", "PAF_", "PC_"]
+    eqs_subset = equations[pattern]
+    assert eqs_subset.get_names() == expected_names
+
+    pattern = "a*;gosh_;Paf_;PC_"
+    expected_names = ["ACAF", "ACAG", "AOUC", "AOUC_", "AQC", "GOSH_", "PAF_", "PC_"]
+    var_subset = variables[pattern]
+    assert var_subset.get_names() == expected_names
+
+    # wrong pattern
     with pytest.raises(KeyError, match=r"Name 'A' not found in the Comments workspace"):
         comments["A"]
 
     with pytest.raises(KeyError, match=r"Name 'A' not found in the Comments workspace"):
         comments._get_object('A')
 
-    with pytest.raises(RuntimeError, match=r"Cannot create a subset the database of type 'Comment' "
-                                           r"using the pattern 'A':\n'Comment': no names found " 
+    with pytest.raises(RuntimeError, match=r"Cannot create a subset the database of type 'comments' "
+                                           r"using the pattern 'A':\nNo names found " 
                                            r"matching the pattern 'A' in the parent database"):
         comments.subset('A', copy=False)
 

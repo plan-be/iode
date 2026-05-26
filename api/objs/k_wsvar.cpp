@@ -1151,7 +1151,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     }
 
     std::string msg = std::to_string(objs_to_copy.size()) + " "; 
-    msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
+    msg += type_name + " read from file '" + file + "'";
     kmsg(msg.c_str());
 
     rc = KV_merge(shared_from_this(), from_ptr, 1);

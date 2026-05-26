@@ -625,7 +625,7 @@ error:
         tkdb = nullptr;
     }
 
-    error_msg += ".\nReset database '" + v_iode_types[this->k_type] + "'.";
+    error_msg += ".\nReset database '" + type_name + "s'.";
     kwarning(error_msg.c_str());
     return false;
 }
@@ -831,7 +831,7 @@ bool KDB::save(const std::string& filename, const bool compress)
 {
     if(this->size() == 0)
     {
-        std::string msg = "Database '" + v_iode_types[this->k_type] + "' is empty. ";
+        std::string msg = "Database '" + type_name + "s' is empty. ";
         msg += "Nothing to save.";
         kwarning(msg.c_str());
         return false;
@@ -849,7 +849,7 @@ bool KDB::save(const std::string& filename, const bool compress)
         // file_type < 0 --> unmanaged format
         if(file_type < 0)
         {
-            std::string error_msg = "Cannot save the '" + v_iode_types[this->k_type] + "' database.\n";   
+            std::string error_msg = "Cannot save the '" + type_name + "s' database.\n";   
             error_msg += "The filename '" + filename + "' has an invalid extension";
             kwarning(error_msg.c_str());
             return false;
@@ -862,7 +862,7 @@ bool KDB::save(const std::string& filename, const bool compress)
 
     if(_filepath_.size() >= sizeof(FNAME))
     {
-        std::string error_msg = "Cannot save the '" + v_iode_types[this->k_type] + "' database.\n";   
+        std::string error_msg = "Cannot save the '" + type_name + "s' database.\n";   
         error_msg += "The filepath '" + _filepath_ + "' is too long";
         throw std::invalid_argument(error_msg);
     }
@@ -908,7 +908,7 @@ bool KDB::save(const std::string& filename, const bool compress)
 
     if(!success)
     {
-        std::string error_msg = "Could not save the '" + v_iode_types[this->k_type] + "' database";
+        std::string error_msg = "Could not save the '" + type_name + "s' database";
         kwarning(error_msg.c_str());
     }
 
@@ -1045,7 +1045,7 @@ bool KDBInfo::predump(FILE* fd, const std::string& filepath, const int nb_objs)
     KDBInfo* xdr_kdb = nullptr;
     this->xdr(&xdr_kdb);
 
-    std::string error_msg = "Failed to save database '" + v_iode_types[this->k_type] + "' ";
+    std::string error_msg = "Failed to save database '" + type_name + "s' ";
     error_msg += "to the file '" + filepath + "'";
 
     // Dump KDB struct
@@ -1126,7 +1126,7 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     std::string tmp = trim(filename);
     std::string file_str = add_file_extension(tmp, ext);
 
-    std::string error_msg = "Failed to save database '" + v_iode_types[this->k_type] + "' ";
+    std::string error_msg = "Failed to save database '" + type_name + "s' ";
     error_msg += "to the file '" + file_str + "'";
 
     if(KDB::backup_enabled) 

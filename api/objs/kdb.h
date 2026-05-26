@@ -42,6 +42,7 @@ struct KDBInfo
     std::string description = "";           // short description of the content of the database
     char        k_compressed = 0;           // are the objects compressed in the file ? (LZH method, slow)
     std::string filepath = std::string(I_DEFAULT_FILENAME);     // filepath to the database file
+    std::string type_name = "";             // name of the type of objects in the database (e.g. "comment", "equation", etc.)
 
 protected:
     void set_mode(const short type)
@@ -89,6 +90,7 @@ public:
         this->k_db_type = is_global ? DB_GLOBAL: DB_STANDALONE;
         this->k_type = (short) type;
         this->set_mode(this->k_type);
+        this->type_name = to_lower(v_iode_types[this->k_type]);
     }
 
     KDBInfo(const KDBInfo& other)
@@ -100,6 +102,7 @@ public:
         this->description = other.description;
         this->k_compressed = other.k_compressed;
         this->filepath = other.filepath;
+        this->type_name = other.type_name;
     }
 
     ~KDBInfo() {}
@@ -236,12 +239,6 @@ public:
         return (IodeDatabaseType) this->k_db_type;
     }
 
-    std::string get_iode_type_str() const
-    { 
-        int _type_ = this->k_type;
-        return v_iode_types[_type_]; 
-    }
-
     std::string get_filename_utf8() const
     {
         if(!this->filepath.empty()) 
@@ -300,6 +297,7 @@ public:
     }
 
     virtual bool contains(const std::string& name) const = 0;
+    virtual std::string get_key(const std::string& name) const = 0;
     virtual int index_of(const std::string& name) const = 0;
     virtual const std::string& get_name(const int index) const = 0;
     virtual std::set<std::string> get_names() const = 0;
@@ -316,8 +314,7 @@ public:
         if(pattern == "*")
             return get_names();
 
-        std::string error_msg = "'" + v_iode_types[this->k_type] + "': ";
-        error_msg += "no names found matching the pattern '" + pattern + "'";
+        std::string error_msg = "No names found matching the pattern '" + pattern + "'";
         
         char* OLD_SEPS = A_SEPS;
         A_SEPS = (char*) " ,;\n\t\r";
@@ -336,13 +333,25 @@ public:
         // 1. convert char** -> std::vector<std::string>
         // 2. check that each name exists in the database (if must_exist == true)
         std::string name;
+        std::string key;
         int nb_names = SCR_tbl_size((unsigned char **) c_names);
         for(int i = 0; i < nb_names; i++)
         {
             name = std::string(c_names[i]);
-            if(must_exist && !contains(name))
+            if(name.empty())
                 continue;
-            names.insert(name);
+            
+            if(must_exist)
+            {
+                key = get_key(name);
+                if(!key.empty())
+                    names.insert(key);
+            }
+            else
+            {
+                key = to_key(name);
+                names.insert(key);
+            }
         }
         SCR_free_tbl((unsigned char **) c_names);
 
@@ -397,7 +406,7 @@ public:
     { 
         std::string msg = "Cannot save CSV: ";
         msg += "CSV saving is not implemented for database of type ";
-        msg += "'" + v_iode_types[this->k_type] + "s'";
+        msg += "'" + type_name + "s'";
         throw std::runtime_error(msg); 
     }
 };
@@ -430,8 +439,8 @@ private:
         {
             if(!other_ptr->contains(name))
             {
-                std::string error_msg = v_iode_types[this->k_type];
-                error_msg += " with '" + name + "' not found in the source database";
+                std::string error_msg = type_name + " with '" + name + "' ";
+                error_msg += "not found in the source database";
                 kwarning(error_msg.c_str());
                 success = false;
                 continue;
@@ -454,8 +463,8 @@ private:
         {
             if(!other_ptr->contains(name))  
             {
-                std::string error_msg = v_iode_types[this->k_type];
-                error_msg += " with '" + name + "' not found in the source database";
+                std::string error_msg = type_name + " with '" + name + "' ";
+                error_msg += "not found in the source database";
                 kwarning(error_msg.c_str());
                 success = false;
                 continue;
@@ -504,7 +513,7 @@ protected:
             catch(const std::bad_weak_ptr&)
             {
                 std::string error_msg = "Internal error: top-level database of type '";
-                error_msg += v_iode_types[this->k_type] + "' is not managed by a shared_ptr";
+                error_msg += type_name + "s' is not managed by a shared_ptr";
                 throw std::runtime_error(error_msg);
             }
         }
@@ -514,7 +523,7 @@ protected:
             if(!parent_ptr)
             {
                 std::string error_msg = "Internal error: subset database of type '";
-                error_msg += v_iode_types[this->k_type] + "' has a null parent database";;
+                error_msg += type_name + "s' has a null parent database";;
                 throw std::runtime_error(error_msg);
             }
             return parent_ptr;
@@ -557,7 +566,7 @@ protected:
             return;
 
         std::string error_msg = "Cannot create a copy of the database of type '";
-        error_msg += v_iode_types[this->k_type] + "'";
+        error_msg += type_name + "s'";
 
         std::set<std::string> subset_keys;
         try
@@ -576,8 +585,8 @@ protected:
         {
             if(!other.contains(name))  
             {
-                std::string error_msg = v_iode_types[this->k_type];
-                error_msg += " with '" + name + "' not found in the source database";
+                std::string error_msg = type_name + " with '" + name + "' ";
+                error_msg += "not found in the source database";
                 kwarning(error_msg.c_str());
                 success = false;
                 continue;
@@ -653,7 +662,7 @@ public:
     virtual std::shared_ptr<D> get_subset(const std::string& pattern, const bool copy)
     {
         std::string error_msg = "Cannot create a subset the database of type '";
-        error_msg += v_iode_types[this->k_type] + "' using the pattern '";
+        error_msg += type_name + "s' using the pattern '";
         error_msg += pattern + "'";
     
         std::set<std::string> subset_keys;
@@ -705,10 +714,62 @@ public:
         return (int) k_objs.size();
     }
 
+    /**
+     * @brief Checks if a name exists in the database
+     * @details Performs case-sensitive lookup based on the database mode.
+     *          for COMMENTS, searches for a matching key with case-insensitive comparison.
+     * @param name The name to search for
+     * @return true if the name exists in the database, false otherwise
+     */
     bool contains(const std::string& name) const override
     {
-        std::string key = to_key(name);
-        return k_objs.contains(key);
+        if(this->k_type == COMMENTS)
+        {
+            std::string lowercase_name = to_lower(trim(name));
+            for(const auto& [k, _] : k_objs)
+            {
+                if(to_lower(k) == lowercase_name)
+                    return true;
+            }
+            return false;
+        }
+        else
+        {
+            std::string key = to_key(name);
+            return k_objs.contains(key);
+        }
+    }
+
+    /**
+     * @brief Retrieves the actual key for a given name
+     * @details Performs case-sensitive lookup based on the database mode.
+     *          for COMMENTS, searches for a matching key with case-insensitive comparison.
+     * @param name The name to search for
+     * @return The actual key if found, empty string otherwise
+     */
+    std::string get_key(const std::string& name) const override
+    {
+        std::string key = "";
+        if(this->k_type == COMMENTS)
+        {
+            bool found = false;
+            std::string lowercase_name = to_lower(trim(name));
+            for(const auto& [k, _] : k_objs)
+            {
+                if(to_lower(k) == lowercase_name)
+                {
+                    key = k;
+                    found = true;
+                }
+            }
+        }
+        else
+        {
+            key = to_key(name);
+            if(!contains(key))
+                key = "";
+        }
+        return key;
     }
 
     bool parent_contains(const std::string& name) const
@@ -829,8 +890,7 @@ public:
         std::shared_ptr<D> top_db = get_top_level_db();
         if(!(this->contains(key) && top_db->contains(key)))
         {
-            std::string str_type = v_iode_types[this->k_type];
-            std::string msg = "Cannot remove " + str_type + ": no " + str_type +
+            std::string msg = "Cannot remove " + type_name + ": no " + type_name +
                               " named '" + key + "' found in the database";
             kwarning(msg.c_str());
             return false;
@@ -912,7 +972,7 @@ public:
         catch(const std::bad_weak_ptr&)
         {
             std::string error_msg = "Internal error: top-level database of type '";
-            error_msg += v_iode_types[this->k_type] + "' is not managed by a shared_ptr";
+            error_msg += type_name + "s' is not managed by a shared_ptr";
             throw std::runtime_error(error_msg);
         }
         
@@ -955,7 +1015,7 @@ public:
         }
     
         std::string msg = std::to_string(objs_to_copy.size()) + " "; 
-        msg += to_lower(v_iode_types[this->k_type]) + " read from file '" + file + "'";
+        msg += type_name + " read from file '" + file + "'";
         kmsg(msg.c_str());
     
         for(const std::string& name : objs_to_copy)
@@ -1034,11 +1094,10 @@ public:
     //       T& operator[](const std::string& name)
     std::shared_ptr<T> get_obj_ptr(const std::string& name) const
     {
-        std::string key = to_key(name);
+        std::string key = get_key(name);
         if(key.empty())
         {
-            std::string error_msg = "Cannot get an object with an empty name from the ";
-            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            std::string error_msg = "Cannot get a(n) " + type_name + " with an empty name";
             throw std::invalid_argument(error_msg);
         }
 
@@ -1048,8 +1107,7 @@ public:
         }
         catch(const std::out_of_range&)
         {
-            std::string error_msg = v_iode_types[this->k_type] + " with name ";
-            error_msg += "'" + name + "' not found in the database";
+            std::string error_msg = type_name + " with name '" + name + "' not found";
             throw std::invalid_argument(error_msg);
         }
     }
@@ -1060,8 +1118,7 @@ public:
         std::string key = to_key(name);
         if(key.empty())
         {
-            std::string error_msg = "Cannot set an object with an empty name in the ";
-            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            std::string error_msg = "Cannot add or update a(n) " + type_name + " with an empty name";
             throw std::invalid_argument(error_msg);
         }
 
@@ -1069,8 +1126,8 @@ public:
 
         if(obj_ptr.get() == nullptr)
         {
-            std::string error_msg = "Cannot set a null object with name '" + name + "' in the ";
-            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            std::string error_msg = "Cannot add or update a null " + type_name; 
+            error_msg += " (name = '" + name + "')";
             throw std::invalid_argument(error_msg);
         }
 
@@ -1080,12 +1137,14 @@ public:
         {
             // if the object already exists in the top-level database
             // -> check if it's the same shared_ptr
-            if(top_db->contains(key))
+            // NOTE: use get_key() to handle the case k_mode == ASIS_CASE
+            std::string existing_key = top_db->get_key(key);
+            if(!existing_key.empty())
             {
                 // NOTE: if the object already exists in the top-level database
                 //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
-                if(top_db->k_objs[key] == obj_ptr)
+                if(top_db->k_objs[existing_key] == obj_ptr)
                     return obj_ptr;
                 // No need to delete - shared_ptr handles memory management automatically
             }     
@@ -1093,12 +1152,14 @@ public:
         else
         {
             // if the object already exists in this database -> check if it's the same shared_ptr
-            if(this->contains(key))
+            // NOTE: use get_key() to handle the case k_mode == ASIS_CASE
+            std::string existing_key = this->get_key(key);
+            if(!existing_key.empty())
             {
                 // NOTE: if the object already exists in the database
                 //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
-                if(this->k_objs[key] == obj_ptr)
+                if(this->k_objs[existing_key] == obj_ptr)
                     return obj_ptr;
                 // No need to delete - shared_ptr handles memory management automatically
             }
@@ -1112,7 +1173,7 @@ public:
         //       created only once.
         obj_ptr = std::make_shared<T>(*obj_ptr);
 
-        this->set_obj_ptr_no_check(name, obj_ptr);
+        this->set_obj_ptr_no_check(key, obj_ptr);
         return obj_ptr;
     }
 
@@ -1121,8 +1182,7 @@ public:
         std::shared_ptr<T> obj_ptr = this->get_obj_ptr(name);
         if(obj_ptr.get() == nullptr)
         {
-            std::string error_msg = "Cannot get a null object with name '" + name + "' from the ";
-            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            std::string error_msg = "Cannot get a null " + type_name + " with name '" + name + "'";
             throw std::runtime_error(error_msg);
         }
 
@@ -1131,15 +1191,38 @@ public:
 
     void set(const std::string& name, const T& obj)
     {
+        // NOTE: make_shared creates a copy of 'obj'.
+        //       We DO NOT use std::make_shared<T>(&obj) because this is dangerous and 
+        //       not recommended because the shared_ptr will try to delete 'obj' when  
+        //       it goes out of scope, leading to undefined behavior.
+        std::shared_ptr<T> obj_ptr = std::make_shared<T>(obj);
+        this->set_obj_ptr(name, obj_ptr);
+    }
+
+    virtual bool add(const std::string& name, const T& obj)
+    {
         std::string key = to_key(name);
         if(key.empty())
         {
-            std::string error_msg = "Cannot set an object with an empty name in the ";
-            error_msg += "database of type '" + v_iode_types[this->k_type] + "'";
+            std::string error_msg = "Cannot add a(n) " + type_name + " with an empty name";
             throw std::invalid_argument(error_msg);
         }
 
         check_name(key, this->k_type);
+
+        if(this->contains(key))
+        {
+            std::string error_msg = "Cannot add a(n) " + type_name + ": a(n) " + type_name; 
+            error_msg += " named '" + key + "' already exists";
+            throw std::invalid_argument(error_msg);
+        }
+    
+        if(this->parent_contains(key))
+        {
+            std::string error_msg = "Cannot add a(n) " + type_name + ": a(n) " + type_name; 
+            error_msg += " named '" + key + "' already in the parent database of the present subset";
+            throw std::invalid_argument(error_msg);
+        }
 
         // NOTE: make_shared creates a copy of 'obj'.
         //       We DO NOT use std::make_shared<T>(&obj) because this is dangerous and 
@@ -1147,26 +1230,6 @@ public:
         //       it goes out of scope, leading to undefined behavior.
         std::shared_ptr<T> obj_ptr = std::make_shared<T>(obj);
         this->set_obj_ptr_no_check(key, obj_ptr);
-    }
-
-    virtual bool add(const std::string& name, const T& obj)
-    {
-        std::string key = to_key(name);
-        if(this->contains(key))
-        {
-            std::string msg = "Cannot add list: a list named '" + key + 
-                              "' already exists in the database.";
-            throw std::invalid_argument(msg);
-        }
-    
-        if(this->parent_contains(key))
-        {
-            std::string msg = "Cannot add list: a list named '" + key + 
-                              "' exists in the parent database of the present subset";
-            throw std::invalid_argument(msg);
-        }
-
-        this->set(key, obj);
         return true;
     }
 

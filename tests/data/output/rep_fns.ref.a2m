@@ -162,7 +162,7 @@ Coin salarial parafiscal"
                 
 @cvalue()             
 --------      
-        @cvalue(acaf)                 =>  "Cmt acaf not found"
+        @cvalue(acaf)                 =>  "Ondernemingen: ontvangen kapitaaloverdrachten."
         @cvalue(ACAF)                 =>  "Ondernemingen: ontvangen kapitaaloverdrachten."
         @cvalue(ACAG)                 =>  "Totale overheid: netto ontvangen kapitaaloverdrachten."
         @cvalue(ACAF,ACAG)            =>  "Ondernemingen: ontvangen kapitaaloverdrachten.;Totale overheid: netto ontvangen kapitaaloverdrachten."

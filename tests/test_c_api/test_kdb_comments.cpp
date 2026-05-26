@@ -201,7 +201,7 @@ TEST_F(KDBCommentsTest, CreateRemove)
     // - name starting with a umber
     EXPECT_THROW(global_ws_cmt->add("1_NEW_NAME", new_comment), std::invalid_argument);
     // - name using forbidden special characters
-    EXPECT_THROW(global_ws_cmt->add("N�W_N@ME", new_comment), std::invalid_argument);
+    EXPECT_THROW(global_ws_cmt->add("NÊW_N@ME", new_comment), std::invalid_argument);
     // - name already exists
     name = global_ws_cmt->get_name(3);
     EXPECT_THROW(global_ws_cmt->add(name, new_comment), std::invalid_argument);
@@ -303,6 +303,15 @@ TEST_F(KDBCommentsTest, Filter)
     EXPECT_EQ(kdb_subset_subset->get_names(), expected_names_subset_subset);
     kdb_subset->clear();
     kdb_subset_subset->clear();
+
+    // pattern with wrong upper/lower case
+    pattern = "a*;gosh_;Paf_;PC_";
+    expected_names.clear();
+    expected_names = {"ACAF", "ACAG", "AOUC", "AQC", "GOSH_", "PC_"};
+    kdb_subset = global_ws_cmt->get_subset(pattern, false);
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    kdb_subset->clear();
 }
 
 TEST_F(KDBCommentsTest, DeepCopy)

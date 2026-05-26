@@ -166,6 +166,15 @@ TEST_F(KDBListsTest, Filter)
     // wrong pattern
     pattern = "anjfks";
     EXPECT_THROW(global_ws_lst->get_subset(pattern, false), std::runtime_error);
+
+    // pattern with wrong upper/lower case
+    pattern = "c*;endo;MainEq;TOTAL";
+    expected_names.clear();
+    expected_names = {"COPY", "COPY0", "COPY1", "ENDO", "MAINEQ", "TOTAL"};
+    kdb_subset = global_ws_lst->get_subset(pattern, false);
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    kdb_subset->clear();
 }
 
 TEST_F(KDBListsTest, DeepCopy)
