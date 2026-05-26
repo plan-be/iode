@@ -17,6 +17,9 @@ Improvements
 - PYTHON: made :meth:`Variables.from_frame` and :meth:`Variables.from_array` methods to 
   also accept columns / time axis with labels of type int (closes :issue:`1151`) 
 
+- PYTHON / GUI: allowed to use either lower or upper case in patterns to filter IODE 
+  objects from any workspace. 
+
 Fixed Bugs 
 ----------
 

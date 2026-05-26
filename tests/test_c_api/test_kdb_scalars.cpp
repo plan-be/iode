@@ -194,6 +194,15 @@ TEST_F(KDBScalarsTest, Filter)
     // wrong pattern
     pattern = "anjfks";
     EXPECT_THROW(global_ws_scl->get_subset(pattern, false), std::runtime_error);
+
+    // pattern with wrong upper/lower case
+    pattern = "A*;dlnPAF;DPUH_1;dpuh_2";
+    expected_names.clear();
+    expected_names = {"acaf1", "acaf2", "acaf3", "acaf4", "dlnpaf", "dpuh_1", "dpuh_2"};
+    kdb_subset = global_ws_scl->get_subset(pattern, false);
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    kdb_subset->clear();
 }
 
 TEST_F(KDBScalarsTest, DeepCopy)

@@ -215,6 +215,15 @@ TEST_F(KDBIdentitiesTest, Filter)
     // wrong pattern
     pattern = "anjfks";
     EXPECT_THROW(global_ws_idt->get_subset(pattern, false), std::runtime_error);
+
+    // pattern with wrong upper/lower case
+    pattern = "a*;gap_;GosFr;KL";
+    expected_names.clear();
+    expected_names = {"AOUC", "AOUC_", "GAP_", "GOSFR", "KL"};
+    kdb_subset = global_ws_idt->get_subset(pattern, false);
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    kdb_subset->clear();
 }
 
 TEST_F(KDBIdentitiesTest, DeepCopy)

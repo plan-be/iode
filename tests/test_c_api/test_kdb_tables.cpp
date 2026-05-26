@@ -364,6 +364,15 @@ TEST_F(KDBTablesTest, Filter)
     // wrong pattern
     pattern = "anjfks";
     EXPECT_THROW(global_ws_tbl->get_subset(pattern, false), std::runtime_error);
+
+    // pattern with wrong upper/lower case
+    pattern = "a*;envi;Mult1Fr;NATY";
+    expected_names.clear();
+    expected_names = {"ANAKNFF", "ANAPRIX", "ENVI", "MULT1FR", "NATY"};
+    kdb_subset = global_ws_tbl->get_subset(pattern, false);
+    EXPECT_EQ(kdb_subset->size(), expected_names.size());
+    EXPECT_EQ(kdb_subset->get_names(), expected_names);
+    kdb_subset->clear();
 }
 
 TEST_F(KDBTablesTest, DeepCopy)

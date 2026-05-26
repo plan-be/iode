@@ -84,8 +84,7 @@ std::string KDBIdentities::get_lec(const std::string& name) const
 {
     // throw exception if object with passed position is not valid
     if(!this->contains(name))
-        throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + 
-                                    "' in the database of '" + get_iode_type_str() + "'.\n" +  
+        throw std::invalid_argument("Cannot get the LEC of the identity with name '" + name + "'.\n" +  
                                     "The identity with name '" + name + "' does not exist.");
     std::shared_ptr<Identity> idt = this->get_obj_ptr(name);
     std::string lec = idt->get_lec();
@@ -174,8 +173,8 @@ bool KDBIdentities::obj_to_binary(char** pack, const std::string& name)
     std::shared_ptr<Identity> idt = this->get_obj_ptr(name);
     if(!idt)
     {
-        std::string error_msg = "Cannot serialize identity with name '" + name + 
-                                "': no identity with this name exists in the database of '" + get_iode_type_str() + "'.";
+        std::string error_msg = "Cannot serialize identity with name '" + name + "': ";
+        error_msg += "no identity with this name exists";
         kwarning(error_msg.c_str());
         return false;
     }
