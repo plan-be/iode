@@ -131,7 +131,7 @@ class IodeDatabase:
         """
         return self._cy_database.get_is_detached()
 
-    def subset(self, Self, pattern: str, copy: bool) -> Self:
+    def subset(self, pattern: str, copy: bool) -> Self:
         r"""
         Create a subset of the database filtered by a name pattern.
 
