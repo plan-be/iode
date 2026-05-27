@@ -231,6 +231,7 @@ class IodeAbstractTableView(QTableView):
         # check if the sample of the IODE Variables database is set 
         if variables.nb_periods:
             return True
+
         # if not -> ask to set it
         else:
             reply = QMessageBox.question(None, "Variables sample", "Variables sample undefined. Set it?",
@@ -590,6 +591,8 @@ class IodeAbstractTableView(QTableView):
     def open_add_dialog(self):
         model: IodeAbstractTableModel = self.model()
         add_dialog = self._open_add_dialog()
+        if add_dialog is None:
+            return
         add_dialog.new_object_inserted.connect(self.new_object_inserted)
         if add_dialog.exec() == QDialog.DialogCode.Accepted:
             model.reset()
