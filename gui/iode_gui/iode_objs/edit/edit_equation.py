@@ -76,8 +76,7 @@ class EditEquationDialog(MixinSettingsDialog):
                 self.ui.lineEdit_name.setReadOnly(False)
 
                 # try to get the sample from the Variables workspace
-                from_period = ""
-                to_period = ""
+                from_period, to_period = "", ""
                 vars_sample = variables.sample
                 if vars_sample.start is None or vars_sample.end is None:
                     try:
@@ -88,17 +87,20 @@ class EditEquationDialog(MixinSettingsDialog):
                             to_period = dialog.to_period
                             variables.sample = f"{from_period}:{to_period}"
                     except Exception as e:
-                        QMessageBox.warning(None, "WARNING", str(e)) 
+                        from_period, to_period = "", ""
+                        QMessageBox.warning(None, "WARNING", str(e))
                 else:
                     from_period = str(vars_sample.start)
                     to_period = str(vars_sample.end)
                 
-                self.ui.sampleEdit_from.setText(from_period)
-                self.ui.sampleEdit_to.setText(to_period)
-
-                self.edit_est_eqs = EditAndEstimateEquations(from_period, to_period)
+                if from_period and to_period:
+                    self.ui.sampleEdit_from.setText(from_period)
+                    self.ui.sampleEdit_to.setText(to_period)
+                    self.edit_est_eqs = EditAndEstimateEquations(from_period, to_period)
+                else:
+                    self.edit_est_eqs = None     
         except Exception as e:
-            self.edit_est_eqs = EditAndEstimateEquations()
+            self.edit_est_eqs = None
             QMessageBox.warning(None, "WARNING", str(e))
 
     # same as ODE_blk_check() from o_est.c from the old GUI
@@ -116,12 +118,13 @@ class EditEquationDialog(MixinSettingsDialog):
         if not block:
             block = current_eq_name
 
-        # Update block in edit_est_eqs
-        self.edit_est_eqs.block = block, current_eq_name
+        if self.edit_est_eqs is not None:
+            # Update block in edit_est_eqs
+            self.edit_est_eqs.block = block, current_eq_name
+            # The list of equations to estimate (block) may have been changed.
+            # See EditAndEstimateEquations.block
+            block = self.edit_est_eqs.block
 
-        # The list of equations to estimate (block) may have been changed.
-        # See EditAndEstimateEquations.block
-        block = self.edit_est_eqs.block
         self.ui.lineEdit_block.setText(block)
 
     # same as ODE_blk_save_cur() from o_est.c from the old GUI
@@ -129,9 +132,17 @@ class EditEquationDialog(MixinSettingsDialog):
         """Saves the current equation."""
         self._update_list_of_equations_to_estimate()
         lec = self.ui.textEdit_lec.toPlainText()
+        if not lec:
+            current_eq_name = self.ui.lineEdit_name.text()
+            lec = f"{current_eq_name} := 0"
         comment = self.ui.lineEdit_comment.text()
-        self.edit_est_eqs.update_current_equation(lec, comment)
-        self.edit_est_eqs.update_scalars()
+        if self.edit_est_eqs is None:
+            endogenous = self.ui.lineEdit_name.text()
+            block = self.ui.lineEdit_block.text()
+            self.eq = Equation(endogenous=endogenous, lec=lec, block=block, comment=comment)
+        else:
+            self.edit_est_eqs.update_current_equation(lec, comment)
+            self.edit_est_eqs.update_scalars()
 
     def _update_estimation_sample(self):
         """Updates the estimation sample."""
@@ -154,8 +165,7 @@ class EditEquationDialog(MixinSettingsDialog):
                         to_period = dialog.to_period
                         variables.sample = f"{from_period}:{to_period}"
                 except Exception as e:
-                    from_period = ""
-                    to_period = ""
+                    from_period, to_period = "", ""
                     QMessageBox.warning(None, "WARNING", str(e))
             else:
                 if not from_period:
@@ -194,23 +204,44 @@ class EditEquationDialog(MixinSettingsDialog):
         try:
             self._save_current_equation()
 
-            if not self.edit_est_eqs.is_done:
-                self.edit_est_eqs.update_scalars()
-                instruments = self.ui.lineEdit_instruments.text()
-                self.edit_est_eqs.instruments = instruments
-
-            hash_before = hash(equations)
-
+            instruments = self.ui.lineEdit_instruments.text()
             from_period = self.ui.sampleEdit_from.text()
             to_period = self.ui.sampleEdit_to.text()
 
-            v_new_eqs = self.edit_est_eqs.save(from_period, to_period)
-            for name in v_new_eqs:
-                self.new_object_inserted.emit(name)
+            if self.edit_est_eqs is None:
+                if not self.eq:
+                    return
+                
+                self.eq.instruments = instruments
+                self.eq.sample = f"{from_period}:{to_period}"
 
-            hash_after = hash(equations)
-            if hash_after != hash_before:
-                self.database_modified.emit()
+                name = self.ui.lineEdit_name.text()
+                new_eq = name in equations
+
+                hash_before = hash(equations)
+                equations[name] = self.eq
+
+                if new_eq:
+                    self.new_object_inserted.emit(name)
+
+                hash_after = hash(equations)
+                if hash_after != hash_before:
+                    self.database_modified.emit()
+
+            else:
+                if not self.edit_est_eqs.is_done:
+                    self.edit_est_eqs.update_scalars()
+                    self.edit_est_eqs.instruments = instruments
+
+                hash_before = hash(equations)
+
+                v_new_eqs = self.edit_est_eqs.save(from_period, to_period)
+                for name in v_new_eqs:
+                    self.new_object_inserted.emit(name)
+
+                hash_after = hash(equations)
+                if hash_after != hash_before:
+                    self.database_modified.emit()
 
             self.accept()
         except Exception as e:
@@ -222,6 +253,10 @@ class EditEquationDialog(MixinSettingsDialog):
         """Displays the coefficients."""
         try:
             self._save_current_equation()
+            if self.edit_est_eqs is None:
+                QMessageBox.warning(None, "WARNING", "Sample for the Variables workspace is not defined. "
+                                    "Please define it before trying to display the coefficients.")
+                return
             dialog = EstimationCoefsDialog(self.edit_est_eqs)
             dialog.exec()
         except Exception as e:
@@ -231,9 +266,15 @@ class EditEquationDialog(MixinSettingsDialog):
     @Slot()
     def estimate(self):
         """Estimates the equation."""
+        if self.edit_est_eqs is None:
+            QMessageBox.warning(None, "WARNING", "Sample for the Variables workspace is not defined. "
+                                "Please define it before trying to perform an estimation.")
+
         warnings.simplefilter("error")
         try:
             self._save_current_equation()
+            if self.edit_est_eqs is None:
+                return
 
             # set method
             method_index = self.ui.comboBox_method.currentIndex()
@@ -270,6 +311,9 @@ class EditEquationDialog(MixinSettingsDialog):
     @Slot()
     def next(self):
         """Moves to the next equation."""
+        if self.edit_est_eqs is None:
+            return
+        
         try:
             # Save the current equation
             self._save_current_equation()
@@ -297,7 +341,7 @@ class EditEquationDialog(MixinSettingsDialog):
     @Slot()
     def results(self):
         """Displays the results."""
-        if self.edit_est_eqs.is_done:
+        if self.edit_est_eqs is not None and self.edit_est_eqs.is_done:
             try:
                 dialog = EstimationResultsDialog(self.edit_est_eqs, self)
                 dialog.setup(self.main_window)

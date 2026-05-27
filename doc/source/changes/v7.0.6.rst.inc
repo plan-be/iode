@@ -33,6 +33,9 @@ Fixed Bugs
 - GUI: fixed filtering objects when the pattern represents a unique object 
   (closes :issue:`1192`)
 
+- GUI: fixed creating and saving an equation when the sample of the Variables workspace 
+  is not defined (closes :issue:`1195`)
+
 Miscellaneous 
 -------------
 
