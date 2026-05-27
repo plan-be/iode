@@ -64,7 +64,6 @@ cdef class Sample:
 
     def get_period_list(self, astype: str) -> Union[List[str], List[float]]:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return []       
         
         if astype == 'float':
@@ -76,16 +75,15 @@ cdef class Sample:
 
     def intersection(self, other_sample: Sample) -> Sample:
         if self.is_undefined():
-            raise RuntimeError("'sample' is not defined")
+            raise RuntimeError("'this' in 'this.intersection(other)' represents an empty sample")
         if other_sample.is_undefined():
-            raise RuntimeError("Passed sample to 'intersection(sample)' represents an empty sample")
+            raise RuntimeError("'other' in 'this.intersection(other)' represents an empty sample")
         
         cdef CSample c_sample_inter = self.c_sample.intersection(dereference(other_sample.c_sample))
         return Sample._from_ptr(new CSample(c_sample_inter), <bint>True)
 
     def get_start(self) -> Period:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return None
         
         c_period = self.c_sample.start_period
@@ -93,7 +91,6 @@ cdef class Sample:
 
     def get_end(self) -> Period:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return None
         
         c_period = self.c_sample.end_period
@@ -101,14 +98,12 @@ cdef class Sample:
 
     def get_nb_periods(self) -> int:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return 0
         
         return self.c_sample.nb_periods
 
     def __len__(self) -> int:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return 0
         
         return self.c_sample.nb_periods
@@ -118,21 +113,19 @@ cdef class Sample:
             warnings.warn("'sample' in 'sample == other' is not defined")
             return False
         elif other.is_undefined():
-            warnings.warn("other sample in 'sample == other' is not defined")
+            warnings.warn("'other' sample in 'sample == other' is not defined")
             return False
         else:
             return str(self) == str(other)
 
     def __str__(self) -> str:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return str(None)
         else:
             return str(self.get_start()) + ":" + str(self.get_end())
 
     def __repr__(self) -> str:
         if self.is_undefined():
-            warnings.warn("'sample' is not defined")
             return str(None)
         else:
             return f'Sample("{self.get_start()}:{self.get_end()}")'
