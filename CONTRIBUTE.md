@@ -2,7 +2,7 @@
 
 - Required tools:
   - **Windows**:
-    - Compiler **MSVC 2022**.
+    - Compiler **MSVC >= 2022**.
     - [CMake](https://cmake.org/download) (>= 3.30) (*) -> controls the software compilation process.
     - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
     <br> Can be installed using [winget](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages#windows) on Windows:
@@ -38,7 +38,7 @@
    - pkginfo >1.12
    - setuptools >=77
    - setuptools-scm
-   - twine <=6.0.0
+   - twine
    - conda-build
    - conda-verify
    - anaconda-client
