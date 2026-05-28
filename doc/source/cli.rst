@@ -11,7 +11,7 @@ performed in the graphical interface.
 
 Syntax::
 
-    iodecmd [-nbrun n] [-alloclog filename] [-v] [-y] [-h] reportfile [arg1] ... [argn]
+    iodecmd [-nbrun n] [-alloclog filename] [-v] [-y] [-h] reportfile.rep [arg1] ... [argn]
 
 where:
 
@@ -20,7 +20,7 @@ where:
 - ``v``: verbose mode (all messages displayed)
 - ``y``: answer yes to all questions asked during the report execution
 - ``h``: display the `iodecmd` options
-- ``reportfile arg1 ...``: *IODE report* to be executed including its optional arguments
+- ``reportfile.rep arg1 ...``: *IODE report* to be executed including its optional arguments
 
 -nbrun
 ------

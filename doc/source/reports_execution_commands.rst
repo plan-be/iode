@@ -849,9 +849,10 @@ Their values are set as follows:
 - If there are fewer or an equal number of actual parameters than formal parameters, 
   the values of the actual parameters are assigned in order to the first formal parameters. 
   Any extra formal parameters are considered empty.
-- If there are more actual parameters than formal parameters, the formal parameters (except 
-  the last one) receive the values of the first actual parameters, in the order they are passed. 
-  The last formal parameter receives the value of all remaining actual parameters.
+- If there are more actual parameters than formal parameters, the formal parameters 
+  (except the last one) receive the values of the first actual parameters, in the order 
+  they are passed. The last formal parameter receives the value of all remaining actual 
+  parameters.
 
 Example with more actual parameters than formal parameters::
 

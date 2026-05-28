@@ -12,6 +12,8 @@ Improvements
 
 - DOC: added new tutorial section for the `LEC language` in the documentation.
 
+- DOC: added new tutorial section for the `IODE reports` in the documentation.
+
 Fixed Bugs 
 ----------
 
