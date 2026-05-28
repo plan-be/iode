@@ -516,7 +516,7 @@ Then, to upload the conda packages to the Anaconda repository, you have to run:
 ```bash
 root_dir_iode> anaconda login
 root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-py*.conda
-root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noarch/iode_gui-<version>-py*.conda
+root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noarch/iode-gui-<version>-py*.conda
 ```
 
 ## After the release
