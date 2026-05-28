@@ -3522,7 +3522,7 @@ Example::
 
 .. _idtexecutesclfiles:
 
-COMMAND IDTEXECUTEScalarFILES
+COMMAND IDTEXECUTESCLFILES
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command is part of a group of commands that allow you to specify additional parameters 
@@ -3555,7 +3555,7 @@ Exemple::
     $IdtExecuteSclFiles WS maribel.scl test.scl
 
 
-Report operations 
+Report operations
 ~~~~~~~~~~~~~~~~~
 
 The following commands allow you to manipulate reports (these functions are recursive):

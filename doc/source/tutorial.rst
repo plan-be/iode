@@ -14,6 +14,11 @@ LEC language
 
 .. include:: ./tutorial/tutorial_lec_language.rst
 
+IODE reports
+------------
+
+.. include:: ./tutorial/tutorial_iode_reports.rst
+
 Python Package
 --------------
 

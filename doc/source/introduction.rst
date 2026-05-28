@@ -218,6 +218,99 @@ Summary:
 - During the session, objects are modified, created, or deleted in the workspaces
 - At the end of the session (or at any time), you must save the workspace to files on disk in order to retrieve them in later sessions.  
 
+.. _generalized_sample:
+
+Generalized Sample and Extra Files
+----------------------------------
+
+An IODE table is computed according to a *generalized sample* and optional *extra files*.
+ 
+A *generalized sample* contains the following information:
+    
+- the sampling of the periods to take into account 
+- the operations to be performed on the periods
+- the list of files involved in the computation of the table
+- the operations to be performed between files
+- the repetition factor
+    
+The syntax of the *generalized sample* follows the rules described below. 
+
+Syntax for Periods
+~~~~~~~~~~~~~~~~~~
+    
+- a period is indicated as in LEC: `yyPpp` or `yyyyPpp` where *yyyy* indicates the year, 
+  *P* the periodicity and *pp* the sub-period (e.g. 1990Y1) 
+- a period can be shifted n periods to the left or right using the operators `<n` and `>n` 
+- when used with a zero argument, the shift operators have a special meaning: 
+
+    - `<0` means "first period of the year" 
+    - `>0` means "last period of the year" 
+
+- the special periods 'BOS', 'EOS' and 'NOW' can be used to represent the beginning 
+  or end of the current sample or the current period (PC clock)
+- the special periods 'BOS1', 'EOS1' and 'NOW1' are equivalent to the previous ones, 
+  except that they are moved to the first sub-period of the year of 'BOS', 'EOS' and 
+  'NOW' respectively (if NOW = 2012M5, NOW1 = 2012M1)
+- each period is separated from the next by a semicolon 
+- a period or group of periods can be repeated: simply place the colon character (`:`) after 
+  the definition of the column or group of columns, followed by the desired number of repetitions. 
+  Repetitions are made with an increment of one period, unless followed by an asterisk and a value. 
+  This value is then the repeat increment. It can be negative, in which case the periods are 
+  presented in decreasing order
+- the repeat, increment and shift can be the words PER (or P) or SUB (or S), which 
+  respectively indicate the number of periods in a year of the current sample and 
+  the current sub-period
+- the file definition is optional and is enclosed in square brackets. 
+  It applies to all preceding period definitions.
+    
+Operations on Periods
+~~~~~~~~~~~~~~~~~~~~~
+    
+- value: (75) 
+- growth rate over one or more periods: (75/74, 75/70) 
+- average growth rate: (75//70) 
+- difference: (75-74, 75-70) 
+- average difference: (75--70) 
+- average: (75~74) or (75^74) 
+- sum of consecutive periods: (70Q1+70Q4) 
+- index or base value: (76=70) 
+
+Periods Repetition
+~~~~~~~~~~~~~~~~~~
+
+Repetition can be performed with an increment greater than 1 or less than 0: 
+simply place a star followed by the step after the number of repetitions 
+(70:3*5 = 70, 75, 80).
+
+Syntax for Files
+~~~~~~~~~~~~~~~~
+    
+- absolute value: [1] 
+- difference: [1-2] 
+- difference in percent: [1/2] 
+- sum: [1+2] 
+- average: [1~2] or [1^2]. 
+    
+The file [1] always refers to the current workspace. 
+Extra files (if passed as argument) are numerated from 2 to 5. 
+        
+Examples
+~~~~~~~~
+
+.. code-block:: none
+
+    70; 75; 80:6 = 70:3*5; 81:5 = 70; 75; 80; 81; 82; 83; 84; 85
+    70/69:2 = 70/69; 71/70
+    (70; 70-69):2 = 70; 70-69; 71; 71-70;
+    70[1,2]:2*5 = 70[1]; 70[2]; 75[1]; 75[2]
+    (70;75)[1,2-1] = 70[1]; 75[1]; 70[2-1]; 75[2-1]
+    (70;75;(80; 80/79):2)[1,2] = 70[1]; 70[2]; 75[1]; 75[2]; 80[1]; 80[2]; 80/79[1]; 80/79[2] 81[1]; 8[2]; 8180[1]; 81/80[2]
+    2000Y1>5 = 2005Y1
+    1999M1>12 = 2000M1
+    EOS<1 = 2019Y1                         (if EOS == 2020Y1)
+    BOS<1 = 1959Y1                         (if BOS == 1960Y1)
+    EOS<4:5*-1 =2016;2017;2018;2019;2020   (if EOS = 2020Y1)
+
 LEC - the IODE Formula Language
 -------------------------------
 
