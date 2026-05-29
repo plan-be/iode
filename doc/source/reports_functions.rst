@@ -1390,5 +1390,5 @@ See example in the function :ref:`@SimEps <simeps>`.
 Python equivalent functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To get the Python equivalent of the above functions, refers to the 
-:ref:`Equivalence Between IODE Report And Python Functions <report_funcs_equivalence>` table.
+To get the Python equivalent of the above IODE commands, refers to the 
+:ref:`API Reference <start_api_reports>` tables.

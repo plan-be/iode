@@ -996,5 +996,5 @@ The result produced is as follows::
 Python equivalent functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To get the Python equivalent of the above commands, refers to the 
-:ref:`Equivalence Between IODE Report Execution Commands And Python Functions <report_execution_commands_equivalence>` table.
+To get the Python equivalent of the above IODE commands, refers to the 
+:ref:`API Reference <start_api_reports>` tables.
