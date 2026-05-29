@@ -10,6 +10,7 @@ New Features
 Improvements 
 ------------
 
+- DOC: added new tutorial section for the `LEC language` in the documentation.
 
 Fixed Bugs 
 ----------
