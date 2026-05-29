@@ -9,6 +9,14 @@ This is an overview of the `iode` library.
 It is not intended to be a fully comprehensive manual.
 It is mainly dedicated to help new users to familiarize with it and others to remind essentials.
 
+LEC language
+------------
+
+.. include:: ./tutorial/tutorial_lec_language.rst
+
+Python Package
+--------------
+
 .. toctree::
    :maxdepth: 2
 
