@@ -10,6 +10,12 @@ New Features
 Improvements 
 ------------
 
+- DOC: added section :ref:`API Reference Reports <api-reference-reports>` 
+  in the documentation.
+
+- DOC: added new tutorial section for the `LEC language` in the documentation.
+
+- DOC: added new tutorial section for the `IODE reports` in the documentation.
 
 Fixed Bugs 
 ----------
