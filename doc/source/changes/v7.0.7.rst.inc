@@ -10,6 +10,7 @@ New Features
 Improvements 
 ------------
 
+- DOC: added section :ref:`API Reference Reports <api-reference-reports>` in the documentation.
 
 Fixed Bugs 
 ----------

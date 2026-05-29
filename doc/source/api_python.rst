@@ -3,9 +3,14 @@
 .. currentmodule:: iode
 
 
-#############
-API Reference
-#############
+####################
+API Reference Python
+####################
+
+.. note::
+
+   To get the Python equivalent of the above IODE commands, refers to the 
+   :ref:`Equivalence Between IODE Report Commands and Python Methods <report_commands_equivalence>` tables.
 
 *********
 WORKSPACE

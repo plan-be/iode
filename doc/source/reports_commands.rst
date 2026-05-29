@@ -39,22 +39,22 @@ File operations
 The commands operating on files allow you to copy, edit, delete, rename, print, etc., any file 
 of a type recognized by IODE. The commands are as follows:
 
-- :ref:`filelist <filelist>`
-- :ref:`fileprint <fileprint>`
-- :ref:`fileedit <fileedit>`
-- :ref:`filedelete <filedelete>`
-- :ref:`filerename <filerename>`
-- :ref:`filecopy <filecopy>`
-- :ref:`SysCopyFile <syscopyfile>`
-- :ref:`SysMoveFile <sysmovefile>`
-- :ref:`SysDeleteFile <sysdeletefile>`
-- :ref:`SysOemToAnsi <sysoemtoansi>`
-- :ref:`SysOemToUTF8 <sysoemtoutf8>`
-- :ref:`SysAnsiToOem <sysansitooem>`
-- :ref:`SysAnsiToUTF8 <sysansitoutf8>`
-- :ref:`SysAppendFile <sysappendfile>`
-- :ref:`FileImportVar <fileimportvar>`
-- :ref:`FileImportCmt <fileimportcmt>`
+- :ref:`filelist <filelist>`: (deprecated as of version 5)
+- :ref:`fileprint <fileprint>`: prints a file to the defined printer
+- :ref:`fileedit <fileedit>`: (deprecated as of version 5)
+- :ref:`filedelete <filedelete>`: deletes a file on disk with specific extensions
+- :ref:`filerename <filerename>`: renames a file on disk with specific extensions
+- :ref:`filecopy <filecopy>`: copies a file on disk with specific extensions
+- :ref:`SysCopyFile <syscopyfile>`: copies any file on disk with any extension
+- :ref:`SysMoveFile <sysmovefile>`: renames any file on disk with any extension
+- :ref:`SysDeleteFile <sysdeletefile>`: deletes any file on disk with any extension
+- :ref:`SysOemToAnsi <sysoemtoansi>`: converts file encoding from OEM to ANSI
+- :ref:`SysOemToUTF8 <sysoemtoutf8>`: converts file encoding from OEM to UTF8
+- :ref:`SysAnsiToOem <sysansitooem>`: converts file encoding from ANSI to OEM
+- :ref:`SysAnsiToUTF8 <sysansitoutf8>`: converts file encoding from ANSI to UTF8
+- :ref:`SysAppendFile <sysappendfile>`: appends one file to another 
+- :ref:`FileImportVar <fileimportvar>`: imports variables in various formats (DIF, ASCII, etc.)   
+- :ref:`FileImportCmt <fileimportcmt>`: imports comments in various formats (DIF, ASCII, etc.)
 
 .. _filelist:
 
@@ -1794,13 +1794,15 @@ Specific operations on equations
 
 The following commands allow you to modify estimation parameters and estimate equations:
 
-- :ref:`EqsEstimate <eqsestimate>`
-- :ref:`EqsStepWise <eqsstepwise>`
-- :ref:`EqsSetCmt <eqssetcmt>`
-- :ref:`EqsSetSample <eqssetsample>`
-- :ref:`EqsSetMethod <eqssetmethod>`
-- :ref:`EqsSetInstrs <eqssetinstrs>`
-- :ref:`EqsSetBloc <eqssetbloc>`
+- :ref:`EqsEstimate <eqsestimate>`: estimates an equation or a block of equations
+- :ref:`EqsStepWise <eqsstepwise>`: estimates a block of equations and searches 
+  for the best possible tests for all possible combinations of coefficients
+- :ref:`EqsSetCmt <eqssetcmt>`: sets comment to an equation
+- :ref:`EqsSetSample <eqssetsample>`: sets sample to an equation
+- :ref:`EqsSetMethod <eqssetmethod>`: sets estimation method for an equation
+- :ref:`EqsSetInstrs <eqssetinstrs>`: sets instruments for an equation
+- :ref:`EqsSetBloc <eqssetbloc>`: sets bloc membership for an equation
+
 
 
 .. _eqsestimate:
@@ -2836,17 +2838,16 @@ Table compilation and printing
 
 The following commands are used to compile tables and print or view them:
 
-- :ref:`PrintTblFile <printtblfile>`
-- :ref:`PrintTbl <printtbl>`
-- :ref:`ViewTblFile <viewtblfile>`
-- :ref:`ViewTbl <viewtbl>`
-- :ref:`ViewByTbl <viewbytbl>`
-- :ref:`PrintVar <printvar>`
-- :ref:`ViewVar <viewvar>`
-- :ref:`ViewNdec <viewndec>`
-- :ref:`ViewWidth <viewwidth>` (obsolete) 
-- :ref:`ViewWidth0 <viewwidth0>` (obsolete)  
-
+- :ref:`PrintTblFile <printtblfile>`: defines files to use when printing comparison tables
+- :ref:`PrintTbl <printtbl>`: builds and prints tables in A2M format
+- :ref:`ViewTblFile <viewtblfile>`: defines files to use when viewing comparison tables
+- :ref:`ViewTbl <viewtbl>`: builds and displays tables in a scrollable table
+- :ref:`ViewByTbl <viewbytbl>`: alias for ViewTbl
+- :ref:`PrintVar <printvar>`: builds and prints comparison tables of series in A2M format
+- :ref:`ViewVar <viewvar>`: views comparison tables of series in A2M format
+- :ref:`ViewNdec <viewndec>`: specifies the number of decimals for values displayed in tables
+- :ref:`ViewWidth <viewwidth>` (obsolete): specifies column width when displaying tables
+- :ref:`ViewWidth0 <viewwidth0>` (obsolete): specifies the width of the first column when displaying tables
 
 .. _printtblfile:
 
@@ -3090,13 +3091,12 @@ Graphs from tables
 The following commands are used to compile tables and display them as graphs or save them 
 in an A2M file:
 
-- :ref:`ViewGr <viewgr>`
-- :ref:`PrintGrAll <printgrall>` (obsolete) 
-- :ref:`PrintGrWin <printgrwin>` (obsolete) 
-- :ref:`PrintGrData <printgrdata>` (obsolete) 
-- :ref:`PrintGr <printgr>`
-- :ref:`DataPrintGraph <dataprintgraph>`
-
+- :ref:`ViewGr <viewgr>`: displays tables as graphs                       
+- :ref:`PrintGrAll <printgrall>` (obsolete): (replaced by PrintGr)                           
+- :ref:`PrintGrWin <printgrwin>` (obsolete): (deprecated as of version 5)                    
+- :ref:`PrintGrData <printgrdata>` (obsolete): (deprecated as of version 5)                    
+- :ref:`PrintGr <printgr>`: prints one or more graphs defined from tables   
+- :ref:`DataPrintGraph <dataprintgraph>`: prints graphs built directly from variables 
 
 .. _viewgr:
 
@@ -3191,15 +3191,14 @@ Model operations
 The following commands allow you to sort and simulate a model, estimate, and 
 recompile equations:
 
-- :ref:`ModelCalcSCC <modelcalcscc>`
-- :ref:`ModelSimulateParms <modelsimulateparms>`
-- :ref:`ModelSimulate <modelsimulate>`
-- :ref:`ModelSimulateSCC <modelsimulatescc>`
-- :ref:`ModelExchange <modelexchange>`
-- :ref:`ModelCompile <modelcompile>`
-- :ref:`ModelSimulateSaveNiters <modelsimulatesaveniters>`
-- :ref:`ModelSimulateSaveNorms <modelsimulatesavenorms>`
-
+- :ref:`ModelCalcSCC <modelcalcscc>`: decomposes the model into SCC and reorders it                            
+- :ref:`ModelSimulateParms <modelsimulateparms>`: specifies additional parameters for a simulation                         
+- :ref:`ModelSimulate <modelsimulate>`: launches the simulation of a model                                       
+- :ref:`ModelSimulateSCC <modelsimulatescc>`: launches simulation of a model decomposed into SCC and sorted            
+- :ref:`ModelExchange <modelexchange>`: defines or cancels endogenous-exogenous exchanges for simulation         
+- :ref:`ModelCompile <modelcompile>`: recompiles equations (useful if equations use macros)                    
+- :ref:`ModelSimulateSaveNiters <modelsimulatesaveniters>`: saves the number of iterations required for each period during simulation
+- :ref:`ModelSimulateSaveNorms <modelsimulatesavenorms>`: saves the convergence threshold reached for each period during simulation
 
 .. _modelcalcscc:
 
@@ -3435,16 +3434,15 @@ Example::
     $ModelSimulateSaveNiters SIM_NORMS
 
 
-Identities executions
-~~~~~~~~~~~~~~~~~~~~~
+Identities execution
+~~~~~~~~~~~~~~~~~~~~
 
 The following commands allow you to execute *identities*:
 
-- :ref:`idtexecute <idtexecute>`
-- :ref:`idtexecutetrace <idtexecutetrace>`
-- :ref:`idtexecutevarfiles <idtexecutevarfiles>`
-- :ref:`idtexecutesclfiles <idtexecutesclfiles>`
-
+- :ref:`idtexecute <idtexecute>`: executes identities and calculates series                          
+- :ref:`idtexecutetrace <idtexecutetrace>`: saves identity calculation trace in A2M file                       
+- :ref:`idtexecutevarfiles <idtexecutevarfiles>`: specifies files to search for variables during identity calculation
+- :ref:`idtexecutesclfiles <idtexecutesclfiles>`: specifies files to search for scalars during identity calculation  
 
 .. _idtexecute:
 
@@ -3558,12 +3556,12 @@ Exemple::
 
 
 Report operations 
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 The following commands allow you to manipulate reports (these functions are recursive):
 
-- :ref:`reportexec <reportexec>`
-- :ref:`reportedit <reportedit>` (OBSOLETE)
+- :ref:`reportexec <reportexec>`: executes an IODE report (recursive, allows multiple levels of sub-reports)
+- :ref:`reportedit <reportedit>`: obsolete
 
 
 .. _reportexec:
@@ -3718,10 +3716,6 @@ Syntax::
 COMMAND A2MTOPRINTER
 ^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
-
-    OBSOLETE
-
 Translates an A2M file and prints it on the current printer.
 
 Syntax::
@@ -3729,11 +3723,12 @@ Syntax::
     $A2mToPrinter file.a2m
 
 
-Other report functions
-~~~~~~~~~~~~~~~~~~~~~~
+Other report commands
+~~~~~~~~~~~~~~~~~~~~~
 
 - :ref:`StatUnitRoot <statunitroot>` : Dickey-Fuller tests
-- :ref:`WsAggrChar <wsaggrchar>` : sets the character to introduce in the code of series created by `WsAggr***`
+- :ref:`WsAggrChar <wsaggrchar>` : sets the character to introduce in 
+  the code of series created by `WsAggr[...]`
 - :ref:`WsAggrSum <wsaggrsum>` : computes the sum of series
 - :ref:`WsAggrMean <wsaggrmean>` : computes the mean of series
 - :ref:`WsAggrProd <wsaggrprod>` : computes the product of series
