@@ -15,8 +15,8 @@ Contents
    lec_language
    iode_reports
    tutorial
-   api
-   equivalence
+   api_reports
+   api_python
    cli
 
 Indices and tables
