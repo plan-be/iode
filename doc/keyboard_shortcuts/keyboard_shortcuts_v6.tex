@@ -1,0 +1,273 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cheatsheet
+% LaTeX Template
+% Version 1.0 (12/12/15)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Michael Müller (https://github.com/cmichi/latex-template-collection) with
+% extensive modifications by Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% The MIT License (see included LICENSE file)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[fontsize=9pt]{scrartcl} % 9pt font size
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage[margin=0pt, landscape]{geometry} % Page margins and orientation
+
+\usepackage{graphicx} % Required for including images
+
+\usepackage{color} % Required for color customization
+\usepackage[table]{xcolor}
+\definecolor{lightblue}{rgb}{0.145, 0.6666, 1}
+
+\usepackage{url} % Required for the \url command to easily display URLs
+
+\usepackage[ % This block contains information used to annotate the PDF
+colorlinks=false, 
+pdftitle={IODE v6 Keyboard Shortcuts}, 
+pdfauthor={Alix Damman}, 
+pdfsubject={IODE v6 Keyboard Shortcuts}, 
+pdfkeywords={IODE, keyboard, shortcuts}
+]{hyperref}
+
+\setlength{\unitlength}{1mm} % Set the length that numerical units are measured in
+\setlength{\parindent}{0pt} % Stop paragraph indentation
+
+\newcommand{\sectiontitle}[1]{\paragraph{#1} \ \\ \rule{\linewidth}{0.2mm} \\} % Custom command for section titles
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\rowcolors{1}{white}{lightblue!25} % alternating colors in tables
+
+\begin{picture}(297,210) % Create a container for the page content
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\put(10,200){ % Position on the page to put the title
+\begin{minipage}[t]{210mm} % The size and alignment of the title
+\section*{\huge IODE v6\newline Keyboard Shortcuts} % Title
+\end{minipage}
+}
+
+%----------------------------------------------------------------------------------------
+%	FIRST COLUMN SPECIFICATION
+%----------------------------------------------------------------------------------------
+
+\put(10,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Global Shortcuts}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Tab                 & Shift to the next field \\
+    Enter               & Start editing field \newline Expand the dropdown menu 
+                          \newline Show list of files in the directory 
+                          \newline Execute button \\ 
+    Esc                 & Stop editing field \newline Exit box dialog \\
+    F1                  & Open IODE help \\
+    F9                  & Show the used memory \\
+    Alt + X             & Exit
+\end{tabular}
+\newline\newline
+
+\sectiontitle{Menus}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    \leftarrow / \rightarrow  & Shift to the next/previous menu \\
+    Enter                     & Expand the menu \newline Open the box dialog \\
+    Alt + [a-z]               & Open the (sub)menu starting with the pressed letter \\
+    Esc                       & Close the menu 
+\end{tabular}
+\newline\newline
+
+\sectiontitle{Box Dialogs}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Tab                 & Shift to the next field \\
+    Enter               & Start editing field \newline Expand the dropdown menu 
+                          \newline Show list of files in the directory 
+                          \newline Execute button \\ 
+    Esc                 & Stop editing field \newline Exit box dialog \\
+    F1                  & Open IODE help \\
+    F3                  & Exit \\
+    F6                  & Open printing options (if available) \\
+    F8                  & Open print box dialog (if available) \\
+    F10                 & Press OK 
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the first column of text
+} % End the first division of the page
+
+%----------------------------------------------------------------------------------------
+%	SECOND COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(105,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Editor Field}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Enter                            & Start editing \\  
+    Home                             & Move cursor to the beginning of the line \\
+    End                              & Move cursor to the end of the line \\
+    Delete / Backspace               & Delete the next/previous character \\
+    Shift + \leftarrow / \rightarrow & Select next/previous character \\
+    Alt + \leftarrow / \rightarrow   & Move cursor to the beginning/end of the line \\
+    Alt + I                          & Insert line \\
+    Alt + J                          & Join next (selected) lines \\ 
+    Alt + G                          & Goto line \\ 
+    Alt + K                          & Delete current line \\
+    Alt + N                          & Split current line \\
+    Alt + Q / Esc                    & Stop editing \\
+    Alt + M                          & Show all shortcuts \\
+    Ctrl + \leftarrow / \rightarrow  & Move cursor to the next/previous of the word \\
+    Ctrl + Home / End                & Move cursor to the beginning/end of the editor \\
+    Ctrl + Backspace                 & Delete the current word \\ 
+    Ctrl + D                         & Delete (cut) block \\
+    Ctrl + Y                         & Copy block \\
+    Ctrl + C                         & Copy to clipboard \\
+    Ctrl + P                         & Paste clipboard \\
+    Ctrl + R                         & Find and replace text \\ 
+    Ctrl + B                         & select current character \\
+    Ctrl + L                         & select current line \\
+    Ctrl + U                         & unselect \\
+    Ctrl + J                         & Insert line \\
+    Ctrl + K                         & Delete current line 
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the second column of text
+} % End the second division of the page
+
+%----------------------------------------------------------------------------------------
+%	THIRD COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(200,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Workspaces}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Space               & Open list of actions \\
+    F2                  & Increase size of names column \\
+    Shift + F2          & Decrease size of names column \\
+    F3                  & Increase size of values column (scalars + variables) \\ 
+    Shift + F3          & Decrease size of values column (scalars + variables) \\
+    F4                  & Increase the number of displayed decimals (scalars + variables) \\
+    Shift + F4          & Decrease the number of displayed decimals (scalars + variables) \\
+    F5                  & Change the mode (variables only) \\
+    F7                  & Execute the selected identity \\
+    Shift + F7          & Execute identities for a range of periods \\ 
+    F8                  & Show the current variable in a graph \\ 
+    Shift + F8          & Open the dialog box to display variables as a graph (variables only) \\
+    Enter               & Start editing IODE object \\
+    Insert              & Create a new IODE object \\
+    Delete              & Delete the selected IODE object \\
+    ~[a-z]              & Go to the first IODE object starting with the pressed letter \\
+    Alt + [F1-F7]       & Show the [comments - variables] with the same name or present 
+                          in the LEC expression of the current equation/identity \\
+    Ctrl + [F1-F7]      & Allow to move the window of objects \\
+    Ctrl + R            & Invert rows and columns (variables only) \\
+    Ctrl + Z            & Allow to resize the window of objects \\
+    Ctrl + X            & Expand the window of objects to its maximum size \\ 
+    Esc                 & Stop displaying workspace 
+\end{tabular}
+\newline\newline
+
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the third column of text
+} % End the third division of the page
+\end{picture} % End the container for the entire page
+
+%----------------------------------------------------------------------------------------
+
+\begin{picture}(297,210) % Create a container for the page content
+
+%----------------------------------------------------------------------------------------
+%	FIRST COLUMN SPECIFICATION
+%----------------------------------------------------------------------------------------
+
+\put(10,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Edit Equation + Estimation}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    F10 & Save equation \\
+    Esc & Cancel \\
+    F1  & Open IODE help \\
+    F3  & Open unit root \\
+    F4  & Show estimated coefficients \\
+    F5  & Run estimation \\
+    F6  & Next equation in block \\
+    F7  & Open dynamic adjustment \\
+    F8  & Show estimation results menu 
+\end{tabular}
+\newline\newline
+
+\sectiontitle{Edit Table}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    F10        & Save table and exit \\
+    Esc        & Cancel \\
+    F1         & Open IODE help \\
+    F2         & Increase size of first column \\
+    Shift + F2 & Decrease size of first column \\
+    F3         & Increase size of second column \\
+    Shift + F3 & Decrease size of second column \\
+    F4         & change the attributes of the current cell \\
+    F5         & Change the alignment of the current cell (if not LEC) \\
+    F6         & Change the font size of the current cell (bold, italic) \\
+    F7         & Compute the table and show the values \\
+    F8         & Compute and display as a graph \\
+    Insert     & Insert a new line \\
+    Delete     & Delete a line
+\end{tabular}
+\newline\newline
+
+%----------------------------------------------------------------------------------------
+%	FOOTNOTE
+%----------------------------------------------------------------------------------------
+
+\vspace{\baselineskip}
+\linethickness{0.5mm} % Thickness of the footer line
+{\color{gray}\line(1,0){30}} % Print the line with a custom color
+
+\footnotesize{
+Created by Alix Damman, 2026\\ 
+\url{https://iode.readthedocs.io/en/stable/index.html}\\
+}
+
+%----------------------------------------------------------------------------------------
+
+\end{minipage} % End the first column of text
+} % End the first division of the page
+
+\end{picture} % End the container for the entire page
+
+\end{document}

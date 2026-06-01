@@ -14,6 +14,7 @@ Contents
    introduction
    lec_language
    iode_reports
+   gui
    tutorial
    api_reports
    api_python

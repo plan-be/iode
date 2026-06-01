@@ -10,7 +10,7 @@ IF(LATEX_FOUND AND LATEX_PDFLATEX_FOUND)
     SET(OUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     # Latex source file.
     SET(MAIN_DOC keyboard_shortcuts)
-    SET(MAIN_TEX ${MAIN_DOC}.tex)
+    SET(MAIN_TEX ${MAIN_DOC}.tex ${MAIN_DOC}_v6.tex)
 
 	# First pass.
 	ADD_CUSTOM_TARGET( latex-prebuild
@@ -23,7 +23,7 @@ IF(LATEX_FOUND AND LATEX_PDFLATEX_FOUND)
 	ADD_CUSTOM_TARGET( latex-pdf	
 				COMMAND ${PDFLATEX_COMPILER} -output-directory ${OUT_DIRECTORY}  ${MAIN_TEX}
 				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-				COMMENT "Assembling the final pdf file."
+				COMMENT "Assembling the final pdf files."
 				DEPENDS  ${MAIN_TEX})
 
 	ADD_CUSTOM_TARGET(keyboard_shortcuts ALL) # Entry point of execution.
@@ -31,7 +31,10 @@ IF(LATEX_FOUND AND LATEX_PDFLATEX_FOUND)
 
 	ADD_CUSTOM_COMMAND(TARGET keyboard_shortcuts POST_BUILD 
 	                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_DOC}.pdf" ${CMAKE_SOURCE_DIR}/doc/build
-					   COMMENT "Copying keyboard_shortcuts.pdf to the doc/build folder")
+	                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_DOC}_v6.pdf" ${CMAKE_SOURCE_DIR}/doc/build
+	                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_DOC}.pdf" ${CMAKE_SOURCE_DIR}/doc/source/_static
+	                   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${MAIN_DOC}_v6.pdf" ${CMAKE_SOURCE_DIR}/doc/source/_static
+					   COMMENT "Copying keyboard_shortcuts(_v6).pdf to the doc/build and doc/source/_static folders")
 ELSE()
 	MESSAGE(CHECK_FAIL "No latex tools found!")
 ENDIF()
