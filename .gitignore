@@ -384,9 +384,10 @@ FodyWeavers.xsd
 dev_prompt.bat
 
 # LaTeX
-keyboard_shortcuts.*
-!keyboard_shortcuts.tex
-!build/keyboard_shortcuts.pdf
+keyboard_shortcuts*.*
+!keyboard_shortcuts*.tex
+!doc/build/keyboard_shortcuts*.pdf
+!doc/source/_static/keyboard_shortcuts*.pdf
 
 # IODE temporary files
 **/*.cm$
