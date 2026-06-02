@@ -224,19 +224,19 @@ Lists Of Objects
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
     | :ref:`@vexpand(pattern, ...) <vexpand>` | :meth:`Variables.get_names`       | returns the list of variables matching pattern   |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
-    | :ref:`@vliste(objname, ...) <vliste>`   | | :meth:`Equation.variables`      | | returns the list of variables in the           |
-    |                                         | | :meth:`Equations.variables`     | | equation(s), identity(ies), table(s)           |
-    |                                         | | :meth:`Identity.variables`      |                                                  |
-    |                                         | | :meth:`Identities.variables`    |                                                  |
-    |                                         | | :meth:`Table.variables`         |                                                  |
-    |                                         | | :meth:`Tables.variables`        |                                                  |
+    | :ref:`@vliste(objname, ...) <vliste>`   | | :attr:`Equation.variables`      | | returns the list of variables in the           |
+    |                                         | | :attr:`Equations.variables`     | | equation(s), identity(ies), table(s)           |
+    |                                         | | :attr:`Identity.variables`      |                                                  |
+    |                                         | | :attr:`Identities.variables`    |                                                  |
+    |                                         | | :attr:`Table.variables`         |                                                  |
+    |                                         | | :attr:`Tables.variables`        |                                                  |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
-    | :ref:`@sliste(objname, ...) <sliste>`   | | :meth:`Equation.coefficients`   | | returns the list of scalars in the             |
-    |                                         | | :meth:`Equations.coefficients`  | | equation(s), identity(ies), table(s)           |
-    |                                         | | :meth:`Identity.coefficients`   |                                                  |
-    |                                         | | :meth:`Identities.coefficients` |                                                  |
-    |                                         | | :meth:`Table.coefficients`      |                                                  |
-    |                                         | | :meth:`Tables.coefficients`     |                                                  |
+    | :ref:`@sliste(objname, ...) <sliste>`   | | :attr:`Equation.coefficients`   | | returns the list of scalars in the             |
+    |                                         | | :attr:`Equations.coefficients`  | | equation(s), identity(ies), table(s)           |
+    |                                         | | :attr:`Identity.coefficients`   |                                                  |
+    |                                         | | :attr:`Identities.coefficients` |                                                  |
+    |                                         | | :attr:`Table.coefficients`      |                                                  |
+    |                                         | | :attr:`Tables.coefficients`     |                                                  |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
 
 ===============
@@ -246,17 +246,17 @@ Objects Content
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
     | Function                                          | Python                                           | Description                             |
     +===================================================+==================================================+=========================================+
-    | :ref:`@ttitle(tablename,tablename, ...) <ttitle>` | :meth:`Table.title`                              | returns the titles of the tables        |
+    | :ref:`@ttitle(tablename,tablename, ...) <ttitle>` | :attr:`Table.title`                              | returns the titles of the tables        |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
-    | :ref:`@srelax(sclname,sclname, ...) <srelax>`     | :meth:`Scalar.relax`                             | returns the relax value for scalars     |
+    | :ref:`@srelax(sclname,sclname, ...) <srelax>`     | :attr:`Scalar.relax`                             | returns the relax value for scalars     |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
-    | :ref:`@sstderr(sclname,sclname, ...) <sstderr>`   | :meth:`Scalar.std`                               | returns the stderr value for scalars    |
+    | :ref:`@sstderr(sclname,sclname, ...) <sstderr>`   | :attr:`Scalar.std`                               | returns the stderr value for scalars    |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
     | :ref:`@cvalue(cmtname,cmtname, ...) <cvalue>`     | :meth:`comments[names] <Comments.__getitem__>`   | returns the content of a comments       |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
     | :ref:`@vvalue(varname,varname, ...) <vvalue>`     | :meth:`variables[names] <Variables.__getitem__>` | returns the values of variables as text |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
-    | :ref:`@sample(B|E|) <sample>`                     | :meth:`Variables.sample`                         | | returns the (beginning/ending of) the |
+    | :ref:`@sample(B|E|) <sample>`                     | :attr:`Variables.sample`                         | | returns the (beginning/ending of) the |
     |                                                   |                                                  | | current sample as text                |
     +---------------------------------------------------+--------------------------------------------------+-----------------------------------------+
 
@@ -267,16 +267,16 @@ Equations
     +----------------------------------------------+---------------------------------+-------------------------------------+
     | Function                                     | Python                          | Description                         |
     +==============================================+=================================+=====================================+
-    | :ref:`@evalue(eqname, eqname, ...) <evalue>` | :meth:`Equation.lec`            | returns the LEC text of an equation |
+    | :ref:`@evalue(eqname, eqname, ...) <evalue>` | :attr:`Equation.lec`            | returns the LEC text of an equation |
     +----------------------------------------------+---------------------------------+-------------------------------------+
-    | :ref:`@eqsample(eqname) <eqsample>`          | :meth:`Equation.sample`         | | returns the estimation sample     |
+    | :ref:`@eqsample(eqname) <eqsample>`          | :attr:`Equation.sample`         | | returns the estimation sample     |
     |                                              |                                 | | of the equation                   |
     +----------------------------------------------+---------------------------------+-------------------------------------+
-    | :ref:`@eqsamplefrom(eqname) <eqsamplefrom>`  | | :meth:`Equation.sample` and   | | returns the *FROM* part of        |
-    |                                              | | :meth:`Sample.start`          | | the estimation sample             |
+    | :ref:`@eqsamplefrom(eqname) <eqsamplefrom>`  | | :attr:`Equation.sample` and   | | returns the *FROM* part of        |
+    |                                              | | :attr:`Sample.start`          | | the estimation sample             |
     +----------------------------------------------+---------------------------------+-------------------------------------+
-    | :ref:`@eqsampleto(eqname) <eqsampleto>`      | | :meth:`Equation.sample` and   | | returns the *TO* part of          |
-    |                                              | | :meth:`Sample.end`            | | the estimation sample             |
+    | :ref:`@eqsampleto(eqname) <eqsampleto>`      | | :attr:`Equation.sample` and   | | returns the *TO* part of          |
+    |                                              | | :attr:`Sample.end`            | | the estimation sample             |
     +----------------------------------------------+---------------------------------+-------------------------------------+
     | :ref:`@eqlhs(eqname) <eqlhs>`                | :meth:`Equation.split_equation` | | returns the left-hand side        |
     |                                              |                                 | | of an equation                    |
@@ -292,13 +292,13 @@ Simulations
     +-------------------------------------+-----------------------------------------------+------------------------------------------+
     | Function                            | Python                                        | Description                              |
     +=====================================+===============================================+==========================================+
-    | :ref:`@SimEps() <simeps>`           | :meth:`Simulation.convergence_threshold`      | | returns the value of the convergence   |
+    | :ref:`@SimEps() <simeps>`           | :attr:`Simulation.convergence_threshold`      | | returns the value of the convergence   |
     |                                     |                                               | | criterion used for the last simulation |
     +-------------------------------------+-----------------------------------------------+------------------------------------------+
-    | :ref:`@SimRelax() <simrelax>`       | :meth:`Simulation.relax`                      | | returns the value of the relaxation    |
+    | :ref:`@SimRelax() <simrelax>`       | :attr:`Simulation.relax`                      | | returns the value of the relaxation    |
     |                                     |                                               | | parameter used for the last simulation |
     +-------------------------------------+-----------------------------------------------+------------------------------------------+
-    | :ref:`@SimMaxit() <simmaxit>`       | :meth:`Simulation.max_nb_iterations`          | | returns the value of the maximum       |
+    | :ref:`@SimMaxit() <simmaxit>`       | :attr:`Simulation.max_nb_iterations`          | | returns the value of the maximum       |
     |                                     |                                               | | number of iterations used for the      |
     |                                     |                                               | | last simulation                        |
     +-------------------------------------+-----------------------------------------------+------------------------------------------+
@@ -382,14 +382,14 @@ Workspace Operations
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
     | :ref:`WsClearAll <wsclearall>`              |                                                                                                | clears all workspaces                             |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
-    | :ref:`WsDescr <wsdescr>`                    | :meth:`~Comments.description`                                                                  | describes a workspace cmt, ..., var               |
+    | :ref:`WsDescr <wsdescr>`                    | :attr:`~Comments.description`                                                                  | describes a workspace cmt, ..., var               |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
     | :ref:`WsSave <wssave>`                      | :meth:`~Comments.save`                                                                         | saves a workspace cmt, ..., var to a file         |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
     | :ref:`WsSaveCmp <wssavecmp>`                | :meth:`~Comments.save`                                                                         | | saves a workspace cmt, ..., var to a file       |
     |                                             |                                                                                                | | in compressed form                              |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
-    | :ref:`WsSample <wssample>`                  | :meth:`Variables.sample`                                                                       | | changes the sample of the *Variables*           |
+    | :ref:`WsSample <wssample>`                  | :attr:`Variables.sample`                                                                       | | changes the sample of the *Variables*           |
     |                                             |                                                                                                | | workspace                                       |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+---------------------------------------------------+
     | :ref:`WsExtrapolate <wsextrapolate>`        | :meth:`Variables.extrapolate`                                                                  | extends series by extrapolation                   |
@@ -482,8 +482,8 @@ Data Operations
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
     | :ref:`datasearch <datasearch>`              | :meth:`~Comments.search`                                                                       | searches for an object (cmt, ..., var)                 |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
-    | :ref:`datascan <datascan>`                  | | :meth:`~Equation.coefficients` and                                                           | scans the objects (eqs / idt / tbl)                    |
-    |                                             | | :meth:`~Equation.variables`                                                                  |                                                        |
+    | :ref:`datascan <datascan>`                  | | :attr:`~Equation.coefficients` and                                                           | scans the objects (eqs / idt / tbl)                    |
+    |                                             | | :attr:`~Equation.variables`                                                                  |                                                        |
     |                                             | | (`Equation`, `Identity` and `Table`)                                                         |                                                        |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
     | :ref:`datalistXxx <datalist>`               | :meth:`~Comments.get_names`                                                                    | creates a list of objects given a pattern              |
@@ -491,7 +491,7 @@ Data Operations
     | :ref:`datalistsort <datalistsort>`          | `sorted with Python lists                                                                      | sorts a list in alphabetical order                     |
     |                                             | <https://docs.python.org/3/library/functions.html#sorted>`_                                    |                                                        |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
-    | :ref:`datacompareEps <datacompareeps>`      | :meth:`Variables.threshold`                                                                    | | sets the equality threshold for variable             |
+    | :ref:`datacompareEps <datacompareeps>`      | :attr:`Variables.threshold`                                                                    | | sets the equality threshold for variable             |
     |                                             |                                                                                                | | comparison                                           |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
     | :ref:`datacompareXxx <datacompare>`         | :meth:`~Comments.compare`                                                                      | | compares the workspace and a file and                |
@@ -512,7 +512,7 @@ Data Operations
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
     | :ref:`datandecvar <datandecvar>`            | via GUI                                                                                        | sets the number of decimals for editing series         |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
-    | :ref:`datamodevar <datamodevar>`            | :meth:`variables.mode <Variables.mode>`                                                        | sets the mode for editing series                       |
+    | :ref:`datamodevar <datamodevar>`            | :attr:`Variables.mode`                                                                         | sets the mode for editing series                       |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
     | :ref:`datastartvar <datastartvar>`          | via GUI                                                                                        | sets the first period for editing series               |
     +---------------------------------------------+------------------------------------------------------------------------------------------------+--------------------------------------------------------+
@@ -543,15 +543,15 @@ Equations
     |                                             | | :meth:`Equations.estimate_step_wise`                     | | for the best possible tests for all possible  |
     |                                             |                                                            | | combinations of coefficients                  |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
-    | :ref:`EqsSetCmt <eqssetcmt>`                | :meth:`Equation.comment`                                   | sets comment to an equation                     |
+    | :ref:`EqsSetCmt <eqssetcmt>`                | :attr:`Equation.comment`                                   | sets comment to an equation                     |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
-    | :ref:`EqsSetSample <eqssetsample>`          | :meth:`Equation.sample`                                    | sets sample to an equation                      |
+    | :ref:`EqsSetSample <eqssetsample>`          | :attr:`Equation.sample`                                    | sets sample to an equation                      |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
-    | :ref:`EqsSetMethod <eqssetmethod>`          | :meth:`Equation.method`                                    | sets estimation method for an equation          |
+    | :ref:`EqsSetMethod <eqssetmethod>`          | :attr:`Equation.method`                                    | sets estimation method for an equation          |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
-    | :ref:`EqsSetInstrs <eqssetinstrs>`          | :meth:`Equation.instruments`                               | sets instruments for an equation                |
+    | :ref:`EqsSetInstrs <eqssetinstrs>`          | :attr:`Equation.instruments`                               | sets instruments for an equation                |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
-    | :ref:`EqsSetBloc <eqssetbloc>`              | :meth:`Equation.block`                                     | sets bloc membership for an equation            |
+    | :ref:`EqsSetBloc <eqssetbloc>`              | :attr:`Equation.block`                                     | sets bloc membership for an equation            |
     +---------------------------------------------+------------------------------------------------------------+-------------------------------------------------+
 
 =====================
@@ -644,12 +644,12 @@ Object Printing
     +=============================================+===========================================+======================================================+
     | :ref:`printobjdef <printobjdef>`            | :meth:`Comments.print_to_file`            | prints a definition of an object cmt, ..., var       |
     +---------------------------------------------+-------------------------------------------+------------------------------------------------------+
-    | :ref:`printobjtitle <printobjtitle>`        | :meth:`Tables.print_tables_as`            | | specifies whether only the titles                  |
+    | :ref:`printobjtitle <printobjtitle>`        | :attr:`Tables.print_tables_as`            | | specifies whether only the titles                  |
     |                                             |                                           | | should be printed                                  | 
     +---------------------------------------------+-------------------------------------------+------------------------------------------------------+
-    | :ref:`printobjlec <printobjlec>`            | :meth:`Equations.print_equations_lec_as`  | specifies the type of equation to print              |
+    | :ref:`printobjlec <printobjlec>`            | :attr:`Equations.print_equations_lec_as`  | specifies the type of equation to print              |
     +---------------------------------------------+-------------------------------------------+------------------------------------------------------+
-    | :ref:`printobjinfos <printobjinfos>`        | :meth:`Equations.print_equations_as`      | specifies the information to print                   |
+    | :ref:`printobjinfos <printobjinfos>`        | :attr:`Equations.print_equations_as`      | specifies the information to print                   |
     +---------------------------------------------+-------------------------------------------+------------------------------------------------------+
 
 ==============================
