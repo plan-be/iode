@@ -72,35 +72,39 @@ pdfkeywords={IODE, keyboard, shortcuts}
 \put(10,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
 
-%----------------------------------------------------------------------------------------
-%	HEADING ONE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Menus}
+\sectiontitle{Global Shortcuts}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Alt + F             & File Menu \\
- Alt + W             & Workspace Menu \\
- Alt + R             & Run Menu \\
- Alt + P             & Print/Graph Menu \\
- Alt + H             & Help Menu \\
- Ctrl + Alt + N      & New Project \\
- Ctrl + O            & Open Project \\
- Ctrl + S            & Save current tab \\
- Ctrl + Shift + S    & Save current tab as \\
- Ctrl + Alt + S      & Save All Tabs \\
- Ctrl + Shift + D    & Clear All WorkSpaces \\
- Shift + F8          & Graphs from Variables \\
- Ctrl + X            & full screen \\
- Alt + X             & Exit
+    Ctrl + Alt + N      & New Project \\
+    Ctrl + O            & Open Project \\
+    \hline 
+    Alt + F             & Open File Menu \\
+    Alt + W             & Open Workspace Menu \\
+    Alt + R             & Open Run Menu \\
+    Alt + P             & Open Print/Graph Menu \\
+    Alt + H             & Open Help Menu \\
+    \hline 
+    Alt + C             & Open Comments tab \\
+    Alt + E             & Open Equations tab \\
+    Alt + I             & Open Identities tab \\
+    Alt + L             & Open Lists tab \\
+    Alt + S             & Open Scalars tab \\
+    Alt + T             & Open Tables tab \\
+    Alt + V             & Open Variables tab \\
+    Ctrl + Tab          & Shift to the next tab \\
+    Ctrl + Shift + Tab  & Shift to the previous tab \\
+    Ctrl + S            & Save current tab \\
+    Ctrl + Shift + S    & Save current tab as \\
+    Ctrl + Alt + S      & Save All Tabs \\
+    Ctrl + W            & close the current tab (if not representing a workspace) \\
+    \hline 
+    Ctrl + Shift + D    & Clear All WorkSpaces \\
+    Ctrl + X            & full screen \\
+    Alt + X             & Exit
 \end{tabular}
 \newline\newline
 
-%----------------------------------------------------------------------------------------
-%	HEADING TWO
-%----------------------------------------------------------------------------------------	
-
-\sectiontitle{File Management}
+\sectiontitle{File Explorer (left panel)}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
  Ctrl + N         & New file \\
@@ -116,26 +120,6 @@ pdfkeywords={IODE, keyboard, shortcuts}
 \newline\newline
 
 %----------------------------------------------------------------------------------------
-%	HEADING THREE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Tabs}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Alt + C            & Comments tab \\
- Alt + E            & Equations tab \\
- Alt + I            & Identities tab \\
- Alt + L            & Lists tab \\
- Alt + S            & Scalars tab \\
- Alt + T            & Tables tab \\
- Alt + V            & Variables tab \\
- Ctrl + S           & Save current tab \\
- Ctrl + Shift + S   & Save current tab as \\
- Ctrl + Alt + S     & Save all tabs \\
- Ctrl + Tab         & Shift to the next tab
-\end{tabular}
-
-%----------------------------------------------------------------------------------------
 
 \end{minipage} % End the first column of text
 } % End the first division of the page
@@ -147,46 +131,33 @@ pdfkeywords={IODE, keyboard, shortcuts}
 \put(105,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
 
-%----------------------------------------------------------------------------------------
-%	HEADING FOUR
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{}
+\sectiontitle{Workspaces Tabs}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Ctrl + Shift + Tab & Shift to the previous tab \\
- Ctrl + W           & close the current tab if not representing an Iode database
-\end{tabular}
-
-\sectiontitle{IODE Objects In Tabs}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Double click        & Edit the IODE object name or value (LEC for equations and title for tables) \\
- Enter               & Finish editing the IODE object name or value \\
- Alt / Shift + Enter & Add a new line when editing the IODE object value (like in Excel cells) \\
- Ctrl + Enter        & Open an edit window for the selected IODE object \\
- Insert              & Create a new IODE object \\
- Delete              & Delete the selected IODE object(s) \\
- Ctrl + D            & Clear the current workspace tab \\
- Ctrl + Shift + D    & Clear all workspaces \\ 
- Ctrl + P            & Print the list of IODE objects \\
- Ctrl + F[1-7]       & shows the [comments - variables] related to the current IODE object \\
- Ctrl + Alt + F[1-7] & shows the [comments - variables] of the same name or present in the LEC expression of the current equation/identity \\
-\end{tabular}
-\newline\newline
-
-\sectiontitle{Equations Tab}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-Ctrl + Enter  & Edit/Estimate
-\end{tabular}
-\newline\newline
-
-\sectiontitle{Identities Tab}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-F7         & Execute the selected identity \\
-Shift + F7 & Execute the selected identities 
+    Double click        & Edit the IODE object name or value inline 
+                          (LEC for equations and title for tables) \\
+    Enter               & Finish editing the IODE object name or value \\
+    Alt / Shift + Enter & Add a new line when editing the IODE object value 
+                          (like in Excel cells) \\
+    Ctrl + Enter        & Open an edit window for the selected IODE object \\
+    ~[a-z]              & Go to the first IODE object starting with the pressed letter \\
+    Ctrl + C            & (scalars + variables) Copy selected values to clipboard \\
+    Ctrl + Shift + C    & (scalars + variables) Copy values including names (and periods) 
+                          to clipboard \\
+    Ctrl + V            & (scalars + variables) Paste values from clipboard \\
+    Ctrl + Shift + V    & (variables) Paste special 
+                          (clipboard must includes names and periods) \\
+    Insert              & Create a new IODE object \\
+    Delete              & Delete the selected IODE object(s) \\
+    Ctrl + D            & Clear the current workspace tab \\
+    Ctrl + Shift + D    & Clear all workspaces \\ 
+    Ctrl + P            & Print the list of IODE objects \\
+    \hline
+    
+    Ctrl + F[1-7]       & shows the [comments - variables] related to the current 
+                          IODE object \\
+    Ctrl + Alt + F[1-7] & shows the [comments - variables] of the same name or present in 
+                            the LEC expression of the current equation/identity
 \end{tabular}
 \newline\newline
 
@@ -202,39 +173,38 @@ Shift + F7 & Execute the selected identities
 \put(200,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
 
-\sectiontitle{Scalars Tab}
+\sectiontitle{Workspaces Tabs}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-(Shift +) F3     & Increase/Decrease the size of the columns \\
-Ctrl + Shift + F3  & Resize columns to contents \\
-(Shift +) F4     & Increase/Decrease the number of displayed decimal \\
-Ctrl + C         & Copy values to clipboard \\
-Ctrl + Shift + C & Copy values including scalars names to clipboard \\
-Ctrl + P         & Paste values 
+    F3                  & Increase the size of the columns \\
+    Shift + F3          & Decrease the size of the columns \\
+    Ctrl + Shift + F3   & Resize columns to contents \\
+    F4                  & Increase the number of displayed decimal \\
+    Shift + F4          & Decrease the number of displayed decimal \\
+    F5                  & (variables) Change display mode \\
+    % F6                & Change the precision \\
+    F7                  & (identities) Execute selected identity 
+                          \newline (tables) Compute selected table and display values \\
+    Shift + F7          & (identities) Open window to execute identities \\
+    F8                  & (tables) Compute selected table and plot values as a graph
+                          \newline (variables) Display the selected series as a graph \\
+    Shift + F8          & (variables) Open window to plot selected variables
 \end{tabular}
 \newline\newline
 
-\sectiontitle{Tables Tab}
+\sectiontitle{Text and Report Tabs}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-Ctrl + Enter  & Edit \\
-F7            & Compute and display values \\
-F8            & Compute and plot values as a graph \\
+    Ctrl + R & Runs the current IODE report \\
+    Ctrl + P & Print report
 \end{tabular}
-\newline\newline
+\newline\newline 
 
-\sectiontitle{Vars Tab}
+\sectiontitle{Report Command (bottom panel)}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- (Shift +) F3       & Increase/Decrease the size of the columns \\
- Ctrl + Shift + F3  & Resize columns to contents \\
- (Shift +) F4       & Increase/Decrease the number of displayed decimal \\
- (Shift +) F5       & Change the display mode (Level, Diff, Grt, YoY Diff, YoY Grt) \\
- % F6               & Change the precision \\
- F8                 & Displays the selected series as a graph \\
- Ctrl + C           & Copy values to clipboard \\
- Ctrl + Shift + C   & Copy values including var names and sample range to clipboard \\
- Ctrl + P           & Paste values 
+    Enter                       & Execute command \\
+    $\uparrow$ / $\downarrow$   & Previous/Next command
 \end{tabular}
 \newline\newline
 
@@ -255,61 +225,44 @@ F8            & Compute and plot values as a graph \\
 \put(10,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
 
-%----------------------------------------------------------------------------------------
-%	HEADING ONE
-%----------------------------------------------------------------------------------------
-
 \sectiontitle{Edit Equation + Estimation}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- F10 & Save equation and estimated coefficients \\
- Esc & Cancel \\
- F1  & Open IODE help \\
- F3  & Open unit root \\
- F4  & Show estimated coefficients \\
- F5  & Run estimation \\
- F6  & Next equation in block \\
- F7  & Open dynamic adjustment \\
- F8  & Show estimation results \\
- Ctrl + X  & full screen
+    F10 & Save equation and estimated coefficients \\
+    Esc & Cancel \\
+    F1  & Open IODE help \\
+    F3  & Open unit root \\
+    F4  & Show estimated coefficients \\
+    F5  & Run estimation \\
+    F6  & Next equation in block \\
+    F7  & Open dynamic adjustment \\
+    F8  & Show estimation results
 \end{tabular}
 \newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING TWO
-%----------------------------------------------------------------------------------------
 
 \sectiontitle{Edit Table}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-F10        & Save table and exit\\
-Esc        & Cancel \\
-F1         & Open IODE help \\
-F8         & Compute and display as a graph \\
-Insert     & Insert a new line \\
-Delete     & Delete a line \\
-Ctrl + X   & full screen
+    F10        & Save table and exit\\
+    Esc        & Cancel \\
+    F1         & Open IODE help \\
+    F8         & Compute and display as a graph \\
+    Insert     & Insert a new line \\
+    Delete     & Delete a line \\
 \end{tabular}
 \newline\newline
 
-%----------------------------------------------------------------------------------------
-%	HEADING THREE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Text And Report Editor}
+\sectiontitle{Graph Window}
 
 \begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Ctrl + Z & Undoes the last operation \\
- Ctrl + Y & Redoes the last operation \\
- Ctrl + F & Opens find dialog \\
- Ctrl + H & Opens find and replace dialog \\
- Shift + Alt + $\downarrow$ & Duplicates line \\
- Tab | Enter | Space & Stop auto-complete \\
- Ctrl + Space & Force auto-complete \\
- Ctrl + R & Runs the current IODE report \\
- Ctrl + P & Print file
+ Ctrl + S & Save As \\
+ Ctrl + C & Copy To Clipboard \\
+ Ctrl + P & Print \\
+ Ctrl + Q & Close \\
+ + & Zoom In \\
+ - & Zoom Out \\
+ Esc & Reset zoom
 \end{tabular}
-\newline\newline
 
 %----------------------------------------------------------------------------------------
 
@@ -323,9 +276,59 @@ Ctrl + X   & full screen
 \put(105,180){ % Divide the page
 \begin{minipage}[t]{85mm} % Create a box to house text
 
+\sectiontitle{Text And Report Editor}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Ctrl + A             & Selects all text \\
+    Ctrl + C             & Copy the selected text to the clipboard \\
+    Ctrl + Insert        & Copy the selected text to the clipboard \\
+    backspace            & Delete the character to the left of the cursor \\
+    Delete               & Delete the character to the right of the cursor \\
+    Ctrl + K             & Delete to the end of the line \\
+    Ctrl + V             & Paste the clipboard text into text edit \\
+    Shift + Insert       & Paste the clipboard text into text edit \\
+    Ctrl + X             & Delete the selected text and copies it to the clipboard \\
+    Shift + Delete       & Delete the selected text and copies it to the clipboard \\
+    \hline 
+    $\leftarrow$         & Move the cursor one character to the left \\
+    Ctrl + $\leftarrow$  & Move the cursor one word to the left \\
+    $\rightarrow$        & Move the cursor one character to the right \\
+    Ctrl + $\rightarrow$ & Move the cursor one word to the right \\
+    Up                   & Move the cursor one line up \\
+    Down                 & Move the cursor one line down \\
+    PageUp               & Move the cursor one page up \\
+    PageDown             & Move the cursor one page down \\
+    Home                 & Move the cursor to the beginning of the line \\
+    Ctrl + Home	         & Move the cursor to the beginning of the text \\
+    End	                 & Move the cursor to the end of the line \\
+    Ctrl + End           & Move the cursor to the end of the text
+\end{tabular}
+\newline\newline
+
 %----------------------------------------------------------------------------------------
-%	HEADING ONE
+
+\end{minipage} % End the second column of text
+} % End the second division of the page
+
 %----------------------------------------------------------------------------------------
+%	THIRD COLUMN SPECIFICATION 
+%----------------------------------------------------------------------------------------
+
+\put(200,180){ % Divide the page
+\begin{minipage}[t]{85mm} % Create a box to house text
+
+\sectiontitle{Text And Report Editor}
+
+\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
+    Ctrl + Z             & Undo the last operation \\
+    Ctrl + Y             & Redo the last operation \\
+    Ctrl + F             & Open find dialog \\
+    Ctrl + H             & Open find and replace dialog \\
+    Shift + Alt + $\downarrow$ & Duplicate line \\
+    Tab / Enter / Space & Stop auto-complete \\
+    Ctrl + Space        & Force auto-complete 
+\end{tabular}
+\newline\newline
 
 \sectiontitle{Find And Replace Dialog}
 
@@ -336,34 +339,6 @@ Ctrl + X   & full screen
  Ctrl + Alt + Enter & Replace all occurrences
 \end{tabular}
 \newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING TWO
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Report Command}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
-Enter                       & Execute command \\
- $\uparrow$ / $\downarrow$  & Previous/Next command
-\end{tabular}
-\newline\newline
-
-%----------------------------------------------------------------------------------------
-%	HEADING THREE
-%----------------------------------------------------------------------------------------
-
-\sectiontitle{Graph Window}
-
-\begin{tabular}{ p{0.4\textwidth} p{0.6\textwidth} }
- Ctrl + S & Save As \\
- Ctrl + C & Copy To Clipboard \\
- Ctrl + P & Print \\
- Ctrl + Q & Close \\
- + & Zoom In \\
- - & Zoom Out \\
- Esc & Reset zoom
-\end{tabular}
 
 %----------------------------------------------------------------------------------------
 
