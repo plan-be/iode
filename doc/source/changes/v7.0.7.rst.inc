@@ -19,6 +19,9 @@ Improvements
 Fixed Bugs 
 ----------
 
+- GUI: fixed shortcut `CTRL + L` to select the current line in a text or report editor 
+  (closes :issue:`1209`)
+
 
 Miscellaneous 
 -------------
