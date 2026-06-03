@@ -63,6 +63,10 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         self.delete_end_of_line_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.delete_end_of_line_shortcut.activated.connect(self.delete_end_of_line)
 
+        self.delete_line_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_U), self)
+        self.delete_line_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.delete_line_shortcut.activated.connect(self.delete_line)
+
     def left_area_paint_event(self, event: QPaintEvent):
         """
         Handles the paint event for the left area.
@@ -187,6 +191,15 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         """
         cursor: QTextCursor = self.textCursor()
         cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+        cursor.removeSelectedText()
+
+    @Slot()
+    def delete_line(self):
+        """
+        Deletes the entire line where the cursor is located.
+        """
+        cursor: QTextCursor = self.textCursor()
+        cursor.select(QTextCursor.SelectionType.LineUnderCursor)
         cursor.removeSelectedText()
 
     @Slot()
