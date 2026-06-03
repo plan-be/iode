@@ -197,11 +197,24 @@ class IodeWidgetWithCompleter():
         if not self._completer_enabled:
             super_cls.keyPressEvent(event)
             return
-        
+
         if self._completer.popup().isVisible():
+            # if the user presses Tab: take the currently selected item
+            # or the first item if there is no selection, and insert it
+            if event.key() == Qt.Key.Key_Tab:
+                model = self._completer.popup().model()
+                if model is not None and model.rowCount() > 0:
+                    index = self._completer.popup().currentIndex()
+                    # if there is no current index, take the first item
+                    if not index.isValid():
+                        index = model.index(0, 0)
+                        completion = model.data(index, Qt.DisplayRole)
+                        self.insert_completion(completion)
+                event.ignore()
+                return # let the completer do default behavior
             # The following keys are forwarded by the completer to the widget
-            if event.key() in [Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Escape, 
-                               Qt.Key.Key_Tab, Qt.Key.Key_Backtab]:
+            elif event.key() in [Qt.Key.Key_Enter, Qt.Key.Key_Return,  
+                               Qt.Key.Key_Escape, Qt.Key.Key_Backtab]:
                 event.ignore()
                 return  # let the completer do default behavior
             elif event.key() == Qt.Key.Key_Space:
@@ -209,8 +222,8 @@ class IodeWidgetWithCompleter():
                 super_cls.keyPressEvent(event)
                 return
 
-        exit: bool = self._handle_special_keys(event)
-        if exit:
+        done: bool = self._handle_special_keys(event)
+        if done:
             return
 
         # CTRL + Space forces auto-completion
