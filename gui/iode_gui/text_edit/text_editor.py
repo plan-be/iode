@@ -1,7 +1,7 @@
 from qtpy.QtWidgets import QWidget
 from qtpy.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
                            QKeySequence, QTextBlock, QTextCursor)
-from qtpy.QtCore import Qt, QRect, QSize, QPoint, QSettings
+from qtpy.QtCore import Qt, QRect, QSize, QPoint, QSettings, Slot
 
 from .find_and_replace_dialog import FindAndReplaceDialog
 from .complete_text_edit import IodeAutoCompleteTextEdit
@@ -50,7 +50,11 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         self.replace_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_H), self)
         self.replace_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.replace_shortcut.activated.connect(self.open_replace_box)
-        
+
+        self.select_line_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_L), self)
+        self.select_line_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.select_line_shortcut.activated.connect(self.select_line)
+
         self.duplicate_shortcut = QShortcut(QKeySequence(Qt.Modifier.SHIFT | Qt.Modifier.ALT | Qt.Key.Key_Down), self)
         self.duplicate_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.duplicate_shortcut.activated.connect(self.duplicate_line)
@@ -163,6 +167,16 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         """
         self.popup_find_replace_box(False)
 
+    @Slot()
+    def select_line(self):
+        """
+        Select the current line in the text editor.
+        """
+        cursor: QTextCursor = self.textCursor()
+        cursor.select(QTextCursor.SelectionType.LineUnderCursor)
+        self.setTextCursor(cursor)
+    
+    @Slot()
     def duplicate_line(self):
         """
         Duplicates the current line in the text editor.
