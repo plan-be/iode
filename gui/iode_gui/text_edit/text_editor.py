@@ -59,6 +59,10 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         self.duplicate_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.duplicate_shortcut.activated.connect(self.duplicate_line)
 
+        self.delete_end_of_line_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_K), self)
+        self.delete_end_of_line_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.delete_end_of_line_shortcut.activated.connect(self.delete_end_of_line)
+
     def left_area_paint_event(self, event: QPaintEvent):
         """
         Handles the paint event for the left area.
@@ -176,6 +180,15 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         cursor.select(QTextCursor.SelectionType.LineUnderCursor)
         self.setTextCursor(cursor)
     
+    @Slot()
+    def delete_end_of_line(self):
+        """
+        Deletes the text from the cursor position to the end of the line.
+        """
+        cursor: QTextCursor = self.textCursor()
+        cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+        cursor.removeSelectedText()
+
     @Slot()
     def duplicate_line(self):
         """

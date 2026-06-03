@@ -22,6 +22,9 @@ Fixed Bugs
 - GUI: fixed shortcut `CTRL + L` to select the current line in a text or report editor 
   (closes :issue:`1209`)
 
+- GUI: fixed shortcut `CTRL + K` to delete from the cursor to the end of the current line 
+  (closes :issue:`1207`)
+
 
 Miscellaneous 
 -------------
