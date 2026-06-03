@@ -16,6 +16,9 @@ Improvements
 
 - DOC: added new tutorial section for the `IODE reports` in the documentation.
 
+- GUI: pressing Tab when the auto-complete popup is visible will insert the first suggestion 
+  (closes :issue:`1210`)
+
 Fixed Bugs 
 ----------
 

@@ -1,4 +1,5 @@
 from qtpy.QtWidgets import QLineEdit
+from qtpy.QtCore import QEvent, Qt
 from qtpy.QtGui import QKeyEvent, QTextCursor
 
 from .completer import IodeWidgetWithCompleter
@@ -12,6 +13,26 @@ class IodeAutoCompleteLineEdit(QLineEdit, IodeWidgetWithCompleter):
         QLineEdit.__init__(self, parent)
         IodeWidgetWithCompleter.__init__(self, completer_enabled)
         self.setup_completer()
+
+    # override QLineEdit method
+    def event(self, event: QEvent) -> bool:
+        """
+        Override the event method to intercept TAB key events before 
+        Qt's focus management system consumes them.
+        
+        This ensures TAB is passed to keyPressEvent for autocomplete handling
+        instead of being used for focus navigation.
+        """
+        if event.type() == QEvent.Type.KeyPress:
+            # When event type is KeyPress, event is already a QKeyEvent
+            key_event: QKeyEvent = event
+            # intercept TAB key to prevent focus change
+            if key_event.key() == Qt.Key.Key_Tab:
+                self._key_press_event(super(), event)
+                return True  # event handled, do not pass to Qt's focus system
+        
+        # For all other events, use default handling
+        return super().event(event)
 
     # override QLineEdit method
     def keyPressEvent(self, event: QKeyEvent):
