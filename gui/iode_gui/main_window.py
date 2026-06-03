@@ -28,7 +28,8 @@ from pathlib import Path
 
 from iode_gui.utils import (IODE_VERSION_MAJOR, IODE_VERSION_MINOR, IODE_VERSION_PATCH, 
                             ORGANIZATION_NAME, URL_HOMEPAGE, URL_CHANGELOG, URL_PYTHON_API, 
-                            URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY, Context)
+                            URL_REPORTS_API, URL_MANUAL, URL_SHORTCUTS, DEFAULT_FONT_FAMILY, 
+                            Context)
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.settings import ProjectSettings
@@ -956,6 +957,10 @@ ul {{text-align: left; margin-left: auto; margin-right: auto; display: inline-bl
     @Slot()
     def open_release_notes(self):
         QDesktopServices.openUrl(URL_CHANGELOG)
+
+    @Slot()
+    def open_reports_api(self):
+        QDesktopServices.openUrl(URL_REPORTS_API)
 
     @Slot()
     def open_python_api(self):
