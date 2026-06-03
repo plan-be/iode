@@ -19,6 +19,8 @@ Improvements
 - GUI: pressing Tab when the auto-complete popup is visible will insert the first suggestion 
   (closes :issue:`1210`)
 
+- GUI: added the *IODE Report API* link in the Help menu.
+
 Fixed Bugs 
 ----------
 

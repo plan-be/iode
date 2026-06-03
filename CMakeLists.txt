@@ -34,7 +34,8 @@ project ("iode" VERSION 7.0.7 HOMEPAGE_URL "https://iode.readthedocs.io/en/stabl
 # -- global variables --
 set(IODE_COMPANY "Federal Planning Bureau (Belgium)")
 set(IODE_EMAIL "ald@plan.be; yvda@plan.be; gb@plan.be; jmarc.paul@gmail.com")
-set(PYTHON_API_URL "https://iode.readthedocs.io/en/stable/api.html")
+set(REPORTS_API_URL "https://iode.readthedocs.io/en/stable/api_reports.html")
+set(PYTHON_API_URL "https://iode.readthedocs.io/en/stable/api_python.html")
 set(CHANGELOG_URL "https://iode.readthedocs.io/en/stable/changes.html")
 set(IODE_BINARY_DIR ${CMAKE_BINARY_DIR})
 set(MINIMUM_PYTHON_VERSION "3.12")
