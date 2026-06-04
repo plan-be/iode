@@ -20,8 +20,13 @@ build:
     - build-essential
     - cmake
     - ninja-build
+    - ccache
   jobs:
     pre_create_environment:
+      # Set up ccache to speed up compilation (cache compiled object files)
+      - export PATH="/usr/lib/ccache:$PATH"
+      - export CC="ccache gcc"
+      - export CXX="ccache g++"
       # to generate the pyproject.toml file using CMake
       - cmake --preset linux-release
 
