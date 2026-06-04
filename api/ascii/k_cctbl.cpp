@@ -286,7 +286,7 @@ static Table* read_tbl(YYFILE* yy)
     if(keyw != TABLE_ASCII_OPEN) 
     {
         kerror(0, "%s: Expected { - Got %s ", yy->yy_text, YY_error(yy));
-        return(NULL);
+        return NULL;
     }
 
     keyw = YY_lex(yy);

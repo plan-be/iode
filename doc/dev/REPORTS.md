@@ -315,8 +315,6 @@ The $defines are stored in the special `KDB RP_MACRO` of type K\_ASIS.
 
 |Syntax|Description|
 |:---|:---|
-|`int RP_macro_createdb()`|Creates the KDB RP\_MACRO if it does not exist.|
-|`int RP_macro_deletedb()`|Deletes the KDB RP\_MACRO and its content.|
 |`int RP_define_1(char *name, char *macro)`|Adds or replaces a macro to RP\_MACRO.|
 |`int RP_define(char* arg, int unused)`|Report function to define a new macro.|
 |`char* RP_get_macro_ptr(char* macro_name)`|Returns the pointer to a macro (aka define) value.|

@@ -120,7 +120,7 @@ char *RP_alloc(int size)
     RP_MEMBLKS[pos].used = 1;
     RP_MEMBLKS[pos].size = size + MEMBLK_ADDSIZE;
     RP_MEMBLKS[pos].ptr = SCR_malloc(size + MEMBLK_ADDSIZE); // JMP 26/8/2012
-    if(RP_MEMBLKS[pos].ptr == 0) return(NULL);
+    if(RP_MEMBLKS[pos].ptr == 0) return NULL;
     memset(RP_MEMBLKS[pos].ptr, 0, size + MEMBLK_ADDSIZE);
     return(RP_MEMBLKS[pos].ptr);
 }

@@ -68,3 +68,8 @@ private:
 };
 
 using KDBMacrosPtr = std::shared_ptr<KDBMacros>;
+
+// shared_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+// RP_MACRO: KDB containing the macros during a report execution
+inline KDBMacrosPtr RP_MACRO = KDBMacros::Create(true);

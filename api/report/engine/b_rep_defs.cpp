@@ -10,8 +10,6 @@
  *  
  *  List of functions
  *  -----------------
- *      int RP_macro_createdb()                     Creates the KDB RP_MACRO if it does not exist.
- *      int RP_macro_deletedb()                     Deletes the KDB RP_MACRO and its content.
  *      int RP_define_1(char *name, char *macro)    Adds or replaces a macro to RP_MACRO.
  *      int RP_define(char* arg, int unused)        Report function to define a new macro.
  *      char* RP_get_macro_ptr(char* macro_name)    Returns the pointer to a macro (aka define) value.    
@@ -31,43 +29,6 @@
 
 
 /**
- *  Creates the KDB RP_MACRO if it does not exist.
- *  
- *  @return int     -3 if K_Create() fails
- *                  0 on success
- */
-int RP_macro_createdb()
-{
-    if(RP_MACRO) 
-        return 0;
-
-    RP_MACRO = KDBMacros::Create(true);
-    if(!RP_MACRO) 
-    {
-        error_manager.append_error("Report : Memory Full");
-        return -3;
-    }
-    
-    return 0;
-}
-
-
-/**
- *  Deletes the KDB RP_MACRO and its content.
- *  
- *  @return int     0 always
- */
-int RP_macro_deletedb()
-{
-    if(!RP_MACRO) 
-        return 0;
-    
-    RP_MACRO.reset();
-    return 0;
-}
-
-
-/**
  *  Adds or replaces a macro to RP_MACRO.
  *  
  *  @param [in] char*   name    macro name
@@ -78,10 +39,6 @@ int RP_macro_deletedb()
  */
 int RP_define_1(char* name, char* c_macro)
 {
-    int rc = RP_macro_createdb();
-    if(rc) 
-        return rc;
-
     if(c_macro == 0) 
         c_macro = "";
     
@@ -237,11 +194,6 @@ int RP_define_save(char *name)
     int     rc, maxdepth;
     char    buf[1024];
 
-    // Create the macro KDB if needed
-    rc = RP_macro_createdb();
-    if(rc) 
-        return rc;
-
     // if the macro "name" does not yet exist, no need to push its definition
     if(!RP_MACRO->contains(name)) 
         return 0;
@@ -270,25 +222,19 @@ int RP_define_save(char *name)
  */
 int RP_define_restore(char *name)
 {
-    int     rc, maxdepth;
-    char    buf[1024];
-
-    // Create the macro KDB if needed
-    rc = RP_macro_createdb();
-    if(rc) return rc;
-
     // Undefine the current
     RP_undef_1(name);
 
     // Try to find object name#* - Nothing to do if not found
-    maxdepth = RP_define_calcdepth(name);
+    int maxdepth = RP_define_calcdepth(name);
     if(maxdepth < 0) 
         return 0;
 
     // Restore the copy of existing name in name#(maxdepth+1)
+    char buf[1024];
     sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
     std::string macro = RP_MACRO->get_macro(buf);
-    rc = RP_define_1(name, (char*) macro.c_str());
+    int rc = RP_define_1(name, (char*) macro.c_str());
 
     // Delete the copy
     RP_undef_1(buf);

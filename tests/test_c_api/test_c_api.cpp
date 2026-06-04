@@ -119,7 +119,7 @@ public:
 	//
 	//    *size = 0;
 	//    fd = fopen(filename, "rb");
-	//    if(fd == 0) return(NULL);
+	//    if(fd == 0) return NULL;
 	//
 	//    while(!feof(fd)) {
 	//        if(*size % 1024 == 0)

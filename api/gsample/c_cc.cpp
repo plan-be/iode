@@ -342,7 +342,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
     char    *res, *txt, *tmp;
 
     if(str == NULL) 
-        return(NULL);
+        return NULL;
     
     lg = (int)strlen(str) + 40;
     res = SW_nalloc(lg + 3);

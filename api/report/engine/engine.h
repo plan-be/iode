@@ -7,9 +7,6 @@
 #include "api/report/reports.h"
 
 
-// KDB containing the macros during a report execution
-inline KDBMacrosPtr RP_MACRO = nullptr;
-
 /* b_rep_utils.c */
 int RP_alloc_ptrs();
 char *RP_alloc(int size);
@@ -53,8 +50,6 @@ int B_ReportExec(char* arg, int unused=-1);
 int B_ReportLine(char* line, int cleanup);
 
 /* b_rep_defs.c */
-int RP_macro_createdb();
-int RP_macro_deletedb();
 int RP_define_1(char* name, char* c_macro);
 int RP_define(char* arg, int unused=-1);
 char* RP_get_macro_ptr(char* macro_name);

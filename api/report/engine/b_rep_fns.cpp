@@ -1999,9 +1999,9 @@ U_ch *RPF_fappend(U_ch** args)
     FILE    *fd;
     int     i;
 
-    if(SCR_tbl_size(args) < 1) return(NULL);
+    if(SCR_tbl_size(args) < 1) return NULL;
     fd = fopen((char*) args[0], "a+");
-    if(fd == 0) return(NULL);
+    if(fd == 0) return NULL;
     for(i = 1 ; args[i] ; i++) {
         if(strcmp((char*) args[i], "NL") == 0) fprintf(fd, "\n");
         else                                   fprintf(fd, "%s", args[i]);
@@ -2020,7 +2020,7 @@ U_ch *RPF_fappend(U_ch** args)
  */
 U_ch *RPF_fdelete(U_ch** args)
 {
-    if(SCR_tbl_size(args) < 1) return(NULL);
+    if(SCR_tbl_size(args) < 1) return NULL;
     _unlink((char*) args[0]);
     return((unsigned char*) SCR_malloc(1));
 }

@@ -106,8 +106,8 @@ int kerror(const int level, const char* fmt, ...)
 
     if(kerror_super != 0) 
         return (*kerror_super)(level, buf);
-    else {
-        //fprintf(stderr, "%s\n", buf);
+    else 
+    {
         printf("%s\n", buf);
         if(level > 0)  
             exit(level);
@@ -129,14 +129,18 @@ int kerror(const int level, const char* fmt, ...)
  */
 void kpause()
 {
-    int     ch = 0;
-
-    if(kpause_continue) return;
+    if(kpause_continue) 
+        return;
+    
     if(kpause_super != 0) 
         (*kpause_super)();
-    else {
+    else 
+    {
         printf("Press ENTER to continue\n"); 
-        while(ch != '\n') ch = getchar();
+        
+        int ch = 0;
+        while(ch != '\n') 
+            ch = getchar();
     }    
 }
 
@@ -169,7 +173,8 @@ void kwarning(const char* fmt, ...)
 
     if(kwarning_super != 0) 
         (*kwarning_super)(buf);
-    else {
+    else 
+    {
         printf("%s\n", buf);
         kpause();
     }    
@@ -258,14 +263,15 @@ int kconfirm(const char *fmt,...)
     
     if(kconfirm_super != 0) 
         return((*kconfirm_super)(buf));
-    else {
+    else 
+    {
 #ifdef __GNUC__
         fgets(buf, sizeof(buf) - 1, stdin);
 #else
         gets_s(buf, sizeof(buf) - 1);
 #endif
         SCR_sqz((unsigned char*) buf);
-        return(!U_is_in(buf[0], "OoYyJj1"));
+        return !U_is_in(buf[0], "OoYyJj1");
     }    
 }
 
@@ -289,11 +295,14 @@ int kmsgbox(const unsigned char* str, const unsigned char* v, const unsigned cha
 {
     if(kmsgbox_super != 0) 
         return((*kmsgbox_super)(str, v, buts));
-    else {
+    else 
+    {
         printf("%s\n", v);
+
         if(!kmsgbox_continue) 
             kpause();
-        return(1);
+        
+        return 1;
     }    
 }
 
@@ -324,8 +333,7 @@ void krecordkey(const int key)
  */
 void krecordtext(const unsigned char* text)
 {
-    int     i;
-
+    int i;
     for(i = (int)strlen((char*) text) - 1 ; i >= 0 ; i--)
         krecordkey(text[i]);
 }
@@ -416,7 +424,7 @@ void ksettitle()
 int ktermvkey(const int vkey)  
 {
     if(ktermvkey_super) 
-        return((*ktermvkey_super)(vkey));
+        return (*ktermvkey_super)(vkey);
     
     return 0;
 }
@@ -432,7 +440,7 @@ int ktermvkey(const int vkey)
 int khitkey()  
 {
     if(khitkey_super) 
-        return((*khitkey_super)());
+        return (*khitkey_super)();
     
     return 0;
 }
@@ -448,7 +456,7 @@ int khitkey()
 int kgetkey()  
 {
     if(kgetkey_super) 
-        return((*kgetkey_super)());
+        return (*kgetkey_super)();
     
     return 0;
 }
@@ -478,7 +486,7 @@ void kbeep()
 Sample* kasksmpl()
 {
     if(kasksmpl_super) 
-        return((*kasksmpl_super)());
+        return (*kasksmpl_super)();
     
     if(global_ws_var)
         return global_ws_var->sample;
@@ -503,7 +511,7 @@ int kexecsystem(const char *arg)
 
     // Alternate implementation
     if(kexecsystem_super) 
-        return((*kexecsystem_super)(arg));
+        return (*kexecsystem_super)(arg);
 
     // Default implementation
 	rc = system(arg); 
@@ -528,7 +536,7 @@ int kshellexec(const char *arg)
     wchar_t warg[1024];
 
     if(kshellexec_super) 
-        return((*kshellexec_super)(arg));
+        return (*kshellexec_super)(arg);
 
     // Default implementation
     memset(&sei, 0, sizeof(sei));
@@ -539,7 +547,6 @@ int kshellexec(const char *arg)
     sei.nShow = SW_SHOW;
     mbstowcs(warg, arg, 1024);
     sei.lpFile = warg;
-//    sei.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(1));
 
     ShellExecuteExW(&sei);
     return res;
@@ -569,6 +576,7 @@ char* A_expand_super_API(char* name)
     std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(name);
     if(!lst) 
         return NULL;
+    
     return (char*) lst->c_str();
 }
 
@@ -584,10 +592,10 @@ char* A_expand_super_API(char* name)
 int ODE_end(const int st)
 {
     if(ODE_end_super) 
-        return((*ODE_end_super)(st));
+        return (*ODE_end_super)(st);
 
     // Default implementation
-    return(IodeEnd());
+    return IodeEnd();
 }
 
 /**
