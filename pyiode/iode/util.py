@@ -2,10 +2,13 @@ import re
 from enum import Enum, auto
 from pathlib import Path
 from textwrap import wrap
+import warnings
 
 from typing import List, Dict, Any
 
-from iode.iode_cython import cython_is_NA, cython_suppress_msgs, cython_enable_msgs, IodeFileType, IodeType
+from iode.iode_cython import (cython_is_NA, cython_suppress_msgs, cython_enable_msgs, 
+                              cython_define, cython_macro_exists, cython_macro, 
+                              IodeFileType, IodeType)
 from .common import IODE_FILE_TYPES
 
 # import constants, functions and classes hidden from users but maybe useful for developers
@@ -50,6 +53,77 @@ def is_NA(value: float) -> bool:
 
 def iode_number_to_str(value: float) -> str:
     return "na" if is_NA(value) else f"{value:g}"
+
+def define(name: str, macro: str):
+    """
+    Define an IODE macro.
+
+    Parameters
+    ----------
+    name: str
+        Name of the macro to define.
+    macro: str
+        Macro value.
+
+    See Also
+    --------
+    macro
+
+    Examples
+    --------
+    >>> from iode import define, macro
+    >>> define("C", "1")
+    >>> macro("C")
+    '1'
+    >>> # the following line raises a warning and returns None 
+    >>> # because the macro is not defined
+    >>> macro("UNDEFINED_MACRO") is None
+    True
+    """
+    if not isinstance(name, str):
+        raise TypeError(f"Expected name of type str. Got name of type {type(name).__name__} instead.")
+    if not isinstance(macro, str):
+        macro = str(macro)
+    success: bool = cython_define(name, macro)
+    if not success:
+        warnings.warn(f"Failed to define macro '{name}' with value '{macro}'.")
+
+
+def macro(name: str) -> str:
+    """
+    Get the value of an IODE macro.
+
+    Parameters
+    ----------
+    name: str
+        Name of the macro to get.
+
+    Returns
+    -------
+    str
+        Value of the macro (as string).
+
+    See Also
+    --------
+    define
+
+    Examples
+    --------
+    >>> from iode import define, macro
+    >>> define("C", "1")
+    >>> macro("C")
+    '1'
+    >>> # the following line raises a warning and returns None 
+    >>> # because the macro is not defined
+    >>> macro("UNDEFINED_MACRO") is None
+    True
+    """
+    if not isinstance(name, str):
+        raise TypeError(f"Expected name of type str. Got name of type {type(name).__name__} instead.")
+    if not cython_macro_exists(name):
+        warnings.warn(f"Macro '{name}' is not defined.")
+        return None
+    return cython_macro(name)
 
 
 def suppress_msgs():
