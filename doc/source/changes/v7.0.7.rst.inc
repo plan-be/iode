@@ -10,6 +10,9 @@ New Features
 Improvements 
 ------------
 
+- PYTHON: added the functions :func:`defines` and :func:`macro` to create and extract IODE 
+  macros from Python (closes :issue:`1214`).
+
 - DOC: added section :ref:`API Reference <start_api_reports>` in the documentation.
 
 - DOC: added new tutorial section for the `LEC language` in the documentation.

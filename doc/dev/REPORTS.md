@@ -317,7 +317,7 @@ The $defines are stored in the special `KDB RP_MACRO` of type K\_ASIS.
 |:---|:---|
 |`int RP_define_1(char *name, char *macro)`|Adds or replaces a macro to RP\_MACRO.|
 |`int RP_define(char* arg, int unused)`|Report function to define a new macro.|
-|`char* RP_get_macro_ptr(char* macro_name)`|Returns the pointer to a macro (aka define) value.|
+|`std::string RP_get_macro(const std::string& name)`|Returns the pointer to a macro (aka define) value.|
 |`int RP_undef_1(char *name)`|Deletes one macro.|
 |`int RP_undef(char *arg, int unused)`|Report function to delete macros.|
 |`int RP_define_calcdepth(char *name)`|Returns the max depth of a saved (pushed) macro.|

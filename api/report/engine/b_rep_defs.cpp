@@ -12,7 +12,7 @@
  *  -----------------
  *      int RP_define_1(char *name, char *macro)    Adds or replaces a macro to RP_MACRO.
  *      int RP_define(char* arg, int unused)        Report function to define a new macro.
- *      char* RP_get_macro_ptr(char* macro_name)    Returns the pointer to a macro (aka define) value.    
+ *      std::string RP_get_macro(const std::string& name)    Returns the pointer to a macro (aka define) value.    
  *      int RP_undef_1(char *name)                  Deletes one macro.
  *      int RP_undef(char *arg, int unused)         Report function to delete macros.
  *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
@@ -79,19 +79,34 @@ int RP_define(char* arg, int unused)
 }
 
 /**
+ * @brief Checks if a macro with the given name exists.
+ * 
+ * @param name 
+ * @return true 
+ * @return false 
+ */
+bool RP_macro_exists(const std::string& name)
+{
+    return RP_MACRO->contains(name);
+}
+
+/**
  *  Returns the pointer to a macro (aka define) value.
  *  
  *  @param [in] char*   macro_name  name of the macro to find
  *  @return     char*               pointer to the macro value (not allocated here)
  *                                  NULL if macro_name does not exist
  */
-char* RP_get_macro_ptr(char* macro_name)
+std::string RP_get_macro(const std::string& name)
 {
-    if(!RP_MACRO->contains(macro_name)) 
-        return NULL;
+    if(!RP_MACRO->contains(name))
+    {
+        std::string warning_msg = "Report: Macro '" + name + "' is not defined";
+        kwarning(warning_msg.c_str());
+        return "";
+    }
    
-    std::string macro = RP_MACRO->get_macro(macro_name);
-    return (char*) macro.c_str();
+    return RP_MACRO->get_macro(name);
 }
 
 /**
@@ -124,13 +139,7 @@ int wrapper_RP_undef_1(char *name, void* unused)
  */
 int RP_undef(char *arg, int unused)
 {
-    //ONAME   name;
-
-    return(B_ainit_loop(arg, wrapper_RP_undef_1, (char *)0));
-    //B_get_arg0(name, arg, K_MAX_NAME + 1);
-    //RP_undef_1(name);
-
-    //return 0;
+    return B_ainit_loop(arg, wrapper_RP_undef_1, (char*) 0);
 }
 
 /** 

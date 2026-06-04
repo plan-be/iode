@@ -713,6 +713,8 @@ REPORTS
    execute_command
    set_t
    increment_t
+   define
+   macro
 
 ************************
 GRAPHICAL USER INTERFACE
