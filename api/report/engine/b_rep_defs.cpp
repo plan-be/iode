@@ -102,7 +102,7 @@ char* RP_get_macro_ptr(char* macro_name)
  */
 int RP_undef_1(char *name)
 {
-    if(!RP_MACRO) 
+    if(!RP_MACRO->contains(name)) 
         return 0;
     
     bool success = RP_MACRO->remove(name);
