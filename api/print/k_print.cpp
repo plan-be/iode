@@ -316,7 +316,7 @@ char **T_find_files(COLS* cls)
             error_manager.append_error(error_msg);
             SCR_add_ptr((unsigned char***) &names, &nf, 0L);
             SCR_free_tbl((unsigned char**) names);
-            return(NULL);
+            return NULL;
         }
 
         sprintf(buf, "[%d] %s", i, (char*) kdb->filepath.c_str());

@@ -164,7 +164,7 @@ static char* K_repack_tbl(Table *tbl)
 {
     char* pack = (char*) P_create();
     if(tbl == NULL) 
-        return(NULL);
+        return NULL;
 
     /* tbl */
     pack = (char*) P_add(pack, (char *) tbl, sizeof(Table));

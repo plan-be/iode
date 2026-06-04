@@ -126,7 +126,7 @@ char* K_read_str(YYFILE* yy)
     char    *ptr = NULL;
 
     if(YY_lex(yy) != YY_STRING) 
-        return(NULL);
+        return NULL;
     
     ptr = (char*) SCR_stracpy(yy->yy_text);
     return ptr;

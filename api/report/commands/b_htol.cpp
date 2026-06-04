@@ -287,7 +287,7 @@ done:
     SW_nfree(t_smpl);
 
     if(rc < 0) 
-        return(NULL);
+        return NULL;
     else 
         return(kdb_to);
 }
