@@ -24,6 +24,9 @@ Improvements
 Fixed Bugs 
 ----------
 
+- PYTHON: fixed crash when trying to run the :func:`execute_command` with an undefined macro 
+  (closes :issue:`1200`)
+
 - GUI: fixed shortcut `CTRL + K` to delete from the cursor to the end of the current line 
   (closes :issue:`1207`)
 
