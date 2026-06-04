@@ -1340,6 +1340,9 @@ def test_execute_command(tmp_path):
     tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
+    with pytest.warns(RuntimeWarning, match=r"Report: Macro 'macro' is not defined"):
+        execute_command("%macro%")
+
     generalized_sample = '1990Y1:2'
     nb_dec = 2
 
