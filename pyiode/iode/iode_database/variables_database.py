@@ -180,6 +180,10 @@ class Variables(IodeDatabase):
     def _load(self, filepath: str):
         self._cy_database._load(filepath)
 
+    def clear(self):
+        super().clear()
+        self._cy_database.finish_clear()
+
     def subset(self, pattern: str, copy: bool, first_period: Union[str, Period]=None, 
                 last_period: Union[str, Period]=None) -> Self:
         if isinstance(first_period, str):

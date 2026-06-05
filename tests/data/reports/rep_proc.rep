@@ -19,6 +19,8 @@ $define output_dir %2%
 # -------------------------
 $PrintDest %output_dir%\rep_proc.a2m A2M
 
+$PrintNbdec -1
+
 # ----------------------------------------------------------
 # printtbl: prints a list of variables on a specific period
 $procdef printtbl year vars
@@ -26,6 +28,7 @@ $procdef printtbl year vars
         %var%[%year%] = {%var%[%year%]}
     $next var
 $procend
+# ----------------------------------------------------------
 
 # ----------------------------------------------------------
 $ sumvars: creates a new series names result = sum of vars
@@ -36,6 +39,7 @@ $procdef sumvars result vars
     $next var
     $DataCalcVar %result% %eq%
 $procend
+# ----------------------------------------------------------
 
 # ----------------------------------------------------------
 $ sumvarsmsg: displays msg, then calls sumvars result vars
@@ -45,11 +49,13 @@ $procdef sumvarsmsg msg result vars
     $procexec sumvars %result% %vars%
     %result%[1992Y1] = {%result%[1992Y1]}
 $procend
+# ----------------------------------------------------------
 
 $WsSample 1990Y1 2000Y1
 $DataCalcVar PIB_A t
 $DataCalcVar PIB_B ln t
 $DataCalcVar PIB_C sin(t)
+
 $procexec sumvarsmsg "Hello IODE!" PIB PIB_A PIB_B
 $procexec sumvarsmsg "Hello World" PIB3 PIB_A PIB_C
 $procexec printtbl 1992Y1 PIB_A PIB_B PIB_C PIB PIB3
@@ -64,11 +70,15 @@ $WsLoadScl %input_dir%\fun
 $WsLoadTbl %input_dir%\fun
 $WsLoadVar %input_dir%\fun
 
+# ----------------------------------------------------------
 $procdef print_eq eqs
 .par1 tit_1 Equations with coefficients
+    $PrintObjInfos 0
     $PrintObjLec 1
     $foreach eq %eqs%
         $PrintObjDefEqs %eq%
     $next eq    
 $procend 
+# ----------------------------------------------------------
+
 $procexec print_eq ACAG ACAF

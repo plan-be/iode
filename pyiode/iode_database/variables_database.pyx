@@ -104,11 +104,36 @@ cdef class Variables(CythonIodeDatabase):
         return t_first_period, t_last_period
 
     def _load(self, filepath: str):
-        if self.database is not NULL:
+        if self.database is NULL:
+            warnings.warn(f"Internal C++ database pointer is NULL. Cannot load the IODE "
+                          f"Variables workspace from file {filepath}.")
+            return 
+        
+        # NOTE: currently the C++ subsets of KDBVariables have their own sample
+        # TODO: fix this in the C++ API
+        if not self.get_is_detached():
+            cpp_global_variables.get().load(filepath.encode())
+            self.database_ptr = cpp_global_variables
+            self.database = self.database_ptr.get()
+            self.abstract_database = self.database
+        else:
             self.database.load(filepath.encode())
-            self.mode_ = IodeVarMode.VAR_MODE_LEVEL
-            self.first_period_subset: Period = None
-            self.last_period_subset: Period = None
+
+        self.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        self.first_period_subset: Period = None
+        self.last_period_subset: Period = None
+
+    def finish_clear(self):
+        # NOTE: currently the C++ subsets of KDBVariables have their own sample
+        # TODO: fix this in the C++ API
+        if not self.get_is_detached():
+            cpp_global_variables.get().clear()
+            self.database_ptr = cpp_global_variables
+            self.database = self.database_ptr.get()
+            self.abstract_database = self.database
+        self.mode_ = IodeVarMode.VAR_MODE_LEVEL
+        self.first_period_subset: Period = None
+        self.last_period_subset: Period = None
 
     def initialize_subset(self, pattern: str, copy: bool, 
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
@@ -520,9 +545,10 @@ cdef class Variables(CythonIodeDatabase):
             return Sample(str(first_period), str(last_period))
 
     def set_sample(self, from_period: str, to_period: str):
-        if self.get_is_detached():
-            self.database.set_sample(from_period.encode(), to_period.encode())
-        else:
+        self.database.set_sample(from_period.encode(), to_period.encode())
+        # NOTE: currently the C++ subsets of KDBVariables have their own sample
+        # TODO: fix this in the C++ API
+        if not self.get_is_detached():
             cpp_global_variables.get().set_sample(from_period.encode(), to_period.encode())
 
     def get_threshold(self) -> float:
