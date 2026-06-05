@@ -1,10 +1,3 @@
-# IODE EXTENSION FOR PYTHON
-# =========================
-#
-#    @header4iode
-#
-# Unit tests for pyd
-
 from iode import *
 
 import pytest
@@ -1376,6 +1369,65 @@ def test_execute_command(tmp_path):
 
         # compare content
         assert python_file_content == iode_report_file_content
+
+    # reset number of decimals to default value
+    execute_command("$PrintNbdec -1")
+
+def test_execute_report():
+    project_dir = (Path(__file__).parent.parent.parent.parent).absolute()
+    data_dir = project_dir / "tests" / "data"
+    report_dir = data_dir / "reports"
+    output_dir: Path = data_dir / "output"
+
+    logging.info(f"project dir: {project_dir}")
+    logging.info(f"data dir: {data_dir}")
+    logging.info(f"report dir: {report_dir}")
+    logging.info(f"expected output dir: {output_dir}")
+    logging.info("")
+
+    parameters = [str(data_dir), str(output_dir)]
+
+    # test LEC expressions in reports
+    stem = "rep_expand"
+    report_file: Path = report_dir / f"{stem}.rep"
+    output_file: Path = output_dir / f"{stem}.a2m"
+    expected_output_file: Path = output_dir / f"{stem}.ref.a2m"
+    assert report_file.exists()
+    assert expected_output_file.exists()
+    print(f"execute report '{str(report_file)}'")
+    execute_report(report_file, parameters)
+    assert output_file.exists()
+    output_content = output_file.read_text()
+    expected_content = expected_output_file.read_text()
+    assert output_content == expected_content
+
+    # test IODE functions in report 
+    stem = "rep_fns"
+    report_file: Path = report_dir / f"{stem}.rep"
+    output_file: Path = output_dir / f"{stem}.a2m"
+    expected_output_file: Path = output_dir / f"{stem}.ref.a2m"
+    assert report_file.exists()
+    assert expected_output_file.exists()
+    print(f"execute report '{str(report_file)}'")
+    execute_report(report_file, parameters)
+    assert output_file.exists()
+    output_content = output_file.read_text()
+    expected_content = expected_output_file.read_text()
+    assert output_content == expected_content
+
+    # test creation IODE procedures in report
+    stem = "rep_proc"
+    report_file: Path = report_dir / f"{stem}.rep"
+    output_file: Path = output_dir / f"{stem}.a2m"
+    expected_output_file: Path = output_dir / f"{stem}.ref.a2m"
+    assert report_file.exists()
+    assert expected_output_file.exists()
+    print(f"execute report '{str(report_file)}'")
+    execute_report(report_file, parameters)
+    assert output_file.exists()
+    output_content = output_file.read_text()
+    expected_content = expected_output_file.read_text()
+    assert output_content == expected_content
 
 
 # WRITE
