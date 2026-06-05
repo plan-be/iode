@@ -456,6 +456,7 @@ generate_stub_files.py
 # PYTHON
 /pyiode/**/*.c
 /pyiode/**/*.cpp
+/pyiode/**/*.txt
 !/pyiode/s_pyiode.c
 !/pyiode/super.cpp
 !/pyiode/cli.cpp
