@@ -199,7 +199,7 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     <BLANKLINE>
     """
     if isinstance(filepath, str):
-        filepath = Path(filepath)
+        filepath = Path(filepath).absolute()
     if not filepath.exists():
         raise ValueError(f"file '{str(filepath)}' not found.")
     filepath = str(filepath)
