@@ -60,6 +60,7 @@ class ReportWidget(AbstractTextWidget):
         self.ui.comboBox_language.addItems(self.v_lang_names)
         self.ui.comboBox_language.setEditable(False)
 
+        self.encoding = 'cp850'
         self.file_filter = f"IODE report files (*{IODE_REPORT_EXTENSION})"
 
         # Connect signals to slots
@@ -141,7 +142,7 @@ class ReportWidget(AbstractTextWidget):
         i_language = self.ui.comboBox_language.currentIndex()
         language = self.v_langs[i_language]
         nb_decimals = self.ui.spinBox_nbDecimals.value()
-        self._editor.run(self.filepath, parameters, nb_decimals, language)
+        self._editor.run(self.filepath, parameters, nb_decimals, language, self.encoding)
         self.main_window.update_tab_and_completer()
 
     @Slot()
