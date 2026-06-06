@@ -80,17 +80,17 @@ def register_super_function(name):
 cdef void c_kwarning_super(const char* msg) noexcept:
     cdef size_t length = strlen(msg)
     cdef bytes b_msg = bytes(msg[:length])
-    __registry_super_functions['warning'](b_msg.decode('utf-8'))
+    __registry_super_functions['warning'](b_msg.decode('cp850'))
 
 cdef void c_kmsg_super(const char* msg) noexcept:
     cdef size_t length = strlen(msg)
     cdef bytes b_msg = bytes(msg[:length])
-    __registry_super_functions['message'](b_msg.decode('utf-8'))
+    __registry_super_functions['message'](b_msg.decode('cp850'))
 
 cdef int c_kconfirm_super(const char* msg) noexcept:
     cdef size_t length = strlen(msg)
     cdef bytes b_msg = bytes(msg[:length])
-    return __registry_super_functions['confirm'](b_msg.decode('utf-8'))
+    return __registry_super_functions['confirm'](b_msg.decode('cp850'))
 
 cdef void c_kpanic_super():
     K_end_ws(1)
@@ -105,7 +105,7 @@ cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg,
     cdef size_t length_msg = strlen(<char*>msg)
     cdef bytes b_title = bytes(title[:length_title])
     cdef bytes b_msg = bytes(msg[:length_msg])
-    return __registry_super_functions['msgbox'](b_title.decode('utf-8'), b_msg.decode('utf-8'))
+    return __registry_super_functions['msgbox'](b_title.decode('cp850'), b_msg.decode('cp850'))
 
 def skip_pause(value: bool):
     kpause_continue = <bint>value

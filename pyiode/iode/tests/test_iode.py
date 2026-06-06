@@ -11,6 +11,7 @@ except ImportError:
 
 import time
 import logging
+import warnings
 from pathlib import Path
 from datetime import datetime
 
@@ -1335,6 +1336,12 @@ def test_execute_command(tmp_path):
 
     with pytest.warns(RuntimeWarning, match=r"Report: Macro 'macro' is not defined"):
         execute_command("%macro%")
+
+    # test no warnings if commands involve special characters
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        execute_command("@ansi(àâäéèêëîïöôùç)")
+        execute_command("@ttitle(C8_1)")
 
     generalized_sample = '1990Y1:2'
     nb_dec = 2
