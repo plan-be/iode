@@ -1,7 +1,7 @@
 from qtpy.QtCore import Qt, QUrl, QDir, QLocale
 
 from iode_gui import GUI_DOC_DIR, GUI_RESOURCES_DIR
-from iode import DOC_DIR
+from iode import DOC_DIR, IodeFileType
 
 IODE_VERSION = "IODE Modeling Software ${PROJECT_VERSION} - (c) 1990-${CURRENT_YEAR} Federal Planning Bureau - Brussels"
 IODE_VERSION_MAJOR = ${PROJECT_VERSION_MAJOR}
@@ -16,6 +16,7 @@ NAN_REP = "--"
 MAX_PRECISION_NUMBERS = 10
 DEFAULT_FONT_FAMILY = "Consolas, \"Courier New\", monospace"
 SHOW_IN_TEXT_TAB_EXTENSIONS_LIST = (".txt", ".a2m", ".prf", ".dif", ".asc", ".ref")
+OEM850_FILES = [IodeFileType.FILE_REP, IodeFileType.FILE_A2M]
 IODE_REPORT_EXTENSION = ".rep"
 TMP_FILENAME: str =  "~dummy"
 

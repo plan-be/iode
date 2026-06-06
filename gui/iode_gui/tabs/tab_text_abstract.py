@@ -4,6 +4,7 @@ from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
 
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.tabs.tab_abstract import IodeAbstractWidget
+from iode_gui.utils import OEM850_FILES
 
 from typing import Optional
 from iode import IodeFileType
@@ -30,6 +31,9 @@ class AbstractTextWidget(IodeAbstractWidget):
         self.printer = QPrinter()
         self._editor: QPlainTextEdit = None
         self._editor_2: QPlainTextEdit = None
+        self.file_encoding = 'utf-8'
+        if self.file_type in OEM850_FILES:
+            self.file_encoding = 'cp850'
 
     @property
     def filepath(self) -> str:
@@ -66,7 +70,7 @@ class AbstractTextWidget(IodeAbstractWidget):
             return False
 
         try:
-            with open(filepath, 'r') as file:
+            with open(filepath, 'r', encoding=self.file_encoding) as file:
                 file_content = file.read()
                 if self._editor.toPlainText() == file_content:
                     return False
@@ -96,7 +100,7 @@ class AbstractTextWidget(IodeAbstractWidget):
         self.saving_file = True
 
         try:
-            with open(filepath, 'w') as file:
+            with open(filepath, 'w', encoding=self.file_encoding) as file:
                 file.write(self._editor.toPlainText() + "\n")
                 # updates modified status -> automatically calls setModified
                 self._editor.document().setModified(False)

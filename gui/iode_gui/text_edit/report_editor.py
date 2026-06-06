@@ -37,7 +37,8 @@ class IodeReportEditor(IodeTextEditor):
         self.setup_completer(main_window=main_window, report_commands=True, 
                              lec_functions=True, iode_types=-1)
 
-    def run(self, filepath: str, parameters: Union[str, List[str]], nb_decimals: int, language: TableLang):
+    def run(self, filepath: str, parameters: Union[str, List[str]], nb_decimals: int, 
+            language: TableLang, encoding: str):
         """
         Executes an IODE report.
 
@@ -48,6 +49,7 @@ class IodeReportEditor(IodeTextEditor):
             parameters (str): The parameters for the report.
             nb_decimals (int): The number of decimals to use.
             language (TableLang): The language to use.
+            encoding (str): The encoding to use for report execution.
         """
         saved_current_dir: str = QDir.currentPath()
         
@@ -83,7 +85,7 @@ class IodeReportEditor(IodeTextEditor):
             execute_command(f"$PrintLang  {language.name.title()}")
 
             # executes IODE report
-            execute_report(filepath, parameters)
+            execute_report(filepath, parameters, encoding=encoding)
 
             # reset current directory execution to project directory (chdir)
             QDir.setCurrent(saved_current_dir)
