@@ -134,7 +134,8 @@ def build_lec_functions_list() -> List[str]:
     return cython_build_lec_functions_list()
 
 
-def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]=None):
+def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]=None, 
+                   encoding: str='cp850'):
     r"""
     Execute an IODE report.
 
@@ -147,7 +148,19 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
         Parameter(s) passed to the report.
         If multiple parameters are passed in one string, they must be separated by a whitespace.
         Default to None.
+    encoding: str, optional
+        Encoding of the report file. Default to 'cp850'. 
+        The (old) IODE report *.rep* are written using encoding 'oem-850' (cp850). 
 
+    Warnings
+    --------
+    The encoding of the report file must be 'oem-850' (cp850) for the report to be executed 
+    correctly. If the encoding is different, it must be specified through the *encoding parameter*. 
+    In that case, a temporary copy of the report file will be created in 'oem-850' encoding 
+    and used for execution. The temporary file will be deleted after execution.
+
+    By default, Python uses 'utf-8' encoding to read text files.
+        
     Notes
     -----
     Equivalent to the IODE command `$ReportExec`
@@ -155,12 +168,79 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     Examples
     --------
     >>> from iode import execute_report, variables
+    >>> from iode import SAMPLE_DATA_DIR
     >>> from pathlib import Path
     >>> output_dir = getfixture('tmp_path')
+
+    Existing (old) IODE report file (oem-850 encoding)
+
+    >>> parameters = [SAMPLE_DATA_DIR, str(output_dir)]
+    >>> report_file = str(f"{SAMPLE_DATA_DIR}/reports/oem850.rep")
+    >>> execute_report(report_file, parameters)             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+    iode> $ report containing special characters
+    iode> $indent
+    iode> $noparsing
+    iode> $goto continue 1
+    iode> $define input_dir ...
+    iode> $define output_dir ...
+    iode> $ print output of the present report to oem850.a2m file
+    iode> $ A2M files are encoded in OEM-850
+    iode> $PrintDest ...oem850.a2m A2M
+    iode> $define string àâäéèêëîïöôùç
+    iode> $ evaluate macro
+    iode> àâäéèêëîïöôùç
+    iode> $ Load comments and tables
+    iode> $WsLoadCmt ...fun
+    Loading ...fun
+    317 objects loaded
+    iode> $WsLoadTbl ...fun
+    Loading ...fun
+    46 objects loaded
+    iode> $ get a comment
+    iode> Deflator privaat verbruik (vóór statistische aanpassing).
+    iode> $ get title of an IODE table
+    iode> Déterminants de l'output potentiel
+    iode> $return
+
+    >>> # check content of output file created by the report
+    >>> # Warning: A2M are written using 'oem-850' encoding (cp850) 
+    >>> #          -> need to specify the encoding when reading the file
+    >>> result_file = output_dir / "oem850.a2m"
+    >>> # without specifying the encoding, the special characters 
+    >>> # are not read correctly
+    >>> with open(result_file, "r") as f:                   # doctest: +NORMALIZE_WHITESPACE
+    ...     print(f.read())
+    …ƒ„‚Šˆ‰Œ‹”“—‡
+    <BLANKLINE>
+    <BLANKLINE>
+    Deflator privaat verbruik (v¢¢r statistische aanpassing).
+    <BLANKLINE>
+    D‚terminants de l'output potentiel
+    <BLANKLINE>
+    <BLANKLINE>
+    <BLANKLINE>
+
+    >>> # with the correct encoding, the special characters 
+    >>> # are read correctly
+    >>> with open(result_file, "r", encoding="cp850") as f:     # doctest: +NORMALIZE_WHITESPACE
+    ...     print(f.read())
+    àâäéèêëîïöôùç
+    <BLANKLINE>
+    <BLANKLINE>
+    Deflator privaat verbruik (vóór statistische aanpassing).
+    <BLANKLINE>
+    Déterminants de l'output potentiel
+    <BLANKLINE>
+    <BLANKLINE>
+    <BLANKLINE>
+    
+    New IODE report file (utf-8 encoding)
+
+    >>> # create a dump report.
+    >>> # Note: By default, Python uses 'utf-8' encoding 
+    >>> #       to write text files.
     >>> create_var_rep = str(output_dir / "create_var.rep")
     >>> result_var_file = str(output_dir / "test_var.av")
-
-    >>> # create an dump report
     >>> with open(create_var_rep, "w") as f:                # doctest: +ELLIPSIS
     ...     f.write("$WsClearVar\n")
     ...     f.write("$WsSample 2000Y1 2005Y1\n")
@@ -177,8 +257,10 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     26
     ...
 
-    >>> # execute report
-    >>> execute_report(create_var_rep, ["A", "B", "C", "D"])    # doctest: +ELLIPSIS
+    >>> # execute the report.
+    >>> # Warning: IODE report files are interpreted as files written 
+    >>> #          using the old 'oem-850' encoding (cp850).
+    >>> execute_report(create_var_rep, ["A", "B", "C", "D"], encoding='utf-8')  # doctest: +ELLIPSIS
     iode> $WsClearVar
     iode> $WsSample 2000Y1 2005Y1
     iode> $DataCalcVar A t+1
@@ -202,14 +284,26 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
         filepath = Path(filepath).absolute()
     if not filepath.exists():
         raise ValueError(f"file '{str(filepath)}' not found.")
-    filepath = str(filepath)
 
     if parameters is None:
         parameters = ''
     if not isinstance(parameters, str):
         parameters = ' '.join(parameters)
     
-    cython_execute_report(filepath, parameters)
+    if encoding.lower() not in ['oem-850', 'cp850']:
+        # C/C++ code of IODE only accepts 'cp850' encoding (also known as 'oem-850') 
+        # for report execution -> need to create a temporary copy of the report file in 'cp850' encoding
+        stem = Path(filepath).stem
+        temp_filepath: Path = filepath.with_stem(f"{stem}_cp850").with_suffix('.rep')
+        with open(filepath, 'r', encoding=encoding) as f_in, \
+                open(temp_filepath, 'w', encoding='cp850') as f_out:
+            f_out.write(f_in.read())
+        try:
+            cython_execute_report(str(temp_filepath), parameters)
+        finally:
+            temp_filepath.unlink()  # delete the temporary file
+    else:
+        cython_execute_report(str(filepath), parameters)
 
 
 def execute_command(command: Union[str, List[str]]):

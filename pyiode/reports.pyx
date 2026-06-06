@@ -31,7 +31,11 @@ def cython_build_lec_functions_list() -> List[str]:
     return[name.decode() for name in cpp_build_lec_functions_list()]
 
 def cython_execute_report(filepath: str, parameters: str):
-    cpp_execute_report(filepath.encode(), parameters.encode())
+    # C/C++ code of IODE only accepts 'cp850' encoding (also known as 'oem-850') 
+    # for report execution
+    cpp_execute_report(filepath.encode(), parameters.encode('cp850'))
 
-def cython_execute_command(command: str):    
-    cpp_execute_report_line(command.encode())
+def cython_execute_command(command: str):   
+    # C/C++ code of IODE only accepts 'cp850' encoding (also known as 'oem-850') 
+    # for IODE command execution 
+    cpp_execute_report_line(command.encode('cp850'))
