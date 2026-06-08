@@ -1,5 +1,6 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr
 
 from pyiode.util cimport IODE_IS_A_NUMBER
 from pyiode.time.period cimport CPeriod
@@ -67,8 +68,13 @@ cdef class ComputedTable:
         return self.c_computed_table.get_nb_periods()
 
     def get_sample(self) -> Sample:
-        cdef CSample* c_sample = self.c_computed_table.get_sample().get()
-        return Sample._from_ptr(c_sample, <bint>False)
+        cdef shared_ptr[CSample] sample_ptr = self.c_computed_table.get_sample()
+        cdef CSample* c_sample = sample_ptr.get()
+        if c_sample is NULL:
+            return None
+        if c_sample.start_period.year == 0 or c_sample.nb_periods == 0:
+            return None
+        return Sample._from_ptr(sample_ptr)
 
     def get_title(self) -> str:
         return self.c_computed_table.get_title().decode()

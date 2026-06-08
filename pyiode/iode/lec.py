@@ -1,3 +1,4 @@
+import warnings
 import pandas as pd
 from typing import List, Union
 from iode.time.period import Period
@@ -83,6 +84,10 @@ def execute_lec(lec: str, period: Union[str, int, Period]=None) -> Union[float, 
     # evaluate a LEC expression over the whole sample
     if period is None:
         from iode.iode_database.variables_database import variables
+        if not variables.sample:
+            warnings.warn("The sample of the Variables workspace is not defined. "
+                            "Evaluate the LEC expression over an undefined sample.")
+            return None
         values = cython_execute_lec(lec)
         periods = [str(p) for p in variables.periods]
         series = pd.Series(values, index=periods)

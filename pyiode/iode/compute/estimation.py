@@ -241,7 +241,7 @@ class EditAndEstimateEquations:
     def __init__(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None):
         if from_period is None or to_period is None:
             vars_sample = variables.sample
-            if vars_sample.start is None or vars_sample.end is None:
+            if not vars_sample:
                 warnings.warn("The sample of the Variables workspace is not defined. "
                               "Set estimation sample as undefined.")
                 from_period, to_period = '', ''
