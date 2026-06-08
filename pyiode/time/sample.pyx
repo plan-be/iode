@@ -51,7 +51,7 @@ cdef class Sample:
         if c_period.year == 0:
             return True
         c_period = self.c_sample.end_period
-        if c_period.year ==0:
+        if c_period.year == 0:
             return True
         return False
 

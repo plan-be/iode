@@ -68,6 +68,8 @@ cdef class ComputedTable:
 
     def get_sample(self) -> Sample:
         cdef CSample* c_sample = self.c_computed_table.get_sample()
+        if c_sample is NULL:
+            return None
         return Sample._from_ptr(c_sample, <bint>False)
 
     def get_title(self) -> str:
