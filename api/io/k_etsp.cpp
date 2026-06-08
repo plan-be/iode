@@ -45,11 +45,11 @@
 
 int ExportObjsTSP::write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
-    int freq = get_nb_periods_per_year(dbv_ptr->sample->start_period.periodicity);
-    std::string start_period_year = std::to_string((dbv_ptr->sample->start_period).year);
-    std::string end_period_year   = std::to_string((dbv_ptr->sample->end_period).year);
-    std::string start_period_step = std::to_string((dbv_ptr->sample->start_period).step);
-    std::string end_period_step   = std::to_string((dbv_ptr->sample->end_period).step);
+    int freq = get_nb_periods_per_year(dbv_ptr->get_sample()->start_period.periodicity);
+    std::string start_period_year = std::to_string((dbv_ptr->get_sample()->start_period).year);
+    std::string end_period_year   = std::to_string((dbv_ptr->get_sample()->end_period).year);
+    std::string start_period_step = std::to_string((dbv_ptr->get_sample()->start_period).step);
+    std::string end_period_step   = std::to_string((dbv_ptr->get_sample()->end_period).step);
 
     file_descriptor.open(outfile);
 

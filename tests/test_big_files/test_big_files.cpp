@@ -61,8 +61,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
-        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        EXPECT_EQ(kdb_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->get_sample()->nb_periods, 71);
         all_nb_names = kdb_var->size();
         auto end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
@@ -82,8 +82,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var->load_binary(fullfilename);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), 175760);
-        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        EXPECT_EQ(kdb_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->get_sample()->nb_periods, 71);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(STANDALONE - ALL VARS)  loaded " << std::to_string(kdb_var->size()) 
@@ -100,8 +100,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
-        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        EXPECT_EQ(kdb_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->get_sample()->nb_periods, 71);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(GLOBAL - SOME VARS)     loaded " << std::to_string(nb_names) 
@@ -116,8 +116,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         kdb_var->load_binary(fullfilename, v_objs);
         EXPECT_TRUE(kdb_var != nullptr);
         EXPECT_EQ(kdb_var->size(), nb_names);
-        EXPECT_EQ(kdb_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(kdb_var->sample->nb_periods, 71);
+        EXPECT_EQ(kdb_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(kdb_var->get_sample()->nb_periods, 71);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(STANDALONE - SOME VARS) loaded " << std::to_string(nb_names) 
@@ -187,8 +187,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         EXPECT_TRUE(global_ws_var.get() != nullptr);
         global_ws_var->load(std::string(fullfilename));
         EXPECT_EQ(global_ws_var->size(), 175760);
-        EXPECT_EQ(global_ws_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(global_ws_var->sample->nb_periods, 71);
+        EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(global_ws_var->get_sample()->nb_periods, 71);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "loaded " << std::to_string(global_ws_var->size()) << " variables in " 
@@ -244,8 +244,8 @@ TEST(BigFilesTest, Tests_BIG_WS)
         EXPECT_TRUE(global_ws_var.get() != nullptr);
         global_ws_var->load(std::string(fullfilename));
         EXPECT_EQ(global_ws_var->size(), 175760);
-        EXPECT_EQ(global_ws_var->sample->to_string(), "1990Y1:2060Y1");
-        EXPECT_EQ(global_ws_var->sample->nb_periods, 71);
+        EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1990Y1:2060Y1");
+        EXPECT_EQ(global_ws_var->get_sample()->nb_periods, 71);
         end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
         std::cout << "(B_WsLoad) [.av file]      loaded " << std::to_string(global_ws_var->size()) 

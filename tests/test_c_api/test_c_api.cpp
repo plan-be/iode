@@ -189,7 +189,7 @@ public:
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
 	    KV_sample(kdb_var, smpl);
-	    EXPECT_TRUE(kdb_var->sample != nullptr);
+	    EXPECT_TRUE(kdb_var->get_sample() != nullptr);
 	
 	    // Creates or update new vars
         Variable A;
@@ -257,7 +257,7 @@ public:
 	    double  calc_val;
 	    int     rc;
 	
-	    Period per = global_ws_var->sample->start_period.shift(t);
+	    Period per = global_ws_var->get_sample()->start_period.shift(t);
 	
 	    clec = L_cc(lec);
         EXPECT_TRUE(clec != NULL);
@@ -458,14 +458,14 @@ public:
 	
 	    B_WsClearAll("");
         EXPECT_EQ(global_ws_var->size(), 0);
-        EXPECT_TRUE(global_ws_var->sample == nullptr);
+        EXPECT_TRUE(global_ws_var->get_sample() == nullptr);
 
 	    // 1. Copy full VAR file (Warning: * required)
 	    sprintf(arg,  "%sfun.av *", input_test_dir);
 	    rc = B_WsCopy(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
         EXPECT_EQ(global_ws_var->size(), 394);
-        EXPECT_TRUE(global_ws_var->sample != nullptr);
+        EXPECT_TRUE(global_ws_var->get_sample() != nullptr);
 	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
 	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
@@ -622,7 +622,7 @@ public:
 	    if(!global_ws_var) 
             return false;
         
-	    nb = global_ws_var->sample->nb_periods;
+	    nb = global_ws_var->get_sample()->nb_periods;
 	    A = L_cc_link_exec(lec, global_ws_var, global_ws_scl);
 	    global_ws_var->add(name, Variable(A, A + nb));
 	    SCR_free(A);
@@ -739,7 +739,7 @@ public:
         sprintf(arg, "%sfun", input_test_dir);
 	    B_WsLoad(arg, VARIABLES);
         EXPECT_EQ(global_ws_var->size(), 394);
-        EXPECT_TRUE(global_ws_var->sample != nullptr);
+        EXPECT_TRUE(global_ws_var->get_sample() != nullptr);
 	    sprintf(arg, "%sfuncsv.csv A* *G", output_test_dir);
 	    rc = B_CsvSave(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
@@ -786,9 +786,9 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
     EXPECT_TRUE(found);
 
     // Test KV_sample()
-    std::string asmpl1 = global_ws_var->sample->to_string();
+    std::string asmpl1 = global_ws_var->get_sample()->to_string();
     KV_sample(global_ws_var, NULL);
-    std::string asmpl2 = global_ws_var->sample->to_string();
+    std::string asmpl2 = global_ws_var->get_sample()->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
 
@@ -1126,7 +1126,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename);
     EXPECT_NE(kdb_var, nullptr);
-    EXPECT_NE(kdb_var->sample, nullptr);
+    EXPECT_NE(kdb_var->get_sample(), nullptr);
     EXPECT_EQ(kdb_var->size(), 394);
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
@@ -1142,7 +1142,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename, v_objs);
     EXPECT_NE(kdb_var, nullptr);
-    EXPECT_NE(kdb_var->sample, nullptr);
+    EXPECT_NE(kdb_var->get_sample(), nullptr);
     EXPECT_EQ(kdb_var->size(), 2);
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAF", 32) * 1000) / 1000, 30.159);   // ACAF 1992Y1
     EXPECT_DOUBLE_EQ(round(kdb_var->get_value("ACAG", 32) * 1000) / 1000, -40.286);  // ACAG 1992Y1
@@ -1734,7 +1734,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
     EXPECT_EQ(rc, 0);
-    smpl = global_ws_var->sample;
+    smpl = global_ws_var->get_sample();
     rc = B_DataUpdate("U L 2000Y1 2 3.1 4e2" , VARIABLES);
     EXPECT_EQ(rc, 0);
 
@@ -3588,7 +3588,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
     rc = B_WsSample("1965Y1 2020Y1");
     smpl = new Sample("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(*global_ws_var->sample, *smpl);
+    EXPECT_EQ(*global_ws_var->get_sample(), *smpl);
     delete smpl;
 
     U_test_reset_kmsg_msgs();

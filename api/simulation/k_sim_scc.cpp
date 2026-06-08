@@ -122,8 +122,8 @@ int CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDB
     KSIM_DBS = dbs;
 
     // Check Sample dans les bornes du WS
-    t = smpl->start_period.difference(dbv->sample->start_period);
-    at = dbv->sample->end_period.difference(smpl->end_period);
+    t = smpl->start_period.difference(dbv->get_sample()->start_period);
+    at = dbv->get_sample()->end_period.difference(smpl->end_period);
     if(t < 0 || at < 0) 
     {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
@@ -139,9 +139,9 @@ int CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDB
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->sample->nb_periods);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->sample->nb_periods);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->sample->nb_periods);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->get_sample()->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->get_sample()->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->get_sample()->nb_periods);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     std::string eq_name;
@@ -213,7 +213,7 @@ int CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScala
     for(i = 0;     i < KSIM_POST; i++)  KSIM_ORDER[j++] = dbe->index_of(std::string(post[i]));
 
     // Simulation
-    t = smpl->start_period.difference(dbv->sample->start_period);
+    t = smpl->start_period.difference(dbv->get_sample()->start_period);
 
     for(i = 0; i < smpl->nb_periods; i++, t++)
         if(rc = sub_simulate(t)) 

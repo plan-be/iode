@@ -54,6 +54,8 @@ TEST_F(KDBVariablesTest, Subset)
     EXPECT_TRUE(global_ws_var->is_global_database());
     std::set<std::string> names = global_ws_var->filter_names(pattern);
 
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1960Y1:2015Y1");
+
     // DEEP COPY SUBSET
     KDBVariablesPtr kdb_subset_deep_copy = global_ws_var->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
@@ -62,6 +64,10 @@ TEST_F(KDBVariablesTest, Subset)
     EXPECT_EQ(global_ws_var->get("ACAF"), var);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
 
+    global_ws_var->set_sample("1980Y1", "2030Y1");
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1980Y1:2030Y1");
+    EXPECT_EQ(kdb_subset_deep_copy->get_sample()->to_string(), "1960Y1:2015Y1");
+
     // SHALLOW COPY SUBSET
     KDBVariablesPtr kdb_subset_shallow_copy = global_ws_var->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
@@ -69,6 +75,10 @@ TEST_F(KDBVariablesTest, Subset)
     kdb_subset_shallow_copy->update("ACAF", lec);
     EXPECT_EQ(global_ws_var->get("ACAF"), new_var);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), new_var);
+
+    global_ws_var->set_sample("2000Y1", "2020Y1");
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "2000Y1:2020Y1");
+    EXPECT_EQ(kdb_subset_shallow_copy->get_sample()->to_string(), "2000Y1:2020Y1");
 }
 
 TEST_F(KDBVariablesTest, Save)

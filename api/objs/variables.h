@@ -78,6 +78,7 @@ struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
     static char* CSV_AXES;
     static int   CSV_NBDEC;
 
+private:
     // periods of the Variables database
     Sample* sample = nullptr;
 
@@ -123,8 +124,8 @@ private:
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) 
     {
-        if(other.sample)
-            this->sample = new Sample(*(other.sample));
+        if(other.get_sample())
+            this->sample = new Sample(*(other.get_sample()));
         else
             this->sample = nullptr;
     }
@@ -169,8 +170,7 @@ public:
     std::shared_ptr<KDBVariables> initialize_subset(const std::shared_ptr<KDBVariables> true_parent) override
     {
         std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::initialize_subset(true_parent);
-        if(true_parent->sample)
-            subset_ptr->sample = new Sample(*(true_parent->sample));
+        subset_ptr->sample = nullptr;
         return subset_ptr;
     }
 
@@ -361,7 +361,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     if(cpp_kdb.size() == 0)
         return 0;
 
-	Sample* smpl = cpp_kdb.sample;
+	Sample* smpl = cpp_kdb.get_sample();
     if(!smpl)
         return 0;
     

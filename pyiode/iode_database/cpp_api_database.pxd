@@ -328,8 +328,6 @@ cdef extern from "api/objs/tables.h":
 
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
-        CSample* sample
-
         # factory method
         shared_ptr[KDBVariables] Create(bool is_global) except +
 

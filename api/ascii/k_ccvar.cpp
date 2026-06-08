@@ -36,7 +36,7 @@ int   KDBVariables::CSV_NBDEC = 15;
  */
 static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
 {
-    Sample* smpl = kdb.sample;
+    Sample* smpl = kdb.get_sample();
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
@@ -121,7 +121,9 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
         return false;
     }
     
-    kdb.sample = new Sample(*smpl);
+    Period start_period = smpl->start_period;
+    Period end_period = smpl->end_period;
+    kdb.set_sample(start_period, end_period);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...

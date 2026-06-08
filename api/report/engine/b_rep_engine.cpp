@@ -710,7 +710,7 @@ int RP_evaltime()
     if(!kdb_var)
         return 0;
     
-    Sample* sample = kdb_var->sample;
+    Sample* sample = kdb_var->get_sample();
     if(!sample)
         return 0;
     
@@ -799,7 +799,7 @@ int RP_fmt(char* buf, char* format, double value)
     if(format[0] == 'T') 
     {
         t = (int) value;
-        Period per = global_ws_var->sample->start_period.shift(t);
+        Period per = global_ws_var->get_sample()->start_period.shift(t);
         strcpy(buf, (char*) per.to_string().c_str());
         return 0;
     }

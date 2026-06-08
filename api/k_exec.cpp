@@ -323,8 +323,8 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     if(vars_to_read.size() == 0)
         return 0;
 
-    Sample* vsmpl = dbv_ptr->sample;
-    Sample* tsmpl = dbv_tmp->sample;
+    Sample* vsmpl = dbv_ptr->get_sample();
+    Sample* tsmpl = dbv_tmp->get_sample();
     if(!tsmpl)
     {
         std::string msg = "Function KI_read_vars_db: the sample of the ";
@@ -340,8 +340,8 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     // The sample of the KDB of the variables to read is empty 
     if(!vsmpl) 
     {
-        dbv_ptr->sample = new Sample(*tsmpl);
-        vsmpl = dbv_ptr->sample;
+        dbv_ptr->set_sample(tsmpl->start_period, tsmpl->end_period);
+        vsmpl = dbv_ptr->get_sample();
     }
     
     Sample smpl = vsmpl->intersection(*tsmpl);
@@ -513,7 +513,7 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
     if(nb_found_total < dbv_ptr->size()) 
     {
         j = 0;
-        dim = dbv_ptr->sample->nb_periods;
+        dim = dbv_ptr->get_sample()->nb_periods;
         // using iterator to avoid concurrent modification of dbv when we add the 
         // missing VARs with NaN values
         std::string name;
@@ -729,7 +729,7 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
 static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
     int* order, Sample* smpl)
 {
-    int start = smpl->start_period.difference(dbv_ptr->sample->start_period);
+    int start = smpl->start_period.difference(dbv_ptr->get_sample()->start_period);
     if(start < 0) 
         start = 0;
 
@@ -779,7 +779,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     int* order;
     int  res;
 
-    Sample* var_sample = global_ws_var->sample;
+    Sample* var_sample = global_ws_var->get_sample();
     Sample* exec_sample = nullptr; 
     if(in_smpl)
         exec_sample = new Sample(*in_smpl);
@@ -832,9 +832,9 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
 
     KDBVariablesPtr dbv_i_ptr = KI_series_list(dbi_ptr);
     if(var_sample) 
-        dbv_i_ptr->sample = new Sample(*var_sample);
+        dbv_i_ptr->set_sample(var_sample->start_period, var_sample->end_period);
     else  
-        dbv_i_ptr->sample = new Sample(*exec_sample);
+        dbv_i_ptr->set_sample(exec_sample->start_period, exec_sample->end_period);
 
     if(KEXEC_TRACE) 
     {

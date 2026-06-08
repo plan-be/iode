@@ -92,7 +92,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    res = HP_smpl(from->sample, global_ws_var->sample, &t_smpl, &shift);
+    res = HP_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &shift);
     if(res < 0) 
         goto done;
 
@@ -104,7 +104,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     to = KDBVariables::Create(false);
     nb = t_smpl->nb_periods;
-    to->sample = new Sample(*t_smpl);
+    to->set_sample(t_smpl->start_period, t_smpl->end_period);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 

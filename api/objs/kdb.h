@@ -502,6 +502,21 @@ private:
     }
 
 protected:
+    std::shared_ptr<D> get_parent_db() const
+    {
+        if(k_db_type != DB_SUBSET)
+            return nullptr;
+
+        std::shared_ptr<D> parent_ptr = db_parent.lock();
+        if(!parent_ptr)
+        {
+            std::string error_msg = "Internal error: subset database of type '";
+            error_msg += type_name + "s' has a null parent database";;
+            throw std::runtime_error(error_msg);
+        }
+        return parent_ptr;
+    } 
+
     std::shared_ptr<D> get_top_level_db()
     {
         if(k_db_type != DB_SUBSET)
@@ -518,16 +533,7 @@ protected:
             }
         }
         else
-        {
-            std::shared_ptr<D> parent_ptr = db_parent.lock();
-            if(!parent_ptr)
-            {
-                std::string error_msg = "Internal error: subset database of type '";
-                error_msg += type_name + "s' has a null parent database";;
-                throw std::runtime_error(error_msg);
-            }
-            return parent_ptr;
-        }
+            return get_parent_db();
     }
 
     std::set<std::shared_ptr<D>> get_children_db() const

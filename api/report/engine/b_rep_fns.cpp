@@ -801,7 +801,8 @@ U_ch *RPF_vvalue(U_ch** args)
     if(!kdb) 
         return res;
 
-    if(kdb->sample == nullptr || kdb->sample->nb_periods == 0) 
+    Sample* sample = kdb->get_sample();
+    if(sample == nullptr || sample->nb_periods == 0) 
         return (U_ch*) "";
 
     std::string name;
@@ -818,7 +819,7 @@ U_ch *RPF_vvalue(U_ch** args)
         else 
         {
             val = kdb->get_var_ptr(name);
-            for(int j = 0 ; j < kdb->sample->nb_periods; j++, val++) 
+            for(int j = 0 ; j < kdb->get_sample()->nb_periods; j++, val++) 
             {
                 IodeFmtVal((char*) buf, *val);
                 res = SCR_strafcat(res, buf);
@@ -1174,7 +1175,7 @@ U_ch *RPF_sample(U_ch** args)
     KDBVariablesPtr kdb = global_ws_var;
     char     what = 'F';
 
-    smpl = kdb->sample;
+    smpl = kdb->get_sample();
     if(!smpl || smpl->nb_periods == 0) 
         return res;
 
@@ -1493,11 +1494,11 @@ int RPF_CalcPeriod(U_ch** args)
         return -1; // Error
 
     // Calc diff bw per and WS sample
-    int t = per.difference(global_ws_var->sample->start_period);
+    int t = per.difference(global_ws_var->get_sample()->start_period);
     if(t < 0)  
         return -1;
 
-    int at = per.difference(global_ws_var->sample->end_period);
+    int at = per.difference(global_ws_var->get_sample()->end_period);
     if(at > 0)
         return -1;
 

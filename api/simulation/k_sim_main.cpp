@@ -461,7 +461,7 @@ int CSimulation::sub_simulate(int t)
             ktermvkey(ovtime);  // Resets the interval between 2 keyboard readings
             return -1;
         }
-        Period period = KSIM_DBV->sample->start_period.shift(t);
+        Period period = KSIM_DBV->get_sample()->start_period.shift(t);
         sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
                       (char*) period.to_string().c_str(), it, KSIM_NORM, 
                       WscrGetMS() - ms_iter);
@@ -562,8 +562,8 @@ int CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPt
 
     // Find in the KSIM_DBV sample the position t of the first period to simulate
     // and check that the simulation sample is included in KSIM_DBV sample
-    at = smpl->start_period.difference(dbv->sample->start_period);
-    bt = dbv->sample->end_period.difference(smpl->end_period);
+    at = smpl->start_period.difference(dbv->get_sample()->start_period);
+    bt = dbv->get_sample()->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
@@ -583,9 +583,9 @@ int CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPt
     SCR_free(KSIM_NORMS);
     SCR_free(KSIM_NITERS);
     SCR_free(KSIM_CPUS);
-    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->sample->nb_periods);
-    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->sample->nb_periods);
-    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->sample->nb_periods);
+    KSIM_NORMS = (double *) SCR_malloc(sizeof(double) * dbv->get_sample()->nb_periods);
+    KSIM_NITERS = (int *) SCR_malloc(sizeof(int) * dbv->get_sample()->nb_periods);
+    KSIM_CPUS = (long *) SCR_malloc(sizeof(long) * dbv->get_sample()->nb_periods);
 
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
@@ -696,7 +696,7 @@ int CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPt
 
                 var_exo = KSIM_DBV->get_name(posexo);
                 x = KSIM_DBV->get_var_ptr(var_exo);
-                for(j = t + 1; j < dbv->sample->nb_periods; j++)  
+                for(j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
                     x[j] = x[t];
 
                 SCR_free_tbl((unsigned char**) var);
@@ -747,7 +747,7 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
     if(!IODE_IS_A_NUMBER(x) && msg)
     {
-        Period period = KSIM_DBV->sample->start_period.shift(t);
+        Period period = KSIM_DBV->get_sample()->start_period.shift(t);
         kerror(0, "%s : becomes unavailable at %s%s",
                KSIM_DBV->get_name(varnb), /* JMP 16-06-99 a la place de eqvarnb */
                (char*) period.to_string().c_str(),

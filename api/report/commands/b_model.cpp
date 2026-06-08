@@ -436,7 +436,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
     // Copy values
     if(vec) 
     {
-        for(int t = 0; t < global_ws_var->sample->nb_periods; t++)
+        for(int t = 0; t < global_ws_var->get_sample()->nb_periods; t++)
             x[t] = vec[t];
     }
     return 0;
@@ -468,7 +468,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     // Copy values
     if(vec) 
     {
-        for(int t = 0; t < global_ws_var->sample->nb_periods; t++)
+        for(int t = 0; t < global_ws_var->get_sample()->nb_periods; t++)
             x[t] = vec[t];
     }
     return 0;

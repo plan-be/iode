@@ -269,7 +269,7 @@ int B_DataCalcVar(char* arg, int unused)
         if(clec != 0 && !L_link(kdb, global_ws_scl, clec)) 
         {
             double d;
-            for(int t = 0 ; t < kdb->sample->nb_periods ; t++) 
+            for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 
             {
                 d = L_exec(kdb, global_ws_scl, clec, t);
                 kdb->get_var_ptr(name)[t] = d;
@@ -350,7 +350,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             }
             case VARIABLES :
             {
-                Sample* sample = global_ws_var->sample;
+                Sample* sample = global_ws_var->get_sample();
                 if(!sample) 
                     throw std::runtime_error("No sample defined in the Variables database");
                 Variable var(sample->nb_periods, IODE_NAN);
@@ -696,9 +696,9 @@ int B_DataUpdate(char* arg, int type)
                     success = false;
                     break;
                 }
-                int nb_periods = global_ws_var->sample->end_period.difference(*per) + 1;
+                int nb_periods = global_ws_var->get_sample()->end_period.difference(*per) + 1;
                 nb_upd = std::min(nb_upd, nb_periods);
-                int shift = per->difference(global_ws_var->sample->start_period);
+                int shift = per->difference(global_ws_var->get_sample()->start_period);
                 if(per == nullptr || shift < 0)
                     success = false;
                 else 

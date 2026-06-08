@@ -355,7 +355,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    res = LTOH_smpl(from->sample, global_ws_var->sample, &t_smpl, &skip, &shift);
+    res = LTOH_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &skip, &shift);
     if(res < 0) 
     {
         rc = -1;
@@ -369,7 +369,7 @@ static int B_ltoh(int type, char* arg)
     }
 
     to = KDBVariables::Create(false);
-    to->sample = new Sample(*t_smpl);
+    to->set_sample(t_smpl->start_period, t_smpl->end_period);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
         Variable to_var(t_smpl->nb_periods, 0);
@@ -377,14 +377,14 @@ static int B_ltoh(int type, char* arg)
         {
             case LTOH_CS :
                 LTOH_cs(type,
-                        from_var_ptr->data(), (int) from->sample->nb_periods,
+                        from_var_ptr->data(), (int) from->get_sample()->nb_periods,
                         to_var.data(), (int) t_smpl->nb_periods,
                         shift);
                 break;
 
             case LTOH_STEP:
                 LTOH_step(type,
-                          from_var_ptr->data(), (int) from->sample->nb_periods,
+                          from_var_ptr->data(), (int) from->get_sample()->nb_periods,
                           to_var.data(), (int) t_smpl->nb_periods,
                           shift);
                 break;
@@ -392,7 +392,7 @@ static int B_ltoh(int type, char* arg)
             default       :
             case LTOH_LIN :
                 LTOH_lin(type,
-                         from_var_ptr->data(), (int) from->sample->nb_periods,
+                         from_var_ptr->data(), (int) from->get_sample()->nb_periods,
                          to_var.data(), (int) t_smpl->nb_periods,
                          shift);
                 break;
