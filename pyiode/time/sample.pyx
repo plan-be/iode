@@ -1,4 +1,5 @@
 from cython.operator cimport dereference
+from libcpp.memory cimport shared_ptr, make_shared
 
 from typing import Union, Tuple, List, Optional, Any
 try:
@@ -12,35 +13,33 @@ from pyiode.time.sample cimport CSample
 
 
 cdef class Sample:
-    cdef bint ptr_owner
+    cdef shared_ptr[CSample] sample_ptr
     cdef CSample* c_sample
 
     def __init__(self, start_period: str, end_period: str):
-        self.ptr_owner = True
         if not start_period:
             raise ValueError("String value of 'start_period' is empty")
         if not end_period:
             raise ValueError("String value of 'end_period' is empty")
-        self.c_sample = new CSample(start_period.encode(), end_period.encode())
+        self.sample_ptr = make_shared[CSample](start_period.encode(), end_period.encode())
+        self.c_sample = self.sample_ptr.get()
 
     def __cinit__(self):
-        self.ptr_owner = False
         self.c_sample = NULL
 
     def __dealloc__(self):
-        if self.ptr_owner and self.c_sample is not NULL:
-            del self.c_sample
-            self.c_sample = NULL
+        self.sample_ptr.reset()
+        self.c_sample = NULL
 
     @staticmethod
-    cdef Sample _from_ptr(CSample* ptr, bint owner=False):
+    cdef Sample _from_ptr(shared_ptr[CSample] sample_ptr):
         """
         Factory function to create Sample objects from a given CSample pointer.
         """
         # Fast call to __new__() that bypasses the __init__() constructor.
         cdef Sample wrapper = Sample.__new__(Sample)
-        wrapper.c_sample = ptr
-        wrapper.ptr_owner = owner
+        wrapper.sample_ptr = sample_ptr
+        wrapper.c_sample = wrapper.sample_ptr.get()
         return wrapper
 
     def is_undefined(self) -> bool:
@@ -51,7 +50,7 @@ cdef class Sample:
         if c_period.year == 0:
             return True
         c_period = self.c_sample.end_period
-        if c_period.year ==0:
+        if c_period.year == 0:
             return True
         return False
 
@@ -79,8 +78,9 @@ cdef class Sample:
         if other_sample.is_undefined():
             raise RuntimeError("'other' in 'this.intersection(other)' represents an empty sample")
         
-        cdef CSample c_sample_inter = self.c_sample.intersection(dereference(other_sample.c_sample))
-        return Sample._from_ptr(new CSample(c_sample_inter), <bint>True)
+        cdef CSample c_sample_inter = self.c_sample.intersection(dereference(other_sample.sample_ptr))
+        cdef shared_ptr[CSample] sample_ptr_inter = make_shared[CSample](c_sample_inter)
+        return Sample._from_ptr(sample_ptr_inter)
 
     def get_start(self) -> Period:
         if self.is_undefined():

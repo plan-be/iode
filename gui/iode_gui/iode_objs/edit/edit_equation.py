@@ -78,7 +78,7 @@ class EditEquationDialog(MixinSettingsDialog):
                 # try to get the sample from the Variables workspace
                 from_period, to_period = "", ""
                 vars_sample = variables.sample
-                if vars_sample.start is None or vars_sample.end is None:
+                if not vars_sample.start:
                     try:
                         # ask the user to define the sample of the Variables workspace
                         dialog = EditIodeSampleDialog(self)
@@ -156,7 +156,7 @@ class EditEquationDialog(MixinSettingsDialog):
         if not from_period or not to_period:
             # try to get the sample from the Variables workspace
             vars_sample = variables.sample
-            if vars_sample.start is None or vars_sample.end is None:
+            if not vars_sample.start:
                 try:
                     # ask the user to define the sample of the Variables workspace
                     dialog = EditIodeSampleDialog(self)

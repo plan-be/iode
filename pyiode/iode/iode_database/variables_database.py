@@ -194,16 +194,22 @@ class Variables(IodeDatabase):
 
         # get the sample of the real database
         whole_db_sample: Sample = self._get_whole_sample()
+        if whole_db_sample is None:
+            raise RuntimeError("Cannot create subset because the sample of the Variables "
+                               "database is not defined yet. ")
 
         # get the position of "self" first and last periods according to the real database sample
         self_t_first, self_t_last = self._get_periods_bounds()
 
         # if first_period and last_period arguments are None, they will be set to the first 
         # and last periods of the parent database sample (if the parent db is a subset of the real db)
+        sample = self.sample
+        if not sample:
+            sample = whole_db_sample
         if first_period is None and self_t_first > 0:
-            first_period = self.sample.start
+            first_period = sample.start
         if last_period is None and self_t_last < whole_db_sample.nb_periods - 1:
-            last_period = self.sample.end
+            last_period = sample.end
 
         # check that first period subset < last period subset
         if first_period is not None and last_period is not None and first_period > last_period:
@@ -491,6 +497,9 @@ class Variables(IodeDatabase):
         # convert slice to a (start, end) tuple or a list of periods if step is not None
         elif isinstance(_periods, slice):
             sample = self.sample
+            if not sample:
+                raise ValueError(f"variables[names, {_periods}]: cannot use a slice to select " 
+                                 "periods if the sample of the Variables database is not defined.")
             first_period = sample.start if _periods.start is None else _periods.start
             last_period = sample.end if _periods.stop is None else _periods.stop
             if _periods.step is not None:
@@ -988,6 +997,12 @@ class Variables(IodeDatabase):
             if not values.flags['C_CONTIGUOUS']:
                 values = np.ascontiguousarray(values)
         elif isinstance(values, Variables):
+            if not values.sample:
+                raise ValueError(f"Cannot add the IODE variable '{name}': the sample of the "
+                                 "right-hand side Variables object is not defined.")
+            if not self.sample:
+                raise ValueError(f"Cannot add the IODE variable '{name}': the sample of the "
+                                 "left-hand side Variables database is not defined.")
             if values.sample != self.sample:
                 raise ValueError(f"Cannot add the IODE variable '{name}': Incompatible periods.\n"
                                 f"Expected right-hand side Variables object to have sample {self.sample}.\n"
@@ -1031,6 +1046,10 @@ class Variables(IodeDatabase):
         if values is None:
             raise ValueError(f"Cannot add or update the IODE variable '{key_name}'.\n"
                              f"Got None as value.")
+
+        if not self.sample:
+            raise RuntimeError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                               f"The sample of the current Variables database is not defined.")   
 
         if key_periods is not None:
             if isinstance(key_periods, str):
@@ -2031,6 +2050,10 @@ class Variables(IodeDatabase):
                       op: BinaryOperation, copy_self: bool) -> Self:
         other = self._convert_values(other)    
         _self: Variables = self.copy() if copy_self else self
+
+        if not _self.sample:
+            raise ValueError("Cannot perform arithmetic operation on an IODE Variables database "
+                             "with an undefined sample.")
 
         if isinstance(other, (int, float)):
             _self._cy_database = _self._cy_database.binary_op_scalar(other, op, copy_self)
@@ -6158,8 +6181,8 @@ class Variables(IodeDatabase):
         >>> from iode import SAMPLE_DATA_DIR
         >>> from iode import variables
         >>> variables.clear()
-        >>> variables.sample
-        None
+        >>> variables.sample is None
+        True
 
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
@@ -6262,6 +6285,9 @@ class Variables(IodeDatabase):
         <BLANKLINE>
         """
         cy_sample = self._cy_database.get_sample()
+        if cy_sample is None:
+            warnings.warn("Variables sample has not been defined yet.")
+            return None
         sample = Sample.from_cython_obj(cy_sample)
         return sample
 
@@ -6309,6 +6335,8 @@ class Variables(IodeDatabase):
         56
         """
         # self.sample calls self._maybe_update_subset_sample()
+        if self.sample is None:
+            return 0
         return self.sample.nb_periods
 
     @property
@@ -6333,6 +6361,8 @@ class Variables(IodeDatabase):
         [Period("1960Y1"), Period("1961Y1"), ..., Period("2014Y1"), Period("2015Y1")]
         """
         # self.sample calls self._maybe_update_subset_sample()
+        if self.sample is None:
+            return []
         return self.sample.periods
 
     @property
@@ -6357,6 +6387,8 @@ class Variables(IodeDatabase):
         ['1960Y1', '1961Y1', ..., '2014Y1', '2015Y1']
         """
         # self.sample calls self._maybe_update_subset_sample()
+        if self.sample is None:
+            return []
         return self.sample.get_period_list(astype=str)
 
     @property
@@ -6381,6 +6413,8 @@ class Variables(IodeDatabase):
         [1960.0, 1961.0, ..., 2014.0, 2015.0]
         """
         # self.sample calls self._maybe_update_subset_sample()
+        if self.sample is None:
+            return []
         return self.sample.get_period_list(astype=float)
 
     @property
@@ -6593,6 +6627,9 @@ class Variables(IodeDatabase):
         [1990.0, 1991.0, ..., 1999.0, 2000.0]
         """
         # self.sample calls self._maybe_update_subset_sample()
+        if self.sample is None:
+            return []
+
         sample = self.sample
         if from_period is None or to_period is None:
             if from_period is None:
@@ -6626,8 +6663,13 @@ class Variables(IodeDatabase):
         input_files, names = self._copy_from(input_files, names)
 
         # self.sample calls self._maybe_update_subset_sample()
-        sample = self.sample
         if from_period is None or to_period is None:
+            sample = self.sample
+            if sample is None:
+                raise RuntimeError("Cannot copy variables from input file(s) because "
+                                   "the current Variables sample is not defined yet. "
+                                   "Please set the current Variables sample before copying "
+                                   "variables from input file(s).")
             if from_period is None:
                 from_period = sample.start
             if to_period is None:
@@ -7179,6 +7221,9 @@ class Variables(IodeDatabase):
         ACAF          3.00    4.00    5.00    6.00    7.00    8.00    9.00
         <BLANKLINE>
         """
+        if not self.sample:
+            raise ValueError("Sample must be first defined in the current Variables database.")
+
         if isinstance(method, str):
             method = method.upper()
             method = SimulationInitialization[method]

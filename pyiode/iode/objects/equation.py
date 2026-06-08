@@ -101,7 +101,7 @@ class Equation:
         if from_period is None or to_period is None:
             from iode.iode_database.variables_database import variables
             vars_sample = variables.sample
-            if vars_sample.start is None or vars_sample.end is None:
+            if not vars_sample:
                 warnings.warn("The sample of the Variables workspace is not defined. "
                               "Set estimation sample as undefined.")
                 from_period, to_period = '', ''
@@ -875,11 +875,11 @@ class Equation:
         --------
         >>> from iode import Equation, variables
         >>> variables.clear()
-        >>> variables.sample
-        None
+        >>> variables.sample is None
+        True
         >>> eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
-        >>> eq_ACAF.sample
-        None
+        >>> eq_ACAF.sample is None
+        True
 
         >>> # set Variables sample
         >>> variables.sample = "1960Y1:2015Y1"
@@ -905,10 +905,12 @@ class Equation:
 
         >>> # specify nothing -> reset the sample
         >>> eq_ACAF.sample = ":"
-        >>> eq_ACAF.sample
-        None
+        >>> eq_ACAF.sample is None
+        True
         """
         cy_sample: CythonSample = self._cy_equation.get_sample()
+        if cy_sample is None:
+            return None
         sample = Sample.from_cython_obj(cy_sample)
         return sample
 

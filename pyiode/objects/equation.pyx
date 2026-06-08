@@ -149,8 +149,11 @@ cdef class Equation:
         self.c_equation.set_method(<IodeEquationMethod>(value))
 
     def get_sample(self) -> Sample:
-        cdef CSample sample = self.c_equation.sample
-        return Sample._from_ptr(new CSample(sample), <bint>True)
+        cdef CSample c_sample = self.c_equation.sample
+        if c_sample.start_period.year == 0 or c_sample.nb_periods == 0:
+            return None
+        cdef shared_ptr[CSample] sample_ptr = make_shared[CSample](c_sample)
+        return Sample._from_ptr(sample_ptr)
 
     def set_sample(self, from_period: str, to_period: str):
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
@@ -205,7 +208,7 @@ cdef class Equation:
         s = [f"endogenous = {self.get_endogenous()}"]
         s += [f"lec = {self.get_lec()}"]
         s += [f"method = {self.get_method()}"]
-        if len(sample):
+        if sample is not None and len(sample):
             s+= [f"sample = {sample}"]
         if self.get_comment():
             s += [f"comment = {self.get_comment()}"]
@@ -231,7 +234,7 @@ cdef class Equation:
         s = [f"endogenous = {repr(self.get_endogenous())}"]
         s += [f"lec = {repr(self.get_lec())}"]
         s += [f"method = {repr(self.get_method())}"]
-        if len(sample):
+        if sample is not None and len(sample):
             s+= [f"from_period = '{sample.get_start()}'", f"to_period = '{sample.get_end()}'"]
         if self.get_comment():
             s += [f"comment = {repr(self.get_comment())}"]
