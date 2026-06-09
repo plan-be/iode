@@ -1,0 +1,32 @@
+$ report containing special characters
+
+$indent
+$noparsing
+$goto continue {%0% >= 2}
+    $show Syntax: rep_fns input_dir output_dir
+    $show Syntax error. Report aborted.
+    $return
+$label continue
+$define input_dir %1%
+$define output_dir %2%
+
+$ print output of the present report to oem850.a2m file
+$ A2M files are encoded in OEM-850
+$PrintDest %output_dir%\oem850.a2m A2M
+
+$define string …ƒ„‚Šˆ‰Œ‹”“—‡
+
+$ evaluate macro
+%string%
+
+$ Load comments and tables
+$WsLoadCmt %input_dir%\fun
+$WsLoadTbl %input_dir%\fun
+
+$ get a comment 
+@cvalue(PC_)
+
+$ get title of an IODE table 
+@ttitle(C8_1)
+
+$return
