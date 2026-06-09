@@ -771,6 +771,9 @@ U_ch *RPF_cvalue(U_ch** args)
         else 
         {
             Comment comment = kdb->get(name);
+            // W_printf() called in RP_ReportExec_tbl() expects OEM encoding, so convert the title 
+            // from UTF-8 to OEM before printing
+            comment = utf8_to_oem(comment);
             res = SCR_strafcat(res, (unsigned char*) comment.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }
