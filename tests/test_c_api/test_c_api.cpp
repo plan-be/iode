@@ -3933,6 +3933,23 @@ TEST_F(LegacyAPITest, Tests_B_REP_ENGINE)
 }
 
 
+TEST_F(LegacyAPITest, Tests_B_REP_OEM850)
+{
+    int     rc;
+    char    cmd[1024];
+
+    U_test_print_title("Tests B_ReportExec(\"oem850.rep\")");
+    kmsg_toggle(1);
+
+    // Execution of the report oem850.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
+    sprintf(cmd,  "%soem850.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
+    rc = B_ReportExec(cmd);
+    EXPECT_EQ(rc, 0);
+    compare_files(output_test_dir, "oem850.a2m", output_test_dir, "oem850.ref.a2m");
+}
+
+
 TEST_F(LegacyAPITest, Tests_B_REP_FNS)
 {
     int     rc;
