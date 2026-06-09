@@ -422,10 +422,9 @@ gui> cd ..
 
 ### Build
 
-Build the *iode* package (for all supported python versions \*):
+Build the *iode* package:
 ```bash
 root_dir_iode> cd pyiode
-pyiode> conda activate py3xx
 pyiode> python -m build --sdist --wheel
 ```
 and the *iode_gui* Python packages:
@@ -434,17 +433,13 @@ root_dir_iode> cd gui
 gui> python -m build --sdist --wheel
 ```
 
-\* No need to build a specific version for Python 3.13 or later, since we use 
-*Stable ABI* for Python 3.12+
-
 ### Test
 
 To test the new versions of *iode*, first reinstall it using the new Wheel files:
 ```bash
 root_dir_iode> cd pyiode
-pyiode> conda activate py3xx
 pyiode> pip uninstall iode
-pyiode> pip install dist\iode-x.x.x-cp3xx-(...).whl
+pyiode> pip install dist\iode-x.x.x-(...).whl
 ```
 Then, test the installed package
 ```bash
@@ -455,9 +450,8 @@ root_dir_iode> python -m pytest --pyargs iode --doctest-modules --doctest-contin
 To test the new version of *iode-gui*, first reinstall from the new Wheel file:
 ```bash
 root_dir_iode> cd gui
-gui> conda activate py3xx
 gui> pip uninstall iode
-gui> pip install dist\iode_gui-x.x.x-(***).whl
+gui> pip install dist\iode_gui-x.x.x-(...).whl
 gui> cd ..
 ```
 
