@@ -1,7 +1,7 @@
 Version 7.0.7
 =============
 
-In development
+Released on `09/06/2026`
 
 New Features 
 ------------
