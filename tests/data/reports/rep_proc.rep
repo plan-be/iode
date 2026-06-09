@@ -28,7 +28,7 @@ $procdef printtbl year vars
 $procend
 
 # ----------------------------------------------------------
-$ sumvars: creates a new series names %result% = sum of %vars%
+$ sumvars: creates a new series names result = sum of vars
 $procdef sumvars result vars
     $define eq 0
     $foreach var %vars%
