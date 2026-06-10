@@ -15,9 +15,9 @@ source:
   # git_rev: ${CMAKE_PROJECT_VERSION}    # (Defaults to "HEAD")
 
 build:
+  noarch: python
   entry_points:
     - iode-gui = iode_gui.main:start
-  noarch: python
   script: 
     - mkdir -p "{{ PREFIX }}\Menu"                                                    # [win]
     - copy "{{ RECIPE_DIR }}\menu.json" "{{ PREFIX }}\Menu\{{ PKG_NAME }}-menu.json"  # [win]
@@ -50,7 +50,7 @@ requirements:
   run:
     - python
     - numpy >=2.0
-    - pandas >=2.0
+    - pandas <3.0
     - matplotlib-base
     - iode
     - qtpy

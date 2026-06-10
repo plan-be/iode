@@ -15,6 +15,7 @@ source:
   # git_rev: ${CMAKE_PROJECT_VERSION}    # (Defaults to "HEAD")
 
 build:
+  python_version_independent: true
   entry_points:
     - iodecmd = iode.cli:main
   script_env:                                                                         # [win]
@@ -37,10 +38,11 @@ build:
 
 requirements:
   host:
-    - python ={{ PY_VER }}
+    - python-abi3
+    - python
     - scikit-build-core >=0.10
     - numpy >=2.0
-    - pandas >=2.0
+    - pandas <3.0
     - cython ==3.1.4
     - mypy >=1.10
     - pip
@@ -55,9 +57,9 @@ requirements:
     - {{ compiler('cxx') }}                                                         # [not win]
 
   run:
-    - python ={{ PY_VER }}
+    - python
     - numpy >=2.0
-    - pandas >=2.0
+    - pandas <3.0
     - matplotlib-base
 
 test:
