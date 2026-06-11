@@ -533,11 +533,11 @@ class IodeAbstractTableModel(QAbstractTableModel):
             return []
 
     @Slot(str, IodeType)
-    def get_related_objs(self, name: str, other_type: IodeType) -> List[str]:
+    def get_objs_containing(self, name: str, other_type: IodeType) -> List[str]:
         """
-        Returns a list of all related objects of type other_type.
+        Returns a list of all objects of type *other_type* containing the object *name*.
 
-        :param name: The name of the object to search for related objects.
+        :param name: The name of the object to search in workspace of type *other_type*.
         :param other_type: The type of IODE objects to search for.
         """
         if not len(self._database):
