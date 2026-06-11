@@ -142,34 +142,34 @@ class IodeAbstractTableView(QTableView):
         self.vars_from_CLEC_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.vars_from_CLEC_shortcut.activated.connect(lambda: self.show_same_name_obj_or_objs_from_CLEC(IodeType.VARIABLES))
         
-        # get list of related objects
-        self.related_cmt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F1), self)
-        self.related_cmt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_cmt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.COMMENTS))
+        # get list of objects containing the selected object
+        self.objs_containg_cmt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F1), self)
+        self.objs_containg_cmt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_cmt_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.COMMENTS))
         
-        self.related_eq_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F2), self)
-        self.related_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_eq_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.EQUATIONS))
+        self.objs_containg_eq_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F2), self)
+        self.objs_containg_eq_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_eq_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.EQUATIONS))
         
-        self.related_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F3), self)
-        self.related_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_idt_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.IDENTITIES))
+        self.objs_containg_idt_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F3), self)
+        self.objs_containg_idt_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_idt_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.IDENTITIES))
         
-        self.related_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F4), self)
-        self.related_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_lst_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.LISTS))
+        self.objs_containg_lst_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F4), self)
+        self.objs_containg_lst_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_lst_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.LISTS))
         
-        self.related_scl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F5), self)
-        self.related_scl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_scl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.SCALARS))
+        self.objs_containg_scl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F5), self)
+        self.objs_containg_scl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_scl_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.SCALARS))
         
-        self.related_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F6), self)
-        self.related_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_tbl_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.TABLES))
+        self.objs_containg_tbl_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F6), self)
+        self.objs_containg_tbl_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_tbl_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.TABLES))
         
-        self.related_var_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F7), self)
-        self.related_var_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.related_var_shortcut.activated.connect(lambda: self.show_related_objs(IodeType.VARIABLES))
+        self.objs_containg_var_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_F7), self)
+        self.objs_containg_var_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.objs_containg_var_shortcut.activated.connect(lambda: self.show_objs_containing(IodeType.VARIABLES))
 
     def setup(self, main_window: AbstractMainWindow):
         """
@@ -619,12 +619,12 @@ class IodeAbstractTableView(QTableView):
             self.show_objs_request.emit(other_type, list_objs)
 
     @Slot(IodeType)
-    def show_related_objs(self, other_type: IodeType):
+    def show_objs_containing(self, other_type: IodeType):
         """
-        Shows all related objects.
+        Shows all objects of type *other_type* containing the selected one(s).
 
         Parameters:
-        other_type: The type of the object to show.
+        other_type: The type of the objects to show.
         """
         selection = self.selectedIndexes()
         if not selection:
@@ -634,6 +634,6 @@ class IodeAbstractTableView(QTableView):
         table_model: IodeAbstractTableModel = self.model()
         name = table_model.headerData(index.row(), Qt.Orientation.Vertical, Qt.ItemDataRole.DisplayRole)
 
-        list_objs = table_model.get_related_objs(name, other_type)
+        list_objs = table_model.get_objs_containing(name, other_type)
         if list_objs is not None and len(list_objs):
             self.show_objs_request.emit(other_type, list_objs)
