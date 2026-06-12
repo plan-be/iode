@@ -1,0 +1,448 @@
+$ tutorial for IODE reports
+$ -------------------------
+
+$ Cleanup
+$ -------
+
+$ $WsClearAll: clear all workspaces
+$WsClearAll
+
+$ Preliminary
+$ -----------
+
+$ $indent: allow to indent lines 
+$indent
+
+$ $define: create a new macro
+$define data_dir ../data
+$define output_dir ../output
+
+$ $PrintDest: define the file that will contain the execution output (logs)
+$ %output_dir%: extract the value of the macro output_dir
+$PrintDest %output_dir%/report_tutorial.a2m A2M 
+
+$ Variables Sample
+$ ----------------
+
+$define START 1960Y1
+$define END 2015Y1
+
+$ $WsSample: set the sample (list of periods) of the variables workspace
+$WsSample %START% %END%
+
+$ @sample(): extract the whole sample ()
+$ @sample(B): extract the beginning (B) of the sample
+$ @sample(E): extract the end (E) of the sample
+$show current sample: @sample()
+$show beginning of the sample: @sample(B)
+$show end of the sample: @sample(E)
+
+
+$ Executing LEC expression
+$ ------------------------
+
+$ default execution period is start of the sample
+$show Default execution period {t@T}
+
+$ $settime: set current execution period t (string value)
+$settime 1970Y1
+
+$show Execution period after settime {t@T}
+
+$ $incrtime: increase execution period by n periods (int value)
+$incrtime 10
+
+$show Execution period after incrtime {t@T}
+
+$ Create - Update - Delete objects
+$ --------------------------------
+
+$ $DataCreateXxx: create a comment ... variable
+$ - comments, lists, identities, and tables: empty
+$ - equation: "NAME := NAME"
+$ - scalars: 0.9
+$ - tables: creates an empty table
+$ - variables: a series with NA for the entire sample of the workspace
+$DataCreateVar ACAF
+
+$ $DataCalcVar: add or update a variable given a LEC formula
+$DataCalcVar ACAF2 2 * t + 1
+
+$ $DataUpdateXxx: create or update an comment ... variable
+$ $DataUpdateCmt name value
+$DataUpdateCmt ACAF Ondernemingen: ontvangen 
+$ $DataUpdateEqs name LEC_definition
+$DataUpdateEqs ACAF (ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)
+$ $DataUpdateIdt name LEC_definition
+$DataUpdateIdt BDY YN - YK
+$ $DataUpdateLst name value
+$DataUpdateLst A_VAR ACAF;ACAG;AOUC;AQC
+$ $DataUpdateScl name value [relax]
+$DataUpdateScl acaf1 0.1 0.9
+$ $DataUpdateTbl name title;lec1;lec2;...
+$DataUpdateTbl T1 title of my table;ACAF;YN;YK
+$ $DataUpdateVar name [L,l | D,d | G,g] period value1 value2 ...
+$ where L,l := in value (default)
+$       D, d := in difference
+$       G, g := in growth rate
+$       period := the period at the start of the update
+$DataUpdateVar ACAF %START% 0.0
+
+$ @[c|e|i|l|s|t|v]value: return the value of a comment ... variable
+$show Content of the comment ACAF: @cvalue(ACAF)
+
+$ $DataAppend[Cmt|Lst]: append text to the definition of 
+$                       a comment or a list
+$DataAppendCmt ACAF kapitaaloverdrachten.
+$show Content of the comment ACAF: @cvalue(ACAF)
+
+$ $DataExistXxx: test if a comment ... variable exist 
+$show Does comment ACAF exist ? {$DataExistCmt ACAF}
+
+$ $DataDeleteXxx: delete a comment ... variable
+$DataDeleteCmt ACAF
+
+$show Does comment ACAF exist ? {$DataExistCmt ACAF}
+
+$ $DataRenameXxx: rename an object
+$DataRenameScl acaf1 acaf0 
+
+$ Load - Save - Clear workspaces
+$ ------------------------------
+
+$ $WsClearXxx: clear all objects from a workspace
+$WsClearCmt 
+
+$ $WsLoadXxx: load comments ... variables from a file
+$ *.cmt ... *.var: binary files -> fast
+$ *.ac ... *.av: ASCII (text) files -> slow but human readable
+$WsLoadCmt %data_dir%/fun.cmt
+$WsLoadEqs %data_dir%/fun.eqs
+$WsLoadIdt %data_dir%/fun.idt
+$WsLoadLst %data_dir%/fun.lst
+$WsLoadScl %data_dir%/fun.scl
+$WsLoadTbl %data_dir%/fun.tbl
+$WsLoadVar %data_dir%/fun.var
+
+$ $WsSaveXxx: save a workspace to a file
+$ *.cmt ... *.var: binary files -> fast
+$ *.ac ... *.av: ASCII (text) files -> slow but human readable
+$WsSaveVar %data_dir%/fun_ascii.ac
+
+$ Filtering - Searching
+$ ---------------------
+
+$ @[c|e|i|l|s|t|v]expand: return list of comments ... variables matching pattern(s)
+$define A_EQS @eexpand(A*)
+$show Equations with names starting by A: %A_EQS%
+
+$ $DataListXxx: create a new IODE list containing the object names 
+$               based on a selection criterion (pattern)
+$DataListVar A_VARS A*
+$show Variables with names starting by A: @lvalue(A_VARS)
+
+$ @vliste: returns the list of variables in the equation(s)
+$define VARS_EQ @vliste(ACAF, ACAG, AOUC)
+$show Variables present in equations ACAF, ACAG and AOUC: %VARS_EQ%
+
+$ @sliste: returns the list of variables in the equation(s)
+$define SCLS_EQ @sliste(ACAF, ACAG, AOUC)
+$show Scalars present in equations ACAF, ACAG and AOUC: %SCLS_EQ%
+
+$ $DataScan[Eqs|Idt|Tbl]: search in one of the Eqs, Idt or Tbl workspace 
+$ for the list of variables and scalars. Store them in special lists 
+$ _SCAL (for scalars) and _EXO (for variables)
+$DataScanEqs ACAF ACAG AOUC
+$show Scalars in eqs ACAF ACAG AOUC: @lvalue(_SCAL) 
+$show Variables in eqs ACAF ACAG AOUC: @lvalue(_EXO) 
+
+$ $DataSearchXxx: search in a workspace for the list of objects containing a given string.
+$ The search differs depending on the type of object:
+$   - Comments: the name and the text of the comment are analyzed
+$   - Equations: the name and the LEC form of the equation are analyzed
+$   - Identities: the name and the LEC form of the identity are analyzed
+$   - Lists: the name and the text of the list are analyzed
+$   - Scalars: the name of the scalar is analyzed
+$   - Tables: the name, titles, and LEC forms of the table are analyzed
+$   - Variables: the name of the variable is analyzed
+$ require 7 parameters:
+$   - mask (string): pattern to search for
+$   - word [0|1]: 1 -> search for a whole word and not part of a word
+$   - ecase [0|1]: 1 if search should be case-sensitive
+$   - in_name [0|1]: 1 if the search should be done in the object name
+$   - in_formula [0|1]: 1 if the search should be done in the object's LEC formula
+$   - in_text [0|1]: 1 if the search should be done in the object's text
+$   - list_result (string): name of the IODE list that contain the result
+$DataSearchTbl croissance 1 0 0 0 1 SEARCH_CROISSANCE
+$show Tables containing croissance in text: @lvalue(SEARCH_CROISSANCE)
+$DataSearchTbl GAP 1 0 1 1 1 SEARCH_GAP
+$show Tables containing GAP (name + LEC + text): @lvalue(SEARCH_GAP)
+
+$ Compare
+$ -------
+
+$ $DataCompareEps: set the threshold below which two variables 
+$                  are considered equal
+$ test is |(x1 - x2) / x1| < eps
+$DataCompareEps 1.e-7
+
+$ add two variables
+$DataCreateVar NEW_VAR
+$DataCreateVar NEW_VAR_2
+$ delete two variables
+$DataDeleteVar AOUC
+$DataDeleteVar AQC
+$ change the value of two variables (above compare threshold)
+$DataCalcVar ACAF ACAF + 1.e-5
+$DataCalcVar ACAG ACAG + 1.e-5
+$ change the value of two variables (below compare threshold)
+$DataCalcVar BENEF BENEF + 1.e-8
+$DataCalcVar BQY BQY + 1.e-8
+$ save the Variables file to compare with
+$WsSaveVar %output_dir%/fun_other.var
+$ reload fun.var 
+$WsLoadVar %data_dir%/fun.var
+
+$ $DataCompareXxx filename ONE TWO THREE FOR
+$   - WS     in workspace only
+$   - FILE   in file only
+$   - EQUAL  in both, equal
+$   - DIFF   in both, different
+$DataCompareVar %output_dir%/fun_other.var WS FILE EQUAL DIFF
+$show Compare current Variables workspace with file fun_other.var
+$show Variables only in the current workspace: @lvalue(WS)
+$show Variables only in file: @lvalue(FILE)
+$show Variables equal in current WS and in file: @lvalue(EQUAL)
+$show Variables with different values: @lvalue(DIFF)
+
+$ Execute Identities
+$ ------------------
+
+$ reset AOUC and AOUC_
+$DataCalcVar AOUC 0.0
+$DataCalcVar AOUC_ 0.0
+
+$ $IdtExecute: execute identites over a range of periods and 
+$              generate values of associated variables
+$IdtExecute %START% %END% AOUC AOUC_
+
+$ Estimation
+$ ----------
+
+$ $EqsEstimate: estimate an equation or a block of equations
+
+$DataUpdateScl acaf1 0.9 1.0
+$DataUpdateScl acaf2 0.9 1.0
+$DataUpdateScl acaf4 0.9 1.0
+
+$show estimate coeffs of eq ACAF between 2000Y and 2020Y2
+$EqsEstimate 1990Y1 2000Y1 ACAF
+
+$show estimated value of coef acaf1: {acaf1} 
+$show estimated value of coef acaf2: {acaf2}
+$show estimated value of coef acaf4: {acaf4}
+
+$ The tests resulting from the last estimation are saved 
+$ in special scalars
+$show number of periods in the sample: {e0_n}
+$show number of estimated coefficients: {e0_k}
+$show standard deviation of residuals: {e0_stdev}
+$show mean of Y: {e0_meany}
+$show sum of squared residuals: {e0_ssres}
+$show standard error: {e0_stderr}
+$show standard error %: {e0_stderrp}
+$show F-Stat: {e0_fstat}
+$show R squared: {e0_r2}
+$show adjusted R squared: {e0_r2adj}
+$show Durbin-Watson: {e0_dw}
+$show Log Likelihood: {e0_loglik}
+
+$ The calculated, observed and reqsidual series are:
+$show Calculated series: @vvalue(_YCALC0)
+$show Observed series: @vvalue(_YOBS0)
+$show Calculated series: @vvalue(_YRES0)
+
+$ Simulation
+$ ----------
+
+$DataUpdateVar UY 2000Y1 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+$show Variable UY before simulation: @vvalue(UY)
+
+$ $ModelSimulateParms: specify parameters for a simulation
+$ takes 7 arguments:
+$	  - eps: convergence threshold
+$	  - relax: relaxation parameter
+$	  - maxit : maximum number of iterations
+$	  - Connex, Triangulation or None: reordering algorithm
+$	  - initial values (0 to 4)
+$		  - 0 -> Y := Y[-1], if Y null or NA
+$		  - 1 -> Y := Y[-1], always
+$		  - 2 -> Y := extrapolation, if Y null or NA
+$		  - 3 -> Y := extrapolation, always
+$		  - 4 -> Y unchanged
+$	  - debug: simulation with debugging
+$	  - debug_NR: debugging of the Newton-Raphson sub-iteration
+$	  - nbtri: number of sorting iterations for the connected components
+$ModelSimulateParms 0.001 0.7 100 Connex 0 Yes No 5
+$show convergence criterion eps: @simeps()
+$show relaxation parameter: @simrelax()
+$show maximum number of iterations: @simmaxit() 
+
+$ $ModelSimulateSaveNIters: save in a variable the number of 
+$    iterations required for each period during the simulation
+$ModelSimulateSaveNiters SIM_NITERS
+
+$ $ModelSimulateSaveNiters: save in a variable the convergence 
+$    threshold (the norm) reached for each period during the simulation
+$ModelSimulateSaveNorms SIM_NORMS
+
+$ $ModelSimulate: Run the simulation of a model for a given starting period 
+$    and an ending period. The list of equations to simulate can be passed 
+$    as an 3rd argument. Default to all equations
+$ Syntax: $modelsimulate start end [list_of_equations]
+$ WARNING: To simulate a model, all the model's equations must be present 
+$          in the equations workspace, and all variables and scalars used 
+$          in the model's equations must be defined in the variables and 
+$          scalars workspaces. The values of exogenous variables and scalars 
+$          CANNOT be NA (Not Available) over the relevant period.
+$show Run the simulation on all equations between 2000Y1 and 2010Y1
+$ModelSimulate 2000Y1 2010Y1
+
+$show Variable UY after simulation: @vvalue(UY)
+$show Nb iteractions for each period: @vvalue(SIM_NITERS)
+$show Norm reached for each period: @vvalue(SIM_NORMS) 
+
+$ Print Objects Definition
+$ ------------------------
+
+$PrintDest %output_dir%/eqs_def.a2m A2M 
+
+$ $PrintObjDefXxx: print the definition of (an) object(s) in a A2M file
+
+$ $PrintObjInfos: indicate how to print equation(s) definition
+$   0: equation only
+$   1: equation + comment
+$   2: equation + comment + estimation
+$PrintObjEqsInfos 0
+
+$ $PrintObjLec: indicate how equations should be printed
+$   0: normal LEC form 
+$   1: coefficients replaced by their value 
+$   2: coefficients replaced by their value + t-tests
+
+$PrintObjLec 0
+$PrintObjDefEqs ACAF
+
+$PrintObjLec 1
+$PrintObjDefEqs ACAG
+
+$PrintObjLec 2
+$PrintObjDefEqs AOUC
+
+$PrintDest %output_dir%/tbl_def.a2m A2M 
+
+$ $PrintObjTblTitle: indicate whether only the title should be printed 
+$                    or the entire table definition.
+$   0: full definition
+$   1: titles only 
+
+$PrintObjTblTitle 0 
+$PrintObjDefTbl ANAKNFF
+
+$PrintObjTblTitle 1
+$PrintObjDefTbl ANAPRIX
+
+$ Compute Tables
+$ --------------
+
+$PrintDest %output_dir%/tbl_ANAKNFF.a2m A2M 
+$PrintNbDec 4
+
+$ $PrintTbl: build and print (a) table(s) in A2M format
+$ Syntax: $PrintTbl gsample table1 [other tables]
+
+$ case 1: - simple time series (current workspace) 
+$         - 6 periods 
+$ columns: (00, 01, 02, 03, 04, 05)
+$PrintTbl 2000:6 C8_1
+
+$ case 2: - two time series (current workspace) 
+$         - 5 periods 
+$ columns: (10, 10/09, 11, 11/10, 12, 12/11, 13, 13/12, 14, 14/13)
+$PrintTbl (2010;2010/2009):5 C8_1
+
+$ $PrintTblFile: define the files to use when printing a comparison 
+$                table between several files (n = 2, 3, 4, 5).
+$                In the print sample, [1] represents the current workspace.
+$                The other files are [2|3|4|5] (e.g. 90:2^[1;2]).
+$ WARNING: After a call to $PrintTbl, you must redefine the files to compare. 
+$          $PrintTbl "consumes" the files specified previously with $PrintTblFile.
+$PrintTblFile 2 %data_dir%/ref.av
+
+$ case 3: - simple time series 
+$         - current workspace + one extra file 
+$         - 5 periods     
+$ columns: (10[1], 10[2],  11[1], 11[2], 12[1], 12[2], 13[1], 13[2], 14[1], 14[2]) 
+$PrintTbl 2010[1;2]:5 C8_1
+
+$ case 4: - simple time series 
+$         - current workspace + 4 extra files 
+$         - 1 period
+$ columns: (10[1], 10[2], 10[3], 10[4], 10[5])
+$PrintTblFile 2 %data_dir%/ref.av
+$PrintTblFile 3 %data_dir%/fun.av
+$PrintTblFile 4 %data_dir%/fun2.av
+$PrintTblFile 5 %data_dir%/a.var
+$PrintTbl 2010[1;2;3;4;5]:1 C8_1
+
+$ case 5: - multiple patterns (separated by ';')
+$         - current workspace + 1 extra file
+$ columns: (00[1], 02[1], 04//03[1], 06[1], 06[2], 08[1+2], 10/09[1^2])
+$PrintTblFile 2 %data_dir%/ref.av
+$PrintTbl 2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2] C8_1
+
+$ $PrintVar: build and print a comparison table of series in A2M format
+$ Syntax: $PrintVar gsample var1;var2;...
+
+$PrintDest %output_dir%/tbl_vars.a2m A2M 
+$PrintVar 2000:6 ACAF;ACAG;AOUC;ACAF+ACAG+AOUC 
+
+$ Procedures
+$ ----------
+
+$show procedure print_vars: print a list of variables on a specific period
+
+$ $procdef: start to write a new procedure
+$ arguments passed to the procedure become macros inside
+$procdef print_vars year vars
+    $ $foreach: looping over a list of items 
+		$ inside the foreach loop, the looping variable becomes a macro
+    $foreach var %vars%
+        $show %var%[%year%] = {%var%[%year%]}
+		$ $next: move to next item of the loop
+    $next var
+$ $procend: end of the procedure
+$procend
+
+$ $procexec: execute a procedure
+$procexec print_vars 2000Y1 ACAF ACAG AOUC
+
+$ Convert A2M Files To Other Formats
+$ ----------------------------------
+
+$A2mToCsv %output_dir%/eqs_def.a2m %output_dir%/eqs_def.csv
+$A2mToCsv %output_dir%/tbl_def.a2m %output_dir%/tbl_def.csv
+$A2mToCsv %output_dir%/tbl_anaknff.a2m %output_dir%/tbl_anaknff.csv
+$A2mToCsv %output_dir%/tbl_vars.a2m %output_dir%/tbl_vars.csv
+
+$ Sub-Reports
+$ -----------
+
+$ $ReportExec: allow to execute a sub-report
+$ReportExec oem850.rep %data_dir% %output_dir%
+
+$ Ending Report
+$ -------------
+
+$return
+
