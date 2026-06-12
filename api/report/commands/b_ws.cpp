@@ -54,18 +54,16 @@
 
 
 template<typename T>
-static bool load_global_database(std::shared_ptr<T>& global_ptr, 
-        const std::string& filepath)
+static bool load_global_database(std::shared_ptr<T>& global_ptr, const std::string& filepath)
 {
-    std::shared_ptr<T> global_kdb_ptr = T::Create(true);
-    bool success = global_kdb_ptr->load(filepath);
+    global_ptr->clear();
+    bool success = global_ptr->load(filepath);
     if(!success)
     {
-        global_kdb_ptr.reset();
+        global_ptr->clear();
         return false;
     }
-
-    global_ptr = global_kdb_ptr; 
+ 
     return true;
 }
 

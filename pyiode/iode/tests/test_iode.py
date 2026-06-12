@@ -1343,6 +1343,30 @@ def test_execute_command(tmp_path):
         execute_command("@ansi(àâäéèêëîïöôùç)")
         execute_command("@ttitle(C8_1)")
 
+    comments.clear()
+    equations.clear()
+    identities.clear()
+    lists.clear()
+    scalars.clear()
+    tables.clear()
+    variables.clear()
+
+    execute_command(f"$WsLoadCmt {SAMPLE_DATA_DIR}/fun.cmt")
+    execute_command(f"$WsLoadEqs {SAMPLE_DATA_DIR}/fun.eqs")
+    execute_command(f"$WsLoadIdt {SAMPLE_DATA_DIR}/fun.idt")
+    execute_command(f"$WsLoadLst {SAMPLE_DATA_DIR}/fun.lst")
+    execute_command(f"$WsLoadScl {SAMPLE_DATA_DIR}/fun.scl")
+    execute_command(f"$WsLoadTbl {SAMPLE_DATA_DIR}/fun.tbl")
+    execute_command(f"$WsLoadVar {SAMPLE_DATA_DIR}/fun.var")
+
+    assert len(comments) == 317
+    assert len(equations) == 274
+    assert len(identities) == 48
+    assert len(lists) == 17
+    assert len(scalars) == 161
+    assert len(tables) == 46
+    assert len(variables) == 394
+
     generalized_sample = '1990Y1:2'
     nb_dec = 2
 
