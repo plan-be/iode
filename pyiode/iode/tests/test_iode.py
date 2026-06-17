@@ -1062,6 +1062,39 @@ def test_variables_from_array_integer_time_axis():
     assert variables["BXL_01", "2025Y1"] == 35.0  # 2 * 2 * 6 + 1 * 6 + 5 = 35
 
 
+@pytest.mark.skipif(la is None, reason="larray is not installed")
+def test_variables_from_array_object_time_axis():
+    """Test from_array() method with object dtype time axis labels."""
+    variables.clear()
+    assert len(variables) == 0
+
+    # create LArray with object dtype time axis labels
+    regions_axis = la.Axis("region=VLA,WAL")
+    code_axis = la.Axis("code=00,01")
+    # Create object dtype labels - using strings stored as object dtype
+    object_labels = np.array(['2020Y1', '2021Y1', '2022Y1'], dtype=object)
+    periods_axis = la.Axis(object_labels, name='time')
+    
+    # Create array with test data
+    array = la.ndtest((regions_axis, code_axis, periods_axis), dtype=float)
+    
+    # Verify that time axis labels are indeed object dtype
+    assert array.axes['time'].labels.dtype.kind == 'O'
+    
+    # load the IODE Variables from the Array object
+    variables.from_array(array)
+    assert len(variables) == 4  # 2 regions x 2 codes = 4 variables
+    
+    # Check that object labels were converted to proper period format
+    assert str(variables.sample) == '2020Y1:2022Y1'
+    
+    # check some values to ensure data was loaded correctly
+    assert variables["VLA_00", "2020Y1"] == 0.0
+    assert variables["VLA_00", "2022Y1"] == 2.0
+    assert variables["VLA_01", "2021Y1"] == 4.0
+    assert variables["WAL_01", "2022Y1"] == 11.0
+
+
 def test_variables_big_file():
     variables.clear()
 

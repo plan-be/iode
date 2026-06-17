@@ -5880,6 +5880,14 @@ class Variables(IodeDatabase):
             first_period, last_period = f"{labels[0]}Y1", f"{labels[-1]}Y1" 
         elif labels.dtype.kind in 'SU':
             first_period, last_period = labels[0], labels[-1]
+        elif labels.dtype.kind == 'O':
+            # if the labels are of type object, we try to convert them to str
+            try:
+                labels = labels.astype(str)
+                first_period, last_period = labels[0], labels[-1]
+            except Exception:
+                raise TypeError("The labels of the time axis in the passed Array must be either " \
+                                "strings or integers representing periods")
         else:
             raise TypeError("The labels of the time axis in the passed Array must be either " \
                              "strings or integers representing periods")
