@@ -194,7 +194,6 @@ void T_print_title(TableCell* cell, int straddle)
     W_printf((char*) "%s", (char*) content.c_str());
 
     T_close_attr(attribute);
-    W_printf("\n");
 }
 
 
@@ -273,7 +272,6 @@ int T_print_line(Table* tbl, int i, COLS* cls)
             T_print_cell(cell, cl, 1);
         }
     }
-    W_printf((char*) "\n");
 
     return 0;
 }
@@ -347,7 +345,7 @@ void T_print_files(COLS* cls, int dim)
     for(int i = 0; KT_names[i]; i++) 
     {
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
-        W_printf((char*) "%s\n", KT_names[i]);
+        W_printf((char*) "%s", KT_names[i]);
     }
 }
 
@@ -369,9 +367,8 @@ void T_print_mode(COLS* cls, int dim)
     {
         if(KT_mode[i] == 0) 
             continue;
-        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);  /* JMP 17-12-93 */
-        //W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][B_LANG]);
-        W_printf((char*) "(%s) %s\n", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]); // JMP 18-04-2022
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        W_printf((char*) "(%s) %s", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]);
     }
 }
 
@@ -390,7 +387,7 @@ void T_print_date(int dim)
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
     T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
-    W_printf((char*) "%s\n", date);
+    W_printf((char*) "%s", date);
 }
 
 
@@ -412,10 +409,12 @@ int T_begin_tbl(int dim, COLS* cls)
     COL_find_mode(cls, KT_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
+
     if(A2M_SEPCH == '\t') 
-        W_printf((char*) ".sep TAB\n");
+        W_printf((char*) ".sep TAB");
     else 
-        W_printf((char*) ".sep %c\n", A2M_SEPCH);
+        W_printf((char*) ".sep %c", A2M_SEPCH);
+    W_printf("\n");
     
     return 0;
 }
@@ -487,7 +486,7 @@ int T_print_tbl(Table* tbl, char* smpl)
     if(T_begin_tbl(dim, cls)) 
         return -1;
     
-    W_printf((char*) ".ttitle %s\n", title.c_str());
+    W_printf((char*) ".ttitle %s", title.c_str());
     
     TableLine* line;
     TableCell* cell;
@@ -497,7 +496,7 @@ int T_print_tbl(Table* tbl, char* smpl)
         switch(line->get_type()) 
         {
             case TABLE_LINE_SEP   :
-                W_printf((char*) ".tl\n");
+                W_printf((char*) ".tl");
                 break;
             case TABLE_LINE_TITLE :
                 if(first) 
@@ -526,6 +525,7 @@ int T_print_tbl(Table* tbl, char* smpl)
                 }
                 break;
         }
+        W_printf("\n");
     }
     T_end_tbl();
 

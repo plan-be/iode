@@ -15,43 +15,7 @@
 #include <filesystem>
 #include <iostream>
 
-
-// BEGIN_KEEP
-//#ifdef __cplusplus
-//extern "C"
-//{
-//#endif
-//    int  A2mGIF_HTML(A2MGRF * go, U_ch * filename) { return 0; }
-//#ifdef __cplusplus
-//}
-//#endif
-// END_KEEP
-
-// Temporarily removed fns (to allow linking)
-
-// Pour tester l'estimation
-//#ifdef __cplusplus
-//extern "C"
-//{
-//#endif
-//
-//    extern char    SCR_NAME_ERR[255 + 1];
-//    int     A2M_SEPCH;
-//
-//    //int o_estgr(char** titles, Sample *smpl, MAT* mlhs, MAT* mrhs, int view, int res) {return 0;}
-//    //int B_A2mSetRtfTitle(U_ch* title) {return 0;}
-//    //int B_A2mSetRtfCopy(U_ch* copyr) {return 0;}
-//    //int B_PrintRtfTopic(char* x) { return 0; }
 int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return 0;}
-//    //int W_printf(char*fmt, ...) {return 0;}
-//    //void K_load_iode_ini() {}
-//    //void K_save_iode_ini() {}
-//
-//#ifdef __cplusplus
-//}
-//#endif
-
-// END_KEEP
 
 
 class LegacyAPITest : public TestAbstract, public ::testing::Test
@@ -1269,9 +1233,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_NE(tbl_ptr.get(), nullptr);
 
     // Select Print destination
-    //W_dest("test1_tbl.htm", W_HTML);
     W_dest("test1_tbl.a2m", W_A2M);
-    //W_dest("", W_GDI);
 
     // Print tbl as table
     rc = T_print_tbl(tbl_ptr.get(), "2000:5[1;2]");
@@ -1294,14 +1256,37 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Test $PrintTbl gsample table
     memset(fullfilename, 0, sizeof(fullfilename));
+    B_PrintNbDec("2");
+    
+    // A2M
     sprintf(fullfilename, "%s%s", output_test_dir, "printtbl_C8_1.a2m");
     W_dest(fullfilename, W_A2M);
-    B_PrintNbDec("2");
     rc = B_PrintTbl("2000:5 C8_1");
     EXPECT_EQ(rc, 0);
     W_close();
 
     compare_files(output_test_dir, "printtbl_C8_1.a2m", output_test_dir, "printtbl_C8_1.ref.a2m");
+
+    // HTML
+    // TODO : fix test below HTML
+    /*
+    sprintf(fullfilename, "%s%s", output_test_dir, "printtbl_C8_1.html");
+    W_dest(fullfilename, W_HTML);
+    rc = B_PrintTbl("2000:5 C8_1");
+    EXPECT_EQ(rc, 0);
+    W_close();
+
+    compare_files(output_test_dir, "printtbl_C8_1.html", output_test_dir, "printtbl_C8_1.ref.html");
+    */
+
+    // CSV
+    sprintf(fullfilename, "%s%s", output_test_dir, "printtbl_C8_1.csv");
+    W_dest(fullfilename, W_CSV);
+    rc = B_PrintTbl("2000:5 C8_1");
+    EXPECT_EQ(rc, 0);
+    W_close();
+
+    compare_files(output_test_dir, "printtbl_C8_1.csv", output_test_dir, "printtbl_C8_1.ref.csv");
 
     // Test $PrintGr gsample table
     memset(fullfilename, 0, sizeof(fullfilename));

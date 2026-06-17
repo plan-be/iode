@@ -420,7 +420,7 @@ void ComputedTable::print_to_file()
     if(res != 0) 
         throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
 
-    W_printf(".ttitle %s\n", title_oem.c_str());
+    W_printf(".ttitle %s", title_oem.c_str());
 
     TableCell* cell;
     bool first_title = true;
@@ -431,7 +431,7 @@ void ComputedTable::print_to_file()
         switch(line.get_type()) 
         {
             case TABLE_LINE_SEP:
-                W_printf(".tl\n");
+                W_printf(".tl");
                 break;
             case TABLE_LINE_TITLE:
                 // 1st title has already been printed by W_printf(".ttitle %s\n", ...) above
@@ -457,6 +457,7 @@ void ComputedTable::print_to_file()
                 if(res != 0)
                     throw std::runtime_error("Couldn't print table. Couldn't print line " + std::to_string(i));
         }
+        W_printf("\n");
     }
     T_end_tbl();
 }
