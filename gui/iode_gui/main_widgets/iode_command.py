@@ -157,7 +157,7 @@ class IodeCommandLine(IodeAutoCompleteLineEdit):
         # try to execute the command
         try:
             execute_command(cmd)
-            if len(self.executed_commands_list) > 0 and cmd != self.executed_commands_list[-1]:
+            if not self.executed_commands_list or cmd != self.executed_commands_list[-1]:
                 self.executed_commands_list.append(cmd)
             if len(self.executed_commands_list) > self.MAX_NB_COMMANDS_TO_REMEMBER:
                 self.executed_commands_list = self.executed_commands_list[-self.MAX_NB_COMMANDS_TO_REMEMBER:]
