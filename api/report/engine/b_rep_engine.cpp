@@ -857,8 +857,9 @@ int RP_eval(char** res, char* farg)
 {
     char        ch, name[31],
                 *lec, *fmt;
-    int         rc, rp_rt, pos, inv;
+    int         rc, rp_rt, pos;
     double      x;
+    bool        inv = false;
 
     *res = SW_nalloc(41);
     ch = farg[0];
@@ -869,11 +870,12 @@ int RP_eval(char** res, char* farg)
         rp_rt = RP_RT;      // Memorise the current return value
         RP_RT = 0;          // Reset RT to "$Onerror Ignore"
         
-        inv = 0;
-        if(farg[1] == '!') inv = 1; // if $!name of #!name: inverts the return code
+        // if $!name of #!name: inverts the return code
+        if(farg[1] == '!') 
+            inv = true; 
         
         // Retrieve the command name (max 30 chars)
-        B_get_arg0(name, farg + 1 + inv, 30);
+        B_get_arg0(name, farg + 1 + (int) inv, 30);
 
         // Execute the function name
         rc = RP_exec_fn(name, farg + strlen(name) + 2, ch);
@@ -881,10 +883,15 @@ int RP_eval(char** res, char* farg)
         // Reset the previous OnError value (before calling RP_exec_fn)
         RP_RT = rp_rt;          
         
-        // Return code to save in *res
-        rc = (rc < 0) ? 0 : 1;  // on error set rc to 0 (why ?)
-        if(inv) rc = !rc;       // invert rc if $!name
+        // rc must be 0 or 1
+        // NOTE: on error set rc to 0 (why ?)
+        rc = (rc < 0) ? 0 : 1;
 
+        // invert rc if $!name
+        if(inv) 
+            rc = !rc;       
+
+        // Return code to save in *res
         sprintf(*res, "%d", rc); // save in allocated *res (TODO: improve this!!!)
         return 0;
     }
@@ -912,7 +919,9 @@ int RP_eval(char** res, char* farg)
 
     x = RP_evallec(lec);
     // TODO: reset farg[pos] = '@' ?
-    if(!IODE_IS_A_NUMBER(x)) return -1;  // Empty string on error
+    // Empty string on error
+    if(!IODE_IS_A_NUMBER(x)) 
+        return -1;
     
     RP_fmt(*res, fmt, x);       // The formatted value is returned
     return 0;

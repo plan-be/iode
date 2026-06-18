@@ -1105,7 +1105,7 @@ int B_DataExist(char* arg, int type)
     try
     {
         KDB& kdb = get_global_db(type);
-        return kdb.contains(std::string(arg));
+        return kdb.contains(std::string(arg)) ? 1 : -1;
     }
     catch (const std::runtime_error& e) 
     {
