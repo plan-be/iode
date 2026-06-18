@@ -123,3 +123,19 @@ TEST_F(ReportTest, Tests_B_REP_PROC)
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "/rep_proc.a2m", output_test_dir, "/rep_proc.ref.a2m");
 }
+
+TEST_F(ReportTest, Tests_Data_Exist)
+{
+    char cmd[1024];
+
+    std::cout << "Testing IODE command $DataExistXxx" << std::endl;
+
+    // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
+    sprintf(cmd,  "%s/rep_data_exist.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
+    int rc = B_ReportExec(cmd);
+    EXPECT_EQ(rc, 0);
+    compare_files(output_test_dir, "/rep_data_exist.a2m", output_test_dir, "/rep_data_exist.ref.a2m");
+}
+
+
