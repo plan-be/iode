@@ -138,4 +138,60 @@ TEST_F(ReportTest, Tests_Data_Exist)
     compare_files(output_test_dir, "/rep_data_exist.a2m", output_test_dir, "/rep_data_exist.ref.a2m");
 }
 
+TEST_F(ReportTest, Tests_Print_Eqs)
+{
+    char cmd[1024];
+    kmsg_toggle(1);
 
+    std::cout << "Testing IODE command $PrintObjDefEqs" << std::endl;
+
+    B_PrintObjLec("0");
+    EXPECT_EQ(B_EQS_LEC, 0);
+    B_PrintObjLec("1");
+    EXPECT_EQ(B_EQS_LEC, 1);
+    B_PrintObjLec("2");
+    EXPECT_EQ(B_EQS_LEC, 2);
+
+    B_PrintObjEqsInfos("0");
+    EXPECT_EQ(B_EQS_INFOS, 0);
+    B_PrintObjEqsInfos("1");
+    EXPECT_EQ(B_EQS_INFOS, 1);
+    B_PrintObjEqsInfos("2");
+    EXPECT_EQ(B_EQS_INFOS, 2);
+
+    B_PrintObjLec("0");
+    B_PrintObjEqsInfos("0");
+
+    // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
+    sprintf(cmd,  "%s/rep_print_def_eqs.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
+    int rc = B_ReportExec(cmd);
+    EXPECT_EQ(rc, 0);
+    compare_files(output_test_dir, "/rep_print_def_eqs.a2m", output_test_dir, "/rep_print_def_eqs.ref.a2m");
+
+    kmsg_toggle(0);
+}
+
+TEST_F(ReportTest, Tests_Print_Tbl)
+{
+    char cmd[1024];
+    kmsg_toggle(1);
+
+    std::cout << "Testing IODE command $PrintObjDefTbl" << std::endl;
+
+    B_PrintObjTblTitle("0");
+    EXPECT_EQ(B_TABLE_TITLE, 0);
+    B_PrintObjTblTitle("1");
+    EXPECT_EQ(B_TABLE_TITLE, 1);
+
+    B_PrintObjTblTitle("0");
+
+    // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
+    sprintf(cmd,  "%s/rep_print_def_tbl.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
+    int rc = B_ReportExec(cmd);
+    EXPECT_EQ(rc, 0);
+    compare_files(output_test_dir, "/rep_print_def_tbl.a2m", output_test_dir, "/rep_print_def_tbl.ref.a2m");
+
+    kmsg_toggle(0);
+}

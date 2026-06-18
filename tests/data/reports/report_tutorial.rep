@@ -323,7 +323,7 @@ $ $PrintObjInfos: indicate how to print equation(s) definition
 $   0: equation only
 $   1: equation + comment
 $   2: equation + comment + estimation
-$PrintObjEqsInfos 0
+$PrintObjInfos 0
 
 $ $PrintObjLec: indicate how equations should be printed
 $   0: normal LEC form 
@@ -341,15 +341,15 @@ $PrintObjDefEqs AOUC
 
 $PrintDest %output_dir%/tbl_def.a2m A2M 
 
-$ $PrintObjTblTitle: indicate whether only the title should be printed 
-$                    or the entire table definition.
+$ $PrintObjTitle: indicate whether only the title should be printed 
+$                 or the entire table definition.
 $   0: full definition
 $   1: titles only 
 
-$PrintObjTblTitle 0 
+$PrintObjTitle 0 
 $PrintObjDefTbl ANAKNFF
 
-$PrintObjTblTitle 1
+$PrintObjTitle 1
 $PrintObjDefTbl ANAPRIX
 
 $ Compute Tables
