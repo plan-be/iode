@@ -1,0 +1,23 @@
+.topic 0 0 D‚terminants de la croissance de K
+.tb 2
+.sep &
+&2C\bANAKNFF : definition\B
+
+.tl
+&2C\b"D‚terminants de la croissance de K"\B
+.tl
+&1L &1C"#s"
+.tl
+&1L"Croissance de K "&1Ldln KNFF
+&1L"Output gap "&1Lknff1*ln (QAFF_/(Q_F+Q_I))
+&1L"Rentabilit‚ "&1Lknf2*ln mavg(3,RENT)
+&1L"Croissance anticip‚e de l'output"&1L0.416*mavg(4,dln QAFF_)+0.023
+
+.tl
+.te
+
+
+\bANAPRIX\B : Analyse des prix
+
+
+

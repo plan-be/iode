@@ -1,0 +1,177 @@
+---- print equation only ----
+
+
+normal LEC form
+
+.par1 enum_1
+
+ (\bACAF\B/\iVAF\I[-1 ])   := \iacaf1\I + \iacaf2\I*\iGOSF\I[-1 ] + 
+ \iacaf4\I*(\iTIME\I= 1995) 
+
+coefficients replaced by their value
+
+.par1 enum_1
+
+ (\bACAF\B/\iVAF\I[-1 ])   := \i0.0158\I + \i-0.0000\I*\iGOSF\I[-1 ] + 
+ \i-0.0085\I*(\iTIME\I= 1995) 
+
+coefficients replaced by their value + t-tests
+
+.par1 enum_1
+
+ (\bACAF\B/\iVAF\I[-1 ])   := \i0.0158(11.5206) \I + \i-0.0000(-5.3691) \I*\iGOSF\I[-1 ] + 
+ \i-0.0085(-4.0825) \I*(\iTIME\I= 1995) 
+
+---- print equation + comment ----
+
+
+
+normal LEC form
+
+.par1 enum_1
+
+ ln (\bDTF\B-(\iDTFX\I*40.34) -100*(\iTIME\I>1998) )  := \idtf0\I + (\idtf1\I*ln \iGOSF\I)  + \idtf2\I*ln(\iGOSF\I/\iVAF_\I) 
+
+.par1 par_1
+\i dummy comment
+
+coefficients replaced by their value
+
+.par1 enum_1
+
+ ln (\bDTF\B-(\iDTFX\I*40.34) -100*(\iTIME\I>1998) )  := \i-1.6602\I + (\i0.8936\I*ln \iGOSF\I)  + \i-0.4412\I*ln(\iGOSF\I/\iVAF_\I) 
+
+.par1 par_1
+\i dummy comment
+
+coefficients replaced by their value + t-tests
+
+.par1 enum_1
+
+ ln (\bDTF\B-(\iDTFX\I*40.34) -100*(\iTIME\I>1998) )  := \i-1.6602(-3.0496) \I + (\i0.8936(18.3961) \I*ln \iGOSF\I)  + \i-0.4412(-2.1227) \I*ln(\iGOSF\I/\iVAF_\I) 
+
+.par1 par_1
+\i dummy comment
+
+---- equation + comment + estimation ----
+
+
+normal LEC form
+
+.topic 0 0 DPUH
+.par1 enum_1
+
+ dln (\bDPUH\B/\iDPUHO\I)  := \idpuh_1\I + \idpuh_2\I*dln(\iIHU\I/\iPI5\I)  + dln \iPC\I
+.par enum_2
+Estimation : \iL\I on 1972Y1-1996Y1
+
+
+Block : DPUH
+
+Tests :
+.par enum_3
+St dev of residuals         : 0.037786
+
+Mean of YOBS                : 0.069307
+
+Sum of Squares of Residuals : 0.009236
+
+Standard error (%)          : 0.020039 (\i28.913286\I)
+
+F-stat                      : 62.333542
+
+R2 (R2 adjusted)            : 0.730469 (\i0.718751\I)
+
+Durbin-Watson               : 2.109863
+
+Log Likelihood              : 63.320908
+
+.par1 enum_2
+Coefficient values \i(relax, stderr, t-stat)\I :
+
+.par1 enum_3
+\bdpuh_1\B : 0.0183 \i(1, 0.0041, 4.5051)
+.par1 enum_3
+\bdpuh_2\B : 0.0628 \i(1, 0.0320, 1.9605)
+
+
+coefficients replaced by their value
+
+.topic 1 0 DPUH
+.par1 enum_1
+
+ dln (\bDPUH\B/\iDPUHO\I)  := \i0.0183\I + \i0.0628\I*dln(\iIHU\I/\iPI5\I)  + dln \iPC\I
+.par enum_2
+Estimation : \iL\I on 1972Y1-1996Y1
+
+
+Block : DPUH
+
+Tests :
+.par enum_3
+St dev of residuals         : 0.037786
+
+Mean of YOBS                : 0.069307
+
+Sum of Squares of Residuals : 0.009236
+
+Standard error (%)          : 0.020039 (\i28.913286\I)
+
+F-stat                      : 62.333542
+
+R2 (R2 adjusted)            : 0.730469 (\i0.718751\I)
+
+Durbin-Watson               : 2.109863
+
+Log Likelihood              : 63.320908
+
+.par1 enum_2
+Coefficient values \i(relax, stderr, t-stat)\I :
+
+.par1 enum_3
+\bdpuh_1\B : 0.0183 \i(1, 0.0041, 4.5051)
+.par1 enum_3
+\bdpuh_2\B : 0.0628 \i(1, 0.0320, 1.9605)
+
+
+coefficients replaced by their value + t-tests
+
+.topic 2 0 DPUH
+.par1 enum_1
+
+ dln (\bDPUH\B/\iDPUHO\I)  := \i0.0183(4.5051) \I + \i0.0628(1.9605) \I*dln(\iIHU\I/\iPI5\I)  + dln \iPC\I
+.par enum_2
+Estimation : \iL\I on 1972Y1-1996Y1
+
+
+Block : DPUH
+
+Tests :
+.par enum_3
+St dev of residuals         : 0.037786
+
+Mean of YOBS                : 0.069307
+
+Sum of Squares of Residuals : 0.009236
+
+Standard error (%)          : 0.020039 (\i28.913286\I)
+
+F-stat                      : 62.333542
+
+R2 (R2 adjusted)            : 0.730469 (\i0.718751\I)
+
+Durbin-Watson               : 2.109863
+
+Log Likelihood              : 63.320908
+
+.par1 enum_2
+Coefficient values \i(relax, stderr, t-stat)\I :
+
+.par1 enum_3
+\bdpuh_1\B : 0.0183 \i(1, 0.0041, 4.5051)
+.par1 enum_3
+\bdpuh_2\B : 0.0628 \i(1, 0.0320, 1.9605)
+
+
+
+

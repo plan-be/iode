@@ -205,12 +205,12 @@ bool Equation::print_definition() const
             {
                 if(!global_ws_scl->contains(sname))
                 {
-                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
+                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, (char*) sname.c_str());
                     W_printf((char*) "?\n");
                 }
                 else
                 {
-                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, sname);
+                    W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, (char*) sname.c_str());
                     
                     std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(sname);
                     if(!scl) 

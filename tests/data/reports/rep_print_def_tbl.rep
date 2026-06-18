@@ -1,0 +1,34 @@
+$ report testing printing IODE object
+
+$indent
+$noparsing
+$goto continue {%0% >= 2}
+    $show Syntax: rep_fns input_dir output_dir
+    $show Syntax error. Report aborted.
+    $return
+$label continue
+$define input_dir %1%
+$define output_dir %2%
+
+$PrintDest %output_dir%/rep_print_def_tbl.a2m A2M 
+
+$WsClearAll
+
+$WsLoadTbl %input_dir%/fun.tbl
+
+$ $PrintObjDefXxx: print the definition of (an) object(s) in a A2M file
+
+$ $PrintObjTitle: indicate whether only the title should be printed 
+$                 or the entire table definition.
+$   0: full definition
+$   1: titles only 
+
+$PrintObjTitle 0 
+$PrintObjDefTbl ANAKNFF
+
+$PrintObjTitle 1
+$PrintObjDefTbl ANAPRIX
+
+$WsClearAll
+
+$return
