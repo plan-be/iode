@@ -20,4 +20,6 @@ $DataDeleteCmt TEST
 Deleted comment TEST
 Comment TEST exist ?: {$DataExistCmt TEST}
 
+$WsClearAll
+
 $return
