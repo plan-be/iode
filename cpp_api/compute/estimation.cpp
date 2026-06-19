@@ -28,11 +28,11 @@ std::string dynamic_adjustment(const IodeAdjustmentMethod method,
     if(res < 0)
     {
         std::string error_msg = "Error during dynamic adjustment of equation \"" + eqs + "\"";
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            error_msg += "\n" + last_error;
-        throw std::runtime_error(error_msg);
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
+        return "";
     }
+
     return adjusted_eqs;
 }
 
@@ -51,6 +51,8 @@ static void add_df_test_coeff(KDBScalarsPtr kdb, const std::string& coeff_name, 
 //                    Then, why not working on a local KDB of scalars ?
 KDBScalarsPtr dickey_fuller_test(const std::string& lec, bool drift, bool trend, int order)
 {
+    KDBScalarsPtr kdb_res = KDBScalars::Create(false);
+
     double* res = E_UnitRoot(to_char_array(lec), drift, trend, order);
     if(!res)
     {
@@ -60,15 +62,14 @@ KDBScalarsPtr dickey_fuller_test(const std::string& lec, bool drift, bool trend,
         error_msg += "LEC expression: " + lec + "\n";
         error_msg += "Drift: " + is_drift + "\n";
         error_msg += "Trend: " + is_trend + "\n";
-        error_msg += "Order: " + std::to_string(order);
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            error_msg += "\n" + last_error;
-        throw std::runtime_error(error_msg);
+        error_msg += "Order: " + std::to_string(order) + "\n";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
+        return kdb_res;
     }
 
     int pos = 0;
-    KDBScalarsPtr kdb_res = KDBScalars::Create(false);
+
     // order 0
     add_df_test_coeff(kdb_res, "df_", res, pos);
     pos += 3;
@@ -273,14 +274,14 @@ void EditAndEstimateEquations::update_current_equation(const std::string& lec, c
 
 void EditAndEstimateEquations::estimate(int maxit, double eps)
 {
+    // clear C API errors stack
+    error_manager.clear();
+
     if(maxit <= 0)
         maxit = DEFAULT_MAXIT;
     
     if(eps <= 0.0)
         eps = DEFAULT_EPS;
-
-    // clear C API errors stack
-    error_manager.clear();
 
     // frees all allocated variables for the last estimation
     if(estimation_done)
@@ -340,9 +341,9 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     }
     else
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            throw std::runtime_error("Could not estimate equation(s) " + join(v_equations, ";") + "\n" + last_error);
+        std::string error_msg = "Could not estimate equation(s) " + join(v_equations, ";");
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
     }
 }
 
@@ -435,9 +436,8 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     if(res != 0)
     {
         std::string error_msg = "Could not estimate equation(s) '" + eqs + "' from '" + from + "' to '" + to + "'";
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            throw std::runtime_error(error_msg + ":\n" + last_error);
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
     }
 }
 

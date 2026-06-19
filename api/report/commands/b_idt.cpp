@@ -70,6 +70,7 @@ int B_IdtExecute(char* arg, int unused)
 
     if(rc != 0)
         error_manager.display_last_error();
+    
     return rc;
 }
 
@@ -121,10 +122,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
     SCR_free_tbl((unsigned char**) KEXEC_SFILES);
     KEXEC_SFILES = NULL;
 
-    std::string last_error = error_manager.get_last_error();
-    if(last_error != "")
+    if(error_manager.has_errors())
     {
-        error_manager.append_error("Error(s) during identity execution:\n" + last_error);
+        error_manager.prepend_error("Error(s) during identity execution");
+        error_manager.display_last_error();
         return -1;
     }
 

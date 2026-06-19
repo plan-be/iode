@@ -369,6 +369,7 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         {
             error_manager.append_error("RuleExport:\n" + std::string(e.what()));
             error_manager.display_last_error(); 
+            return -1;
         }
     }
 

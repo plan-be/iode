@@ -1156,20 +1156,20 @@ def test_estimation(capsys):
 
     estimation = EditAndEstimateEquations("1980Y1", "1996Y1")
     estimation.block = "ACAF;DPUH", "ACAF"
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+    with pytest.warns(RuntimeWarning, match=r"errors:\nCould not prepare estimation:\n"
                                             r"Estimation: NaN Generated"):
         estimation.estimate()
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+    with pytest.warns(RuntimeWarning, match=r"errors:\nCould not prepare estimation:\n"
                                             r"Estimation: NaN Generated"):
         eq_ACAF.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+    with pytest.warns(RuntimeWarning, match=r"errors:\nCould not prepare estimation:\n"
                                             r"No scalars to estimate in your block of equations\n"
                                             r"Estimation: No current estimation"):
         eq_ACAG.estimate("1980Y1", "1996Y1")
 
-    with pytest.warns(RuntimeWarning, match=r"Could not prepare estimation:\nerrors:\n"
+    with pytest.warns(RuntimeWarning, match=r"errors:\nCould not prepare estimation:\n"
                                             r"Estimation: NaN Generated"):
         equations.estimate("1980Y1", "1996Y1", "ACAF")
 
@@ -1332,8 +1332,8 @@ def test_simulation(capsys):
     simu.relax = 1.0
     simu.initialization_method = 'TM1'
 
-    with pytest.warns(RuntimeWarning, match=r"Cannot simulate the model for the sample "
-                                            r"'2000Y1:2010Y1':\nerrors:\nModel does not "
+    with pytest.warns(RuntimeWarning, match=r"errors:\nCannot simulate the model for the "
+                                            r"sample '2000Y1:2010Y1':\nModel does not "
                                             r"converge after 2 iterations\n"):
         simu.model_simulate("2000Y1", "2010Y1")
 
@@ -1434,10 +1434,17 @@ def test_execute_command(tmp_path):
         # compare content
         assert python_file_content == iode_report_file_content
 
+    # check that the error stack is emptyied after executing a report command
+    with pytest.raises(RuntimeError, match=r"Error: WsLoadCmt .*non_existing_file.cmt"):
+        execute_command(f'$WsLoadCmt {SAMPLE_DATA_DIR}/non_existing_file.cmt')
+     
+    with pytest.raises(RuntimeError, match=r"Error: WsLoadEqs .*non_existing_file.eqs"):
+        execute_command(f'$WsLoadEqs {SAMPLE_DATA_DIR}/non_existing_file.eqs') 
+
     # reset number of decimals to default value
     execute_command("$PrintNbdec -1")
 
-def test_execute_report():
+def test_execute_report(tmp_path):
     project_dir = (Path(__file__).parent.parent.parent.parent).absolute()
     data_dir = project_dir / "tests" / "data"
     report_dir = data_dir / "reports"
@@ -1492,6 +1499,24 @@ def test_execute_report():
     output_content = output_file.read_text()
     expected_content = expected_output_file.read_text()
     assert output_content == expected_content
+
+    # check that the error stack is emptyied after executing a report command
+
+    dummy_content = ["$ This is a dummy report file for testing purposes."]
+
+    with pytest.raises(RuntimeError, match=r"Error: WsLoadCmt .*non_existing_file.cmt"):
+        dummy_content += ["$WsLoadCmt non_existing_file.cmt"]
+        dummy_report_file: Path = tmp_path / "dummy.rep"
+        with dummy_report_file.open("w", encoding="cp850") as f:
+            f.write("\n".join(dummy_content))
+        execute_report(dummy_report_file)
+     
+    with pytest.raises(RuntimeError, match=r"Error: WsLoadEqs .*non_existing_file.eqs"):
+        dummy_content[-1] = "$WsLoadEqs non_existing_file.eqs"
+        dummy_report_file: Path = tmp_path / "dummy.rep"
+        with dummy_report_file.open("w", encoding="cp850") as f:
+            f.write("\n".join(dummy_content))
+        execute_report(dummy_report_file) 
 
 
 # WRITE

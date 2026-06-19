@@ -371,10 +371,10 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
 
     if(res < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty()) 
-            throw std::invalid_argument(std::string("Cannot initialize printing.\n") + 
-                    "Invalid value for 'destination_file' or 'format' argument.\n" + last_error);
+        std::string error_msg = "Cannot initialize printing.\n";
+        error_msg += "Invalid value for 'destination_file' or 'format' argument.";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
     }
 }
 
@@ -387,10 +387,11 @@ void ComputedTable::print_to_file()
     res = B_PrintNbDec(str_nb_decimals.data());
     if(res < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            throw std::invalid_argument(std::string("Cannot initialize printing.\n") + 
-                "Invalid value for 'nb_decimals' argument.\n" + last_error);
+        std::string error_msg = "Cannot initialize printing.\n";
+        error_msg += "Invalid value for the 'nb_decimals' argument.";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
+        return;
     }
 
     // set language
@@ -405,10 +406,11 @@ void ComputedTable::print_to_file()
     res = B_PrintLang(tlang);
     if(res < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            throw std::invalid_argument(std::string("Cannot initialize printing.\n") + 
-                    "Invalid value for 'language' argument.\n" + last_error);
+        std::string error_msg = "Cannot initialize printing.\n"; 
+        error_msg += "Invalid value for the 'language' argument.";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
+        return;
     }
 
     std::string title_utf8 = T_get_title(ref_table);

@@ -20,6 +20,9 @@ Fixed Bugs
 - GUI: fixed remembering previously executed commands in the Report Commands 
   console (closes :issue:`1228`)
 
+- PYTHON + GUI: clean the errors stack after the execution of an IODE report 
+  or an IODE function/command (closes :issue:`1229`)
+
 - PYTHON: fixed calling `execute_command(f"$WsLoadXxx filepath")` not 
   changing the workspace at the Python level (closes :issue:`1230`)
 

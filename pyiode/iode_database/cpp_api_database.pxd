@@ -161,9 +161,8 @@ cdef extern from "pyiode/iode_database/variables_database.cpp":
 cdef extern from "api/b_errors.h":
     cdef cppclass IodeErrorManager:
         void append_error(string& msg)
+        string get_all_errors()
         void display_last_error()
-        string get_last_error()
-        void print_last_error()
         void clear()
 
     # Define the global IodeErrorManager instance

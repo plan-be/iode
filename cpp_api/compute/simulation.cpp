@@ -75,10 +75,9 @@ bool Simulation::model_compile(const std::string& list_eqs)
 
             if(rc < 0)
             {
-                std::string last_error = error_manager.get_last_error();
-                if(!last_error.empty()) 
-                    error_msg += "\t" + last_error;
-                kwarning(error_msg.c_str());
+                std::string error_msg = "Could not compile the model";
+                error_manager.prepend_error(error_msg);
+                kwarning(error_manager.get_all_errors().c_str());
                 return false;
             }
         }
@@ -116,7 +115,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
     error_msg += "'" + from + ":" + to + "'";
     if(!list_eqs.empty()) 
         error_msg += " and for the equations list '" + list_eqs + "'";
-    error_msg += ":\n";
+    error_msg += ":";
 
     int rc = -1;
     if(list_eqs.empty())
@@ -136,7 +135,7 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
         }
         catch(const std::exception& e)
         {
-            error_msg += "\t" + std::string(e.what());
+            error_msg += "\n\t" + std::string(e.what());
             kwarning(error_msg.c_str());
             if(sample) delete sample;
             return false;
@@ -148,10 +147,8 @@ bool Simulation::model_simulate(const std::string& from, const std::string& to,
 
     if(rc < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            error_msg += last_error;
-        kwarning(error_msg.c_str());
+        error_manager.prepend_error(error_msg);
+        kwarning(error_manager.get_all_errors().c_str());
         return false;
     }
 
@@ -224,10 +221,9 @@ bool Simulation::model_calculate_SCC(const int nb_iterations, const std::string&
     
     if(rc < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            error_msg += "\t" + last_error;
-        kwarning(error_msg.c_str());
+        std::string error_msg = "Could not calculate SCC for the model";
+        error_manager.prepend_error(error_msg);
+        kwarning(error_manager.get_all_errors().c_str());
         return false;
     }
 
@@ -331,10 +327,9 @@ bool Simulation::model_simulate_SCC(const std::string& from, const std::string& 
 
     if(rc < 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            error_msg += "\t" + last_error;
-        kwarning(error_msg.c_str());
+        std::string error_msg = "Could not simulate SCC for the model"; 
+        error_manager.prepend_error(error_msg);
+        kwarning(error_manager.get_all_errors().c_str());
         return false;
     }
 
