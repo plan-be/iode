@@ -26,6 +26,22 @@ public:
         return instance;
     }
 
+    bool has_errors() const
+    {
+        return !B_ERROR_MSG.empty();
+    }
+
+    void prepend_error(const std::string& msg)
+    {
+        if(msg.empty()) 
+            return;
+
+        if(std::find(B_ERROR_MSG.begin(), B_ERROR_MSG.end(), msg) != B_ERROR_MSG.end())
+            return; // error message already present
+
+        B_ERROR_MSG.insert(B_ERROR_MSG.begin(), msg);
+    }
+
     void append_error(const std::string& msg)
     {
         if(msg.empty()) 
@@ -37,20 +53,7 @@ public:
         B_ERROR_MSG.push_back(msg);
     }
 
-    void display_last_error()
-    {
-        if(B_ERROR_MSG.empty()) 
-            return;
-
-        std::string errors = "errors:\n";
-        for(const auto& msg : B_ERROR_MSG)
-            errors += msg + "\n";
-        kerror(0, errors.c_str());
-        kpause();
-        B_ERROR_MSG.clear();
-    }
-
-    std::string get_last_error()
+    std::string get_all_errors()
     {
         if(B_ERROR_MSG.empty())
             return "";
@@ -62,14 +65,15 @@ public:
         return errors;
     }
 
-    void print_last_error()
+    void display_last_error()
     {
         if(B_ERROR_MSG.empty()) 
             return;
 
-        for(const std::string& msg : B_ERROR_MSG) 
-            W_printf((char*) "%s\n", msg.c_str());
-
+        std::string errors = "errors:\n";
+        for(const auto& msg : B_ERROR_MSG)
+            errors += msg + "\n";
+        kerror(0, errors.c_str());
         B_ERROR_MSG.clear();
     }
 

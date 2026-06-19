@@ -327,9 +327,12 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 
     if(rc < 0)
     {
-        std::string error_msg = error_manager.get_last_error();
-        if(!error_msg.empty())
-            kwarning(error_msg.c_str());
+        std::string action = (mode == 0) ? "display" : "print";
+        std::string names = trim(std::string(arg + strlen(smpl) + 1));
+        std::string error_msg = "Cannot " + action + " table(s) '" + names + "'";
+        error_manager.prepend_error(error_msg);
+        if(error_manager.has_errors())
+            kwarning((char*) error_manager.get_all_errors().c_str());
     }
 
     return rc;

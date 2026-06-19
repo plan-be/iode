@@ -254,12 +254,13 @@ public:
         for(const std::string& instr: v_instrs) 
         {
             CLEC* clec = L_cc(to_char_array(instr));
-            if(clec == NULL) 
+            if(!clec) 
             {
                 this->instruments = "";
                 std::string error_msg = "Estimation : Instrument '" + instr + "' : error " + std::string(L_error());
                 error_manager.append_error(error_msg);
-                throw std::runtime_error(error_manager.get_last_error());
+                error_manager.display_last_error();
+                return;
             }
         }
 

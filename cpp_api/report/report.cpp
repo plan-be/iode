@@ -3,6 +3,8 @@
 
 void execute_report(const std::string& filepath, const std::string& parameters)
 {
+    error_manager.clear();
+
     if(RP_DEBUG == 0)
         RP_STDOUT = 1;      // write the report output to stdout
 
@@ -18,11 +20,11 @@ void execute_report(const std::string& filepath, const std::string& parameters)
     if(success != 0)
     {
         std::string error_msg = "Execution of report " + filepath_ + " " + parameters + " has failed";
-        std::string last_error = error_manager.get_last_error();
-        if (!last_error.empty())
-            error_msg += ":\n" + last_error;
-        throw std::runtime_error(error_msg);
+        error_manager.prepend_error(error_msg);
     }
+
+    if(error_manager.has_errors())
+        error_manager.display_last_error();
 }
 
 void execute_report(const std::string& filepath, const std::vector<std::string>& parameters)
@@ -33,6 +35,8 @@ void execute_report(const std::string& filepath, const std::vector<std::string>&
 
 void execute_report_line(const std::string& commands)
 {
+    error_manager.clear();
+    
     if(RP_DEBUG == 0)
         RP_STDOUT = 1;      // force output of the report line to be written to stdout
 
@@ -43,11 +47,11 @@ void execute_report_line(const std::string& commands)
     if(success != 0)
     {
         std::string error_msg = "Execution of report command(s):\n" + commands + "\n\nhas failed";
-        std::string last_error = error_manager.get_last_error();
-        if (!last_error.empty())
-            error_msg += ":\n" + last_error;
-        throw std::runtime_error(error_msg);
+        error_manager.prepend_error(error_msg);
     }
+
+    if(error_manager.has_errors())
+        error_manager.display_last_error();
 }
 
 void execute_report_line(const std::vector<std::string>& commands)

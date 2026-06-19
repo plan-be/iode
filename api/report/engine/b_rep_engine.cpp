@@ -537,18 +537,15 @@ int RP_exec_fn(char* name, char* arg, int fs)
  */
 int RP_err_dump(char* name, char* arg)
 {
-    /* File */
-    if(RP_PRINT == 1) 
-    {
-        W_printf((char*) "Error : %s %s\n", name, arg);
-        error_manager.print_last_error();
-        return 0;
-    }
-
-    /* Display */
     std::string error_msg = "Error: " + std::string(name) + " " + std::string(arg);
-    error_manager.append_error(error_msg);
-    error_manager.display_last_error();
+
+    // print
+    if(RP_PRINT == 1)
+        W_printf((char*) error_msg.c_str());
+    // display
+    else
+        kerror(0, (char*) error_msg.c_str());
+
     return 0;
 }
 

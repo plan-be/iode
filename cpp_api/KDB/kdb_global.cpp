@@ -163,9 +163,9 @@ void export_as(const std::string& var_file, const std::string cmt_file, const st
 
     if(res != 0)
     {
-        std::string last_error = error_manager.get_last_error();
-        if(!last_error.empty())
-            throw std::runtime_error("Cannot export variables\n" + last_error);
+        std::string error_msg = "Cannot export variables.";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
     }
 }
 

@@ -569,7 +569,8 @@ TEST_F(EstimationTest, DickeyFullerTest)
     std::shared_ptr<Scalar> scl_order_0;
 
     // Unknown variable
-    EXPECT_THROW(dickey_fuller_test("XORGLUB", drift, trend, order), std::runtime_error);
+    KDBScalarsPtr kdb_res_failed = dickey_fuller_test("XORGLUB", drift, trend, order);
+    EXPECT_EQ(kdb_res_failed->size(), 0);
 
     // no drift, no trend
     drift = false;

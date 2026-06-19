@@ -236,12 +236,11 @@ public:
 
         if(rc != 0)
         {
-            std::string last_error = error_manager.get_last_error();
-            if(!last_error.empty())
-                throw std::runtime_error("Estimation failed:\n" + last_error);
-            else
-                throw std::runtime_error("Estimation failed with unknown error.");
+            std::string error_msg = "Estimation failed";
+            error_manager.prepend_error(error_msg);
+            error_manager.display_last_error();
         }
+        
         return rc;
     }
 

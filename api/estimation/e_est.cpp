@@ -605,9 +605,10 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     rc_prep = E_prep(lecs, instrs);
     if(rc_prep != 0)
     {
-        std::string error_msg = error_manager.get_last_error();
-        if(!error_msg.empty())
-            throw std::runtime_error("Could not prepare estimation:\n" + error_msg);
+        std::string error_msg = "Could not prepare estimation:";
+        error_manager.prepend_error(error_msg);
+        error_manager.display_last_error();
+        return -1;
     }
     
     rc_est = E_gls();
