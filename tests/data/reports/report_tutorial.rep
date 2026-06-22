@@ -432,7 +432,7 @@ $ ----------------------------------
 
 $A2mToCsv %output_dir%/eqs_def.a2m %output_dir%/eqs_def.csv
 $A2mToCsv %output_dir%/tbl_def.a2m %output_dir%/tbl_def.csv
-$A2mToCsv %output_dir%/tbl_anaknff.a2m %output_dir%/tbl_anaknff.csv
+$A2mToCsv %output_dir%/tbl_c8_1.a2m %output_dir%/tbl_c8_1.csv
 $A2mToCsv %output_dir%/tbl_vars.a2m %output_dir%/tbl_vars.csv
 
 $ Sub-Reports
