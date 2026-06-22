@@ -134,12 +134,12 @@ class AddTableDialog(AbstractAddDialog):
         name = self.ui.lineEdit_name.text()
         nb_columns = self.ui.spinBox_nb_columns.value()
         title = self.ui.lineEdit_table_title.text()
-        lecs = self.ui.textEdit_lec.text()
+        lecs = self.ui.textEdit_lec.toPlainText()
         mode = self.ui.checkBox_mode.isChecked()
         files = self.ui.checkBox_files.isChecked()
         date = self.ui.checkBox_date.isChecked()
 
-        table: Table = Table(nb_columns, title, lecs, mode, files, date)
+        table: Table = Table(nb_columns, title, lecs, mode=mode, files=files, date=date)
         self._add(name, table)
 
 

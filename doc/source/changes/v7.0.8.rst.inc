@@ -28,6 +28,9 @@ Fixed Bugs
 
 - PYTHON: fixed IODE command $DataExistXxx returning always 1 (closes :issue:`1237`)
 
+- GUI: fixed insert new IODE tables through the "Add Tables" button 
+  (closes issue:`1251`)
+
 Miscellaneous 
 -------------
 
