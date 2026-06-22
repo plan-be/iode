@@ -355,7 +355,7 @@ $PrintObjDefTbl ANAPRIX
 $ Compute Tables
 $ --------------
 
-$PrintDest %output_dir%/tbl_ANAKNFF.a2m A2M 
+$PrintDest %output_dir%/tbl_c8_1.a2m A2M 
 $PrintNbDec 4
 
 $ $PrintTbl: build and print (a) table(s) in A2M format
