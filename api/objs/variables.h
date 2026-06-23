@@ -241,6 +241,7 @@ public:
 
     void set_sample(const std::string& from, const std::string& to);
     void set_sample(const Period& from, const Period& to);
+    void set_sample(const Sample* new_sample);
 
     int get_nb_periods() const;
     std::string get_period(const int t) const;
@@ -391,7 +392,6 @@ inline bool var_to_binary(char** pack, const Variable& var)
 // TODO : make functions below methods of KDBVariables
 
 /* k_wsvar.c */
-int KV_sample(KDBVariablesPtr kdb, Sample* new_sample);
 int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
 void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
 int KV_add(KDBVariablesPtr kdb, char* varname);

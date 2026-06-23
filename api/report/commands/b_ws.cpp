@@ -291,11 +291,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    if(KV_sample(global_ws_var, new_smpl) < 0)
-    {
-        error_manager.append_error("New sample invalid");
-        goto err;
-    } 
+    global_ws_var->set_sample(new_smpl);
 
     delete new_smpl;
     new_smpl = nullptr;

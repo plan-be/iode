@@ -1,18 +1,3 @@
-/**
- * @header4iode
- *
- * Functions acting on workspaces of variables.
- *
- *    int KV_sample(KDBVariablesPtr kdb, Sample *new_sample)                               Changes the Sample of a KDB of variables.
- *    int KV_merge(KDBVariablesPtr kdb1, KDB* kdb2, int replace)                           Merges two KDB of variables: kdb1 <- kdb1 + kdb2.            
- *    void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)                      Merges 2 KDB of variables, then deletes the second one.
- *    int KV_add(KDBVariablesPtr kdb, char* varname)                                       Adds a new variable in global_ws_var. Fills it with IODE_NAN.
- *    double KV_get(KDBVariablesPtr kdb, int pos, int t, int mode)                         Gets VAR[t]  where VAR is the series in position pos in kdb. 
- *    void KV_set(KDBVariablesPtr kdb, int pos, int t, int mode, double new)               Sets VAR[t], where VAR is the series in position pos in kdb. 
- *    int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample *smpl, char* pattern)     Extrapolates variables on a selected Sample according to one of the available methods.
- *    KDBVariablesPtr KV_aggregate(KDBVariablesPtrdbv, int method, char *pattern, char *filename)    Creates a new KDB with variables created by aggregation based on variable names.
- *    void KV_init_values_1(double* val, int t, int method)                     Extrapolates 1 value val[t] based on val[t], val[t-1] and a selected method.
- */
 #include "api/b_errors.h"
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"
@@ -23,65 +8,6 @@
 #include "api/report/undoc/undoc.h"
 #include "api/report/commands/commands.h"
 
-
-/**
- * Changes the Sample of a KDB of variables. Truncates the vars and/or add NaN values to fill the variables on the new sample.
- * 
- * @param [in, out] kdb          KDB*            pointer to a KDB of variables
- * @param [in]      new_sample   Sample* | NULL  new sample or NULL. If NULL or empty, no changes are made to the current WS
- * @return                       int             -1 if the kdb's sample and new_sample don't overlap or the resulting set is empty
- *                                               0 otherwise
- */
- 
-int KV_sample(KDBVariablesPtr kdb, Sample *new_sample)
-{
-    if(!kdb)
-        return -1;
-
-    if(new_sample == nullptr || new_sample->nb_periods == 0)
-    {
-        kwarning("Empty sample passed to KV_sample. No changes will be made to the current sample.");
-        return -1;
-    }
-
-    Sample intersection_smpl;
-    int start1 = 0;
-    int start2 = 0;
-    if(kdb->sample) 
-    {
-        intersection_smpl = kdb->sample->intersection(*new_sample);
-        if(intersection_smpl.nb_periods > 0) 
-        {
-            start1 = intersection_smpl.start_period.difference(kdb->sample->start_period);
-            start2 = intersection_smpl.start_period.difference(new_sample->start_period);
-        }
-    }
-
-    if(kdb->sample)
-        delete kdb->sample;
-    kdb->sample = new Sample(*new_sample);
-
-    std::shared_ptr<Variable> var_ptr;
-    std::shared_ptr<Variable> new_var_ptr;
-    int nb_periods = kdb->sample->nb_periods;
-    // use iterator to allow modifying k_objs while looping on it
-    for(auto it = kdb->k_objs.begin(); it != kdb->k_objs.end(); it++)   
-    {
-        var_ptr = it->second;
-        new_var_ptr = std::make_shared<Variable>(nb_periods, IODE_NAN);
-        if(var_ptr) 
-        {
-            Variable& var = *var_ptr;
-            Variable& new_var = *new_var_ptr;
-            for(int t = 0; t < intersection_smpl.nb_periods; t++)
-                new_var[start2 + t] = var[start1 + t];
-        }
-        it->second.reset();
-        it->second = new_var_ptr;
-    }
-
-    return 0;
-}
 
 /**
  *  Merges two KDB of variables: kdb1 <- kdb1 + kdb2.
@@ -200,7 +126,7 @@ void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
         if(kdb1->k_type == VARIABLES)
         {
             if(kdb1->sample)
-                KV_sample(kdb2, kdb1->sample);
+                kdb2->set_sample(kdb1->sample);
             else if(kdb2->sample)
                 kdb1->sample = new Sample(*kdb2->sample);
         }
@@ -991,32 +917,69 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 
 void KDBVariables::set_sample(const Period& from, const Period& to)
 {
-	Sample* sample = get_sample();
-	Sample new_sample(from, to);
-	if(sample != nullptr && new_sample == *sample)
+	Sample* new_sample = new Sample(from, to);
+    this->set_sample(new_sample);
+    delete new_sample;
+}
+
+void KDBVariables::set_sample(const Sample* new_sample)
+{
+    if(new_sample == nullptr || new_sample->nb_periods == 0)
+    {
+        kwarning("Empty sample passed to set_sample. No changes will be made to the current sample.");
+        return;
+    }
+
+    // check if the new sample is the same as the current one
+    // if the new sample is the same as the current one, do nothing
+	if(sample != nullptr && *new_sample == *sample)
 		return;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
 	//       A shallow copy is created by calling the corresponding copy constructor.
 	//       Each 'key' in the shallow copy points to the same data as the original.
-	//       The C function KV_sample(KDB*, Sample*) used below does the following things: 
-	//       1. changes the 'sample' attribute of the passed KDB
-	//       2. reallocates the data for each 'key' (IODE variable) [a bit more more complicated than that but that's not the point]
 	//       Problem: if the 'sample' attribute is changed on the subset (passed KDB), the 'sample' attribute of 
 	//                the global database is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
 	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling global_ws_var[var_name, 2001] is still 
 	//                possible but will return garbage.
 	if(this->is_subset_database())
-		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");	
+		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");
 
-	int res = KV_sample(shared_from_this(), &new_sample);
-	if (res < 0) 
-	{
-		std::string error_msg = "Cannot set sample -> invalid \"from_period\" or \"to_period\" argument\n";
-		error_msg += "from_period: " + from.to_string() + "\n";
-		error_msg += "to_period: " + to.to_string();
-		throw std::invalid_argument(error_msg);
-	}
+    Sample intersection_smpl;
+    int start1 = 0;
+    int start2 = 0;
+    if(sample) 
+    {
+        intersection_smpl = sample->intersection(*new_sample);
+        if(intersection_smpl.nb_periods > 0) 
+        {
+            start1 = intersection_smpl.start_period.difference(sample->start_period);
+            start2 = intersection_smpl.start_period.difference(new_sample->start_period);
+        }
+    }
+
+    if(sample)
+        delete sample;
+    sample = new Sample(*new_sample);
+
+    std::shared_ptr<Variable> var_ptr;
+    std::shared_ptr<Variable> new_var_ptr;
+    int nb_periods = sample->nb_periods;
+    // use iterator to allow modifying k_objs while looping on it
+    for(auto it = k_objs.begin(); it != k_objs.end(); it++)   
+    {
+        var_ptr = it->second;
+        new_var_ptr = std::make_shared<Variable>(nb_periods, IODE_NAN);
+        if(var_ptr) 
+        {
+            Variable& var = *var_ptr;
+            Variable& new_var = *new_var_ptr;
+            for(int t = 0; t < intersection_smpl.nb_periods; t++)
+                new_var[start2 + t] = var[start1 + t];
+        }
+        it->second.reset();
+        it->second = new_var_ptr;
+    }
 }
 
 int KDBVariables::get_nb_periods() const
@@ -1120,9 +1083,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
         return false;
     }
 
-    int rc = KV_sample(from_ptr, &merge_sample);
-    if(rc < 0) 
-        return false;
+    from_ptr->set_sample(&merge_sample);
 
     std::set<std::string> s_objs;
     try
@@ -1154,7 +1115,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
     msg += type_name + " read from file '" + file + "'";
     kmsg(msg.c_str());
 
-    rc = KV_merge(shared_from_this(), from_ptr, 1);
+    int rc = KV_merge(shared_from_this(), from_ptr, 1);
     if(rc < 0) 
         return false;
 
