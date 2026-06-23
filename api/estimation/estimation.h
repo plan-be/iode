@@ -306,9 +306,9 @@ private:
         else
         {
             // If no sample is provided, we will use the one from the global variables database
-            if(!global_ws_var->sample)
+            if(!global_ws_var->get_sample())
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            est_smpl = *global_ws_var->sample;
+            est_smpl = *global_ws_var->get_sample();
         }
     }
 

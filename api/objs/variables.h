@@ -78,10 +78,10 @@ struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
     static char* CSV_AXES;
     static int   CSV_NBDEC;
 
+private:
     // periods of the Variables database
     Sample* sample = nullptr;
 
-private:
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
     {
         int nb_periods = get_nb_periods();
@@ -239,9 +239,9 @@ public:
         return true;
     }
 
-    void set_sample(const std::string& from, const std::string& to);
-    void set_sample(const Period& from, const Period& to);
-    void set_sample(const Sample* new_sample);
+    bool set_sample(const std::string& from, const std::string& to);
+    bool set_sample(const Period& from, const Period& to);
+    bool set_sample(const Sample* new_sample);
 
     int get_nb_periods() const;
     std::string get_period(const int t) const;
@@ -362,7 +362,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     if(cpp_kdb.size() == 0)
         return 0;
 
-	Sample* smpl = cpp_kdb.sample;
+	Sample* smpl = cpp_kdb.get_sample();
     if(!smpl)
         return 0;
     

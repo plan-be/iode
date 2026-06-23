@@ -222,7 +222,7 @@ int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPtr db
     if(rc < 0)
         goto err;
 
-    dim = dbv_ptr->sample->nb_periods;
+    dim = dbv_ptr->get_sample()->nb_periods;
     for(i = 0; i < dbv_ptr->size(); i++) 
     {
         strcpy(iname, (char*) dbv_ptr->get_name(i).c_str());
@@ -278,7 +278,7 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPt
     if(rc < 0) 
         goto err;
 
-    nl = dbv_ptr->sample->nb_periods;
+    nl = dbv_ptr->get_sample()->nb_periods;
     nc = dbv_ptr->size();
 
     expdef->write_variable_and_comment(EXP_SEP, 0, 0);
@@ -298,7 +298,7 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPt
 
     for(j = 0; j < nl; j++) 
     {
-        Period per = dbv_ptr->sample->start_period.shift(j);
+        Period per = dbv_ptr->get_sample()->start_period.shift(j);
         sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(oname, 0, 0);
 

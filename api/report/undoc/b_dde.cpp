@@ -147,7 +147,7 @@ char *IodeDdeGetWS(char *szItem)
         KDB& kdb = get_global_db(type);
         if(strcmp(szItem, "Sample") == 0) 
         {
-            res = (char*) global_ws_var->sample->to_string().c_str();
+            res = (char*) global_ws_var->get_sample()->to_string().c_str();
             return res;
         }
         else if(strcmp(szItem + 1, "LIST") == 0) 
@@ -199,10 +199,10 @@ char *IodeDdeCreateSeries(int objnb, int bt)
         return NULL;
 
     std::string name = kdb->get_name(objnb);
-    res = SCR_malloc(40 * (1 + kdb->sample->nb_periods - bt)); /* JMP 29-06-00 */
+    res = SCR_malloc(40 * (1 + kdb->get_sample()->nb_periods - bt)); /* JMP 29-06-00 */
     strcpy(res, name.c_str());
     strcat(res, "\t");
-    for(t = bt ; t < kdb->sample->nb_periods ; t++) 
+    for(t = bt ; t < kdb->get_sample()->nb_periods ; t++) 
     {
         x = kdb->get_value(name, t);
         if(!IODE_IS_A_NUMBER(x)) 
@@ -225,10 +225,10 @@ char *IodeDdeCreatePer(int bt)
     if(!kdb)
         return NULL;
 
-    res = SCR_malloc(11 * (1 + kdb->sample->nb_periods - bt));
-    for(t = bt ; t < kdb->sample->nb_periods ; t++) 
+    res = SCR_malloc(11 * (1 + kdb->get_sample()->nb_periods - bt));
+    for(t = bt ; t < kdb->get_sample()->nb_periods ; t++) 
     {
-        Period per = kdb->sample->start_period.shift(t);
+        Period per = kdb->get_sample()->start_period.shift(t);
         strcat(res, (char*) per.to_string().c_str());
         strcat(res, "\t");
     }
@@ -368,7 +368,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
         {
             case VARIABLES:
             {
-                int nb_periods = global_ws_var->sample->nb_periods;
+                int nb_periods = global_ws_var->get_sample()->nb_periods;
                 if(SCR_tbl_size(lst) == 0) 
                 {
                     res = IodeDdeCreatePer(0);
@@ -510,7 +510,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
     
             case VARIABLES :
             {
-                int nb_periods = global_ws_var->sample->nb_periods;
+                int nb_periods = global_ws_var->get_sample()->nb_periods;
                 res = SCR_malloc(40 * (1 + nb_periods));
                 for(t = 0 ; t < nb_periods ; t++) 
                 {
@@ -651,7 +651,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
         tmp = SCR_malloc((int)strlen(szBuffer) + 30);
         if(type == VARIABLES) 
         {
-            Sample* sample = global_ws_var->sample;
+            Sample* sample = global_ws_var->get_sample();
             if(!sample)
                 throw std::runtime_error("No sample defined");
             sprintf(tmp, "%s %s %s", szItem,
@@ -1003,7 +1003,7 @@ int B_ExcelSet(char *arg, int type)
 
             /* Name Period nVal */
             per = new Period(std::string(args[1]));
-            shift = per->difference(global_ws_var->sample->start_period);
+            shift = per->difference(global_ws_var->get_sample()->start_period);
             if(per == NULL || shift< 0) 
                 shift = 0;
             else 
@@ -1011,7 +1011,7 @@ int B_ExcelSet(char *arg, int type)
     
             int pos = global_ws_var->index_of(name);
             ptr = IodeDdeCreateSeries(pos, shift);
-            nc = 1 + global_ws_var->sample->nb_periods - shift;
+            nc = 1 + global_ws_var->get_sample()->nb_periods - shift;
             break;
         } 
     }

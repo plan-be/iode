@@ -317,7 +317,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
 
     // get period position 
     COL column = columns->cl_cols[col_pos];
-    Sample var_sample(*global_ws_var->sample);
+    Sample var_sample(*global_ws_var->get_sample());
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 
     // get lec

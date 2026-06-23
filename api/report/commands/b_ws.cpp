@@ -269,6 +269,7 @@ int B_WsImport(char* arg, int type)
 
 int B_WsSample(char* arg, int unused)
 {
+    bool success = false;
     Sample* new_smpl = nullptr;
     
     char** args = B_ainit_chk(arg, NULL, 2);
@@ -291,7 +292,12 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    global_ws_var->set_sample(new_smpl);
+    success = global_ws_var->set_sample(new_smpl);
+    if(!success)
+    {
+        error_manager.append_error("Failed to set new sample");
+        goto err;
+    }
 
     delete new_smpl;
     new_smpl = nullptr;

@@ -1128,7 +1128,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     COLS    *cls;
 
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-    Sample* smpl = global_ws_var->sample;
+    Sample* smpl = global_ws_var->get_sample();
 
     /* date */
     char date[11];

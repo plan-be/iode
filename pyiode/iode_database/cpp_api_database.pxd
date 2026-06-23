@@ -327,8 +327,6 @@ cdef extern from "api/objs/tables.h":
 
 cdef extern from "api/objs/variables.h":
     cdef cppclass KDBVariables(KDB):
-        CSample* sample
-
         # factory method
         shared_ptr[KDBVariables] Create(bool is_global) except +
 
@@ -350,7 +348,7 @@ cdef extern from "api/objs/variables.h":
         bool set_var(string& name, double* value) except +
 
         CSample* get_sample()
-        void set_sample(string& from_period, string& to_period) except +
+        bint set_sample(string& from_period, string& to_period) except +
 
         int get_nb_periods()
         string get_period(int t) except +

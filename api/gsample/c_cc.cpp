@@ -477,7 +477,7 @@ static void COL_apply_fil(COL* cl, FIL* fl)
  
 static void COL_calc_now(Period *per)
 {
-    memcpy(per, &(global_ws_var->sample->start_period), sizeof(Period));
+    memcpy(per, &(global_ws_var->get_sample()->start_period), sizeof(Period));
     per->year = SCR_current_date() / 10000L;
     switch(per->periodicity) 
     {
@@ -524,7 +524,7 @@ static int COL_read_long_per(YYFILE *yy)
     if(keyw == YY_LONG)         
         return(yy->yy_long);
     else if(keyw == COL_PER)    
-        return(get_nb_periods_per_year(global_ws_var->sample->start_period.periodicity));
+        return(get_nb_periods_per_year(global_ws_var->get_sample()->start_period.periodicity));
     else if(keyw == COL_SUBPER) 
         return(COL_calc_subper());
     else                        
@@ -570,20 +570,20 @@ static int COL_read_per(YYFILE* yy, Period* per)
             break;
 
         case COL_EOS :
-            memcpy(per, &(global_ws_var->sample->end_period), sizeof(Period));
+            memcpy(per, &(global_ws_var->get_sample()->end_period), sizeof(Period));
             break;
 
         case COL_EOS1 :
-            memcpy(per, &(global_ws_var->sample->end_period), sizeof(Period));
+            memcpy(per, &(global_ws_var->get_sample()->end_period), sizeof(Period));
             per->step = 1;
             break;
 
         case COL_BOS :
-            memcpy(per, &(global_ws_var->sample->start_period), sizeof(Period));
+            memcpy(per, &(global_ws_var->get_sample()->start_period), sizeof(Period));
             break;
 
         case COL_BOS1 :
-            memcpy(per, &(global_ws_var->sample->start_period), sizeof(Period));
+            memcpy(per, &(global_ws_var->get_sample()->start_period), sizeof(Period));
             per->step = 1;
             break;
 
@@ -726,7 +726,7 @@ static int COL_calc_subper()
     Period  *per;
     int     p;
 
-    per = &(global_ws_var->sample->start_period);
+    per = &(global_ws_var->get_sample()->start_period);
 
     switch(per->periodicity) 
     {

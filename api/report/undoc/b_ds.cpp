@@ -266,11 +266,11 @@ int B_DSImportDb(char *arg, int unused)
 #ifdef WIN32
     Sample  *smpl;
 
-    if(global_ws_var->sample->nb_periods == 0) 
+    if(global_ws_var->get_sample()->nb_periods == 0) 
         return -1;
 
     WscrDdeSetTimeOut(10000, 3);
-    smpl = global_ws_var->sample;
+    smpl = global_ws_var->get_sample();
     return(B_ainit_loop(arg, wrapper_B_DSImportDb_1, (char *) smpl));
 #else
     return -1;
