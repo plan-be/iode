@@ -64,7 +64,7 @@
 
 int ExportObjsDIF::write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile)
 {
-    int dim = dbv_ptr->sample->nb_periods;
+    int dim = dbv_ptr->get_sample()->nb_periods;
     int nb  = dbv_ptr->size();
 
     file_descriptor.open(outfile);
@@ -75,7 +75,7 @@ int ExportObjsDIF::write_header(const KDBVariablesPtr dbv_ptr, const KDBComments
 
     for(int i = 0; i < dim; i++) 
     {
-        Period per = dbv_ptr->sample->start_period.shift(i);
+        Period per = dbv_ptr->get_sample()->start_period.shift(i);
         file_descriptor <<  "1,0\n\"" + per.to_string() + "\"\n";
     }
     return 0;

@@ -311,7 +311,7 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     CLEC* clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) 
     {
-        int nb = dbv->sample->nb_periods;
+        int nb = dbv->get_sample()->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
         for(int t = 0 ; t < nb ; t++)
             vec[t] = L_exec(dbv, dbs, clec, t);

@@ -308,23 +308,23 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     int start, start_tmp;
 
     // get list of VARs to be read (from dbv_tmp)
-    std::set<std::string> vars_to_read;
+    std::set<std::string> vars_to_copy;
     for(const auto& [name, var_ptr] : dbv_ptr->k_objs)
     {
         // series already present
-        if(var_ptr->size() > 0)
+        if(idt_exec_loaded_vars.contains(name))
             continue;
         
         if(dbv_tmp->contains(name)) 
-            vars_to_read.insert(name);
+            vars_to_copy.insert(name);
     }
 
     // no VARs to be read
-    if(vars_to_read.size() == 0)
+    if(vars_to_copy.size() == 0)
         return 0;
 
-    Sample* vsmpl = dbv_ptr->sample;
-    Sample* tsmpl = dbv_tmp->sample;
+    Sample* vsmpl = dbv_ptr->get_sample();
+    Sample* tsmpl = dbv_tmp->get_sample();
     if(!tsmpl)
     {
         std::string msg = "Function KI_read_vars_db: the sample of the ";
@@ -340,8 +340,8 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     // The sample of the KDB of the variables to read is empty 
     if(!vsmpl) 
     {
-        dbv_ptr->sample = new Sample(*tsmpl);
-        vsmpl = dbv_ptr->sample;
+        dbv_ptr->set_sample(tsmpl);
+        vsmpl = dbv_ptr->get_sample();
     }
     
     Sample smpl = vsmpl->intersection(*tsmpl);
@@ -357,7 +357,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
         W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
 
     int nb_found = 0;
-    for(const std::string& name : vars_to_read)
+    for(const std::string& name : vars_to_copy)
     {
         std::shared_ptr<Variable> var_ptr = dbv_ptr->get_obj_ptr(name);
         // NOTE: should not happen because we check above that the VAR is present 
@@ -370,7 +370,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
         }
 
         // series already loaded
-        if(var_ptr->size() > 0)
+        if(idt_exec_loaded_vars.contains(name))
             continue;
 
         // get values to be copied from dbv_tmp
@@ -394,9 +394,13 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
         // update dbv with the copied VAR
         dbv_ptr->remove(name);
         dbv_ptr->set(name, var);
+
+        // update the list of loaded VARs
+        idt_exec_loaded_vars.insert(name);
         
         if(KEXEC_TRACE)
             W_printf((char*) "%s ", name.c_str());
+        
         nb_found++;
     }
 
@@ -426,7 +430,7 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
     for(const auto& [name, var_ptr] : dbv_ptr->k_objs) 
     {
         // series already loaded in dbv
-        if(var_ptr->size() > 0) 
+        if(idt_exec_loaded_vars.contains(name)) 
             continue;
         
         vars_to_read.insert(name);
@@ -480,9 +484,11 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
 static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_ws, 
     int nb_files, char* files[])
 {
-    int i, j, dim, nb_found, nb_found_total = 0;
+    idt_exec_loaded_vars.clear();
 
     int nb = 0;
+    int nb_found = 0;
+    int nb_found_total = 0;
     if(nb_files == 0) 
     {
         // No filename given => read in dbv_ws (normally global_ws_var)
@@ -494,7 +500,7 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
     else 
     {
         // Files given, search in files in the same order as they are listed
-        for(i = 0;  i < nb_files && nb_found_total < dbv_ptr->size(); i++) 
+        for(int i = 0;  i < nb_files && nb_found_total < dbv_ptr->size(); i++) 
         {
             if(strcmp(files[i], "WS") == 0)
                 // Special name "WS" => read in dbv_ws 
@@ -512,8 +518,8 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
     // If all target VARs are not found, creates them with NaN values
     if(nb_found_total < dbv_ptr->size()) 
     {
-        j = 0;
-        dim = dbv_ptr->sample->nb_periods;
+        int j = 0;
+        int dim = dbv_ptr->get_sample()->nb_periods;
         // using iterator to avoid concurrent modification of dbv when we add the 
         // missing VARs with NaN values
         std::string name;
@@ -529,7 +535,7 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
                 break;
 
             // series already present in dbv
-            if(var_ptr->size() > 0) 
+            if(idt_exec_loaded_vars.contains(name))
                 continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN Variable
@@ -549,7 +555,7 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
         }
 
         // all VARs found or created with NaN values
-        if(j == 0) 
+        if(j == 0)
             return 0;
         
         // more than 10 exogenous vars not found => special msg
@@ -593,6 +599,7 @@ static int KI_read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, 
 
         if(KEXEC_TRACE) 
             W_printf((char*) "%s ", name.c_str());
+        
         nb_found++;
     }
 
@@ -729,7 +736,7 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
 static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
     int* order, Sample* smpl)
 {
-    int start = smpl->start_period.difference(dbv_ptr->sample->start_period);
+    int start = smpl->start_period.difference(dbv_ptr->get_sample()->start_period);
     if(start < 0) 
         start = 0;
 
@@ -779,7 +786,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     int* order;
     int  res;
 
-    Sample* var_sample = global_ws_var->sample;
+    Sample* var_sample = global_ws_var->get_sample();
     Sample* exec_sample = nullptr; 
     if(in_smpl)
         exec_sample = new Sample(*in_smpl);
@@ -832,9 +839,9 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
 
     KDBVariablesPtr dbv_i_ptr = KI_series_list(dbi_ptr);
     if(var_sample) 
-        dbv_i_ptr->sample = new Sample(*var_sample);
+        dbv_i_ptr->set_sample(var_sample);
     else  
-        dbv_i_ptr->sample = new Sample(*exec_sample);
+        dbv_i_ptr->set_sample(exec_sample);
 
     if(KEXEC_TRACE) 
     {
@@ -846,6 +853,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     }
     
     res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
+    idt_exec_loaded_vars.clear();
     if(res != 0) 
     {
         free(order);
@@ -856,6 +864,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     KDBScalarsPtr dbs_i = KI_scalar_list(dbi_ptr);
     if(KEXEC_TRACE) 
         W_printf((char*) ".par1 tit_1\nScalars loaded\n");
+    
     res = KI_read_scls(dbs_i, dbs_ptr, ns, sfiles);
     if(res != 0) 
     {

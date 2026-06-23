@@ -135,7 +135,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    res = HTOL_smpl(from->sample, global_ws_var->sample, &t_smpl, &skip, &shift); 
+    res = HTOL_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &skip, &shift); 
     if(res < 0) 
     {
         rc = -1;
@@ -149,7 +149,7 @@ static int B_htol(int method, char* arg)
     }
 
     to = KDBVariables::Create(false);
-    to->sample = new Sample(*t_smpl);
+    to->set_sample(new Sample(*t_smpl));
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
         double* from_values = from_var_ptr->data(); 
@@ -166,7 +166,7 @@ static int B_htol(int method, char* arg)
             }
         }
 
-        for(; f + shift <= from->sample->nb_periods; t++, f += shift) 
+        for(; f + shift <= from->get_sample()->nb_periods; t++, f += shift) 
         {
             if(method == HTOL_LAST)
                 to_values[t] = from_values[f + shift - 1];
@@ -224,7 +224,7 @@ KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
     Sample* t_smpl = nullptr;
     KDBVariablesPtr kdb_to = nullptr;
 
-    int res = HTOL_smpl(kdb_from->sample, kdb_from->sample, &t_smpl, &skip, &shift);
+    int res = HTOL_smpl(kdb_from->get_sample(), kdb_from->get_sample(), &t_smpl, &skip, &shift);
     if(res < 0) 
     {
         rc = -1;
@@ -238,7 +238,7 @@ KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
     }
 
     kdb_to = KDBVariables::Create(false);
-    kdb_to->sample = new Sample(*t_smpl);
+    kdb_to->set_sample(new Sample(*t_smpl));
     for(const auto& [from_name, from_var_ptr] : kdb_from->k_objs) 
     {
         double* from_values = from_var_ptr->data(); 
@@ -255,7 +255,7 @@ KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
             }
         }
 
-        for(; f + shift <= kdb_from->sample->nb_periods; t++, f += shift) 
+        for(; f + shift <= kdb_from->get_sample()->nb_periods; t++, f += shift) 
         { 
             if(method == HTOL_LAST)
                 to_values[t] = from_values[f + shift - 1];

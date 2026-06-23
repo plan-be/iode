@@ -60,11 +60,11 @@ int ExportObjsCSV::write_header(const KDBVariablesPtr dbv_ptr, const KDBComments
     }
 
     file_descriptor <<  "code" << EXP_SEP << "comment" << EXP_SEP;
-    dim = dbv_ptr->sample->nb_periods;
+    dim = dbv_ptr->get_sample()->nb_periods;
     std::string str_period;
     for(i = 0; i < dim; i++) 
     {
-        Period period = dbv_ptr->sample->start_period.shift(i);
+        Period period = dbv_ptr->get_sample()->start_period.shift(i);
         str_period = period.to_string();
         file_descriptor << str_period << EXP_SEP;
     }

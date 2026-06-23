@@ -187,8 +187,10 @@ public:
     
         if(type == VARIABLES) 
         {
-            if(xdr_kdb->sample)
-                K_xdrSMPL((unsigned char*) xdr_kdb->sample);
+            KDBVariables* kdb_var = static_cast<KDBVariables*>(xdr_kdb);
+            Sample* smpl = kdb_var->get_sample();
+            if(smpl)
+                K_xdrSMPL((unsigned char*) smpl);
         }
     #endif
     }

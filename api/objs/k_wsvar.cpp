@@ -39,10 +39,10 @@ int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
         return -1;
     }
 
-    if(!kdb1->sample)
+    if(!kdb1->get_sample())
     {
-        if(kdb2->sample)
-            kdb1->sample = new Sample(*kdb2->sample);
+        if(kdb2->get_sample())
+            kdb1->set_sample(kdb2->get_sample());
         else
         {
             kwarning("Cannot merge the 2 Variables databases: sample of both databases is empty");
@@ -51,11 +51,11 @@ int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
     }
 
     int start1, start2;
-    Sample smpl = kdb1->sample->intersection(*kdb2->sample);
+    Sample smpl = kdb1->get_sample()->intersection(*kdb2->get_sample());
     if(smpl.nb_periods > 0) 
     {
-        start1 = smpl.start_period.difference(kdb1->sample->start_period); /* always >= 0 */
-        start2 = smpl.start_period.difference(kdb2->sample->start_period); /* always >= 0 */
+        start1 = smpl.start_period.difference(kdb1->get_sample()->start_period); /* always >= 0 */
+        start2 = smpl.start_period.difference(kdb2->get_sample()->start_period); /* always >= 0 */
     }
 
     bool found;
@@ -125,10 +125,10 @@ void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
     {
         if(kdb1->k_type == VARIABLES)
         {
-            if(kdb1->sample)
-                kdb2->set_sample(kdb1->sample);
-            else if(kdb2->sample)
-                kdb1->sample = new Sample(*kdb2->sample);
+            if(kdb1->get_sample())
+                kdb2->set_sample(kdb1->get_sample());
+            else if(kdb2->get_sample())
+                kdb1->set_sample(kdb2->get_sample());
         }
         kdb1->k_objs = kdb2->k_objs;
         kdb2->clear();
@@ -163,7 +163,7 @@ int KV_add(KDBVariablesPtr kdb, char* varname)
     bool found = kdb->contains(varname);
     if(!found) 
     {
-        int nobs = kdb->sample->nb_periods;
+        int nobs = kdb->get_sample()->nb_periods;
         // Set IODE_NAN if the new var
         kdb->set(varname, Variable(nobs, IODE_NAN));
     }
@@ -174,7 +174,7 @@ int KV_add(KDBVariablesPtr kdb, char* varname)
         if(!vptr) 
             return -1;
         
-        for(int t = 0; t < kdb->sample->nb_periods; t++)
+        for(int t = 0; t < kdb->get_sample()->nb_periods; t++)
             vptr[t] = IODE_NAN;
     }
     
@@ -212,7 +212,7 @@ double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mod
         return IODE_NAN;
     }
 
-    Sample* smpl = kdb->sample;
+    Sample* smpl = kdb->get_sample();
     if(!smpl) 
     {
         error_msg += "sample of the KDB is empty.";
@@ -312,7 +312,7 @@ void KV_set(KDBVariablesPtr kdb, const std::string& name, int t, int mode, doubl
         return;
     }
 
-    Sample* smpl = kdb->sample;
+    Sample* smpl = kdb->get_sample();
     if(!smpl) 
     {
         error_msg += "sample of the KDB is empty.";
@@ -440,8 +440,8 @@ int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample* smpl, char* pattern)
     if(!dbv)
         return -1;
 
-    int bt = smpl->start_period.difference(dbv->sample->start_period);
-    int at = dbv->sample->end_period.difference(smpl->end_period);
+    int bt = smpl->start_period.difference(dbv->get_sample()->start_period);
+    int at = dbv->get_sample()->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         error_manager.append_error("WsExtrapolate : sample definition error");
@@ -508,21 +508,21 @@ KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, cha
     if(!edbv) 
         goto done;
 
-    if(!edbv->sample)
+    if(!edbv->get_sample())
         goto done;
     
-    if(edbv->sample->nb_periods == 0)
+    if(edbv->get_sample()->nb_periods == 0)
         goto done;
 
-    smpl = edbv->sample;
-    nb_per = edbv->sample->nb_periods;
+    smpl = edbv->get_sample();
+    nb_per = edbv->get_sample()->nb_periods;
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = KDBVariables::Create(false);
     if(!ndbv) 
         goto done;
     
-    ndbv->sample = new Sample(*edbv->sample);
+    ndbv->set_sample(edbv->get_sample());
 
     for(const auto& [ename, var_ptr] : edbv->k_objs) 
     {
@@ -895,10 +895,10 @@ Sample* KDBVariables::get_sample() const
 	return this->sample;
 }
 
-void KDBVariables::set_sample(const std::string& from, const std::string& to)
+bool KDBVariables::set_sample(const std::string& from, const std::string& to)
 {
 	if(from.empty() && to.empty())
-		return;
+		return false;
 	
 	Sample* sample = get_sample();
     if ((sample == nullptr || sample->nb_periods == 0) && (from.empty() || to.empty()))
@@ -912,28 +912,29 @@ void KDBVariables::set_sample(const std::string& from, const std::string& to)
 
 	Period period_from(from_);
 	Period period_to(to_);
-	set_sample(period_from, period_to);
+	return set_sample(period_from, period_to);
 }
 
-void KDBVariables::set_sample(const Period& from, const Period& to)
+bool KDBVariables::set_sample(const Period& from, const Period& to)
 {
 	Sample* new_sample = new Sample(from, to);
-    this->set_sample(new_sample);
+    bool success = this->set_sample(new_sample);
     delete new_sample;
+    return success;
 }
 
-void KDBVariables::set_sample(const Sample* new_sample)
+bool KDBVariables::set_sample(const Sample* new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0)
     {
         kwarning("Empty sample passed to set_sample. No changes will be made to the current sample.");
-        return;
+        return false;
     }
 
     // check if the new sample is the same as the current one
     // if the new sample is the same as the current one, do nothing
 	if(sample != nullptr && *new_sample == *sample)
-		return;
+		return true;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
 	//       A shallow copy is created by calling the corresponding copy constructor.
@@ -980,6 +981,8 @@ void KDBVariables::set_sample(const Sample* new_sample)
         it->second.reset();
         it->second = new_var_ptr;
     }
+
+    return true;
 }
 
 int KDBVariables::get_nb_periods() const
@@ -1071,7 +1074,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
         return false;
 
     Sample merge_sample;
-    Sample file_sample = *(from_ptr->sample);
+    Sample file_sample = *(from_ptr->get_sample());
     if(!copy_sample) 
         merge_sample = file_sample;
     else
@@ -1307,7 +1310,7 @@ char* KDBVariables::dde_create_obj_by_name(const std::string& name, int* nc, int
 
 bool KDBVariables::print_obj_def(const std::string& name)
 {
-    Sample* smpl = this->sample;
+    Sample* smpl = this->get_sample();
     if(!smpl || smpl->nb_periods == 0) 
     {
         std::string msg = "Cannot print the variable '" + name + "' because ";

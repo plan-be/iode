@@ -36,7 +36,7 @@ int   KDBVariables::CSV_NBDEC = 15;
  */
 static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
 {
-    Sample* smpl = kdb.sample;
+    Sample* smpl = kdb.get_sample();
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
@@ -121,7 +121,7 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
         return false;
     }
     
-    kdb.sample = new Sample(*smpl);
+    kdb.set_sample(smpl);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
@@ -278,7 +278,7 @@ bool KDBVariables::save_asc(const std::string& filename)
         }
     }
 
-    Sample* smpl = this->sample;
+    Sample* smpl = this->get_sample();
     if(!smpl) 
     {
         kwarning("Cannot save the Variables to an ascii file -> sample is empty");
@@ -367,7 +367,7 @@ bool KDBVariables::save_csv(const std::string& filename, const std::vector<std::
 
     // sample : if CSV_Sample == NULL => tout le sample
     if(!smpl)
-        smpl = this->sample;
+        smpl = this->get_sample();
     
     if(!smpl) 
     {

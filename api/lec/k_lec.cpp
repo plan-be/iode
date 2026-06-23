@@ -61,7 +61,7 @@ double L_getscl(KDBScalarsPtr kdb, int pos)
  */
 Sample *L_getsmpl(KDBVariablesPtr kdb)
 {
-    return(kdb->sample);
+    return(kdb->get_sample());
 }
 
 

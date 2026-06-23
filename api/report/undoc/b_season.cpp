@@ -70,12 +70,12 @@ int B_season(char* arg)
         goto done;
     }
 
-    nbper = DS_smpl(from->sample, global_ws_var->sample, &t_smpl, &shift);
+    nbper = DS_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &shift);
     if(nbper < 0 || t_smpl == nullptr) 
         goto done;
     
     to = KDBVariables::Create(false);
-    to->sample = new Sample(*t_smpl);
+    to->set_sample(new Sample(*t_smpl));
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));

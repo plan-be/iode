@@ -43,7 +43,7 @@ static bool K_cmpvar_1(double v1, double v2)
 
 bool K_compare_var(const Variable& var1, const Variable& var2)
 {
-    int nb_periods = global_ws_var->sample->nb_periods;
+    int nb_periods = global_ws_var->get_sample()->nb_periods;
     for(int i = 0; i < nb_periods; i++)
         if(!K_cmpvar_1(var1[i], var2[i])) 
             return false;

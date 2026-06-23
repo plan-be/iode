@@ -29,7 +29,7 @@ int ExportObjsWKS:: write_header(const KDBVariablesPtr dbv_ptr, const KDBComment
     int dim, nb, i;
 
     WKS_COL = 1, WKS_ROW = 1;
-    dim = dbv_ptr->sample->nb_periods;
+    dim = dbv_ptr->get_sample()->nb_periods;
     nb = dbv_ptr->size();
 
     wks_init(outfile, dim + 2, nb + 1);
@@ -38,7 +38,7 @@ int ExportObjsWKS:: write_header(const KDBVariablesPtr dbv_ptr, const KDBComment
     std::string period_str;
     for(i = 0, WKS_COL = 3; i < dim; i++, WKS_COL++)
     {
-        Period period = dbv_ptr->sample->start_period.shift(i);
+        Period period = dbv_ptr->get_sample()->start_period.shift(i);
         period_str = period.to_string();
         wks_string((char*) period_str.c_str(), WKS_COL, WKS_ROW);
     }
