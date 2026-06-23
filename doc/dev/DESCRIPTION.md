@@ -301,7 +301,6 @@ Functions acting on workspaces of variables.
 
 |Syntax|Description|
 |:---|:---|
-|`int KV_sample(KDB* kdb, Sample *nsmpl)`|Changes the Sample of a KDB of variables.|
 |`int KV_merge(KDB* kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
 |`int KV_add(KDBVariablesPtr kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
