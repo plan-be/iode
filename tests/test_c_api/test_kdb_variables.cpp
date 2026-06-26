@@ -42,19 +42,23 @@ TEST_F(KDBVariablesTest, Load)
 
 TEST_F(KDBVariablesTest, Subset)
 {
+    Sample* new_sample = nullptr;
     std::string pattern = "A*";
-    Variable var = global_ws_var->get("ACAF");
-    std::string lec = "10 + t";
+    Variable var;
     Variable new_var;
-    new_var.reserve(var.size());
-    for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
+    std::string lec = "10 + t";
 
     // GLOBAL KDB
     EXPECT_EQ(global_ws_var->size(), 394);
     EXPECT_TRUE(global_ws_var->is_global_database());
     std::set<std::string> names = global_ws_var->filter_names(pattern);
+    std::string original_sample = global_ws_var->get_sample()->to_string();
 
     // DEEP COPY SUBSET
+    var = global_ws_var->get("ACAF");
+    new_var.clear();
+    for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
+
     KDBVariablesPtr kdb_subset_deep_copy = global_ws_var->get_subset(pattern, true);
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
@@ -62,13 +66,33 @@ TEST_F(KDBVariablesTest, Subset)
     EXPECT_EQ(global_ws_var->get("ACAF"), var);
     EXPECT_EQ(kdb_subset_deep_copy->get("ACAF"), new_var);
 
+    // extra test: change the sample of the parent database and 
+    // check that the sample of the subset is not updated
+    new_sample = new Sample("1970Y1", "2010Y1");
+    global_ws_var->set_sample(new_sample);
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1970Y1:2010Y1");
+    EXPECT_EQ(kdb_subset_deep_copy->get_sample()->to_string(), original_sample);
+    delete new_sample;
+
     // SHALLOW COPY SUBSET
+    var = global_ws_var->get("ACAF");
+    new_var.clear();
+    for (int p = 0; p < var.size(); p++) new_var.push_back(10.0 + p);
+    
     KDBVariablesPtr kdb_subset_shallow_copy = global_ws_var->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", lec);
     EXPECT_EQ(global_ws_var->get("ACAF"), new_var);
     EXPECT_EQ(kdb_subset_shallow_copy->get("ACAF"), new_var);
+
+    // extra test: change the sample of the parent database and 
+    // check that the sample of the subset is also updated
+    new_sample = new Sample("1980Y1", "2020Y1");
+    global_ws_var->set_sample(new_sample);
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1980Y1:2020Y1");
+    EXPECT_EQ(kdb_subset_shallow_copy->get_sample()->to_string(), "1980Y1:2020Y1");
+    delete new_sample;
 }
 
 TEST_F(KDBVariablesTest, Save)

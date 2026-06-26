@@ -241,7 +241,7 @@ int KDBVariables::preload(FILE *fd, const std::string& filepath, const int vers)
     if(data[0] != 0)
     {
         Sample* smpl = (Sample*) data;
-        this->sample = new Sample(*smpl);
+        this->sample = std::make_shared<Sample>(*smpl);
     }
 
     return res.first;
