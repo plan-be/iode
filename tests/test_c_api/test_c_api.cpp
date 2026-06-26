@@ -152,7 +152,7 @@ public:
 
 	    // Set the sample for the variable WS
 	    smpl = new Sample("2000Y1", "2020Y1");
-	    kdb_var->set_sample(smpl);
+	    kdb_var->set_sample(*smpl);
 	    EXPECT_TRUE(kdb_var->get_sample() != nullptr);
 	
 	    // Creates or update new vars
@@ -750,8 +750,10 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
     EXPECT_TRUE(found);
 
     // Test set_sample()
+    Sample empty_sample;
     std::string asmpl1 = global_ws_var->get_sample()->to_string();
-    global_ws_var->set_sample(nullptr);
+    success = global_ws_var->set_sample(empty_sample);
+    EXPECT_FALSE(success);
     std::string asmpl2 = global_ws_var->get_sample()->to_string();
     EXPECT_EQ(asmpl1, asmpl2);
 }
@@ -2189,7 +2191,7 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2010Q1", "2020Q4");
-    global_ws_var->set_sample(smpl);
+    global_ws_var->set_sample(*smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun.av", input_test_dir);
@@ -2251,7 +2253,7 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
     smpl = new Sample("2000Y1", "2020Y1");
-    global_ws_var->set_sample(smpl);
+    global_ws_var->set_sample(*smpl);
     delete smpl;
 
     sprintf(varfile, "%sfun_q.var", input_test_dir);

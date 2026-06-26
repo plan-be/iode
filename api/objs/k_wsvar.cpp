@@ -42,7 +42,7 @@ int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
     if(!kdb1->get_sample())
     {
         if(kdb2->get_sample())
-            kdb1->set_sample(kdb2->get_sample());
+            kdb1->set_sample(*kdb2->get_sample());
         else
         {
             kwarning("Cannot merge the 2 Variables databases: sample of both databases is empty");
@@ -126,9 +126,9 @@ void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
         if(kdb1->k_type == VARIABLES)
         {
             if(kdb1->get_sample())
-                kdb2->set_sample(kdb1->get_sample());
+                kdb2->set_sample(*kdb1->get_sample());
             else if(kdb2->get_sample())
-                kdb1->set_sample(kdb2->get_sample());
+                kdb1->set_sample(*kdb2->get_sample());
         }
         kdb1->k_objs = kdb2->k_objs;
         kdb2->clear();
@@ -522,7 +522,7 @@ KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, cha
     if(!ndbv) 
         goto done;
     
-    ndbv->set_sample(edbv->get_sample());
+    ndbv->set_sample(*edbv->get_sample());
 
     for(const auto& [ename, var_ptr] : edbv->k_objs) 
     {
@@ -917,10 +917,18 @@ bool KDBVariables::set_sample(const std::string& from, const std::string& to)
 
 bool KDBVariables::set_sample(const Period& from, const Period& to)
 {
-	Sample* new_sample = new Sample(from, to);
-    bool success = this->set_sample(new_sample);
-    delete new_sample;
-    return success;
+    try
+    {
+        Sample new_sample(from, to);
+        return this->set_sample(new_sample);
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "Cannot set sample from '" + from.to_string(); 
+        error_msg += "' to '" + to.to_string() + "':\n" + std::string(e.what());
+        kwarning(error_msg.c_str());
+        return false;
+    }
 }
 
 void KDBVariables::update_sample_child(std::shared_ptr<Sample> parent_sample)
@@ -930,9 +938,9 @@ void KDBVariables::update_sample_child(std::shared_ptr<Sample> parent_sample)
         this->sample = parent_sample;
 }
 
-bool KDBVariables::set_sample(const Sample* new_sample)
+bool KDBVariables::set_sample(const Sample& new_sample)
 {
-    if(new_sample == nullptr || new_sample->nb_periods == 0)
+    if(new_sample.nb_periods == 0)
     {
         kwarning("Empty sample passed to set_sample. No changes will be made to the current sample.");
         return false;
@@ -940,7 +948,7 @@ bool KDBVariables::set_sample(const Sample* new_sample)
 
     // check if the new sample is the same as the current one
     // if the new sample is the same as the current one, do nothing
-	if(sample && *new_sample == *sample)
+	if(sample && new_sample == *sample)
 		return true;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
@@ -958,16 +966,16 @@ bool KDBVariables::set_sample(const Sample* new_sample)
     int start2 = 0;
     if(sample) 
     {
-        intersection_smpl = sample->intersection(*new_sample);
+        intersection_smpl = sample->intersection(new_sample);
         if(intersection_smpl.nb_periods > 0) 
         {
             start1 = intersection_smpl.start_period.difference(sample->start_period);
-            start2 = intersection_smpl.start_period.difference(new_sample->start_period);
+            start2 = intersection_smpl.start_period.difference(new_sample.start_period);
         }
     }
 
     sample.reset();
-    sample = std::make_shared<Sample>(*new_sample);
+    sample = std::make_shared<Sample>(new_sample);
     // update the sample of all children databases (subsets)
     for(std::shared_ptr<KDBVariables> child : this->get_children_db())
         child->update_sample_child(sample);
@@ -1100,7 +1108,7 @@ bool KDBVariables::copy_from_file(const std::string& file, const std::string& ob
         return false;
     }
 
-    from_ptr->set_sample(&merge_sample);
+    from_ptr->set_sample(merge_sample);
 
     std::set<std::string> s_objs;
     try

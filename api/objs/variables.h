@@ -250,7 +250,7 @@ public:
 
     bool set_sample(const std::string& from, const std::string& to);
     bool set_sample(const Period& from, const Period& to);
-    bool set_sample(const Sample* new_sample);
+    bool set_sample(const Sample& new_sample);
     void update_sample_child(std::shared_ptr<Sample> parent_sample);
 
     int get_nb_periods() const;

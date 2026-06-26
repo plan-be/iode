@@ -131,8 +131,11 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
     if(!kdb_var) 
         return -1;
+
+    if(!smpl)
+        return -1;
     
-    kdb_var->set_sample(smpl);
+    kdb_var->set_sample(*smpl);
 
     if(global_ws_var) 
         KV_merge_del(global_ws_var, kdb_var, 1);

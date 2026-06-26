@@ -369,7 +369,7 @@ static int B_ltoh(int type, char* arg)
     }
 
     to = KDBVariables::Create(false);
-    to->set_sample(new Sample(*t_smpl));
+    to->set_sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
         Variable to_var(t_smpl->nb_periods, 0);

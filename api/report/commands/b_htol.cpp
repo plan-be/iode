@@ -149,7 +149,7 @@ static int B_htol(int method, char* arg)
     }
 
     to = KDBVariables::Create(false);
-    to->set_sample(new Sample(*t_smpl));
+    to->set_sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : from->k_objs) 
     {
         double* from_values = from_var_ptr->data(); 
@@ -238,7 +238,7 @@ KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
     }
 
     kdb_to = KDBVariables::Create(false);
-    kdb_to->set_sample(new Sample(*t_smpl));
+    kdb_to->set_sample(*t_smpl);
     for(const auto& [from_name, from_var_ptr] : kdb_from->k_objs) 
     {
         double* from_values = from_var_ptr->data(); 

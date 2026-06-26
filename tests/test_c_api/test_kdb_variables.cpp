@@ -42,7 +42,6 @@ TEST_F(KDBVariablesTest, Load)
 
 TEST_F(KDBVariablesTest, Subset)
 {
-    Sample* new_sample = nullptr;
     std::string pattern = "A*";
     Variable var;
     Variable new_var;
@@ -68,11 +67,10 @@ TEST_F(KDBVariablesTest, Subset)
 
     // extra test: change the sample of the parent database and 
     // check that the sample of the subset is not updated
-    new_sample = new Sample("1970Y1", "2010Y1");
+    Sample new_sample("1970Y1", "2010Y1");
     global_ws_var->set_sample(new_sample);
     EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1970Y1:2010Y1");
     EXPECT_EQ(kdb_subset_deep_copy->get_sample()->to_string(), original_sample);
-    delete new_sample;
 
     // SHALLOW COPY SUBSET
     var = global_ws_var->get("ACAF");
@@ -88,11 +86,10 @@ TEST_F(KDBVariablesTest, Subset)
 
     // extra test: change the sample of the parent database and 
     // check that the sample of the subset is also updated
-    new_sample = new Sample("1980Y1", "2020Y1");
-    global_ws_var->set_sample(new_sample);
+    Sample new_sample_2("1980Y1", "2020Y1");
+    global_ws_var->set_sample(new_sample_2);
     EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1980Y1:2020Y1");
     EXPECT_EQ(kdb_subset_shallow_copy->get_sample()->to_string(), "1980Y1:2020Y1");
-    delete new_sample;
 }
 
 TEST_F(KDBVariablesTest, Save)

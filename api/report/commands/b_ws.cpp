@@ -292,7 +292,7 @@ int B_WsSample(char* arg, int unused)
         goto err;
     }
 
-    success = global_ws_var->set_sample(new_smpl);
+    success = global_ws_var->set_sample(*new_smpl);
     if(!success)
     {
         error_manager.append_error("Failed to set new sample");

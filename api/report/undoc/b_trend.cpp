@@ -104,7 +104,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     to = KDBVariables::Create(false);
     nb = t_smpl->nb_periods;
-    to->set_sample(new Sample(*t_smpl));
+    to->set_sample(*t_smpl);
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     f_vec = (double *) SW_nalloc(nb * sizeof(double));
 
