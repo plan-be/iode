@@ -546,7 +546,7 @@ protected:
         }
     }
 
-    virtual std::shared_ptr<D> initialize_subset(const std::shared_ptr<D> true_parent)
+    virtual std::shared_ptr<D> initialize_subset(const std::shared_ptr<D> true_parent, const bool copy)
     {
         std::shared_ptr<D> subset_ptr = D::Create(false);
         subset_ptr->description = true_parent->description;
@@ -689,7 +689,7 @@ public:
             throw std::runtime_error(error_msg);
         }
 
-        std::shared_ptr<D> subset_ptr = initialize_subset(true_parent);
+        std::shared_ptr<D> subset_ptr = initialize_subset(true_parent, copy);
         if(copy)
         {
             subset_ptr->k_db_type = DB_STANDALONE;

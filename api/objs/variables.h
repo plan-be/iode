@@ -7,6 +7,7 @@
 #include "api/objs/pack.h"
 
 #include <string>
+#include <memory>       // for std::shared_ptr
 
 /*----------------------- TYPEDEF ----------------------------*/
 
@@ -80,7 +81,7 @@ struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
 
 private:
     // periods of the Variables database
-    Sample* sample = nullptr;
+    std::shared_ptr<Sample> sample = nullptr;
 
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
     {
@@ -104,7 +105,7 @@ private:
     {
         if(this->sample)
         {
-            char* c_smpl = (char*) this->sample; 
+            char* c_smpl = (char*) this->sample.get(); 
             *data = c_smpl;
             return sizeof(Sample);
         }
@@ -123,8 +124,9 @@ private:
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) 
     {
-        if(other.sample)
-            this->sample = new Sample(*(other.sample));
+        Sample* other_sample = other.sample.get();
+        if(other_sample)
+            this->sample = std::make_shared<Sample>(*other_sample);
         else
             this->sample = nullptr;
     }
@@ -148,29 +150,36 @@ public:
         return std::shared_ptr<KDBVariables>(new KDBVariables(is_global));
     }
 
-    ~KDBVariables() 
-    {
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
-    }
+    ~KDBVariables() {}
 
     void clear() override
     {
-        if(this->sample)
-            delete this->sample;
-        this->sample = nullptr;
-
         KDBTemplate::clear();
+
+        if(this->sample)
+            this->sample.reset();
+        
+        // reset the sample of all children databases (subsets)
+        for(std::shared_ptr<KDBVariables> child : this->get_children_db())
+            child->update_sample_child(this->sample);
     }
 
     int preload(FILE *fd, const std::string& filepath, const int vers) override;
 
-    std::shared_ptr<KDBVariables> initialize_subset(const std::shared_ptr<KDBVariables> true_parent) override
+    std::shared_ptr<KDBVariables> initialize_subset(const std::shared_ptr<KDBVariables> true_parent, const bool copy) override
     {
-        std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::initialize_subset(true_parent);
-        if(true_parent->sample)
-            subset_ptr->sample = new Sample(*(true_parent->sample));
+        std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::initialize_subset(true_parent, copy);
+        
+        // deep copy -> create a new Sample instance for the subset
+        if(copy)
+        {
+            if(true_parent->sample)
+                subset_ptr->sample = std::make_shared<Sample>(*true_parent->sample);
+        }
+        // shallow copy -> share the same Sample pointer
+        else
+            subset_ptr->sample = true_parent->sample;
+        
         return subset_ptr;
     }
 
@@ -242,6 +251,7 @@ public:
     bool set_sample(const std::string& from, const std::string& to);
     bool set_sample(const Period& from, const Period& to);
     bool set_sample(const Sample* new_sample);
+    void update_sample_child(std::shared_ptr<Sample> parent_sample);
 
     int get_nb_periods() const;
     std::string get_period(const int t) const;

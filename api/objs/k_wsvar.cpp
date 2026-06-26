@@ -892,7 +892,7 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 // WARNING: the returned Sample pointer must not be deleted
 Sample* KDBVariables::get_sample() const
 {
-	return this->sample;
+	return this->sample.get();
 }
 
 bool KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -923,6 +923,13 @@ bool KDBVariables::set_sample(const Period& from, const Period& to)
     return success;
 }
 
+void KDBVariables::update_sample_child(std::shared_ptr<Sample> parent_sample)
+{
+    this->sample.reset();
+    if(parent_sample)
+        this->sample = parent_sample;
+}
+
 bool KDBVariables::set_sample(const Sample* new_sample)
 {
     if(new_sample == nullptr || new_sample->nb_periods == 0)
@@ -933,7 +940,7 @@ bool KDBVariables::set_sample(const Sample* new_sample)
 
     // check if the new sample is the same as the current one
     // if the new sample is the same as the current one, do nothing
-	if(sample != nullptr && *new_sample == *sample)
+	if(sample && *new_sample == *sample)
 		return true;
 
 	// NOTE: prevent changing the sample on a subset (shallow copy).
@@ -959,30 +966,37 @@ bool KDBVariables::set_sample(const Sample* new_sample)
         }
     }
 
-    if(sample)
-        delete sample;
-    sample = new Sample(*new_sample);
+    sample.reset();
+    sample = std::make_shared<Sample>(*new_sample);
+    // update the sample of all children databases (subsets)
+    for(std::shared_ptr<KDBVariables> child : this->get_children_db())
+        child->update_sample_child(sample);
 
+    bool success = true;
+    Variable var_copy;
     std::shared_ptr<Variable> var_ptr;
-    std::shared_ptr<Variable> new_var_ptr;
     int nb_periods = sample->nb_periods;
     // use iterator to allow modifying k_objs while looping on it
     for(auto it = k_objs.begin(); it != k_objs.end(); it++)   
     {
         var_ptr = it->second;
-        new_var_ptr = std::make_shared<Variable>(nb_periods, IODE_NAN);
-        if(var_ptr) 
+        if(!var_ptr)
         {
-            Variable& var = *var_ptr;
-            Variable& new_var = *new_var_ptr;
-            for(int t = 0; t < intersection_smpl.nb_periods; t++)
-                new_var[start2 + t] = var[start1 + t];
+            std::string error_msg = "Variable '" + it->first + "' is null. Cannot set sample.";
+            kwarning(error_msg.c_str());
+            success = false;
+            continue;
         }
-        it->second.reset();
-        it->second = new_var_ptr;
+
+        Variable& var = *var_ptr;
+        var_copy = var;
+        var.clear();
+        var.resize(nb_periods, IODE_NAN);
+        for(int t = 0; t < intersection_smpl.nb_periods; t++)
+            var[start2 + t] = var_copy[start1 + t];
     }
 
-    return true;
+    return success;
 }
 
 int KDBVariables::get_nb_periods() const
