@@ -107,11 +107,11 @@ KDBVariablesPtr IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impde
     }
 
     rc = impdef->read_header(yy, smpl);
-    if(rc < 0) 
+    if(!smpl || rc < 0) 
         goto err;
 
     kdb = KDBVariables::Create(false);
-    kdb->set_sample(smpl);
+    kdb->set_sample(*smpl);
     nb = smpl->nb_periods;
 
     if(impdef->read_variable_implemented) 

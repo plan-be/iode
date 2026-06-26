@@ -358,12 +358,12 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
     SCR_strip((unsigned char*) from);
     SCR_strip((unsigned char*) to);
 
-    Sample *smpl = nullptr;
+    std::shared_ptr<Sample> smpl_ptr = nullptr;
     if(from[0] != 0 && to[0] != 0)
     {
         try
         {
-            smpl = new Sample(std::string(from), std::string(to));
+            smpl_ptr = std::make_shared<Sample>(std::string(from), std::string(to));
         }
         catch(const std::exception& e)
         {
@@ -393,8 +393,8 @@ int EXP_RuleExport(char* trace, char* rule, char* out, char* vfile, char* cfile,
         success = dbv_ptr->load(std::string(vfile));
         if(!success) 
             return -1;
-        if(smpl) 
-            dbv_ptr->set_sample(smpl);
+        if(smpl_ptr) 
+            dbv_ptr->set_sample(*smpl_ptr);
     }
 
     auto dbc_ptr = KDBComments::KDBComments::Create(false);

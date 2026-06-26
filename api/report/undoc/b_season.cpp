@@ -75,7 +75,7 @@ int B_season(char* arg)
         goto done;
     
     to = KDBVariables::Create(false);
-    to->set_sample(new Sample(*t_smpl));
+    to->set_sample(*t_smpl);
     nb = t_smpl->nb_periods;
     t_vec = (double *) SW_nalloc(nb * sizeof(double));
     c_vec = (double *) SW_nalloc(nb * sizeof(double));

@@ -340,7 +340,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     // The sample of the KDB of the variables to read is empty 
     if(!vsmpl) 
     {
-        dbv_ptr->set_sample(tsmpl);
+        dbv_ptr->set_sample(*tsmpl);
         vsmpl = dbv_ptr->get_sample();
     }
     
@@ -839,9 +839,9 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
 
     KDBVariablesPtr dbv_i_ptr = KI_series_list(dbi_ptr);
     if(var_sample) 
-        dbv_i_ptr->set_sample(var_sample);
+        dbv_i_ptr->set_sample(*var_sample);
     else  
-        dbv_i_ptr->set_sample(exec_sample);
+        dbv_i_ptr->set_sample(*exec_sample);
 
     if(KEXEC_TRACE) 
     {

@@ -121,7 +121,7 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
         return false;
     }
     
-    kdb.set_sample(smpl);
+    kdb.set_sample(*smpl);
 
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
