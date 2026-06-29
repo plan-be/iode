@@ -16,8 +16,8 @@ TEST_F(LecTest, LEC)
 {
     Variable var_A = global_ws_var->get("A");
 
-    Sample* sample = global_ws_var->get_sample();
-    EXPECT_TRUE(sample != nullptr);
+    std::shared_ptr<Sample> sample = global_ws_var->get_sample();
+    EXPECT_TRUE(sample.get() != nullptr);
 
     int t = 10;
     double value = execute_lec("A + 1", t);

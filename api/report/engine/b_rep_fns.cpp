@@ -1169,15 +1169,12 @@ U_ch *RPF_eqrhs(U_ch **args)
  */
 U_ch *RPF_sample(U_ch** args)
 {
-    U_ch    *res = 0, buf[128];
-    Sample  *smpl;
     KDBVariablesPtr kdb = global_ws_var;
-    char     what = 'F';
-
-    smpl = kdb->get_sample();
+    std::shared_ptr<Sample> smpl = kdb->get_sample();
     if(!smpl || smpl->nb_periods == 0) 
-        return res;
-
+        return 0;
+    
+    char what = 'F';
     if(args[0]) 
         what = args[0][0];
     
@@ -1185,7 +1182,9 @@ U_ch *RPF_sample(U_ch** args)
     std::string s_per1 = smpl->start_period.to_string();
     std::string s_per2 = smpl->end_period.to_string();
     
-    switch(what) {
+    U_ch buf[128];
+    switch(what) 
+    {
         case 'B':
             sprintf((char*) buf, "%s", (char*) s_per1.c_str());
             break;
@@ -1197,6 +1196,7 @@ U_ch *RPF_sample(U_ch** args)
             break;
     }
 
+    U_ch* res = 0;
     res = SCR_strafcat(res, buf);
     return res;
 }

@@ -42,7 +42,7 @@ static int E_GetSmpl(Sample* smpl, char* c_name)
     double* val = global_ws_var->get_var_ptr(name);
 
     int t;
-    Sample* wsmpl = global_ws_var->get_sample();
+    std::shared_ptr<Sample> wsmpl = global_ws_var->get_sample();
     for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
 
@@ -148,7 +148,7 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
     if(vec == NULL) 
         return NULL;
     strcpy(varname, "_DF");
-    Sample* var_sample = global_ws_var->get_sample();
+    std::shared_ptr<Sample> var_sample = global_ws_var->get_sample();
     if(!var_sample) 
     {
         kwarning("No sample defined for the Variables workspace");

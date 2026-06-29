@@ -455,8 +455,13 @@ int B_WsCopy(char* arg, int type)
             }
             else
             {
-                Sample* vars_sample = global_ws_var->get_sample();
-                if(vars_sample)
+                std::shared_ptr<Sample> vars_sample = global_ws_var->get_sample();
+                if(!vars_sample)
+                {
+                    error_manager.append_error("WsCopy : the Variables sample is not yet defined");
+                    return -1;
+                }
+                else
                 {
                     from = vars_sample->start_period.to_string();
                     to = vars_sample->end_period.to_string();
@@ -774,7 +779,7 @@ int B_CsvSave(char* arg, int type)
     }
 
     int shift = 0;
-    Sample* smpl = nullptr;
+    std::shared_ptr<Sample> smpl = nullptr;
     if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
     {
         // check if from to passed as arguments
@@ -782,7 +787,7 @@ int B_CsvSave(char* arg, int type)
         {
             try
             {
-                smpl = new Sample(std::string(data0[0]), std::string(data0[1]));
+                smpl = std::make_shared<Sample>(std::string(data0[0]), std::string(data0[1]));
                 shift = 2;
             }
             catch(const std::exception& e)
@@ -821,9 +826,6 @@ int B_CsvSave(char* arg, int type)
     }
 
     SCR_free_tbl((unsigned char**) data0);
-    if(smpl) delete smpl;
-    smpl = nullptr;
-
     return rc;
 }
 

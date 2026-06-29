@@ -105,7 +105,7 @@ static Equation* read_eq(YYFILE* yy, char* name)
     std::string block;
     std::string comment;
     std::string instruments;
-    Sample* smpl = nullptr;
+    std::shared_ptr<Sample> smpl = nullptr;
     float tests[EQS_NBTESTS] = { 0.0f };
     while(!exit) 
     {
@@ -219,8 +219,8 @@ static Equation* read_eq(YYFILE* yy, char* name)
         }
     }
 
-    Period from_period = (smpl != NULL) ? smpl->start_period : Period();
-    Period to_period = (smpl != NULL) ? smpl->end_period : Period();
+    Period from_period = (smpl.get() != nullptr) ? smpl->start_period : Period();
+    Period to_period = (smpl.get() != nullptr) ? smpl->end_period : Period();
     Equation* eq = new Equation(endo, lec, method, from_period.to_string(), 
                                 to_period.to_string(), comment, instruments, block, false);
     memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));

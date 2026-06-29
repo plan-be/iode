@@ -46,7 +46,8 @@ double execute_lec(const std::string& lec, const std::string& period)
 {
     if(!global_ws_var->check_sample())
         return IODE_NAN;
-    Sample* sample = global_ws_var->get_sample();
+    
+    std::shared_ptr<Sample> sample = global_ws_var->get_sample();
     int t = sample->get_period_position(period);
     return execute_lec(lec, t);
 }

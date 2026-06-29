@@ -356,7 +356,11 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
     std::string no_est_to;
     if(!estimation_done)
     {
-        Sample* vars_sample = global_ws_var->get_sample();  
+        std::shared_ptr<Sample> vars_sample = global_ws_var->get_sample();
+        if(!vars_sample || vars_sample->nb_periods == 0)
+            throw std::runtime_error("Cannot save the (block of) equation(s) " + block + 
+                                     "\nThe Variables sample is not yet defined.");
+
         // throw an error if the string does not represent a valid period
         Period from_per = (!from.empty()) ? Period(from) : vars_sample->start_period;
         // throw an error if the string does not represent a valid period
@@ -424,8 +428,8 @@ void eqs_estimate(const std::string& eqs, const std::string& from, const std::st
     // clear C API errors stack
     error_manager.clear();
 
-    Sample* sample = global_ws_var->get_sample();
-    if(sample->nb_periods == 0)
+    std::shared_ptr<Sample> sample = global_ws_var->get_sample();
+    if(!sample || sample->nb_periods == 0)
         throw std::runtime_error("Could not perform estimation: No estimation sample is defined");
     std::string from_period = (from.empty()) ? sample->start_period.to_string() : from;
     std::string to_period = (to.empty()) ? sample->end_period.to_string() : to;

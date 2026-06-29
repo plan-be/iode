@@ -4,19 +4,6 @@
  * Helper functions for reading and writing IODE ascii files containing mostly IODE obect definitions.
  * Some of these functions parse files and/or strings using the SCR4 group of functions "YY". 
  * See http://www.xon.be/scr4/libs1/libs157.htm for more details.
- *
- *    double K_read_real(YYFILE *yy):    reads a token on the YY stream and interprets the token as a double (double) if possible.
- *    long K_read_long(YYFILE* yy):         reads the next token on the YY stream and returns a long. 
- *    char* K_read_str(YYFILE* yy):         reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.  
- *    Period *K_read_per(YYFILE* yy):       reads the next tokens on the YY stream and tries to interpret them as a Period definition (<long><char><long>).
- *    Sample *K_read_smpl(YYFILE* yy):      reads the next tokens on the YY stream and tries to interpret them as a Sample.
- *    int K_read_align(YYFILE* yy):         reads the next token on the YY stream: LEFT, RIGHT or CENTER.
- *  
- *    void K_stracpy(char** to, char* from):         allocates and copies a null terminated string. 
- *    int K_wrdef(FILE* fd, YYKEYS* table, int def): searches the position of a integer in a table of YYKEYS and writes the corresponding token onto fd. 
- *    int K_compare(YYKEYS* yy1, YYKEYS* yy2):       helper function passed as parameter to qsort to sort a table of YYKEYS.
- *    char *K_wrap(char *in, int lg):                wraps a string (by inserting \n) to limit each line to lg characters.
- *
  */
 #include "api/k_super.h"
 #include "api/constants.h"
@@ -176,13 +163,14 @@ Period* K_read_per(YYFILE* yy)
  *  
  *  TODO: improve (correct) if the syntax is incorrect on YY stream.
  */
-Sample* K_read_smpl(YYFILE* yy)
+std::shared_ptr<Sample> K_read_smpl(YYFILE* yy)
 {
+    std::shared_ptr<Sample> sample_ptr = nullptr;
     Period* one = K_read_per(yy);
     if(!one)
     {
         kerror(0, "%s incorrect period", YY_error(yy));
-        return nullptr;
+        return sample_ptr;
     }
 
     Period* two = K_read_per(yy);
@@ -190,7 +178,7 @@ Sample* K_read_smpl(YYFILE* yy)
     {
         kerror(0, "%s incorrect period", YY_error(yy));
         delete one;
-        return nullptr;
+        return sample_ptr;
     }
     
     int nb = two->difference(*one);
@@ -199,17 +187,15 @@ Sample* K_read_smpl(YYFILE* yy)
         kerror(0, "%s second period is before the first one", YY_error(yy));
         delete one;
         delete two;
-        return nullptr;
+        return sample_ptr;
     }
-        
-    Sample* smpl = new Sample(*one, *two);
+    
+    sample_ptr = std::make_shared<Sample>(*one, *two);
 
     delete one;
-    one = nullptr;
     delete two;
-    two = nullptr;
 
-    return smpl;
+    return sample_ptr;
 }
 
 

@@ -36,8 +36,8 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
     {
-        Sample* sample = global_ws_var->get_sample();
-        if(sample == NULL || sample->nb_periods == 0)
+        std::shared_ptr<Sample> sample = global_ws_var->get_sample();
+        if(!sample || sample->nb_periods == 0)
             throw std::runtime_error("Cannot return the list of variables associated with the identity " + 
                                     std::string(this->lec) +"\nThe global sample is not yet defined");
 

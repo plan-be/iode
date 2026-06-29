@@ -150,9 +150,9 @@ cdef class Variables(CythonIodeDatabase):
     def _get_whole_sample(self) -> Sample:
         cdef CSample* c_sample 
         if self.get_is_detached():
-            c_sample = self.database.get_sample()
+            c_sample = self.database.get_sample().get()
         else:
-            c_sample = cpp_global_variables.get().get_sample()
+            c_sample = cpp_global_variables.get().get_sample().get()
         return Sample._from_ptr(c_sample, <bint>False)
 
     def _maybe_update_subset_sample(self):
@@ -181,11 +181,11 @@ cdef class Variables(CythonIodeDatabase):
         """
         Get the position of a period in the Variables database sample (not the subset).
         """
-        cdef CSample* c_sample
+        cdef CSample* c_sample = NULL
         if self.get_is_detached():
-            c_sample = self.database.get_sample()
+            c_sample = self.database.get_sample().get()
         else:
-            c_sample = cpp_global_variables.get().get_sample()
+            c_sample = cpp_global_variables.get().get_sample().get()
         return c_sample.get_period_position(<CPeriod>c_period)
 
     def _get_real_period_position(self, period: Period) -> int:

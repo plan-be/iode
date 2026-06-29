@@ -75,7 +75,7 @@ cdef class Equation:
         cdef string eq_name = self.c_equation.endo
 
         if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get().get_sample()
+            c_sample = cpp_global_variables.get().get_sample().get()
             if from_period is None:
                 from_period = c_sample.start_period.to_string().decode()
             if to_period is None:
@@ -109,7 +109,7 @@ cdef class Equation:
         cdef string eq_name = self.c_equation.endo
         
         if from_period is None or to_period is None:
-            c_sample = cpp_global_variables.get().get_sample()
+            c_sample = cpp_global_variables.get().get_sample().get()
             if from_period is None:
                 from_period = c_sample.start_period.to_string().decode()
             if to_period is None:

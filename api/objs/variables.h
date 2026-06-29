@@ -235,12 +235,12 @@ public:
     void update(const std::string& name, const std::string& lec, const int t_first, const int t_last);
     void update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period);
 
-    Sample* get_sample() const;
+    std::shared_ptr<Sample> get_sample() const;
 
     bool check_sample() const
     {
-        Sample* sample = get_sample();
-        if(sample == nullptr || sample->nb_periods == 0)
+        std::shared_ptr<Sample> sample = get_sample();
+        if(!sample || sample->nb_periods == 0)
         {
             kwarning("The Variables sample has not been yet defined");
             return false;
@@ -327,7 +327,7 @@ public:
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
     bool save_csv(const std::string& filename, const std::vector<std::string>& 
-        varlist=std::vector<std::string>(), Sample* sample=nullptr) override;
+        varlist=std::vector<std::string>(), std::shared_ptr<Sample> sample=nullptr) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
 
@@ -372,7 +372,7 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
     if(cpp_kdb.size() == 0)
         return 0;
 
-	Sample* smpl = cpp_kdb.get_sample();
+	std::shared_ptr<Sample> smpl = cpp_kdb.get_sample();
     if(!smpl)
         return 0;
     

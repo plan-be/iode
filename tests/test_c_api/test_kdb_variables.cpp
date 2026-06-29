@@ -166,7 +166,7 @@ TEST_F(KDBVariablesTest, GetSetVar)
 
 TEST_F(KDBVariablesEmptyTest, Sample)
 {
-    Sample* sample_undef = global_ws_var->get_sample();
+    auto sample_undef = global_ws_var->get_sample();
     EXPECT_TRUE(sample_undef == nullptr);
     EXPECT_EQ(global_ws_var->get_nb_periods(), 0);
 
@@ -180,7 +180,7 @@ TEST_F(KDBVariablesEmptyTest, Sample)
 
 TEST_F(KDBVariablesTest, Sample)
 {
-    Sample* sample = global_ws_var->get_sample();
+    auto sample = global_ws_var->get_sample();
     Sample expected_sample("1960Y1", "2015Y1");
     EXPECT_EQ(sample->to_string(), expected_sample.to_string());
 
@@ -365,7 +365,7 @@ TEST_F(KDBVariablesTest, Update)
     std::string lec;
     Variable expected_var;
     int nb_periods = global_ws_var->get_nb_periods();
-    Sample* sample = global_ws_var->get_sample();
+    auto sample = global_ws_var->get_sample();
 
     Variable values;
     for(int y=1980; y <= 1990; y++)

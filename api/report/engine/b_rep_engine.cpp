@@ -707,7 +707,7 @@ int RP_evaltime()
     if(!kdb_var)
         return 0;
     
-    Sample* sample = kdb_var->get_sample();
+    std::shared_ptr<Sample> sample = kdb_var->get_sample();
     if(!sample)
         return 0;
     
