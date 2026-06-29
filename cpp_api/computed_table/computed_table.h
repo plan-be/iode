@@ -36,12 +36,12 @@ const static std::string ALLOWED_FORMATS = "AHMRCD";
  */
 struct ComputedTable
 {
-    Table*       ref_table;
-    std::string  gsample;
-    Sample*      sample;
-    int          nb_decimals;
+    Table* ref_table;
+    std::string gsample;
+    int nb_decimals;
+    std::shared_ptr<Sample> sample;
 
-    int   dim; 
+    int dim; 
     COLS* columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
@@ -116,7 +116,7 @@ public:
         return (int) files_ops.size();
     }
 
-    Sample* get_sample() const
+    std::shared_ptr<Sample> get_sample() const
     {
         return sample;
     }

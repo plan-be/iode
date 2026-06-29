@@ -6,6 +6,7 @@ from typing import Union, Tuple, List, Dict, Optional
 # Import necessary C++ types/classes
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr
 
 from pyiode.common cimport TableGraphAxis, TableGraphGrid, TableTextAlign
 from pyiode.time.period cimport CPeriod
@@ -54,7 +55,7 @@ cdef extern from "cpp_api/computed_table/computed_table.h":
         TableTextAlign get_alignement()
         double get_ymin()
         double get_ymax()
-        CSample* get_sample()
+        shared_ptr[CSample] get_sample()
         vector[string] get_list_files()
         string get_title() except +
 
