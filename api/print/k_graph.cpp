@@ -125,16 +125,8 @@ int T_GraphEnd()
  *  @return     int             0 on success, -1 on error (more than 2 cols in tbl 
  *                              or one of the ref files is not in global_ref_xxx)
  */
-int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
+int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
 {
-    int     i, dim, begin = 1, w;
-    char    **files;
-    COLS    *cls, *fcls;
-    TableLine   *line;
-    Sample  smpl;
-    double  step, *x, *y;
-    TableCell   *cells; 
-
     // KT_attr = 4;
     if(tbl->nb_columns != 2) 
     {
@@ -143,24 +135,27 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
         return -1;
     }
 
-    dim = T_prep_cls(tbl, gsmpl, &cls);
+    COLS* cls = nullptr;
+    int dim = T_prep_cls(tbl, gsmpl, &cls);
     if(dim < 0) 
         return -1;
 
-    T_prep_smpl(cls, &fcls, &smpl);
-    files = T_find_files(cls);
+    COLS* fcls = nullptr;
+    std::shared_ptr<Sample> smpl = nullptr;
+    T_prep_smpl(cls, &fcls, smpl);
+    char** files = T_find_files(cls);
     if(files == 0) 
-        return -1; /* JMP 11-06-99 */
+        return -1;
 
-    x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
-    step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
-    x[0] = smpl.start_period.to_float();
+    double* x = (double *) SW_nalloc(sizeof(double) * smpl->nb_periods);
+    double step = 1.0 / get_nb_periods_per_year(smpl->start_period.periodicity);
+    x[0] = smpl->start_period.to_float();
     if(step < 1) 
-        x[0] += step/2; /* GB 23-11-2010, center Q en M  */
-    for(i = 1; i < smpl.nb_periods; i++) 
+        x[0] += step/2;         // center Q and M periodicity
+    for(int i = 1; i < smpl->nb_periods; i++) 
         x[i] = x[i - 1] + step;
 
-    y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
+    double* y = (double *) SW_nalloc(sizeof(double) * smpl->nb_periods);
 
     if(mode != 0)
     {
@@ -171,14 +166,17 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
         W_print_rtf_topic((char*) title.c_str());
     } 
     
-    w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
+    int w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
                     (int) tbl->get_gridx(), (int) tbl->get_gridy(),
                     (double)tbl->y_min, (double)tbl->y_max,
                     (double)tbl->z_min, (double)tbl->z_max,
                     (int) tbl->get_text_alignment(), tbl->chart_box, 50 * tbl->chart_shadow);
 
+    int begin = 1;
     std::string content;
-    for(i = 0; i < tbl->lines.size() && w >= 0; i++) 
+    TableLine* line = nullptr;
+    TableCell* cells = nullptr; 
+    for(int i = 0; i < tbl->lines.size() && w >= 0; i++) 
     {
         line = &tbl->lines[i];
         cells = line->cells.data();
@@ -189,7 +187,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, &smpl, x, y, fcls)) 
+                if(T_GraphLine(tbl, i, cls, smpl, x, y, fcls)) 
                     w = -1;
                 break;
 
@@ -216,7 +214,7 @@ int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)
     SW_nfree(y);
     COL_free_cols(cls);
     COL_free_cols(fcls);
-    return(w);
+    return w;
 }
 
 
@@ -309,14 +307,15 @@ int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
  *  @param [in] double*  y       y-values
  *  @return     int                 0 always
  */
-int T_GraphTimeData(Sample *smpl, double *y)
+int T_GraphTimeData(const std::shared_ptr<Sample> smpl, double *y)
 {
-    char    buf[21];
+    char buf[21];
 
     std::string str_period = smpl->start_period.to_string();
     W_printf((char*) "%s ", (char*) str_period.c_str());
 
-    for(int i = 0; i < smpl->nb_periods; i++) {
+    for(int i = 0; i < smpl->nb_periods; i++) 
+    {
         T_fmt_val(buf, y[i], 16, -1);
         W_printf((char*) " %s ", buf);
     }
@@ -366,24 +365,23 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  @return 
  *  
  */
-int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
+int T_GraphLine(Table* tbl, int i, COLS* cls, const std::shared_ptr<Sample> smpl, double* x, double* y, COLS* fcls)
 {
-    int     j, dt, k;
-    TableLine   *line = &tbl->lines[i];
-    COL     *cl;
-
     COL_clear(cls);
     if(COL_exec(tbl, i, cls) < 0) 
         return -1;
 
-    for(k = 0 ; k < fcls->cl_nb ; k++) 
+    TableLine* line = &tbl->lines[i];
+    for(int k = 0 ; k < fcls->cl_nb ; k++) 
     {
         T_GraphLineTitle(line, fcls, k);
 
-        for(j = 0 ; j < smpl->nb_periods ; j++) 
+        for(int j = 0 ; j < smpl->nb_periods ; j++) 
             y[j] = IODE_NAN;
         
-        for(j = 1; j < cls->cl_nb; j += 2) 
+        int dt = 0;
+        COL* cl = nullptr;
+        for(int j = 1; j < cls->cl_nb; j += 2) 
         {
             cl = cls->cl_cols + j;
             if(T_find_opf(fcls, cl) != k) 
@@ -433,20 +431,22 @@ int T_find_opf(COLS *fcls, COL *cl)
  *  @param [out] Sample* smpl   minimum Sample enclosing cls periods
  *  @return 
  */
-int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
+int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl)
 {
-    int     i, pos;
-    COL     *cl;
-
     *fcls = 0;
-    cl = cls->cl_cols;  // First col in cls
-    smpl->start_period = cl->cl_per[0];
-    smpl->end_period = cl->cl_per[0];
 
-    for(i = 0; i < cls->cl_nb; i++) {
+    COL* cl = cls->cl_cols;  // First col in cls
+    Period start_period = cl->cl_per[0];
+    Period end_period = cl->cl_per[0];
+    smpl = std::make_shared<Sample>(start_period, end_period);
+    
+    int pos;
+    for(int i = 0; i < cls->cl_nb; i++) 
+    {
         cl = cls->cl_cols + i;
         pos = T_find_opf(*fcls, cl);
-        if(pos < 0) {
+        if(pos < 0) 
+        {
             *fcls = COL_add_col(*fcls); // JMP 19/04/2022
             memcpy((*fcls)->cl_cols + (*fcls)->cl_nb - 1, cl, sizeof(COL));
         }
@@ -486,15 +486,11 @@ int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)
  *  
  */
 static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, Sample* smpl, int dt, int nt, KDBVariablesPtr kdb, 
-           char* names, int mode)
+           double ymin, double ymax, const std::shared_ptr<Sample> smpl, int dt, int nt, 
+           KDBVariablesPtr kdb, char* names, int mode)
 {
-    char    *buf, **vars;
-    int     i, t, ng, rc = 0;
-    double  *y;
-
-    vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
-    ng = SCR_tbl_size((unsigned char**) vars);
+    char** vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
+    int ng = SCR_tbl_size((unsigned char**) vars);
     if(ng == 0) 
     {
         std::string err_msg = "No variable defined";
@@ -502,18 +498,19 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         return -1;
     }
 
-    y = (double *) SW_nalloc(sizeof(double) * nt);
+    double* y = (double*) SW_nalloc(sizeof(double) * nt);
 
     T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
-    buf = SCR_malloc((int)strlen(names) + 20);
+    char* buf = SCR_malloc((int)strlen(names) + 20);
     //sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);
     sprintf(buf, "%s (%s)", names, KLG_MODES[mode][0]);
     T_GraphTitle(buf);
     SCR_free(buf);
 
+    int rc = -1;
     std::string var_name;
-    for(i = 0 ; i < ng ; i++) 
+    for(int i = 0 ; i < ng ; i++) 
     {
         var_name = std::string(vars[i]);
         if(!kdb->contains(var_name)) 
@@ -526,7 +523,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
             goto fin;
         }
 
-        for(t = 0; t < nt; t++) 
+        for(int t = 0; t < nt; t++) 
             y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
 
         T_GraphLegend(0, "LSBL"[type], vars[i], NULL);
@@ -552,11 +549,10 @@ fin:
  */
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, Sample* smpl, KDBVariablesPtr kdb, char** names, int mode)
+    double ymin, double ymax, const std::shared_ptr<Sample> smpl, KDBVariablesPtr kdb, 
+    char** names, int mode)
 {
-    int i, ng;
-
-    ng = SCR_tbl_size((unsigned char**) names);
+    int ng = SCR_tbl_size((unsigned char**) names);
     if(ng == 0) 
     {
         std::string err_msg = "DataDisplayGraph : empty variable list";
@@ -597,7 +593,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
         return -1;
     }
 
-    for(i = 0; i < ng; i++) 
+    for(int i = 0; i < ng; i++) 
     {
         if(view) W_InitDisplay();
         V_graph_vars_1(i, type, xgrid, ygrid, axis, ymin, ymax, smpl, dt, nt, kdb, names[i], mode);
@@ -631,15 +627,9 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
  *  @return     int             0 on success, -1 on error
  */
 int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, Sample* smpl, char** names)
+    double ymin, double ymax, const std::shared_ptr<Sample> smpl, char** names)
 {
-    int     rc;
-    //int old_mode = global_VM, rc;
-
-    //global_VM = mode;
-    rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var, names, mode); // JMP 8/8//2022
-
-    //global_VM = old_mode;
+    int rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var, names, mode); // JMP 8/8//2022
     return rc;
 }
 
@@ -651,13 +641,14 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis,
 // -----------------------------------------------------------------------------------------------------------------------------
 
 // Struct declarations
-struct APICHRT {
-    char    **ChrtTitle;
-    char    *ChrtType;
-    int     *ChrtAxis;
-    double    **ChrtData;
-    int     ChrtI;
-    int     ChrtNb;
+struct APICHRT 
+{
+    char**   title;
+    char*    type;
+    int*     axis;
+    double** data;
+    int      i;
+    int      nb;
 };
 
 // Global variables
@@ -665,8 +656,9 @@ APICHRT** API_CHARTS = NULL;
 int       API_NBCHARTS = 0;
 
 // Functions declarations 
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
-int APIGraphTimeData(int hdl, Sample *smpl, double *y);
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, 
+        double *x, double *y, COLS *fcls);
+int APIGraphTimeData(int hdl, const std::shared_ptr<Sample> smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
 int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
@@ -683,27 +675,36 @@ double *APIChartData(int hdl, int i);
 int APIPrepareChart(Table *tbl, char *gsmpl);
 
 
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, 
+    double *x, double *y, COLS *fcls)
 {
-    int     j, dt, k;
-    TableLine   *line = &tbl->lines[i];
-    COL     *cl;
-    APICHRT    *Chrt = API_CHARTS[hdl];
-
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) return -1;
-    for(k = 0 ; k < fcls->cl_nb ; k++) {
+    if(COL_exec(tbl, i, cls) < 0) 
+        return -1;
+    
+    APICHRT* Chrt = API_CHARTS[hdl];
+    TableLine* line = &tbl->lines[i];
+    for(int k = 0 ; k < fcls->cl_nb ; k++) 
+    {
         APIGraphLineTitle(hdl, line, fcls, k);
-        for(j = 0 ; j < smpl->nb_periods ; j++) y[j] = IODE_NAN;
-        for(j = 1; j < cls->cl_nb; j += 2) {
+        for(int j = 0 ; j < smpl->nb_periods ; j++)
+             y[j] = IODE_NAN;
+
+        int dt = 0;
+        COL* cl = nullptr;
+        for(int j = 1; j < cls->cl_nb; j += 2) 
+        {
             cl = cls->cl_cols + j;
-            if(T_find_opf(fcls, cl) != k) continue;
+            if(T_find_opf(fcls, cl) != k) 
+                continue;
             dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
         }
+
         APIGraphTimeData(hdl, smpl, y);
-        Chrt->ChrtI++;
+        Chrt->i++;
     }
+
     return 0;
 }
 
@@ -715,12 +716,12 @@ int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x,
  *  @param [in] double*  y    
  *  @return 
  */
-int APIGraphTimeData(int hdl, Sample *smpl, double *y)
+int APIGraphTimeData(int hdl, const std::shared_ptr<Sample> smpl, double *y)
 {
-    int         nb = smpl->nb_periods;
-    APICHRT    *Chrt = API_CHARTS[hdl];
-    Chrt->ChrtData[Chrt->ChrtI] = (double *)SW_nalloc(sizeof(double) * nb);
-    memcpy(Chrt->ChrtData[Chrt->ChrtI], y, sizeof(double) * nb);
+    int nb = smpl->nb_periods;
+    APICHRT* Chrt = API_CHARTS[hdl];
+    Chrt->data[Chrt->i] = (double*) SW_nalloc(sizeof(double) * nb);
+    memcpy(Chrt->data[Chrt->i], y, sizeof(double) * nb);
     return 0;
 }
 
@@ -738,13 +739,13 @@ int APIGraphTitle(int hdl, char *txt, double *x, int nb)
     int         i = 0;
 
     APICHRT    *Chrt = API_CHARTS[hdl];
-    Chrt->ChrtType[Chrt->ChrtI] = 'T';
-    Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_stracpy((unsigned char*) txt);
-    SCR_OemToAnsi((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI],
-                  (unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI]);
-    Chrt->ChrtData[Chrt->ChrtI] = (double *) SW_nalloc(sizeof(double) * nb);
-    memcpy(Chrt->ChrtData[Chrt->ChrtI], x, sizeof(double) * nb);
-    Chrt->ChrtI++;
+    Chrt->type[Chrt->i] = 'T';
+    Chrt->title[Chrt->i] = (char*) SCR_stracpy((unsigned char*) txt);
+    SCR_OemToAnsi((unsigned char*) Chrt->title[Chrt->i],
+                  (unsigned char*) Chrt->title[Chrt->i]);
+    Chrt->data[Chrt->i] = (double *) SW_nalloc(sizeof(double) * nb);
+    memcpy(Chrt->data[Chrt->i], x, sizeof(double) * nb);
+    Chrt->i++;
     return 0;
 }
 
@@ -762,13 +763,13 @@ int APIGraphTitle(int hdl, char *txt, double *x, int nb)
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
 {
     APICHRT    *Chrt = API_CHARTS[hdl];
-    Chrt->ChrtType[Chrt->ChrtI] = type;
-    Chrt->ChrtAxis[Chrt->ChrtI] = axis;
-    Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_stracpy((unsigned char*) txt);
+    Chrt->type[Chrt->i] = type;
+    Chrt->axis[Chrt->i] = axis;
+    Chrt->title[Chrt->i] = (char*) SCR_stracpy((unsigned char*) txt);
     if(fileop != NULL && fileop[0] != 0)
-        Chrt->ChrtTitle[Chrt->ChrtI] = (char*) SCR_strafcat((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI], (unsigned char*) fileop);
-    SCR_OemToAnsi((unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI],
-                  (unsigned char*) Chrt->ChrtTitle[Chrt->ChrtI]);
+        Chrt->title[Chrt->i] = (char*) SCR_strafcat((unsigned char*) Chrt->title[Chrt->i], (unsigned char*) fileop);
+    SCR_OemToAnsi((unsigned char*) Chrt->title[Chrt->i],
+                  (unsigned char*) Chrt->title[Chrt->i]);
     return 0;
 }
 
@@ -811,12 +812,12 @@ APICHRT *APIChartInit(int nl)
 {
     APICHRT *Chrt;
     Chrt = (APICHRT *) SW_nalloc(sizeof(APICHRT));
-    Chrt->ChrtTitle = (char **) SW_nalloc(sizeof(char *) * nl);
-    Chrt->ChrtType = (char *) SW_nalloc(sizeof(char) * nl);
-    Chrt->ChrtAxis = (int *) SW_nalloc(sizeof(int) * nl);
-    Chrt->ChrtData = (double **) SW_nalloc(sizeof(double *) * nl);
-    Chrt->ChrtI = 0;
-    Chrt->ChrtNb = 0;
+    Chrt->title = (char **) SW_nalloc(sizeof(char *) * nl);
+    Chrt->type = (char *) SW_nalloc(sizeof(char) * nl);
+    Chrt->axis = (int *) SW_nalloc(sizeof(int) * nl);
+    Chrt->data = (double **) SW_nalloc(sizeof(double *) * nl);
+    Chrt->i = 0;
+    Chrt->nb = 0;
     return(Chrt);
 }
 
@@ -830,14 +831,14 @@ APICHRT *APIChartInit(int nl)
 int APIChartEnd(APICHRT *Chrt)
 {
     int i;
-    for(i = 0; Chrt->ChrtTitle[i]; i ++)
-        SW_nfree(Chrt->ChrtTitle[i]);
-    SW_nfree(Chrt->ChrtTitle);
-    for(i = 0; Chrt->ChrtData[i]; i ++)
-        SW_nfree(Chrt->ChrtData[i]);
-    SW_nfree(Chrt->ChrtData);
-    SW_nfree(Chrt->ChrtType);
-    SW_nfree(Chrt->ChrtAxis);
+    for(i = 0; Chrt->title[i]; i ++)
+        SW_nfree(Chrt->title[i]);
+    SW_nfree(Chrt->title);
+    for(i = 0; Chrt->data[i]; i ++)
+        SW_nfree(Chrt->data[i]);
+    SW_nfree(Chrt->data);
+    SW_nfree(Chrt->type);
+    SW_nfree(Chrt->axis);
     SW_nfree(Chrt);
     return 0;
     
@@ -872,7 +873,7 @@ int APIChartNl(int hdl)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtI);
+    return(Chrt->i);
 }
 
 
@@ -881,7 +882,7 @@ int APIChartNc(int hdl)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtNb);
+    return(Chrt->nb);
 }
 
 
@@ -890,7 +891,7 @@ int APIChartType(int hdl, int i)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtType[i]);
+    return(Chrt->type[i]);
 }
 
 
@@ -899,7 +900,7 @@ int APIChartAxis(int hdl, int i)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtAxis[i]);
+    return(Chrt->axis[i]);
 }
 
 
@@ -908,7 +909,7 @@ char *APIChartTitle(int hdl, int i)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtTitle[i]);
+    return(Chrt->title[i]);
 }
 
 
@@ -917,19 +918,12 @@ double  *APIChartData(int hdl, int i)
     APICHRT    *Chrt;
     if(hdl > API_NBCHARTS || API_CHARTS[hdl] == 0) return 0;
     Chrt = API_CHARTS[hdl];
-    return(Chrt->ChrtData[i]);
+    return(Chrt->data[i]);
 }
 
 
 int APIPrepareChart(Table *tbl, char *gsmpl)
 {
-    int     i, dim, begin = 1, w, hdl;
-    char    **files;
-    COLS    *cls, *fcls;
-    TableLine   *line;
-    Sample  smpl;
-    double  step, *x, *y;
-
     if(tbl->nb_columns != 2) 
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
@@ -937,26 +931,31 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
         return -1;
     }
     
-    dim = T_prep_cls(tbl, gsmpl, &cls);
+    COLS* cls = nullptr;
+    int dim = T_prep_cls(tbl, gsmpl, &cls);
     if(dim < 0) 
         return -1;
     
-    T_prep_smpl(cls, &fcls, &smpl);
-    files = T_find_files(cls);
+    COLS* fcls = nullptr;
+    std::shared_ptr<Sample> smpl = nullptr;
+    T_prep_smpl(cls, &fcls, smpl);
+    char** files = T_find_files(cls);
     if(files == 0) 
-        return -1; /* JMP 11-06-99 */
-    
-    x = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
-    step = 1.0 / get_nb_periods_per_year(smpl.start_period.periodicity);
-    x[0] = smpl.start_period.to_float();
-    for(i = 1; i < smpl.nb_periods; i++) 
-        x[i] = x[i - 1] + step;
-    y = (double *) SW_nalloc(sizeof(double) * smpl.nb_periods);
-    hdl = APIChartAlloc((int) tbl->lines.size());
-    w = 1;
+        return -1;
 
+    double* x = (double*) SW_nalloc(sizeof(double) * smpl->nb_periods);
+    double step = 1.0 / get_nb_periods_per_year(smpl->start_period.periodicity);
+    x[0] = smpl->start_period.to_float();
+    for(int i = 1; i < smpl->nb_periods; i++) 
+        x[i] = x[i - 1] + step;
+    double* y = (double*) SW_nalloc(sizeof(double) * smpl->nb_periods);
+    int hdl = APIChartAlloc((int) tbl->lines.size());
+    int w = 1;
+
+    int begin = 1;
     std::string content;
-    for(i = 0; i < tbl->lines.size() && w > 0; i++) 
+    TableLine* line = nullptr;
+    for(int i = 0; i < tbl->lines.size() && w > 0; i++) 
     {
         line = &tbl->lines[i];
         switch(line->get_type()) 
@@ -964,7 +963,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
             case TABLE_LINE_CELL  :
                 if(line->cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
-                if(APIGraphLine(hdl, tbl, i, cls, &smpl, x, y, fcls)) 
+                if(APIGraphLine(hdl, tbl, i, cls, smpl, x, y, fcls)) 
                     w = -1;
                 break;
 
@@ -972,7 +971,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
                 content = line->cells[0].get_content();
                 // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
                 content = utf8_to_oem(content);
-                APIGraphTitle(hdl, (char*) content.c_str(), x, smpl.nb_periods);
+                APIGraphTitle(hdl, (char*) content.c_str(), x, smpl->nb_periods);
                 break;
 
             case TABLE_LINE_FILES :
@@ -981,12 +980,12 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
         }
     }
 
-    API_CHARTS[hdl]->ChrtNb = smpl.nb_periods;
+    API_CHARTS[hdl]->nb = smpl->nb_periods;
     SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
     COL_free_cols(cls);
     COL_free_cols(fcls);
-    return(hdl);
+    return hdl;
 }
 

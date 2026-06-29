@@ -111,7 +111,7 @@ cdef class CythonEditAndEstimateEquations:
             self.c_estimation_ptr  = NULL
 
     def get_sample(self) -> Sample:
-        cdef CSample* c_sample = self.c_estimation_ptr.get_sample()
+        cdef CSample* c_sample = self.c_estimation_ptr.get_sample().get()
         return Sample._from_ptr(c_sample, <bint>False)
 
     def set_sample(self, from_period: str, to_period: str):

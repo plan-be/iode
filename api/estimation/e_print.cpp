@@ -287,32 +287,35 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
  *  @param [in] int         res     print residuals 
  *  @return     int                 0 always
  */
-int Estimation::E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res)
+int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, 
+    int view, int res)
 {
-    char    buf[256], lhs[80], rhs[80];
-    int     i, t, nt, ng;
-    double    *y;
+    char buf[256], lhs[80], rhs[80];
 
-    ng = M_NL(mlhs);
-    nt = M_NC(mlhs);
+    int ng = M_NL(mlhs);
+    int nt = M_NC(mlhs);
 
-    y = (double *)SW_nalloc(sizeof(double) * nt);
+    double* y = (double*) SW_nalloc(sizeof(double) * nt);
 
-    for(i = 0; i < ng && res == 0; i ++) {
-        if(view) W_InitDisplay();
+    for(int i = 0; i < ng && res == 0; i ++) 
+    {
+        if(view) 
+            W_InitDisplay();
 
         T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH); /* JMP 19-02-98 */
         sprintf(buf, "Equation %s : observed and fitted values", titles[i]);    /* JMP 26-02-98 */
         T_GraphTitle(buf);                             /* JMP 26-02-98 */
 
-        for(t = 0; t < nt; t ++) y[t] = MATE(mlhs, i, t);
+        for(int t = 0; t < nt; t ++) 
+            y[t] = MATE(mlhs, i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "%s : observed", lhs);
         T_GraphLegend(0, 'L', buf, NULL);
 
         T_GraphTimeData(smpl, y);
 
-        for(t = 0; t < nt; t ++) y[t] = MATE(mrhs, i, t);
+        for(int t = 0; t < nt; t ++) 
+            y[t] = MATE(mrhs, i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "%s : fitted", lhs);
         T_GraphLegend(0, 'L', buf, NULL);
@@ -321,17 +324,21 @@ int Estimation::E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int v
         T_GraphEnd();
 
         sprintf(buf, "Equation %s : observed and fitted values", titles[i]);    /* JMP 26-02-98 */
-        if(view) W_EndDisplay(buf, -ng, -i, -1, -1);
+        if(view) 
+            W_EndDisplay(buf, -ng, -i, -1, -1);
     }
 
-    for(i = 0; i < ng && res == 1; i ++) {
-        if(view) W_InitDisplay();
+    for(int i = 0; i < ng && res == 1; i ++) 
+    {
+        if(view) 
+            W_InitDisplay();
 
         T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
         sprintf(buf, "Equation %s : residuals", titles[i]);    /* JMP 26-02-98 */
         T_GraphTitle(buf);                                     /* JMP 26-02-98 */
 
-        for(t = 0; t < nt; t ++) y[t] = MATE(mlhs, i, t) - MATE(mrhs, i, t);
+        for(int t = 0; t < nt; t ++) 
+            y[t] = MATE(mlhs, i, t) - MATE(mrhs, i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "(%s) - (%s) : residuals", lhs, rhs);
         T_GraphLegend(0, 'L', buf, NULL);
@@ -340,7 +347,8 @@ int Estimation::E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int v
         T_GraphEnd();
 
         sprintf(buf, "Equation %s : residuals", titles[i]);    /* JMP 26-02-98 */
-        if(view) W_EndDisplay(buf, -ng, -i, -1, -1);
+        if(view) 
+            W_EndDisplay(buf, -ng, -i, -1, -1);
     }
 
 
@@ -369,17 +377,22 @@ int Estimation::E_print_results(int corr, int corru, int obs, int grobs, int grr
     E_print_parms();
     E_print_instrs();
 
-    if(E_CONV == 0) {
+    if(E_CONV == 0) 
+    {
         W_printf((char*) ".par1 parb\nTHE PROCESS DOES NOT CONVERGE\n");
         return 0;
     }
 
     E_print_coefs();
-    if(corr) E_print_mcorr();           /* JMP38 27-09-92 */
-    if(corru) E_print_mcorru();         /* JMP38 27-09-92 */
+    if(corr) 
+        E_print_mcorr();
+    if(corru) 
+        E_print_mcorru();
     E_print_eqres(obs);
-    if(grobs) E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 0);  /* JMP 23-03-98 */
-    if(grres) E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 1);  /* JMP 23-03-98 */
+    if(grobs) 
+        E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 0);
+    if(grres) 
+        E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 1);
 
     W_flush();
     return 0;

@@ -166,24 +166,25 @@ int APIChartNl(int hdl);
 char *APIChartTitle(int hdl, int i);
 int APIChartType(int hdl, int i);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, double *x, double *y, COLS *fcls);
 int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
-int APIGraphTimeData(int hdl, Sample *smpl, double *y);
+int APIGraphTimeData(int hdl, const std::shared_ptr<Sample> smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIPrepareChart(Table *tbl, char *gsmpl);
 int T_GraphEnd();
 int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls);
+int T_GraphLine(Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, double *x, double *y, COLS *fcls);
 int T_GraphTest(Table *tbl);
-int T_GraphTimeData(Sample *smpl, double *y);
+int T_GraphTimeData(const std::shared_ptr<Sample> smpl, double *y);
 int T_GraphTitle(char *txt);
 int T_GraphXYData(int nb, double *x, double *y);
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
 int T_find_opf(COLS *fcls, COL *cl);
 int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode);
-int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl);
-int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample *smpl, char **names);
+int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl);
+int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, 
+    const std::shared_ptr<Sample> smpl, char **names);
 
 /* int.c */
 int T_prep_cls(Table* tbl, char* smpl, COLS** cls);

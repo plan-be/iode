@@ -33,7 +33,7 @@
  *  @param [in]       char*    name     variable to be analysed (from global_ws_var)
  *  @return           int               0 if name is found in global_ws_var, -1 otherwise
  */
-static int E_GetSmpl(Sample* smpl, char* c_name)
+static int E_GetSmpl(std::shared_ptr<Sample>& smpl, char* c_name)
 {
     std::string name = std::string(c_name);
     if(!global_ws_var->contains(name)) 
@@ -45,6 +45,9 @@ static int E_GetSmpl(Sample* smpl, char* c_name)
     std::shared_ptr<Sample> wsmpl = global_ws_var->get_sample();
     for(t = 0 ; t < wsmpl->nb_periods ; t++)
         if(IODE_IS_A_NUMBER(val[t])) break;
+
+    if(!smpl)
+        smpl = std::make_shared<Sample>();
 
     smpl->start_period = wsmpl->start_period.shift(t);
 
@@ -99,10 +102,10 @@ int E_GetLecName(char* lec, char* name)
  *  @param [in] char*       buf     LEC expression of the equation _DF.
  *  @return     int                 result the estimation: 0 on success, -1 on error.
  */
-static int E_UnitRoot_1(Sample* smpl, char* buf)
+static int E_UnitRoot_1(const std::shared_ptr<Sample> smpl, char* buf)
 {
-    int     rc = -1, neqs = 0;
-    char    **eqs = NULL;
+    int  neqs = 0;
+    char** eqs = NULL;
 
     SCR_add_ptr((unsigned char***) &eqs, &neqs, (unsigned char*) "_DF");
     SCR_add_ptr((unsigned char***) &eqs, &neqs, NULL);
@@ -111,7 +114,7 @@ static int E_UnitRoot_1(Sample* smpl, char* buf)
     global_ws_eqs->set("_DF", eq);
     
     Estimation est(eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
-    rc = est.estimate();
+    int rc = est.estimate();
 
     global_ws_eqs->remove("_DF");
     SCR_free_tbl((unsigned char**) eqs);
@@ -140,13 +143,14 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
 {
     int      i, pos, rc = -1;
     char     buf[1024], scl[11], varname[64];
-    Sample   smpl;
     double   *res = NULL, *vec;
+    std::shared_ptr<Sample> smpl = nullptr;
 
     // Computes the lec formula and stores the result in the VAR _DF
     vec = L_cc_link_exec(lec, global_ws_var, global_ws_scl);
     if(vec == NULL) 
         return NULL;
+    
     strcpy(varname, "_DF");
     std::shared_ptr<Sample> var_sample = global_ws_var->get_sample();
     if(!var_sample) 
@@ -154,16 +158,17 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
         kwarning("No sample defined for the Variables workspace");
         return NULL;
     }
+
     int nb_periods = var_sample->nb_periods;
     Variable var(vec, vec + nb_periods);
     global_ws_var->set(varname, var);
     SW_nfree(vec);
     
     // Checks that the sample is large enough for the estimation 
-    E_GetSmpl(&smpl, varname);
-    smpl.start_period = smpl.start_period.shift(1);
-    smpl.nb_periods--;
-    if(smpl.nb_periods < (drift + trend + order + 1) * 2) 
+    E_GetSmpl(smpl, varname);
+    smpl->start_period = smpl->start_period.shift(1);
+    smpl->nb_periods--;
+    if(smpl->nb_periods < (drift + trend + order + 1) * 2) 
     {
         error_manager.append_error("Sample too small for this test");
         global_ws_var->remove("_DF");
@@ -201,9 +206,9 @@ double *E_UnitRoot(char* lec, int drift, int trend, int order)
             sprintf(buf + strlen(buf), " + df%d*d(%s[-%d])", i, varname, i);
     }
 
-    smpl.start_period = smpl.start_period.shift(order);
-    smpl.nb_periods -= order;
-    rc = E_UnitRoot_1(&smpl, buf);
+    smpl->start_period = smpl->start_period.shift(order);
+    smpl->nb_periods -= order;
+    rc = E_UnitRoot_1(smpl, buf);
 
     if(rc == 0)
         res = (double *) SCR_malloc((drift + trend + order + 1)* 3 * sizeof(double));

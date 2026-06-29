@@ -135,7 +135,7 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
  *  @param [in] float*  tests   list of tests (see KE_est_s() for the complete list)
  *  @return     int             0 on success, -1 on error
  */
-int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, float* tests)
+int Estimation::KE_update(char* name, char* c_lec, int i_method, const std::shared_ptr<Sample> smpl, float* tests)
 {
     std::string endo(name);
     std::string lec(c_lec);
@@ -150,8 +150,8 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
             std::string comment = "";
             std::string instruments = "";
             std::string block = endo;
-            Period from_period = (smpl !=  NULL) ? smpl->start_period : Period();
-            Period to_period = (smpl !=  NULL) ? smpl->end_period : Period();
+            Period from_period = (smpl.get() != nullptr) ? smpl->start_period : Period();
+            Period to_period = (smpl.get() != nullptr) ? smpl->end_period : Period();
             Equation eq(endo, lec, method, from_period.to_string(), to_period.to_string(), 
                         comment, instruments, block, true);
             eq.update_date();
@@ -193,16 +193,16 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, Sample* smpl, f
  *  
  *  @return     int                  0 on success, -1 on error
  */
-int Estimation::KE_est_s(Sample* smpl)
+int Estimation::KE_est_s(const std::shared_ptr<Sample> smpl)
 {
     static char met[6] = {"LZIGM"};
     int        nb, error = 0, nbl = 0, nbe = 0, nblk;
-    Sample*    eq_smpl;
     U_ch**     endos = 0;
     U_ch**     blk = 0;
     U_ch**     lecs = 0;
     U_ch**     instrs = 0;
     float      tests[EQS_NBTESTS];
+    std::shared_ptr<Sample> eq_smpl;
     std::shared_ptr<Equation> eq_ptr;
     
     nb = SCR_tbl_size((unsigned char**) est_endos);
@@ -233,7 +233,7 @@ int Estimation::KE_est_s(Sample* smpl)
 
         if(!smpl) 
         {
-            eq_smpl = new Sample(eq_ptr->sample);
+            eq_smpl = std::make_shared<Sample>(eq_ptr->sample);
             E_SMPL = eq_smpl;
         }
         else

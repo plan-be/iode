@@ -232,7 +232,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(c_estimation->E_NEQ, 2);
 
     // Sample
-    Sample* sample = est.get_sample();
+    std::shared_ptr<Sample> sample = est.get_sample();
     EXPECT_EQ(sample->to_string(), from + ":" + to);
 
     // Correlation matrix
@@ -470,7 +470,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     EXPECT_EQ(eq_DPUH->sample.to_string(), from + ":" + to);
 
     // Sample
-    Sample* sample = est.get_sample();
+    std::shared_ptr<Sample> sample = est.get_sample();
     EXPECT_EQ(sample->to_string(), from + ":" + to);
 
     // Correlation matrix

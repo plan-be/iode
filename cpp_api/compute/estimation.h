@@ -89,10 +89,10 @@ class EditAndEstimateEquations
 {
     bool estimation_done;
 
-    Sample* sample;
     std::string block;
     std::string instruments;
     IodeEquationMethod method;
+    std::shared_ptr<Sample> sample;
 
     std::set<std::string> v_equations;
     std::set<std::string>::iterator current_eq;
@@ -111,27 +111,27 @@ public:
         return estimation;
     }
 
-    Sample* get_sample() const
+    std::shared_ptr<Sample> get_sample() const
     {
         return sample;
     }
 
-    void set_sample(const Sample* sample = nullptr)
+    void set_sample(const std::shared_ptr<Sample> sample = nullptr)
     {
         if(this->sample) 
-            delete this->sample;
+            this->sample.reset();
 
         // make a copy
         if(sample)
-            this->sample = new Sample(*sample);
+            this->sample = std::make_shared<Sample>(*sample);
         else
-            this->sample = new Sample(*(global_ws_var->get_sample()));
+            this->sample = std::make_shared<Sample>(*(global_ws_var->get_sample()));
     }
     
     void set_sample(const Period* from = nullptr, const Period* to = nullptr)
     {
         if(this->sample) 
-            delete this->sample;
+            this->sample.reset();
 
         auto vars_sample = global_ws_var->get_sample();
         Period from_ = from ? Period(*from) : vars_sample->start_period;
@@ -139,7 +139,7 @@ public:
 
         try
         {
-            sample = new Sample(*from, *to);
+            sample = std::make_shared<Sample>(*from, *to);
         }
         catch(const std::exception& e)
         {
@@ -151,7 +151,7 @@ public:
     void set_sample(const std::string& from = "", const std::string& to = "")
     {
         if(this->sample) 
-            delete this->sample;
+            this->sample.reset();
         
         if(!global_ws_var->check_sample())
         {
@@ -167,7 +167,7 @@ public:
 
         try
         {
-            sample = new Sample(from, to);
+            sample = std::make_shared<Sample>(from, to);
         }
         catch(const std::exception& e)
         {
