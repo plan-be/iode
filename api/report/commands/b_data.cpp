@@ -1634,53 +1634,51 @@ int B_DataCompare(char* arg, int type)
  */
 static int B_DataEditGraph(int view, char* arg)
 {
-    int     rc = 0, nb_args, mode, type, xgrid, ygrid, axis;
-    double  ymin, ymax;
-    char    **args = NULL;
-    Sample  *smpl = 0;
-
-    args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
+    char** args = B_ainit_chk(arg, NULL, 0);
+    int nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 10) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");
-        rc = -1;
-        goto fin;
+        A_free((unsigned char**) args);
+        return -1;
     }
 
-    mode = get_pos_in_char_array("LDGdg", args[0][0]); /* GB 10/08/98 */
+    int mode = get_pos_in_char_array("LDGdg", args[0][0]);
     mode = std::max(0, mode);
 
-    type  = B_argpos("LSBM", args[1][0]);
-    //xgrid = B_argpos("MNJ",  args[2][0]);
-    //ygrid = B_argpos("MNJ",  args[3][0]);
-    xgrid = B_argpos("JNM",  args[2][0]); // Corr VL 4/6/2018
-    ygrid = B_argpos("JNM",  args[3][0]); // Id
+    int type  = B_argpos("LSBM", args[1][0]);
+    int xgrid = B_argpos("JNM",  args[2][0]);
+    int ygrid = B_argpos("JNM",  args[3][0]);
  
-    axis  = B_argpos("LGSP", args[4][0]);
-    if(memcmp(args[5], "--", 2) == 0) ymin = IODE_NAN;
-    else                              ymin = atof(args[5]);
-    if(memcmp(args[6], "--", 2) == 0) ymax = IODE_NAN;
-    else                              ymax = atof(args[6]);
+    int axis = B_argpos("LGSP", args[4][0]);
 
+    double ymin;
+    if(memcmp(args[5], "--", 2) == 0) 
+        ymin = IODE_NAN;
+    else                              
+        ymin = atof(args[5]);
+
+    double ymax;
+    if(memcmp(args[6], "--", 2) == 0) 
+        ymax = IODE_NAN;
+    else                              
+        ymax = atof(args[6]);
+
+    std::shared_ptr<Sample> smpl = nullptr;
     try
     {
-        smpl = new Sample(std::string(args[7]), std::string(args[8]));
+        smpl = std::make_shared<Sample>(std::string(args[7]), std::string(args[8]));
     }
     catch(const std::exception& e)
     {
         error_manager.append_error(std::string(e.what()));
-        rc = -1;
-        goto fin;
+        A_free((unsigned char**) args);
+        return -1;
     }
 
-    rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
-		         smpl, args + 9);
-
-fin:
+    int rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
+		             smpl, args + 9);
     A_free((unsigned char**) args);
-    if(smpl) delete smpl;
-    smpl = nullptr;
     return rc;
 }
 

@@ -109,9 +109,6 @@ EditAndEstimateEquations::~EditAndEstimateEquations()
     if(estimation_done) 
         delete estimation;
     
-    if(sample) 
-        delete sample;
-    
     kdb_eqs->clear();
     kdb_eqs.reset();
 
@@ -332,7 +329,9 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
                                 i_method, maxit, eps);
     int res = estimation->estimate();
 
-    if(m_corr_ptr) m_corr_ptr.reset();
+    if(m_corr_ptr) 
+        m_corr_ptr.reset();
+    
     if(res == 0)
     {
         estimation_done = true;

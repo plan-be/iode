@@ -78,22 +78,17 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg, int unused)                                                 
 {
-    int     res;
-    double  value;
-    char    *c_eq_name, *cond, *test, *tmp;
-    char**  args;
-    Sample  *smpl;
-
-    args = B_vtom_chk(arg, 5);
+    char** args = B_vtom_chk(arg, 5);
     if(args == NULL) 
-        return(1);
+        return 1;
 
+    std::shared_ptr<Sample> smpl = nullptr;
     std::string from = std::string(args[0]);                                              
     std::string to = std::string(args[1]);
     try
     {
         /*Calcule le sample*/
-        smpl = new Sample(from, to);
+        smpl = std::make_shared<Sample>(from, to);
     }
     catch(const std::exception& e)
     {   
@@ -103,36 +98,38 @@ int B_EqsStepWise(char* arg, int unused)
         return(1);
     }
 
-    c_eq_name = args[2];
+    char* c_eq_name = args[2];
     std::string eq_name = std::string(c_eq_name);                                               
     if(!global_ws_eqs->contains(eq_name)) 
     {                            
         kerror(0,"Eqs %s not found", c_eq_name);
         SCR_free_tbl((unsigned char**) args);
-        return(1);
+        return 1;
     }
 
-    cond = args[3]; 
-    value = C_evallec(cond, 0);                                    
-    if(int(value) == -1)                                        /* Gère les erreurs de condition */
+    char* cond = args[3]; 
+    double value = C_evallec(cond, 0); 
+    // manage errors from the lec condition                                   
+    if(int(value) == -1)
     {
         SCR_free_tbl((unsigned char**) args);
         return(1);                          
     }
 
-    // Sanitizer -> need to make a copy of str to avoid the 
-    // strcpy-param-overlap error (from SCR_add_ptr())
-    tmp = args[4];
-    test = (char*) SCR_stracpy(SCR_lower((unsigned char*) tmp));
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)         /* Gère les erreurs de test */
+    char* tmp = args[4];
+    char* test = (char*) SCR_stracpy(SCR_lower((unsigned char*) tmp));
+    // manage errors from the r2 and fstat tests
+    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)
     {
         kerror(0,"Incorrect test name");
         SCR_free_tbl((unsigned char**) args);
         return(1);
     }
 
-    res = check_scl_var(c_eq_name);
-    if(res == -1)                                               /* Gère les erreurs de présence des scalaires et variables de l'équation */
+    int res = check_scl_var(c_eq_name);
+    // case where some scalars and/or variables declared in the equation 
+    // are not present in the global workspaces
+    if(res == -1)
     {
         SCR_free_tbl((unsigned char**) args);
         return(1);                      
@@ -140,8 +137,6 @@ int B_EqsStepWise(char* arg, int unused)
 
     estimate_step_wise(smpl, c_eq_name, cond, test);            /* Effectue les estimations */
     
-    delete smpl;
-    smpl = nullptr;
     SCR_free_tbl((unsigned char**) args);
     return 0;
 }

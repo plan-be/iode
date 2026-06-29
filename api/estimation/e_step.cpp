@@ -31,9 +31,8 @@
 // Function declarations
 static std::vector<std::string> E_GetScls(CLEC* clec);
 static void E_SetScl(const bool relax, const std::string& name);
-static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, Sample* smpl, 
-                                   char** eqs, char* test);
-
+static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, 
+    const std::shared_ptr<Sample> smpl, char** eqs, char* test);
 
 /**
  *  Retrieves (in a list of char*) the names of all scalars in a CLEC structure.
@@ -129,7 +128,7 @@ double C_evallec(char* lec, int t)
  *  @return     double                      value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
 static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, 
-    Sample* smpl, char** eqs, char* test)   
+    const std::shared_ptr<Sample> smpl, char** eqs, char* test)   
 {
     char buf[512];
     memset(buf, 0, 512);
@@ -234,9 +233,9 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
  *                                              "fstat" , "r2"    , "r2adj" , "dw" or "loglik"
  *  @return     double          best test "test" value
  */
-double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test)
+double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char* cond, char* test)
 {
-    int     l=0;
+    int l = 0;
 
     // Crée le tableau d'équations à partir de arg
     char** eqs = B_ainit_chk(eqname, NULL, 0);         

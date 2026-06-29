@@ -1210,8 +1210,8 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 {
     char    fullfilename[256];
     char    **varlist;
-    Sample  *smpl;
     int     rc;
+    std::shared_ptr<Sample> smpl;
 
     U_test_suppress_a2m_msgs();
 
@@ -1247,11 +1247,10 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     // Print vars as graphs
     varlist = (char**) SCR_vtoms((U_ch*) "ACAF,ACAG,ACAF+ACAG", (U_ch*) ",;");
-    smpl = new Sample("1990Y1", "2010Y1");
+    smpl = std::make_shared<Sample>("1990Y1", "2010Y1");
     rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
     EXPECT_EQ(rc, 0);
     SCR_free_tbl((U_ch**) varlist);
-    delete smpl;
 
     // Close the output file
     W_close();
@@ -1315,8 +1314,8 @@ TEST_F(LegacyAPITest, Tests_Estimation)
 {
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
-    Sample      *smpl;
     double      r2, *df;
+    std::shared_ptr<Sample> smpl;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation");
@@ -1343,10 +1342,9 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     W_close();
 
     // estimate_step_wise
-    smpl = new Sample("1980Y1", "1995Y1");
+    smpl = std::make_shared<Sample>("1980Y1", "1995Y1");
     r2 = estimate_step_wise(smpl, "ACAF", "", "r2");
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
-    delete smpl;
 
     std::vector<std::string> coef_names = {"acaf1", "acaf2", "acaf3", "acaf4"};
 
@@ -1402,8 +1400,8 @@ TEST_F(LegacyAPITest, Tests_Estimation_Step_Wise)
 {
     int         rc;
     void        (*kmsg_super_ptr)(const char*);
-    Sample      *smpl;
     double      r2;
+    std::shared_ptr<Sample> smpl;
 
     U_test_suppress_a2m_msgs();
     U_test_print_title("Tests Estimation Step Wise");
@@ -1414,10 +1412,9 @@ TEST_F(LegacyAPITest, Tests_Estimation_Step_Wise)
     U_test_load_fun_esv("fun");
 
     // estimate_step_wise
-    smpl = new Sample("1980Y1", "1995Y1");
+    smpl = std::make_shared<Sample>("1980Y1", "1995Y1");
     r2 = estimate_step_wise(smpl, "ACAF", "", "r2");
     EXPECT_DOUBLE_EQ(round(r2 * 1e6) / 1e6, 0.848519);
-    delete smpl;
 
     std::vector<std::string> coef_names = {"acaf1", "acaf2", "acaf3", "acaf4"};
 

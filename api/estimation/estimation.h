@@ -52,9 +52,9 @@ class Estimation
     FRIEND_TEST(EstimationTest, Estimate);
 #endif
 
-    char**    est_endos;      // list of equation names (endos = eqs names)
-    Sample    est_smpl;       // sample used for the estimation
-    int       est_method;     // estimation method
+    char**    est_endos;                // list of equation names (endos = eqs names)
+    int       est_method;               // estimation method
+    std::shared_ptr<Sample> est_smpl;   // sample used for the estimation
 
 protected:
     int       E_IT;           // Number of iterations of the last estimation
@@ -67,10 +67,10 @@ protected:
     int       E_FROM;         // Position in E_DBV of the first period in the estimation sample
     int       E_MAXIT;        // Max number of iterations for the estimation
     int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
-    KDBEquationsPtr  E_DBE;    // KDB of equations used for the estimation
-    KDBScalarsPtr    E_DBS;    // KDB of scalars used for the estimation
-    KDBVariablesPtr  E_DBV;    // KDB of variables used for the estimation 
-    Sample    *E_SMPL;        // Current estimation sample
+    KDBEquationsPtr  E_DBE;             // KDB of equations used for the estimation
+    KDBScalarsPtr    E_DBS;             // KDB of scalars used for the estimation
+    KDBVariablesPtr  E_DBV;             // KDB of variables used for the estimation 
+    std::shared_ptr<Sample> E_SMPL;     // Current estimation sample
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
     double    E_EPS;          // Convergence criterion (threshold) for the estimation
@@ -78,7 +78,7 @@ protected:
     char      **E_LECS;       // List (block) of simultaneous equations of the current estimation
     char      **E_INSTRS;     // List of instruments (LEC formulas) of the current estimation    
     char      **E_ENDOS;      // List of endogenous vars of the current estimation
-      
+    
     MAT* E_U;                 // Residuals (neq x t)
     MAT* E_VCU;               // Variance / covariance of the residuals (neq x neq)    
     MAT* E_IVCU;              // Inverse of E_VCU
@@ -160,12 +160,12 @@ public:
         // TODO: replace hard-coded separators by a (new?) variable 
         char** tmp_endos = (char**) SCR_vtoms((unsigned char*) endos, (unsigned char*) ",; ");
         
-        Sample* smpl = nullptr;
+        std::shared_ptr<Sample> smpl = nullptr;
         if(from_period != NULL && to_period != NULL)
         {
             try
             {
-                smpl = new Sample(std::string(from_period), std::string(to_period));
+                smpl = std::make_shared<Sample>(std::string(from_period), std::string(to_period));
             }
             catch(const std::exception& e)
             {
@@ -174,14 +174,11 @@ public:
         }
 
         initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
-        if(smpl) 
-            delete smpl;
-        smpl = nullptr;
     }
 
     Estimation(char** endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
-               KDBScalarsPtr dbs = nullptr, Sample* smpl = NULL, int method = -1, 
-               int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
+               KDBScalarsPtr dbs = nullptr, const std::shared_ptr<Sample> smpl = nullptr, 
+               int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
         est_endos = NULL;
         initialize(endos, dbe, dbv, dbs, smpl, method, maxit, eps);
@@ -207,32 +204,22 @@ public:
      */
     int estimate(char* from_period = NULL, char* to_period = NULL)
     {
-        int     rc;
-        bool    free_smpl = false;
-        Sample* smpl = nullptr;
-
+        std::shared_ptr<Sample> smpl = nullptr;
         if(from_period != NULL && to_period != NULL)
         {
             try
             {
-                smpl = new Sample(std::string(from_period), std::string(to_period));
+                smpl = std::make_shared<Sample>(std::string(from_period), std::string(to_period));
             }
             catch(const std::exception& e)
             {
                 throw std::invalid_argument("Cannot initialize estimation: " + std::string(e.what()));
-            }
-            free_smpl = true;               // We will free the sample after the estimation  
+            } 
         }
         else
-            smpl = &est_smpl;               // Use the sample provided at initialization
+            smpl = est_smpl;                // Use the sample provided at initialization
 
-        rc = KE_est_s(smpl);                // Perform the estimation
-
-        if(free_smpl)
-        {
-            if(smpl) delete smpl;
-            smpl = nullptr;
-        }
+        int rc = KE_est_s(smpl);            // Perform the estimation
 
         if(rc != 0)
         {
@@ -277,7 +264,7 @@ public:
 
 private:
     void initialize(char** endos, KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
-        Sample* smpl, int method, int maxit, double eps)
+        const std::shared_ptr<Sample> smpl, int method, int maxit, double eps)
     {
         if(endos == NULL || endos[0] == NULL)
             throw std::invalid_argument("List of equations names must be provided");
@@ -301,14 +288,14 @@ private:
         E_DBV  = (dbv.get() != nullptr) ? dbv : global_ws_var;
         E_DBS  = (dbs.get() != nullptr) ? dbs : global_ws_scl;
 
-        if(smpl != nullptr)
-            est_smpl = *smpl;
+        if(smpl)
+            est_smpl = smpl;
         else
         {
             // If no sample is provided, we will use the one from the global variables database
             if(!global_ws_var->get_sample())
                 throw std::invalid_argument("No sample provided and no global variables database available");
-            est_smpl = *global_ws_var->get_sample();
+            est_smpl = global_ws_var->get_sample();
         }
     }
 
@@ -367,15 +354,15 @@ private:
     void E_print_eqres_1(int eq_nb);
     void E_print_eqres_2(int eq_nb);
     void E_print_eqres(int obs);
-    int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res);
+    int E_graph(char** titles, std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, int view, int res);
     int E_print_results(int corr, int corru, int obs, int grobs, int grres);
 
     /* k_est.c */
     void E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k);
     void E_savescl(double val, int eqnb, char* txt);
     void E_savevar(char* name, int eqnb, MAT* mat);
-    int KE_est_s(Sample* smpl);
-    int KE_update(char* name, char* lec, int method, Sample* smpl, float* tests);
+    int KE_est_s(const std::shared_ptr<Sample> smpl);
+    int KE_update(char* name, char* lec, int method, const std::shared_ptr<Sample> smpl, float* tests);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -388,4 +375,4 @@ int E_GetLecName(char* lec, char* name);
 
 /* e_step.c */
 double C_evallec(char* lec, int t);
-double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test);
+double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char* cond, char* test);
