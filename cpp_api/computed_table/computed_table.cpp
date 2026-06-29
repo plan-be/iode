@@ -46,7 +46,7 @@ void ComputedTable::initialize()
             end_per.step = per.step;
         }
     }
-    sample = new Sample(start_per, end_per);
+    sample = std::make_shared<Sample>(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
     dim = COL_resize(ref_table, columns);
@@ -154,7 +154,6 @@ ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const
 ComputedTable::~ComputedTable()
 {
     COL_free_cols(columns);
-    delete sample;
     delete ref_table;
 }
 
