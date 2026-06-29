@@ -1,12 +1,3 @@
-/**
- * @header4iode
- * 
- * Functions to load and save ascii and csv definitions of IODE VAR objects.
- *
- *      bool load_asc(const std::string& filename)
- *      bool save_asc(const std::string& filename)
- *      bool save_vars_csv(const std::string& filename, const std::vector<std::string>& varlist, Sample* smpl)
- */
 #include "scr4.h"
 
 #include "api/b_errors.h"
@@ -36,7 +27,7 @@ int   KDBVariables::CSV_NBDEC = 15;
  */
 static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
 {
-    Sample* smpl = kdb.get_sample();
+    std::shared_ptr<Sample> smpl = kdb.get_sample();
     if(!smpl) 
     {
         kerror(0, "%s : undefined sample", YY_error(yy));
@@ -88,16 +79,13 @@ static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
  */
 static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
 {
-    int     cmpt = 0;
-    ONAME   name;
-    Sample* smpl = nullptr;
-
-    kdb.clear();  /* clear KDB */
+    kdb.clear();
 
     // The keyword sample must be the first on the YY stream */
     // if not:
     //    - if ask == 1: the user must provide the sample via a call to kas->sample
     //    - else:        the function returns NULL
+    std::shared_ptr<Sample> smpl = nullptr;
     if(YY_lex(yy) != SMPL) 
     {
         if(!ask) 
@@ -126,12 +114,13 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
     /* Loop on var definition 
         NAME1 value ... NAME2 ...
     */
+    int cmpt = 0;
+    ONAME name;
     while(1) 
     {
         switch(YY_lex(yy)) 
         {
             case YY_EOF :
-                delete smpl;
                 return true;
 
             case YY_WORD :
@@ -139,7 +128,6 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
                 {
                     kwarning("%s : undefined sample", YY_error(yy));
                     kdb.clear();
-                    delete smpl;
                     return false;
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
@@ -278,7 +266,7 @@ bool KDBVariables::save_asc(const std::string& filename)
         }
     }
 
-    Sample* smpl = this->get_sample();
+    std::shared_ptr<Sample> smpl = this->get_sample();
     if(!smpl) 
     {
         kwarning("Cannot save the Variables to an ascii file -> sample is empty");
@@ -329,12 +317,12 @@ bool KDBVariables::save_asc(const std::string& filename)
  *  
  *  @param [in] kdb      KDB*       KDB of vars to save
  *  @param [in] filename char*      output file or "-" for stdout 
- *  @param [in] smpl     Sample*    sample to save
+ *  @param [in] smpl     std::shared_ptr<Sample>    sample to save
  *  @param [in] varlist  char**     list of variables to save in the file
  *  @return 
  *  
  */
-bool KDBVariables::save_csv(const std::string& filename, const std::vector<std::string>& varlist, Sample* smpl)
+bool KDBVariables::save_csv(const std::string& filename, const std::vector<std::string>& varlist, std::shared_ptr<Sample> smpl)
 {
     FILE        *fd;
     char        fmt[80], buf[256], *sep, *dec, *nan, *axes;

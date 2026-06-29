@@ -39,15 +39,14 @@
  */
 int ImportObjsASCII::read_header(YYFILE* yy, Sample* smpl)
 {
-    Sample  *rsmpl;
+    if(YY_lex(yy) != ASC_SMPL)  
+        return -1;
 
-    if(YY_lex(yy) != ASC_SMPL)  return -1;
+    std::shared_ptr<Sample> rsmpl = K_read_smpl(yy);
+    if(!rsmpl) 
+        return -1;
 
-    rsmpl = K_read_smpl(yy);
-    if(rsmpl == NULL) return -1;
-
-    memcpy(smpl, rsmpl, sizeof(Sample));
-    SW_nfree(rsmpl);
+    memcpy(smpl, rsmpl.get(), sizeof(Sample));
     return 0;
 }
 

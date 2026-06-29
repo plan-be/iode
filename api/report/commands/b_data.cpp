@@ -350,7 +350,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             }
             case VARIABLES :
             {
-                Sample* sample = global_ws_var->get_sample();
+                std::shared_ptr<Sample> sample = global_ws_var->get_sample();
                 if(!sample) 
                     throw std::runtime_error("No sample defined in the Variables database");
                 Variable var(sample->nb_periods, IODE_NAN);

@@ -212,7 +212,7 @@ double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mod
         return IODE_NAN;
     }
 
-    Sample* smpl = kdb->get_sample();
+    std::shared_ptr<Sample> smpl = kdb->get_sample();
     if(!smpl) 
     {
         error_msg += "sample of the KDB is empty.";
@@ -312,7 +312,7 @@ void KV_set(KDBVariablesPtr kdb, const std::string& name, int t, int mode, doubl
         return;
     }
 
-    Sample* smpl = kdb->get_sample();
+    std::shared_ptr<Sample> smpl = kdb->get_sample();
     if(!smpl) 
     {
         error_msg += "sample of the KDB is empty.";
@@ -489,11 +489,11 @@ KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, cha
         return nullptr;
 
     int     nb_per, res, npos, added, *times, nbtimes = 500;
-    Sample* smpl;
     char    c_nname[K_MAX_NAME + 1];
     std::string nname;
     KDBVariablesPtr ndbv = nullptr;
     KDBVariablesPtr edbv = nullptr;
+    std::shared_ptr<Sample> smpl;
 
     if(filename == NULL || filename[0] == 0) 
         edbv = dbv;
@@ -508,14 +508,11 @@ KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, cha
     if(!edbv) 
         goto done;
 
-    if(!edbv->get_sample())
-        goto done;
-    
-    if(edbv->get_sample()->nb_periods == 0)
+    smpl = edbv->get_sample();
+    if(!smpl || smpl->nb_periods == 0)
         goto done;
 
-    smpl = edbv->get_sample();
-    nb_per = edbv->get_sample()->nb_periods;
+    nb_per = smpl->nb_periods;
     times = (int *) SCR_malloc(nbtimes * sizeof(int));
 
     ndbv = KDBVariables::Create(false);
@@ -675,7 +672,7 @@ double KDBVariables::get_var(const std::string& name, const std::string& period,
 	if(!check_sample())
 		return IODE_NAN;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t = sample->get_period_position(period);
 	return get_var(name, t, mode);
 }
@@ -685,7 +682,7 @@ double KDBVariables::get_var(const std::string& name, const Period& period, cons
 	if(!check_sample())
 		return IODE_NAN;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t = sample->get_period_position(period);
 	return get_var(name, t, mode);
 }
@@ -715,7 +712,7 @@ void KDBVariables::set_var(const std::string& name, const std::string& period, c
 	if(!check_sample())
 		return;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t = sample->get_period_position(period);
 	set_var(name, t, value, mode);
 }
@@ -725,7 +722,7 @@ void KDBVariables::set_var(const std::string& name, const Period& period, const 
 	if(!check_sample())
 		return;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t = sample->get_period_position(period);
 	set_var(name, t, value, mode);
 }
@@ -789,7 +786,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std:
 	if(!check_sample())
 		return Variable();
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
@@ -815,7 +812,7 @@ void KDBVariables::update(const std::string& name, const std::string& lec)
 	if(!check_sample())
 		return;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	this->update(name, lec, 0, sample->nb_periods - 1);
 }
 
@@ -864,7 +861,7 @@ void KDBVariables::update(const std::string& name, const Variable& values, const
 	if(!check_sample())
 		return;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
@@ -882,17 +879,16 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 	if(!check_sample())
 		return;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	int t_first = first_period.empty() ? 0 : sample->get_period_position(first_period);
 	int t_last = last_period.empty() ? sample->nb_periods - 1 : sample->get_period_position(last_period);
 
 	this->update(name, lec, t_first, t_last);
 }
 
-// WARNING: the returned Sample pointer must not be deleted
-Sample* KDBVariables::get_sample() const
+std::shared_ptr<Sample> KDBVariables::get_sample() const
 {
-	return this->sample.get();
+	return this->sample;
 }
 
 bool KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -900,8 +896,8 @@ bool KDBVariables::set_sample(const std::string& from, const std::string& to)
 	if(from.empty() && to.empty())
 		return false;
 	
-	Sample* sample = get_sample();
-    if ((sample == nullptr || sample->nb_periods == 0) && (from.empty() || to.empty()))
+	std::shared_ptr<Sample> sample = get_sample();
+    if ((!sample || sample->nb_periods == 0) && (from.empty() || to.empty()))
 	{
         throw std::invalid_argument(std::string("Current sample is empty.\n") + 
 			"Please provide a value for both 'from' and 'to' arguments"); 
@@ -1009,7 +1005,7 @@ bool KDBVariables::set_sample(const Sample& new_sample)
 
 int KDBVariables::get_nb_periods() const
 {
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	if(!sample)
 		return 0;
     return sample->nb_periods;
@@ -1020,7 +1016,7 @@ std::string KDBVariables::get_period(const int t) const
 	if(!check_sample())
 		return "";
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
     Period period = sample->start_period;
     return Period(period).shift(t).to_string();
 }
@@ -1030,7 +1026,7 @@ float KDBVariables::get_period_as_float(const int t) const
 	if(!check_sample())
 		return 0;
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
     Period period = sample->start_period;
     return Period(period).shift(t).to_float();
 }
@@ -1040,7 +1036,7 @@ std::vector<std::string> KDBVariables::get_list_periods(const std::string& from,
 	if(!check_sample())
 		return std::vector<std::string>();
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	if(from.empty() && to.empty())
 		return sample->get_list_periods();
 	else
@@ -1056,7 +1052,7 @@ std::vector<float> KDBVariables::get_list_periods_as_float(const std::string& fr
 	if(!check_sample())
 		return std::vector<float>();
 	
-	Sample* sample = get_sample();
+	std::shared_ptr<Sample> sample = get_sample();
 	if(from.empty() && to.empty())
 		return sample->get_list_periods_as_float();
 	else
@@ -1160,7 +1156,7 @@ bool KDBVariables::copy_from(const std::vector<std::string>& input_files, const 
     Sample* copy_sample = nullptr;
     if((!from.empty()) || (!to.empty()))
     {
-        Sample* var_sample = this->get_sample();
+        auto var_sample = this->get_sample();
         std::string _from_ = from.empty() ? var_sample->start_period.to_string() : from;
         std::string _to_ = to.empty() ? var_sample->end_period.to_string() : to;
         // throw an error if invalid values for from/to
@@ -1332,7 +1328,7 @@ char* KDBVariables::dde_create_obj_by_name(const std::string& name, int* nc, int
 
 bool KDBVariables::print_obj_def(const std::string& name)
 {
-    Sample* smpl = this->get_sample();
+    std::shared_ptr<Sample> smpl = this->get_sample();
     if(!smpl || smpl->nb_periods == 0) 
     {
         std::string msg = "Cannot print the variable '" + name + "' because ";

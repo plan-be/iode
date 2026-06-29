@@ -34,3 +34,5 @@ Fixed Bugs
 Miscellaneous 
 -------------
 
+- C++ API: replaced pointer attributes Sample* by smart pointer shared_ptr<Sample>. 
+  That should not impact the output of estimations or simulations.

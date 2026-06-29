@@ -651,7 +651,7 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
         tmp = SCR_malloc((int)strlen(szBuffer) + 30);
         if(type == VARIABLES) 
         {
-            Sample* sample = global_ws_var->get_sample();
+            std::shared_ptr<Sample> sample = global_ws_var->get_sample();
             if(!sample)
                 throw std::runtime_error("No sample defined");
             sprintf(tmp, "%s %s %s", szItem,

@@ -34,17 +34,20 @@
  */
 int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
 {
-    int     done = 0, nbtoc = 0;
-    Sample  *rsmpl;
+    if(YY_lex(yy) != ASC_SMPL) 
+        return -1;
 
-    if(YY_lex(yy) != ASC_SMPL)  return -1;
+    std::shared_ptr<Sample> rsmpl = K_read_smpl(yy);
+    if(!rsmpl) 
+        return -1;
+    
+    memcpy(smpl, rsmpl.get(), sizeof(Sample));
 
-    rsmpl = K_read_smpl(yy);
-    if(rsmpl == NULL) return -1;
-    memcpy(smpl, rsmpl, sizeof(Sample));
-
-    while(!done) {
-        switch(YY_lex(yy)) {
+    int done = 0, nbtoc = 0;
+    while(!done) 
+    {
+        switch(YY_lex(yy)) 
+        {
             case YY_EOF :
                 SCR_free_tbl((unsigned char**) RASC_toc);
                 RASC_toc = 0;
@@ -60,7 +63,6 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
         }
     }
 
-    SW_nfree(rsmpl);
     return 0;
 }
 

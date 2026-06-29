@@ -44,7 +44,7 @@
 int T_GraphTest(Table *tbl)
 {
     char    gsmpl[20];
-    Sample  *smpl = global_ws_var->get_sample();
+    std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
     if(!smpl) 
         return -1;
 
@@ -571,7 +571,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
         return -1;
     }
 
-    Sample* smpl_kdb = kdb->get_sample();
+    std::shared_ptr<Sample> smpl_kdb = kdb->get_sample();
     if(!smpl_kdb) 
     {
         std::string err_msg = "DataDisplayGraph : Variables workspace has no sample defined";

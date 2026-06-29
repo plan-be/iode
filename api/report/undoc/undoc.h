@@ -163,7 +163,8 @@ int B_WsSeasonAdj(char* arg, int unused=-1);
 int B_season(char* arg);
 int DS_test(double* vec, int nb, int* beg, int* dim, int nbper, double* shift);
 int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbper, double shift);
-int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift);
+int DS_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> ws_smpl, 
+            std::shared_ptr<Sample>& t_smpl, int& shift);
 int DS_extr(double* vec, int dim, int nbper, double* bi, double shift);
 
 /* b_sql.c */

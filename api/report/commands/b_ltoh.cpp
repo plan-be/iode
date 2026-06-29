@@ -261,49 +261,45 @@ static int LTOH_cs(int type, double* f_vec, int f_nb, double* t_vec, int t_nb, i
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */
-static int LTOH_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* skip, int* shift)
+static int LTOH_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> ws_smpl, 
+    std::shared_ptr<Sample>& t_smpl, int& skip, int& shift)
 {
-    int     f_nbper, ws_nbper;
-    long    s, y;
-    Period  p1, p2;
+    int f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
+    int ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
-    f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
-    ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
-
-    if(ws_nbper <= 0) {
+    if(ws_nbper <= 0) 
+    {
         error_manager.append_error("Set the periodicity first");
         return -1;
     }
 
-    if(ws_nbper <= f_nbper) {
+    if(ws_nbper <= f_nbper) 
+    {
         error_manager.append_error("File has more observations than the current workspace");
         return -1;
     }
 
-    p1 = f_smpl->start_period;
-    p2 = f_smpl->end_period;
+    Period p1 = f_smpl->start_period;
+    Period p2 = f_smpl->end_period;
 
-    s = p1.step;
-    y = p1.year;
-    *shift = ws_nbper/f_nbper;
+    long s = p1.step;
+    long y = p1.year;
+    shift = ws_nbper/f_nbper;
 
     p1.periodicity = p2.periodicity = (ws_smpl->start_period).periodicity;
     p1.step = 1;
 
-    p1 = p1.shift((s - 1)/(*shift));
-    /*
-        *skip = (p1.year - y ) * ws_nbper + (p1.step - 1) * (*shift) - (s - 1);
-    */
-    *skip = 0;
+    p1 = p1.shift((s - 1)/(shift));
     p2.step = ws_nbper;
+    skip = 0;
 
     try
     {
-        *t_smpl = new Sample(p1, p2);
+        t_smpl = std::make_shared<Sample>(p1, p2);
     }
     catch(const std::exception& e)
     {
-        *t_smpl = nullptr;
+        t_smpl.reset();
         std::string error_msg = "Low to High: invalid sample\n" + std::string(e.what());
         error_manager.append_error(e.what());
         return -1;
@@ -326,7 +322,7 @@ static int B_ltoh(int type, char* arg)
     int res, rc = 0, shift, skip;
     char method[81], file[K_MAX_FILE + 1];
     int file_type;
-    Sample* t_smpl = nullptr;
+    std::shared_ptr<Sample> t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
@@ -355,7 +351,7 @@ static int B_ltoh(int type, char* arg)
         goto done;
     }
 
-    res = LTOH_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &skip, &shift);
+    res = LTOH_smpl(from->get_sample(), global_ws_var->get_sample(), t_smpl, skip, shift);
     if(res < 0) 
     {
         rc = -1;
@@ -409,10 +405,6 @@ done:
 
     from->clear();
     from.reset();
-    
-    if(t_smpl)
-        delete t_smpl;
-    t_smpl = nullptr;
 
     SCR_free_tbl((unsigned char**) data);
 

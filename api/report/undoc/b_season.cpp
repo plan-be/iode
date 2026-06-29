@@ -36,7 +36,7 @@ int B_season(char* arg)
     double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
             eps, scale, season[12];
     int     file_type;
-    Sample* t_smpl = nullptr;
+    std::shared_ptr<Sample> t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
@@ -70,8 +70,8 @@ int B_season(char* arg)
         goto done;
     }
 
-    nbper = DS_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &shift);
-    if(nbper < 0 || t_smpl == nullptr) 
+    nbper = DS_smpl(from->get_sample(), global_ws_var->get_sample(), t_smpl, shift);
+    if(!t_smpl || nbper < 0) 
         goto done;
     
     to = KDBVariables::Create(false);
@@ -124,10 +124,6 @@ done:
 
     from->clear();
     from.reset();
-
-    if(t_smpl)
-        delete t_smpl;
-    t_smpl = nullptr;
 
     SCR_free_tbl((unsigned char**) data);
     SW_nfree(t_vec);
@@ -440,7 +436,8 @@ int DS_vec(double* vec, double* c1, double* i1, double* season, int nb, int nbpe
     return 0;
 }
 
-int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
+int DS_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> ws_smpl, 
+    std::shared_ptr<Sample>& t_smpl, int& shift)
 {
     if(!f_smpl)
         return -1;
@@ -455,31 +452,32 @@ int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
         return -1;
     }
 
-    if(nbper != 12 && nbper !=4) {
+    if(nbper != 12 && nbper !=4) 
+    {
         error_manager.append_error("Only Monthly and Quarterly series can be seasonally adjusted");
         return -1;
     }
 
     try
     {
-        *t_smpl = new Sample(f_smpl->intersection(*ws_smpl));
-        Period p1 = (*t_smpl)->start_period;
+        t_smpl = std::make_shared<Sample>(f_smpl->intersection(*ws_smpl));
+        Period p1 = t_smpl->start_period;
         if(p1.step != 1) 
         {
             p1.year += 1;
             p1.step =  1;
         }
     
-        Period p2 = (*t_smpl)->end_period;
+        Period p2 = t_smpl->end_period;
         if(p2.step != nbper) 
         {
             p2.year -= 1;
             p2.step =  nbper;
         }
-        delete (*t_smpl);
 
-        *t_smpl = new Sample(p1, p2);
-        *shift = (*t_smpl)->start_period.difference(f_smpl->start_period);
+        t_smpl.reset();
+        t_smpl = std::make_shared<Sample>(p1, p2);
+        shift = t_smpl->start_period.difference(f_smpl->start_period);
     }
     catch(const std::exception& e)
     {
@@ -487,10 +485,8 @@ int DS_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
         return -1;
     }
 
-    return(nbper);
+    return nbper;
 }
-
-
 
 int DS_extr(double* vec, int dim, int nbper, double* bi, double shift)
 {

@@ -1600,8 +1600,8 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     char        buf[512];
     int         rc, i;
     double      *A1, val;
-    Sample      *smpl;
     char        *filename = "fun";
+    std::shared_ptr<Sample> smpl;
 
     U_test_print_title("Tests B_DATA");
 
@@ -2423,7 +2423,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     U_test_suppress_kmsg_msgs();
 
     int t;
-    Sample* var_sample;
+    std::shared_ptr<Sample> var_sample;
     std::shared_ptr<Equation> eq_ptr;
     std::shared_ptr<Identity> idt_ptr;
     std::shared_ptr<Scalar> scl_ptr;
@@ -2798,7 +2798,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     U_test_suppress_kmsg_msgs();
 
     int t;
-    Sample* var_sample;
+    std::shared_ptr<Sample> var_sample;
     std::shared_ptr<Equation> eq_ptr;
     std::shared_ptr<Identity> idt_ptr;
     std::shared_ptr<Scalar> scl_ptr;
@@ -3233,7 +3233,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     U_test_suppress_kmsg_msgs();
 
     int t;
-    Sample* var_sample;
+    std::shared_ptr<Sample> var_sample;
     std::shared_ptr<Equation> eq_ptr;
     std::shared_ptr<Identity> idt_ptr;
     std::shared_ptr<Scalar> scl_ptr;
@@ -3551,9 +3551,6 @@ TEST_F(LegacyAPITest, Tests_B_WsImport)
 
 TEST_F(LegacyAPITest, Tests_B_WsSample)
 {
-    int     rc;
-    Sample  *smpl;
-
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
@@ -3572,11 +3569,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
 
     // int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
     U_test_print_title("B_WsSample()");
-    rc = B_WsSample("1965Y1 2020Y1");
-    smpl = new Sample("1965Y1", "2020Y1");
+    int rc = B_WsSample("1965Y1 2020Y1");
+    Sample smpl("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(*global_ws_var->get_sample(), *smpl);
-    delete smpl;
+    EXPECT_EQ(*global_ws_var->get_sample(), smpl);
 
     U_test_reset_kmsg_msgs();
 }

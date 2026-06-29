@@ -182,8 +182,8 @@ Helper functions for reading and writing IODE ascii files.
 |`double K_read_real(YYFILE *yy)`|reads a token on the YY stream and interprets the token as a IODE\_REAL (double) if possible.|
 |`long K_read_long(YYFILE* yy)`|reads the next token on the YY stream and returns a long.|
 |`char* K_read_str(YYFILE* yy)`|reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.|
-|`Period *K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Period definition (\{long\}\{char\}\{long\}).|
-|`Sample *K_read_smpl(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Sample.|
+|`Period* K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Period definition (\{long\}\{char\}\{long\}).|
+|`std::shared_ptr<Sample> K_read_smpl(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Sample.|
 |`int K_read_align(YYFILE* yy)`|reads the next token on the YY stream: LEFT, RIGHT or CENTER.|
 |                                          ||
 |`void K_stracpy(char** to, char* from)`|allocates and copies a null terminated string.|

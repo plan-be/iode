@@ -347,7 +347,7 @@ cdef extern from "api/objs/variables.h":
         double get_var(string name, int t, IodeVarMode mode) except +
         bool set_var(string& name, double* value) except +
 
-        CSample* get_sample()
+        shared_ptr[CSample] get_sample()
         bint set_sample(string& from_period, string& to_period) except +
 
         int get_nb_periods()

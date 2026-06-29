@@ -133,7 +133,7 @@ public:
         if(this->sample) 
             delete this->sample;
 
-        Sample* vars_sample = global_ws_var->get_sample();  
+        auto vars_sample = global_ws_var->get_sample();
         Period from_ = from ? Period(*from) : vars_sample->start_period;
         Period to_ = to ? Period(*to) : vars_sample->end_period;
 
@@ -152,8 +152,16 @@ public:
     {
         if(this->sample) 
             delete this->sample;
+        
+        if(!global_ws_var->check_sample())
+        {
+            std::string msg = "Cannot set the estimation sample the (block of) equation(s) ";
+            msg += "'" + block + "'.\nThe Variables sample is not yet defined.";
+            kwarning(msg.c_str());
+            return;
+        }
 
-        Sample* vars_sample = global_ws_var->get_sample();  
+        std::shared_ptr<Sample> vars_sample = global_ws_var->get_sample();
         Period from_ = (!from.empty()) ? Period(from) : vars_sample->start_period;
         Period to_ = (!to.empty()) ? Period(to) : vars_sample->end_period;
 

@@ -323,8 +323,8 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     if(vars_to_copy.size() == 0)
         return 0;
 
-    Sample* vsmpl = dbv_ptr->get_sample();
-    Sample* tsmpl = dbv_tmp->get_sample();
+    auto vsmpl = dbv_ptr->get_sample();
+    auto tsmpl = dbv_tmp->get_sample();
     if(!tsmpl)
     {
         std::string msg = "Function KI_read_vars_db: the sample of the ";
@@ -734,8 +734,14 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
  *  
  */
 static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
-    int* order, Sample* smpl)
+    int* order, const std::shared_ptr<Sample> smpl)
 {
+    if(!smpl) 
+    {
+        error_manager.append_error("Empty execution sample");
+        return -1;
+    }
+
     int start = smpl->start_period.difference(dbv_ptr->get_sample()->start_period);
     if(start < 0) 
         start = 0;
@@ -783,15 +789,12 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
 KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int nv, char* vfiles[], 
     KDBScalarsPtr dbs_ptr, int ns, char* sfiles[], Sample* in_smpl)
 {
-    int* order;
-    int  res;
-
-    Sample* var_sample = global_ws_var->get_sample();
-    Sample* exec_sample = nullptr; 
+    std::shared_ptr<Sample> var_sample = global_ws_var->get_sample();
+    std::shared_ptr<Sample> exec_sample = nullptr; 
     if(in_smpl)
-        exec_sample = new Sample(*in_smpl);
+        exec_sample = std::make_shared<Sample>(*in_smpl);
     else if(var_sample)
-        exec_sample = new Sample(*var_sample);
+        exec_sample = std::make_shared<Sample>(*var_sample);
     
     if(!exec_sample)
     {
@@ -804,7 +807,6 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         // execution sample ends after the end of the current Variables workspace sample 
         if(var_sample->end_period.difference(exec_sample->end_period) < 0) 
         {
-            delete exec_sample;
             std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
             msg += "ends after the current Variables workspace sample '" + var_sample->to_string() + "'";
             error_manager.append_error(msg);
@@ -814,7 +816,6 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         // execution sample starts before the start of the current Variables workspace sample 
         if(exec_sample->start_period.difference(var_sample->start_period) < 0) 
         {
-            delete exec_sample;
             std::string msg = "Execution sample '" + exec_sample->to_string() + "' ";
             msg += "starts before the current Variables workspace sample '" + var_sample->to_string() + "'";
             error_manager.append_error(msg);
@@ -824,15 +825,13 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     
     if(dbi_ptr->size() == 0) 
     {
-        delete exec_sample;
         error_manager.append_error("Empty set of identities");
         return nullptr;
     }
 
-    order = KI_reorder(dbi_ptr);
+    int* order = KI_reorder(dbi_ptr);
     if(!order) 
     {
-        delete exec_sample;
         error_manager.append_error("Circular identity definition");
         return nullptr;
     }
@@ -852,12 +851,11 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         W_printf((char*) ".par1 tit_1\nVariables loaded\n");
     }
     
-    res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
+    int res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
     idt_exec_loaded_vars.clear();
     if(res != 0) 
     {
         free(order);
-        delete exec_sample;
         return nullptr;
     }
 
@@ -869,7 +867,6 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     if(res != 0) 
     {
         free(order);
-        delete exec_sample;
         return nullptr;
     }
 
@@ -879,6 +876,5 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     KI_execute(dbv_i_ptr, dbs_i, dbi_ptr, order, exec_sample);
     KI_quick_extract(dbv_i_ptr, dbi_ptr);
     free(order);
-    delete exec_sample;
     return dbv_i_ptr;
 }

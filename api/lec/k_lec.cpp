@@ -59,9 +59,10 @@ double L_getscl(KDBScalarsPtr kdb, int pos)
  *  @return             Sample* pointer to the Sample struct (not allocated)
  *  
  */
-Sample *L_getsmpl(KDBVariablesPtr kdb)
+Sample* L_getsmpl(KDBVariablesPtr kdb)
 {
-    return(kdb->get_sample());
+    std::shared_ptr<Sample> sample = kdb->get_sample();
+    return sample ? sample.get() : nullptr;
 }
 
 

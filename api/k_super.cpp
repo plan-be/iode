@@ -483,15 +483,18 @@ void kbeep()
  *  If the function pointer kasksmpl_super is not null, it is called instead.
  */
 
-Sample* kasksmpl()
+std::shared_ptr<Sample> kasksmpl()
 {
     if(kasksmpl_super) 
         return (*kasksmpl_super)();
     
     if(global_ws_var)
         return global_ws_var->get_sample();
-    else 
-        return nullptr;
+    else
+    {
+        std::shared_ptr<Sample> empty_sample = nullptr;
+        return empty_sample;
+    }
 }
 
 

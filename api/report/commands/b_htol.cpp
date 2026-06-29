@@ -31,14 +31,11 @@
  *  @param [out]  int*     shift      nb of periods to skip in the **source** variable 
  *  @return       rc                  0 on success, -1 on error (incompatible perriodicity...) 
  */
-static int HTOL_smpl(Sample *f_smpl, Sample *ws_smpl, Sample **t_smpl, int* skip, int* shift)
+static int HTOL_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> ws_smpl, 
+    std::shared_ptr<Sample>& t_smpl, int& skip, int& shift)
 {
-    int     f_nbper, ws_nbper;
-    long    s, y;
-    Period  p1, p2;
-
-    f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
-    ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
+    int f_nbper = get_nb_periods_per_year(f_smpl->start_period.periodicity);
+    int ws_nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
 
     if(ws_nbper <= 0 || ws_nbper == 12) 
     {
@@ -52,33 +49,33 @@ static int HTOL_smpl(Sample *f_smpl, Sample *ws_smpl, Sample **t_smpl, int* skip
         return -1;
     }
 
-    p1 = f_smpl->start_period;
-    p2 = f_smpl->end_period;
+    Period p1 = f_smpl->start_period;
+    Period p2 = f_smpl->end_period;
 
-    s = p1.step;
-    y = p1.year;
-    *shift = f_nbper/ws_nbper;
+    long s = p1.step;
+    long y = p1.year;
+    shift = f_nbper/ws_nbper;
 
     p1.periodicity = p2.periodicity = (ws_smpl->start_period).periodicity;
     p1.step = 1;
 
-    p1 = p1.shift((s - 1)/(*shift));
-    *skip = (p1.year - y) * f_nbper + (p1.step - 1) * (*shift) - (s - 1);
+    p1 = p1.shift((s - 1)/(shift));
     p2.step = ws_nbper;
+    skip = (p1.year - y) * f_nbper + (p1.step - 1) * (shift) - (s - 1);
 
-    if(*skip < 0) 
+    if(skip < 0) 
     {
-        *skip += *shift;
+        skip += shift;
         p1.year += 1;
     }
 
     try
     {
-        *t_smpl = new Sample(p1, p2);
+        t_smpl = std::make_shared<Sample>(p1, p2);
     }
     catch(const std::exception& e)
     {
-        *t_smpl = nullptr;
+        t_smpl.reset();
         std::string err_msg = "High to Low: invalid sample\n" + std::string(e.what()); 
         error_manager.append_error(err_msg);
         return -1;
@@ -109,7 +106,7 @@ static int B_htol(int method, char* arg)
     int res, rc = 0, f, t, shift, skip;
     char file[K_MAX_FILE + 1];
     int file_type;
-    Sample* t_smpl = nullptr;
+    std::shared_ptr<Sample> t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
@@ -135,7 +132,7 @@ static int B_htol(int method, char* arg)
         goto done;
     }
 
-    res = HTOL_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &skip, &shift); 
+    res = HTOL_smpl(from->get_sample(), global_ws_var->get_sample(), t_smpl, skip, shift); 
     if(res < 0) 
     {
         rc = -1;
@@ -202,10 +199,6 @@ done:
 
     from->clear();
     from.reset();
-
-    if(t_smpl)
-        delete t_smpl;
-    t_smpl = nullptr;
     
     SCR_free_tbl((unsigned char**) data);
 
@@ -221,10 +214,10 @@ done:
 KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
 {
     int nb, rc = 0, f, t, shift, skip;
-    Sample* t_smpl = nullptr;
+    std::shared_ptr<Sample> t_smpl = nullptr;
     KDBVariablesPtr kdb_to = nullptr;
 
-    int res = HTOL_smpl(kdb_from->get_sample(), kdb_from->get_sample(), &t_smpl, &skip, &shift);
+    int res = HTOL_smpl(kdb_from->get_sample(), kdb_from->get_sample(), t_smpl, skip, shift);
     if(res < 0) 
     {
         rc = -1;
@@ -284,12 +277,10 @@ KDBVariablesPtr B_htol_kdb(int method, KDBVariablesPtr kdb_from)
     }
 
 done:
-    SW_nfree(t_smpl);
-
     if(rc < 0) 
-        return NULL;
+        return nullptr;
     else 
-        return(kdb_to);
+        return kdb_to;
 }
 
 

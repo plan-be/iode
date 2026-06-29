@@ -188,9 +188,9 @@ public:
         if(type == VARIABLES) 
         {
             KDBVariables* kdb_var = static_cast<KDBVariables*>(xdr_kdb);
-            Sample* smpl = kdb_var->get_sample();
+            std::shared_ptr<Sample> smpl = kdb_var->get_sample();
             if(smpl)
-                K_xdrSMPL((unsigned char*) smpl);
+                K_xdrSMPL((unsigned char*) smpl.get());
         }
     #endif
     }
@@ -404,7 +404,7 @@ public:
     bool save(const std::string& filename, const bool compress=false);
 
     virtual bool save_csv(const std::string& filename, const std::vector<std::string>& 
-        varlist=std::vector<std::string>(), Sample* sample=nullptr) 
+        varlist=std::vector<std::string>(), std::shared_ptr<Sample> sample=nullptr) 
     { 
         std::string msg = "Cannot save CSV: ";
         msg += "CSV saving is not implemented for database of type ";

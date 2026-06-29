@@ -28,33 +28,30 @@
 #include "api/report/undoc/undoc.h"
 
 
-static int HP_smpl(Sample* f_smpl, Sample* ws_smpl, Sample** t_smpl, int* shift)
+static int HP_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> ws_smpl, 
+    std::shared_ptr<Sample>& t_smpl, int& shift)
 {
     int nbper = get_nb_periods_per_year(ws_smpl->start_period.periodicity);
-
     if(nbper <= 0) 
     {
         error_manager.append_error("Set periodicity first");
-        goto err;
+        t_smpl.reset();
+        return -1;
     }
 
     try
     {
-        *t_smpl = new Sample(f_smpl->intersection(*ws_smpl));
-        *shift = (*t_smpl)->start_period.difference(f_smpl->start_period);
-        return(nbper);
+        t_smpl = std::make_shared<Sample>(f_smpl->intersection(*ws_smpl));
+        shift = t_smpl->start_period.difference(f_smpl->start_period);
     }
     catch(const std::exception& e)
     {
         error_manager.append_error(e.what());
-        goto err;
+        t_smpl.reset();
+        return -1;
     }
 
-err:
-    if(*t_smpl) 
-        delete *t_smpl;
-    t_smpl = nullptr;
-    return -1;
+    return nbper;
 }
 
 
@@ -64,7 +61,7 @@ static int B_WsTrendAll(char* arg, int std)
     char    file[K_MAX_FILE + 1];
     double  *t_vec = NULL, *f_vec = NULL;
     int     file_type;
-    Sample* t_smpl = nullptr;
+    std::shared_ptr<Sample> t_smpl = nullptr;
     std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
@@ -92,7 +89,7 @@ static int B_WsTrendAll(char* arg, int std)
         goto done;
     }
 
-    res = HP_smpl(from->get_sample(), global_ws_var->get_sample(), &t_smpl, &shift);
+    res = HP_smpl(from->get_sample(), global_ws_var->get_sample(), t_smpl, shift);
     if(res < 0) 
         goto done;
 
@@ -125,10 +122,6 @@ done:
 
     from->clear();
     from.reset();
-    
-    if(t_smpl)
-        delete t_smpl;
-    t_smpl = nullptr;
     
     SCR_free_tbl((unsigned char**) data);
     SW_nfree(t_vec);
