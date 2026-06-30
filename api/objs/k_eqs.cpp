@@ -242,14 +242,13 @@ bool Equation::to_binary(char** pack) const
     std::string comment_oem = utf8_to_oem(this->comment);
     std::string instruments_oem = utf8_to_oem(this->instruments);
     
-    char* c_endo = (char*) this->endo.c_str();
-    char* c_lec = (char*) lec_oem.c_str();
-    CLEC* clec = L_solve(c_lec, c_endo);
-    if(clec == NULL)  
+    std::shared_ptr<CLEC> clec = L_solve(lec_oem, this->endo);
+    if(!clec)  
         return false;
 
     *pack = (char*) P_create();
 
+    char* c_lec = (char*) lec_oem.c_str();
     *pack = (char*) P_add(*pack, c_lec, (int) this->lec.size() + 1);
     // for backward compatibility with old binary files
     *pack = (char*) P_add(*pack, NULL, 0);
@@ -275,7 +274,6 @@ bool Equation::to_binary(char** pack) const
     *pack = (char*) P_add(*pack, (char*)&(this->date), sizeof(long));                     /* date */
     *pack = (char*) P_add(*pack, (char*)&(this->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
 
-    delete clec;
     return true;
 }
 

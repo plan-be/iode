@@ -133,53 +133,43 @@ public:
 
         return this->objs == other.objs;
     }
+
+    std::vector<std::string> get_scalars() const
+    {
+        std::vector<std::string> list;
+        for(const auto& [name, _] : this->objs)
+        {
+            if(is_coefficient(name))
+                list.push_back(name);
+        }
+        return list;
+    }
+
+    std::vector<std::string> get_variables() const
+    {
+        std::vector<std::string> list;
+        for(const auto& [name, _] : this->objs)
+        {
+            if(!is_coefficient(name))
+                list.push_back(name);
+        }
+        return list;
+    }
 };
 
 /* ---------------------- FUNCS ---------------------- */
-
-inline std::vector<std::string> get_scalars_from_clec(CLEC* clec)
-{
-    std::vector<std::string> list;
-
-    if(!clec)
-        throw std::runtime_error("Cannot get list of scalars.\nClec structure not defined.");
-    
-    for(auto& [name, _] : clec->objs)
-    {
-        if(is_coefficient(name))
-            list.push_back(name);
-    }
-
-    return list;
-}
-
-inline std::vector<std::string> get_variables_from_clec(CLEC* clec)
-{
-    std::vector<std::string> list;
-
-    if(!clec)
-        throw std::runtime_error("Cannot get list of variables.\nClec structure not defined.");
-    
-    for(auto& [name, _] : clec->objs)
-    {
-        if(!is_coefficient(name))
-            list.push_back(name);
-    }
-
-    return list;
-}
 
 /* l_cc1.c */
 int L_cc1();
 int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
 
 /* l_cc2.c */
-CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
-CLEC* L_cc_stream(const std::string& lec);
-CLEC* L_cc(const std::string& lec);
+std::shared_ptr<CLEC> L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+std::shared_ptr<CLEC> L_cc_stream(const std::string& lec);
+std::shared_ptr<CLEC> L_cc(const std::string& lec);
 
 /* l_link.c */
-int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
+int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER
@@ -197,7 +187,7 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl);
         int matherr(struct exception *e);
 #endif
 void L_fperror(int sig);
-double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t);
+double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t);
 double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 
 /* l_hodrick.c */
@@ -205,16 +195,19 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
 void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
-CLEC* L_solve(char* eq, char* endo);
-int L_split_eq(char* eq);
+std::shared_ptr<CLEC> L_solve(const std::string& eq, const std::string& endo);
+int L_split_eq(const std::string& eq);
 
 /* l_newton.c */
-double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
-double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+    const int varnb, const int eqvarnb);
+double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+    const int varnb, const int eqvarnb);
 
 /* l_secant.c */
-double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb);
+double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+    const int varnb, const int eqvarnb);
 
 /* k_lec.c */
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
-    CLEC* eqclec, int coefs);
+    const std::shared_ptr<CLEC> eqclec, const int coefs);

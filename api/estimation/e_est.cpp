@@ -89,7 +89,8 @@ int Estimation::E_c_gmg()
  */
 double Estimation::E_rhs_ij(int i, int t)
 {
-    double rhs_i_t = L_exec(E_DBV, E_DBS, E_CRHS[i], t + E_FROM);
+    std::shared_ptr<CLEC> clec(E_CRHS[i], [](CLEC*) {});
+    double rhs_i_t = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
     return rhs_i_t;
 }
 

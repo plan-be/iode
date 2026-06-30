@@ -19,12 +19,6 @@
  *                           - long for type "integer constant"
  *                           - char for the nb of args in case of type "function"
  *                           - more complex (recursive) struct for types "TFN's" or "MTFN's"
- * 
- * Main functions:
- * 
- *      CLEC *L_cc2(ALEC* expr, std::string& lec)        Second stage of LEC compilation. Generates an "executable" LEC expression.
- *      CLEC *L_cc_stream(std::string& lec)              Compiles L_YY, the open YY stream containing a LEC expression.
- *      CLEC *L_cc(char* lec)                            Compiles a LEC string. 
  */
 
 #include "api/lec/lec.h"
@@ -70,10 +64,11 @@ static int L_calc_len(const std::vector<ATOMIC_LEC>& expr, const int from, const
  * @param [in]  expr    ALEC*   pointer to the first atomic element of the expression (result of L_cc1(), normally L_EXPR)
  * @return              CLEC*   pointer to a compiled LEC (see above for details on the contents of a CLEC)
 */
-CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
+std::shared_ptr<CLEC> L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec) 
 {
+    std::shared_ptr<CLEC> clec;
     if(expr.empty()) 
-        return nullptr;
+        return clec;
 
     int pos_buffer = 0;             // position (in number of bytes) in the buffer
     int pos_expr = 0;               // position in the vector of atomic lec elements
@@ -107,7 +102,7 @@ CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
                 error_msg += "arguments of function '" + al_tfn.representation + "'.";
                 kwarning(error_msg.c_str());
                 SW_nfree(buffer);
-                return nullptr;
+                return clec;
             }
 
             al_tfn.len_args = (short) len;
@@ -134,7 +129,7 @@ CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
                     error_msg += "arguments of function '" + al_mtfn.representation + "'.";
                     kwarning(error_msg.c_str());
                     SW_nfree(buffer);
-                    return nullptr;
+                    return clec;
                 }
                 al_mtfn.v_len_args.push_back(len);
                 new_pos = start_pos - 1;
@@ -151,10 +146,10 @@ CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
     if(pos_buffer == 0)
     {
         SW_nfree(buffer);
-        return nullptr;
+        return clec;
     }
     
-    CLEC* clec = new CLEC(lec, buffer, pos_buffer);
+    clec = std::make_shared<CLEC>(lec, buffer, pos_buffer);
     SW_nfree(buffer);
     L_NAMES.clear();
 
@@ -167,16 +162,16 @@ CLEC* L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
  *  
  * @return  CLEC*  compiled and serialized LEC expression.
  */
-CLEC* L_cc_stream(const std::string& lec)
+std::shared_ptr<CLEC> L_cc_stream(const std::string& lec)
 {
-    CLEC* cl;
+    std::shared_ptr<CLEC> clec;
 
     if(L_cc1() != 0)
-        return NULL;
+        return clec;
     
-    cl = L_cc2(L_EXPR, lec);
+    clec = L_cc2(L_EXPR, lec);
     L_EXPR.clear();
-    return cl;
+    return clec;
 }
 
 
@@ -187,12 +182,13 @@ CLEC* L_cc_stream(const std::string& lec)
  *  @return                 CLEC*   compiled and serialized LEC expression
  *  
  */
-CLEC *L_cc(const std::string& lec)
+std::shared_ptr<CLEC> L_cc(const std::string& lec)
 {
+    std::shared_ptr<CLEC> clec;
     if(L_open_string((char*) lec.c_str())) 
-        return nullptr;
+        return clec;
 
-    CLEC* clec = L_cc_stream(lec);
+    clec = L_cc_stream(lec);
     L_close();
     return clec;
 }

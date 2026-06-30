@@ -85,8 +85,8 @@ TEST_F(KDBIdentitiesTest, Get)
 {
     std::string name;
     std::string expected_lec;
-    CLEC* clec = NULL;
-    CLEC* expected_clec = NULL;
+    std::shared_ptr<CLEC> clec = nullptr;
+    std::shared_ptr<CLEC> expected_clec = nullptr;
     
     // by name
     name = "AOUC";

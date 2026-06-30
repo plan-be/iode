@@ -40,7 +40,7 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
  *  @param [in] CLEC*   clec    compiled LEC expression
  *  @return                     table of Scalar names found in clec
  */
-static std::vector<std::string> E_GetScls(CLEC* clec)                                            
+static std::vector<std::string> E_GetScls(const std::shared_ptr<CLEC> clec)                                            
 {
     std::vector<std::string> v_scalar_names;
     if(clec) 
@@ -96,8 +96,8 @@ double C_evallec(char* lec, int t)
     SCR_strip((unsigned char*) tmplec);
     if(tmplec[0]) 
     {
-        CLEC* clec = L_cc(tmplec);
-        if(clec == NULL) 
+        std::shared_ptr<CLEC> clec = L_cc(tmplec);
+        if(!clec) 
         {
             std::string error_msg = "Syntax error " + std::string(L_error());
             error_manager.append_error(error_msg);
@@ -105,7 +105,6 @@ double C_evallec(char* lec, int t)
         }
         if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, t);
-        delete clec;
     }
 
     return x;
@@ -257,7 +256,7 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);               
-    CLEC* cl = eq_ptr->clec;
+    std::shared_ptr<CLEC> cl = eq_ptr->clec;
     std::vector<std::string> v_scalar_names = E_GetScls(cl);
 
     // Effectue les estimations pour toutes les combi

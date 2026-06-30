@@ -261,7 +261,7 @@ public:
         // Return an error if one instrument is invalid.
         for(const std::string& instr: v_instrs) 
         {
-            CLEC* clec = L_cc(to_char_array(instr));
+            std::shared_ptr<CLEC> clec = L_cc(instr);
             if(!clec) 
             {
                 this->instruments = "";

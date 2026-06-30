@@ -44,16 +44,16 @@ ag:
                 goto ag;
             }
             YY_unread(yy);
-            return(IODE_NAN);
+            return IODE_NAN;
 
         case YY_STRING :
         case YY_WORD   :
             if(strcmp("NA", (char*) yy->yy_text) != 0)
                 YY_unread(yy);
-            return(IODE_NAN);
+            return IODE_NAN;
         default :
             YY_unread(yy);
-            return(IODE_NAN);
+            return IODE_NAN;
     }
 
     return(val);

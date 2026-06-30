@@ -97,7 +97,7 @@ int K_scan(const KDB& kdb, char* l_var, char* l_scal)
  *  
  *  @details 
  */
-static void K_clecscan(const KDB& kdb, CLEC* cl, KDBVariables& exo, KDBScalars& scal)
+static void K_clecscan(const KDB& kdb, const std::shared_ptr<CLEC> cl, KDBVariables& exo, KDBScalars& scal)
 {
     if(!cl) 
         return;
@@ -135,8 +135,8 @@ void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal)
 {
     std::string name = dbe.get_name(i);
     std::shared_ptr<Equation> eq = reinterpret_cast<const KDBEquations&>(dbe).get_obj_ptr(name);
-    CLEC* cl = eq->clec;
-    K_clecscan(dbe, cl, exo, scal);
+    std::shared_ptr<CLEC> clec = eq->clec;
+    K_clecscan(dbe, clec, exo, scal);
 }
 
 
@@ -156,11 +156,8 @@ void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal)
 {
     std::string name = dbi.get_name(i);
     std::shared_ptr<Identity> idt = reinterpret_cast<const KDBIdentities&>(dbi).get_obj_ptr(name);
-    
-    CLEC* cl_idt = idt->get_compiled_lec();
-    CLEC* cl_copy = new CLEC(*cl_idt);
-    K_clecscan(dbi, cl_copy, exo, scal);
-    delete cl_copy;
+    std::shared_ptr<CLEC> clec = idt->get_compiled_lec();
+    K_clecscan(dbi, clec, exo, scal);
 }
 
 
@@ -181,7 +178,7 @@ void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal)
     std::string name = dbt.get_name(i);
     std::shared_ptr<Table> tbl = reinterpret_cast<const KDBTables&>(dbt).get_obj_ptr(name);
 
-    CLEC* clec = NULL;
+    std::shared_ptr<CLEC> clec = nullptr;
     auto kdb_empty_ptr = KDBTables::KDBTables::Create(false);
     for(int k = 0; k < tbl->lines.size(); k++)   
     {

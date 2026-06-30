@@ -3,11 +3,6 @@
  *
  * Functions to compile LEC *equations*.
  * 
- * Main functions
- * --------------
- *    CLEC* L_solve(char* eq, char* endo)  Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
- *    int L_split_eq(char* eq)             Returns the position of ":=" in an equation or -1 if not found.
- * 
  * Context
  * -------
  *      LEC *equations* are made up of 2 LEC *expressions* separated by ":=":  
@@ -224,10 +219,10 @@ ag:
  * @param [in] lec           char*   LEC expression to compile
  * @return                   ALEC*   allocated table of ALEC's or NULL on error
 */
-static std::vector<ATOMIC_LEC> L_cc1_alloc(char* lec)
+static std::vector<ATOMIC_LEC> L_cc1_alloc(const std::string& lec)
 {
     std::vector<ATOMIC_LEC> v_al;
-    if(L_open_string(lec)) 
+    if(L_open_string((char*) lec.c_str())) 
         return v_al;
     
     if(L_cc1() != 0) 
@@ -248,33 +243,34 @@ static std::vector<ATOMIC_LEC> L_cc1_alloc(char* lec)
  * Only the step 1 of the compilation is performed at this stage.
  * 
  * @param [in, out]     sl    SLEC*   struct where the A
- * @param [in]          eq    char*   text of the equation
+ * @param [in]          lec   char*   LEC expression of the equation
  * @return                    int     error code or 0 on success
  *                                      
 */
-static int L_cc1_eq(SLEC* sl, char* eq)
+static int L_cc1_eq(SLEC* sl, const std::string& lec)
 {
     L_NAMES.clear();
 
-    /* SLIT EQ AND COMPILE EACH MEMBER */
-    int pos = L_split_eq(eq);
-    if(pos < 0)
+    // split the equation into LHS and RHS according to :=
+    std::size_t pos = lec.find(":=");
+    if(pos == std::string::npos) 
     {
         L_errno = L_ASSIGN_ERR;
         return L_errno;
     }
+    // make a copy of the equation to modify it
+    std::string lhs = lec.substr(0, pos);
+    std::string rhs = lec.substr(pos + 2);
 
     // Compiles left member
-    eq[pos] = 0;                                // close the left member
-    sl->sl_left_expr = L_cc1_alloc(eq);
+    sl->sl_left_expr = L_cc1_alloc(lhs);
     sl->sl_left_expr.pop_back();                // drop the last element (L_EOE)        
-    L_EXPR.clear();                       // Clean up L_EXPR
-    eq[pos] = ':';                              // Reset the original text
+    L_EXPR.clear();                             // Clean up L_EXPR
     if(sl->sl_left_expr.empty()) 
         return L_errno;
     
     // Compiles the right member
-    sl->sl_right_expr = L_cc1_alloc(eq + pos + 2);
+    sl->sl_right_expr = L_cc1_alloc(rhs);
     sl->sl_right_expr.pop_back();               // drop the last element (L_EOE)
     L_EXPR.clear();
     if(sl->sl_right_expr.empty()) 
@@ -405,9 +401,10 @@ static void L_append_const(int a)
  * @param [out]  duplicated_endo    int*    0 if the equation has been inverted, 1 if endo is present more than once.
  * @return                  int     0 on success and L_errno on error
 */
-static int L_invert(char* eq, char* endo, int *duplicated_endo)
+static int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo)
 { 
-    SLEC slec, *sl = &slec;
+    SLEC slec;
+    SLEC *sl = &slec;
 
     // Compiles the 2 members of eq and put the result in slec
     if(L_cc1_eq(sl, eq)) 
@@ -606,11 +603,11 @@ static int L_invert(char* eq, char* endo, int *duplicated_endo)
  * @param [in] endo     char* 
  * @return              CLEC*
 */
-CLEC* L_solve(char* eq, char* endo)
+std::shared_ptr<CLEC> L_solve(const std::string& eq, const std::string& endo)
 {
-    CLEC* clec = nullptr;
     int duplicated_endo = 0;
-    std::string lec = std::string(eq);
+    std::shared_ptr<CLEC> clec = nullptr;
+    std::string lec = eq;
 
     L_invert(eq, endo, &duplicated_endo);
     switch(L_errno) 
@@ -638,12 +635,12 @@ CLEC* L_solve(char* eq, char* endo)
  * @param [in] eq   char*   equation to analyse
  * @return          int     position of := in the equation or -1 if not found.
 */
-int L_split_eq(char* eq)
+int L_split_eq(const std::string& eq)
 {
     for(int i = 0 ; eq[i] != 0 ; i++)
     {
         if(eq[i] == ':' && eq[i + 1] == '=') 
-            return(i);
+            return i;
     }
 
     return -1;

@@ -51,12 +51,14 @@ bool debug_calc = false;
  *  @return     CLEC*           allocated copy of clec or NULL if clec is empty
  *  
  */
-static CLEC* COL_cp_clec(CLEC* clec)
+static std::shared_ptr<CLEC> COL_cp_clec(const std::shared_ptr<CLEC> clec)
 {
-    if(clec == nullptr) 
-        return nullptr;
+    std::shared_ptr<CLEC> aclec = nullptr;
+    if(!clec) 
+        return aclec;
 
-    CLEC* aclec = new CLEC(*clec);
+    // create a copy of clec in a new CLEC structure
+    aclec = std::make_shared<CLEC>(*clec);
     return aclec;
 }
 
@@ -70,7 +72,7 @@ static CLEC* COL_cp_clec(CLEC* clec)
  *                              -1 on error. A message is sent to kmsg() if the file is not present.
  *  
  */
-static int COL_link(int i, CLEC* clec)
+static int COL_link(const int i, std::shared_ptr<CLEC>& clec)
 {
     KDBVariablesPtr kdbv = (KDBVariablesPtr) global_ref_var[i - 1];
     if(!kdbv) 
@@ -100,7 +102,7 @@ static int COL_link(int i, CLEC* clec)
  *  
  */
  
-static int COL_calc(COL* cl, CLEC* clec, CLEC* dclec)
+static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>& dclec)
 {
     int     i, j, t[2], tmp, per;
     double  vy[2], vf[2], div, mant, sign;
@@ -320,13 +322,15 @@ int COL_exec(Table* tbl, int i, COLS* cls)
 {
     int lg = cls->cl_nb / tbl->nb_columns;
 
-    COL*    cl;
-    TableLine&  line = tbl->lines[i];
-    TableLine&  divider_line = tbl->divider_line;
-    CLEC   *clec = 0, *dclec = 0, *aclec = 0, *adclec = 0;
-    TableCell*  cell = nullptr;
-    TableCell*  dcell = nullptr;
-    
+    COL* cl;
+    TableLine& line = tbl->lines[i];
+    TableLine& divider_line = tbl->divider_line;
+    TableCell* cell = nullptr;
+    TableCell* dcell = nullptr;
+    std::shared_ptr<CLEC> clec = nullptr;
+    std::shared_ptr<CLEC> dclec = nullptr;
+    std::shared_ptr<CLEC> aclec = nullptr; 
+    std::shared_ptr<CLEC> adclec = nullptr;
     for(int d = 0; d < tbl->nb_columns; d++) 
     {
         cell = &line.cells[d];
@@ -353,10 +357,6 @@ int COL_exec(Table* tbl, int i, COLS* cls)
             debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 
                              aclec, adclec, i, d, j);
         }
-
-        SW_nfree(aclec);
-        SW_nfree(adclec);
     }
     return 0;
 }
-

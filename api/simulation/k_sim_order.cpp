@@ -202,14 +202,13 @@ int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& 
  */
 int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
-    int     posj, eq_pos, nb;
-    CLEC    *clec;
-
-    nb = dbe->size();
+    int nb = dbe->size();
     KSIM_ORDER    = (int *)  SW_nalloc(sizeof(int) * nb);
     KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
-
+    
+    int posj, eq_pos;
     int i = 0, j = 0;
+    std::shared_ptr<CLEC> clec;
     for(const auto& [_, eq] : dbe->k_objs) 
     {
         clec = eq->clec;

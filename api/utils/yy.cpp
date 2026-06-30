@@ -47,15 +47,15 @@ ag:
             if(yy->yy_text[0] != '/' &&
                     yy->yy_text[0] != '.')  /* JMP 03-01-2013 */
                 YY_unread(yy);             /* GB / = na  ??? */
-            return(IODE_NAN);
+            return IODE_NAN;
 
         case YY_WORD   :
             if(strcmp("na", (char*) yy->yy_text) != 0)
                 YY_unread(yy);
-            return(IODE_NAN);
+            return IODE_NAN;
         default :
             YY_unread(yy);
-            return(IODE_NAN);
+            return IODE_NAN;
     }
 
     return val;

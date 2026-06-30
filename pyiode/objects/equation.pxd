@@ -5,6 +5,7 @@ from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 from libcpp.map cimport map
 from libcpp cimport bool
+from libcpp.memory cimport shared_ptr
 
 from pyiode.common cimport IodeEquationMethod, IodeEquationTest
 from pyiode.time.sample cimport CSample
@@ -27,17 +28,17 @@ cdef extern from "api/objs/equations.h":
     # declare C++ Equation class
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CEquation "Equation":
-        string   endo
-        string   lec
-        CLEC*    clec
-        char     solved
-        char     method
-        CSample  sample
-        string   comment
-        string   block
-        string   instruments
-        long     date
-        float    tests[20]
+        string           endo
+        string           lec
+        shared_ptr[CLEC] clec
+        char             solved
+        char             method
+        CSample          sample
+        string           comment
+        string           block
+        string           instruments
+        long             date
+        float            tests[20]
 
         CEquation(const string&, const string&, const IodeEquationMethod, const string&, const string&, 
                   const string&, const string&, const string&, const bool date) except +

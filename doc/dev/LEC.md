@@ -194,26 +194,9 @@ Main functions:
 
 Second step of LEC compilation, producing a "CLEC expression" which contains what is needed to efficiently evaluate the expression.
 
-Main functions:
-
-|Syntax|Description|
-|:---|:---|
-|`CLEC *L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec)`|Second stage of LEC compilation. Generates an "executable" LEC expression.|
-|`CLEC *L_cc_stream(const std::string& lec)`|Compiles L\_YY, the open YY stream containing a LEC expression.|
-|`CLEC *L_cc(const std::string& lec)`|Compiles a LEC string.|
-
 ### l\_eqs.c {#T18}
 
 Functions to compile LEC \*equations\*. LEC \*equations\* are made up of 2 LEC \*expressions\* separated by ":=". Equations are used in 2 different contexts: estimation of coefficients and model simulation.
-
-Main functions:
-
-|Syntax|Description|
-|:---|:---|
-|`CLEC* L_solve(char* eq, char* endo)`|Compiles a LEC equation and tries to analytically solve the equation with respect to endo.|
-|`int L_split_eq(char* eq)`|Returns the position of ":=" in an equation or \-1 if not found.|
-
-More details and examples can be found in the source file.
 
 ## LEC linker {#T19}
 
@@ -223,11 +206,6 @@ Three functions, implemented in k\_lec.c, are called during the link process: L\
 
 ### l\_link.c {#T20}
 
-|Syntax|Description|
-|:---|:---|
-|`int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)`|Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.|
-|`void L_link_endos(const KDBEquations& dbe, CLEC *cl)`|Pseudo linking used to calculate the strong connex components of a model (SCC).|
-
 ## LEC execution {#T21}
 
 Finally, the expression is calculated by the fonction L\_exec().
@@ -235,12 +213,6 @@ Finally, the expression is calculated by the fonction L\_exec().
 ### l\_exec.c {#T22}
 
 Functions to evaluate a compiled and linked LEC expression.
-
-|Syntax|Description|
-|:---|:---|
-|`double L_exec_sub(unsigned char* expr, int lg, int t, std::deque<double> stack)`|Execution of a CLEC sub expression.|
-|`double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)`|Execution of a compiled and linked CLEC expression.|
-|`double* L_cc_link_exec(char* lec, KDB* dbv, KDB* dbs)`|Compiles, links and executes a LEC expression.|
 
 ### l\_exec\_var.c {#T23}
 

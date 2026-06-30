@@ -736,25 +736,26 @@ int RP_evaltime()
  *  @return             double              IODE_NAN on error or if RP_PER is before the current WS sample
  *                                          calculated LEC value on success
  */
-double RP_evallec(char* lec)
+double RP_evallec(char* c_lec)
 {
     if(RP_evaltime() < 0) 
         return IODE_NAN;
 
-    CLEC* clec;
+    std::string lec(c_lec);
+    lec = trim(lec);
     double x = IODE_NAN;
-    SCR_strip((unsigned char*) lec);
+    std::shared_ptr<CLEC> clec = nullptr;
     if(lec[0]) 
     {
         clec = L_cc(lec);
-        if(clec == NULL) 
+        if(!clec) 
         {
             error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
+
         if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, RP_T);
-        delete clec;
     }
 
     return x;

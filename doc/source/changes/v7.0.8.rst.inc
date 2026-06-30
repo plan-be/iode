@@ -36,3 +36,6 @@ Miscellaneous
 
 - C++ API: replaced pointer attributes Sample* by smart pointer shared_ptr<Sample>. 
   That should not impact the output of estimations or simulations.
+
+- C++ API: replaced pointer attributes CLEC* by smart pointer shared_ptr<CLEC>. 
+  That should not impact the output of estimations or simulations.

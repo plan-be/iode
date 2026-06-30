@@ -16,11 +16,11 @@
 #define LN_FACTOR   1.6             
 #define LN_MAXIT    20
 
-static int     LN_VARNB;            // Current position of endo in LN_DBV
-static double  LN_SHIFT = 0.0;      // Value of the endo[t] or 0 if the equation is not analytically solved (0 := lhs - rhs)
-static CLEC*   LN_CLEC;             // Current CLEC expression
-static KDBVariablesPtr LN_DBV;       // Current KDB scalars
-static KDBScalarsPtr   LN_DBS;       // Current KDB of vars
+static int     LN_VARNB;                // Current position of endo in LN_DBV
+static double  LN_SHIFT = 0.0;          // Value of the endo[t] or 0 if the equation is not analytically solved (0 := lhs - rhs)
+static KDBVariablesPtr LN_DBV;          // Current KDB scalars
+static KDBScalarsPtr   LN_DBS;          // Current KDB of vars
+static std::shared_ptr<CLEC> LN_CLEC;   // Current CLEC expression
 
 
 /**
@@ -90,7 +90,8 @@ static int L_bracket(double* x1, double* x2, int t)
     f1 = L_fx(*x1, t);
     f2 = L_fx(*x2, t);
 
-    for(i = 0; i < LN_MAXIT; i++) {
+    for(i = 0; i < LN_MAXIT; i++) 
+    {
         if(f1 * f2 < 0.0) return 0;
 
         if(fabs(f1) < fabs(f2))
@@ -127,7 +128,8 @@ static int L_bracket(double* x1, double* x2, int t)
  *  @return     double          root of the equation (varnb value that solves the equation)
  *
  */
-double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)
+double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+    const int varnb, const int eqvarnb)
 {
     int     it = 0;
     double  x1, x2, xl, xh, xr,
@@ -142,35 +144,40 @@ double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int v
 
     d_ptr = L_getvar(dbv, varnb);
     x1 = d_ptr[t];
-    if(!IODE_IS_A_NUMBER(x1)) {
-        //return((double)IODE_NAN);
+    if(!IODE_IS_A_NUMBER(x1)) 
         x1 = 0.9;
-    }
 
     // if endogenous is not changed and endo appears more than once in clec,
     // clec is of the form 0 := lhx - rhs. Hence, shift = 0 instead of endo(t)
-    if(varnb == eqvarnb || clec->duplicated_endo) {   /* JMP 13-12-01 */
+    if(varnb == eqvarnb || clec->duplicated_endo) 
+    {
         LN_SHIFT = 0.0;
         x1 = fabs(x1);
     }
-    else {
+    else 
+    {
         LN_SHIFT = *(L_getvar(dbv, eqvarnb) + t);
-        if(!IODE_IS_A_NUMBER(LN_SHIFT)) {
-            return((double)IODE_NAN); /* GB 03-11-2003 */
-        }
+        if(!IODE_IS_A_NUMBER(LN_SHIFT))
+            return (double) IODE_NAN;
         x1 = fabs(LN_SHIFT);
     }
 
-    if(fabs(L_fx(0.0, t)) < 1.0e-6) return(0.0);            // Solution 0.0 reached 
-    if(L_bracket(&x1, &x2, t) < 0) return((double)IODE_NAN);
+    // Solution 0.0 reached
+    if(fabs(L_fx(0.0, t)) < 1.0e-6) 
+        return 0.0;  
+               
+    if(L_bracket(&x1, &x2, t) < 0) 
+        return (double) IODE_NAN;
 
     fxl = L_fx(x1, t);
     fxh = L_fx(x2, t);
-    if(fxl < 0) {
+    if(fxl < 0) 
+    {
         xl = x1;
         xh = x2;
     }
-    else {
+    else 
+    {
         xl = x2;
         xh = x1;
         tmp = fxl;
@@ -179,23 +186,27 @@ double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int v
     }
     dx = xh - xl;
 
-    while(it < LN_MAXIT) {
+    while(it < LN_MAXIT) 
+    {
         xr = xl + dx * fxl/(fxl -fxh);
         fxr = L_fx(xr, t);
-        if(fxr < 0.0) {
+        if(fxr < 0.0) 
+        {
             tmp = xl - xr;
             xl = xr;
             fxl = fxr;
         }
-        else {
+        else 
+        {
             tmp = xh - xr;
             xh = xr;
             fxh = fxr;
         }
         dx = xh - xl;
-        if(fabs(tmp) < 1.0e-6 * fabs(xr) || fabs(fxr) < 1.0e-6) return(xr);
+        if(fabs(tmp) < 1.0e-6 * fabs(xr) || fabs(fxr) < 1.0e-6) 
+            return xr;
         it++;
     }
 
-    return((double)IODE_NAN);
+    return (double) IODE_NAN;
 }

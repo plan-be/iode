@@ -265,8 +265,8 @@ int B_DataCalcVar(char* arg, int unused)
 
     if(lec[0]) 
     {
-        CLEC* clec = L_cc(lec);
-        if(clec != 0 && !L_link(kdb, global_ws_scl, clec)) 
+        std::shared_ptr<CLEC> clec = L_cc(lec);
+        if(clec && !L_link(kdb, global_ws_scl, clec)) 
         {
             double d;
             for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 
@@ -274,11 +274,9 @@ int B_DataCalcVar(char* arg, int unused)
                 d = L_exec(kdb, global_ws_scl, clec, t);
                 kdb->get_var_ptr(name)[t] = d;
             }
-            delete clec;
         }
         else 
         {
-            delete clec;
             std::string error_msg = std::string(L_error()) + " : " + std::string(lec);
             kwarning(error_msg.c_str());
             return -1;

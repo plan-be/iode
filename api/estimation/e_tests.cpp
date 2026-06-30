@@ -63,7 +63,7 @@ double Estimation::M_c_line(MAT* m1, int line, int oper)
  */
 double Estimation::E_div_0(double a, double b)
 {
-    if(b == 0) return(0.0);
+    if(b == 0) return 0.0;
 
     return(a/b);
 }
@@ -75,7 +75,7 @@ double Estimation::E_div_0(double a, double b)
 double Estimation::E_sqrt(double val)
 {
     if(val < 0)
-        return(0.0);
+        return 0.0;
     else
         return(sqrt(val));
 }

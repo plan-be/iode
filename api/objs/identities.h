@@ -12,27 +12,24 @@
 // Identity (struct with the identity LEC formula and the compiled CLEC structure)
 class Identity
 {
-    std::string lec;        // LEC expression (may not be an equation)
-    CLEC* clec;             // Compiled version of LEC
+    std::string lec;                // LEC expression (may not be an equation)
+    std::shared_ptr<CLEC> clec;     // Compiled version of LEC
 
 public:
     Identity(const std::string& lec)
     {
-        this->clec = nullptr;
         set_lec(lec);
     }
 
     Identity(const Identity& other)
     {
         this->lec = other.lec;
-        this->clec = new CLEC(*other.clec);
+
+        this->clec = nullptr;
+        this->clec = std::make_shared<CLEC>(*other.clec);
     }
 
-    ~Identity()
-    {
-        if(this->clec)
-            delete this->clec;
-    }
+    ~Identity() = default;
 
     std::string get_lec() const 
     {
@@ -42,21 +39,14 @@ public:
     void set_lec(const std::string& lec) 
     {
         this->lec = lec;
-        
-        // L_cc returns an allocated CLEC struct pointer.
-        if(this->clec)
-            delete this->clec;
         // compile the LEC expression
-        this->clec = L_cc((char*) lec.c_str());
+        this->clec = L_cc(lec);
     }
 
-    CLEC* get_compiled_lec()
+    std::shared_ptr<CLEC> get_compiled_lec()
     {
-        if(this->clec)
-            delete this->clec;
         // recompile the LEC expression
-        this->clec = L_cc((char*) lec.c_str());
-
+        this->clec = L_cc(lec);
         return this->clec;
     }
 
@@ -66,11 +56,7 @@ public:
     Identity& operator=(const Identity& other)
     {
         this->lec = other.lec;
-
-        if(this->clec)
-            delete this->clec;
-        this->clec = new CLEC(*other.clec);
-
+        this->clec = std::make_shared<CLEC>(*other.clec);
         return *this;
     }
 
@@ -80,22 +66,14 @@ public:
             return false;
 
         // recompile the LEC expression of both identities 
-        CLEC* cl1 = L_cc((char*) this->lec.c_str());
-        CLEC* cl2 = L_cc((char*) other.lec.c_str());
+        std::shared_ptr<CLEC> cl1 = L_cc(this->lec);
+        std::shared_ptr<CLEC> cl2 = L_cc(other.lec);
 
         // compilation failed for at least one of the two LEC expressions
-        if(cl1 == nullptr || cl2 == nullptr)
-        {
-            if(cl1) delete cl1;
-            if(cl2) delete cl2;
+        if(!cl1 || !cl2)
             return false;
-        }
         
-        bool equal = *cl1 == *cl2;
-        delete cl1;
-        delete cl2;
-        
-        return equal;
+        return *cl1 == *cl2;
     }
 
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true);

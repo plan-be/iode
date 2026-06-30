@@ -129,7 +129,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs);
 U_ch *RPF_eqlhs(U_ch **args);
 U_ch *RPF_eqrhs(U_ch **args);
 U_ch *RPF_sample(U_ch** args);
-int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type);
+int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const int type);
 U_ch *RPF_vsliste(U_ch** args, int type);
 U_ch **RPF_unique(U_ch** tbl);
 U_ch *RPF_vliste(U_ch** args);

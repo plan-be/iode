@@ -120,7 +120,7 @@ struct Equation
 {
     std::string   endo;                     // endogenous variable (= equation name)   
     std::string   lec;                      // LEC form of the equation (LHS := RHS)
-    CLEC*         clec;                     // Compiled equation for the simulation
+    std::shared_ptr<CLEC> clec;             // Compiled equation for the simulation
     char          solved;                   // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
     char          method;                   // Estimation method
     Sample        sample;                   // Estimation sample
@@ -175,7 +175,7 @@ public:
     {
         this->endo = other.endo; 
         this->lec = other.lec;
-        this->clec = new CLEC(*other.clec);
+        this->clec = std::make_shared<CLEC>(*other.clec);
         this->solved = other.solved;
         this->method = other.method;
         if(this->method < 0 || this->method >= IODE_NB_EQ_METHODS)
@@ -188,11 +188,7 @@ public:
         this->tests = other.tests;
     }
 
-    ~Equation()
-    {
-        if(this->clec)
-            delete this->clec;
-    }
+    ~Equation() = default;
 
     // required to be used in std::map
     Equation& operator=(const Equation& other)
@@ -219,19 +215,15 @@ public:
     {
         if(this->lec.empty())
             throw std::invalid_argument("LEC expression is empty");
-        
-        // check if LEC expression is valid
-        CLEC* new_clec = L_solve((char*) this->lec.c_str(), (char*) this->endo.c_str());
+
+        this->clec = nullptr;
+        std::shared_ptr<CLEC> new_clec = L_solve(this->lec, this->endo);
         if(!new_clec)
         {
             std::string error_msg = "Cannot compile the LEC expression '" + lec + "' "; 
             error_msg += "of the equation named '" + endo + "'";
             throw std::invalid_argument(error_msg);
         }
-
-        if(this->clec)
-            delete this->clec;
-
         this->clec = new_clec;
     }
 
@@ -432,7 +424,10 @@ public:
 
     std::vector<std::string> get_coefficients_list(const bool create_if_not_exit=true)
     {
-        std::vector<std::string> coeffs = get_scalars_from_clec(this->clec);
+        if(!this->clec)
+            throw std::runtime_error("Cannot return the list of coefficients.\nClec structure not defined.");
+
+        std::vector<std::string> coeffs = this->clec->get_scalars();
 
         // create scalars not yet present in the Scalars Database
         if(create_if_not_exit)
@@ -452,7 +447,10 @@ public:
 
     std::vector<std::string> get_variables_list(const bool create_if_not_exit=true)
     {
-        std::vector<std::string> vars = get_variables_from_clec(this->clec);
+        if(!this->clec)
+            throw std::runtime_error("Cannot return the list of variables.\nClec structure not defined.");
+
+        std::vector<std::string> vars = this->clec->get_variables();
 
         // create variables not yet present in the Variables Database
         if(create_if_not_exit)
@@ -516,21 +514,14 @@ public:
             return false;
 
         // recompile the LEC expression of both equations
-        char* name = (char*) this->endo.c_str();
-        CLEC* cl1 = L_solve((char*) this->lec.c_str(), name);
-        CLEC* cl2 = L_solve((char*) other.lec.c_str(), name);
+        std::shared_ptr<CLEC> cl1 = L_solve(this->lec, this->endo);
+        std::shared_ptr<CLEC> cl2 = L_solve(other.lec, this->endo);
 
         // compilation failed for at least one of the two LEC expressions
-        if(cl1 == nullptr || cl2 == nullptr)
-        {
-            if(cl1) delete cl1;
-            if(cl2) delete cl2;
+        if(!cl1 || !cl2)
             return false;
-        }
 
         bool clec_equal = (*cl1 == *cl2);
-        delete cl1;
-        delete cl2;
         
         if(!clec_equal)
             return false;
@@ -678,4 +669,4 @@ int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
 
 // lec/l_link.c
 // NOTE: declare here to avoid circular dependency between equations.h and lec.h
-void L_link_endos(const KDBEquationsPtr dbe, CLEC *cl);
+void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl);

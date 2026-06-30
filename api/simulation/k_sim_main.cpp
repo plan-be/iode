@@ -738,8 +738,8 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
 
     std::string eq_name = KSIM_DBE->get_name(eqnb);
     std::shared_ptr<Equation> eq = KSIM_DBE->get_obj_ptr(eq_name);
-    CLEC* eq_clec = eq->clec;
-    CLEC* clec = new CLEC(*eq_clec);
+    std::shared_ptr<CLEC> eq_clec = eq->clec;
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
     eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->duplicated_endo || varnb != eqvarnb)
         x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
@@ -754,7 +754,6 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
                ((clec->duplicated_endo || varnb != eqvarnb) ? "(Newton)" : "")
               );
     }
-    delete clec;
     return x;
 }
 

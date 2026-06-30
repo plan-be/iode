@@ -1211,12 +1211,12 @@ U_ch *RPF_sample(U_ch** args)
  *  @param [in] int     type    type of object to retrieve: 'S' for scalars, 'V' for variables
  *  @return     int             0, always
  */
-int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
+int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const int type)
 {
 
     int k;
     std::string tbl_name;
-    for(auto& [name, _]: cl->objs) 
+    for(auto& [name, _]: clec->objs) 
     {
         if(is_coefficient(name) && type != 'S') 
             continue;
