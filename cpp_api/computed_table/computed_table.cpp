@@ -248,23 +248,23 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     oss << std::setw(20) << std::fixed << std::setprecision(8) << value;
 
     std::string formula = lec + " := " + oss.str() + " * " + div_lec;
-    CLEC* clec = L_solve(to_char_array(formula), to_char_array(var_name));
+    std::shared_ptr<CLEC> clec = L_solve(to_char_array(formula), to_char_array(var_name));
 
     int var_pos = global_ws_var->index_of(var_name);
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used
-    if(clec == NULL || clec->duplicated_endo)
+    if(!clec || clec->duplicated_endo)
     {
-        if(clec != NULL && clec->duplicated_endo) 
-            delete clec;
+        if(clec && clec->duplicated_endo) 
+            clec.reset();
         
         oss.clear();
         oss << std::fixed << std::setprecision(15) << value;
 
         formula = lec + " := " + oss.str() + " * " + div_lec;
-        clec = L_cc(to_char_array(formula));
-        if(clec == NULL)
+        clec = L_cc(formula);
+        if(!clec)
             return false;
 
         L_link(global_ws_var, global_ws_scl, clec);
@@ -277,8 +277,6 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         L_link(global_ws_var, global_ws_scl, clec);
         res = L_exec(global_ws_var, global_ws_scl, clec, period_pos);
     }
-
-    delete clec;
 
     if(!IODE_IS_A_NUMBER(res))
         return false;

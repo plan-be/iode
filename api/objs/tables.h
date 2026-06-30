@@ -312,7 +312,7 @@ public:
     //       Otherwise, it is a LEC cell.
     void set_content(const std::string& content);
 
-	CLEC* get_compiled_lec()
+	std::shared_ptr<CLEC> get_compiled_lec()
     {
         if(type != TABLE_CELL_LEC)
             throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
@@ -326,14 +326,14 @@ public:
 
 	std::vector<std::string> get_variables_from_lec()
     {
-        CLEC* clec = get_compiled_lec();
-        return get_variables_from_clec(clec);
+        std::shared_ptr<CLEC> clec = get_compiled_lec();
+        return clec->get_variables();
     }
 
 	std::vector<std::string> get_coefficients_from_lec()
     {
-        CLEC* clec = get_compiled_lec();
-        return get_scalars_from_clec(clec);
+        std::shared_ptr<CLEC> clec = get_compiled_lec();
+        return clec->get_scalars();
     }
 
     // Checks that a TableCell is not empty (for TEXT cells) and not "1" (for LEC cells)

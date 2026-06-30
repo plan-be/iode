@@ -9,7 +9,7 @@ std::vector<std::string> Identity::get_coefficients_list(const bool create_if_no
     if(this->clec == NULL)
         throw std::runtime_error("Please compute the identity " + std::string(this->lec) + " first");
 
-    std::vector<std::string> coeffs = get_scalars_from_clec(this->clec);
+    std::vector<std::string> coeffs = this->clec->get_scalars();
 
     // create scalars not yet present in the Scalars Database
     if(create_if_not_exit)
@@ -31,7 +31,7 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
     if(this->clec == NULL)
         throw std::runtime_error("Please compute the identity " + std::string(this->lec) + " first");
 
-    std::vector<std::string> vars = get_variables_from_clec(this->clec);
+    std::vector<std::string> vars = this->clec->get_variables();
 
     // create variables not yet present in the Variables Database
     if(create_if_not_exit)
@@ -67,7 +67,7 @@ bool Identity::to_binary(char** pack) const
     if(lec.empty()) 
         return false;
 
-    CLEC* clec = L_cc(c_lec);
+    std::shared_ptr<CLEC> clec = L_cc(c_lec);
     if(!clec)  
         return false;
     
@@ -76,7 +76,6 @@ bool Identity::to_binary(char** pack) const
     // for backward compatibility with old binary files
     *pack = (char*) P_add(*pack, NULL, 0);
 
-    delete clec;
     return true;
 }
 
@@ -210,7 +209,7 @@ bool KDBIdentities::print_obj_def(const std::string& name)
     // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
     std::string lec_oem = utf8_to_oem(lec);
     std::string tmp = name + " : " + lec_oem;
-    CLEC* clec = this->get_obj_ptr(name)->get_compiled_lec();
+    std::shared_ptr<CLEC> clec = this->get_obj_ptr(name)->get_compiled_lec();
 
     W_printf((char*) ".par1 enum_1\n");
     print_lec_definition(name, tmp, clec, B_EQS_LEC);

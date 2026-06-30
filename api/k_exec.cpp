@@ -111,11 +111,9 @@ static int wrapper_KI_strcmp(const void *pa, const void *pb)
  */
 static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
 {
-    CLEC* clec;
-    
     // Creates a list with all variable names encountered
     // (without checking for duplicates)
-    std::string name;
+    std::shared_ptr<CLEC> clec;
     std::set<std::string> vars_to_compute;
     for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
     {
@@ -147,23 +145,19 @@ static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
  */
 static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
 {
-    CLEC* clec;
-    CLEC* tclec;
-
     Scalar new_scl;
-    std::string name;
+    std::shared_ptr<CLEC> clec;
     KDBScalarsPtr dbs = KDBScalars::Create(false);
     for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
     {
         clec = idt->get_compiled_lec();
-        tclec = new CLEC(*clec);
-        for(auto& [name, _]: tclec->objs) 
+        CLEC clec_copy(*clec);
+        for(auto& [name, _]: clec_copy.objs) 
         {
             if(!is_coefficient(name)) 
                 continue;
             dbs->set(name, new_scl);
         }
-        delete tclec;
     }
 
     return dbs;
@@ -225,7 +219,7 @@ static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
 
     int i, pos;
     std::string name;
-    CLEC* clec = nullptr;
+    std::shared_ptr<CLEC> clec = nullptr;
     while(nb_ordered < nb_identities) 
     {
         i = 0;
@@ -748,22 +742,21 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
 
     double d;
     std::string idt_name;
-    CLEC* idt_clec = nullptr;
+    std::shared_ptr<CLEC> idt_clec = nullptr;
+    std::shared_ptr<CLEC> clec_copy = nullptr;
     for(int i = 0; i < dbi_ptr->size(); i++) 
     {
         idt_name = dbi_ptr->get_name(order[i]);
         idt_clec = dbi_ptr->get_obj_ptr(idt_name)->get_compiled_lec();
-        CLEC* tmp = new CLEC(*idt_clec);
-        if(L_link(dbv_ptr, dbs_ptr, tmp)) 
+        clec_copy = std::make_shared<CLEC>(*idt_clec);
+        if(L_link(dbv_ptr, dbs_ptr, clec_copy)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(dbv_ptr, dbs_ptr, tmp, t);
+            d = L_exec(dbv_ptr, dbs_ptr, clec_copy, t);
             dbv_ptr->get_var_ptr(idt_name)[t] = d;
         }
-        
-        delete tmp;
     }
 
     return 0;

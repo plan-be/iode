@@ -126,7 +126,8 @@ char* L_expand(char* list_name)
  *                                   if 2: replace scalars by their value and their t-test   
  *  @return            bool
  */
-bool print_lec_definition(const std::string& name, const std::string& eqlec, CLEC* eqclec, int coefs)
+bool print_lec_definition(const std::string& name, const std::string& eqlec, 
+    const std::shared_ptr<CLEC> eqclec, const int coefs)
 {
     // create a char* array containing a copy of the string eqlec
     int lg = (int) eqlec.size();
@@ -135,7 +136,7 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec, CLE
     strcpy(c_lec, eqlec.c_str());
     
     // create a copy of the CLEC* eqclec
-    CLEC* clec = new CLEC(*eqclec);
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eqclec);
 
     char buf[80];
     sprintf(buf, "%cb%s%cB", A2M_ESCCH, name.c_str(), A2M_ESCCH);
@@ -170,6 +171,5 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec, CLE
     dump_string((char*) " ", c_lec);
 
     delete[] c_lec;
-    SCR_free(clec);
     return true;
 }

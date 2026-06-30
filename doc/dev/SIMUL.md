@@ -313,27 +313,8 @@ It is possible to exchange the status of an exogenous variable with that of an e
 
 Another way to view the process is to say that the model is solved with respect to another list of variables.
 
-|Syntax|Description|
-|:---|:---|
-|`int exo_to_endo(int posendo, int posexo)`|Modify the model to solve it with respect to another set of variables|
-
 ### Single equation solver {#T15}
 
 When an equation is not analytically solved during the compilation process or if it has been inverted by the endo\-exo exchange, that equation must be solved numerically during the simulation.
 
 Two methods are used: a simple Newton\-Raphson method or a secant method in case of non convergence.
-
-#### l\_newton.c {#T16}
-
-|Syntax|Description|
-|:---|:---|
-|`double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Solves numerically a LEC equation for one period of time with respect to a given variable. If the Newton\-Raphson method does not reach a solution, tries a bisection (secant) method.|
-|`double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to solve a LEC equation by the Newton\-Raphson method.|
-
-#### l\_secant.c {#T17}
-
-|Syntax|Description|
-|:---|:---|
-|`static double L_fx(double x, int t)`|Computes the value of f(x) in time t|
-|`double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)`|Tries to find a solution to the equation clec by a secant method.|
-

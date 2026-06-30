@@ -8,23 +8,22 @@
  * 
  *  @note same as function IodeLinkLec() from b_api.c (from iode_dos repository).
  */
-static CLEC* link_lec(const std::string& lec)
+static std::shared_ptr<CLEC> link_lec(const std::string& lec)
 {
     char* error_msg = to_char_array("Could not compile LEC expression " + lec);
 
-    CLEC* clec = L_cc(to_char_array(lec));
-    if(clec == NULL)
+    std::shared_ptr<CLEC> clec = L_cc(lec);
+    if(!clec)
     {
         kerror(0, error_msg);
-        return NULL;
+        return nullptr;
     } 
     
     int res = L_link(global_ws_var, global_ws_scl, clec);
     if(res != 0)
     {
-        SCR_free(clec);
         kerror(0, error_msg);
-        return NULL;
+        return nullptr;
     }
 
     return clec;
@@ -32,13 +31,11 @@ static CLEC* link_lec(const std::string& lec)
 
 double execute_lec(const std::string& lec, const int t)
 {
-    CLEC* clec = link_lec(lec);
-    if(clec == NULL) 
+    std::shared_ptr<CLEC> clec = link_lec(lec);
+    if(!clec) 
         return IODE_NAN;
 
     double value = L_exec(global_ws_var, global_ws_scl, clec, t);
-    SCR_free(clec);
-
     return value;
 }
 
@@ -63,14 +60,13 @@ std::vector<double> execute_lec(const std::string& lec)
         return res;
     }
 
-    CLEC* clec = link_lec(lec);
-    if(clec == NULL) 
+    std::shared_ptr<CLEC> clec = link_lec(lec);
+    if(!clec) 
         return res;
 
     res.reserve(nb_per);
     for(int t = 0; t < nb_per; t++) 
         res.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
-    SCR_free(clec);
-
+    
     return res;
 }

@@ -26,8 +26,6 @@
  *  
  *  @param [in] char*   eqs     equation name
  *  @return     int             1 on success, -1 if some variable present in eqs does not exist in global_ws_var
- *  
- *  TODO: éliminer les B_DataUpdate et autres fonctions de haut niveau
  */
 static int check_scl_var(char *eqs)
 {
@@ -41,7 +39,7 @@ static int check_scl_var(char *eqs)
     if(!eq_ptr) 
         return -1;
 
-    CLEC* cl = eq_ptr->clec;
+    std::shared_ptr<CLEC> cl = eq_ptr->clec;
     for(auto& [cl_name, _]: cl->objs) 
     {
         if(is_coefficient(cl_name)) 

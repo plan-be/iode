@@ -88,8 +88,8 @@ int Estimation::E_prep_alloc()
 int Estimation::E_prep_lecs(char** lecs)
 {
     int     i, pos, t;
-    CLEC    *clec = 0;
     double  x;
+    std::shared_ptr<CLEC> clec = nullptr;
 
     E_NEQ = SCR_tbl_size((unsigned char**) lecs);
     if(E_NEQ < 1)
@@ -99,14 +99,14 @@ int Estimation::E_prep_lecs(char** lecs)
     }
 
     E_LHS = M_alloc(E_NEQ, E_T);
-    if(E_LHS == 0)
+    if(!E_LHS)
     {
         error_manager.append_error("Estimation: Memory Error");
         return -1;
     }
 
     E_CRHS = (CLEC **) SW_nalloc(E_NEQ * sizeof(CLEC *));
-    if(E_CRHS == 0)
+    if(!E_CRHS)
     {
         error_manager.append_error("Estimation: Memory Error");
         return -1;
@@ -123,7 +123,7 @@ int Estimation::E_prep_lecs(char** lecs)
 
         lecs[i][pos] = 0;
         clec = L_cc(lecs[i]);
-        if(clec == 0)
+        if(!clec)
         {
             error_manager.append_error("Estimation: Syntax Error");
             return -1;
@@ -137,7 +137,6 @@ int Estimation::E_prep_lecs(char** lecs)
 
         if(L_link(E_DBV, E_DBS, clec) != 0) 
         {
-            delete clec; // GB 14/11/2012
             error_manager.append_error("Estimation: Link Error");
             return -1;
         }
@@ -147,33 +146,34 @@ int Estimation::E_prep_lecs(char** lecs)
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
-                delete clec; // GB 14/11/2012
                 error_manager.append_error("Estimation: NaN Generated");
                 return -1;
             }
             MATE(E_LHS, i, t) = x;
         }
-        delete clec; // GB 14/11/2012
+        
         lecs[i][pos] = ':';
 
-        E_CRHS[i] = L_cc(lecs[i] + pos + 2);
-        if(E_CRHS[i] == 0)
+        clec = L_cc(lecs[i] + pos + 2);
+        if(!clec)
         {
             error_manager.append_error("Estimation: Syntax Error");
             return -1;
         } 
 
-        if(E_add_scls(E_CRHS[i], *E_DBS))
+        if(E_add_scls(clec, *E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
             return -1; // JMP 13/11/2012
         } 
 
-        if(L_link(E_DBV, E_DBS, E_CRHS[i]) != 0)
+        if(L_link(E_DBV, E_DBS, clec) != 0)
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
         }
+
+        E_CRHS[i] = new CLEC(*clec);
     }
 
     return 0;
@@ -188,7 +188,7 @@ int Estimation::E_prep_lecs(char** lecs)
  *  @return     int             0        
  *  
  */
-int Estimation::E_add_scls(CLEC* clec, KDBScalars& dbs)
+int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 {
     std::string name;
     Scalar scl(0.9, 1.0);
@@ -214,9 +214,8 @@ int Estimation::E_add_scls(CLEC* clec, KDBScalars& dbs)
 int Estimation::E_prep_instrs(char** instrs)
 {
     int     i, t;
-    CLEC    *clec = 0;
-    MAT     *minstr = 0, *mip = 0, *miip = 0, *miipi = 0, *mipiipi = 0;
     double  x;
+    std::shared_ptr<CLEC> clec = nullptr;
 
     // Check if there are instruments. If not, return 0
     if(E_MET != 2 && E_MET != 3) 
@@ -227,15 +226,15 @@ int Estimation::E_prep_instrs(char** instrs)
         return 0;
 
     // Alloc local MAT
-    minstr  = M_alloc(E_T, E_NINSTR + 1);
-    mip     = M_alloc(E_NINSTR + 1, E_T);
-    miip    = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
-    miipi   = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
-    mipiipi = M_alloc(E_T, E_NINSTR + 1);
-    E_D     = M_alloc(E_T, E_T);
+    MAT* minstr  = M_alloc(E_T, E_NINSTR + 1);
+    MAT* mip     = M_alloc(E_NINSTR + 1, E_T);
+    MAT* miip    = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
+    MAT* miipi   = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
+    MAT* mipiipi = M_alloc(E_T, E_NINSTR + 1);
+    E_D = M_alloc(E_T, E_T);
 
     // Check allocation succeeded
-    if(minstr == 0 || mip == 0 || miip == 0 || miipi == 0 || mipiipi == 0 || E_D == 0) 
+    if(!minstr || !mip || !miip || !miipi || !mipiipi || !E_D) 
     {
         error_manager.append_error("Estimation: Memory Error");
         goto fin;
@@ -243,11 +242,11 @@ int Estimation::E_prep_instrs(char** instrs)
 
     for(i = 0 ; i < E_T ; i++) 
         MATE(minstr, i, 0) = 1.0;
-    
+   
     for(i = 0 ; i < E_NINSTR ; i++) 
     {
         clec = L_cc(instrs[i]);
-        if(clec == 0) 
+        if(!clec) 
         {
             error_manager.append_error("Estimation: Syntax Error");
             goto fin;
@@ -255,7 +254,6 @@ int Estimation::E_prep_instrs(char** instrs)
 
         if(L_link(E_DBV, E_DBS, clec) != 0) 
         {
-            delete clec;
             error_manager.append_error("Estimation: Link Error");
             goto fin;
         }
@@ -265,13 +263,11 @@ int Estimation::E_prep_instrs(char** instrs)
             x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
-                delete clec;
                 error_manager.append_error("Estimation: NaN Generated");
                 goto fin;
             }
             MATE(minstr, t, i + 1) = x;
         }
-        delete clec;
     }
 
     M_xprimx(miip, minstr);

@@ -241,6 +241,13 @@ inline std::vector<std::string> split(const std::string& str, char delimiter)
     return result;
 }
 
+/**
+ * @brief split a string into substrings based on multiple delimiters
+ * 
+ * @param str 
+ * @param delimiters 
+ * @return std::vector<std::string> 
+ */
 inline std::vector<std::string> split_multi(const std::string& str, const std::string& delimiters)
 {
     std::vector<std::string> result;

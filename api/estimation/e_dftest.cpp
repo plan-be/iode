@@ -72,7 +72,7 @@ static int E_GetSmpl(std::shared_ptr<Sample>& smpl, char* c_name)
 int E_GetLecName(char* lec, char* name)
 {
     name[0] = 0;
-    CLEC* clec = L_cc(lec);
+    std::shared_ptr<CLEC> clec = L_cc(lec);
     if(!clec) 
         return -1;
 
@@ -90,7 +90,6 @@ int E_GetLecName(char* lec, char* name)
         } 
     }
 
-    delete clec;
     return 0;
 }
 

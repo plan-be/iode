@@ -217,9 +217,9 @@ public:
 
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
 	{
-	    CLEC*   clec;
-	    double  calc_val;
+        double  calc_val;
 	    int     rc;
+	    std::shared_ptr<CLEC> clec;
 	
 	    Period per = global_ws_var->get_sample()->start_period.shift(t);
 	
@@ -228,20 +228,19 @@ public:
 	    rc = L_link(global_ws_var, global_ws_scl, clec);
 	    EXPECT_EQ(rc, 0);
 	    calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
-	    SCR_free(clec);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
 	double U_test_calc_lec(char* lec, int t)
 	{
-	    CLEC*   clec;
-	    double  res;
-	
-	    clec = L_cc(lec);
-	    if(clec == NULL) return(IODE_NAN);
-	    if(L_link(global_ws_var, global_ws_scl, clec)) return(IODE_NAN);
-	    res = L_exec(global_ws_var, global_ws_scl, clec, t);
-	    SCR_free(clec);
+	    std::shared_ptr<CLEC> clec = L_cc(lec);
+	    if(!clec) 
+            return IODE_NAN;
+        
+	    if(L_link(global_ws_var, global_ws_scl, clec)) 
+            return IODE_NAN;
+        
+	    double res = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    return res;
 	}
 
@@ -974,7 +973,7 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     U_test_print_title("Tests CLEC compile");
 
     std::string lec = "A + 1";
-    CLEC* clec = nullptr;
+    std::shared_ptr<CLEC> clec = nullptr;
     
     U_test_CreateObjects();
 
@@ -987,7 +986,6 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     EXPECT_EQ(clec->len_expr, 27);
     EXPECT_EQ(clec->objs.size(), 1);
     EXPECT_TRUE(lec_contains(clec, "A"));
-    delete clec;
     
     // Using macros in LEC
     clec = L_cc("1 + vmax($LST1)");
@@ -995,14 +993,12 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     EXPECT_EQ(clec->objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
-    delete clec;
 
     clec = L_cc("1 + vmax($LST2)");
     EXPECT_TRUE(clec != NULL);
     EXPECT_EQ(clec->objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
-    delete clec;
 }
 
 TEST_F(LegacyAPITest, Tests_CLEC_Copy)
@@ -1010,8 +1006,8 @@ TEST_F(LegacyAPITest, Tests_CLEC_Copy)
     U_test_print_title("Tests CLEC copy");
 
     std::string lec = "A + 1";
-    CLEC* clec = L_cc((char*) lec.c_str());
-    CLEC* copy_clec = new CLEC(*clec);
+    std::shared_ptr<CLEC> clec = L_cc((char*) lec.c_str());
+    std::shared_ptr<CLEC> copy_clec = std::make_shared<CLEC>(*clec);
 
     EXPECT_TRUE(copy_clec != nullptr);
     EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
@@ -1025,9 +1021,6 @@ TEST_F(LegacyAPITest, Tests_CLEC_Copy)
         EXPECT_EQ(it_clec->first, it_copy_clec->first);
         EXPECT_EQ(it_clec->second, it_copy_clec->second);
     }
-
-    delete clec;
-    delete copy_clec;
 }
 
 TEST_F(LegacyAPITest, Tests_ARGS)

@@ -187,7 +187,7 @@ static double LTOH_ycs(double* y, double* y2, double x)
     double    res, a, b;
     int     hi, lo;
 
-    if(x < 0) return(IODE_NAN);
+    if(x < 0) return IODE_NAN;
 
     lo = (int) floor(x);
     hi = (int) (lo + 1.0);

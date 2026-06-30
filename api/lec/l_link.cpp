@@ -6,11 +6,6 @@
  *
  *  Three functions, implemented in k_lec.c, are called during the link process: L_findvar(), L_findscl() L_getsmpl(). 
  *  The positions of variables and scalars returned by these functions will be used at execution time by L_getvar() and L_getscl().
- *   
- *  Main functions
- * 
- *      int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)    Links a CLEC expression to KDB's of variables and scalars. Aligns Period's to the Sample of dbv.
- *      void L_link_endos(const KDBEquationsPtr dbe, CLEC *cl)       Pseudo linking used to calculate the strong connex components of a model (SCC).
  */
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -30,7 +25,7 @@
  * @param [in, out] cl      CLEC*   Compiled LEC
  * @return                  int     0 on success,  L_NOT_FOUND_ERR on error
 */
-static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
+static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl)
 {
     for(auto& [name, pos] : cl->objs) 
     {
@@ -186,7 +181,7 @@ void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
  * @param [in]      dbv     KDB*    KDB of variables
  * @param [in, out] cl      CLEC*   Compiled LEC
  */
-static void L_link_sample(KDBVariablesPtr dbv, CLEC* cl)
+static void L_link_sample(KDBVariablesPtr dbv, std::shared_ptr<CLEC>& cl)
 {
     if(!cl) 
         return;
@@ -207,7 +202,7 @@ static void L_link_sample(KDBVariablesPtr dbv, CLEC* cl)
  * @param [in, out] cl   CLEC*       CLEC expression whose content must be linked to dbv and dbs
  * @return               int         0 on success, L_errno on error
 */
-int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
+int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl)
 {
     if(!cl) 
         return 0;
@@ -229,7 +224,7 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* cl)
  * @param [in, out] cl      CLEC*    Compiled lec
  *
  */
-static void L_link1_endos(const KDBEquationsPtr dbe, CLEC* cl)
+static void L_link1_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl)
 {
     for(auto& [name, pos] : cl->objs) 
     {
@@ -253,12 +248,10 @@ static void L_link1_endos(const KDBEquationsPtr dbe, CLEC* cl)
  * @param [in]      dbe     KDB*    KDB of equations
  * @param [in, out] cl      CLEC*   compiled LEC expression
  * @return                  int     0 on success, L_errno on error
- * 
- * @author JMP 16/3/2012
  */
-void L_link_endos(const KDBEquationsPtr dbe, CLEC *cl)
+void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl)
 {
-    if (cl == NULL) 
+    if (!cl) 
         return;
     
     L_link1_endos(dbe, cl);

@@ -762,23 +762,18 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	}
 
 	// code below is an adapted copy/paste from B_DataCalcVar() (in b_data.c)
-	char* c_lec = to_char_array(lec);
 	// Compiles the LEC string 
-	CLEC* clec = L_cc(c_lec);
+	std::shared_ptr<CLEC> clec = L_cc(lec);
 	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
 	// The CLEC object is modified (inplace) by L_link()
-	if(clec != NULL && L_link(global_ws_var, global_ws_scl, clec) == 0)
+	if(clec && L_link(global_ws_var, global_ws_scl, clec) == 0)
 	{
 		for (int t = t_first; t <= t_last; t++) 
 			var.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
-		delete clec;
 		return var;
 	}
 	else 
-	{
-		delete clec;
 		throw std::runtime_error("Calculate variable values: Cannot compute LEC expressions: '" + lec + "'");
-	}
 }
 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)

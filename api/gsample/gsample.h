@@ -159,7 +159,8 @@ int COL_exec(Table* tbl, int i, COLS* cls);
 extern bool debug_calc;
 
 inline void debug_calc_table(const COL* cl, const std::string& lec, const std::string& dlec, 
-    const CLEC* clec, const CLEC* dclec, const int line, const int d, const int j)
+    const std::shared_ptr<CLEC> clec, const std::shared_ptr<CLEC> dclec, const int line, 
+    const int d, const int j)
 {
     if(!debug_calc)
         return;

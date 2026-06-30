@@ -237,7 +237,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
  *  @return          double     result of the calculation 
  *                              IODE_NAN on error (and L_errno is set)
  */
-double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t)
+double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t)
 {
     if(!clec) 
         return IODE_NAN;
@@ -308,7 +308,7 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     if(lec == NULL || lec[0] == 0) 
         return vec;
     
-    CLEC* clec = L_cc(lec);
+    std::shared_ptr<CLEC> clec = L_cc(lec);
     if(clec != 0 && !L_link(dbv, dbs, clec)) 
     {
         int nb = dbv->get_sample()->nb_periods;
@@ -317,6 +317,5 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             vec[t] = L_exec(dbv, dbs, clec, t);
     }
 
-    delete clec;
     return vec;
 }
