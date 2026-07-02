@@ -6286,7 +6286,6 @@ class Variables(IodeDatabase):
         """
         cy_sample = self._cy_database.get_sample()
         if cy_sample is None:
-            warnings.warn("Variables sample has not been defined yet.")
             return None
         sample = Sample.from_cython_obj(cy_sample)
         return sample
