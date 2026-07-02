@@ -15,6 +15,7 @@ Contents
    lec_language
    iode_reports
    gui
+   methods_and_algorithms
    tutorial
    api_reports
    api_python
