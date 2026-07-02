@@ -116,7 +116,7 @@ The simulation results by period can be retrieved using the following functions:
 
 .. _upper:
 
-FUNCTION @UPPER
+FUNCTION @upper
 ~~~~~~~~~~~~~~~
 
 This function converts the text passed as an argument to uppercase.
@@ -135,7 +135,7 @@ Result::
 
 .. _lower:
 
-FUNCTION @LOWER
+FUNCTION @lower
 ~~~~~~~~~~~~~~~
 
 This function converts the text passed as an argument to lowercase.
@@ -154,7 +154,7 @@ Result::
 
 .. _replace:
 
-FUNCTION @REPLACE
+FUNCTION @replace
 ~~~~~~~~~~~~~~~~~
 
 This function replaces one string with another.
@@ -174,7 +174,7 @@ Result::
 
 .. _fmt:
 
-FUNCTION @FMT
+FUNCTION @fmt
 ~~~~~~~~~~~~~
 
 Formats an integer *val* according to a given format *fmt*.
@@ -202,7 +202,7 @@ Example::
 
 .. _take:
 
-FUNCTION @TAKE
+FUNCTION @take
 ~~~~~~~~~~~~~~
 
 Extracts the first *n* characters of a string.
@@ -224,7 +224,7 @@ Result::
 
 .. _drop:
 
-FUNCTION @DROP
+FUNCTION @drop
 ~~~~~~~~~~~~~~
 
 Removes the first *n* characters from a string.
@@ -246,7 +246,7 @@ Result::
 
 .. _count:
 
-FUNCTION @COUNT
+FUNCTION @count
 ~~~~~~~~~~~~~~~
 
 Returns the number of elements in a string (these elements are separated by commas ``,`` 
@@ -268,7 +268,7 @@ Result::
 
 .. _index:
 
-FUNCTION @INDEX
+FUNCTION @index
 ~~~~~~~~~~~~~~~
 
 Returns the nth element of an IODE list.
@@ -289,7 +289,7 @@ Result::
 
 .. _sqz:
 
-FUNCTION @SQZ
+FUNCTION @sqz
 ~~~~~~~~~~~~~
 
 Removes whitespaces from a string.
@@ -304,7 +304,7 @@ Example::
 
 .. _strip:
 
-FUNCTION @STRIP
+FUNCTION @strip
 ~~~~~~~~~~~~~~~
 
 Removes trailing whitespaces from a string.
@@ -319,7 +319,7 @@ Example::
 
 .. _ansi:
 
-FUNCTION @ANSI
+FUNCTION @ansi
 ~~~~~~~~~~~~~~
 
 This function converts a string encoded in ASCII to characters encoded in ANSI.
@@ -340,7 +340,7 @@ Result::
 
 .. _equal:
 
-FUNCTION @EQUAL
+FUNCTION @equal
 ~~~~~~~~~~~~~~~
 
 Checks if two values are identical.
@@ -362,7 +362,7 @@ Example::
 
 .. _void:
 
-FUNCTION @VOID(ARGS)
+FUNCTION @void(args)
 ~~~~~~~~~~~~~~~~~~~~
 
 Empties the text of its arguments, regardless of what the arguments are.
@@ -381,7 +381,7 @@ Result::
 
 .. _vtake:
 
-FUNCTION @VTAKE(N,VALUES)
+FUNCTION @vtake(n,values)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Keeps only the first *n* strings from *values*. If *n* is negative, keeps the last *n*.
@@ -420,14 +420,14 @@ Example::
 
 .. _vdrop:
 
-FUNCTION @VDROP(N,VALUES)
+FUNCTION @vdrop(n,values)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`@vtake <vtake>`.
 
 .. _vcount:
 
-FUNCTION @VCOUNT(N,VALUES)
+FUNCTION @vcount(n,values)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This function returns the number of elements in a list of strings.
@@ -446,7 +446,7 @@ See also :ref:`@vtake <vtake>`.
 
 .. _fdelete:
 
-FUNCTION @FDELETE
+FUNCTION @fdelete
 ~~~~~~~~~~~~~~~~~
 
 This function deletes a file. It does not return any result.
@@ -465,7 +465,7 @@ Result::
 
 .. _fappend:
 
-FUNCTION @FAPPEND
+FUNCTION @fappend
 ~~~~~~~~~~~~~~~~~
 
 This function appends strings to the content of an ASCII file.
@@ -496,8 +496,8 @@ Result::
 
 .. _getdir:
 
-FUNCTION @GETDIR ()
-~~~~~~~~~~~~~~~~~~~
+FUNCTION @getdir()
+~~~~~~~~~~~~~~~~~~
 
 Returns the current directory.
 
@@ -511,7 +511,7 @@ Result::
 
 .. _chdir:
 
-FUNCTION @CHDIR(DIRNAME)
+FUNCTION @chdir(dirname)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Changes the current directory to dirname and returns the new current directory.
@@ -528,7 +528,7 @@ Result::
 
 .. _mkdir:
 
-FUNCTION @MKDIR(DIRNAME)
+FUNCTION @mkdir(dirname)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creates a new directory named dirname.
@@ -548,7 +548,7 @@ Result::
 
 .. _rmdir:
 
-FUNCTION @RMDIR(DIRNAME)
+FUNCTION @rmdir(dirname)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Deletes the directory dirname.
@@ -561,7 +561,7 @@ Returns no value.
 
 .. _date:
 
-FUNCTION @DATE
+FUNCTION @date
 ~~~~~~~~~~~~~~
 
 This function returns the current date.
@@ -584,7 +584,7 @@ Result::
 
 .. _time:
 
-FUNCTION @TIME
+FUNCTION @time
 ~~~~~~~~~~~~~~
 
 This function returns the current time.
@@ -607,7 +607,7 @@ Result::
 
 .. _month:
 
-FUNCTION @MONTH
+FUNCTION @month
 ~~~~~~~~~~~~~~~
 
 This function returns the name of a month in a given language.
@@ -631,7 +631,7 @@ Result::
 
 .. _chronoreset:
 
-FUNCTION @CHRONORESET()
+FUNCTION @ChronoReset()
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 A timer has been added to allow calculation of processing durations.
@@ -640,7 +640,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _chronoget:
 
-FUNCTION @CHRONOGET()
+FUNCTION @ChronoGet()
 ~~~~~~~~~~~~~~~~~~~~~
 
 Returns the elapsed time (in milliseconds) since the last call to 
@@ -648,7 +648,7 @@ Returns the elapsed time (in milliseconds) since the last call to
 
 .. _cexpand:
 
-FUNCTION @CEXPAND
+FUNCTION @cexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE comments whose name matches one of the strings 
@@ -678,7 +678,7 @@ See also :ref:`@eexpand <eexpand>`, :ref:`@iexpand <iexpand>`, :ref:`@lexpand <l
 
 .. _eexpand:
 
-FUNCTION @EEXPAND
+FUNCTION @eexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of equations whose name matches one of the strings 
@@ -701,7 +701,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@iexpand <iexpand>`, :ref:`@lexpand <l
 
 .. _iexpand:
 
-FUNCTION @IEXPAND
+FUNCTION @iexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE identities whose name matches one of the strings 
@@ -724,7 +724,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@lexpand <l
 
 .. _lexpand:
 
-FUNCTION @LEXPAND
+FUNCTION @lexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE lists whose name matches one of the strings 
@@ -745,7 +745,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <i
 
 .. _sexpand:
 
-FUNCTION @SEXPAND
+FUNCTION @sexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE scalars whose name matches one of the strings 
@@ -766,7 +766,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <i
 
 .. _texpand:
 
-FUNCTION @TEXPAND
+FUNCTION @texpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE tables whose name matches one of the strings 
@@ -787,7 +787,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <i
 
 .. _vexpand:
 
-FUNCTION @VEXPAND
+FUNCTION @vexpand
 ~~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE variables whose name matches one of the strings 
@@ -808,7 +808,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <i
 
 .. _vliste:
 
-FUNCTION @VLISTE
+FUNCTION @vliste
 ~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE variables used in the equations whose names are 
@@ -828,7 +828,7 @@ See also :ref:`@sliste <sliste>`.
 
 .. _sliste:
 
-FUNCTION @SLISTE
+FUNCTION @sliste
 ~~~~~~~~~~~~~~~~
 
 This function returns the list of IODE scalars used in the equations whose names are 
@@ -848,7 +848,7 @@ See also :ref:`@vliste <vliste>`.
 
 .. _ttitle:
 
-FUNCTION @TTITLE
+FUNCTION @ttitle
 ~~~~~~~~~~~~~~~~
 
 This function returns the titles of the tables passed as arguments.
@@ -867,7 +867,7 @@ Result::
 
 .. _srelax:
 
-FUNCTION @SRELAX
+FUNCTION @srelax
 ~~~~~~~~~~~~~~~~
 
 This function returns the relaxation parameter values of the IODE scalars passed as arguments.
@@ -886,7 +886,7 @@ Result::
 
 .. _sstderr:
 
-FUNCTION @SSTDERR
+FUNCTION @sstderr
 ~~~~~~~~~~~~~~~~~
 
 This function returns the standard deviation values of the IODE scalars 
@@ -906,7 +906,7 @@ Result::
 
 .. _cvalue:
 
-FUNCTION @CVALUE
+FUNCTION @cvalue
 ~~~~~~~~~~~~~~~~
 
 This function returns the text of the comments whose names are passed as arguments.
@@ -925,7 +925,7 @@ Result::
 
 .. _vvalue:
 
-FUNCTION @VVALUE
+FUNCTION @vvalue
 ~~~~~~~~~~~~~~~~
 
 This function returns the formatted values of the variables whose names are 
@@ -945,7 +945,7 @@ Result::
 
 .. _sample:
 
-FUNCTION @Sample
+FUNCTION @sample
 ~~~~~~~~~~~~~~~~
 
 This function returns the current sample.
@@ -971,7 +971,7 @@ Result::
 
 .. _evalue:
 
-FUNCTION @EVALUE
+FUNCTION @evalue
 ~~~~~~~~~~~~~~~~
 
 This function returns the LEC formula defining an equation.
@@ -990,14 +990,14 @@ Result::
 
 .. _eqsample:
 
-FUNCTION @EQSample(EQNAME)
+FUNCTION @eqsample(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the estimation sample of the equation *eqname*.
 
 .. _eqsamplefrom:
 
-FUNCTION @EQSampleFROM(EQNAME)
+FUNCTION @eqsamplefrom(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the *FROM* part of the estimation sample.
@@ -1012,7 +1012,7 @@ Example::
 
 .. _eqsampleto:
 
-FUNCTION @EQSampleTO(EQNAME)
+FUNCTION @eqsampleto(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the *TO* part of the estimation sample.
@@ -1021,21 +1021,21 @@ See example in :ref:`@EqSampleFrom <eqsamplefrom>`.
 
 .. _eqlhs:
 
-FUNCTION @EQLHS(EQNAME)
+FUNCTION @eqlhs(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the left-hand side of an equation.
 
 .. _eqrhs:
 
-FUNCTION @EQRHS(EQNAME)
+FUNCTION @eqrhs(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the right-hand side of an equation.
 
 .. _sqlopen:
 
-FUNCTION @SQLOPEN
+FUNCTION @SqlOpen
 ~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1055,18 +1055,18 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
+     $show  ODBC-Database opened  
      ....  
      
      @SqlClose()  
  
 .. _sqlquery:
 
-FUNCTION @SQLQUERY
+FUNCTION @SqlQuery
 ~~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1091,19 +1091,19 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
-     $Show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
+     $show  ODBC-Database opened  
+     $show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
      ....  
      
      @SqlClose()  
  
 .. _sqlnext:
 
-FUNCTION @SQLNEXT
+FUNCTION @SqlNext
 ~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1125,22 +1125,22 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
-     $Show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
+     $show  ODBC-Database opened  
+     $show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
      @SqlNext()  
-     $Define BFLD @SqlField(0)  
+     $define BFLD @SqlField(0)  
      
      $label again_date  
-     $Show Skipping @SqlField(0)  
+     $show Skipping @SqlField(0)  
      $goto again_date, @SqlNext()  
-     $Define EFLD @SqlField(0)  
+     $define EFLD @SqlField(0)  
      
-     $Define BEGIN @replace(%BFLD%,/,Q)  
-     $Define END   @replace(%EFLD%,/,Q)  
+     $define BEGIN @replace(%BFLD%,/,Q)  
+     $define END   @replace(%EFLD%,/,Q)  
      
      $WsSample %BEGIN% %END%  
      ....  
@@ -1149,7 +1149,7 @@ Example::
  
 .. _sqlfield:
 
-FUNCTION @SQLFIELD
+FUNCTION @SqlField
 ~~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1170,22 +1170,22 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
-     $Show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
+     $show  ODBC-Database opened  
+     $show  @SqlQuery("SELECT DISTINCT TRIM FROM RSZ_bruto;")  
      @SqlNext()  
-     $Define BFLD @SqlField(0)  
+     $define BFLD @SqlField(0)  
      
      $label again_date  
-     $Show Skipping @SqlField(0)  
+     $show Skipping @SqlField(0)  
      $goto again_date, @SqlNext()  
-     $Define EFLD @SqlField(0)  
+     $define EFLD @SqlField(0)  
      
-     $Define BEGIN @replace(%BFLD%,/,Q)  
-     $Define END   @replace(%EFLD%,/,Q)  
+     $define BEGIN @replace(%BFLD%,/,Q)  
+     $define END   @replace(%EFLD%,/,Q)  
      
      $WsSample %BEGIN% %END%  
      ....  
@@ -1194,7 +1194,7 @@ Example::
  
 .. _sqlrecord:
 
-FUNCTION @SQLRECORD
+FUNCTION @SqlRecord
 ~~~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1219,21 +1219,21 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
+     $show  ODBC-Database opened  
      
-     $Define PIVOT RETOMA_DBF  
-     $Define PREP  RT  
+     $define PIVOT RETOMA_DBF  
+     $define PREP  RT  
      
      $Msg  NBCOLS @SqlQuery("TRANSFORM Sum(RSZ_bruto.%PIVOT%) AS AGGR SELECT 
      RSZ_bruto.CODRED, NaceTbl.NACE FROM NaceTbl INNER JOIN RSZ_bruto ON 
      NaceTbl.FICTIF=RSZ_bruto.FICTIF GROUP BY RSZ_bruto.CODRED, NaceTbl.NACE PIVOT 
      RSZ_bruto.TRIM;")
  
-     $Show  @SqlNext()  
+     $show  @SqlNext()  
      $label again  
      $DataUpdateVar %PREP%@SqlField(0)@SqlField(1) %BEGIN% @SqlRecord(2, 8)  
      $goto again, @SqlNext()  
@@ -1243,7 +1243,7 @@ Example::
  
 .. _sqlclose:
 
-FUNCTION @SQLCLOSE
+FUNCTION @SqlClose
 ~~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -1260,18 +1260,18 @@ Syntax::
 Example::
 
      $goto continue, @SqlOpen(RSZ)  
-     $Show  ODBC-Database not opened  
-     $Return  
+     $show  ODBC-Database not opened  
+     $return  
      
      $label continue  
-     $Show  ODBC-Database opened  
+     $show  ODBC-Database opened  
      ....  
      
      @SqlClose()  
 
 .. _simeps:
 
-FUNCTION @SIMEPS
+FUNCTION @simeps
 ~~~~~~~~~~~~~~~~
 
 Returns the value of the convergence criterion used for the last simulation.
@@ -1353,7 +1353,7 @@ Example::
 
 .. _simrelax:
 
-FUNCTION @SIMRELAX()
+FUNCTION @simrelax()
 ~~~~~~~~~~~~~~~~~~~~
 
 Returns the value of the relaxation parameter used for the last simulation.
@@ -1362,7 +1362,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _simmaxit:
 
-FUNCTION @SIMMAXIT()
+FUNCTION @simmaxit()
 ~~~~~~~~~~~~~~~~~~~~
 
 Returns the value of the maximum number of iterations used for the last simulation.
@@ -1371,7 +1371,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _simniter:
 
-FUNCTION @SIMNITER(Period)
+FUNCTION @simniter(period)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the number of iterations required to solve the model for year *period*.
@@ -1380,7 +1380,7 @@ See example in the function :ref:`@SimEps <simeps>`.
 
 .. _simnorm:
 
-FUNCTION @SIMNORM (Period)
+FUNCTION @simnorm (period)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the convergence threshold reached when solving the model for year *period*.
