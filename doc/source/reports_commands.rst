@@ -58,7 +58,7 @@ of a type recognized by IODE. The commands are as follows:
 
 .. _filelist:
 
-COMMAND FILELIST
+COMMAND FileList
 ^^^^^^^^^^^^^^^^
 
 .. warning:: 
@@ -67,7 +67,7 @@ COMMAND FILELIST
 
 .. _fileprint:
 
-COMMAND FILEPRINT
+COMMAND FilePrint
 ^^^^^^^^^^^^^^^^^
 
 This command allows the user to print a file. The file must be a text file.
@@ -89,7 +89,7 @@ Example::
 
 .. _fileedit:
 
-COMMAND FILEEDIT
+COMMAND FileEdit
 ^^^^^^^^^^^^^^^^
 
 .. warning:: 
@@ -98,10 +98,10 @@ COMMAND FILEEDIT
 
 .. _filedelete:
 
-COMMAND FILEDELETE XXX
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND FileDelete<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt,    eqs,    idt,    lst,    scl,    tbl,    var,  
     ac,     ae,     ai,     al,     as,     at,     av,  
@@ -132,10 +132,10 @@ Example::
 
 .. _filerename:
 
-COMMAND FILERENAME XXX
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND FileRename<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt,    eqs,    idt,    lst,    scl,    tbl,    var,  
     ac,     ae,     ai,     al,     as,     at,     av,  
@@ -162,10 +162,10 @@ Example::
 
 .. _filecopy:
 
-COMMAND FILECOPYXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND FileCopy<...>
+^^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt,    eqs,    idt,    lst,    scl,    tbl,    var,  
     ac,     ae,     ai,     al,     as,     at,     av,  
@@ -192,11 +192,11 @@ Example::
 
 .. _syscopyfile:
 
-COMMAND SYSCOPYFILE
+COMMAND SysCopyFile
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to copy any file on disk.
-Unlike the :ref:`FileCopyXxx <filecopy>` function, the extension can be anything.
+Unlike the :ref:`FileCopy<...> <filecopy>` function, the extension can be anything.
 
 .. warning:: 
 
@@ -216,11 +216,11 @@ Example::
 
 .. _sysmovefile:
 
-COMMAND SYSMOVEFILE
+COMMAND SysMoveFile
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to rename any file on disk.
-Unlike the :ref:`FileRenameXxx <filerename>` function, the extension can be anything.
+Unlike the :ref:`FileRename<...> <filerename>` function, the extension can be anything.
 
 .. warning::
 
@@ -241,11 +241,11 @@ Example::
 
 .. _sysdeletefile:
 
-COMMAND SYSDELETE FILE
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND SysDeleteFile
+^^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to delete any file on disk.
-Unlike the :ref:`FileDeleteXxx <filedelete>` function, the extension can be anything.
+Unlike the :ref:`FileDelete<...> <filedelete>` function, the extension can be anything.
 
 .. warning:: 
 
@@ -265,8 +265,8 @@ Example::
 
 .. _sysappendfile:
 
-COMMAND SYSAPPEND FILE
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND SysAppendFile
+^^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to append one file to another.
 If not possible, the function returns an error code.
@@ -288,8 +288,8 @@ Example::
 
 .. _fileimportvar:
 
-COMMAND FILEIMPORT VAR
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND FileImportVar
+^^^^^^^^^^^^^^^^^^^^^
 
 This function concerns the import of IODE variables in different formats such as
 ``DIF``, ``ASCII``, ``rotated ASCII``, ``DIF Belgostat``, ``TXT Belgostat``, ``PRN Aremos``
@@ -313,8 +313,8 @@ Example::
 
 .. _fileimportcmt:
 
-COMMAND FILEIMPORT CMT
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND FileImportCmt
+^^^^^^^^^^^^^^^^^^^^^
 
 This function concerns the import of IODE comments in different formats such as
 ``DIF``, ``ASCII``, ``rotated ASCII``, ``DIF Belgostat``, ``TXT Belgostat`` 
@@ -371,10 +371,10 @@ These functions allow the user to join, copy, load, and save workspaces:
 
 .. _wsload:
 
-COMMAND WSLOADXXX
-^^^^^^^^^^^^^^^^^
+COMMAND WsLoad<...>
+^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -386,8 +386,8 @@ The command parameter is the path to the file to load.
 
 Syntax::
 
-    $WsLoadXxx filename
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsLoad<...> filename
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -398,10 +398,10 @@ of the loaded file.
 
 .. _wscopy:
 
-COMMAND WSCOPYXXX
-^^^^^^^^^^^^^^^^^
+COMMAND WsCopy<...>
+^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -414,8 +414,8 @@ You pass as parameters the name of the workspace file on disk and the list of ob
 
 Syntax::
 
-    $WsCopyXxx file;file;... {object | list of objects}
-    where Xxx = cmt / eqs / idt / lst / scl / tbl  
+    $WsCopy<...> file;file;... {object | list of objects}
+    where <...> = cmt / eqs / idt / lst / scl / tbl  
 
 Example::
 
@@ -450,10 +450,10 @@ same as above, but for the entire sample of the file *maribel.var*.
 
 .. _wsmerge:
 
-COMMAND WSMERGEXXX
-^^^^^^^^^^^^^^^^^^
+COMMAND WsMerge<...>
+^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -464,8 +464,8 @@ The command parameter is the name of the file.
 
 Syntax::
 
-    $WsMergeXxx filename  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsMerge<...> filename  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -473,10 +473,10 @@ Example::
 
 .. _wsclear:
 
-COMMAND WScalarEARXXX
-^^^^^^^^^^^^^^^^^^
+COMMAND WsClear<...>
+^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -485,8 +485,8 @@ No parameter is required.
 
 Syntax::
 
-    $WsClearXxx  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsClear<...>  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -494,17 +494,17 @@ Example::
 
 .. _wsclearall:
 
-COMMAND WScalarEARALL
+COMMAND WsClearAll
 ^^^^^^^^^^^^^^^^^^
 
 Clear all workspaces.
 
 .. _wsdescr:
 
-COMMAND WSDESCRXXX
-^^^^^^^^^^^^^^^^^^
+COMMAND WsDescr<...>
+^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -515,8 +515,8 @@ You pass the file description as a parameter.
 
 Syntax::
 
-    $WsDescrXxx text  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsDescr<...> text  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -524,10 +524,10 @@ Example::
 
 .. _wssave:
 
-COMMAND WSSAVEXXX
-^^^^^^^^^^^^^^^^^
+COMMAND WsSave<...>
+^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -538,8 +538,8 @@ The command parameter is the name of the file to save.
 
 Syntax::
 
-    $WsSaveXxx filename  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsSave<...> filename  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -547,7 +547,7 @@ Example::
 
 .. _wssavecmp:
 
-COMMAND WSSAVECMP
+COMMAND WsSaveCmp
 ^^^^^^^^^^^^^^^^^
 
 The different workspaces can be compressed when saving them.
@@ -562,12 +562,12 @@ identical to :ref:`$WsSave <wssave>` except that it compresses the files when sa
 
 Syntax::
 
-    $WsSaveCmpXxx filename  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsSaveCmp<...> filename  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 .. _wssample:
 
-COMMAND WSSample
+COMMAND WsSample
 ^^^^^^^^^^^^^^^^
 
 This function allows the user to modify the sample of the IODE variables workspace.
@@ -585,7 +585,7 @@ Example::
 
 .. _wsextrapolate:
 
-COMMAND WSEXTRAPOLATE
+COMMAND WsExtrapolate
 ^^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to complete series using a chosen method based on previous periods.
@@ -617,7 +617,7 @@ Example::
 
 .. _wsltohstock:
 
-COMMAND WSLTOHSTOCK
+COMMAND WsLtoHStock
 ^^^^^^^^^^^^^^^^^^^
 
 Builds higher frequency series for stock-type data (Unemployment, Debt, ...).
@@ -653,7 +653,7 @@ Example::
 
 .. _wsltohflow:
 
-COMMAND WSLTOHFLOW
+COMMAND WsLtoHFlow
 ^^^^^^^^^^^^^^^^^^
 
 Builds higher frequency series for flow-type data (GDP, Deficit, ...).
@@ -689,7 +689,7 @@ Example::
 
 .. _wshtolsum:
 
-COMMAND WSHTOLSUM
+COMMAND WsHtoLSum
 ^^^^^^^^^^^^^^^^^
 
 Builds lower frequency series by summing the sub-periods.
@@ -721,7 +721,7 @@ Example::
 
 .. _wshtolmean:
 
-COMMAND WSHTOLMEAN
+COMMAND WsHtoLMean
 ^^^^^^^^^^^^^^^^^^
 
 Builds lower frequency series by taking the mean of the sub-periods.
@@ -754,7 +754,7 @@ Example::
 
 .. _wshtollast:
 
-COMMAND WSHTOLLAST
+COMMAND WsHtoLLast
 ^^^^^^^^^^^^^^^^^^
 
 Builds lower frequency series by taking the last observation of the sub-periods.
@@ -787,7 +787,7 @@ Example::
 
 .. _wsseasonadj:
 
-COMMAND WSSEASONADJ
+COMMAND WsSeasonAdj
 ^^^^^^^^^^^^^^^^^^^
 
 Builds seasonally adjusted series using the ``Census XI`` method, as well as the 
@@ -819,7 +819,7 @@ See also :ref:`$WsSeasAdj <wsseasadj>`.
 
 .. _wsseasadj:
 
-COMMAND WSSEASADJ
+COMMAND WsSeasAdj
 ^^^^^^^^^^^^^^^^^
 
 This function is identical to :ref:`$WsSeasAdj <wsseasadj>` except that it allows you 
@@ -832,7 +832,7 @@ Syntax::
 
 .. _wstrend:
 
-COMMAND WSTREND
+COMMAND WsTrend
 ^^^^^^^^^^^^^^^
 
 Implementation of the Hodrick-Prescott method for constructing trend series.
@@ -845,10 +845,10 @@ Syntax::
 
 .. _wsimport:
 
-COMMAND WSIMPORTXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND WsImport<...>
+^^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -861,8 +861,8 @@ You pass the name of the file to load as a parameter to the command.
 
 Syntax::
 
-    $WsImportXxx filename
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsImport<...> filename
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -873,22 +873,22 @@ by that of the loaded file.
 
 .. _wsexport:
 
-COMMAND WSEXPORTXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND WsExport<...>
+^^^^^^^^^^^^^^^^^^^^^
 
-*XXX* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
-This function performs the inverse operation of the :ref:`$WsImportXxx <wsimport>` 
+This function performs the inverse operation of the :ref:`$WsImport<...> <wsimport>` 
 function: it saves the current state of the workspace to disk in ASCII format.
 
 You pass the name of the file to save as a parameter to the command.
 
 Syntax::
 
-    $WsExportXxx filename  
-    where Xxx = cmt / eqs / idt / lst / scl / tbl / var
+    $WsExport<...> filename  
+    where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
 Example::
 
@@ -896,7 +896,7 @@ Example::
 
 .. _wsimporteviews:
 
-COMMAND WSIMPORTEVIEWS
+COMMAND WsImportEviews
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Extraction of equations, scalars and identities from E-Views export data.
@@ -1018,10 +1018,10 @@ delete, rename, print, etc., the data of a workspace:
 - :ref:`datarename <datarename>` : renames an object (cmt / eqs / idt / lst / scl / tbl / var)
 - :ref:`datasearch <datasearch>` : searches for an object cmt / eqs / idt / lst / scl / tbl / var
 - :ref:`datascan <datascan>` : scans the objects eqs / idt / tbl
-- :ref:`datalistXxx <datalist>` : creates a list of objects whose names match a given criterion cmt / eqs / idt / lst / scl / tbl / var
+- :ref:`datalist<...> <datalist>` : creates a list of objects whose names match a given criterion cmt / eqs / idt / lst / scl / tbl / var
 - :ref:`datalistsort <datalistsort>` : sorts a list in alphabetical order
 - :ref:`datacompareEps <datacompareeps>` : sets the equality threshold for variable comparison
-- :ref:`datacompareXxx <datacompare>` : compares the workspace and a file and creates lists
+- :ref:`datacompare<...> <datacompare>` : compares the workspace and a file and creates lists
 - :ref:`datacalclst <datacalclst>` : performs logical operations on lists
 - :ref:`datacalcvar <datacalcvar>` : calculates a variable based on a LEC expression
 - :ref:`datadisplaygraph <datadisplaygraph>` : displays a graph based on series (without a table)
@@ -1035,15 +1035,15 @@ delete, rename, print, etc., the data of a workspace:
 - :ref:`datandecscl <datandecscl>` : sets the number of decimals for editing scalars
 - :ref:`dataeditcnf <dataeditcnf>` : changes the editing options for variables
 - :ref:`datarasvar <datarasvar>` : RAS method for completing a matrix of series
-- :ref:`datapatternXXX <datapattern>` : creates lists of names from a pattern
+- :ref:`datapattern<...> <datapattern>` : creates lists of names from a pattern
 
 
 .. _datacreate:
 
-COMMAND DATACREATEXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataCreate<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1064,10 +1064,10 @@ Syntax::
 
 .. _datadelete:
 
-COMMAND DATADELETEXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataDelete<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1084,10 +1084,10 @@ Syntax::
 
 .. _dataexist:
 
-COMMAND DATAEXISTXXX
-^^^^^^^^^^^^^^^^^^^^
+COMMAND DataExist<...>
+^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1096,18 +1096,18 @@ If the object *name* does not exist, the function returns and signals an error.
 
 Syntax::
 
-    $DataDeleteVar name
+    $DataExistVar name
 
 .. _dataedit:
 
-COMMAND DATAEDITXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND DataEdit<...>
+^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
 
     OBSOLETE
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1133,15 +1133,15 @@ If the list is empty (no argument), all objects appear in the editing table.
 
 Syntax::
 
-    #DataEditXxx [object [list of objects]]  
-    {Xxx = cmt / eqs / idt / lst / scl / tbl / var}
+    #DataEdit<...> [object [list of objects]]  
+    {<...> = cmt / eqs / idt / lst / scl / tbl / var}
 
 .. _dataupdate:
 
-COMMAND DATAUPDATEXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataUpdate<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1229,10 +1229,10 @@ Syntax::
 
 .. _dataappend:
 
-COMMAND DATAAPPENDXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataAppend<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1257,17 +1257,17 @@ Syntax::
 
 .. _dataduplicate:
 
-COMMAND DATADUPLICATEXXX
-^^^^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataDuplicate<...>
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / idt / lst / scl / tbl / var
 
 Objects defined in the current workspaces can be copied to objects of the same 
 type but with a different name.
 
-The `$DataDuplicateXxx` command takes two parameters in succession: the old and 
+The `$DataDuplicate<...>` command takes two parameters in succession: the old and 
 the new object name.
 
 Syntax::
@@ -1285,10 +1285,10 @@ which makes no sense.
 
 .. _datarename:
 
-COMMAND DATARENAMEXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataRename<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / idt / lst / scl / tbl / var
 
@@ -1309,10 +1309,10 @@ which makes no sense.
 
 .. _datasearch:
 
-COMMAND DATASEARCHXXX
-^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataSearch<...>
+^^^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::
+*<...>* takes one of the following values::
 
     cmt / eqs / idt / lst / scl / tbl / var
 
@@ -1333,7 +1333,7 @@ The search differs depending on the type of object:
 
 Syntax::
 
-    $DataSearchXxx mask word ecase in_name in_formula in_text list_result  
+    $DataSearch<...> mask word ecase in_name in_formula in_text list_result  
 
     (word, ecase, in_name, in_formula, in_text := 0 or 1)  
     (mask := characters and possibly ?, *, ...)  
@@ -1365,10 +1365,10 @@ Example::
 
 .. _datascan:
 
-COMMAND DATASCANXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND DataScan<...>
+^^^^^^^^^^^^^^^^^^^^^
 
-*Xxx* takes one of the following values::    
+*<...>* takes one of the following values::    
 
     eqs / idt / tbl
 
@@ -1386,8 +1386,8 @@ Syntax::
 
 .. _datalist:
 
-COMMAND DATALISTXXX
-^^^^^^^^^^^^^^^^^^^
+COMMAND DataList<...>
+^^^^^^^^^^^^^^^^^^^^^
 
 This function builds a list of object names based on a selection criterion (pattern) 
 applied to the names. It can operate on objects in a workspace or on objects in a file. 
@@ -1399,7 +1399,7 @@ The second is the pattern. The third (optional) is the name of the file.
 
 Syntax::
 
-    $DataListXxx listname pattern [filename]
+    $DataList<...> listname pattern [filename]
 
 Example::
 
@@ -1410,7 +1410,7 @@ AX1BEL, BEL1, MIRABELLE, etc.
 
 .. _datalistsort:
 
-COMMAND DATALISTSORT
+COMMAND DataListSort
 ^^^^^^^^^^^^^^^^^^^^
 
 This function performs an alphanumeric sort on the contents of a list.
@@ -1424,7 +1424,7 @@ Syntax::
 
 .. _datacompareeps:
 
-COMMAND DATACOMPAREEPS
+COMMAND DataCompareEps
 ^^^^^^^^^^^^^^^^^^^^^^
 
 This function sets the threshold below which the variable equality test is 
@@ -1443,8 +1443,8 @@ The comparison threshold is set to 1e-7 by default.
 
 .. _datacompare:
 
-COMMAND DATACOMPAREXXX
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataCompare<...>
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 The contents of the current workspace can be compared to those of a file.
 The result of this comparison consists of 4 lists:
@@ -1458,7 +1458,7 @@ The function takes 5 parameters: the file to compare and the 4 lists to build.
 
 Syntax::
 
-    $DataCompareXxx filename ONE TWO THREE FOR  
+    $DataCompare<...> filename ONE TWO THREE FOR  
 
     ONE    in workspace only  
     TWO    in file only  
@@ -1471,7 +1471,7 @@ Example::
 
 .. _datacalclst:
 
-COMMAND DATACALCLST
+COMMAND DataCalcLst
 ^^^^^^^^^^^^^^^^^^^
 
 This function calculates a list based on two lists by taking their union, 
@@ -1499,7 +1499,7 @@ generates the IODE list `_RES` of names present in both *LST1* and *LST2*.
 
 .. _datacalcvar:
 
-COMMAND DATACALCVAR
+COMMAND DataCalcVar
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to calculate a new series from a LEC formula.
@@ -1521,7 +1521,7 @@ Example::
 
 .. _datadisplaygraph:
 
-COMMAND DATADISPLAYGRAPH
+COMMAND DataDisplayGraph
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to display series as a graph.
@@ -1559,7 +1559,7 @@ where:
 
 .. _datasavegraph:
 
-COMMAND DATASAVEGRAPH
+COMMAND DataSaveGraph
 ^^^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to build graphs from series and save the result in an AGL file.
@@ -1598,7 +1598,7 @@ where:
  
 .. _datawidthvar:
 
-COMMAND DATAWIDTHVAR
+COMMAND DataWidthVar
 ^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -1615,7 +1615,7 @@ Syntax::
 
 .. _datandecvar:
 
-COMMAND DATANDECVAR
+COMMAND DataNdecVar
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify the number of decimals when editing statistical series. 
@@ -1628,7 +1628,7 @@ Syntax::
 
 .. _datamodevar:
 
-COMMAND DATAMODEVAR
+COMMAND DataModeVar
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to choose the editing mode for statistical series: Level, 
@@ -1643,7 +1643,7 @@ Syntax::
 
 .. _datastartvar:
 
-COMMAND DATASTARTVAR
+COMMAND DataStartVar
 ^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -1660,7 +1660,7 @@ Syntax::
 
 .. _datawidthtbl:
 
-COMMAND DATAWIDTHTBL
+COMMAND DataWidthTbl
 ^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -1675,8 +1675,8 @@ Syntax::
     $DataWidthTbl n
     n between 2 and 60
 
-COMMAND DATAWIDTHScalar
-^^^^^^^^^^^^^^^^^^^^
+COMMAND DataNdecScl
+^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify the number of decimals when editing scalars.
 The value must be between -1 (variable number of decimals) and 6.
@@ -1688,7 +1688,7 @@ Syntax::
 
 .. _dataeditcnf:
 
-COMMAND DATAEDITCNF
+COMMAND DataEditCnf
 ^^^^^^^^^^^^^^^^^^^
 
 This function allows the user to change the display mode of the series table to ``Level`` 
@@ -1707,7 +1707,7 @@ Syntax::
 
 .. _datarasvar:
 
-COMMAND DATARASVAR
+COMMAND DataRasVar
 ^^^^^^^^^^^^^^^^^^
 
 Starting from the values of variables matching the pattern, the values are distributed 
@@ -1754,14 +1754,14 @@ the unknown values with `NA` (Not Available).
 
 .. _datapattern:
 
-COMMAND DATAPATTERNXXX
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND DataPattern<...>
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 This function creates lists containing the names of objects that match a given pattern.
 
 Syntax::
 
-    $DataPatternXXX list pattern X_dimension [Y_dimension]
+    $DataPattern<...> list pattern X_dimension [Y_dimension]
 
 where:
 
@@ -1807,7 +1807,7 @@ The following commands allow you to modify estimation parameters and estimate eq
 
 .. _eqsestimate:
 
-COMMAND EQSESTIMATE
+COMMAND EqsEstimate
 ^^^^^^^^^^^^^^^^^^^
 
 This function estimates an equation or a block of equations.
@@ -1839,8 +1839,8 @@ These scalars have the following names (``e0_*`` for the first equation in the b
 
 The calculated series are also saved:
 
-- ``_YCALC0`` for the right-hand side of the first equation in the block,
-  ``_YCALC1`` for the second equation, etc.
+- ``_YCalc0`` for the right-hand side of the first equation in the block,
+  ``_YCalc1`` for the second equation, etc.
 - ``_YOBS0`` for the left-hand side of the first equation in the block,
   ``_YOBS1`` for the second equation, etc.
 - ``_YRES0`` for the residuals of the first equation in the block, ...
@@ -1849,7 +1849,7 @@ Outside the estimation sample, the values of the series are `NA` (Not Available)
 
 .. _eqsstepwise:
 
-COMMAND EQSSTEPWISE
+COMMAND EqsStepWise
 ^^^^^^^^^^^^^^^^^^^
 
 This function estimates a block of equations and searches for the best possible tests 
@@ -1864,7 +1864,7 @@ Syntax::
 
 .. _eqssetcmt:
 
-COMMAND EQSSETCMT
+COMMAND EqsSetCmt
 ^^^^^^^^^^^^^^^^^
 
 This function sets the comment for an equation.
@@ -1886,7 +1886,7 @@ Example::
 
 .. _eqssetsample:
 
-COMMAND EQSSETSample
+COMMAND EqsSetSample
 ^^^^^^^^^^^^^^^^^^^^
 
 This function sets the estimation period for a list of equations.
@@ -1911,7 +1911,7 @@ Example::
 
 .. _eqssetmethod:
 
-COMMAND EQSSETMETHOD
+COMMAND EqsSetMethod
 ^^^^^^^^^^^^^^^^^^^^
 
 This function sets the estimation method for a list of equations.
@@ -1942,7 +1942,7 @@ Example::
 
 .. _eqssetinstrs:
 
-COMMAND EQSSETINSTRS
+COMMAND EqsSetInstrs
 ^^^^^^^^^^^^^^^^^^^^
 
 This function sets the instruments to be used for estimating an equation.
@@ -1967,7 +1967,7 @@ Example::
 
 .. _eqssetbloc:
 
-COMMAND EQSSETBLOC
+COMMAND EqsSetBloc
 ^^^^^^^^^^^^^^^^^^
 
 This function sets the estimation block for a list of equations.
@@ -2037,7 +2037,7 @@ The following commands are used to configure the printer or the output file for 
 
 .. _printdest:
 
-COMMAND PRINTDEST
+COMMAND PrintDest
 ^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify whether to print to a file and, if so, the name and 
@@ -2064,7 +2064,7 @@ Example::
 
 .. _printdestnew:
 
-COMMAND PRINTDESTNEW
+COMMAND PrintDestNew
 ^^^^^^^^^^^^^^^^^^^^
 
 This function is identical to :ref:`$PrintDest <printdest>`, except that it deletes 
@@ -2082,7 +2082,7 @@ If ``filename`` is not specified, printing will be sent to a printer.
 
 .. _printnbdec:
 
-COMMAND PRINTNBDEC
+COMMAND PrintNbDec
 ^^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify the number of decimals to print when printing tables 
@@ -2106,7 +2106,7 @@ Example::
 
 .. _printlang:
 
-COMMAND PRINTLANG
+COMMAND PrintLang
 ^^^^^^^^^^^^^^^^^
 
 This function allows the user to specify the print language when printing tables. 
@@ -2132,7 +2132,7 @@ Example::
 
 .. _printa2mappend:
 
-COMMAND PRINTA2MAPPEND
+COMMAND PrintA2mAppend
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Allows the user not to clear the a2m file before printing. 
@@ -2154,7 +2154,7 @@ and do not clear this file.
 
 .. _printfont:
 
-COMMAND PRINTFONT
+COMMAND PrintFont
 ^^^^^^^^^^^^^^^^^
 
 Sets the font for printing text paragraphs. In addition to the family, the base size 
@@ -2184,7 +2184,7 @@ tit_1 to 14 points, and tit_0 to 18 points.
 
 .. _printtablefont:
 
-COMMAND PRINTTABLEFONT
+COMMAND PrintTableFont
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the font for tables only. This font can therefore be different from that of the rest 
@@ -2209,7 +2209,7 @@ Sets the font for all tables to Palatino, 8 points.
 
 .. _printtablebox:
 
-COMMAND PRINTTABLEBOX
+COMMAND PrintTableBox
 ^^^^^^^^^^^^^^^^^^^^^
 
 Sets the border width of tables in points. This value can be zero to avoid borders.
@@ -2229,7 +2229,7 @@ Removes the border from tables.
 
 .. _printtablecolor:
 
-COMMAND PRINTTABLECOLOR
+COMMAND PrintTableColor
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Allows the user to use or not use color in tables.
@@ -2249,7 +2249,7 @@ Removes color from table printing.
 
 .. _printtablewidth:
 
-COMMAND PRINTTABLEWIDTH
+COMMAND PrintTableWidth
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the width of tables in Frame and Rtf. The parameters must be expressed in mm. 
@@ -2272,7 +2272,7 @@ Example::
 
 .. _printtablebreak:
 
-COMMAND PRINTTABLEBREAK
+COMMAND PrintTableBreak
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Allows or disallows tables to be split across multiple pages: if a table is placed on the page 
@@ -2293,7 +2293,7 @@ Table splitting is allowed during printing.
 
 .. _printtablepage:
 
-COMMAND PRINTTABLEPAGE
+COMMAND PrintTablePage
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Forces a page break before each table.
@@ -2313,7 +2313,7 @@ Forces a page break for each table.
 
 .. _printbackground:
 
-COMMAND PRINTBACKGROUND
+COMMAND PrintBackground
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the background color (tables and charts). A table will be hatched if the value of 
@@ -2335,7 +2335,7 @@ The color of the hatched background in charts and tables is set to blue.
 
 .. _printgraphbox:
 
-COMMAND PRINTGRAPHBOX
+COMMAND PrintGraphBox
 ^^^^^^^^^^^^^^^^^^^^^
 
 Sets the border width of charts in points.
@@ -2355,7 +2355,7 @@ Subsequent charts will have a thick border.
 
 .. _printgraphbrush:
 
-COMMAND PRINTGRAPHBRUSH
+COMMAND PrintGraphBrush
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the background density of charts. The value is expressed as a percentage.
@@ -2375,7 +2375,7 @@ The density of the hatch "brush" is set to 10%. The color is determined by the $
 
 .. _printgraphsize:
 
-COMMAND PRINTGRAPHSIZE
+COMMAND PrintGraphSize
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the size of charts in mm and the font size used.
@@ -2397,7 +2397,7 @@ Subsequent charts will occupy a frame of 15 cm by 6 cm and the text will be 8 po
 
 .. _printgraphpage:
 
-COMMAND PRINTGRAPHPAGE
+COMMAND PrintGraphPage
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Forces a page break before each chart.
@@ -2417,7 +2417,7 @@ Each subsequent chart will be placed at the beginning of a page.
 
 .. _printrtfhelp:
 
-COMMAND PRINTRTFHELP
+COMMAND PrintRtfHelp
 ^^^^^^^^^^^^^^^^^^^^
 
 Generates an RTF file for Windows help. This file can then be compiled using Microsoft's 
@@ -2438,7 +2438,7 @@ The next file defined by $PrintDest ... RTF will be of the Windows Help type.
 
 .. _printrtftopic:
 
-COMMAND PRINTRTFTOPIC
+COMMAND PrintRtfTopic
 ^^^^^^^^^^^^^^^^^^^^^
 
 Creates a new topic for a Windows help file (or a2m). 
@@ -2466,7 +2466,7 @@ generate a title when printed.
 
 .. _printrtflevel:
 
-COMMAND PRINTRTFLEVEL
+COMMAND PrintRtfLevel
 ^^^^^^^^^^^^^^^^^^^^^
 
 Changes the hierarchical level of the following topics. 
@@ -2486,7 +2486,7 @@ in the generated table of contents.
 
 .. _printrtftitle:
 
-COMMAND PRINTRTFTITLE
+COMMAND PrintRtfTitle
 ^^^^^^^^^^^^^^^^^^^^^
 
 Sets the title of the Windows help file.
@@ -2501,7 +2501,7 @@ Example::
 
 .. _printrtfcopyright:
 
-COMMAND PRINTRTFCOPYRIGHT
+COMMAND PrintRtfCopyright
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the copyright text for Windows help. 
@@ -2517,7 +2517,7 @@ Example::
 
 .. _printhtmlhelp:
 
-COMMAND PRINTHTMLHELP
+COMMAND PrintHtmlHelp
 ^^^^^^^^^^^^^^^^^^^^^
 
 Specifies that the next generation of Html file should be for Windows HtmlHelp. 
@@ -2534,7 +2534,7 @@ Example::
 
 .. _printhtmlstrip:
 
-COMMAND PRINTHTMLSTRIP
+COMMAND PrintHtmlStrip
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Specifies that the next generation of Html file should not include the HTML header and 
@@ -2553,7 +2553,7 @@ Example::
 
 .. _printparanum:
 
-COMMAND PRINTPARANUM
+COMMAND PrintParanum
 ^^^^^^^^^^^^^^^^^^^^
 
 Allows numbering of headings when printing (1., 1.1, ...).
@@ -2575,7 +2575,7 @@ Removes automatic numbering of headings.
 
 .. _printpageheader:
 
-COMMAND PRINTPAGEHEADER
+COMMAND PrintPageHeader
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the title of printed pages. The characters %d are replaced by the current page number.
@@ -2590,7 +2590,7 @@ Example::
 
 .. _printpagefooter:
 
-COMMAND PRINTPAGEFOOTER
+COMMAND PrintPageFooter
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the footnote of printed pages. 
@@ -2606,7 +2606,7 @@ Example::
 
 .. _setprinter:
 
-COMMAND SETPRINTER
+COMMAND SetPrinter
 ^^^^^^^^^^^^^^^^^^
 
 Sets the default Windows printer for subsequent print jobs.
@@ -2621,7 +2621,7 @@ Example::
 
 .. _printorientation:
 
-COMMAND PRINTORIENTATION
+COMMAND PrintOrientation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the orientation of the current Windows printer.
@@ -2636,7 +2636,7 @@ Example::
 
 .. _printduplex:
 
-COMMAND PRINTDUPLEX
+COMMAND PrintDuplex
 ^^^^^^^^^^^^^^^^^^^
 
 Sets the duplex (double-sided) mode of the current Windows printer.
@@ -2651,7 +2651,7 @@ Example::
 
 .. _printgifbackcolor:
 
-COMMAND PRINTGIFBACKCOLOR
+COMMAND PrintGIFBackColor
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the background color of GIF charts generated when creating an HTML document.
@@ -2666,7 +2666,7 @@ Example::
 
 .. _printgiftranscolor:
 
-COMMAND PRINTGIFTRANSCOLOR
+COMMAND PrintGIFTransColor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the color considered as "transparent" in GIF files generated when creating an 
@@ -2683,7 +2683,7 @@ Example::
 
 .. _printgiftransparent:
 
-COMMAND PRINTGIFTRANSPARENT
+COMMAND PrintGIFTransparent
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Indicates whether GIF files generated when creating an HTML document should be 
@@ -2700,7 +2700,7 @@ Example::
 
 .. _printgifinterlaced:
 
-COMMAND PRINTGIFINTERLACED
+COMMAND PrintGIFInterlaced
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Indicates whether GIF files generated when creating an HTML document should be in 
@@ -2716,7 +2716,7 @@ Example::
 
 .. _printgiffilled:
 
-COMMAND PRINTGIFFILLED
+COMMAND PrintGIFFilled
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Indicates whether to fill bars in bar charts of GIF graphics.
@@ -2731,7 +2731,7 @@ Example::
 
 .. _printgiffont:
 
-COMMAND PRINTGIFFONT
+COMMAND PrintGIFFont
 ^^^^^^^^^^^^^^^^^^^^
 
 Specifies the font to use when creating GIF graphics. 
@@ -2766,10 +2766,10 @@ The following commands are used to print object definitions:
 
 .. _printobjdef:
 
-COMMAND PRINTOBJDEFXXX
-^^^^^^^^^^^^^^^^^^^^^^
+COMMAND PrintObjDef<...>
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-Xxx takes one of the following values:
+<...> takes one of the following values:
     cmt / eqs / idt / lst / scl / tbl / var
 
 This command prints the definition of objects from the current workspace in A2M format.
@@ -2778,8 +2778,8 @@ The list of comments to print is passed as a parameter to the command.
 
 Syntax::
 
-    $PrintObjDefXxx [list of parameters]  
-    where Xxx = {cmt / idt / lst / scl / tbl / var}
+    $PrintObjDef<...> [list of parameters]  
+    where <...> = {cmt / idt / lst / scl / tbl / var}
 
 Example::
 
@@ -2787,7 +2787,7 @@ Example::
 
 .. _printobjtitle:
 
-COMMAND PRINTOBJTITLE
+COMMAND PrintObjTitle
 ^^^^^^^^^^^^^^^^^^^^^
 
 This function is used before :ref:`$PrintObjDefTbl <printobjdeftbl>`.
@@ -2800,10 +2800,10 @@ Syntax
 
 .. _printobjlec:
 
-COMMAND PRINTOBJLEC
+COMMAND PrintObjLec
 ^^^^^^^^^^^^^^^^^^^
 
-This function is used before :ref:`$PrintObjDefXxx <printobjdef>`.
+This function is used before :ref:`$PrintObjDef<...> <printobjdef>`.
 It indicates how equations should be printed: as is, with coefficients replaced 
 by their values, or with t-tests.
 
@@ -2815,7 +2815,7 @@ Syntax
 
 .. _printobjinfos:
 
-COMMAND PRINTOBJINFOS
+COMMAND PrintObjInfos
 ^^^^^^^^^^^^^^^^^^^^^
 
 This function is used before :ref:`$PrintObjDefEqs <printobjdefeqs>`.
@@ -2851,7 +2851,7 @@ The following commands are used to compile tables and print or view them:
 
 .. _printtblfile:
 
-COMMAND PRINTTBLFILE
+COMMAND PrintTblFile
 ^^^^^^^^^^^^^^^^^^^^
 
 This command allows you to define the files to use when printing a comparison table 
@@ -2886,7 +2886,7 @@ There can be no space in the sample statement.
 
 .. _printtbl:
 
-COMMAND PRINTTBL
+COMMAND PrintTbl
 ^^^^^^^^^^^^^^^^
 
 This command allows you to build and print tables in A2M format.
@@ -2936,7 +2936,7 @@ Example::
     
 .. _viewtblfile:
 
-COMMAND VIEWTBLFILE
+COMMAND ViewTblFile
 ^^^^^^^^^^^^^^^^^^^
 
 This command allows you to define the files to use when viewing a comparison table 
@@ -2966,7 +2966,7 @@ After a call to :ref:`$ViewTbl <viewtbl>`, you must redefine the files to compar
 
 .. _viewtbl:
 
-COMMAND VIEWTBL
+COMMAND ViewTbl
 ^^^^^^^^^^^^^^^
 
 This function builds and displays tables in a scrollable table (or editing table).
@@ -2988,14 +2988,14 @@ $ViewTbl 90:6 CIIIR0 CIIR
 
 .. _viewbytbl:
 
-COMMAND VIEWBYTBL
+COMMAND ViewByTbl
 ^^^^^^^^^^^^^^^^^
 
 Alias for the :ref:`$ViewTbl <viewtbl>` command.
 
 .. _printvar:
 
-COMMAND PRINTVAR
+COMMAND PrintVar
 ^^^^^^^^^^^^^^^^
 
 This command allows the user to build and print comparison tables of series in A2M format. 
@@ -3017,7 +3017,7 @@ Example::
 
 .. _viewvar:
 
-COMMAND VIEWVAR
+COMMAND ViewVar
 ^^^^^^^^^^^^^^^
 
 This command allows you to view comparison tables of series in A2M format.
@@ -3039,7 +3039,7 @@ Example::
 
 .. _viewwidth:
 
-COMMAND VIEWWIDTH
+COMMAND ViewWidth
 ^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3056,7 +3056,7 @@ Syntax::
 
 .. _viewwidth0:
 
-COMMAND VIEWWIDTH0
+COMMAND ViewWidth0
 ^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3073,7 +3073,7 @@ Syntax::
 
 .. _viewndec:
 
-COMMAND VIEWNDEC
+COMMAND ViewNdec
 ^^^^^^^^^^^^^^^^
 
 This function allows you to specify the number of decimals for values displayed 
@@ -3100,7 +3100,7 @@ in an A2M file:
 
 .. _viewgr:
 
-COMMAND VIEWGR
+COMMAND ViewGr
 ^^^^^^^^^^^^^^
 
 This command allows you to display tables as graphs. 
@@ -3122,7 +3122,7 @@ as two separate graphs.
 
 .. _printgrall:
 
-COMMAND PRINTGRALL
+COMMAND PrintGrAll
 ^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3132,7 +3132,7 @@ COMMAND PRINTGRALL
 
 .. _printgrwin:
 
-COMMAND PRINTGRWIN
+COMMAND PrintGrWin
 ^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3141,7 +3141,7 @@ COMMAND PRINTGRWIN
 
 .. _printgrdata:
 
-COMMAND PRINTGRDATA
+COMMAND PrintGrData
 ^^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3150,7 +3150,7 @@ COMMAND PRINTGRDATA
 
 .. _printgr:
 
-COMMAND PRINTGR
+COMMAND PrintGr
 ^^^^^^^^^^^^^^^
 
 This command prints one or more graphs defined from tables.
@@ -3165,7 +3165,7 @@ Example::
 
 .. _dataprintgraph:
 
-COMMAND DATAPRINTGRAPH
+COMMAND DataPrintGraph
 ^^^^^^^^^^^^^^^^^^^^^^
 
 This command prints graphs built directly from variables (without using tables). 
@@ -3202,7 +3202,7 @@ recompile equations:
 
 .. _modelcalcscc:
 
-COMMAND MODELCALCSCC
+COMMAND ModelCalcSCC
 ^^^^^^^^^^^^^^^^^^^^
 
 This function decomposes the model into Strongly Connected Components (SCC) and reorders it.
@@ -3238,7 +3238,7 @@ The number of passes of the sorting algorithm can be specified in several places
 
 .. _modelsimulateparms:
 
-COMMAND MODELSIMULATEPARMS
+COMMAND ModelSimulateParms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command allows you to specify additional (mainly technical) parameters for a simulation. 
@@ -3303,7 +3303,7 @@ After decomposition into SCC, the interdependent block is sorted to increase sim
 
 .. _modelsimulate:
 
-COMMAND MODELSIMULATE
+COMMAND ModelSimulate
 ^^^^^^^^^^^^^^^^^^^^^
 
 This function launches the simulation of a model.
@@ -3332,12 +3332,12 @@ Example::
     $show test1  
     $modelsimulate 1990Y1 1995Y1 PC0 PIF  
     $show test2  
-    $modelsimulate 1990Y1 1995Y1 $LIST  
+    $modelsimulate 1990Y1 1995Y1 $List  
     $show end of report
 
 .. _modelsimulatescc:
 
-COMMAND MODELSIMULATESCC
+COMMAND ModelSimulateSCC
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command launches the simulation of a model previously decomposed into SCC and sorted.
@@ -3361,7 +3361,7 @@ where:
 
 .. _modelexchange:
 
-COMMAND MODELEXCHANGE
+COMMAND ModelExchange
 ^^^^^^^^^^^^^^^^^^^^^
 
 This command allows you to define or cancel endogenous-exogenous exchanges before 
@@ -3380,7 +3380,7 @@ To cancel the ENDO-EXO exchange, simply call the command without parameters::
 
 .. _modelcompile:
 
-COMMAND MODELCOMPILE
+COMMAND ModelCompile
 ^^^^^^^^^^^^^^^^^^^^
 
 This command recompiles a list of equations or all equations if no list is specified. 
@@ -3394,7 +3394,7 @@ Syntax::
 
 .. _modelsimulatesaveniters:
 
-COMMAND MODELSIMULATESAVENITERS
+COMMAND ModelSimulateSaveNiters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command allows you to save in a variable the number of iterations required for each 
@@ -3415,7 +3415,7 @@ Example::
 
 .. _modelsimulatesavenorms:
 
-COMMAND MODELSIMULATESAVENORMS
+COMMAND ModelSimulateSaveNorms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command allows you to save in a variable the convergence threshold (the norm) reached 
@@ -3446,7 +3446,7 @@ The following commands allow you to execute *identities*:
 
 .. _idtexecute:
 
-COMMAND IDTEXECUTE
+COMMAND IdtExecute
 ^^^^^^^^^^^^^^^^^^
 
 An identity is an LEC form that indicates how a series (variable) should be constructed.
@@ -3468,11 +3468,11 @@ Syntax::
 Example::
 
     $IdtExecute 1953Y1 1996Y1 IDT1 IDT2  
-    $IdtExecute 1953Y1 1996Y1 $IDTLIST
+    $IdtExecute 1953Y1 1996Y1 $IDTList
 
 .. _idtexecutetrace:
 
-COMMAND IDTEXECUTETRACE
+COMMAND IdtExecuteTrace
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 The trace of the identity calculation can be saved in the current A2M file defined by 
@@ -3488,7 +3488,7 @@ Syntax::
 
 .. _idtexecutevarfiles:
 
-COMMAND IDTEXECUTEVARFILES
+COMMAND IdtExecuteVarFiles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command is part of a group of commands that allow you to specify additional parameters 
@@ -3522,7 +3522,7 @@ Example::
 
 .. _idtexecutesclfiles:
 
-COMMAND IDTEXECUTESCLFILES
+COMMAND IdtExecuteSclFiles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This command is part of a group of commands that allow you to specify additional parameters 
@@ -3566,7 +3566,7 @@ The following commands allow you to manipulate reports (these functions are recu
 
 .. _reportexec:
 
-COMMAND REPORTEXEC
+COMMAND ReportExec
 ^^^^^^^^^^^^^^^^^^
 
 This command executes an IODE report.
@@ -3586,11 +3586,11 @@ Example::
 
 The `$ReportExec` function accepts a list as an argument::
 
-    $ReportExec test $LIST
+    $ReportExec test $List
 
-receives as arguments the elements of the `$LIST` list and thus allows you to execute 
+receives as arguments the elements of the `$List` list and thus allows you to execute 
 a generic report on an initially unknown number of arguments. 
-For example, to replace all 0s with `NA` for the list `$LIST` of variables, simply do::
+For example, to replace all 0s with `NA` for the list `$List` of variables, simply do::
 
     FILE ZEROTONA.REP  
 
@@ -3604,13 +3604,13 @@ For example, to replace all 0s with `NA` for the list `$LIST` of variables, simp
 
 The command::
 
-    $ReportExec zerotona.rep $LIST
+    $ReportExec zerotona.rep $List
 
-will replace 0s with NA for the series in the `$LIST` list.
+will replace 0s with NA for the series in the `$List` list.
 
 .. _reportedit:
 
-COMMAND REPORTEDIT
+COMMAND ReportEdit
 ^^^^^^^^^^^^^^^^^^
 
 .. warning::
@@ -3644,7 +3644,7 @@ The following functions allow you to translate A2M files into different formats:
 
 .. _a2mtohtml:
 
-COMMAND A2MTOHTML
+COMMAND A2mToHtml
 ^^^^^^^^^^^^^^^^^
 
 Translates an A2M file to HTML. If a previous call to the :ref:`$PrintHtmlHelp <printhtmlhelp>` 
@@ -3667,7 +3667,7 @@ When creating the *HtmlHelp*, several output files will be created:
 
 .. _a2mtortf:
 
-COMMAND A2MTORTF
+COMMAND A2mToRtf
 ^^^^^^^^^^^^^^^^
 
 Translates an A2M file to RTF. If a previous call to the :ref:`$PrintRtfHelp <printrtfhelp>` 
@@ -3687,7 +3687,7 @@ When creating the *Windows Help*, several output files will be created:
 
 .. _a2mtomif:
 
-COMMAND A2MTOMIF
+COMMAND A2mToMif
 ^^^^^^^^^^^^^^^^
 
 Translates an A2M file to a MIF file.
@@ -3700,7 +3700,7 @@ Syntax::
 
 .. _a2mtocsv:
 
-COMMAND A2MTOCSV
+COMMAND A2mToCsv
 ^^^^^^^^^^^^^^^^
 
 Translates an A2M file to a CSV file.
@@ -3713,7 +3713,7 @@ Syntax::
 
 .. _a2mtoprinter:
 
-COMMAND A2MTOPRINTER
+COMMAND A2mToPrinter
 ^^^^^^^^^^^^^^^^^^^^
 
 Translates an A2M file and prints it on the current printer.
@@ -3736,7 +3736,7 @@ Other report commands
 
 .. _statunitroot:
 
-COMMAND STATUNITROOT
+COMMAND StatUnitRoot
 ^^^^^^^^^^^^^^^^^^^^
 
 This command computes Dickey-Fuller tests.
@@ -3770,7 +3770,7 @@ Result::
 
 .. _wsaggrchar:
 
-COMMAND WSAGGRCHAR
+COMMAND WsAggrChar
 ^^^^^^^^^^^^^^^^^^
 
 Defines the character to introduce in the name of the series created by ``WsAggr...``.
@@ -3778,7 +3778,7 @@ See :ref:`$WsAggrSum <wsaggrsum>`.
 
 .. _wsaggrsum:
 
-COMMAND WSAGGRSUM
+COMMAND WsAggrSum
 ^^^^^^^^^^^^^^^^^
 
 Report functions allow you to perform aggregations, products, or sums of series. 
@@ -3871,7 +3871,7 @@ series (like ``BES101``) will be aggregated in other series (``__S101``).
 
 .. _wsaggrmean:
 
-COMMAND WSAGGRMEAN
+COMMAND WsAggrMean
 ^^^^^^^^^^^^^^^^^^
 
 Computes the mean of series.
@@ -3879,7 +3879,7 @@ See :ref:`$WsAggrSum <wsaggrsum>`.
 
 .. _wsaggrprod:
 
-COMMAND WSAGGRPROD
+COMMAND WsAggrProd
 ^^^^^^^^^^^^^^^^^^
 
 Computes the product of series.
