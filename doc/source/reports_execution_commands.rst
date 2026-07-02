@@ -47,8 +47,8 @@ The available execution commands (keywords) are:
 
 .. _define:
 
-COMMAND $DEFINE
-~~~~~~~~~~~~~~~~
+COMMAND $define
+~~~~~~~~~~~~~~~
 
 This command allows you to define macros that can be used later in the report and its 
 sub-reports. A macro is a kind of global variable that remains defined throughout the 
@@ -56,48 +56,48 @@ execution of the current report.
 
 Syntax::
 
-    $Define name text  
+    $define name text  
     name := name used to refer to the content (text) of the  
             macro (the name must start with a letter and not  
             exceed 10 characters)  
 
 The name is referenced in a report by enclosing it in ``%`` signs::
 
-    $Define a Hello World!  
-    $Show %a%
+    $define a Hello World!  
+    $show %a%
 
 Example::
 
-    $Define VAR A  
-    $GoTo exist {$DataExistVar %VAR%}  
-    $Show Variable %VAR% does not exist  
-    $Return  
+    $define VAR A  
+    $goto exist {$DataExistVar %VAR%}  
+    $show Variable %VAR% does not exist  
+    $return  
     ....  
-    $Label exist  
-    $Show Variable %VAR% exists  
-    $Return  
+    $label exist  
+    $show Variable %VAR% exists  
+    $return  
     ...
 
 If a report has arguments, these can be used as macros whose name is ``%n%``, where *n* is 
 the argument number. The special value ``%0%`` contains the number of arguments passed when 
 calling the report. For instance, the *exist.rep* report below::
 
-    $Define VAR %1%  
-    $GoTo exist {$DataExistVar %VAR%}  
-    $Show Variable %VAR% does not exist  
-    $Return  
+    $define VAR %1%  
+    $goto exist {$DataExistVar %VAR%}  
+    $show Variable %VAR% does not exist  
+    $return  
     ....  
-    $Label exist  
-    $Show Variable %VAR% exists  
-    $Return  
+    $label exist  
+    $show Variable %VAR% exists  
+    $return  
     ...
 
 executed with *A* as an argument, checks if the variable *A* exists.
 
 You can also store calculated values in macros::
 
-    $Define PNB {PNB}  
-    $Define GPNB {r PNB * 100}  
+    $define PNB {PNB}  
+    $define GPNB {r PNB * 100}  
     The value of PNB is %PNB% (difference of %GPNB% percent)
 
 Uppercase/lowercase mode
@@ -127,7 +127,7 @@ will produce at execution::
 
 .. _label:
 
-COMMAND $LABEL
+COMMAND $label
 ~~~~~~~~~~~~~~
 
 This instruction indicates and names a branch point in a report. This branch point can 
@@ -149,14 +149,14 @@ passed as parameters to the report. As a reminder, ``%0%`` is the number of argu
 
 .. _goto:
 
-COMMAND $GOTO
+COMMAND $goto
 ~~~~~~~~~~~~~
 
 This command performs a jump to a branch point (label) in the current report.
 
 Syntax::
 
-    $GoTo label [{condition}]  
+    $goto label [{condition}]  
     label := branch point indicated by the Label command  
     condition := LEC expression or report command
 
@@ -166,9 +166,9 @@ is interrupted.
 Use case::
 
     ...
-    $Label loop  
+    $label loop  
     ...  
-    $GoTo loop  
+    $goto loop  
     ...
 
 It is also possible to construct certain tests to direct the subsequent execution of the report.
@@ -183,25 +183,25 @@ the command must always start with the ``$`` character.
 Example (command)::
 
     ...  
-    $GoTo exist {$DataExistVar A}  
-    $Show Variable A does not exist  
-    $Return  
+    $goto exist {$DataExistVar A}  
+    $show Variable A does not exist  
+    $return  
     ....  
-    $Label exist  
-    $Show Variable A exists  
-    $Return  
+    $label exist  
+    $show Variable A exists  
+    $return  
     ...  
  
 or (LEC formula)::
 
     ...  
-    $GoTo end {X + Y > 1000}  
+    $goto end {X + Y > 1000}  
     ...  
-    $Return  
+    $return  
     ....  
-    $Label end  
-    $Show X + Y exceeds the limit of 1000  
-    $Return  
+    $label end  
+    $show X + Y exceeds the limit of 1000  
+    $return  
     ...
 
 It is also possible to invert the result of an IODE command, just as with an LEC formula. 
@@ -210,13 +210,13 @@ To do this, simply place an exclamation mark ``!`` after the ``$``.
 Example::
 
     ...  
-    $GoTo notexist {$!DataExistVar A}  
-    $Show Variable A does exist  
-    $Return  
+    $goto notexist {$!DataExistVar A}  
+    $show Variable A does exist  
+    $return  
     ....  
-    $Label notexist  
-    $Show Variable A does not exist  
-    $Return  
+    $label notexist  
+    $show Variable A does not exist  
+    $return  
     ...
 
 In the same way, LEC formulas can easily be adapted to return the desired value 
@@ -224,7 +224,7 @@ In the same way, LEC formulas can easily be adapted to return the desired value
 
 .. _onerror:
 
-COMMAND $ONERROR
+COMMAND $OnError
 ~~~~~~~~~~~~~~~~
 
 This command specifies the action to take when an error is encountered in an IODE command, 
@@ -267,7 +267,7 @@ Example::
 
 .. _return:
 
-COMMAND $RETURN
+COMMAND $return
 ~~~~~~~~~~~~~~~
 
 This instruction indicates that the execution of the current report is finished.
@@ -275,19 +275,19 @@ If it is a sub-report, the calling report continues.
 
 Syntax::
 
-    $Return
+    $return
 
 Example::
 
     Report createvar.rep  
     ---------------------  
     # Create series %1%  
-    $GoTo exist {$DataExistVar %1%}  
+    $goto exist {$DataExistVar %1%}  
     $DataCalcVar %1% 0.9  
-    $Show Variable %1% created  
-    $Return  
-    $Label exist  
-    $Show Variable %1% exists  
+    $show Variable %1% created  
+    $return  
+    $label exist  
+    $show Variable %1% exists  
     
     Call  
     -----  
@@ -295,7 +295,7 @@ Example::
 
 .. _abort:
 
-COMMAND $ABORT
+COMMAND $abort
 ~~~~~~~~~~~~~~
 
 This instruction indicates that the execution of the report must be interrupted.
@@ -303,27 +303,27 @@ If the current report is a sub-report, all higher-level reports will also be int
 
 Syntax::
 
-    $Abort
+    $abort
 
 Example::
 
     ...  
-    $GoTo continue {$DataExistVar A}  
-    $Show Variable A does not exist  
-    $Abort  
+    $goto continue {$DataExistVar A}  
+    $show Variable A does not exist  
+    $abort  
     ....  
-    $Label continue  
+    $label continue  
     ...
 
 .. _quitode:
 
-COMMAND $QUITODE
+COMMAND $quitode
 ~~~~~~~~~~~~~~~~
 See :ref:`$QUIT <quit>`.
 
 .. _quit:
 
-COMMAND $QUIT
+COMMAND $quit
 ~~~~~~~~~~~~~
 
 This instruction indicates that the execution of the report must be interrupted and 
@@ -331,14 +331,14 @@ that the graphical interface must be closed.
 
 Syntax::
 
-    $Quit
+    $quit
 
 Example::
 
     $WsLoadVar refsim  
     $ModelSimulate 1997Y1 1998Y1  
     $WsSaveVar myws  
-    $Quit
+    $quit
 
 This function is particularly useful when a report is launched from a command file 
 (*DOS* or *Unix*). By allowing IODE to exit, it returns control to the command file, 
@@ -346,7 +346,7 @@ which can then proceed with another program (printing, another simulation, etc.)
 
 .. _show:
 
-COMMAND $SHOW
+COMMAND $show
 ~~~~~~~~~~~~~
 
 This command produces a beep sound and displays a message in a new box dialog of 
@@ -354,12 +354,12 @@ the graphical interface during the execution of the report.
 
 Syntax::
 
-    $Show message  
+    $show message  
     message := any text
     
 .. _msg:
 
-COMMAND $MSG
+COMMAND $msg
 ~~~~~~~~~~~~
 
 This command displays the text of the argument and waits for a key press before continuing.
@@ -368,23 +368,23 @@ unlike the :ref:`$show <show>` function which displays in a box dialog but does 
 
 Syntax::
 
-    $Msg message  
+    $msg message  
     message := any text
 
 .. _beep:
 
-COMMAND $BEEP
+COMMAND $beep
 ~~~~~~~~~~~~~
 
 This command produces a beep sound during the execution of the report.
 
 Syntax::
 
-    $Beep
+    $beep
 
 .. _ask:
 
-COMMAND $ASK
+COMMAND $ask
 ~~~~~~~~~~~~
 
 This command displays a question to which the answer can be `Yes` or `No`.
@@ -396,7 +396,7 @@ This command displays a question to which the answer can be `Yes` or `No`.
 
 Syntax::
 
-    $Ask label,question  
+    $ask label,question  
 
     where label    := branch point indicated by the Label command  
           question := any text
@@ -404,14 +404,14 @@ Syntax::
 Example::
 
     ...
-    $Label loop  
+    $label loop  
     ...  
-    $Ask loop,return to loop?  
+    $ask loop,return to loop?  
     ...
 
 .. _prompt:
 
-COMMAND $PROMPT
+COMMAND $prompt
 ~~~~~~~~~~~~~~~
 
 This command allows you to define macros that can be used later in the report and its 
@@ -423,9 +423,9 @@ variable that can be used later in the report.
 
 Syntax::
 
-    #Prompt VarName Question  
-    Question := question to be asked  
-    VarName := name used to refer to the content (text) of the  
+    #prompt varname question  
+    question := question to be asked  
+    varname := name used to refer to the content (text) of the  
                macro (the name must start with a letter and not  
                exceed 10 characters)  
   
@@ -433,12 +433,12 @@ The name is referenced in a report by enclosing between two ``%`` signs.
 
 Example::
 
-    #Prompt Begin Start period?  
-    $SetTime %Begin%
+    #prompt BEGIN Start period?  
+    $SetTime %BEGIN%
 
 .. _settime:
 
-COMMAND $SETTIME
+COMMAND $SetTime
 ~~~~~~~~~~~~~~~~
 
 This command sets the period ``t`` for which the LEC formulas used in the reports 
@@ -461,7 +461,7 @@ produce the output::
 
 .. _incrtime:
 
-COMMANDE $INCRTIME
+COMMANDE $IncrTime
 ~~~~~~~~~~~~~~~~~~
 
 This command increases the period ``t`` by as many units as indicated. 
@@ -475,11 +475,11 @@ Syntax::
 The following report lines::
 
     $SetTime 1990Y1  
-    $Label print  
+    $label print  
     The value of PNB for the year {t@T} is {PNB} billion.  
     $IncrTime 5  
     $goto print {t < 2000Y1}  
-    $Return
+    $return
 
 produce the result::
 
@@ -488,7 +488,7 @@ produce the result::
 
 .. _system:
 
-COMMAND $SYSTEM
+COMMAND $system
 ~~~~~~~~~~~~~~~
 
 This report command is used to execute a system command.
@@ -512,16 +512,16 @@ screen is cleared. After executing the command, the screen is restored to its in
 
 Syntax::
 
-    $System command1 [;command2;...]
+    $system command1 [;command2;...]
     command := valid operating system command [+ arguments]
 
 Example::
 
-    $System qode -d qms result.a2m
+    $system qode -d qms result.a2m
 
 .. _shift:
 
-COMMAND $SHIFT
+COMMAND $shift
 ~~~~~~~~~~~~~~
 
 This function shifts the report arguments one position to the left. 
@@ -543,7 +543,7 @@ Example::
 
 .. _minimize:
 
-COMMAND $MINIMIZE
+COMMAND $minimize
 ~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -555,11 +555,11 @@ generated by the current simulation).
 
 Syntax::
 
-    $Minimize
+    $minimize
 
 .. _maximize:
 
-COMMAND $MAXIMIZE
+COMMAND $maximize
 ~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -570,11 +570,11 @@ This command restores the IODE window.
 
 Syntax::
 
-    $Maximize
+    $maximize
 
 .. _sleep:
 
-COMMAND $SLEEP
+COMMAND $sleep
 ~~~~~~~~~~~~~~
 
 Pauses the process for *n* milliseconds. 
@@ -582,13 +582,13 @@ This allows a client to retain control in case of requests that are too fast.
 
 Syntax::
 
-    $Sleep n
+    $sleep n
 
 where ``n`` = number of milliseconds to pause.
 
 .. _debug:
 
-COMMAND $DEBUG
+COMMAND $debug
 ~~~~~~~~~~~~~~
 
 This command displays in the output window the name of the current report and 
@@ -601,7 +601,7 @@ Syntax::
 
 .. _repeat:
 
-COMMAND $REPEAT
+COMMAND $repeat
 ~~~~~~~~~~~~~~~
 
 This function allows you to execute a command on a list of arguments without having to create 
@@ -620,7 +620,7 @@ Examples:
 1. Sorting multiple lists::
 
     $RepeatString ++  
-    $Repeat "$DataListSort ++ ++" A B C
+    $repeat "$DataListSort ++ ++" A B C
 
 is equivalent to the three commands::
 
@@ -631,11 +631,11 @@ is equivalent to the three commands::
 2. Duplicate Vars: With the @fn() functions, you can copy all the variables 
 from a workspace in a single operation::
 
-    $Repeat "$DataDuplicateVar _ _1" @vexpand(*)
+    $repeat "$DataDuplicateVar _ _1" @vexpand(*)
 
 .. _repeatstring:
 
-COMMAND $REPEATSTRING
+COMMAND $RepeatString
 ~~~~~~~~~~~~~~~~~~~~~
 
 This function allows you to specify the characters to be replaced in the first argument 
@@ -649,11 +649,11 @@ Syntaxe::
 Exemple::
 
     $RepeatString --  
-    $Repeat "$DataListSort -- --" A B C
+    $repeat "$DataListSort -- --" A B C
 
 .. _chdir:
 
-COMMAND $CHDIR
+COMMAND $chdir
 ~~~~~~~~~~~~~~
 
 This report command changes the current directory.
@@ -672,7 +672,7 @@ Example::
 
 .. _mkdir:
 
-COMMAND $MKDIR
+COMMAND $mkdir
 ~~~~~~~~~~~~~~
 
 This report command creates a new directory.
@@ -689,7 +689,7 @@ Example::
 
 .. _multiline:
 
-COMMAND $MULTILINE
+COMMAND $multiline
 ~~~~~~~~~~~~~~~~~~
 
 By default, a report line can be continued on the next line if it ends with a space followed 
@@ -729,7 +729,7 @@ tries to create an equation ending with ``+ \``, which produces the following re
 
 .. _rmdir:
 
-COMMAND $RMDIR
+COMMAND $rmdir
 ~~~~~~~~~~~~~~
 
 This report command deletes a directory.
@@ -746,7 +746,7 @@ Example::
 
 .. _vseps:
 
-COMMAND $VSEPS
+COMMAND $vseps
 ~~~~~~~~~~~~~~
 
 This command redefines the separators used by the functions ``@vdrop()``, ``@vtake()`` 
@@ -764,7 +764,7 @@ See also :ref:`@vtake <vtake>`.
 
 .. _foreach:
 
-COMMAND $FOREACH
+COMMAND $foreach
 ~~~~~~~~~~~~~~~~
 
 This command simplifies writing loops or nested loops.
@@ -796,22 +796,22 @@ Example 1: nested loops::
 Example 2: using lists::
 
     $DataUpdateLst MYLIST X,Y,Z  
-    $Define n 0  
+    $define n 0  
     $foreach I @lvalue(MYLIST)  
-    $Define n {%n% + 1}  
+    $define n {%n% + 1}  
     $show Element %n% : [%I%]  
     $next I
 
 .. _next:
 
-COMMAND $NEXT
+COMMAND $next
 ~~~~~~~~~~~~~
 
 See :ref:`$foreach <foreach>`.
 
 .. _procdef:
 
-COMMAND $PROCDEF
+COMMAND $procdef
 ~~~~~~~~~~~~~~~~
 
 This command indicates the start of the definition of an IODE procedure.
@@ -932,7 +932,7 @@ Result::
 
 .. _procend:
 
-COMMAND $PROCEND
+COMMAND $procend
 ~~~~~~~~~~~~~~~~
 
 This command indicates the end of a procedure definition.
@@ -941,7 +941,7 @@ See :ref:`$procdef <procdef>` for more details.
 
 .. _procexec:
 
-COMMAND $PROCEXEC
+COMMAND $procexec
 ~~~~~~~~~~~~~~~~~
 
 This command allows the execution of a procedure.
@@ -950,7 +950,7 @@ See :ref:`$procdef <procdef>` for more details.
 
 .. _indent:
 
-COMMAND $INDENT
+COMMAND $indent
 ~~~~~~~~~~~~~~~
 
 By default, commands (``$command`` or ``#command``) must be flush with the left margin. 
