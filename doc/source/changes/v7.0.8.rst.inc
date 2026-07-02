@@ -10,6 +10,7 @@ New Features
 Improvements 
 ------------
 
+- DOC: added new section *Methods And Algorithms* in the documentation.
 
 Fixed Bugs 
 ----------
