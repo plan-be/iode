@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include "s_strs.h"
+
+int SCR_dumphexfd(char* filein, FILE* fdout, int nl);
 
 /* ===================================================================
 Dumps file filein in hexadecimal.

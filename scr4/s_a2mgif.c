@@ -507,21 +507,21 @@ A2MBRUSH    *brush;
 /******* FUNCTION TABLE FOR GIF ***********/
 
 int (*A2M_GIF_GRF_FNS[])() = {
-    A2mGIFGrfInit,
-    A2mGIFGrfEnd,
-    A2mGIFGrfPen,
-    A2mGIFGrfBrush,
-    A2mGIFGrfLine,
-    A2mGIFGrfText,
-    A2mGIFGrfLabel,
-    A2mGIFGrfPar,
+    (int (*)())A2mGIFGrfInit,
+    (int (*)())A2mGIFGrfEnd,
+    (int (*)())A2mGIFGrfPen,
+    (int (*)())A2mGIFGrfBrush,
+    (int (*)())A2mGIFGrfLine,
+    (int (*)())A2mGIFGrfText,
+    (int (*)())A2mGIFGrfLabel,
+    (int (*)())A2mGIFGrfPar,
     A2mGIFGrfGroupObj,
     A2mGIFGrfGroup,
-    A2mGIFGrfBox,
-    A2mGIFGrfPolyLine,
-    A2mGIFGrfPolyBar,
-    A2mGIFGrfPrepare,
-    A2mGIFGrfGetPen,
-    A2mGIFGrfGetBrush
+    (int (*)())A2mGIFGrfBox,
+    (int (*)())A2mGIFGrfPolyLine,
+    (int (*)())A2mGIFGrfPolyBar,
+    (int (*)())A2mGIFGrfPrepare,
+    (int (*)())A2mGIFGrfGetPen,
+    (int (*)())A2mGIFGrfGetBrush
 };
 

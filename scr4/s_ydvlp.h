@@ -14,7 +14,7 @@
 /*extern int      strcmp(); /* JMP 29-12-97 */
 #endif
 
-extern double   SCR_atof(); /* JMP_M 4.21 29-09-95 */
+extern double   SCR_atof(char *txt); /* JMP_M 4.21 29-09-95 */
 
 #endif  /* _SCR_YY_H_ */
 

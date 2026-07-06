@@ -1,4 +1,5 @@
 #include "s_ydvlp.h"
+#include "s_dir.h"
 
 /* =+====== YY_include =================================================
     Read the keyword include, the name of the include file and opens it.
@@ -11,8 +12,7 @@
 &EN yy : IO : YYFILE pointer
 ===================================================================== */
 
-YY_include(yy)
-YYFILE  *yy;
+int YY_include(YYFILE *yy)
 {
     int     ch;
     YYFILE  yy_buf, *yy_new;

@@ -8,8 +8,7 @@ int YY_COMMENT2 = 1; /* JMP 03-03-2004 */
      yy : IO : YYFILE pointer
    ============================================================== */
 
-YY_comment(yy)
-YYFILE  *yy;
+int YY_comment(YYFILE *yy)
 {
     int     ch;
 
@@ -37,8 +36,7 @@ fin:
      yy : IO : YYFILE pointer
    ============================================================== */
 
-YY_comment2(yy)
-YYFILE  *yy;
+int YY_comment2(YYFILE *yy)
 {
     YY_skip_to_eol(yy);
     yy->yy_type = YY_COMMENT;
@@ -46,9 +44,7 @@ YYFILE  *yy;
 }
 
 /*NH*/
-YY_add_to_text(yy, pos, ch)
-YYFILE  *yy;
-int     pos, ch;
+int YY_add_to_text(YYFILE *yy, int pos, int ch)
 {
     unsigned char   *ptr;
 
@@ -95,8 +91,7 @@ Le pointeur vers le texte est placé sur le premier caractère suivant.
     YY_read_to_string()
 =======================================================================*/
 
-int YY_skip_spaces(yy)
-YYFILE  *yy;
+int YY_skip_spaces(YYFILE *yy)
 {
     int     ch;
 
@@ -131,8 +126,7 @@ dernier élément lu disponible pour la lecture suivante.
 &SA YY_read(), YY_lex()
 =======================================================================*/
 
-int YY_unread(yy)
-YYFILE  *yy;
+int YY_unread(YYFILE *yy)
 {
     yy->yy_reread = 1;
     return(0);
@@ -148,8 +142,7 @@ Le pointeur vers le texte est placé sur le premier caractère suivant.
     YY_read_to_string()
 =======================================================================*/
 
-int YY_skip_to_eol(yy)
-YYFILE  *yy;
+int YY_skip_to_eol(YYFILE *yy)
 {
     YY_skip_to_char(yy, '\n');
     return(0);
@@ -165,9 +158,7 @@ Le pointeur vers le texte est placé sur le premier caractère suivant.
     YY_read_to_string()
 =======================================================================*/
 
-int YY_skip_to_char(yy, c)
-YYFILE  *yy;
-int     c;
+int YY_skip_to_char(YYFILE *yy, int c)
 {
     int     ch;
 
@@ -198,9 +189,7 @@ Le pointeur vers le texte est placé sur le premier caractère suivant.
 =======================================================================*/
 
 
-int YY_read_to_char(yy, c)
-YYFILE  *yy;
-int     c;
+int YY_read_to_char(YYFILE *yy, int c)
 {
     unsigned char  chars[2];
 
@@ -209,9 +198,7 @@ int     c;
     return(YY_read_to_chars(yy, chars));
 }
 /*NH*/
-int YY_isin(ch, chars)
-int             ch;
-unsigned char   *chars;
+int YY_isin(int ch, unsigned char *chars)
 {
     int     i;
 
@@ -240,9 +227,7 @@ Le pointeur vers le texte est placé sur le premier caractère suivant.
     YY_read_to_string()
 =======================================================================*/
 
-int YY_read_to_chars(yy, chars)
-YYFILE        *yy;
-unsigned char *chars;
+int YY_read_to_chars(YYFILE *yy, unsigned char *chars)
 {
     int     ch, lg = 0;
 
@@ -276,9 +261,7 @@ string cible.
 =======================================================================*/
 
 
-int YY_read_to_string(yy, str)
-YYFILE          *yy;
-unsigned char   *str;
+int YY_read_to_string(YYFILE *yy, unsigned char *str)
 {
     int     ch, lg = 0, str_lg = (int)strlen(str);
 
@@ -350,8 +333,7 @@ Le type est toujours sauvé dans yy->yy_type.
 &SA YY_lex()
 =======================================================================*/
 
-int YY_read(yy)
-YYFILE  *yy;
+int YY_read(YYFILE *yy)
 {
 	#ifdef DEBUG
 	char    c_ch;		// for debug purpose
@@ -513,8 +495,7 @@ again:
     ungets the character.
    ====================================================================== */
 
-YY_read_control(yy)
-YYFILE  *yy;
+int YY_read_control(YYFILE *yy)
 {
     int     ch;
 
@@ -537,8 +518,7 @@ YYFILE  *yy;
     Return : integer = character represented by the sequence
    ==================================================================== */
 
-YY_read_escape(yy)
-YYFILE  *yy;
+int YY_read_escape(YYFILE *yy)
 {
     char    buf[4];
     int     ch;
@@ -603,8 +583,7 @@ YYFILE  *yy;
      return : length of the word read
    ============================================================== */
 
-YY_read_word(yy)
-YYFILE  *yy;
+int YY_read_word(YYFILE *yy)
 {
     int     i = 0;
     int     ch = 0;
@@ -630,8 +609,7 @@ YYFILE  *yy;
      return : 0
    ============================================================== */
 
-YY_read_letter(yy)
-YYFILE  *yy;
+int YY_read_letter(YYFILE *yy)
 {
     int     ch;
 
@@ -663,9 +641,7 @@ YYFILE  *yy;
      return : type read (YY_LONG or YY_DOUBLE)
    ============================================================== */
 
-YY_read_num(yy, dbl)
-YYFILE  *yy;
-int     dbl;
+int YY_read_num(YYFILE *yy, int dbl)
 {
     int     i = 0;
     int     ch;
@@ -737,9 +713,7 @@ int     dbl;
 	return : length of the string read
    ============================================================== */
 
-YY_read_string(yy, quote)
-YYFILE  *yy;
-int     quote;
+int YY_read_string(YYFILE *yy, int quote)
 {
     int     i = 0;
     int     ch = 0;
@@ -769,8 +743,7 @@ int     quote;
 	}
 }
 /*NH*/
-U_hex_to_dec(buf)
-char    *buf;
+int U_hex_to_dec(char *buf)
 {
     int     res = 0;
     int     i;
@@ -785,8 +758,7 @@ char    *buf;
     return(res);
 }
 /*NH*/
-U_octal_to_dec(buf)
-char    *buf;
+int U_octal_to_dec(char *buf)
 {
     int     res = 0;
     int     i;

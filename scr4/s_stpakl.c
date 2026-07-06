@@ -39,7 +39,7 @@ est terminé. La fonction SCR_free_tbl() permet de libérer l'espace.
 ARLIST **AR_list(arname)
 char    *arname;
 {
-    FILE    *fd, *AR_open();
+    FILE    *fd;
     ARLIST  **arl = 0, carl;
     int     arnb = 0;
 

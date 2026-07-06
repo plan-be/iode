@@ -13,7 +13,7 @@
     Ne fait rien en Windows ou DOS.
 ========================================================== */
 
-SCR_localisestring(char *txt)
+int SCR_localisestring(char *txt)
 {
 #ifdef UNIX
     int     i, sep = '.', csep = '.';
@@ -37,8 +37,7 @@ SCR_localisestring(char *txt)
 	20,5
     ========================================================== */
 
-double SCR_atof(txt)        /* BP_M 24-07-95 */
-char    *txt;
+double SCR_atof(char *txt)        /* BP_M 24-07-95 */
 {
     char    buf[255];
 

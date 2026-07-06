@@ -52,16 +52,7 @@ extern HREF    **JHRefs;
 extern int     JHRefsNb;
 
 /* FUNCTIONS */
-
-#ifndef SCRPROTO
-
-HFILE   *JHOpen();
-U_ch    *JHRefFullPath();
-U_ch    *SCR_std_filename();
-
-#else
 #include <s_prohtm.h>
-#endif
 
 #endif
 

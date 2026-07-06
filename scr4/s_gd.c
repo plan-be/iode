@@ -3273,7 +3273,8 @@ void gdImageFilledPolygon(gdImagePtr im, gdPointPtr p, int n, int c)
 		interFirst = 0;
 	    }
 	}
-	qsort(im->polyInts, ints, sizeof(int), gdCompareInt);
+    qsort(im->polyInts, ints, sizeof(int),
+          (int (*)(const void *, const void *))gdCompareInt);
 	for (i=0; (i < (ints-1)); i+=2) {
 	    gdImageLine(im, im->polyInts[i], y,
 		im->polyInts[i+1], y, c);

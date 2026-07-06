@@ -54,10 +54,7 @@ int     usection,
 int     uparam
 )
 #else
-INIFILE *IniOpen(filename, usection, uparam)
-char    *filename;
-int     usection;
-int     uparam;
+INIFILE *IniOpen(char *filename, int usection, int uparam)
 #endif
 {
     INIFILE    *inif = 0;
@@ -108,8 +105,7 @@ Libère la structure INIFILE allouée.
 &SA IniOpen(), UniRead(), IniUnRead(), IniOpenSection()
 =======================================================================*/
 
-int IniClose(inif)
-INIFILE     *inif;
+int IniClose(INIFILE *inif)
 {
     if(inif == 0) return(0);
     if(inif->if_fd) ISC_fclose(inif->if_fd); /* JMP 11-06-02 */
@@ -127,8 +123,7 @@ Retient le dernier élément lu par IniRead() pour le prochain appel
 &SA IniOpen(), UniRead(), IniClose(), IniOpenSection()
 =======================================================================*/
 
-int IniUnRead(inif)
-INIFILE    *inif;
+int IniUnRead(INIFILE *inif)
 {
     if(inif == 0) return(0);
     inif->if_unread = 1;
@@ -148,8 +143,7 @@ en début ou en fin de lignes sont ignorés (SQZ).
 &SA IniOpen(), UniClose(), IniUnRead(), IniOpenSection()
 =======================================================================*/
 
-IniRead(inif)
-INIFILE    *inif;
+int IniRead(INIFILE *inif)
 {
     U_ch    buf[4096];   /* BP_M 26-09-2008 11:20 */
 
@@ -174,10 +168,7 @@ ag:
     return(inif->if_type = INI_PARAM);
 }
 /*NH*/
-int IniSetData(adr, txt, ucase)
-U_ch    **adr;
-U_ch    *txt;
-int     ucase;
+int IniSetData(U_ch **adr, U_ch *txt, int ucase)
 {
     SCR_free(*adr);
     *adr = SCR_stracpy(txt);
@@ -186,17 +177,13 @@ int     ucase;
 }
 
 /*NH*/
-int IniSetParam(inif, txt)
-INIFILE *inif;
-U_ch     *txt;
+int IniSetParam(INIFILE *inif, U_ch *txt)
 {
     IniSetData(&(inif->if_param), txt, inif->if_uparam);
     return(0);
 }
 /*NH*/
-int IniSetSection(inif, txt)
-INIFILE *inif;
-U_ch     *txt;
+int IniSetSection(INIFILE *inif, U_ch *txt)
 {
     IniSetData(&(inif->if_section), txt, inif->if_usection);
     return(0);
@@ -260,10 +247,7 @@ int     usection,
 int     uparam
 )
 #else
-INIFILE *IniOpenSection(filename, section, usection, uparam)
-U_ch    *filename;
-U_ch    *section;
-int     usection, uparam;
+INIFILE *IniOpenSection(U_ch *filename, U_ch *section, int usection, int uparam)
 #endif
 
 {
@@ -334,8 +318,7 @@ pointeur nul est retourné par la fonction.
 &SA IniOpen(), UniClose(), IniRead(), IniUnRead(), IniReadCurSection()
 =======================================================================*/
 
-U_ch  **IniReadSection(filename, section)
-char    *filename, *section;
+U_ch  **IniReadSection(char *filename, char *section)
 {
     INIFILE *inif;
     U_ch    **lines = 0;
@@ -388,8 +371,7 @@ de pointeurs alloué par la fonction et terminé par un pointeur nul.
 =======================================================================*/
 
 
-U_ch  **IniReadCurSection(inif)
-INIFILE *inif;
+U_ch  **IniReadCurSection(INIFILE *inif)
 {
     U_ch    **lines = 0;
     int     nl = 0;
@@ -427,8 +409,7 @@ Le pointeur retourné est une valeur statique (non modifiable).
 &SA IniOpen(), UniClose(), IniRead(), IniUnRead(), IniReadSection()
 =======================================================================*/
 
-U_ch  *IniError(inif)
-INIFILE *inif;
+U_ch  *IniError(INIFILE *inif)
 {
     static U_ch     buf[80];
 
@@ -478,9 +459,7 @@ la longueur est au minimum de lg caractères.
 &SA IniOpen(), IniClose(), IniReadNumParm(), IniReadSection()
 =======================================================================*/
 
-IniReadTxtParm(filename, section, parm, val, lg)
-U_ch    *filename, *section, *parm, *val;
-int     lg;
+int IniReadTxtParm(U_ch *filename, U_ch *section, U_ch *parm, U_ch *val, int lg)
 {
     INIFILE *inif;
     int     pos;
@@ -552,9 +531,7 @@ pointeur est passé dans val.
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection()
 =======================================================================*/
 
-int IniReadNumParm(filename, section, parm, num)
-U_ch    *filename, *section, *parm;
-int     *num;
+int IniReadNumParm(U_ch *filename, U_ch *section, U_ch *parm, int *num)
 {
     char    val[32];
 
@@ -605,9 +582,7 @@ pointeur est passé dans val.
 &SA IniOpen(), IniClose(), IniReadTxtParm(), IniReadSection(), IniReadNumParm()
 =======================================================================*/
 
-int IniReadRealParm(filename, section, parm, num)
-U_ch    *filename, *section, *parm;
-double  *num;
+int IniReadRealParm(U_ch *filename, U_ch *section, U_ch *parm, double *num)
 {
     char    val[32];
 
@@ -652,8 +627,7 @@ int IniReadYNParm(char* filename, char* section, char* parm)
 }
 
 /*NH*/
-IniIsSection(buf, section)
-char    *buf, *section;
+int IniIsSection(char *buf, char *section)
 {
     char    buf2[512];
 
@@ -669,8 +643,7 @@ char    *buf, *section;
 }
 
 /*NH*/
-IniIsParm(buf, parm)
-char    *buf, *parm;
+int IniIsParm(char *buf, char *parm)
 {
     int     pos;
     char    buf2[512];
@@ -799,8 +772,7 @@ U_ch **IniReadAllSections(
 U_ch    *filename
 )
 #else
-U_ch **IniReadAllSections(filename)
-U_ch    *filename;
+U_ch **IniReadAllSections(U_ch *filename)
 #endif
 {
     INIFILE *inif;

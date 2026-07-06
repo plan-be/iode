@@ -1,6 +1,8 @@
 #include <string.h>
 #include "s_args.h"
 
+int A_expandstar_dft(char *arg);
+
 //#if defined(DOS) && !defined(VC) /* JMP 14-02-17 */
 //#include <dos.h>
 
@@ -34,8 +36,7 @@ A_expandstar_dft().
 &SA A_init(), A_initv(), A_expand(), A_iexpand(), A_expandstar_dft()
 ==================================================================== */
 
-A_expandstar(arg)
-char    *arg;
+int A_expandstar(char *arg)
 {
     if(A_NO_EXPANDSTAR_DFT == 0)        /* JMP 12-11-2012 */
         return(A_expandstar_dft(arg));  /* JMP 10-03-98 */

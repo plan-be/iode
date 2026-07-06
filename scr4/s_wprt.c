@@ -129,7 +129,7 @@ int WprPrinterInitStd(HWND hWndOwner, int dlg, char *docname)
     return(0);
 }
 
-WprPrinterInitEx(HWND hWndOwner, int dlg, char *docname)
+int WprPrinterInitEx(HWND hWndOwner, int dlg, char *docname)
 {
 /*    DOCINFO     diInfo; */
 
@@ -174,7 +174,7 @@ WprPrinterInitEx(HWND hWndOwner, int dlg, char *docname)
 }
 
 /*NH*/
-WprAllInit()
+int WprAllInit()
 {
     WprSetFont('T', 10, 0, 0, 0);
     WprHORZRES = GetDeviceCaps(WprhDC, HORZRES);
@@ -199,14 +199,14 @@ nécessaires à l'impression.
 &SA WprPrinterInit()
 ========================================================================= */
 
-WprPrinterEnd()
+int WprPrinterEnd()
 {
     WprPrinterEndFF(1);
     return(0);
 }
 
 /*NH*/
-WprEndAll()
+int WprEndAll()
 {
     WprDeleteFonts();
     WprDeleteBrushes();
@@ -238,7 +238,7 @@ int WprPrinterEndFFStd(int ff)
     return(0);
 }
 
-WprPrinterEndFFEx(int ff)
+int WprPrinterEndFFEx(int ff)
 {
     if(WprPDEX == 0) return(0);
 
@@ -260,7 +260,7 @@ WprPrinterEndFFEx(int ff)
 /*NH*/
 /********************** FONTS ************************************/
 
-WprRegisterFont(int family, int size, int bold, int italic,
+int WprRegisterFont(int family, int size, int bold, int italic,
 		int underl, HANDLE hFont, int w, int h)
 {
     WprFONTS = (WPRFONT *) SCR_realloc(WprFONTS, sizeof(WPRFONT),
@@ -280,7 +280,7 @@ WprRegisterFont(int family, int size, int bold, int italic,
 }
 
 /*NH*/
-WprSelectFont(int family, int size, int bold, int italic, int underl)
+int WprSelectFont(int family, int size, int bold, int italic, int underl)
 {
     int     i;
 
@@ -300,7 +300,7 @@ WprSelectFont(int family, int size, int bold, int italic, int underl)
 }
 
 /*NH*/
-WprSetCurFont(int i)
+int WprSetCurFont(int i)
 {
     WprFONT  = WprFONTS[i].wf_hFont;
     WprFONTH = WprFONTS[i].wf_h;
@@ -311,7 +311,7 @@ WprSetCurFont(int i)
 }
 
 /*NH*/
-WprDeleteFonts()
+int WprDeleteFonts()
 {
     int     i;
 
@@ -345,7 +345,7 @@ l'impression de façon à optimiser la vitesse de basculement d'une police
 
 ========================================================================= */
 
-WprSetFont(family, pty, bold, italic, underl)
+int WprSetFont(family, pty, bold, italic, underl)
 int     family, pty, bold, italic, underl;
 {
     HDC             hDC = WprhDC;
@@ -483,7 +483,7 @@ suivantes indiquent la taille du papier et la définition de l'impression:
 &EN int WprVERTRES : nombre de pixels par page en Y
 ========================================================================= */
 
-WprPrintStringNoAlign(int x, int y, U_ch *txt)
+int WprPrintStringNoAlign(int x, int y, U_ch *txt)
 {
     if(txt == 0) return(0);
     SCR_OemToAnsi(txt, txt);
@@ -509,7 +509,7 @@ suivantes indiquent la taille du papier et la définition de l'impression:
 &EN int WprVERTRES : nombre de pixels par page en Y
 ========================================================================= */
 
-WprPrintString(int x, int y, U_ch *txt)
+int WprPrintString(int x, int y, U_ch *txt)
 {
     SetBkMode(WprhDC, TRANSPARENT);
     SetTextAlign(WprhDC, TA_BASELINE | TA_LEFT);
@@ -524,7 +524,7 @@ Le texte sera cadré à gauche.
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprHCenterLeft()
+int WprHCenterLeft()
 {
     SetTextAlign(WprhDC, TA_LEFT);
     return(0);
@@ -537,7 +537,7 @@ Le texte sera cadré à droite
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprHCenterRight()
+int WprHCenterRight()
 {
     SetTextAlign(WprhDC, TA_RIGHT);
     return(0);
@@ -550,7 +550,7 @@ Le texte sera centré autour du point de référence.
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprHCenterCenter()
+int WprHCenterCenter()
 {
     SetTextAlign(WprhDC, TA_CENTER);
     return(0);
@@ -563,7 +563,7 @@ Le point de référence indiquera le bord supérieur.
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprVCenterTop()
+int WprVCenterTop()
 {
     SetTextAlign(WprhDC, TA_TOP);
     return(0);
@@ -576,7 +576,7 @@ Le point de référence indiquera le bord inférieur.
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprVCenterBottom()
+int WprVCenterBottom()
 {
     SetTextAlign(WprhDC, TA_BOTTOM);
     return(0);
@@ -589,7 +589,7 @@ Le point de référence indiquera la ligne de base.
 &SA WprPrintString(), WprPrintStringNoAlign(), WprHCenter*(), WprVCenter*()
 ========================================================================= */
 
-WprVCenterBaseline()
+int WprVCenterBaseline()
 {
     SetTextAlign(WprhDC, TA_BASELINE);
     return(0);
@@ -612,7 +612,7 @@ suivantes indiquent la taille du papier et la définition de l'impression:
 
 ========================================================================= */
 
-WprGetStringWidth(U_ch *txt, long *w, long *h)
+int WprGetStringWidth(U_ch *txt, long *w, long *h)
 {
     SIZE    size;
 
@@ -636,7 +636,7 @@ Dessine un rectangle avec la plume (PEN), la couleur et la brosse
 
 ========================================================================= */
 
-WprRectangle(int x, int y, int w, int h)
+int WprRectangle(int x, int y, int w, int h)
 {
     Rectangle(WprhDC, x, y, x + w, y + h);
     return(0);
@@ -653,7 +653,7 @@ La plume et la couleur courantes sont utilisées.
 &SA WprSetPen(), WprSetColor(), WprLine()
 ========================================================================= */
 
-WprPolyline(long *pts, int npts)
+int WprPolyline(long *pts, int npts)
 {
     Polyline(WprhDC, (POINT *)pts, npts);
     return(0);
@@ -672,7 +672,7 @@ La plume et la couleur courantes sont utilisées.
 &SA WprSetPen(), WprSetColor(), WprLine(), WprRectangle()
 ========================================================================= */
 
-WprArc(int left, int top, int right, int bot, int x0, int y0, int x1, int y1)
+int WprArc(int left, int top, int right, int bot, int x0, int y0, int x1, int y1)
 {
     Arc(WprhDC, left, top, right, bot, x0, y0, x1, y1);
     return(0);
@@ -687,7 +687,7 @@ La plume et la couleur courantes sont utilisées.
 
 ========================================================================= */
 
-WprLine(int x0, int y0, int x1, int y1)
+int WprLine(int x0, int y0, int x1, int y1)
 {
     MoveToEx(WprhDC, x0, y0, 0L);
     LineTo(WprhDC, x1, y1);
@@ -710,7 +710,7 @@ suivantes. Les couleurs sont définies comme suit :
 La couleur des seules brosses 3 à 8 sont modifiables.
 ========================================================================= */
 
-WprSetColor(int i)
+int WprSetColor(int i)
 {
     if(i < 0) i = 0;
     if(WprCOLOR == i) return(0);
@@ -747,7 +747,7 @@ La couleur des brosses 3 à 8 sont définies par la fonction WprSetColor().
 sélectionnée.
 ========================================================================= */
 
-WprSetBrush(int brush)
+int WprSetBrush(int brush)
 {
     int     nbr;
 
@@ -786,7 +786,7 @@ HBRUSH WprCreateBrush(WORD *brdef)
 }
 
 /*NH*/
-WprCreateBrushes()
+int WprCreateBrushes()
 {
     WprBRUSHES[0] = CreateSolidBrush(RGB(255, 255, 255)); /* White */
     WprBRUSHES[1] = WprCreateBrush(WprBR0);
@@ -800,7 +800,7 @@ WprCreateBrushes()
 }
 
 /*NH*/
-WprDeleteBrushes()
+int WprDeleteBrushes()
 {
     int     i;
 
@@ -815,7 +815,7 @@ WprDeleteBrushes()
 /*************************** PENS ********************************/
 
 /*NH*/
-WprRegisterPen(int type, int width, int color, HPEN hPen)
+int WprRegisterPen(int type, int width, int color, HPEN hPen)
 {
     WprPENS = (WPRPEN *) SCR_realloc(WprPENS, sizeof(WPRPEN),
 					WprNBPENS, WprNBPENS + 1);
@@ -828,7 +828,7 @@ WprRegisterPen(int type, int width, int color, HPEN hPen)
 }
 
 /*NH*/
-WprDeletePens()
+int WprDeletePens()
 {
     int     i;
 
@@ -843,7 +843,7 @@ WprDeletePens()
 }
 
 /*NH*/
-WprSetCurPen(int i)
+int WprSetCurPen(int i)
 {
     if(WprCURPEN == i ) return(0);
     SelectObject(WprhDC, WprPENS[i].wp_hPen);
@@ -852,7 +852,7 @@ WprSetCurPen(int i)
 }
 
 /*NH*/
-WprFindPen(int type, int width, int color)
+int WprFindPen(int type, int width, int color)
 {
     int     i;
 
@@ -890,7 +890,7 @@ Sélectionne une plume de pour les tracés suivants.
 &SA WprSetBrush(), WprSetFont()
 ========================================================================= */
 
-WprSetPen(int type, int width, int color)
+int WprSetPen(int type, int width, int color)
 {
     HPEN    hPen;
     int     style;
@@ -950,7 +950,7 @@ DWORD WprSEGS2[]  = {1, 1, 0};
 DWORD WprSEGS3[]  = {3, 1, 1, 1, 0};
 DWORD WprSEGS4[]  = {3, 1, 1, 1, 1, 1, 0};
 
-WprCreatePens()
+int WprCreatePens()
 {
     WprPENS[0] = WprCreateDashPen(1, (long *)0L);
     WprPENS[1] = WprCreateDashPen(1, (long *)WprSEGS1);

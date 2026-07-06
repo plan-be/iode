@@ -10,9 +10,7 @@ Retourne la position d'un caractère ch dans un string str.
 &SA U_is_in()
 =======================================================================*/
 
-U_pos(ch, str)
-int             ch;
-unsigned char   *str;
+int U_pos(int ch, unsigned char *str)
 {
     int     i;
 

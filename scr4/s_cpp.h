@@ -24,21 +24,7 @@ typedef struct _cppfile_ {
 extern int  CPP_DIRCH, CPP_DEFCH, CPP_EOLCH;
 
 /* FUNCTIONS */
-
-#ifndef SCRPROTO
-
-CPPFILE *CppOpen();
-CPPFILE *CppCurrent();
-U_ch    *CppReadLine();
-U_ch    *CppReadToChars();
-double  CppReadDbl();
-U_ch    *CppReadQuotedString();
-long    CppReadLong();
-char    *CppPos();
-
-#else
 #include <s_procpp.h>
-#endif
 
 #endif
 

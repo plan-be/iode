@@ -8,9 +8,7 @@ Recherche un caractère dans un string.
 &TX
 ====================================================================== */
 
-U_is_in(ch, string)
-int     ch;
-char    *string;
+int U_is_in(int ch, char *string)
 {
     if(U_pos(ch, string) < 0) return(0);
     return(1);

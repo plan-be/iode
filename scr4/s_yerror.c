@@ -15,8 +15,7 @@ différemment suivant le type de texte lu :
 &TX
 =======================================================================*/
 
-char *YY_error(yy)
-YYFILE  *yy;
+char *YY_error(YYFILE *yy)
 {
     static char ptr[81];
 

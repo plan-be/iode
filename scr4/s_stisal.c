@@ -14,8 +14,7 @@ accentuée).
 &SA SCR_is_anum(), SCR_is_num(), SCR_upper_char()
 =======================================================================*/
 
-SCR_is_alpha(ch)
-int     ch;
+int SCR_is_alpha(int ch)
 {
     int     ch1;
 
@@ -36,8 +35,7 @@ Indique si un caractère est un chiffre.
 &SA SCR_is_anum(), SCR_is_alpha()
 =======================================================================*/
 
-SCR_is_num(ch)
-int     ch;
+int SCR_is_num(int ch)
 {
     if(('0' <= ch && '9' >= ch)) return(1);
     return(0);
@@ -60,14 +58,13 @@ accentuée) ou un chiffre.
 &SA SCR_is_alpha(), SCR_is_num(), SCR_upper_char()
 =======================================================================*/
 
-SCR_is_anum(ch)
-int     ch;
+int SCR_is_anum(int ch)
 {
     return(SCR_is_num(ch) || SCR_is_alpha(ch));
 }
 
 /* Recherche un string f dans la liste txt */
-ScrStrIsIn(U_ch **txt, char *f)
+int ScrStrIsIn(U_ch **txt, char *f)
 {
     int     i;
 
@@ -78,7 +75,7 @@ ScrStrIsIn(U_ch **txt, char *f)
 }
 
 /* Recherche un string f ce trouvant dans un des string de txt */
-ScrStrIsIn2(U_ch **txt, char *f)
+int ScrStrIsIn2(U_ch **txt, char *f)
 {
     int     i, len_f = (int)strlen(f);
 

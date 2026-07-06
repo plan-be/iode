@@ -78,7 +78,7 @@ extern unsigned char *SCR_mtovs(unsigned char **tbl,unsigned char *seps);
 extern int SCR_LoadString(FILE *fd,unsigned char **txt);
 extern int SCR_LoadShort(FILE *fd,short *a);
 extern int SCR_DumpString(FILE *fd,unsigned char *txt);
-extern int SCR_DumpShort(FILE *fd,int a);
+extern int SCR_DumpShort(FILE *fd, short a);
 extern unsigned char *SCR_pad(unsigned char *str,int lg);
 extern char *AR_error(void);
 extern FILE *AR_open(char *arname,int mode);
@@ -88,8 +88,8 @@ extern int AR_add_1(FILE *fdar,char *filename);
 extern int AR_series(FILE *fd,int ch);
 extern int AR_dump(FILE *fd,FILE *fd2,long *rsize,long *psize);
 extern ARLIST **AR_list(char *arname);
-extern int AR_extract(char *arname,char **files,int n,int (*fn)());
-extern int AR_uncat(FILE *fdar,char *filename,long lg,int (*fn)());
+extern int AR_extract(char *arname,char **files,int n,int (*fn)(char *, long, long));
+extern int AR_uncat(FILE *fdar,char *filename,long lg,int (*fn)(char *, long, long));
 extern int PC_open(char *filename);
 extern int PC_getline(char *prname,char *buf);
 extern int PC_exec(char *filename,char *prname,char *arg1,char *arg2,char *arg3);
@@ -146,7 +146,7 @@ extern char *SCR_str_find(int nb);
 extern unsigned char *SCR_stripdc(unsigned char *txt,int ch,unsigned char *str);
 extern unsigned char *SCR_strip(unsigned char *str);
 extern unsigned char **SCR_text(unsigned char *str,unsigned char *seps,int lg);
-extern int SCR_text_title(unsigned char *title,unsigned char *str,unsigned char *seps,int lg,int (*fn)());
+extern int SCR_text_title(unsigned char *title,unsigned char *str,unsigned char *seps,int lg,int (*fn)(unsigned char *));
 extern unsigned char *U_center_text(unsigned char *text);
 extern unsigned long SCR_ufmt_long(char *fmt,char *in);
 extern unsigned char *SCR_ufmt_text(unsigned char *out,unsigned char *fmt,unsigned char *in);
@@ -176,7 +176,7 @@ extern int SCR_fprintf_esc(FILE *fd, char *str, int addquotes);
 
 
 /* s_allc.c  */
-extern int AllocDocLoop();
+extern int AllocDocLoop(void);
 extern char *SCR_malloc_chk(unsigned int lg, int panic);
 extern char *SCR_realloc_chk(void *old_ptr,unsigned int el_size,unsigned int old_count,unsigned int new_count, int panic);
 extern char *SCR_malloc_doc(unsigned int lg, char *file, int ligne);

@@ -11,8 +11,7 @@ des arguments (A_init() et A_initv()).
 &SA A_init(), A_initv(), A_expand(), A_iexpand(), A_expandstar()
 ==================================================================== */
 
-A_expandstar_dft(arg)
-char    *arg;
+int A_expandstar_dft(char *arg)
 {
     struct find_t   ffblk;
     char            fullname[65], dir[65];
@@ -42,8 +41,7 @@ char    *arg;
 }
 
 #else
-A_expandstar_dft(arg)
-char    *arg;
+int A_expandstar_dft(char *arg)
 {
     return(0);
 }

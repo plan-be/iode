@@ -345,7 +345,7 @@ extern int BCAB_edis_query(A_BAR *ab,BC *bc);
 
 /* s_hsis.c */
 extern int IS_init_history(void);
-extern int IS_open_trans_();
+extern int IS_open_trans_(void);
 extern int IS_end_history(void);
 extern int IS_close_trans_(void);
 extern int IS_trans_write(ISAM *is);

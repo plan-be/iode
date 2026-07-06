@@ -111,46 +111,6 @@ extern  int M_errno;
 #endif
 
 /********** FNS PROTOTYPES ***********/
-
-#ifndef SCRPROTO
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern  char    *M_error();
-extern  MAT*    M_alloc();
-extern  MAT*    M_prod();
-extern  MAT*    M_trans();
-extern  MAT*    M_copy();
-extern  MAT*    M_dup();
-extern  MAT*    M_inv_1();
-extern  MAT*    M_inv_2();
-extern  MREAL*   M_alloc_vec();
-extern  MREAL*   M_vswp_to_cnv();
-extern  VECT    M_vcnv_to_swp();
-extern  MREAL    M_det_1();
-extern  MREAL    M_det_2();
-extern  MAT     *M_solve();
-extern  MAT     *M_solve_2();
-extern  MAT     *M_trace();
-extern  MAT     *M_oper();
-extern  MAT     *M_diag();
-extern  MAT     *M_scale();
-extern  MAT     *M_extr();
-extern  MAT     *M_xprimx();
-extern  MAT     *M_xxprim();
-extern  MAT     *M_xaxprim();
-extern  MAT     *M_xpri_max_();
-
-#ifdef __cplusplus
-}
-#endif
-
-#else
-
 #include <s_proma.h>
-
-#endif
 
 #endif /* _S_SWAP_H_ */

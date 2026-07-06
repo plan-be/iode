@@ -1,5 +1,9 @@
 #include "s_a2m.h"
 
+int A2mOemToAnsi(FILE *fd, unsigned char *title);
+int A2mGetModulePath(char *buf);
+int DrawVLine(double rper, int nbper);
+
 /****************** SWF ***************************/
 
 /* Public SWF */
@@ -22,7 +26,6 @@ double  rper;
 int     nbper;
 {
     int     sper, year;
-    double  floor();
     static char buf[25];
 
     year = (int)floor(rper + 0.001);
@@ -249,10 +252,9 @@ int A2mSWFIni()
     return(0);
 }
 
-DrawVLine(double rper, int nbper)
+int DrawVLine(double rper, int nbper)
 {
     int     sper, year;
-    double  floor();
 
     if(nbper == 1) return(1);
 

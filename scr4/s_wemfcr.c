@@ -114,7 +114,7 @@ Les variables globales suivantes sont définies par la fonction :
     une seule "page" étant disponible.
 ========================================================================= */
 
-WprEMFInit(char *filename, int w, int h, U_ch *pictname)
+int WprEMFInit(char *filename, int w, int h, U_ch *pictname)
 {
     char    buf[132], *fn;
 
@@ -173,7 +173,7 @@ Les variables globales suivantes sont définies par la fonction :
     une seule "page" étant disponible.
 ========================================================================= */
 
-WprWMFInit(char *filename, int w, int h)
+int WprWMFInit(char *filename, int w, int h)
 {
     if(WprEMFInit(filename, w, h, 0L)) return(-1);
     WprOutType = WPR_TYPE_WMF;

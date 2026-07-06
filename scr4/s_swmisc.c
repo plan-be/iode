@@ -24,8 +24,7 @@ int      SW_ACTIVE = 0;
 &SA SW_end()
 */
 
-SW_init(ems)
-int     ems;
+int SW_init(int ems)
 {
     int     i = 0;
     SWSEG   *seg;
@@ -140,8 +139,7 @@ void SW_end()
 
 */
 
-SW_panic(code)
-int     code;
+int SW_panic(int code)
 {
     char        *text;
     static  int is_panic = 0;
@@ -169,9 +167,7 @@ int     code;
 }
 
 /*NH*/
-SW_init_blk(blk_nb, size)
-int     blk_nb;
-SWSIZE  size;
+int SW_init_blk(int blk_nb, SWSIZE size)
 {
     BLKSIZE(blk_nb) = size;
     SPACE(blk_nb)   = size;
@@ -182,8 +178,7 @@ SWSIZE  size;
 }
 
 /*NH*/
-SW_compress(blk_nb)
-int     blk_nb;
+int SW_compress(int blk_nb)
 {
     char    *ptr;
     SWSIZE  size, gain = 0, shift = 0;
@@ -241,8 +236,7 @@ long    SW_coreleft()
     package.
 */
 
-SW_status(st)
-SWSTAT  *st;
+int SW_status(SWSTAT *st)
 {
     int     i;
     extern  long SCR_free_mem();
@@ -285,10 +279,7 @@ SWSTAT  *st;
 /*NH*/
 /* GESTION MEMOIRE DES ITEMS_BLK, ITEMS_POS, FREES */
 
-SW_set_item(item, blk, pos)
-SWHDL   item;
-int     blk;
-SWSIZE  pos;
+int SW_set_item(SWHDL item, int blk, SWSIZE pos)
 {
     char    *ptr;
 
@@ -299,8 +290,7 @@ SWSIZE  pos;
 }
 
 /*NH*/
-SWSIZE SW_get_pos(item)
-SWHDL item;
+SWSIZE SW_get_pos(SWHDL item)
 {
     char    *ptr;
 
@@ -309,8 +299,7 @@ SWHDL item;
 }
 
 /*NH*/
-SW_get_blk(item)
-SWHDL   item;
+int SW_get_blk(SWHDL item)
 {
     char    *ptr;
 
@@ -322,21 +311,20 @@ SWHDL   item;
 }
 
 /*NH*/
-SW_add_item()
+int SW_add_item(void)
 {
     LST_add_1(SW_ITEMS);
     return(0);
 }
 
 /*NH*/
-SW_nb_items()
+int SW_nb_items(void)
 {
     return(SW_ITEMS->nb_els);
 }
 
 /*NH*/
-SWHDL SW_get_free(item)
-SWHDL   item;
+SWHDL SW_get_free(SWHDL item)
 {
     SWHDL  *it;
 
@@ -345,8 +333,7 @@ SWHDL   item;
 }
 
 /*NH*/
-SW_add_free(item)
-SWHDL   item;
+int SW_add_free(SWHDL item)
 {
     LST_add_1(SW_FREES);
     LST_set(SW_FREES, SW_nb_frees() - 1L, &item);
@@ -354,7 +341,7 @@ SWHDL   item;
 }
 
 /*NH*/
-SW_nb_frees()
+int SW_nb_frees(void)
 {
     return(SW_FREES->nb_els);
 }

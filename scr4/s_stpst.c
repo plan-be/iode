@@ -12,10 +12,7 @@ float   PS_FONTSIZE;
 int     *PS_VG_LG, *PS_VG_POS, *PS_VG_SIZE, PS_VNB;
 
 /*NH*/
-PS_init(ifl, ofl, font, size, margv, margh, spacing, landsc)
-char    *ifl, *ofl, *font;
-double  size, margv, margh, spacing;
-int     landsc;
+int PS_init(char *ifl, char *ofl, char *font, double size, double margv, double margh, double spacing, int landsc)
 {
     char    fi[81], fo[81];
 
@@ -113,10 +110,7 @@ L'interligne est calculé comme size + spacing.
 &SA PS_labels()
 ------------------------------------------------------------------------- */
 
-PS_text(ifl, ofl, font, size, margv, margh, spacing, landsc)
-char    *ifl, *ofl, *font;
-double  size, margv, margh, spacing;
-int     landsc;
+int PS_text(char *ifl, char *ofl, char *font, double size, double margv, double margh, double spacing, int landsc)
 {
     int     ch;
 /*    void    *malloc(); /* JMP 04-01-98 */

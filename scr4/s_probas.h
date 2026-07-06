@@ -616,7 +616,7 @@ extern int PG_fld_free(PAGE *pg);
 extern int WscrDOSUserInit(int argc,char *argv[]);
 
 /* s_wgetms.c */
-extern long WscrGetMS(); 
+extern long WscrGetMS(void);
 
 /* s_cmtscr.c */
 extern int PG_display_scr(PAGE *pg);
@@ -697,8 +697,8 @@ extern int PR_file_ungetc(int ch);
 extern int PR_file_getc(FILE *fd);
 extern int PR_file_eol(FILE *fd);
 extern int PR_print_var(char *fld_name);
-extern int PR_mail_col(unsigned char *filename,unsigned char *(*fn)(),int col,int nl,int first_ch);
-extern int PR_mail(unsigned char *filename,unsigned char *(*fn)());
+extern int PR_mail_col(unsigned char *filename,unsigned char *(*fn)(unsigned char *),int col,int nl,int first_ch);
+extern int PR_mail(unsigned char *filename,unsigned char *(*fn)(unsigned char *));
 extern int PR_is_empty(unsigned char *ptr);
 
 /* s_prfile.c */
@@ -720,7 +720,7 @@ extern int PR_listing_0(PAGE *pg_ref,char *file);
 extern int PR_listing_eop(void);
 extern int PR_listing_1(ISAM *is,long nb_read,long nb_found,int success);
 extern int PR_listing(PR_DEF *pr,PAGE *pg_ref,PAGE *pg_scan,int cmp,char *file);
-extern int PR_listing_fn(PR_DEF *pr,PAGE *pg_ref,PAGE *pg_scan,int cmp,char *file,int (*fn)());
+extern int PR_listing_fn(PR_DEF *pr,PAGE *pg_ref,PAGE *pg_scan,int cmp,char *file,int (*fn)(ISAM *, long, long, int));
 
 /* s_prtdev.c */
 extern int PR_set_device(PR_DEF *pr,int type,char *name);

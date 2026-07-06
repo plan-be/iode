@@ -9,10 +9,6 @@ char    *str, *fmt;
 long PG_ftime_to_long(txt, fmt)
 char    *txt, *fmt;
 {
-#ifndef __cplusplus
-    extern long SCR_ftime_to_long();
-#endif
-
     return(SCR_ftime_to_long(txt, fmt));
 }
 

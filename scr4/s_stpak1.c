@@ -31,9 +31,7 @@ char *AR_error()
 }
 
 /*NH*/
-FILE *AR_open(arname, mode)
-char    *arname;
-int     mode;
+FILE *AR_open(char *arname, int mode)
 {
     FILE    *fd;
     int     new = 0;
@@ -73,12 +71,9 @@ int     mode;
 }
 
 /*NH*/
-AR_readnext(fd, arl)
-FILE    *fd;
-ARLIST  *arl;
+int AR_readnext(FILE *fd, ARLIST *arl)
 {
     char    trsize[10], tpsize[10], tdate[10];
-    long    atol();
 
     if(fread(trsize, 8, 1, fd) < 1 ||
        fread(tpsize, 8, 1, fd) < 1 ||

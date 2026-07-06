@@ -21,9 +21,7 @@ int     mdim,
 double  dscale
 )
 #else
-MAT *M_diag(mdim, dscale)
-int     mdim;
-MREAL   dscale;
+MAT *M_diag(int mdim, MREAL dscale)
 #endif
 
 {

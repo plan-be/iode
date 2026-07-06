@@ -124,7 +124,7 @@ extern ATOM WscrEMFRegister(void);
 extern HWND WscrEMFWMFCreate(int type,HWND hParent,char *filename,HANDLE hemf,int del);
 extern HWND WscrEMFCreate(HWND hParent,char *filename,HANDLE hemf,int del);
 extern HWND WscrWMFCreate(HWND hParent,char *filename,HANDLE hemf,int del);
-extern LONG __stdcall WscrEMFProc(HWND hWnd,UINT wMsg,WPARAM wParam,LPARAM lParam);
+extern LRESULT CALLBACK WscrEMFProc(HWND hWnd,UINT wMsg,WPARAM wParam,LPARAM lParam);
 extern int WscrEMFDestroy(HWND hWnd);
 extern int WscrEMFWMFPaint(HWND hWnd);
 extern int WscrEMFPaint(HWND hWnd);
@@ -256,7 +256,7 @@ extern int WprSetCurFont(int i);
 extern int WprDeleteFonts(void);
 extern int WprSetFont(int family,int pty,int bold,int italic,int underl);
 extern int WprFormFeed(void);
-extern int WprFormFeedStd();
+extern int WprFormFeedStd(void);
 extern int WprPrintStringNoAlign(int x,int y,unsigned char *txt);
 extern int WprPrintString(int x,int y,unsigned char *txt);
 extern int WprHCenterLeft(void);
@@ -463,7 +463,7 @@ extern int WscrRegisterDeleteApplData(char *ApplCode);
 extern HWND WscrGetMainWnd(void);
 
 /* s_wsys2.c */
-extern int WscrGetPid();
+extern int WscrGetPid(void);
 extern int WscrTempFilenameInDir(char *dirname, char *filename);
 extern int WscrTempFilename(char *filename);
 extern int WscrTempPath(char *dirbuf);

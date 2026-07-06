@@ -87,7 +87,7 @@ int     maxlevel;
     fprintf(JFdToc, "</TABLE>\n");
     fprintf(JFdToc, "<!ENDTOC>\n");
     fclose(JFdToc);
-    SCR_add_ptr(&JHRefs, &JHRefsNb, 0L);
+	SCR_add_ptr((unsigned char ***)&JHRefs, &JHRefsNb, 0L);
     JHRefFree();
 
     if(clevel < 0) return(-2);

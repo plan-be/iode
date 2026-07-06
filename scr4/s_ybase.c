@@ -72,20 +72,7 @@ dernier cas un message est envoyé vers le stderr.
 &TX
 &SA YY_close()
 =======================================================================*/
-#ifdef __cplusplus
-YYFILE *YY_open(
-char    *filename,
-YYKEYS  *table,
-int     size,
-int     type
-)
-#else
-YYFILE *YY_open(filename, table, size, type)
-char    *filename;
-YYKEYS  *table;
-int     size;
-int     type;
-#endif
+YYFILE *YY_open(char *filename, YYKEYS *table, int size, int type)
 {
     YYFILE  *yy;
 
@@ -108,23 +95,8 @@ int     type;
      return   : 0 of OK, -1 otherwise
    ============================================================== */
 
-#ifdef __cplusplus
 /*NH*/
-int YY_init(
-YYFILE  *yy,
-char    *filename,
-YYKEYS  *table,
-int     size,
-int     type
-)
-#else
-int YY_init(yy, filename, table, size, type)
-YYFILE  *yy;
-char    *filename;
-YYKEYS  *table;
-int     size;
-int     type;
-#endif
+int YY_init(YYFILE *yy, char *filename, YYKEYS *table, int size, int type)
 {
 
     memset(yy, 0, sizeof(YYFILE));
@@ -159,8 +131,7 @@ int     type;
      yy : IN : YYFILE pointer
    ============================================================== */
 
-int YY_end(yy)
-YYFILE  *yy;
+int YY_end(YYFILE *yy)
 {
     int     i;
 
@@ -194,8 +165,7 @@ trouvées en cours d'interprétation du fichier).
 &SA YY_open()
 =======================================================================*/
 
-int YY_close(yy)
-YYFILE  *yy;
+int YY_close(YYFILE *yy)
 {
     if(yy == 0) return(-1);
     YY_end(yy);
@@ -225,9 +195,7 @@ excédentaires sont ignorés et un message est envoyé vers le stderr.
 &SA YY_ungetc(), YY_getc()
 =======================================================================*/
 
-int YY_record(yy, txt)
-YYFILE  *yy;
-unsigned char *txt;
+int YY_record(YYFILE *yy, unsigned char *txt)
 {
     int             lg, i, add;
     unsigned char   *ptr;
@@ -275,9 +243,7 @@ YY_ungetc() fait appel à YY_record().
 &SA YY_record()
 =======================================================================*/
 
-int YY_ungetc(ch, yy)
-int     ch;
-YYFILE  *yy;
+int YY_ungetc(int ch, YYFILE *yy)
 {
     char    buf[2];
 
@@ -316,8 +282,7 @@ Cette fonction est utilisée par les autres fonctions de lecture
 &SA YY_record(), YY_ungetc(), YY_read(), YY_lex()
 =======================================================================*/
 
-YY_getc(yy)
-YYFILE  *yy;
+int YY_getc(YYFILE *yy)
 {
     int     ch;
 
@@ -372,8 +337,7 @@ again :
 	}
 }
 /*NH*/
-int YY_upper(str)
-char    *str;
+int YY_upper(char *str)
 {
     SCR_upper(str);
 /*    while(*str) {

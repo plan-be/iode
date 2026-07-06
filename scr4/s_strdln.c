@@ -21,10 +21,7 @@ par le caractère \0.
 &SA SCR_add_ptr()
 =======================================================================*/
 
-SCR_read_line(fd, buf, lg)
-FILE            *fd;
-unsigned char   *buf;
-int             lg;
+int SCR_read_line(FILE *fd, unsigned char *buf, int lg)
 {
     int     i = 0, ch;
 

@@ -18,8 +18,7 @@ int (**A2M_GRF_FNS)(...);
 int (**A2M_GRF_FNS)();
 #endif
 
-A2mGrfPrint(agrf)
-A2MGRF  *agrf;
+int A2mGrfPrint(A2MGRF *agrf)
 {
     A2mGrfInit(agrf);
     A2mGrf(agrf);
@@ -27,8 +26,7 @@ A2MGRF  *agrf;
     return(0);
 }
 
-A2mGrfInit(ag)
-A2MGRF  *ag;
+int A2mGrfInit(A2MGRF *ag)
 {
     double  width = ag->ag_size[0],
 	    height = ag->ag_size[1];
@@ -43,8 +41,7 @@ A2MGRF  *ag;
     return(0);
 }
 
-A2mGrfEnd(ag)
-A2MGRF  *ag;
+int A2mGrfEnd(A2MGRF *ag)
 {
     A2mGrfGroup();
     A2mDEVGrfEnd(ag);
@@ -53,8 +50,7 @@ A2MGRF  *ag;
 
 double GR_Box[4];
 
-A2mGrf(agrf)
-A2MGRF  *agrf;
+int A2mGrf(A2MGRF *agrf)
 {
     A2mGrfTitle(agrf);
     A2mGrfGrid(agrf);
@@ -66,14 +62,12 @@ A2MGRF  *agrf;
     return(0);
 }
 
-A2mGrfTitle(agrf)
-A2MGRF  *agrf;
+int A2mGrfTitle(A2MGRF *agrf)
 {
 	return(0);
 }
 
-A2mGrfLegend(agrf)
-A2MGRF  *agrf;
+int A2mGrfLegend(A2MGRF *agrf)
 {
     double  x, y;
 
@@ -95,8 +89,7 @@ A2MGRF  *agrf;
 
 }
 
-A2mGrfBarNbr(agrf)
-A2MGRF  *agrf;
+int A2mGrfBarNbr(A2MGRF *agrf)
 {
 	int i, j, maxobs = 0, nobs;
 
@@ -155,8 +148,7 @@ int A2M_NBGR;
 int     GR_nbdec[3];
 double  GR_incr[3], GR_left[3], GR_right[3];
 
-A2mGrfGrid(agrf)
-A2MGRF  *agrf;
+int A2mGrfGrid(A2MGRF *agrf)
 {
 	double  nb_axes;
 	int     i;
@@ -218,8 +210,7 @@ A2MGRF  *agrf;
 	return(0);
 }
 
-A2mGrfXy(agrf)
-A2MGRF  *agrf;
+int A2mGrfXy(A2MGRF *agrf)
 {
     if(agrf->ag_gxy == NULL) return(0);
 
@@ -229,18 +220,18 @@ A2MGRF  *agrf;
     return(0);
 }
 
-A2mGrfBeginObj()
+int A2mGrfBeginObj(void)
 {
     return(GR_obj_id++);
 }
 
-A2mGrfEndObj()
+int A2mGrfEndObj(void)
 {
     A2mDEVGrfGroupObj();
     return(0);
 }
 
-A2mGrfGroup()
+int A2mGrfGroup(void)
 {
     A2mDEVGrfGroup();
     return(0);
@@ -249,8 +240,7 @@ A2mGrfGroup()
 double *A2MGRFMULTI_Y, *A2MGRFMULTI_Z;
 int             A2MGRFMULTI_Y_STACK, A2MGRFMULTI_Z_STACK;
 
-A2mGrfPlot(agrf)
-A2MGRF  *agrf;
+int A2mGrfPlot(A2MGRF *agrf)
 {
 	int     i, pen = 1, brush = 1, sign = 1;
 	A2MGXY  *gxy;
@@ -263,9 +253,9 @@ A2MGRF  *agrf;
 
 	if(A2M_GR_MULTIBAR > 0) {
 		A2MGRFBARNB = 1 + A2MGRFHASZ;
-		A2MGRFMULTI_Y = SCR_malloc(A2MGRFMAXOBS * sizeof(double));
+		A2MGRFMULTI_Y = (double *) SCR_malloc(A2MGRFMAXOBS * sizeof(double));
 		A2MGRFMULTI_Y_STACK = 0;
-		A2MGRFMULTI_Z = SCR_malloc(A2MGRFMAXOBS * sizeof(double));
+		A2MGRFMULTI_Z = (double *) SCR_malloc(A2MGRFMAXOBS * sizeof(double));
 		A2MGRFMULTI_Z_STACK = 0;
 	}
 
@@ -305,8 +295,7 @@ A2MGRF  *agrf;
 
 
 
-A2mGrfOrigin(left, right)
-double  *left, *right;
+int A2mGrfOrigin(double *left, double *right)
 {
 	GR_X_origin = GR_Y_origin = GR_Z_origin = 0.0;
 
@@ -334,8 +323,7 @@ double  *left, *right;
     return(0);
 }
 
-A2mGrfTranslate(x, y, z)
-double  x, y, z;
+int A2mGrfTranslate(double x, double y, double z)
 {
     GR_X_0 += x;
     GR_Y_0 += y;
@@ -343,9 +331,7 @@ double  x, y, z;
     return(0);
 }
 
-A2mGrfBox(axis, x, y, w, h, props)
-int     axis, props;
-double  x, y, w, h;
+int A2mGrfBox(int axis, double x, double y, double w, double h, int props)
 {
     double  y_origin, y_scale;
 
@@ -365,9 +351,7 @@ double  x, y, w, h;
 }
 
 
-A2mGrfLine(axis, x1, y1, x2, y2, props)
-int     axis, props;
-double  x1, y1, x2, y2;
+int A2mGrfLine(int axis, double x1, double y1, double x2, double y2, int props)
 {
 	double  y_origin, y_scale;
 
@@ -385,10 +369,7 @@ double  x1, y1, x2, y2;
 	return(0);
 }
 
-A2mGrfPlotGrid(agrf, left, right, incr, nbdec)
-A2MGRF  *agrf;
-int     *nbdec;
-double  *left, *right, *incr;
+int A2mGrfPlotGrid(A2MGRF *agrf, double *left, double *right, double *incr, int *nbdec)
 {
 	int      i, k, l, level, clevel;
 	double   j, start, stop;
@@ -464,11 +445,7 @@ double  *left, *right, *incr;
 	return(0);
 }
 
-int A2mGrfGridLine(agrf, type, left, right, span, text, dir, maxi, level)
-A2MGRF  *agrf;
-double  left, right, span, maxi;
-A2MPAR *text;
-int     type, dir, level;
+int A2mGrfGridLine(A2MGRF *agrf, int type, double left, double right, double span, A2MPAR *text, int dir, double maxi, int level)
 {
 	int     axis;
 	char    align[10];
@@ -535,11 +512,7 @@ int     type, dir, level;
     return(0);
 }
 
-A2mGrfPar(axis, x1, y1, par, align, color)
-int     axis;
-double  x1, y1;
-A2MPAR  *par;
-char    *align, *color;
+int A2mGrfPar(int axis, double x1, double y1, A2MPAR *par, char *align, char *color)
 {
     char    *ptr;
     double  y_origin, y_scale;
@@ -560,9 +533,7 @@ char    *align, *color;
     return(0);
 }
 
-A2mGrfPlotXy(axis, type, nobs, vals, props)
-int     axis, type, nobs, props;
-double  *vals;
+int A2mGrfPlotXy(int axis, int type, int nobs, double *vals, int props)
 {
 	int     i, *stacked;
 	double  *scaled, width;
@@ -628,9 +599,7 @@ double  *vals;
     return(0);
 }
 
-A2mGrfPolyBar(axis, nobs, vals, width, props)
-int     axis, nobs, props;
-double  *vals, width;
+int A2mGrfPolyBar(int axis, int nobs, double *vals, double width, int props)
 {
     int     i, nbar = A2MGRFBARNB, cbar = A2MGRFBARCURRENT;
     double      *multi;
@@ -652,9 +621,7 @@ double  *vals, width;
 	return(0);
 }
 
-int A2mGrfMins(agrf, mins, maxs) // GB 16/03/2009
-A2MGRF  *agrf;
-double  mins[3], maxs[3];
+int A2mGrfMins(A2MGRF *agrf, double mins[3], double maxs[3]) // GB 16/03/2009
 {
 	int     i, j, a, nbgr,hasZ;
 	A2MGXY  *gxy;
@@ -674,8 +641,8 @@ double  mins[3], maxs[3];
 			maxnobs = _max_(maxnobs, gxy->xy_nobs);
 		}
 */
-		multiy = SCR_malloc(A2MGRFMAXOBS * sizeof(double));
-		multiz = SCR_malloc(A2MGRFMAXOBS * sizeof(double));
+		multiy = (double *) SCR_malloc(A2MGRFMAXOBS * sizeof(double));
+		multiz = (double *) SCR_malloc(A2MGRFMAXOBS * sizeof(double));
 	}
 
 	nbgr = 0;
@@ -751,11 +718,7 @@ double  mins[3], maxs[3];
 	return(nbgr);
 }
 
-A2mGrfIncr(agrf, grid, mini, maxi, incr, nbdec, left, right, lbar)
-A2MGRF  *agrf;
-short   grid;
-double  mini, maxi, *left, *right, *incr, *lbar;
-int     *nbdec;
+int A2mGrfIncr(A2MGRF *agrf, short grid, double mini, double maxi, double *incr, int *nbdec, double *left, double *right, double *lbar)
 {
     double  d, ld, x;
 
@@ -804,22 +767,19 @@ int     *nbdec;
 	return(0);
 }
 
-int A2mEmptyPar(ap)
-A2MPAR  *ap;
+int A2mEmptyPar(A2MPAR *ap)
 {
 	int             i;
 	A2MSTR  *as;
 
-	for(i = 0; i < ap->ap_strs[i]; i++) {
+	for(i = 0; ap->ap_strs[i]; i++) {
 		as = ap->ap_strs[i];
 		if(as  && as->as_txt && as->as_txt[0] != 0) return(0);   // Not Empty
 	}
 	return(1); // Empty Par
 }
 
-A2mGrfLabel(nbr, type, title, props)
-int     nbr, type, props;
-A2MPAR  *title;
+int A2mGrfLabel(int nbr, int type, A2MPAR *title, int props)
 {
 	int         i, line, col;
 	double      x, y, width;
@@ -870,9 +830,7 @@ A2MPAR  *title;
 }
 
 
-A2mGrfPolyLine(axis, nobs, vals, props)
-int     axis, nobs, props;
-double  *vals;
+int A2mGrfPolyLine(int axis, int nobs, double *vals, int props)
 {
     int     i, start, stop;
 

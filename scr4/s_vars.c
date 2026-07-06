@@ -106,8 +106,8 @@ int     SCR_ms_event;
 PR_DEF  *PR_CURRENT = 0;
 char    *PR_TITLE = 0;
 char    *PR_DOCNAME = 0;        /* JMP 23-08-98 */
-int (*SCR_FN_KEY)() = 0;        /* JMP 4.23 14-12-95 */
-int (*SCR_HIT_KEY_FN)() = 0;    /* JMP 4.23 14-12-95 */
+int (*SCR_FN_KEY)(int, int) = 0;        /* JMP 4.23 14-12-95 */
+int (*SCR_HIT_KEY_FN)(void) = 0;    /* JMP 4.23 14-12-95 */
 MSSTAT   MS_stat;               /* JMP 4.23 14-12-95 */
 int      MS_present = 0;        /* JMP 4.23 14-12-95 */
 int     SCR_vtime;              /* JMP 4.23 14-12-95 */

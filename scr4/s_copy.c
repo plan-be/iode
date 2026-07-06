@@ -23,9 +23,7 @@ Duplicie un fichier avec ou sans bufferisation (de l'output).
 &EN -4 : Error writing output file
 ================================================ */
 
-SCR_copy_file_ex(in, out, buf)
-char    *in, *out;
-int     buf;
+int SCR_copy_file_ex(char *in, char *out, int buf)
 {
     FILE    *fi, *fo;
     int     ch, rc = 0;
@@ -85,8 +83,7 @@ Duplicie un fichier.
 &EN -4 : Error writing output file
 ================================================ */
 
-SCR_copy_file(in, out)
-char    *in, *out;
+int SCR_copy_file(char *in, char *out)
 {
     return(SCR_copy_file_ex(in, out, 0));
 }
@@ -107,9 +104,7 @@ Duplicie un fichier en flushant tous les buf bytes.
 &EN -4 : Error writing output file
 ================================================ */
 
-SCR_copy_file_flush(in, out, buf)
-char    *in, *out;
-int     buf;
+int SCR_copy_file_flush(char *in, char *out, int buf)
 {
     FILE    *fi, *fo;
     int     ch, rc = 0;
@@ -169,9 +164,7 @@ Append un fichier en flushant tous les buf bytes.
 &EN -4 : Error writing output file
 ================================================ */
 
-SCR_append_file_flush(in, out, buf)
-char    *in, *out;
-int     buf;
+int SCR_append_file_flush(char *in, char *out, int buf)
 {
     FILE    *fi, *fo;
     int     ch, rc = 0;

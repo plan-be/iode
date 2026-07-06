@@ -11,8 +11,7 @@ Retourne la position d'un string sstr dans le string str.
 &SA U_pos()
 =======================================================================*/
 
-U_index(str, sstr)
-unsigned char   *str, *sstr;
+int U_index(unsigned char *str, unsigned char *sstr)
 {
     int     i = 0, lg, slg, pos;
 

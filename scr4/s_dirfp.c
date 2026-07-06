@@ -70,7 +70,7 @@ char    *name, *res;
 	vcdir = (char **) SCR_vtoms("", "\\/");
     else
 	vcdir = (char **) SCR_vtoms(cdir + 2, "\\/");
-    nvcdir = SCR_tbl_size(vcdir);
+	nvcdir = SCR_tbl_size((unsigned char **)vcdir);
     for(i = 0; vname[i] ; i++) {
 	if(strcmp(vname[i], ".") == 0) continue;
 	if(strncmp(vname[i], "..", 2) == 0) {
@@ -80,15 +80,15 @@ char    *name, *res;
 		}
 	    continue;
 	    }
-	SCR_add_ptr(&vcdir, &nvcdir, vname[i]);
+	SCR_add_ptr((unsigned char ***)&vcdir, &nvcdir, vname[i]);
 	}
 
-    SCR_add_ptr(&vcdir, &nvcdir, 0L);
-    tmp = SCR_mtov(vcdir, dirch);
+	SCR_add_ptr((unsigned char ***)&vcdir, &nvcdir, 0L);
+	tmp = SCR_mtov((unsigned char **)vcdir, dirch);
     strcat(res, tmp);
     SCR_free(tmp);
-    SCR_free_tbl(vcdir);    /* JMP 14-12-96 */
-    SCR_free_tbl(vname);    /* JMP 14-12-96 */
+	SCR_free_tbl((unsigned char **)vcdir);    /* JMP 14-12-96 */
+	SCR_free_tbl((unsigned char **)vname);    /* JMP 14-12-96 */
 
 #if defined(DOS) && !defined(DOSW32) && !defined(SCRW32) /* JMP 31-03-98 */
     SCR_lower(res);

@@ -1,7 +1,9 @@
 #if defined(SCRW32) || defined(DOSW32)
 #include "scr4w.h"
 
-LONG FAR PASCAL WscrEMFProc();
+LRESULT CALLBACK WscrEMFProc(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam);
+int WscrEMFCalcWindowPos(int nb, int i, int *x, int *y, int *w, int *h);
+int WscrEMFPrintDirect(HWND hWnd);
 
 /*NH*/
 ATOM WscrEMFRegister()
@@ -115,7 +117,7 @@ HWND WscrWMFCreate(HWND hParent, char *filename, HANDLE hemf, int del)
 
 
 /*NH*/
-LONG FAR PASCAL WscrEMFProc(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WscrEMFProc(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 {
 //    WORD    wId = LOWORD(wParam);
     HENHMETAFILE    hemf;
@@ -145,7 +147,7 @@ LONG FAR PASCAL WscrEMFProc(HWND hWnd, UINT wMsg, WPARAM wParam, LPARAM lParam)
 }
 
 /*NH*/
-WscrEMFDestroy(HWND hWnd)
+int WscrEMFDestroy(HWND hWnd)
 {
     HANDLE  hemf;
     int     type = GetWindowLongPtr(hWnd, 8);
@@ -169,7 +171,7 @@ WscrEMFDestroy(HWND hWnd)
 }
 
 /*NH*/
-WscrEMFWMFPaint(HWND hWnd)
+int WscrEMFWMFPaint(HWND hWnd)
 {
     int     type = GetWindowLongPtr(hWnd, 8);
 
@@ -180,7 +182,7 @@ WscrEMFWMFPaint(HWND hWnd)
 }
 
 /*NH*/
-WscrEMFPaint(HWND hWnd)
+int WscrEMFPaint(HWND hWnd)
 {
     HENHMETAFILE    hemf;
     HDC             hDC;
@@ -226,7 +228,7 @@ WscrEMFPaint(HWND hWnd)
 }
 
 /*NH*/
-WscrEMFPrint(HWND hWnd, char *filename, HENHMETAFILE hemf, int ask)
+int WscrEMFPrint(HWND hWnd, char *filename, HENHMETAFILE hemf, int ask)
 {
     extern HDC      WprhDC;
     RECT            rct;
@@ -249,7 +251,7 @@ fin:
 }
 
 /*NH*/
-WscrWMFPrint(HWND hWnd, char *filename, HMETAFILE hwmf, int ask)
+int WscrWMFPrint(HWND hWnd, char *filename, HMETAFILE hwmf, int ask)
 {
     extern HDC      WprhDC;
     RECT            rect;
@@ -275,7 +277,7 @@ fin:
 }
 
 /*NH*/
-WscrEMFPrintDirect(HWND hWnd)
+int WscrEMFPrintDirect(HWND hWnd)
 {
     char            *filename;
     HENHMETAFILE    hemf;
@@ -290,12 +292,13 @@ WscrEMFPrintDirect(HWND hWnd)
 	}
     else {
 	hwmf = (HMETAFILE)GetWindowLongPtr(hWnd, 4);
-	WscrWMFPrint(hWnd, filename, hemf, 1);
+    WscrWMFPrint(hWnd, filename, hwmf, 1);
 	}
+    return(0);
 }
 
 /*NH*/
-WscrWMFPaint(HWND hWnd)
+int WscrWMFPaint(HWND hWnd)
 {
     HMETAFILE       hwmf;
     HDC             hDC;
@@ -323,7 +326,7 @@ WscrWMFPaint(HWND hWnd)
 }
 
 
-WscrEMFCalcWindowPos(int nb, int i, int *x, int *y, int *w, int *h)
+int WscrEMFCalcWindowPos(int nb, int i, int *x, int *y, int *w, int *h)
 {
     int     nrows, ncols;
     int     cx = GetSystemMetrics(SM_CXSCREEN);
@@ -351,6 +354,7 @@ WscrEMFCalcWindowPos(int nb, int i, int *x, int *y, int *w, int *h)
 
     *x = cx / 10 + (i % ncols) * *w;
     *y = cy / 10 + (i / ncols) * *h;
+    return(0);
 }
 
 #endif

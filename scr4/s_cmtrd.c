@@ -8,11 +8,6 @@ int     mode;
 {
     static int last_mode, first_call = 1;
     char    *pt;
-#ifdef __cplusplus
-    char    *SCR_search_file(char *);
-#else
-    char    *SCR_search_file();  /* JMP 07-01-98 */
-#endif
     char    *open_mode;
 
     if(SCR_CMT_FILE[0] == 0)

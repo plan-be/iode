@@ -2,7 +2,7 @@
 #ifndef PRWINDOWS
 
 /*NH*/
-A2mToGdiEMF()
+int A2mToGdiEMF(void)
 {
     return(-1);
 }
@@ -15,9 +15,7 @@ extern int  A2M_GDI_W, A2M_GDI_H;
 extern int  A2M_GDI_MARGX, A2M_GDI_MARGY;
 
 /*NH*/
-A2mGdiEMFInit(filename, w, h)
-U_ch    *filename;
-int     w, h;
+int A2mGdiEMFInit(U_ch * filename, int w, int h)
 {
     if(WprEMFInit(filename, w, h, 0L)) return(-1);
     A2mGdiAllInit();
@@ -28,7 +26,7 @@ int     w, h;
 }
 
 /*NH*/
-A2mGdiEMFEnd()
+int A2mGdiEMFEnd(void)
 {
     WprEMFEnd();
     A2mGdiAllEnd();
@@ -36,7 +34,7 @@ A2mGdiEMFEnd()
 }
 
 /*NH*/
-A2mGdiWMFEnd()
+int A2mGdiWMFEnd(void)
 {
     WprWMFEnd();
     A2mGdiAllEnd();
@@ -44,9 +42,7 @@ A2mGdiWMFEnd()
 }
 
 /*NH*/
-A2mGdiWMFInit(filename, w, h)
-U_ch    *filename;
-int     w, h;
+int A2mGdiWMFInit(U_ch * filename, int w, int h)
 {
     if(WprWMFInit(filename, w, h)) return(-1);
     A2mGdiAllInit();
@@ -151,9 +147,7 @@ Ces variables sont définies dans la section [GDI] du fichier .ini.
     A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mToGdiEMF(a2mfile, outfile, w, h)
-U_ch    *a2mfile, *outfile;
-int     w, h;
+int A2mToGdiEMF(U_ch * a2mfile, U_ch * outfile, int w, int h)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -187,7 +181,7 @@ en un fichier EMF outfile.
 
 ===========================================================*/
 
-A2mGdiEMFGrf(char *a2mfile, char *outfile)
+int A2mGdiEMFGrf(char *a2mfile, char *outfile)
 {
     A2MFILE *af;
     A2MOBJ  *ao;

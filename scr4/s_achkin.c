@@ -8,9 +8,7 @@
 &SA A_check()
 =========================================================================*/
 
-A_check_int(argc, argv)
-int     argc;
-char    *argv[];
+int A_check_int(int argc, char *argv[])
 {
     int     i;
 
@@ -20,8 +18,7 @@ char    *argv[];
 }
 /*NH*/
 
-A_check_int_1(parm)
-char    *parm;
+int A_check_int_1(char *parm)
 {
     int     i;
 

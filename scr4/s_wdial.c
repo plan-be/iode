@@ -459,11 +459,11 @@ char **WscrRasGetConnections()
 	}
 
     for(i = 0; i < Nb; i++) {
-	SCR_add_ptr(&tbl, &nb, lpRasConns[i].szEntryName);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, lpRasConns[i].szEntryName);
 	}
 
     SCR_free(lpRasConns);
-    SCR_add_ptr(&tbl, &nb, (char *)0);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, (char *)0);
     return(tbl);
 }
 

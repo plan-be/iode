@@ -7,7 +7,7 @@ extern "C" {
 
 /* s_dir*.c */
 extern char *SCR_getcwd(int drive,char *dir);
-extern int SCR_dosgetdrive();
+extern int SCR_dosgetdrive(void);
 extern int SCR_dossetdrive(int ndrive);
 extern int SCR_dosgetcwd(char* dir, int lg);
 extern int SCR_dir_edit_fn(char *text,char *dirname,SCRSTAT *ss);

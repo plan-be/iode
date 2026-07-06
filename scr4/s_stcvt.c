@@ -7,22 +7,23 @@
 /* localtime ne fonctionne pas correctement en VC (retourne NULL)
   et donc wrapper */
 
-struct tm *localtime_vc_bc(time_t *t)
+struct tm *localtime_vc_bc(long t)
 {
 #ifdef VC
-    return(_localtime32(t));
+    __time32_t t32 = (__time32_t)t;
+    return(_localtime32(&t32));
 #else
-    return(localtime(t));
+    time_t tt = (time_t)t;
+    return(localtime(&tt));
 #endif
 
 }
-long SCR_cvt_time(t)
-long    t;
+long SCR_cvt_time(long t)
 {
     struct tm   *tt;
     long        l;
 
-    tt = localtime_vc_bc((time_t *)&t);
+    tt = localtime_vc_bc(t);
     if(tt == 0) return(0L); /* JMP 26-03-98 */
     l = (long)tt->tm_hour * 10000L +
 	(long)tt->tm_min * 100L +
@@ -30,13 +31,12 @@ long    t;
     return(l);
 }
 
-long SCR_cvt_time64(t)
-long    t;
+long SCR_cvt_time64(long t)
 {
     struct tm   *tt;
     long        l;
 
-    tt = localtime_vc_bc((time_t *)&t);
+    tt = localtime_vc_bc(t);
     if(tt == 0) return(0L); /* JMP 26-03-98 */
     l = (long)tt->tm_hour * 10000L +
 	(long)tt->tm_min * 100L +
@@ -44,13 +44,12 @@ long    t;
     return(l);
 }
 
-long SCR_cvt_date(t)
-long    t;
+long SCR_cvt_date(long t)
 {
     struct tm   *tt;
     long        l;
 
-    tt = localtime_vc_bc((time_t *)&t);
+    tt = localtime_vc_bc(t);
     if(tt == 0) return(0L); /* JMP 26-03-98 */
     l = (long)tt->tm_mday +
 	100L * (long)(tt->tm_mon + 1L) +

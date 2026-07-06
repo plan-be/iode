@@ -23,10 +23,7 @@ seule ligne ou lorsque l'opérateur n'est pas connu.
 ======================================================================= */
 
 
-MREAL   M_cstat(m1, c, op)
-MAT *m1;
-int c;
-int op;
+MREAL M_cstat(MAT * m1, int c, int op)
 {
     int i;
     MREAL res = 0.0, sce = 0.0, m, x;
@@ -93,10 +90,7 @@ seule colonne ou lorsque l'opérateur n'est pas connu.
 ======================================================================= */
 
 
-MREAL   M_lstat(m1, l, op)
-MAT *m1;
-int l;
-int op;
+MREAL M_lstat(MAT * m1, int l, int op)
 {
     int     j;
     MREAL   res = 0.0, sce = 0, m, x;

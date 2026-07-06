@@ -168,17 +168,7 @@ extern  REAL        *stack0;
 #define CALC_open_string(str)      CALC_open_all(str, YY_MEM)
 #define CALC_open_stdin()          CALC_open_all((char *)0, YY_STDIN)
 
-#ifndef SCRPROTO
-extern  PAS     *CALC_cc_stream();
-extern  PAS     *CALC_cc2();
-extern  REAL    CALC_exec_pas();
-extern  REAL    CALC_start_exec_pas();
-extern  char    *CALC_error();
-extern  REAL    CALC_start();
-
-#else /* SCRPROTO */
 #include <s_proclc.h>
-#endif /* SCRPROTO */
 
 #endif
 

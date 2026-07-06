@@ -8,8 +8,7 @@ pas le system call rename.
 &RT 0 en cas de succès, -1 sinon.
 =======================================================================*/
 
-SCR_rename(fold, fnew)
-char    *fold, *fnew;
+int SCR_rename(char *fold, char *fnew)
 {
 #if defined(XENIX) || defined(LINUX)
     if(link(fold, fnew)) return(-1);

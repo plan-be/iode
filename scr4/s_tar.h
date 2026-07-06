@@ -49,26 +49,15 @@ extern int              TarTracks[];
 extern int              TarDensity[];
 
 /************* FUNCTIONS ***************/
-#ifndef SCRPROTO
-extern int              (*TarNextFn)();
-extern char             *TarError();
-extern FILE             *Tarfopen();
-extern int              TarDftNextFn(), TarDftTableFn();
-
-#else /* SCRPROTO */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 extern int              (*TarNextFn)(int);
-/*extern int              TarDftNextFn(int), TarDftTableFn(TARHEAD *); */
 #ifdef __cplusplus
 }
 #endif
 
 #include <s_protar.h>
-
-#endif /* SCRPROTO */
 #endif /* _S_TAR_ */
 
 

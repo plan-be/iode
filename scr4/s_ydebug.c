@@ -13,8 +13,7 @@ message debug et de la mémoire disponible.
 ======================================================================= */
 
 
-int YY_debug(yy)
-YYFILE  *yy;
+int YY_debug(YYFILE *yy)
 {
     fprintf(stderr, "%s : debug", YY_error(yy));
 #ifdef DOS

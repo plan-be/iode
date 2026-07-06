@@ -31,9 +31,7 @@ int     nl,
 int     nc
 )
 #else
-MAT *M_extr(m2, m1, l, c, nl, nc)
-MAT     *m2, *m1;
-int     l, c, nl, nc;
+MAT *M_extr(MAT *m2, MAT *m1, int l, int c, int nl, int nc)
 #endif
 {
     int i,j, k, m;

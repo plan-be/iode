@@ -11,8 +11,7 @@ de caractère de séparation entre les zônes.
 &RT 0 au cas où le numéro est correct, -1 sinon.
 ------------------------------------------------------------------------- */
 
-SCR_check_nb(rn)
-char    *rn;
+int SCR_check_nb(char *rn)
 {
     long    rnnum, res;
 /*  long    atol(); /* JMP 04-01-98 */

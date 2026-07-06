@@ -168,9 +168,9 @@ FIELD   *fld;
     return(0);
 }
 
-extern long     ACT_find_lg();
-extern char     *ACT_find_str();
-extern double   ACT_find_db();
+extern long     ACT_find_lg(A_ACTION *aa,int i);
+extern char     *ACT_find_str(A_ACTION *aa,int i);
+extern double   ACT_find_db(A_ACTION *aa,int i);
 
 /*NH*/
 extern char    SCR_EXPORT_TXT[SCR_MAX_FIELD_LENGTH + 1];    /* BP_M 12-12-2009 13:22 */

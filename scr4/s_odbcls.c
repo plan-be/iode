@@ -7,7 +7,7 @@
 
 extern char        OCharBuf[256];
 extern SQLSMALLINT OShortBuf;
-extern SQLINTEGER  OLongBuf;
+extern SQLLEN      OLongBuf;
 
 /* ====================================================================
 Retourne la liste de toutes les Data Sources disponibles sur le
@@ -22,7 +22,7 @@ système.
     dsns = OListDSNs();
     if(dsns) {
 	for(i = 0; dsns[i] ; i++) printf("%s\n", dsns[i]);
-	SCR_free_tbl(dsns);
+    SCR_free_tbl((unsigned char **)dsns);
 	}
     else {
 	printf("Error reading DSN list\n");
@@ -45,15 +45,15 @@ char **OListDSNs()
     //with SQL_FETCH_NEXT until it returns SQL_NO_DATA.
     nDirection = SQL_FETCH_FIRST;
     while(1) {
-	nResult = SQLDataSources(OHenv, nDirection, szDSN, 255,
-				  &nDSNlg, szDescr, 255,
+    nResult = SQLDataSources(OHenv, nDirection, (SQLCHAR *)szDSN, 255,
+                  &nDSNlg, (SQLCHAR *)szDescr, 255,
 				  &nSDlg);
 	if(nResult == SQL_NO_DATA || nResult == SQL_ERROR) break;
-	SCR_add_ptr(&tbl, &nb, szDSN);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, (unsigned char *)szDSN);
 	nDirection = SQL_FETCH_NEXT;
 	}
 
-    SCR_add_ptr(&tbl, &nb, 0L);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, 0L);
     return(tbl);
 }
 
@@ -97,7 +97,7 @@ char **OListTables(ODSN *odsn)
 		     NULL, 0, /* All catalogs */
 		     NULL, 0, /* All schemas     */
 		     NULL, 0, /* All names */
-		     "TABLE", SQL_NTS);             /* Only Tabbles */
+             (SQLCHAR *)"TABLE", SQL_NTS);             /* Only Tabbles */
 
     if(retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) return((char **)0);
 
@@ -108,11 +108,11 @@ char **OListTables(ODSN *odsn)
     while(1) {
 	retcode = SQLFetch(odsn->hstmt);
 	if(retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) break;
-	SQLGetData(odsn->hstmt, 3, SQL_C_CHAR, OCharBuf, 100, &OShortBuf);
-	SCR_add_ptr(&tbl, &nb, OCharBuf);
+    SQLGetData(odsn->hstmt, 3, SQL_C_CHAR, OCharBuf, 100, &OLongBuf);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, (unsigned char *)OCharBuf);
 	}
 
-    SCR_add_ptr(&tbl, &nb, 0L);
+    SCR_add_ptr((unsigned char ***)&tbl, &nb, 0L);
 //    SQLFreeStmt(odsn->hstmt, SQL_UNBIND);
 //    SQLFreeStmt(odsn->hstmt, SQL_RESET_PARAMS);
     SQLFreeHandle(SQL_HANDLE_STMT, odsn->hstmt);

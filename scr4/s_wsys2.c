@@ -1,4 +1,7 @@
 #include <time.h>
+#if defined(SCRW32) || defined(DOSW32)
+#include <process.h>
+#endif
 
 #ifdef UNIX
     // #include <sys/time.h>    // JMP 6/4/2022
@@ -6,6 +9,22 @@
 #endif
 
 #include "scr4w.h"
+
+#if defined(SCRW32) || defined(DOSW32)
+static int StatTimeToFileTime(FILETIME *pft, long date, long time)
+{
+    SYSTEMTIME st;
+
+    st.wYear = (WORD)(date / 10000L);
+    st.wMonth = (WORD)((date / 100L) % 100L);
+    st.wDay = (WORD)(date % 100L);
+    st.wHour = (WORD)(time / 10000L);
+    st.wMinute = (WORD)((time / 100L) % 100L);
+    st.wSecond = (WORD)(time % 100L);
+    st.wMilliseconds = 0;
+    return(SystemTimeToFileTime(&st, pft) ? 0 : -1);
+}
+#endif
 
 /* ===============================================================
 Retourne le process id

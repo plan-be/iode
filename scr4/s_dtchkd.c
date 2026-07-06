@@ -30,8 +30,7 @@ défini dans la variable globale SCR_DATE_FMT.
 &SA SCR_fdate_to_long()
 =======================================================================*/
 
-long SCR_date_to_long(string)
-char *string ;
+long SCR_date_to_long(char * string)
 {
     return(SCR_fdate_to_long(string, SCR_DATE_FMT));
 }
@@ -74,10 +73,9 @@ long SCR_fdate_to_long(str, fmt)  /* BP_M 14-07-1997 */
 char    *str;
 char    *fmt;
 {
-    long    date = 0, dt[3], atol();
-    int     nby = 0, nbd = 0, nbm = 0,
-	    y = 1, m = 10, d = 10;
-    int     i, j;
+	long    date = 0, dt[3];
+    int     nby = 0, nbd = 0, nbm = 0, y = 1, m = 10, d = 10;
+    int     i;
     char    bd[5], bm[5], by[10];
     extern  int     DT_DAYS[];
 
@@ -235,8 +233,7 @@ Vérifie qu'une date est correcte. Le mois doit étre compris entre 01 et
 &SA SCR_check_fmt_date()
 =======================================================================*/
 
-SCR_check_date(date)
-long    date;
+int SCR_check_date(long date)
 {
     int day, month, year;
 
@@ -266,8 +263,7 @@ entre 01 et 12, le jour entre 1 et 31, l'année n'est pas vérifiée.
 &SA SCR_check_date()
 =======================================================================*/
 
-SCR_check_fmt_date(str, fmt)
-char    *str, *fmt;
+int SCR_check_fmt_date(char * str, char * fmt)
 {
     return(SCR_check_date(SCR_fdate_to_long(str, fmt)));
 }

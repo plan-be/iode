@@ -12,8 +12,7 @@ fprintf(a1, a2, ...).
 &RT -1 en cas d'erreur, 0 sinon.
 ------------------------------------------------------------------------- */
 
-SCR_printf_file(filename, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
-char    *filename, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10;
+int SCR_printf_file(char *filename, char *a1, char *a2, char *a3, char *a4, char *a5, char *a6, char *a7, char *a8, char *a9, char *a10)
 {
     FILE    *fd;
 
@@ -42,10 +41,7 @@ de retour est 0;
 &RT -1 en cas d'erreur, 0 sinon (même si le fichier n'est pas créé).
 ------------------------------------------------------------------------- */
 
-SCR_printf_tbl(filename, tbl, fmt)
-char    *filename;
-unsigned char **tbl;
-char    *fmt;
+int SCR_printf_tbl(char *filename, unsigned char **tbl, char *fmt)
 {
     FILE    *fd;
     int     i;
@@ -70,9 +66,7 @@ Copie  le contenu du fichier filename dans le stream fd.
 &RT -1 en cas d'erreur, 0 sinon (même si le fichier n'est pas créé).
 ------------------------------------------------------------------------- */
 
-SCR_dumpf_file(fd, filename)
-FILE    *fd;
-char    *filename;
+int SCR_dumpf_file(FILE *fd, char *filename)
 {
     FILE    *fdi = fopen(filename, "r");
     int     ch;

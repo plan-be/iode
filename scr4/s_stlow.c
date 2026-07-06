@@ -16,8 +16,7 @@ Les caractères accentués sont considérés comme des minuscules.
 &SA SCR_is_upper(), SCR_upper(), SCR_lower_char(), SCR_lower()
 =======================================================================*/
 
-SCR_is_lower(ch)
-int     ch;
+int SCR_is_lower(int ch)
 {
     if(SCR_upper_char(ch) != ch) return(1);
     return(0);
@@ -39,8 +38,7 @@ transformer le caractère.
 &SA SCR_lower(), SCR_upper_char(), SCR_upper()
 =======================================================================*/
 
-SCR_lower_char(ch)
-int     ch;
+int SCR_lower_char(int ch)
 {
     if(ch >= 'A' && ch <= 'Z') return(ch - 'A' + 'a'); /* JMP 14-06-96 */
 /*  if(SCR_is_upper(ch)) ch = tolower(ch);             /* JMP 14-06-96 */
@@ -57,8 +55,7 @@ Met un string en minuscules. La modification a lieu sur place.
 &SA SCR_lower_char(), SCR_upper_char(), SCR_upper()
 =======================================================================*/
 
-unsigned char *SCR_lower(str)
-unsigned char    *str;
+unsigned char *SCR_lower(unsigned char *str)
 {
     int     i;
 

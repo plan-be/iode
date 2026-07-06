@@ -1395,9 +1395,9 @@ extern MENU     *MN_auto_create();
 extern char     *IS_text();
 extern MENU     *MN_create_default();
 extern unsigned char *OBJ_search_ptr();
-extern char     *ACT_find_str();
-extern long     ACT_find_lg();
-extern double   ACT_find_db();
+extern char     *ACT_find_str(A_ACTION *aa,int i);
+extern long     ACT_find_lg(A_ACTION *aa,int i);
+extern double   ACT_find_db(A_ACTION *aa,int i);
 extern long     IS_copy(), IS_copy_fn(), IS_dup_dbase(); /* JMP 08-11-98 */
 extern IMAGE    *PG_cmt_display();
 extern char     *SCR_construct_cmt_fnk();
@@ -1424,25 +1424,21 @@ extern unsigned char *MMT_edit_field();
 extern LST  *MMT_get_lst();
 extern char *SCR_fnk_txt();
 
-extern double SCR_atof();   /* BP_M 24-07-95 */
+extern double SCR_atof(char *txt);   /* BP_M 24-07-95 */
 
 extern short SCR_str_add(); /* BP_M 23-01-97 */
 extern short SCR_str_find_str(); /* BP_M 23-01-97 */
 extern char *SCR_str_get(); /* BP_M 23-01-97 */
 
-extern long WscrGetMS(); /* JMP 01-04-99 */
+extern long WscrGetMS(void); /* JMP 01-04-99 */
 
-extern int  (*SCR_FN_KEY)(); /* JMP 10-06-94 */
-extern int  (*SCR_HIT_KEY_FN)();
+extern int  (*SCR_FN_KEY)(int, int); /* JMP 10-06-94 */
+extern int  (*SCR_HIT_KEY_FN)(void);
 
 extern char *IS_get_field();        /* BP_M 22-02-2000 */
 extern GZIPFILE *GzipCreate();      /* JMP 19-10-00 */
 
 extern char *SCR_HttpGetFile(); 
-
-#ifndef WATCOM
-extern double  atof();
-#endif
 
 #else /* SCRPROTO */
 

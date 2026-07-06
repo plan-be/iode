@@ -36,8 +36,7 @@ MAT     *m1,
 MAT     *m2
 )
 #else
-MAT *M_solve(m3, m1, m2)
-MAT   *m3, *m1, *m2;
+MAT *M_solve(MAT *m3, MAT *m1, MAT *m2)
 #endif
 
 {
@@ -99,9 +98,7 @@ err:
    trivial case dim == 1.
 */
 
-M_gel_init(dim, m1, m2, m3)    /* mat, vect, sol */
-int     dim;
-MAT     *m1, *m2, *m3;
+int M_gel_init(int dim, MAT *m1, MAT *m2, MAT *m3)    /* mat, vect, sol */
 {
   if (dim < 1) return(-1);
   else
@@ -125,9 +122,7 @@ MAT     *m1, *m2, *m3;
    no solution exists (error == 2 is returned).
 */
 
-M_gel_ut(dim, m1, m2)
-int     dim;
-MAT     *m1, *m2;
+int M_gel_ut(int dim, MAT *m1, MAT *m2)
 {
     int     error = 0, row, r_row = 0;
     MREAL   mult;
@@ -181,10 +176,7 @@ err:
    singular && no solution exists (error == 2 is returned).
 */
 
-M_gel_pivot(dim, r_row, m1, m2)
-int     dim;
-int     r_row;
-MAT     *m1, *m2;
+int M_gel_pivot(int dim, int r_row, MAT *m1, MAT *m2)
 {
 
     int   n_row, error;
@@ -227,9 +219,7 @@ MAT     *m1, *m2;
    is returned in the vector solution.
 */
 
-M_bw_sub(dim, m1, m2, m3)
-int     dim;
-MAT     *m1, *m2, *m3;
+int M_bw_sub(int dim, MAT *m1, MAT *m2, MAT *m3)
 {
     register int    term, row;
     register MREAL   sum = 0.0;

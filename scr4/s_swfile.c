@@ -39,7 +39,7 @@ extern  char    *getenv(const char*);
     contient le nom du disque et du fichier à utiliser.
 */
 
-SW_open()
+int SW_open(void)
 {
     char    *ptr;
     int     o_fmode, ext;
@@ -91,8 +91,7 @@ int SW_close()
 }
 
 /*NH*/
-int SW_append_file(ptr)
-char    *ptr;
+int SW_append_file(char *ptr)
 {
 /*    extern long lseek(); cfr stdio.h /* JMP 03-01-98 */
     long        pos;
@@ -108,9 +107,7 @@ char    *ptr;
 #define SW_BUF_SIZE SW_SEG_SIZE
 
 /*NH*/
-int SW_swap(ptr, ref)
-char    *ptr;
-int     ref;
+int SW_swap(char *ptr, int ref)
 {
     char   *buf;
     long   pos, i, chk;

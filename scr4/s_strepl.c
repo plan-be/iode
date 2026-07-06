@@ -76,8 +76,7 @@ occurences du string repl par le string by dans txt.
 &SA U_index(), SCR_areplace()
 =======================================================================*/
 
-SCR_replace_len(txt, repl, by, chars)
-unsigned char   *txt, *repl, *by, *chars;
+int SCR_replace_len(unsigned char *txt, unsigned char *repl, unsigned char *by, unsigned char *chars)
 {
     int     pos, shift = 0, add = (int)strlen(txt),
                  lgrepl = (int)strlen(repl),

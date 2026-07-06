@@ -26,9 +26,7 @@ MAT     *m2,
 MREAL   scale
 )
 #else
-MAT *M_scale(m2, m1, scale)
-MAT     *m1, *m2;
-MREAL    scale;
+MAT *M_scale(MAT *m2, MAT *m1, MREAL scale)
 #endif
 
 {

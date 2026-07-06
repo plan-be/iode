@@ -1,8 +1,8 @@
 #include "scr.h"
 
-extern long     ACT_find_lg();
-extern char     *ACT_find_str();
-extern double   ACT_find_db();
+extern long     ACT_find_lg(A_ACTION *aa,int i);
+extern char     *ACT_find_str(A_ACTION *aa,int i);
+extern double   ACT_find_db(A_ACTION *aa,int i);
 
 /*NH*/
 ACT_exec_aa_bc(aa)

@@ -27,13 +27,13 @@ NULL ou vide, ou fld_select est < 0, toutes les lignes sont sélectionnées.
 	descr = PC_list("printcap", 2, -1, NULL);
 	if(descr == 0) return(-1);
 	mn = MN_auto_create(descr, 5, 15, 10, 1, SCR_REVERSE);
-	SCR_free_tbl(descr);
+	SCR_free_tbl((unsigned char **)descr);
 
 	prnb = MN_edit(mn) - 1;
 	if(prnb < 0) return(-1);
 	descr = PC_list("printcap", 0, -1, NULL);
 	PR_exec("printcap", descr[prnb], filename, NULL, NULL);
-	SCR_free_tbl(descr);
+	SCR_free_tbl((unsigned char **)descr);
 	return(0);
     }
 &TX

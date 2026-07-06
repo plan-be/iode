@@ -27,8 +27,7 @@ MAT     *m2,
 MAT     *m3
 )
 #else
-MAT *M_xaxprim(m3, m1, m2)
-MAT   *m1, *m2, *m3;
+MAT *M_xaxprim(MAT *m3, MAT *m1, MAT *m2)
 #endif
 
 {

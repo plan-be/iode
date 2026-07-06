@@ -180,25 +180,6 @@ extern int      SW_SEG_SIZE; /* JMP 27-11-07 */
 #endif 
 
 /* =================== FNS PROTOTYPES =========================== */
-
-#ifndef SCRPROTO
-extern char     *EMS_error_text();
-extern int      SW_init();
-extern void     SW_end();
-extern SWHDL    SW_alloc();
-extern SWHDL    SW_realloc();
-extern char     *SW_getptr();
-extern char     *SW_nalloc_doc();
-extern char     *SW_nrealloc_doc();
-extern char     *SW_nalloc_orig();
-extern char     *SW_nrealloc_orig();
-extern SWHDL    SW_find_free_item();
-extern long     SW_coreleft();
-extern SWSIZE   SW_get_pos();
-extern SWHDL    SW_get_free();
-extern void     SW_Debug();
-#else
-
 #include <s_prosw.h>
 
 #ifdef __cplusplus
@@ -206,8 +187,6 @@ extern "C" {
     int Wprintf(char *, ...);
 }
 #endif /* __cplusplus */
-
-#endif /* SCRPROTO */
 
 
 #endif /* _SWAP_ */

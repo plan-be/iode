@@ -113,21 +113,7 @@ typedef struct _scrdir_ {
 #endif
 
 /* ============= Functions declarations ============= */
-
-#ifndef SCRPROTO
-
-SCRSTAT *SCR_readdir();
-SCRSTAT *SCR_readdir_ex();
-SCRDIR  *SCR_opendir();
-SCRSTAT **SCR_dir();
-SCRSTAT **SCR_dir_ex();
-SCRSTAT *SCR_dir_edit(), *SCR_dir_edit_1();
-char    *SCR_fullpath(), *SCR_getcwd(), *SCR_relpath();
-char    *SCR_dir_join();
-
-#else
 #include <s_prodir.h>
-#endif
 
 #endif
 

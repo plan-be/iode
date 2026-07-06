@@ -36,9 +36,7 @@ La fonction inverse est SCR_mtov().
 &SA <-SCR_vtom()>, <-SCR_vtoms2()>, <-SCR_vtoms3()>, SCR_mtov(), SCR_free_tbl(), SCR_copy_tbl()
 =======================================================================*/
 
-unsigned char **SCR_vtoms(str, seps)
-unsigned char    *str,
-		 *seps;
+unsigned char **SCR_vtoms(unsigned char *str, unsigned char *seps)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, i;
@@ -96,9 +94,7 @@ La fonction inverse est SCR_mtov().
 &SA SCR_vtoms() SCR_mtov(), SCR_free_tbl();
 =======================================================================*/
 
-unsigned char **SCR_vtom(str, sep)
-unsigned char   *str;
-int             sep;
+unsigned char **SCR_vtom(unsigned char *str, int sep)
 {
     U_ch    seps[2];
 
@@ -152,10 +148,7 @@ La fonction inverse est SCR_mtov().
 &SA SCR_vtom(), SCR_vtoms(), SCR_vtoms3(), SCR_mtov(), SCR_free_tbl(), SCR_copy_tbl()
 =======================================================================*/
 
-unsigned char **SCR_vtoms2(str, seps, supdbl)
-unsigned char    *str,
-		 *seps;
-int              supdbl;
+unsigned char **SCR_vtoms2(unsigned char *str, unsigned char *seps, int supdbl)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, i;
@@ -189,10 +182,7 @@ int              supdbl;
 }
 
 /*NH*/
-SCR_vtoms2ACmpt(str, seps, supdbl)
-unsigned char    *str,
-		 *seps;
-int              supdbl;
+int SCR_vtoms2ACmpt(unsigned char *str, unsigned char *seps, int supdbl)
 {
     int     ntbl = 0, i;
 
@@ -220,10 +210,7 @@ int              supdbl;
 }
 
 /*NH*/
-unsigned char **SCR_vtoms2A(str, seps, supdbl)
-unsigned char    *str,
-		 *seps;
-int              supdbl;
+unsigned char **SCR_vtoms2A(unsigned char *str, unsigned char *seps, int supdbl)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, i, intbl = 0;
@@ -313,10 +300,7 @@ contiennent un séparateur.
 TODO: ERREUR: à corriger pour les args entre "abc","def" => "abc",NULL,"def" 
 =======================================================================*/
 
-unsigned char **SCR_vtoms3(str, seps, supdbl)
-unsigned char    *str,
-		 *seps;
-int              supdbl;
+unsigned char **SCR_vtoms3(unsigned char *str, unsigned char *seps, int supdbl)
 {
     U_ch    **tbl = 0;
     int     ntbl = 0, i;

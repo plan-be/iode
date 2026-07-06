@@ -19,7 +19,7 @@
 #include <stdio.h>
 //#include <ctype.h>
 #include <s_yy.h>
-double  atof();
+double  atof(void);
 
 
 #define SCR_REVERSE     1  /* LIGHT GREY BLACK */
@@ -118,9 +118,9 @@ extern char             *_SCR_find_buf();
 extern char             *PG_get_rec_txt();
 extern char             *PG_aget_rec_txt();
 
-extern long             SCR_current_time();
-extern long             SCR_ftime_to_long();
-extern long             SCR_fdate_to_long();
+extern long             SCR_current_time(void);
+extern long             SCR_ftime_to_long(char *str,char *fmt);
+extern long             SCR_fdate_to_long(char *str,char *fmt);
 extern long             SCR_get_field_date();
 extern long             SCR_get_field_time();
 
@@ -165,8 +165,8 @@ extern int              SCR_CHECK_DELETE;
 extern int              SCR_EDIT_KILL;
 extern char             SCR_NAME_SCR[SCR_MAX_FILE_LG_MAX + 1];
 extern char             SCR_NAME_ERR[SCR_MAX_FILE_LG_MAX + 1];
-extern int              (*SCR_FN_KEY)();
-extern int              (*SCR_HIT_KEY_FN)(); /* JMP 10-06-94 */
+extern int              (*SCR_FN_KEY)(int, int);
+extern int              (*SCR_HIT_KEY_FN)(void); /* JMP 10-06-94 */
 extern int              SCR_CLOCK_POS[];
 extern int              SCR_MEM_POS[];
 extern char             SCR_LANGUAGE[] ;

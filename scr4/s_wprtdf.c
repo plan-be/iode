@@ -89,7 +89,7 @@ Fournit le nom du printer par défaut.
 
 ========================================================================= */
 
-WscrGetDefaultPrinter(char *PrinterName)
+int WscrGetDefaultPrinter(char *PrinterName)
 {
     LPPRINTER_INFO_5    ppinfo5; /* JMP 22-04-02 */
     DWORD               nb, ret;
@@ -126,7 +126,7 @@ sous NT 4.0.
 &SA WscrSetPrinter*(), WscrPrinterProperties()
 ========================================================================= */
 
-WscrSetDefaultPrinter(char *PrinterName)
+int WscrSetDefaultPrinter(char *PrinterName)
 {
     HANDLE          hPrinter;
     PRINTER_INFO_4  *ppinfo4;
