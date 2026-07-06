@@ -70,6 +70,20 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(iode_scr4 PRIVATE "-Wno-implicit-function-declaration")
 endif()
 
+if (MSVC)
+	target_compile_options(iode_scr4 PRIVATE
+		/W4
+		# /WX	# Treats all compiler warnings as errors.
+		/we4013 # function undefined; assuming extern returning int
+		/we4020 # too many actual parameters
+		/we4024 # different types for formal and actual parameter
+		/we4047 # different levels of indirection
+		/we4113 # function parameter lists differ
+		/we4133 # incompatible pointer types
+		/we4431 # missing type specifier; int assumed
+	)
+endif()
+
 if(TARGET iode_scr4)
 	message(STATUS "New target iode_scr4 enabled\n")
 else()
