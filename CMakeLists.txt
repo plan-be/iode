@@ -2,8 +2,8 @@
 # and include sub-projects here.
 #
 
-# installed CMake version on ReadTheDocs is 3.22 (September 2024)
-cmake_minimum_required(VERSION 3.22)
+# github actions: ubuntu-latest -> cmake version 3.31 (July 2026)
+cmake_minimum_required(VERSION 3.31)
 
 include(CMakePrintHelpers)
 
