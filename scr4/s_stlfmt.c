@@ -13,8 +13,7 @@ tous les '0', '9', 'X' et 'x' présents dans le format.
 &SA SCR_ufmt_text(), SCR_fmt_text()
 =======================================================================*/
 
-SCR_fmt_lg(fmt)
-char    *fmt;
+int SCR_fmt_lg(char *fmt)
 {
     int     i, nb = 0;
 

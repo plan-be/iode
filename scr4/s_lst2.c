@@ -15,8 +15,7 @@ unsigned char   *LST_BUF = 0;
 int    LST_BUF_LEN = 0;             // JMP 30/11/2022
 
 /*NH*/
-LST_set_buf(ch, pos)
-int     ch, pos;
+int LST_set_buf(int ch, int pos)
 {
     unsigned char   *buf;
 
@@ -118,8 +117,7 @@ unsigned char   *seps;
 int     LST_POS;
 
 /*NH*/
-int LST_nextch(fdvec)
-FILE    *fdvec;
+int LST_nextch(FILE *fdvec)
 {
     int             ch;
     unsigned char   *vec = (unsigned char *)fdvec;
@@ -142,16 +140,7 @@ est rencontré, une ligne de texte est stockée (et allouée) dans la liste.
 &SA LST_ltov(), LST_free_text(), LST_get(), LST_set()
 ------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
-LST *LST_vtol(
-unsigned char   *vec,
-unsigned char   *seps
-)
-#else
-LST *LST_vtol(vec, seps)
-unsigned char   *vec, *seps;
-#endif
-
+LST *LST_vtol(unsigned char *vec, unsigned char *seps)
 {
     LST_POS = 0;
     return(LST_read_in(LST_nextch, (FILE *)vec, seps));
@@ -166,9 +155,7 @@ en séparant les strings originaux par seps.
 &SA LST_vtol(), LST_free_text(), LST_get(), LST_set()
 ------------------------------------------------------------------------- */
 
-unsigned char *LST_ltov(lst, seps)
-LST             *lst;
-unsigned char   *seps;
+unsigned char *LST_ltov(LST *lst, unsigned char *seps)
 {
     unsigned char   *ptr, *vec = 0;
     long            i;
@@ -241,8 +228,7 @@ Libère une liste de strings alloués en SWAP.
 &TX
 &SA LST_read_file(), SW_getptr()
 ------------------------------------------------------------------------- */
-int LST_free_text(lst)
-LST     *lst;
+int LST_free_text(LST *lst)
 {
     long            i;
 
@@ -279,15 +265,7 @@ raison d'un élément de liste par ligne du fichier.
 &SA LST_save_file() LST_free_text()
 ------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
-LST *LST_read_file(
-char   *filename
-)
-#else
-LST *LST_read_file(filename)
-char   *filename;
-#endif
-
+LST *LST_read_file(char *filename)
 {
     FILE            *fd;
     LST             *lst = 0;
@@ -314,9 +292,7 @@ Sauve dans le fichier filename la liste de strings lst (strings en SWAP).
 &RT 0 si le fichier est correctement créé, -1 sinon
 &SA LST_read_file()
 ------------------------------------------------------------------------- */
-LST_save_file(filename, lst)
-char    *filename;
-LST     *lst;
+int LST_save_file(char *filename, LST *lst)
 {
     FILE            *fd;
     unsigned char   *ptr;
@@ -348,9 +324,7 @@ LST     *lst;
 int LST_NO_TABS = 0;
 
 /*NH*/
-int LST_fwrite(fd, ptr)
-FILE            *fd;
-unsigned char   *ptr;
+int LST_fwrite(FILE *fd, unsigned char *ptr)
 {
     int         i, nbl = 0, flag = LST_NO_TABS;
 

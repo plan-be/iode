@@ -28,6 +28,8 @@ char   *A2M_FRM_BASEFONT = "Arial"; /* JMP 05-01-2017 */
 /* Private */
 FILE    *A2M_fdfrm = 0, *A2M_fdtbl = 0, *A2M_fdfrw = 0;
 int     A2M_TBLID = 0, A2M_FRAMEID = 0;
+int A2mFrColorCatalog(void);
+int A2mFrPrintNewPage(A2MPAGE *apg);
 char    *A2M_FRCOLORS[] = {
     "Black",
     "White",
@@ -48,8 +50,7 @@ FILE *A2mFrOpenFile(
     char    *ext
 )
 #else
-FILE *A2mFrOpenFile(outfile, ext)
-char    *outfile, *ext;
+FILE *A2mFrOpenFile(char *outfile, char *ext)
 #endif
 {
     FILE    *fd;
@@ -62,8 +63,7 @@ char    *outfile, *ext;
 }
 
 /*NH*/
-A2mFrUnlinkFiles(outfile)
-char    *outfile;
+int A2mFrUnlinkFiles(char * outfile)
 {
     char    buf[256];
 
@@ -184,8 +184,7 @@ Ces variables sont définies dans la section [MAKER] du fichier .ini.
 &SA A2mFrmReadIni(), A2mToRtf(), A2mToGdi(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mToMif(a2mfile, outfile)
-char    *a2mfile, *outfile;
+int A2mToMif(char * a2mfile, char * outfile)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -210,8 +209,7 @@ char    *a2mfile, *outfile;
 }
 
 /*NH*/
-A2mFrInit(outfile)
-char    *outfile;
+int A2mFrInit(char * outfile)
 {
     extern int A2M_CUROBJ;
 
@@ -233,8 +231,7 @@ char    *outfile;
 }
 
 /*NH*/
-A2mFrPrintObj(ao)
-A2MOBJ  *ao;
+int A2mFrPrintObj(A2MOBJ * ao)
 {
     char        msg[80];
     extern int  A2M_CUROBJ;
@@ -259,8 +256,7 @@ A2MOBJ  *ao;
 }
 
 /*NH*/
-A2mFrEnd(outfile)
-char    *outfile;
+int A2mFrEnd(char * outfile)
 {
     fclose(A2M_fdfrw);
     fclose(A2M_fdtbl);
@@ -286,14 +282,13 @@ char    *outfile;
 }
 
 /*NH*/
-A2mFrPrintNewPage(A2MPAGE *apg)
+int A2mFrPrintNewPage(A2MPAGE *apg)
 {
     fprintf(A2M_fdfrw, " <Para <Pgf <PgfTag `newpage'>> <ParaLine <String ` '> >>\n");
     /* JMP 17-01-02 */
 }
 /*NH*/
-A2mFrCalcBlc(ap)
-A2MPAR  *ap;
+int A2mFrCalcBlc(A2MPAR * ap)
 {
     /* GB 03/05/04 */
     int     i;
@@ -312,10 +307,7 @@ A2MPAR  *ap;
 }
 
 /*NH*/
-A2mFrPrintPar(ap, dest, shift, tbl, grf, just, var)
-A2MPAR  *ap;
-int     dest, shift, tbl, grf, just;
-U_ch    *var;
+int A2mFrPrintPar(A2MPAR * ap, int dest, int shift, int tbl, int grf, int just, U_ch * var)
 {
     FILE    *fd;
     int     i;
@@ -373,10 +365,7 @@ U_ch    *var;
 }
 
 /*NH*/
-A2mFrPrintStr(fd, ap, n)
-FILE    *fd;
-A2MPAR  *ap;
-int     n;
+int A2mFrPrintStr(FILE * fd, A2MPAR * ap, int n)
 {
     A2MSTR  *as = ap->ap_strs[n];
     int     i;
@@ -413,9 +402,7 @@ int     n;
 }
 
 /*NH*/
-A2mFrPrintChar(fd, ch)
-FILE    *fd;
-int     ch;
+int A2mFrPrintChar(FILE * fd, int ch)
 {
     U_ch    *str;
 
@@ -535,10 +522,7 @@ int     ch;
 }
 
 /*NH*/
-A2mFrAFrame(fd, rfilename, type)
-FILE    *fd;
-char    *rfilename;
-int     type;
+int A2mFrAFrame(FILE * fd, char * rfilename, int type)
 {
     int     isgif = 0, ispdf = 0; /* JMP 03-03-99 */
     char    filename[256];
@@ -633,10 +617,7 @@ int     type;
 }
 
 /*NH*/
-A2mFrPrintAttr(fd, ap, n)
-FILE    *fd;
-A2MPAR  *ap;
-int     n;
+int A2mFrPrintAttr(FILE * fd, A2MPAR * ap, int n)
 {
     A2MFNT  fnt, fntp;
     A2MSTR  *asp = 0, *as;
@@ -685,8 +666,7 @@ int     n;
 }
 
 /*NH*/
-A2mFrPrintTbl(at)
-A2MTBL  *at;
+int A2mFrPrintTbl(A2MTBL * at)
 {
     /* 1. fdfrw */
     if(at->at_title && A2M_FRM_TTITLE == 0)
@@ -723,8 +703,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mFrCalcShading(val)
-int     val;
+int A2mFrCalcShading(int val)
 {
     switch(val) {
         case 8 :
@@ -745,8 +724,7 @@ int     val;
 }
 
 /*NH*/
-char *A2mFrRuling(line)
-int     line;
+char *A2mFrRuling(int line)
 {
     if(line == 0) return("None");
     else if(line == 1) return("Thin");
@@ -755,9 +733,7 @@ int     line;
 
 
 /*NH*/
-A2mFrPrintTblFmt(fd, at)
-FILE    *fd;
-A2MTBL  *at;
+int A2mFrPrintTblFmt(FILE * fd, A2MTBL * at)
 {
     int     i, b = at->at_border;
 
@@ -821,9 +797,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mFrTblNbLines(at, hbf)
-A2MTBL  *at;
-int     hbf;
+int A2mFrTblNbLines(A2MTBL * at, int hbf)
 {
     int     nb = 0, i;
 
@@ -836,9 +810,7 @@ int     hbf;
 }
 
 /*NH*/
-A2mFrPrintTblLines(at, hbf)
-A2MTBL  *at;
-int     hbf;
+int A2mFrPrintTblLines(A2MTBL * at, int hbf)
 {
     A2MTC   *tc;
     int     i, j, line = 0, just;
@@ -886,7 +858,7 @@ int     hbf;
 }
 
 /*NH*/
-A2mFrFontCatalog()
+int A2mFrFontCatalog(void)
 {
     int     pts = 10;
     
@@ -954,7 +926,7 @@ A2mFrFontCatalog()
 }
 
 /*NH*/
-A2mFrColorCatalog()
+int A2mFrColorCatalog(void)
 {
     fprintf(A2M_fdfrm, "<ColorCatalog                            \n");
     fprintf(A2M_fdfrm, " <Color                                  \n");
@@ -1105,8 +1077,7 @@ A2mFrColorCatalog()
 }
 
 /*NH*/
-char *A2mFrAlignment(just)
-int     just;
+char *A2mFrAlignment(int just)
 {
     switch(just) {
         case 1 :
@@ -1123,8 +1094,7 @@ int     just;
 }
 
 /*NH*/
-char *A2mFrNoYes(ny)
-int     ny;
+char *A2mFrNoYes(int ny)
 {
     switch(ny) {
         case 1 :
@@ -1135,8 +1105,7 @@ int     ny;
 }
 
 /*NH*/
-char *A2mFrPlacement(newpage)
-int     newpage;
+char *A2mFrPlacement(int newpage)
 {
     switch(newpage) {
         case 1 :
@@ -1147,8 +1116,7 @@ int     newpage;
 }
 
 /*NH*/
-char *A2mFrFontFamily(family)
-int     family;
+char *A2mFrFontFamily(int family)
 {
     switch(family) {
         case 'B' :
@@ -1169,7 +1137,7 @@ int     family;
 }
 
 /*NH*/
-A2mFrCatalogPar()
+int A2mFrCatalogPar(void)
 {
     int     i;
 
@@ -1182,9 +1150,7 @@ A2mFrCatalogPar()
 }
 
 /*NH*/
-A2mFrCatalog1Par(fd, pp)
-FILE    *fd;
-A2MPPR  *pp;
+int A2mFrCatalog1Par(FILE * fd, A2MPPR * pp)
 {
     int     i;
 
@@ -1268,8 +1234,7 @@ d'interprétation et d'impression.
 &SA A2mToGdi(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mFrmReadIni(filename)
-char    *filename;
+int A2mFrmReadIni(char * filename)
 {
     char    buf[256];
 
@@ -1298,8 +1263,7 @@ char    *filename;
 extern int (*A2M_FR_GRF_FNS[])();
 
 /*NH*/
-A2mFrPrintGrf(agrf)
-A2MGRF  *agrf;
+int A2mFrPrintGrf(A2MGRF * agrf)
 {
     A2M_GRF_FNS = A2M_FR_GRF_FNS;
     A2mGrfPrint(agrf);
@@ -1307,8 +1271,7 @@ A2MGRF  *agrf;
 }
 
 /*NH*/
-A2mFrGrfInit(ag)
-A2MGRF  *ag;
+int A2mFrGrfInit(A2MGRF * ag)
 {
     FILE    *fdfrw = A2M_fdfrw,
              *fdfrm = A2M_fdfrm;
@@ -1336,8 +1299,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mFrGrfEnd(ag)
-A2MGRF  *ag;
+int A2mFrGrfEnd(A2MGRF * ag)
 {
     FILE    *fd = A2M_fdfrm;
     A2MPAR  *prFootnote = ag->ag_footnote;
@@ -1347,8 +1309,7 @@ A2MGRF  *ag;
     return(0);
 }
 
-A2mFrGrfPen(pen)
-A2MPEN  *pen;
+int A2mFrGrfPen(A2MPEN * pen)
 {
     int     i;
     FILE    *fd = A2M_fdfrm;
@@ -1365,8 +1326,7 @@ A2MPEN  *pen;
 }
 
 /*NH*/
-A2mFrGrfBrush(brush)
-A2MBRUSH  *brush;
+int A2mFrGrfBrush(A2MBRUSH * brush)
 {
     FILE    *fd = A2M_fdfrm;
 
@@ -1376,9 +1336,7 @@ A2MBRUSH  *brush;
 }
 
 /*NH*/
-A2mFrGrfLine(axis, x1, y1, x2, y2, props)
-double  x1, y1, x2, y2;
-int     axis, props;
+int A2mFrGrfLine(int axis, double x1, double y1, double x2, double y2, int props)
 {
     A2MPEN  pen;
     FILE    *fd = A2M_fdfrm;
@@ -1412,10 +1370,7 @@ int     axis, props;
 }
 
 /*NH*/
-A2mFrGrfText(axis, x, y, string, align, color)
-int     axis;
-double  x, y;
-char    *string, *align, *color;
+int A2mFrGrfText(int axis, double x, double y, char * string, char * align, char * color)
 {
     FILE    *fd = A2M_fdfrm;
     double  y_0;
@@ -1432,9 +1387,7 @@ char    *string, *align, *color;
 }
 
 /*NH
-A2mFrGrfLabel(nbr, type, title, props)
-int     nbr, type, props;
-A2MPAR  *title;
+int A2mFrGrfLabel(int nbr, int type, A2MPAR * title, int props)
 {
     int         i, line, col;
     double      x, y, width;
@@ -1465,10 +1418,7 @@ A2MPAR  *title;
 }
 */
 /*NH*/
-A2mFrGrfPar(axis, x, y, par, align, color)
-double  x, y;
-char    *align, *color;
-A2MPAR  *par;
+int A2mFrGrfPar(int axis, double x, double y, A2MPAR *par, char *align, char *color)
 {
     int         i;
     FILE        *fd = A2M_fdfrm;
@@ -1496,7 +1446,7 @@ A2MPAR  *par;
 }
 
 /*NH*/
-A2mFrGrfGroupObj()
+int A2mFrGrfGroupObj(void)
 {
     FILE    *fd = A2M_fdfrm;
 
@@ -1505,7 +1455,7 @@ A2mFrGrfGroupObj()
 }
 
 /*NH*/
-A2mFrGrfGroup()
+int A2mFrGrfGroup(void)
 {
     FILE    *fd = A2M_fdfrm;
 
@@ -1515,9 +1465,7 @@ A2mFrGrfGroup()
 
 
 /*NH*/
-A2mFrGrfBox(axis, x, y, w, h, props)
-double  x, y, w, h;
-int     axis, props;
+int A2mFrGrfBox(int axis, double x, double y, double w, double h, int props)
 {
     A2MBRUSH    brush;
     FILE        *fd = A2M_fdfrm;
@@ -1549,9 +1497,7 @@ int     axis, props;
 }
 
 /*NH*/
-A2mFrGrfPolyLine(axis, nobs, vals, props)
-int     axis, nobs, props;
-double  *vals;
+int A2mFrGrfPolyLine(int axis, int nobs, double * vals, int props)
 {
     int     i;
     A2MPEN  pen;
@@ -1575,9 +1521,7 @@ double  *vals;
 }
 
 /*NH*/
-A2mFrGrfPolyBar(axis, nobs, vals, width, props)
-int     axis, nobs, props;
-double  *vals, width;
+int A2mFrGrfPolyBar(int axis, int nobs, double * vals, double width, int props)
 {
     /*
         int     i,
@@ -1594,9 +1538,7 @@ double  *vals, width;
 
 /*********** TEMPORARY OBJECTS *******************/
 /*NH*/
-A2mFrGrfGetPen(props, pen)
-int     props;
-A2MPEN  *pen;
+int A2mFrGrfGetPen(int props, A2MPEN * pen)
 {
     extern A2MPEN      A2mFrGridPen;
     extern  A2MPEN     *A2mFrGrfdPen;
@@ -1610,9 +1552,7 @@ A2MPEN  *pen;
 
 
 /*NH*/
-A2mFrGrfGetBrush(props, brush)
-int         props;
-A2MBRUSH    *brush;
+int A2mFrGrfGetBrush(int props, A2MBRUSH * brush)
 {
     extern  A2MBRUSH    *A2mFrGrfdBrush;
 
@@ -1624,22 +1564,22 @@ A2MBRUSH    *brush;
 /******* FUNCTION TABLE FOR FRAME ***********/
 
 int (*A2M_FR_GRF_FNS[])() = {
-    A2mFrGrfInit,
-    A2mFrGrfEnd,
-    A2mFrGrfPen,
-    A2mFrGrfBrush,
-    A2mFrGrfLine,
-    A2mFrGrfText,
+    (int (*)())A2mFrGrfInit,
+    (int (*)())A2mFrGrfEnd,
+    (int (*)())A2mFrGrfPen,
+    (int (*)())A2mFrGrfBrush,
+    (int (*)())A2mFrGrfLine,
+    (int (*)())A2mFrGrfText,
     0,
-    A2mFrGrfPar,
+    (int (*)())A2mFrGrfPar,
     A2mFrGrfGroupObj,
     A2mFrGrfGroup,
-    A2mFrGrfBox,
-    A2mFrGrfPolyLine,
-    A2mFrGrfPolyBar,
+    (int (*)())A2mFrGrfBox,
+    (int (*)())A2mFrGrfPolyLine,
+    (int (*)())A2mFrGrfPolyBar,
     A2mFrGrfPrepare,
-    A2mFrGrfGetPen,
-    A2mFrGrfGetBrush
+    (int (*)())A2mFrGrfGetPen,
+    (int (*)())A2mFrGrfGetBrush
 };
 
 

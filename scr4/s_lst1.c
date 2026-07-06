@@ -22,16 +22,7 @@ La liste peut être désallouée par LST_free().
 &SA LST_free(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-#ifdef __cplusplus
-LST *LST_create(
-int     tbl_size,
-int     el_size
-)
-#else
-LST *LST_create(tbl_size, el_size)
-int     tbl_size, el_size;
-#endif
-
+LST *LST_create(int tbl_size, int el_size)
 {
     LST     *lst;
     char    *ptr;
@@ -57,8 +48,7 @@ pas traités.
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_free(lst)
-LST     *lst;
+int LST_free(LST *lst)
 {
     int     i;
 
@@ -83,8 +73,7 @@ Ajoute un élément à la fin de la liste lst. Cet élément est nul.
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_add_1(lst)
-LST     *lst;
+int LST_add_1(LST *lst)
 {
     char    **tbls;
 
@@ -117,9 +106,7 @@ Pour ajouter au début de la liste, after peut valoir -1L.
 &SA LST_create(), LST_add1(), LST_set(), LST_del(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_add(lst, after, n)
-LST     *lst;
-long    after, n;
+int LST_add(LST *lst, long after, long n)
 {
     long    i;
 
@@ -142,9 +129,7 @@ Détruit n éléments à partir de l'élément from.
 &SA LST_create(), LST_add(), LST_set(), LST_get(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_del(lst, from, n)
-LST     *lst;
-long    from, n;
+int LST_del(LST *lst, long from, long n)
 {
     long    i;
     int     nb_tbls;
@@ -175,9 +160,7 @@ Déplace les n éléments à partir de from après l'élémént after.
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_get()
 ------------------------------------------------------------------------- */
 
-LST_move(lst, from, after, n)
-LST     *lst;
-long    from, after, n;
+int LST_move(LST *lst, long from, long after, long n)
 {
     long    i;
 
@@ -200,9 +183,7 @@ Retourne un pointeur vers l'élément n de la liste lst.
 &SA LST_create(), LST_add(), LST_set(), LST_del(), LST_move()
 ------------------------------------------------------------------------- */
 
-void *LST_get(lst, n)
-LST     *lst;
-long    n;
+void *LST_get(LST *lst, long n)
 {
     int     blk_nb, el_nb;
 
@@ -232,10 +213,7 @@ par exemple, on aura :
 &SA LST_create(), LST_add(), LST_get(), LST_del(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_set(lst, n, ptr)
-LST     *lst;
-long    n;
-void    *ptr;
+int LST_set(LST *lst, long n, void *ptr)
 {
     char    *el_ptr;
 
@@ -254,8 +232,7 @@ un élément non nul.
 &SA LST_create(), LST_add(), LST_get(), LST_del(), LST_move()
 ------------------------------------------------------------------------- */
 
-LST_strip(lst)
-LST     *lst;
+int LST_strip(LST *lst)
 {
     long    i;
     int     j;
@@ -280,8 +257,7 @@ Retourne le nombre d'éléments de la liste lst.
 &TX
 &RT le nombre d'éléments actuel de la liste
 ------------------------------------------------------------------------- */
-LST_nb(lst)
-LST *lst;
+int LST_nb(LST *lst)
 {
     return(lst->nb_els);
 }

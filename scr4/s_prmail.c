@@ -257,11 +257,6 @@ unsigned char   *repl, *by;
 #endif
 
 {
-#ifdef SCRPROTO
-    FILE *PR_file_open(char *);
-#else
-    FILE *PR_file_open();
-#endif
     FILE            *fd;
     unsigned char   fld_name[65], *val;
     int             ch, fld_nb, nb_lines = 0, first = 1, i;

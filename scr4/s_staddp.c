@@ -42,10 +42,7 @@ Le tableau ainsi alloué peut être libéré par SCR_free_tbl().
 &SA SCR_free_tbl(), SCR_add_ptr(), SCR_tbl_size(), SCR_add_ptr_lg()
 =======================================================================*/
 
-SCR_add_ptr_lg_0(tbl, ntbl, txt, lg, z)
-U_ch    ***tbl;
-int     *ntbl, lg, z;
-U_ch    *txt;
+int SCR_add_ptr_lg_0(U_ch ***tbl, int *ntbl, U_ch *txt, int lg, int z)
 {
     /*    char    *SCR_malloc(), *SCR_realloc(); /* JMP 04-01-98 */
     U_ch    **tmp;
@@ -109,10 +106,7 @@ Le tableau ainsi alloué peut être libéré par SCR_free_tbl().
 &SA SCR_free_tbl(), SCR_add_ptr(), SCR_tbl_size()
 =======================================================================*/
 
-SCR_add_ptr_lg(tbl, ntbl, txt, lg)
-U_ch    ***tbl;
-int     *ntbl, lg;
-U_ch    *txt;
+int SCR_add_ptr_lg(U_ch ***tbl, int *ntbl, U_ch *txt, int lg)
 {
     return(SCR_add_ptr_lg_0(tbl, ntbl, txt, lg, 0));
 }
@@ -152,10 +146,7 @@ Le tableau ainsi alloué peut être libéré par SCR_free_tbl().
 &SA SCR_free_tbl(), SCR_tbl_size(), SCR_add_ptr_lg(), SCR_add_ptr_lg_0()
 =======================================================================*/
 
-SCR_add_ptr(tbl, ntbl, txt)
-U_ch    ***tbl;
-int     *ntbl;
-U_ch    *txt;
+int SCR_add_ptr(U_ch ***tbl, int *ntbl, U_ch *txt)
 {
     int     lg;
 
@@ -185,8 +176,7 @@ SCR_vtom(), SCR_vtoms() et SCR_text().
 &SA SCR_vtoms() SCR_vtom(), SCR_text(), SCR_add_ptr(), SCR_tbl_size()
 =======================================================================*/
 
-int SCR_free_tbl(tbl)
-U_ch    **tbl;
+int SCR_free_tbl(U_ch **tbl)
 {
     int i;
 
@@ -205,8 +195,7 @@ SCR_add_ptr).
 &SA SCR_add_ptr_lg(), SCR_add_ptr(), SCR_free_tbl()
 =======================================================================*/
 
-SCR_tbl_size(tbl)
-U_ch    **tbl;
+int SCR_tbl_size(U_ch **tbl)
 {
     int i;
 
@@ -222,8 +211,7 @@ Copie un tableau de pointeurs vers des strings. Les strings sont
 &SA SCR_add_ptr(), SCR_free_tbl(), SCR_tbl_size(), SCR_stracpy()
 =======================================================================*/
 
-U_ch **SCR_copy_tbl(opts)
-U_ch    **opts;
+U_ch **SCR_copy_tbl(U_ch **opts)
 {
     int     i, nb;
     U_ch    **tbl = 0;

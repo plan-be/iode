@@ -11,8 +11,7 @@ de caractère de séparation entre les zônes.
 &RT 0 au cas où le numéro est correct, -1 sinon.
 ------------------------------------------------------------------------- */
 
-SCR_check_bank(ccp)
-char    *ccp;
+int SCR_check_bank(char *ccp)
 {
     long    bank, nb, res, reste;
 /*  long atol(); /* JMP 04-01-98 */

@@ -4,8 +4,7 @@
 extern FILE    *A2M_fdrtf;
 
 /*NH*/
-A2mRtfPrintGrf(ao)
-A2MOBJ  *ao;
+int A2mRtfPrintGrf(A2MOBJ * ao)
 {
 #if defined(SCRW32) || defined (DOSW32)
 #ifndef NOEMF // Suppression des EMF/WMF pour iodew

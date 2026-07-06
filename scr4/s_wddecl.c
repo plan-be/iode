@@ -23,7 +23,7 @@ Par défaut, ces valeurs sont respectivement de 4000 msecs et 5 essais.
 &SA WscrDdeConnect(), WscrDdeGet(), WscrDdeSet(), WscrDdeExecute()
 ==================================================================== */
 
-WscrDdeSetTimeOut(int msecs, int nbtries)
+int WscrDdeSetTimeOut(int msecs, int nbtries)
 {
     WDDE_TIMEOUT = msecs;
     WDDE_NB_TRIES = nbtries;
@@ -61,9 +61,7 @@ programme.
 &SA WscrDdeConnect(), WscrDdeGet(), WscrDdeSet()
 ==================================================================== */
 
-WscrDdeExecute(Service, Topic, Cmd)
-char *Service, *Topic;
-unsigned char *Cmd;
+int WscrDdeExecute(char *Service, char *Topic, unsigned char *Cmd)
 {
     HCONV           hConv;
     int             rc;                    /* JMP 25-10-97 */
@@ -76,9 +74,7 @@ unsigned char *Cmd;
 }
 
 /*NH*/
-WscrDdeExecuteCmd(hConv, cmd)
-HCONV   hConv;
-unsigned char* cmd;
+int WscrDdeExecuteCmd(HCONV hConv, unsigned char *cmd)
 {
     DWORD       dwResult;
     int         i;
@@ -103,8 +99,7 @@ Cette fonction termine une conversation démarrée par WscrDdeConnect().
 &SA WscrDdeConnect(), WscrDdeGetItem() et WscrDdeSetItem()
 ==================================================================== */
 
-WscrDdeEnd(hConv)
-HCONV   hConv;
+int WscrDdeEnd(HCONV hConv)
 {
     DdeDisconnect(hConv);
     DdeUninitialize(idInst) ;
@@ -125,9 +120,7 @@ WscrDdeConnect() et demande l'information décrite dans szItem.
 &SA WscrDdeConnect(), WscrDdeSetItem(), WscrDdeEnd(), WscrDdeGet()
 ==================================================================== */
 
-unsigned char* WscrDdeGetItem(hConv, szItem)
-HCONV   hConv;
-char    *szItem;
+unsigned char* WscrDdeGetItem(HCONV hConv, char *szItem)
 {
     unsigned char   *ptr = NULL;
 
@@ -178,10 +171,7 @@ par WscrDdeConnect().
 &SA WscrDdeConnect(), WscrDdeGetItem(), WscrDdeEnd(), WscrDdeSet()
 ==================================================================== */
 
-WscrDdeSetItem(hConv, szItem, ptr)
-HCONV   hConv;
-char    *szItem;
-unsigned char* ptr;
+int WscrDdeSetItem(HCONV hConv, char *szItem, unsigned char *ptr)
 {
     HSZ         hszItem;
     DWORD       dwResult;
@@ -227,8 +217,7 @@ requête et coupe la conversation.
 &SA WscrDdeConnect(), WscrDdeSet()
 ==================================================================== */
 
-unsigned char* WscrDdeGet(szService, szTopic, szItem)
-char *szService, *szTopic, *szItem;
+unsigned char* WscrDdeGet(char *szService, char *szTopic, char *szItem)
 {
     HCONV           hConv;
     unsigned char   *ptr;
@@ -263,9 +252,7 @@ données au serveur et coupe la conversation.
 &SA WscrDdeConnect(), WscrDdeGet()
 ==================================================================== */
 
-WscrDdeSet(szService, szTopic, szItem, ptr)
-unsigned char *ptr;
-char *szService, *szTopic, *szItem;
+int WscrDdeSet(char *szService, char *szTopic, char *szItem, unsigned char *ptr)
 {
     HCONV           hConv;
 
@@ -292,12 +279,11 @@ WscrDdeGet() et WscrDdeSet().
 &SA WscrDdeEnd(), WscrDdeGetItem() et WscrDdeSetItem()
 ==================================================================== */
 
-HCONV WscrDdeConnect(szService, szTopic)
-char *szService, *szTopic;
+HCONV WscrDdeConnect(char *szService, char *szTopic)
 {
     HCONV   hConv = NULL;
     HSZ     hszService, hszTopic;
-    char    *ptr, buf[255], *getenv();    /* BP_MODIF 18-12-98 */
+    char    *ptr, buf[255];    /* BP_MODIF 18-12-98 */
     UINT    ScrDdeError;
 
     if(szService == NULL || szTopic == NULL) return(NULL);

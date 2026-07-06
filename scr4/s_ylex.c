@@ -3,9 +3,7 @@
 
 /*NH*/
 /*#ifndef GENPROTO */
-int YY_strcmp(pyk1, pyk2)
-const char *pyk1;
-const char *pyk2;
+int YY_strcmp(const char *pyk1, const char *pyk2)
 {
     YYKEYS  *yk1 = (YYKEYS *)pyk1,
 	    *yk2 = (YYKEYS *)pyk2;
@@ -20,16 +18,14 @@ const char *pyk2;
 	return   : the pos of the operator found or -1
    ============================================================== */
 
-YY_find_oper(yy, yykeys, nbkeys)
-YYFILE      *yy;
-YYKEYS      *yykeys;
-int         nbkeys;
+int YY_find_oper(YYFILE *yy, YYKEYS *yykeys, int nbkeys)
 {
     int     i, ch, pos;
     YYKEYS  *yk, yk1;
 
     yk1.yk_word = yy->yy_text;
-    yk = (YYKEYS *) bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS), YY_strcmp);
+    yk = (YYKEYS *) bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS),
+                            (int (*)(const void *, const void *))YY_strcmp);
     if(yk == 0) return(-1);
     pos = (int)(yk - yykeys);
     if(pos == nbkeys -1 || yk[1].yk_word[0] != yy->yy_text[0])
@@ -49,15 +45,13 @@ int         nbkeys;
 	return   : the pos of the string found or -1
    ============================================================== */
 
-YY_find_string(yy, yykeys, nbkeys)
-YYFILE      *yy;
-YYKEYS      *yykeys;
-int         nbkeys;
+int YY_find_string(YYFILE *yy, YYKEYS *yykeys, int nbkeys)
 {
     YYKEYS  *yk, yk1;
 
     yk1.yk_word = yy->yy_text;
-    yk = (YYKEYS *)bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS), YY_strcmp);
+    yk = (YYKEYS *)bsearch(&yk1, yykeys, nbkeys, sizeof(YYKEYS),
+                           (int (*)(const void *, const void *))YY_strcmp);
     if(yk != 0)
 	return(yk->yk_def);
     return(-1);
@@ -78,10 +72,7 @@ correspondant au mot-clé lu dans la table des YYKEYS.
 &SA YY_read(), YY_unread(), YY_lex()
 =======================================================================*/
 
-YY_lex2(yy, yykeys, nbkeys)
-YYFILE      *yy;
-YYKEYS      *yykeys;
-int         nbkeys;
+int YY_lex2(YYFILE *yy, YYKEYS *yykeys, int nbkeys)
 {
     int     type,
 	    found;
@@ -142,8 +133,7 @@ correspondant au mot-clé lu dans la table des YYKEYS.
 &SA YY_read(), YY_unread(), YY_lex2()
 =======================================================================*/
 
-YY_lex(yy)
-YYFILE      *yy;
+int YY_lex(YYFILE *yy)
 {
     return(YY_lex2(yy, yy->yy_keys, yy->yy_nb_keys));
 }

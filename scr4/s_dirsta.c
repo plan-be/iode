@@ -59,10 +59,7 @@ Si ss[i]->ss_name[0] <= ' ', ne lit rien.
 &SA structure SCRSTAT, SCR_dir(), SCR_stat_ex(), ISC_mstat_ex()
 ======================================================================= */
 
-SCR_mstat_ex_fn(ss, crc, fn)
-SCRSTAT **ss;
-int     crc;
-int     *fn();
+int SCR_mstat_ex_fn(SCRSTAT **ss, int crc, int (*fn)(SCRSTAT *))
 {
     int             nb, i;
 
@@ -84,7 +81,7 @@ int     *fn();
     return(0);
 }
 
-SCR_mstat_ex(SCRSTAT **ss, int crc)
+int SCR_mstat_ex(SCRSTAT **ss, int crc)
 {
     return(SCR_mstat_ex_fn(ss, crc, 0));
 }
@@ -115,10 +112,7 @@ les valeurs et les place dans la structure SCRSTAT pointeur par ss.
 &SA structure SCRSTATEX, SCR_dir(), SCR_stat()
 ======================================================================= */
 
-SCR_stat_ex(filename, ss, crc)
-char        *filename;
-SCRSTAT     *ss;
-int         crc;
+int SCR_stat_ex(char *filename, SCRSTAT *ss, int crc)
 {
     struct  stat            buf;
     int                     rc = 0;
@@ -199,9 +193,7 @@ les valeurs et les place dans la structure SCRSTAT pointée par ss.
 &SA structure SCRSTAT, SCR_dir(), SCR_stat_ex()
 ======================================================================= */
 
-SCR_stat(filename, ss)
-char    *filename;
-SCRSTAT *ss;
+int SCR_stat(char *filename, SCRSTAT *ss)
 {
     return(SCR_stat_ex(filename, ss, 0)); /* JMP 07-03-03 */
 }

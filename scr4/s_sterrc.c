@@ -9,7 +9,7 @@ void SCR_close_err_txt()
     fd_msg = 0;
 }
 
-SCR_end_cmt()
+int SCR_end_cmt(void)
 {
     extern FILE    *fd_cmt;
 

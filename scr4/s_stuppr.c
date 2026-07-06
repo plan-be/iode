@@ -12,8 +12,7 @@ Indique si un caractère est majuscule (A-Z).
 &SA SCR_is_lower(), SCR_upper(), SCR_lower_char(), SCR_lower()
 =======================================================================*/
 
-SCR_is_upper(ch)
-int     ch;
+int SCR_is_upper(int ch)
 {
     if(ch >= 'A' && ch <= 'Z') return(1);       /* JMP 14-06-96 */
 /*    if(isupper(ch)) return(1);                /* JMP 14-06-96 */
@@ -40,8 +39,7 @@ Les caractères accentués sont également transformés en majuscules (é->E).
 &SA SCR_upper(), SCR_lower_char(), SCR_lower()
 =======================================================================*/
 
-SCR_upper_char(ch)
-int     ch;
+int SCR_upper_char(int ch)
 {
 /*    if(SCR_is_lower(ch)) return(toupper(ch));        /* JMP 14-06-96 */
     if(ch >= 'a' && ch <= 'z') return(ch - 'a' + 'A'); /* JMP 14-06-96 */
@@ -103,8 +101,7 @@ accents sont également transformés.
 &SA SCR_lower_char(), SCR_upper_char(), SCR_lower()
 =======================================================================*/
 
-unsigned char *SCR_upper(str)
-unsigned char *str;
+unsigned char *SCR_upper(unsigned char *str)
 {
     int     i;
 
@@ -115,8 +112,7 @@ unsigned char *str;
 }
 
 
-SCR_is_space(ch)
-int     ch;
+int SCR_is_space(int ch)
 {
     if(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 	|| ch == 013 || ch == 014) return(1);

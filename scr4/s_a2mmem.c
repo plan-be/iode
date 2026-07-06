@@ -65,10 +65,7 @@ U_ch    *outfile,
 int     ask
 )
 #else
-A2MFILE *A2mMemBegin(dest, outfile, ask)
-int     dest;
-U_ch    *outfile;
-int     ask;
+A2MFILE *A2mMemBegin(int dest, U_ch *outfile, int ask)
 #endif
 {
     A2MFILE     *af = 0;
@@ -149,9 +146,7 @@ interpréter le texte enregisté et envoyer vers la destination prévue.
 &SA A2mMemBegin(), A2mMemFlush(), A2mMemRecordFile(), A2mMemEnd()
 ========================================================================= */
 
-A2mMemRecord(af, str)
-A2MFILE *af;
-U_ch    *str;
+int A2mMemRecord(A2MFILE * af, U_ch * str)
 {
     if(af->af_dest == A2M_DESTDUMMY) return(0);
 
@@ -189,9 +184,7 @@ destination prévue.
 &SA A2mMemBegin(), A2mMemFlush(), A2mMemRecord(), A2mMemEnd()
 ========================================================================= */
 
-A2mMemRecordFile(af, filename)
-A2MFILE *af;
-U_ch    *filename;
+int A2mMemRecordFile(A2MFILE * af, U_ch * filename)
 {
     FILE    *fd;
     U_ch    buf[512];
@@ -240,8 +233,7 @@ partie d'un objet est en enregistrée, soit l'objet n'est pas imprimé
 &SA A2mMemBegin(), A2mMemFlush(), A2mMemRecord(), A2mMemEnd()
 ========================================================================= */
 
-A2mMemFlush(af)
-A2MFILE *af;
+int A2mMemFlush(A2MFILE * af)
 {
     A2MOBJ  *ao;
 
@@ -293,8 +285,7 @@ déterminée lors de la création du descripteur af.
 &SA A2mMemBegin(), A2mMemFlush(), A2mMemRecord()
 ========================================================================= */
 
-A2mMemEnd(af)
-A2MFILE *af;
+int A2mMemEnd(A2MFILE * af)
 {
     A2mMemFlush(af);
     switch(af->af_dest) {

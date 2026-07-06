@@ -16,9 +16,7 @@ Si le string lu dans le fichier est de longueur nulle, *txt est fixé
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
 
-SCR_LoadString(fd, txt)
-FILE            *fd;
-unsigned char   **txt;
+int SCR_LoadString(FILE *fd, unsigned char **txt)
 {
     unsigned short  lg = 0;
 
@@ -46,9 +44,7 @@ Si le string lu dans le fichier est de longueur nulle, txt[0] est fixé
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
 
-SCR_LoadSString(fd, txt)
-FILE            *fd;
-unsigned char   *txt;
+int SCR_LoadSString(FILE *fd, unsigned char *txt)
 {
     unsigned short  lg = 0;
 
@@ -72,9 +68,7 @@ préalablement construit à l'aide des fonctions SCR_Dump*().
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
 
-SCR_LoadShort(fd, a)
-FILE    *fd;
-short   *a;
+int SCR_LoadShort(FILE *fd, short *a)
 {
     if(fread(a, sizeof(short), 1, fd) != 1) return(-1);
     return(0);
@@ -89,9 +83,7 @@ Sauve le string txt (terminé par 0) dans le fichier décrit par fd.
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
 
-int SCR_DumpString(fd, txt)
-FILE            *fd;
-unsigned char   *txt;
+int SCR_DumpString(FILE *fd, unsigned char *txt)
 {
     unsigned short  lg = 0;
 
@@ -113,9 +105,7 @@ Sauve le short a dans le fichier décrit par fd.
 &SA SCR_Dump*(), SCR_Load*()
 ==================================================================== */
 
-int SCR_DumpShort(fd, a)
-FILE    *fd;
-short   a;
+int SCR_DumpShort(FILE *fd, short a)
 {
     fwrite(&a, sizeof(short), 1, fd);
     return(0);

@@ -62,8 +62,7 @@ int     nl,
 int     nc
 )
 #else
-MAT *M_alloc(nl, nc)
-int     nl, nc;
+MAT *M_alloc(int nl, int nc)
 #endif
 
 {
@@ -107,8 +106,7 @@ Si le pointeur est nul, la fonction est sans effet.
 &SA M_alloc(), M_free_vec().
 ======================================================================= */
 
-M_free(m1)
-MAT     *m1;
+int M_free(MAT *m1)
 {
     int          i;
 
@@ -124,10 +122,7 @@ MAT     *m1;
 /*
     transfère un vecteur du swap en mémoire conv.
 */
-MREAL* M_vswp_to_cnv(row2, row1, dim)     /* dest , source */
-MREAL    *row2;
-VECT    row1;
-int     dim;
+MREAL* M_vswp_to_cnv(MREAL *row2, VECT row1, int dim)     /* dest , source */
 {
     memcpy(row2, row1, dim * sizeof(MREAL));
     return(row2);
@@ -138,10 +133,7 @@ int     dim;
 /*
     transfère de mémoire conv. vers swap
 */
-VECT M_vcnv_to_swp(row2, row1, dim)     /* dest , source */
-VECT    row2;
-MREAL*   row1;
-int     dim;
+VECT M_vcnv_to_swp(VECT row2, MREAL *row1, int dim)     /* dest , source */
 {
     memcpy(row2, row1, dim * sizeof(MREAL));
     return(row2);
@@ -154,8 +146,7 @@ int     dim;
 
 /*NH*/
 
-MAT *M_alloc(nl, nc)
-int     nl, nc;
+MAT *M_alloc(int nl, int nc)
 {
     MAT          *m1;
     int          i;
@@ -183,8 +174,7 @@ memerr:
 
 /*NH*/
 
-M_free(m1)
-MAT     *m1;
+int M_free(MAT *m1)
 {
     int          i;
 
@@ -199,10 +189,7 @@ MAT     *m1;
 /*
     transfère un vecteur du swap en mémoire conv.
 */
-MREAL* M_vswp_to_cnv(row2, row1, dim)     /* dest , source */
-MREAL    *row2;
-VECT    row1;
-int     dim;
+MREAL* M_vswp_to_cnv(MREAL *row2, VECT row1, int dim)     /* dest , source */
 {
     memcpy(row2, (MREAL*)SW_getptr(row1), dim * sizeof(MREAL));
     return(row2);
@@ -213,10 +200,7 @@ int     dim;
 /*
     transfère de mémoire conv. vers swap
 */
-VECT M_vcnv_to_swp(row2, row1, dim)     /* dest , source */
-VECT    row2;
-MREAL*   row1;
-int     dim;
+VECT M_vcnv_to_swp(VECT row2, MREAL *row1, int dim)     /* dest , source */
 {
     memcpy((MREAL*)SW_getptr(row2), row1, dim * sizeof(MREAL));
     return(row2);
@@ -257,8 +241,7 @@ L'allocation utilise la librairie s_swap.lib.
 ======================================================================= */
 
 
-MREAL    *M_alloc_vec(nc)
-int     nc;
+MREAL    *M_alloc_vec(int nc)
 {
     MREAL*   vec;
 
@@ -285,8 +268,7 @@ Si le pointeur est nul, la fonction est sans effet.
 &SA M_alloc_vec(), M_alloc(), M_free().
 ======================================================================= */
 
-M_free_vec(vec)
-MREAL*    vec;
+int M_free_vec(MREAL *vec)
 {
     if(vec == 0) return(0);
     SW_nfree((char *)vec);

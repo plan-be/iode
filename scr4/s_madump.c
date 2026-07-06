@@ -20,10 +20,7 @@ néant (0)
 
 ======================================================================= */
 
-M_dump(fd, m1, tit)
-FILE    *fd;
-MAT     *m1;
-char    *tit;
+int M_dump(FILE *fd, MAT *m1, char *tit)
 {
     int     i, j;
 

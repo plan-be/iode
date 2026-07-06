@@ -7,6 +7,12 @@
 
 char    *OMyEngine = 0, *OMyCharSet = 0, *OMyDbName = 0; /* JMP 05-02-11 */
 
+int OFreeOTBL(OTBL *otbl);
+OIDX *OGetTableIndices(ODSN *odsn, char *tblname);
+int OFreeOIDX(OIDX *oidx);
+int ODisplayTableEx(char *dsn, char *user, char *passwd, char *table, int names);
+int ODisplayFieldSCR(OCOL *ocol, int k);
+
 /* ====================================================================
 Imprime dans le fichier décrit par fd la ligne courante d'un dataset.
 Le format est identique à l'output de scr4 -dump, soit un ligne avec
@@ -21,7 +27,7 @@ les champs séparés par des '|'.
 &SA OQuery(), ONext(), OBindCOl()
 =======================================================================*/
 
-OPrintRowFd(FILE *fd, OCSR *ocsr)
+int OPrintRowFd(FILE *fd, OCSR *ocsr)
 {
     int     i;
     short   *sh;
@@ -85,6 +91,7 @@ OPrintRowFd(FILE *fd, OCSR *ocsr)
 	    }
 	}
     fprintf(fd, "\n");
+	return(0);
 }
 
 /* ====================================================================
@@ -102,7 +109,7 @@ forme d'une instruction INSERT INTO.
 &SA OQuery(), ONext(), OBindCOl()
 =======================================================================*/
 
-OPrintInsertRowFd(FILE *fd, OCSR *ocsr, char *tblname, int strip, int synt)
+int OPrintInsertRowFd(FILE *fd, OCSR *ocsr, char *tblname, int strip, int synt)
 {
     int     i, j, ch;
     short   *sh;
@@ -195,6 +202,7 @@ OPrintInsertRowFd(FILE *fd, OCSR *ocsr, char *tblname, int strip, int synt)
 	    }
 	}
     fprintf(fd, ");\n");
+	return(0);
 }
 
 /* ====================================================================
@@ -211,9 +219,10 @@ les champs séparés par des '|'.
 &SA OQuery(), ONext(), OBindCOl()
 =======================================================================*/
 
-OPrintRow(OCSR *ocsr)
+int OPrintRow(OCSR *ocsr)
 {
     OPrintRowFd(stdout, ocsr);
+	return(0);
 }
 
 /* ====================================================================
@@ -228,14 +237,15 @@ Imprime dans le standard output la ligne courante d'un dataset sous forme d'une 
 &SA OQuery(), ONext(), OBindCOl()
 =======================================================================*/
 
-OPrintInsertRow(OCSR *ocsr, char *tblname, int strip)
+int OPrintInsertRow(OCSR *ocsr, char *tblname, int strip)
 {
     OPrintInsertRowFd(stdout, ocsr, tblname, strip, 0);
+	return(0);
 }
 
 
 /*NH*/
-ODisplayCreateFieldFd(FILE *fd, OCOL *ocol, int synt)
+int ODisplayCreateFieldFd(FILE *fd, OCOL *ocol, int synt)
 {
     short   *sh;
     long    val;
@@ -265,6 +275,7 @@ ODisplayCreateFieldFd(FILE *fd, OCOL *ocol, int synt)
 	}
     else
 	fprintf(fd, "%s", ocol->typename);
+	return(0);
 }
 
 /* ====================================================================
@@ -280,7 +291,7 @@ de la valeur de synt (MySQL, ...).
 &RT 0 en cas de succès, -1 en cas d'erreur
 =======================================================================*/
 
-ODisplayDropTableFd(FILE *fd, char *table, int synt)
+int ODisplayDropTableFd(FILE *fd, char *table, int synt)
 {
     fprintf(fd, "DROP TABLE ");
     switch(synt) {
@@ -292,6 +303,7 @@ ODisplayDropTableFd(FILE *fd, char *table, int synt)
 	default : fprintf(fd, "%s ", table); break;
 	}
     fprintf(fd, ";\n");
+	return(0);
 }
 
 /* ====================================================================
@@ -313,7 +325,7 @@ de la valeur de synt (MySQL, ...).
 &TX
 =======================================================================*/
 
-ODisplayCreateTableFd(FILE *fd, ODSN *odsn, char *table, int synt)
+int ODisplayCreateTableFd(FILE *fd, ODSN *odsn, char *table, int synt)
 {
     int     i, k;
     OTBL    *otbl;
@@ -357,7 +369,7 @@ ODisplayCreateTableFd(FILE *fd, ODSN *odsn, char *table, int synt)
 	fprintf(fd, ";\n");
 	}
 
-    SCR_free_tbl(tbls);
+	SCR_free_tbl((unsigned char **)tbls);
     return(0);
 }
 
@@ -377,13 +389,13 @@ les tables d'un DSN dans le format SQL.
 &TX
 =======================================================================*/
 
-ODisplayCreateTable(ODSN *odsn, char *table)
+int ODisplayCreateTable(ODSN *odsn, char *table)
 {
     return(ODisplayCreateTableFd(stdout, odsn, table, 0));
 }
 
 
-ODisplayCreateIndexFieldFd(FILE *fd, OIDXFLD *ofld, int synt)
+int ODisplayCreateIndexFieldFd(FILE *fd, OIDXFLD *ofld, int synt)
 {
     switch(synt) {
 	case 1  : fprintf(fd, "`%s` ", ofld->name); break;
@@ -393,6 +405,7 @@ ODisplayCreateIndexFieldFd(FILE *fd, OIDXFLD *ofld, int synt)
 
     if(ofld->asc == 'D') fprintf(fd, "DESC");
     else                 fprintf(fd, "ASC");
+	return(0);
 }
 
 /* ====================================================================
@@ -412,7 +425,7 @@ d'un DSN dans le format SQL.
 &TX
 =======================================================================*/
 
-ODisplayCreateIndicesFd(FILE *fd, ODSN *odsn, char *table, int synt)
+int ODisplayCreateIndicesFd(FILE *fd, ODSN *odsn, char *table, int synt)
 {
     int     i, j, k, flag_pri;
     OIDX    *oidx;
@@ -463,7 +476,7 @@ ODisplayCreateIndicesFd(FILE *fd, ODSN *odsn, char *table, int synt)
 	OFreeOIDX(oidx);
 	}
 
-    SCR_free_tbl(tbls);
+	SCR_free_tbl((unsigned char **)tbls);
     return(0);
 }
 
@@ -483,7 +496,7 @@ les tables d'un DSN dans le format SQL.
 &TX
 =======================================================================*/
 
-ODisplayCreateIndices(ODSN *odsn, char *table)
+int ODisplayCreateIndices(ODSN *odsn, char *table)
 {
     return(ODisplayCreateIndicesFd(stdout, odsn, table, 0));
 }
@@ -505,13 +518,13 @@ est ouvert et fermé par cette fonction.
 &TX
 =======================================================================*/
 
-ODisplayTable(char *dsn, char *user, char *passwd, char *table)
+int ODisplayTable(char *dsn, char *user, char *passwd, char *table)
 {
     return(ODisplayTableEx(dsn, user, passwd, table, 0));
 }
 
 /*NH*/
-ODisplayTableEx(char *dsn, char *user, char *passwd, char *table, int names)
+int ODisplayTableEx(char *dsn, char *user, char *passwd, char *table, int names)
 {
     int     i, k;
     ODSN    *odsn;
@@ -550,21 +563,21 @@ ODisplayTableEx(char *dsn, char *user, char *passwd, char *table, int names)
 		for(k = 0 ; k < otbl->ncols ; k++)
 		    ODisplayFieldSCR(otbl->cols + k, k);
 		OFreeOTBL(otbl);
-		printf("  }\n", tbls[i]);
+		printf("  }\n");
 		}
 	    }
 	else
 	    printf("%s\n", tbls[i]);
 	}
 
-    SCR_free_tbl(tbls);
+	SCR_free_tbl((unsigned char **)tbls);
     OCloseDSN(odsn);
     return(0);
 }
 
 
 /*NH*/
-ODisplayFieldSCR(OCOL *ocol, int k)
+int ODisplayFieldSCR(OCOL *ocol, int k)
 {
     if(ocol->Cvar)    printf("    VFIELD /*%d*/ ", k);
     else              printf("    FIELD /*%d*/ ", k);
@@ -592,6 +605,7 @@ ODisplayFieldSCR(OCOL *ocol, int k)
 	ocol->len,
 	ocol->nullable,
 	ocol->isnull);
+    return(0);
 }
 
 
@@ -611,7 +625,7 @@ Le DSN est ouvert et fermé par cette fonction.
 &TX
 =======================================================================*/
 
-ODisplayDSNInfos(char *dsn, char *user, char *passwd)
+int ODisplayDSNInfos(char *dsn, char *user, char *passwd)
 {
     ODSN            *odsn;
     unsigned long   bits;
@@ -665,7 +679,7 @@ ODisplayDSNInfos(char *dsn, char *user, char *passwd)
     return(0);
 }
 
-OSqlQP2Ascii(U_ch *in, U_ch *out)
+int OSqlQP2Ascii(U_ch *in, U_ch *out)
 {
     int     i, j;
 
@@ -679,6 +693,7 @@ OSqlQP2Ascii(U_ch *in, U_ch *out)
 	    out[j++] = in[i];
 	}
     out[j] = 0;
+    return(0);
 }
 
 /* ====================================================================
@@ -703,7 +718,7 @@ Les lignes sont limitées à 10239 caractères.
 &SA OQuery()
 =======================================================================*/
 
-OExecSQLFileQP(ODSN *odsn, char *filename, int Verbose, int maxerr)
+int OExecSQLFileQP(ODSN *odsn, char *filename, int Verbose, int maxerr)
 {
     FILE    *fd;
     char    buf[10240];

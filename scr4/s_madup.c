@@ -29,8 +29,7 @@ MAT     *m2,     // Destination
 MAT     *m1      // Source
 )
 #else
-MAT     *M_copy(m2, m1)
-MAT     *m2, *m1;
+MAT     *M_copy(MAT *m2, MAT *m1)
 #endif
 
 {
@@ -73,8 +72,7 @@ MAT     *M_dup(
 MAT     *m1
 )
 #else
-MAT     *M_dup(m1)
-MAT     *m1;
+MAT     *M_dup(MAT *m1)
 #endif
 
 {

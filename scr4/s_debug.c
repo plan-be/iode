@@ -73,7 +73,7 @@ changer le nom du fichier à n'importe quel moment.
 int Debug(txt, a, b, c, d, e)
 char    *txt, *a, *b, *c, *d, *e;
 {
-    static  indebug = 0;
+    static int indebug = 0;
 
     if(indebug) return(0);
     indebug = 1;

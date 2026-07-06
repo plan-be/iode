@@ -12,8 +12,7 @@ mais sera relu lors du prochain appel à CppGetc().
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipToChars()
 ================================================================ */
 
-CppSkipSpaces(cpp)
-CPPFILE *cpp;
+int CppSkipSpaces(CPPFILE * cpp)
 {
     int     ch;
 
@@ -39,9 +38,7 @@ l'appel suivant à CppGetc().
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipSpaces()
 ================================================================ */
 
-CppSkipToChars(cpp, chs)
-CPPFILE *cpp;
-U_ch    *chs;
+int CppSkipToChars(CPPFILE * cpp, U_ch * chs)
 {
     int     ch;
 
@@ -120,8 +117,7 @@ returné lors de l'appel suivant à CppGetc()).
 &SA CppOpen(), CppGetc(), CppUngetc(), CppSkipToChars()
 ================================================================ */
 
-int CppSkipToEol(cpp)
-CPPFILE *cpp;
+int CppSkipToEol(CPPFILE * cpp)
 {
     CppSkipToChars(cpp, "\n");
     return(0);
@@ -158,10 +154,7 @@ sorte coupé en deux.
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadLong()
 ================================================================ */
 
-CppReadOnlyChars(cpp, chs, str, maxlg)
-CPPFILE *cpp;
-U_ch    *chs, *str;
-int     maxlg;
+int CppReadOnlyChars(CPPFILE * cpp, U_ch * chs, U_ch * str, int maxlg)
 {
     int     ch, i = 0;
 
@@ -208,10 +201,7 @@ en deux.
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadLong()
 ================================================================ */
 
-CppReadWord(cpp, str, maxlg)
-CPPFILE *cpp;
-U_ch    *str;
-int     maxlg;
+int CppReadWord(CPPFILE * cpp, U_ch * str, int maxlg)
 {
     int     ch, i = 0;
 
@@ -242,8 +232,7 @@ trouvent dans le même nombre, ils sont tous lus.
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadWord()
 ================================================================ */
 
-long CppReadLong(cpp)
-CPPFILE *cpp;
+long CppReadLong(CPPFILE * cpp)
 {
     char    str[51];
 /*    long    atol(); /* JMP 04-01-98 */
@@ -267,8 +256,7 @@ Un nombre ne peut pas dépasser 50 caractères.
 &SA CppOpen(), CppGetc(), CppUngetc(), CppReadString(), CppReadWord()
 ================================================================ */
 
-double CppReadDbl(cpp)
-CPPFILE *cpp;
+double CppReadDbl(CPPFILE * cpp)
 {
     U_ch    str[51];
     double  val;
@@ -311,10 +299,7 @@ sorte coupé en deux.
 &SA CppOpen(), CppGetc(), CppReadWord(), CppReadLong()
 ================================================================ */
 
-CppReadString(cpp, str, maxlg)
-CPPFILE *cpp;
-U_ch    *str;
-int     maxlg;
+int CppReadString(CPPFILE * cpp, U_ch * str, int maxlg)
 {
     int     ch, i = 0;
 

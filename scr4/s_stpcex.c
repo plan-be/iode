@@ -17,8 +17,7 @@ Le fichier est décrit dans la fonction PC_list().
 &SA PC_infos(), PC_list(), SCR_free_tbl();
 =======================================================================*/
 
-PC_exec(filename, prname, arg1, arg2, arg3)
-char    *filename, *prname, *arg1, *arg2, *arg3;
+int PC_exec(char *filename, char *prname, char *arg1, char *arg2, char *arg3)
 {
     char    buf[200];
     int     type;

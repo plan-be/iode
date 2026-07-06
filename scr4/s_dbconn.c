@@ -126,7 +126,6 @@ SCR_find_alias(char *srv, char *res, long *port)
 {
     char    buf[1024], *ptrh, *ptr;
     U_ch    **tbl, **ptr2, **ip;
-    long    atol();
 
     if(SCR_ISC_ALIAS == 0) {
 	ptr = getenv("SCR_ISC_ALIAS");

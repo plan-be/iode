@@ -15,7 +15,7 @@ extern int A_is_sep(int ch);
 extern int A_free(unsigned char **args);
 extern int A_find(char **args,char *string);
 extern int A_nb(char **args,int pos);
-extern int A_help(char **args,int (*fn)());
+extern int A_help(char **args,int (*fn)(void));
 
 /* s_aerr.c */ 
 extern int A_error(char *txt);

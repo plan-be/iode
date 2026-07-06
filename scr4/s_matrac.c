@@ -26,8 +26,7 @@ MAT     *m2,
 MAT     *m1
 )
 #else
-MAT *M_trace(m2, m1)
-MAT   *m2, *m1;
+MAT *M_trace(MAT *m2, MAT *m1)
 #endif
 
 {

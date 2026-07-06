@@ -497,7 +497,7 @@ WscrSystem(char *cmd)
 
     argv = SCR_vtom(cmd, ' ');
     spawnv(P_WAIT, argv[0], argv);
-    SCR_free_tbl(argv);
+    SCR_free_tbl((unsigned char **)argv);
 }
 
 

@@ -2,8 +2,7 @@
 
 int     YY_OLD_DEF = 0;
 
-int YY_undef(yy)
-YYFILE  *yy;
+int YY_undef(YYFILE *yy)
 {
     char    name[YY_MAX_DEF_LG + 1];
 
@@ -18,15 +17,12 @@ YYFILE  *yy;
 	yy : IN :
 	name : IN : define name
    ==================================================== */
-int YY_unsave_define(yy, name)
-YYFILE  *yy;
-char    *name;
+int YY_unsave_define(YYFILE *yy, char *name)
 {
     return(0);
 }
 /**/
-int YY_define(yy)
-YYFILE  *yy;
+int YY_define(YYFILE *yy)
 {
     char    name[YY_MAX_DEF_LG + 1];
     int     c;
@@ -54,9 +50,7 @@ YYFILE  *yy;
 }
 
 /**/
-YY_ifdef(yy, flag)
-YYFILE  *yy;
-int     flag;
+int YY_ifdef(YYFILE *yy, int flag)
 {
     char    name[YY_MAX_DEF_LG + 1];
     YYDEF   *yd;
@@ -79,8 +73,7 @@ int     flag;
     return(0);
 }
 
-YY_find_end_else(yy)
-YYFILE  *yy;
+int YY_find_end_else(YYFILE *yy)
 {
     int     nbif = NBIF - 1;
 
@@ -134,10 +127,7 @@ int YY_defcmp1(const void* ptr, const void* pyd2)
 	def  : text of define
    ==================================================== */
 
-YY_save_define(yy, name, def)
-YYFILE  *yy;
-char    *name,
-	*def;
+int YY_save_define(YYFILE *yy, char *name, char *def)
 {
     YYDEF   **yd, *yd_new;
     int     lg;
@@ -175,7 +165,8 @@ char    *name,
     yd_new->yd_def = (unsigned char *)SCR_malloc(lg + 1); /* JMP 22-08-2012 */
     memcpy(yd_new->yd_def, def, lg + 1);
 
-    qsort(DDEFS, NBDDEFS, sizeof(YYDEF *), YY_defcmp);
+        qsort(DDEFS, NBDDEFS, sizeof(YYDEF *),
+            (int (*)(const void *, const void *))YY_defcmp);
     return(0);
 }
 /**/
@@ -193,7 +184,8 @@ YYDEF *YY_search_def(YYDEF   **tbl, int nb, char *txt)
     YYDEF   **yd;
 
     if(nb == 0) return((YYDEF *)0);
-    yd = (YYDEF **) bsearch(txt, tbl, nb, sizeof(YYDEF *), YY_defcmp1);
+    yd = (YYDEF **) bsearch(txt, tbl, nb, sizeof(YYDEF *),
+                            (int (*)(const void *, const void *))YY_defcmp1);
     return((yd == 0) ? (YYDEF *)0 : *yd);
 }
 /**/
@@ -203,8 +195,7 @@ YYDEF *YY_search_def(YYDEF   **tbl, int nb, char *txt)
      yy : IN : YYFILE pointer
    ============================================================== */
 
-YY_find_def(yy)
-YYFILE  *yy;
+int YY_find_def(YYFILE *yy)
 {
     YYDEF   *yd;
 

@@ -27,7 +27,7 @@ double A2MGRFPEN[5][5] = {0.0, 0.0, 0.0, 0.0, 0.0,
 double A2MGRFBRUSH[5] = {3, 5, 8, 9, 12};
 
 /*NH*/
-A2mFrGrfPrepare()
+int A2mFrGrfPrepare(void)
 {
     int         i, j, p;
     A2MPEN      *Pen;

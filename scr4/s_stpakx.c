@@ -44,13 +44,9 @@ se présente plusieurs fois, c'est le dernier qui est restauré.
 &TX
 &SA AR_add(), AR_error(), AR_list()
 ======================================================================= */
-AR_extract(arname, files, n, fn)
-char    *arname;
-char    **files;
-int     n;
-int     (*fn)();
+int AR_extract(char *arname, char **files, int n, int (*fn)(char *, long, long))
 {
-    FILE    *fd, *AR_open();
+	FILE    *fd;
     int     i;
     ARLIST  arl;
 
@@ -75,18 +71,14 @@ int     (*fn)();
 /*NH*/
 #ifdef SCRPROTO
 /*NH*/
-AR_uncat(
+int AR_uncat(
 FILE    *fdar,
 char    *filename,
 long    lg,
 int     (*fn)(char *, long, long)
 )
 #else
-AR_uncat(fdar, filename, lg, fn)
-FILE    *fdar;
-char    *filename;
-long    lg;
-int     (*fn)();
+int AR_uncat(FILE *fdar, char *filename, long lg, int (*fn)())
 #endif
 {
     FILE    *fd2;

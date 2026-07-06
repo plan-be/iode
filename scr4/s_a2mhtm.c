@@ -1,6 +1,9 @@
 #include "s_a2m.h"
 #include "s_ini.h"
 
+int SCR_dumpf_file(FILE *fd, char *filename);
+int A2mHtmlPrintFdTxt(FILE *fd, U_ch *txt);
+
 /********************* Parameters *************************/
 
 /* Public */
@@ -143,9 +146,7 @@ Ces variables sont définies dans la section [HTML] du fichier .ini.
 &SA A2mHtmlReadIni(), A2mToRtf(), A2mToMif(), A2mToMif(), A2mPrintError()
 ==================================================================== */
 
-A2mToHtml(a2mfile, outfile, wh)
-char    *a2mfile, *outfile;
-int     wh;
+int A2mToHtml(char * a2mfile, char * outfile, int wh)
 {
     return(A2mToHtmlStrip(a2mfile, outfile, A2M_HTML_STRIP, wh));
 }
@@ -189,9 +190,7 @@ int A2mToHtmlStrip(char* a2mfile, char* outfile, int strp, int wh)
     return(0);
 }
 /*NH*/
-int A2mHtmlPre(fd, base)
-FILE    *fd;
-char    *base;
+int A2mHtmlPre(FILE * fd, char * base)
 {
     //int     i;
     extern  int A2M_SWF_NOGIF;
@@ -263,9 +262,7 @@ int A2mHtmlPost(FILE* fd)
 }
 
 /*NH*/
-A2mHtmlInit(outfile, wh)
-char    *outfile;
-int     wh;
+int A2mHtmlInit(char * outfile, int wh)
 {
     char        buf[256];
     extern int  A2M_CUROBJ;
@@ -402,9 +399,7 @@ int A2mHtmlEnd()
 }
 
 /*NH*/
-A2mHtmlPrintObj(ao, del)
-A2MOBJ  *ao;
-int     del;
+int A2mHtmlPrintObj(A2MOBJ * ao, int del)
 {
     char        msg[80];
     extern int  A2M_CUROBJ;
@@ -460,8 +455,7 @@ int A2mHtmlPrintTopic(A2MTOP* atp, int alias)
 }
 
 /*NH*/
-A2mHtmlCalcBlc(ap)
-A2MPAR  *ap;
+int A2mHtmlCalcBlc(A2MPAR * ap)
 {
     int     i;
     U_ch    *txt;
@@ -481,8 +475,7 @@ A2MPAR  *ap;
 }
 
 /*NH*/
-A2mHtmlOpenTab(blc)
-int     blc;
+int A2mHtmlOpenTab(int blc)
 {
     int     i;
 
@@ -503,8 +496,7 @@ int     blc;
 }
 
 /*NH
-A2mHtmlCloseTab(blc)
-int     blc;
+int A2mHtmlCloseTab(int blc)
 {
     int     i;
 
@@ -519,9 +511,7 @@ int     blc;
 */
 
 /*NH*/
-A2mHtmlPrintPar(ap, tbl, tcol)
-A2MPAR  *ap;
-int     tbl, tcol;
+int A2mHtmlPrintPar(A2MPAR * ap, int tbl, int tcol)
 {
     int     i, level, blc;
     char    tag[32], *just;
@@ -602,9 +592,7 @@ int     tbl, tcol;
 }
 
 /*NH*/
-A2mHtmlFindTag(pp, tag)
-A2MPPR  *pp;
-char    *tag;
+int A2mHtmlFindTag(A2MPPR * pp, char * tag)
 {
     A2M_HTML_GREEK = 0;
     if(pp->pp_html)                      sprintf(tag, "H%d", pp->pp_html);
@@ -618,9 +606,7 @@ char    *tag;
 
 
 /*NH*/
-A2mHtmlCalcTagFnt(tag, fnt)
-char    *tag;
-A2MFNT  *fnt;
+int A2mHtmlCalcTagFnt(char * tag, A2MFNT * fnt)
 {
     memset(fnt, 0, sizeof(A2MFNT));
 
@@ -641,11 +627,7 @@ A2MFNT  *fnt;
 }
 
 /*NH*/
-A2mHtmlPrintStr(ap, n, fntt, tbl)
-A2MPAR  *ap;
-int     n;
-A2MFNT  *fntt;
-int     tbl;
+int A2mHtmlPrintStr(A2MPAR * ap, int n, A2MFNT * fntt, int tbl)
 {
     A2MSTR  *as = ap->ap_strs[n];
     int     i;
@@ -711,7 +693,7 @@ int     tbl;
 }
 
 /*NH*/
-A2mHtmlResetFont()
+int A2mHtmlResetFont(void)
 {
     int     i;
 
@@ -741,10 +723,7 @@ char    *A2M_HTMLCOLORS[] = {
 };
 
 /*NH*/
-A2mHtmlPrintAttr(ap, n, fntt)
-A2MPAR  *ap;
-int     n;
-A2MFNT  *fntt;
+int A2mHtmlPrintAttr(A2MPAR * ap, int n, A2MFNT * fntt)
 {
     A2MFNT  fnt, fntp;
 
@@ -884,9 +863,7 @@ A2MFNT  *fntt;
 }
 
 /*NH*/
-A2mHtmlPrintChar(fd, ch)
-FILE    *fd;
-int     ch;
+int A2mHtmlPrintChar(FILE * fd, int ch)
 {
     char    *txt;
 
@@ -1173,7 +1150,7 @@ int     ch;
 }
 
 /*NH*/
-A2mHtmlGetCenter(A2MPAR *ap)
+int A2mHtmlGetCenter(A2MPAR *ap)
 {
     A2MPAR  tmpap;
 
@@ -1182,7 +1159,7 @@ A2mHtmlGetCenter(A2MPAR *ap)
 }
 
 /*NH*/
-A2mHtmlGetNowrap(A2MPAR *ap)
+int A2mHtmlGetNowrap(A2MPAR *ap)
 {
     A2MPAR  tmpap;
 
@@ -1204,8 +1181,7 @@ char *A2mHtmlClass(char *class, char *dftclass)
 }
 
 /*NH*/
-A2mHtmlPrintTbl(at)
-A2MTBL  *at;
+int A2mHtmlPrintTbl(A2MTBL * at)
 {
     A2MTC   *tc;
     int     i, j, col;
@@ -1330,8 +1306,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mHtmlPrintGrf(ag)
-A2MGRF  *ag;
+int A2mHtmlPrintGrf(A2MGRF * ag)
 {
     int         w, h;
     char        buf[256];
@@ -1380,8 +1355,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mHtmlAFrame(filename)
-char    *filename;
+int A2mHtmlAFrame(char * filename)
 {
     char    buf[128];
 
@@ -1465,8 +1439,7 @@ d'interprétation et d'impression.
 
 &SA A2mToGdi(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
-A2mHtmlReadIni(filename)
-char    *filename;
+int A2mHtmlReadIni(char * filename)
 {
     U_ch    buf[256];
 
@@ -1513,9 +1486,7 @@ int A2mHtmlPrintKeyTxt(U_ch* txt)
 }
 
 /*NH*/
-A2mHtmlPrintFdTxt(fd, txt)
-FILE    *fd;
-U_ch    *txt;
+int A2mHtmlPrintFdTxt(FILE * fd, U_ch * txt)
 {
     int     i;
 
@@ -1601,9 +1572,7 @@ int A2mHtmlPrintTopicKey(A2MTOP* atp)
 
 
 
-int A2mOemToAnsi(fd, title)
-FILE    *fd;
-unsigned char   *title;
+int A2mOemToAnsi(FILE * fd, unsigned char * title)
 {
     int j;
 
@@ -1628,7 +1597,7 @@ unsigned char   *title;
 }
 
 
-A2mGetModulePath(char *buf)
+int A2mGetModulePath(char *buf)
 {
     //HANDLE hInst;                                     // JMP 22/11/2011
     int         i;

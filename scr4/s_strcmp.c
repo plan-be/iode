@@ -9,8 +9,7 @@ et majuscules.
 
 =======================================================================*/
 
-SCR_cstrcmp(str1, str2)
-U_ch    *str1, *str2;
+int SCR_cstrcmp(U_ch *str1, U_ch *str2)
 {
     return(SCR_cstrncmp(str1, str2, -1));
 }
@@ -24,8 +23,7 @@ entre minuscules et majuscules.
 
 =======================================================================*/
 
-SCR_cstrncmp(str1, str2, lg)
-U_ch    *str1, *str2;
+int SCR_cstrncmp(U_ch *str1, U_ch *str2, int lg)
 {
     U_ch    *u1, *u2;
     int     rc;

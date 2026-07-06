@@ -51,8 +51,7 @@ nom SWAPFILE.SW.
 */
 
 
-SWHDL SW_alloc(size)
-SWSIZE     size;
+SWHDL SW_alloc(SWSIZE size)
 {
     SWSIZE  lost, size2;
     int     blk;
@@ -84,8 +83,7 @@ SWSIZE     size;
 
 
 /*NH*/
-SW_find_free_blk(size)
-SWSIZE  size;
+int SW_find_free_blk(SWSIZE size)
 {
     int     i, j = -1;
 
@@ -110,8 +108,7 @@ SWSIZE  size;
 
 /*NH*/
 /* Fonction de restauration d'un bloc */
-int SW_restore(blk_nb)
-int     blk_nb;
+int SW_restore(int blk_nb)
 {
     int     seg_nb;
 
@@ -134,8 +131,7 @@ int     blk_nb;
 }
 
 /*NH*/
-int SW_create_blk(size)
-SWSIZE      size;
+int SW_create_blk(SWSIZE size)
 {
     int     seg_nb;
 
@@ -202,8 +198,7 @@ mémoire conventionnelle, EMS ou fichier.
 &SA SW_alloc(), SW_realloc()
 */
 
-int SW_free(item)
-SWHDL   item;
+int SW_free(SWHDL item)
 {
     int     blk;
     SWSIZE  size, lost;
@@ -244,17 +239,7 @@ de bytes est inférieur ou égal à l'ancien.
 &SA SW_alloc(), SW_free(), SW_getptr()
 */
 
-#ifdef __cplusplus
-SWHDL SW_realloc(
-    SWHDL   item,
-    SWSIZE  size
-)
-#else
-SWHDL SW_realloc(item, size)
-SWHDL   item;
-SWSIZE  size;
-#endif
-
+SWHDL SW_realloc(SWHDL item, SWSIZE size)
 {
     char    *buf, *tmp;
     SWSIZE  osize, allc = 0;
@@ -312,8 +297,7 @@ conventionnelle ou dans le Page Frame de l'EMS. Le pointeur peut alors
 &SA SW_alloc(), SW_realloc()
 */
 
-char *SW_getptr(item)
-SWHDL   item;
+char *SW_getptr(SWHDL item)
 {
     int     blk, seg_nb;
 
@@ -347,8 +331,7 @@ La mémoire allouée est mise à zéro.
 &SA SW_alloc(), SW_nrealloc(), SW_nfree()
 */
 
-char *SW_nalloc_orig(size)
-unsigned int    size;
+char *SW_nalloc_orig(unsigned int size)
 {
     char    *ptr = 0;
 
@@ -400,10 +383,7 @@ La mémoire supplémentaire allouée est mise à zéro.
 &SA SW_nalloc(), SW_nfree(), SW_realloc()
 */
 
-char *SW_nrealloc_orig(old_ptr, old_count, new_count)
-void            *old_ptr;
-unsigned int    old_count,
-         new_count;
+char *SW_nrealloc_orig(void *old_ptr, unsigned int old_count, unsigned int new_count)
 {
     char    *ptr;
 
@@ -428,13 +408,7 @@ unsigned int    old_count,
     }
 }
 
-void *SW_nrealloc_doc(old_ptr, old_count, new_count, file, line)
-//char *SW_nrealloc_doc(old_ptr, old_count, new_count, file, line)
-void            *old_ptr;
-unsigned int    old_count,
-         new_count;
-char            *file;
-int             line;
+void *SW_nrealloc_doc(void *old_ptr, unsigned int old_count, unsigned int new_count, char *file, int line)
 {
     char        *ptr = SW_nrealloc_orig(old_ptr, old_count, new_count);
     ALLOCDOC    *ad;
@@ -458,9 +432,7 @@ Cette fonction libère une allocation standard en mémoire conventionnelle
 à l'aide de free, sauf si le pointeur passé est nul.
 */
 
-int SW_nfree(ptr)
-//char    *ptr;
-void *ptr;
+int SW_nfree(void *ptr)
 {
     if(ptr == 0) return(0);
     //free(ptr);

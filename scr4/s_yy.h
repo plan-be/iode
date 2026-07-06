@@ -91,27 +91,10 @@ extern int      YY_CASE_SENSITIVE;
 }
 #endif
 
-#ifndef SCRPROTO
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern YYFILE   *YY_open();
-extern char     *YY_error();
-extern int      YY_strcmp();
-extern YYDEF    *YY_search_def();
-
-#ifdef __cplusplus
-}
-#endif
-
-#else
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-/*extern int      YY_strcmp(char *, char *); */
 extern double   SCR_atof(char *); /* JMP 29-12-97 */
 
 #ifdef __cplusplus
@@ -119,7 +102,6 @@ extern double   SCR_atof(char *); /* JMP 29-12-97 */
 #endif
 
 #include <s_proy.h> /* JMP 28-12-97 */
-#endif /* SCRPROTO */
 
 #endif /* _YY_ */
 

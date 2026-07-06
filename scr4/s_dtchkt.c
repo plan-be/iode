@@ -30,8 +30,7 @@ défini dans la variable globale SCR_TIME_FMT.
 &SA SCR_ftime_to_long()
 =======================================================================*/
 
-long SCR_time_to_long(string)
-char *string ;
+long SCR_time_to_long(char * string)
 {
     return(SCR_ftime_to_long(string, SCR_TIME_FMT));
 }
@@ -54,11 +53,9 @@ Ainsi le format "hhH.mm" sur "24H.30" donnera 243000.
 &SA SCR_time_to_long()
 =======================================================================*/
 
-long SCR_ftime_to_long(str, fmt)
-char    *str;
-char    *fmt;
+long SCR_ftime_to_long(char * str, char * fmt)
 {
-    long    hour = 0, atol();
+    long    hour = 0;
     int     h = 10, m = 10, s = 10;
     int     i;
     //char    buf[255];
@@ -103,8 +100,7 @@ et 23, les minutes et les secondes entre 00 et 59.
 &SA SCR_check_fmt_time()
 =======================================================================*/
 
-SCR_check_time(hour)
-long    hour;
+int SCR_check_time(long hour)
 {
     long    h, m, s;
 
@@ -122,8 +118,7 @@ Vérifie qu'une heure formattée est correcte.
 &SA SCR_check_date()
 =======================================================================*/
 
-SCR_check_fmt_time(str, fmt)
-char    *str, *fmt;
+int SCR_check_fmt_time(char * str, char * fmt)
 {
     return(SCR_check_time(SCR_ftime_to_long(str, fmt)));
 }

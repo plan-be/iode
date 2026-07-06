@@ -14,7 +14,7 @@ extern int LST_set(LST *lst,long n,void *ptr);
 extern int LST_strip(LST *lst);
 extern int LST_nb(LST *lst);
 extern int LST_set_buf(int ch,int pos);
-extern LST *LST_read_in(int (*fn_next)(),FILE *fd,unsigned char *seps);
+extern LST *LST_read_in(int (*fn_next)(FILE *),FILE *fd,unsigned char *seps);
 extern int LST_nextch(FILE *fdvec);
 extern LST *LST_vtol(unsigned char *vec,unsigned char *seps);
 extern unsigned char *LST_ltov(LST *lst,unsigned char *seps);

@@ -724,7 +724,7 @@ S'il n'y a pas de nom de machine, l'opération a lieu sur la machine locale.
 &RT 0 en cas de succès, -1 en cas d'erreur.
 &SA SCR_stat_ex(), ISC_stat()
 ================================================================== */
-ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int *fn())
+ISC_mstat_ex_fn(SCRSTAT **ss, int crc, int (*fn)(SCRSTAT *))
 {
 #if defined(DOS16) || (defined(UNIX) && !defined(LINUX))
     return(SCR_mstat_ex(ss, crc));
@@ -1955,7 +1955,6 @@ ISC_split_filename(char *fullname, char *server, int *port, char *srvfile)
     int     pos;
     char    buf[255], buf2[255], *ptr;
     U_ch    **tbl, **ptr2;
-    long    atol();
 
     server[0]  = 0;
     *port      = 0;
@@ -2913,7 +2912,7 @@ SCR_replace_alias(char *file, U_ch **alias)
 {
     FILE    *fd_in, *fd_out;
     int     c, i, j, flag_glob;
-    char    buf[512], tmp_file[30], *ptr, *getenv();
+    char    buf[512], tmp_file[30], *ptr;
 
 //  if(alias == 0) return(0);
 

@@ -27,8 +27,7 @@ MAT     *m1,
 MAT     *m2
 )
 #else
-MAT *M_prod(m3, m1, m2)
-MAT   *m3, *m1, *m2;
+MAT *M_prod(MAT *m3, MAT *m1, MAT *m2)
 #endif
 
 {

@@ -10,8 +10,7 @@ Sa valeur de retour n'est pas testée. Son paramètre est le tableau
 des arguments à traiter.
 =======================================================================*/
 
-A_iexpand(args)
-char    **args;
+int A_iexpand(char **args)
 {
     return(0);
 }

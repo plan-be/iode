@@ -255,12 +255,6 @@ PAGE    *pg;
 int     fld_nb;
 char    *txt;
 {
-#ifndef __cplusplus /* JMP 06-01-98 */
-    extern long PG_fdate_to_long(), PG_ftime_to_long();
-    extern unsigned long PG_ufmt_long();
-    extern unsigned char *PG_ufmt_text();
-    double  SCR_atof();
-#endif
     FIELD   *fld;
     char    *fmt, buf[80], buf1[80];
     long    l;

@@ -23,18 +23,26 @@
 
 #endif
 
-extern PAGE     *PG_read(/* char **/) ;
-extern MENU     *MN_read(/* char **/) ;
-extern ISAM     *IS_read(/* char **/) ;
-extern ACTION   *ACT_read();
-extern FNKEYS   *FNK_read();
-extern PR_DEF   *PR_read(/* char *, FILE * */);
-extern A_BAR    *AB_read(/* char **/) ;
-extern APPL     *AP_read(/* char **/) ;
-extern BC       *BC_read(/* char **/) ;
-extern MPAGE    *MP_read(/* char **/) ;
-extern TPAGES   *TP_read(/* char **/) ;
-extern WTOOLBAR *TB_read(/* char **/) ;     /* BP_M 18-04-1997 */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern PAGE     *PG_read(char *name);
+extern MENU     *MN_read(char *name);
+extern ISAM     *IS_read(char *name);
+extern ACTION   *ACT_read(char *name);
+extern FNKEYS   *FNK_read(char *name);
+extern PR_DEF   *PR_read(char *name);
+extern A_BAR    *AB_read(char *name);
+extern APPL     *AP_read(char *name);
+extern BC       *BC_read(char *name);
+extern MPAGE    *MP_read(char *name);
+extern TPAGES   *TP_read(char *name);
+extern WTOOLBAR *TB_read(char *name);       /* BP_M 18-04-1997 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SCR4_RD_H_ */
 

@@ -81,7 +81,7 @@ SCR_stop_alarm() {return(0);}
 /* TAR */
 #ifndef GENPROTO
 AR_add(char *arname, char **files, int n) {return(0);}
-AR_extract(char *arname, char **files, int n, int (*fn)()) {return(0);}
+AR_extract(char *arname, char **files, int n, int (*fn)(char *, long, long)) {return(0);}
 TarXtract(int a,char *b,char **c,int (*fn)()) {return(0);}
 TarCopy(int a,char *b,char **c,int (*fn)()) {return(0);}
 char *TarError() {return("Not imlemented");}

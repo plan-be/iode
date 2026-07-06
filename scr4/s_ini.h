@@ -19,18 +19,7 @@ typedef struct _inifile_ {
 #define INI_PARAM   2
 
 /* FUNCTIONS */
-
-#ifndef SCRPROTO
-INIFILE *IniOpen();
-INIFILE *IniOpenSection();
-U_ch    **IniReadCurSection();
-U_ch    **IniReadSection();
-U_ch    *IniError();
-U_ch    **IniReadAllSections();
-
-#else
 #include <s_proini.h>
-#endif
 
 #endif /* _S_INI_H_ */
 

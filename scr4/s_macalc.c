@@ -31,9 +31,7 @@ MAT     *m2,
 int     oper
 )
 #else
-MAT *M_calc(m3, m1, m2, oper)
-MAT   *m3, *m1, *m2;
-int   oper;
+MAT *M_calc(MAT *m3, MAT *m1, MAT *m2, int oper)
 #endif
 {
     int  i, j;

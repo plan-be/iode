@@ -37,10 +37,7 @@ L'interligne est calculé comme size + spacing.
 &SA PS_text()
 ------------------------------------------------------------------------- */
 
-PS_labels(ifl, ofl, nvl, nhl, font, size, margv, margh, spacing)
-char    *ifl, *ofl, *font;
-int     nvl, nhl;
-double  size, margv, margh, spacing;
+int PS_labels(char *ifl, char *ofl, int nvl, int nhl, char *font, double size, double margv, double margh, double spacing)
 {
     if(PS_init(ifl, ofl, font, size, margv, margh, spacing, 0)) return(-1);
 
@@ -59,7 +56,7 @@ double  size, margv, margh, spacing;
 }
 
 /*NH*/
-PS_next_label()
+int PS_next_label(void)
 {
     int     ch;
 

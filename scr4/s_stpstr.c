@@ -17,9 +17,7 @@ si on désire supprimer les blancs.
 &SA SCR_pstrip()
 ======================================================================= */
 
-SCR_pstrip_lg(buf, punct)
-unsigned char *buf,
-	      *punct;
+int SCR_pstrip_lg(unsigned char *buf, unsigned char *punct)
 {
     int     i;
 
@@ -48,9 +46,7 @@ on désire supprimer les blancs.
 &SA SCR_pstrip_lg()
 ======================================================================= */
 
-unsigned char *SCR_pstrip(buf, punct)
-unsigned char *buf,
-	      *punct;
+unsigned char *SCR_pstrip(unsigned char *buf, unsigned char *punct)
 {
     buf[SCR_pstrip_lg(buf, punct)] = 0;
     return(buf);    /* JMP 4.23 19-12-95 */

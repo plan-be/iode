@@ -57,8 +57,7 @@ A2MFILE *A2mOpen(char    *filename, int     type)
 }
 
 /*NH*/
-int A2mClose(af)
-A2MFILE *af;
+int A2mClose(A2MFILE * af)
 {
     if(af == 0) return(0);
     CppClose(af->af_cpp);
@@ -80,8 +79,7 @@ A2MPAR *A2mNewPar(
     char    *tag
 )
 #else
-A2MPAR *A2mNewPar(tag)
-char    *tag;
+A2MPAR *A2mNewPar(char *tag)
 #endif
 {
     A2MPAR  *ap;
@@ -102,9 +100,7 @@ char    *tag;
 }
 
 /*NH*/
-int A2mSetParTag(ap, tag)
-A2MPAR  *ap;
-U_ch    *tag;
+int A2mSetParTag(A2MPAR * ap, U_ch * tag)
 {
     if(ap == 0) return(0);
     SCR_free(ap->ap_tag);
@@ -113,8 +109,7 @@ U_ch    *tag;
 }
 
 /*NH*/
-int A2mFreePar(ap)
-A2MPAR  *ap;
+int A2mFreePar(A2MPAR * ap)
 {
     if(ap == 0) return(0);
     A2mFreeStrs(ap->ap_strs);
@@ -125,8 +120,7 @@ A2MPAR  *ap;
 }
 
 /*NH*/
-int A2mFreeStrs(as)
-A2MSTR  **as;
+int A2mFreeStrs(A2MSTR ** as)
 {
     int     i;
 
@@ -168,8 +162,7 @@ A2MTOP *A2mNewTopic()
 }
 
 /*NH*/
-int A2mFreeTopic(atp)
-A2MTOP  *atp;
+int A2mFreeTopic(A2MTOP * atp)
 {
     if(atp == 0) return(0);
     SCR_free(atp->atp_keyws);
@@ -189,8 +182,7 @@ A2MPAGE *A2mNewPage()
 }
 
 /*NH*/
-int A2mFreePage(apg)
-A2MPAGE  *apg;
+int A2mFreePage(A2MPAGE * apg)
 {
     SCR_free(apg);
     return(0);
@@ -227,17 +219,14 @@ A2MMARGINS *A2mNewMargins()
 }
 
 /*NH*/
-int A2mFreeLine(al)
-A2MLINE  *al;
+int A2mFreeLine(A2MLINE * al)
 {
     SCR_free(al);
     return(0);
 }
 
 /*NH*/
-int A2mAddTblLine(at, type, pos)
-A2MTBL  *at;
-int     type, pos;
+int A2mAddTblLine(A2MTBL * at, int type, int pos)
 {
     at->at_tls = (A2MTL *) SCR_realloc(at->at_tls, sizeof(A2MTL),
                                        at->at_nl, at->at_nl + 1);
@@ -253,9 +242,7 @@ int     type, pos;
 }
 
 /*NH*/
-int A2mSetTblNc(at, nc)
-A2MTBL  *at;
-int     nc;
+int A2mSetTblNc(A2MTBL * at, int nc)
 {
     int     i;
 
@@ -271,8 +258,7 @@ int     nc;
 
 
 /*NH*/
-int A2mFreeTbl(at)
-A2MTBL  *at;
+int A2mFreeTbl(A2MTBL * at)
 {
     int     i, j;
     A2MTL   *tl;
@@ -313,16 +299,14 @@ A2MGRF *A2mNewGrf()
 
 
 /*NH*/
-int A2mFreeGrids(grids)
-A2MGRID **grids;
+int A2mFreeGrids(A2MGRID ** grids)
 {
     SCR_free_tbl((U_ch **)grids);
     return(0);
 }
 
 /*NH*/
-int A2mFreeLabs(labs)
-A2MLAB  **labs;
+int A2mFreeLabs(A2MLAB ** labs)
 {
     int     i;
 
@@ -334,8 +318,7 @@ A2MLAB  **labs;
 }
 
 /*NH*/
-int A2mFreeGXY(gxy)
-A2MGXY  **gxy;
+int A2mFreeGXY(A2MGXY ** gxy)
 {
     int     i;
 
@@ -351,8 +334,7 @@ A2MGXY  **gxy;
 }
 
 /*NH*/
-int A2mFreeGrf(ag)
-A2MGRF  *ag;
+int A2mFreeGrf(A2MGRF * ag)
 {
     int     i;
 
@@ -380,8 +362,7 @@ A2MOBJ *A2mNewObj(
     int     type
 )
 #else
-A2MOBJ *A2mNewObj(type)
-int     type;
+A2MOBJ *A2mNewObj(int type)
 #endif
 {
     A2MOBJ  *ao = (A2MOBJ *) SCR_malloc(sizeof(A2MOBJ));
@@ -420,8 +401,7 @@ int     type;
 }
 
 /*NH*/
-int A2mFreeObj(ao)
-A2MOBJ  *ao;
+int A2mFreeObj(A2MOBJ * ao)
 {
     if(ao == 0) return(0);
     switch(ao->ao_type) {
@@ -452,9 +432,7 @@ A2MOBJ  *ao;
 }
 
 /*NH*/
-int A2mReadVar(af, var)
-A2MFILE *af;
-U_ch    **var;
+int A2mReadVar(A2MFILE * af, U_ch ** var)
 {
     SCR_free(*var);
     CppSkipSpaces(af->af_cpp);
@@ -464,8 +442,7 @@ U_ch    **var;
 }
 
 /*NH*/
-int A2mReadInt(af)
-A2MFILE *af;
+int A2mReadInt(A2MFILE * af)
 {
     int     i;
 
@@ -476,9 +453,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mDefCh(af, escch)
-A2MFILE *af;
-int     *escch;
+int A2mDefCh(A2MFILE * af, int * escch)
 {
     int     ch;
 
@@ -492,9 +467,7 @@ int     *escch;
 }
 
 /*NH*/
-int A2mDefPar(af, parname)
-A2MFILE *af;
-char    *parname;
+int A2mDefPar(A2MFILE * af, char * parname)
 {
     char    str[51];
 
@@ -514,9 +487,7 @@ A2MOBJ *A2mReadLine(
     int     type
 )
 #else
-A2MOBJ *A2mReadLine(af, type)
-A2MFILE *af;
-int     type;
+A2MOBJ *A2mReadLine(A2MFILE *af, int type)
 #endif
 
 {
@@ -538,8 +509,7 @@ A2MOBJ *A2mReadGoto(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadGoto(af)
-A2MFILE *af;
+A2MOBJ *A2mReadGoto(A2MFILE *af)
 #endif
 
 {
@@ -561,8 +531,7 @@ A2MOBJ *A2mReadMargins(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadMargins(af)
-A2MFILE *af;
+A2MOBJ *A2mReadMargins(A2MFILE *af)
 #endif
 
 {
@@ -587,8 +556,7 @@ A2MOBJ *A2mReadPage(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadPage(af)
-A2MFILE *af;
+A2MOBJ *A2mReadPage(A2MFILE *af)
 #endif
 {
     A2MOBJ  *ao;
@@ -608,8 +576,7 @@ A2MOBJ *A2mReadTopic(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadTopic(af)
-A2MFILE *af;
+A2MOBJ *A2mReadTopic(A2MFILE *af)
 #endif
 {
     A2MOBJ  *ao;
@@ -638,8 +605,7 @@ A2MOBJ *A2mReadTopicAlias(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadTopicAlias(af)
-A2MFILE *af;
+A2MOBJ *A2mReadTopicAlias(A2MFILE *af)
 #endif
 {
     A2MOBJ  *ao;
@@ -660,9 +626,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mReadTopicLink(af, atp)
-A2MFILE *af;
-A2MTOP  *atp;
+int A2mReadTopicLink(A2MFILE * af, A2MTOP * atp)
 {
     char    buf[65];
     int     ch, val;
@@ -699,8 +663,7 @@ A2MTOP  *atp;
 }
 
 /*NH*/
-int A2mReadTopicsLink(af)
-A2MFILE *af;
+int A2mReadTopicsLink(A2MFILE * af)
 {
     char    buf[65];
     int     ch;
@@ -732,8 +695,7 @@ A2MOBJ *A2mReadPar(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadPar(af)
-A2MFILE *af;
+A2MOBJ *A2mReadPar(A2MFILE *af)
 #endif
 {
     int     ch, i;
@@ -792,9 +754,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mSupdbl(txt, ljust)
-U_ch    *txt;
-int     ljust;
+int A2mSupdbl(U_ch * txt, int ljust)
 {
     int     i = 0, j = 0, prev = 1;
 
@@ -827,10 +787,7 @@ char *A2M_TBLHBF[] = {
 };
 
 /*NH*/
-int A2mReadTblLine(af, at, pos)
-A2MFILE *af;
-A2MTBL  *at;
-int     pos;
+int A2mReadTblLine(A2MFILE * af, A2MTBL * at, int pos)
 {
     U_ch    chars[3], *cell, str[51];
     A2MTC   *tc;
@@ -910,9 +867,7 @@ int     pos;
 }
 
 /*NH*/
-int A2mReadTblWidth(af, at)
-A2MFILE *af;
-A2MTBL  *at;
+int A2mReadTblWidth(A2MFILE * af, A2MTBL * at)
 {
     U_ch    str[51];
     int     j, i = 0;
@@ -950,8 +905,7 @@ A2MTBL  *at;
 }
 
 /*NH*/
-int A2mReadTblWidths(af)
-A2MFILE *af;
+int A2mReadTblWidths(A2MFILE * af)
 {
     U_ch    str[51];
     int     i = 0;
@@ -988,9 +942,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mReadParLine(af, ap)
-A2MFILE *af;
-A2MPAR  **ap;
+int A2mReadParLine(A2MFILE * af, A2MPAR ** ap)
 {
     U_ch    *txt;
 
@@ -1126,9 +1078,7 @@ int A2mEndTbl(A2MTBL* at)
 
 /*NH*/
 
-int A2mReadGrTxt(af, txt)
-A2MFILE *af;
-U_ch    **txt;
+int A2mReadGrTxt(A2MFILE * af, U_ch ** txt)
 {
     CppSkipSpaces(af->af_cpp);
     *txt = CppReadToChars(af->af_cpp, "\n");
@@ -1137,8 +1087,7 @@ U_ch    **txt;
 }
 
 /*NH*/
-double A2mRead1Dbl(af)
-A2MFILE *af;
+double A2mRead1Dbl(A2MFILE * af)
 {
     double  val;
 
@@ -1150,9 +1099,7 @@ A2MFILE *af;
 /*NH*/
 
 /*NH*/
-int A2mReadGrGrids(af, grds)
-A2MFILE *af;
-A2MGRID ***grds;
+int A2mReadGrGrids(A2MFILE * af, A2MGRID *** grds)
 {
     A2MGRID grd;
     U_ch    str[256];
@@ -1186,9 +1133,7 @@ A2MGRID ***grds;
 }
 
 /*NH*/
-int A2mReadGrLabs(af, labs)
-A2MFILE *af;
-A2MLAB  ***labs;
+int A2mReadGrLabs(A2MFILE * af, A2MLAB *** labs)
 {
     A2MLAB  lab;
     U_ch    *txt;
@@ -1225,9 +1170,7 @@ A2MLAB  ***labs;
 }
 
 /*NH*/
-int A2mReadGrGrid(af, grid)
-A2MFILE *af;
-short   *grid;
+int A2mReadGrGrid(A2MFILE * af, short * grid)
 {
     int     i;
     U_ch    str[256];
@@ -1254,10 +1197,7 @@ short   *grid;
 
 
 /*NH*/
-int A2mReadGrXY(af, gxys, axis)
-A2MFILE *af;
-A2MGXY  ***gxys;
-int     axis;
+int A2mReadGrXY(A2MFILE * af, A2MGXY *** gxys, int axis)
 {
     A2MGXY  *gxy;
     U_ch    str[256], ch, *txt;
@@ -1314,8 +1254,7 @@ int     axis;
 }
 
 /*NH*/
-int A2mReadAlign(af)
-A2MFILE *af;
+int A2mReadAlign(A2MFILE * af)
 {
     U_ch    ch;
 
@@ -1330,10 +1269,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mReadGrTY(af, gxys, axis)
-A2MFILE *af;
-A2MGXY  ***gxys;
-int     axis;
+int A2mReadGrTY(A2MFILE * af, A2MGXY *** gxys, int axis)
 {
     A2MGXY  *gxy;
     U_ch    str[256], ch, *txt;
@@ -1411,9 +1347,7 @@ int     axis;
 }
 
 /*NH JMP 20-02-98 */
-int A2mReadGrBox(af, ag)
-A2MFILE *af;
-A2MGRF  *ag;
+int A2mReadGrBox(A2MFILE * af, A2MGRF * ag)
 {
     char    str[256];
     int     br, pct;
@@ -1443,8 +1377,7 @@ A2MGRF  *ag;
 
 
 /*NH*/
-int A2mSkipBrackets(af)
-A2MFILE *af;
+int A2mSkipBrackets(A2MFILE * af)
 {
     int     ch;
 
@@ -1464,8 +1397,7 @@ A2MOBJ *A2mReadGraph(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadGraph(af)
-A2MFILE *af;
+A2MOBJ *A2mReadGraph(A2MFILE *af)
 #endif
 
 {
@@ -1622,8 +1554,7 @@ A2MOBJ *A2mReadCmd(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mReadCmd(af)
-A2MFILE *af;
+A2MOBJ *A2mReadCmd(A2MFILE *af)
 #endif
 {
     char    str[51];
@@ -1670,9 +1601,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mReadCmdNoObj(af, str)
-A2MFILE *af;
-char    str[51];
+int A2mReadCmdNoObj(A2MFILE * af, char str[51])
 {
     /* Lignes ..... ===> comment */ /* JMP 21-05-99 */
     if(str[0] == 0) {               /* JMP 21-05-99 */
@@ -1782,8 +1711,7 @@ char    str[51];
 }
 
 /*NH*/
-int A2mReadTShading(af)
-A2MFILE *af;
+int A2mReadTShading(A2MFILE * af)
 {
     char    str[256];
     int     br, pct, col, i;
@@ -1820,8 +1748,7 @@ A2MOBJ *A2mRead(
     A2MFILE *af
 )
 #else
-A2MOBJ *A2mRead(af)
-A2MFILE *af;
+A2MOBJ *A2mRead(A2MFILE *af)
 #endif
 {
     int     ch;
@@ -1843,9 +1770,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mAddParStrAlloc(as, nl)
-A2MSTR  ***as;
-int     *nl;
+int A2mAddParStrAlloc(A2MSTR *** as, int * nl)
 {
     *as = (A2MSTR **) SCR_realloc(*as, sizeof(A2MSTR *), *nl, 1 + *nl);
     (*as)[*nl] = (A2MSTR *) SCR_malloc(sizeof(A2MSTR));
@@ -1854,9 +1779,7 @@ int     *nl;
 }
 
 /*NH*/
-int A2mAddParStr(as, nl, as_proto)
-A2MSTR  ***as, *as_proto;
-int     *nl;
+int A2mAddParStr(A2MSTR *** as, int * nl, A2MSTR * as_proto)
 {
     *as = (A2MSTR **) SCR_realloc(*as, sizeof(A2MSTR *), *nl, 1 + *nl);
     (*as)[*nl] = 0;
@@ -1877,9 +1800,7 @@ A2MSTR **A2mAddParLine(
     U_ch    *txt
 )
 #else
-A2MSTR **A2mAddParLine(as, txt)
-A2MSTR  **as;
-U_ch    *txt;
+A2MSTR **A2mAddParLine(A2MSTR **as, U_ch *txt)
 #endif
 {
     A2MSTR  as_proto;
@@ -2153,9 +2074,7 @@ lecture du fichier a2m ouvert.
     #include <scr4.h>
     #include <s_a2m.h>
 
-    A2mPrintError(af, txt)
-    A2MFILE *af;
-    U_ch    *txt;
+    int A2mPrintError(A2MFILE * af, U_ch * txt)
     {
 	PG_display_error("%s : %s", A2mError(af), txt);
     }
@@ -2163,8 +2082,7 @@ lecture du fichier a2m ouvert.
 &SA A2mPrintError(), A2mToGdi(), A2mToHtml(), A2mToRtf(), A2mToMif()
 ======================================================================== */
 
-U_ch *A2mError(af)
-A2MFILE *af;
+U_ch *A2mError(A2MFILE *af)
 {
     static char msg[128];
 
@@ -2177,8 +2095,7 @@ A2MFILE *af;
 /***************** Catalogue de paragraphes *********************/
 
 /*NH*/
-A2mFindPpr(partag)
-char    *partag;
+int A2mFindPpr(char * partag)
 {
     int     i;
 
@@ -2196,8 +2113,7 @@ A2MPPR *A2mCreatePpr(
     char    *partag
 )
 #else
-A2MPPR *A2mCreatePpr(partag)
-char    *partag;
+A2MPPR *A2mCreatePpr(char *partag)
 #endif
 {
     int     i = A2mFindPpr(partag);
@@ -2216,9 +2132,7 @@ char    *partag;
 }
 
 /*NH*/
-int A2mReadParString(af, str)
-A2MFILE *af;
-U_ch    *str;
+int A2mReadParString(A2MFILE * af, U_ch * str)
 {
     int     ch;
 
@@ -2235,8 +2149,7 @@ U_ch    *str;
 }
 
 /*NH*/
-int A2mReadParVal(af)
-A2MFILE *af;
+int A2mReadParVal(A2MFILE * af)
 {
     char    str[65];
 
@@ -2245,10 +2158,7 @@ A2MFILE *af;
 }
 
 /*NH*/
-int A2mReadParChars(af, chars, upper)
-A2MFILE *af;
-char    *chars;
-int     upper;
+int A2mReadParChars(A2MFILE * af, char * chars, int upper)
 {
     char    str[65];
     int     pos;
@@ -2261,8 +2171,7 @@ int     upper;
 }
 
 /*NH*/
-int A2mReadParChar(af)
-A2MFILE *af;
+int A2mReadParChar(A2MFILE * af)
 {
     char    str[65];
 
@@ -2272,9 +2181,7 @@ A2MFILE *af;
 
 
 /*NH*/
-int A2mReadParAlias(af, pp)
-A2MFILE *af;
-A2MPPR  *pp;
+int A2mReadParAlias(A2MFILE * af, A2MPPR * pp)
 {
     char    str[65], partag[65];
     int     pos;
@@ -2289,8 +2196,7 @@ A2MPPR  *pp;
 }
 
 /*NH*/
-int A2mReadParDef(af)
-A2MFILE *af;
+int A2mReadParDef(A2MFILE * af)
 {
     char    buf[65];
     A2MPPR  *pp;
@@ -2341,8 +2247,7 @@ A2MPAR *A2mTxt2Par(
     char    *txt
 )
 #else
-A2MPAR *A2mTxt2Par(tag, txt)
-char    *tag, *txt;
+A2MPAR *A2mTxt2Par(char *tag, char *txt)
 #endif
 {
     A2MPAR *par;
@@ -2354,8 +2259,7 @@ char    *tag, *txt;
 
 
 /*NH*/
-int A2mReadA2mIni(filename)
-char    *filename;
+int A2mReadA2mIni(char * filename)
 {
     U_ch    buf[256];
 
@@ -2383,9 +2287,7 @@ char    A2M_PER_CH[] = "YSQMWD";
 int     A2M_PER_NB[] = {1, 2, 4, 12, 52, 365};
 
 /*NH*/
-int A2mAnalysePeriod(str, period, skip)
-char    *str;
-double  *period, *skip;
+int A2mAnalysePeriod(char * str, double * period, double * skip)
 {
     int     i, j, nb_per, year, sub;
 
@@ -2499,8 +2401,7 @@ int A2mReadAllTopics(A2MFILE* af)
 }
 
 /*NH*/
-A2mReadTopics(a2mfile)
-char    *a2mfile;
+int A2mReadTopics(char * a2mfile)
 {
     A2MFILE *af;
     CPPFILE *cpp;
@@ -2521,7 +2422,8 @@ char    *a2mfile;
 
     A2mFreeTopics();
     A2mReadAllTopics(af);
-    qsort(A2M_TOPICS, A2M_NB_TOPICS, sizeof(A2MTOP *), A2mTopicSort);
+        qsort(A2M_TOPICS, A2M_NB_TOPICS, sizeof(A2MTOP *),
+            (int (*)(const void *, const void *))A2mTopicSort);
 
     CppClose(af->af_cpp);
     SCR_free(af->af_outfile);
@@ -2552,8 +2454,7 @@ int A2mFreeTopics()
 }
 
 /*NH*/
-U_ch *A2mHHTopic(line)
-U_ch    *line;
+U_ch *A2mHHTopic(U_ch *line)
 {
     A2MTOP  *atp;
     int     i;
@@ -2581,8 +2482,7 @@ U_ch    *line;
 
 
 /*NH*/
-A2mHHKeepKw(keyw)
-U_ch    *keyw;
+int A2mHHKeepKw(U_ch * keyw)
 {
     int     i;
 
@@ -2594,9 +2494,7 @@ U_ch    *keyw;
 
 #define lettre(x)   (SCR_is_anum(x) || (x) == '_')
 /*NH*/
-A2mHHCalcPosH(txt, pos, posH)
-U_ch    *txt;
-int     pos, *posH;
+int A2mHHCalcPosH(U_ch * txt, int pos, int * posH)
 {
     int     i;
 
@@ -2615,9 +2513,7 @@ int     pos, *posH;
 }
 
 /*NH*/
-int A2mHHCalcPosA(txt, shift, pos, posH)
-U_ch    *txt;
-int     shift, pos, *posH;
+int A2mHHCalcPosA(U_ch * txt, int shift, int pos, int * posH)
 {
     int     i;
 

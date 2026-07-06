@@ -32,8 +32,7 @@ dans file les "wildcards" correspondant aux fichiers spécifiés.
 &SA SCR_dir_std(), SCR_split_dir()
 ======================================================================= */
 
-SCR_split_name(path, dir, file)
-char    *path, *dir, *file;
+int SCR_split_name(char *path, char *dir, char *file)
 {
     char    buf[SCR_STAT_NAME_LG + 1];
 

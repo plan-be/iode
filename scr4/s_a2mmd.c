@@ -528,7 +528,7 @@ char *A2mMDFNote(char* ref)
 }
 
 /*NH*/
-A2mMDPrintFNotes()
+int A2mMDPrintFNotes(void)
 {
     int     i;
 

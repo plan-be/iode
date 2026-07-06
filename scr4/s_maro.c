@@ -6,9 +6,7 @@
     Elementary row operation - switching two rows
 */
 
-M_ero_sw(dim, row1, row2)
-int     dim;
-MREAL    *row1, *row2;
+int M_ero_sw(int dim, MREAL *row1, MREAL *row2)
 {
     MREAL*     row;
 
@@ -38,10 +36,7 @@ MREAL    *row1, *row2;
 	row2 = row2 + mult * row1
 */
 
-M_ero_ma(dim, mult, row1, row2)
-int     dim;
-MREAL    mult;
-MREAL    *row1, *row2;
+int M_ero_ma(int dim, MREAL mult, MREAL *row1, MREAL *row2)
 {
     int   j;
 
@@ -59,10 +54,7 @@ MREAL    *row1, *row2;
    Elementary row operation - dividing by a constant
 */
 
-M_ero_div(dim, div, row)
-int     dim;
-MREAL    div;
-MREAL    *row;
+int M_ero_div(int dim, MREAL div, MREAL *row)
 {
     int   i;
 

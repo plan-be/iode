@@ -260,77 +260,10 @@ extern int  WSCR_FONTSIZE;
 
 
 /* ====== FNS PROTOTYPES =========================== */
-
-#ifndef SCRPROTO
-
-extern int      WscrUnRegisterObjPg(char *, PAGE *);
-extern PAGE     *WscrFindPage(HWND );
-extern MENU     *WscrFindMenu(HMENU );
-extern APPL     *WscrFindAppl(HMENU );
-extern char     *WscrFindObjPtr(HWND );
-extern WSCROLL  *WscrSCROLLToWSCROLL(SCROLL *);
-extern U_ch     *WscrOemVsAnsi(U_ch  *, int);
-extern U_ch     *WscrOemToAnsi(U_ch  *);
-extern U_ch     *WscrAnsiToOem(U_ch  *);
-extern U_ch     *WscrGetWindowTextOem(HWND);
-extern int      WscrKeyScrToWin(int);
-extern int      WscrKeyWinToScr(int);
-extern int      WscrSetWindowTextOem(HWND, U_ch  *);
-extern U_ch     *WscrGetWindowTextOem(HWND);
-extern int      WscrTextOutOem(HDC, int, int, U_ch  *);
-extern HWND     WscrCreateWscr(HMENU );
-extern HWND     WapEditAppl(APPL *);
-extern HWND     WscrMain(int, U_ch **);
-extern HWND     WscrPgDisplay(PAGE *, int);
-extern HWND     WscrObjDisplay(PAGE *, int , int );
-extern HMENU    WscrCreateMenu();
-extern HMENU    WscrCreateMenu(U_ch  *, U_ch , int);
-extern int      WscrSetSubMenu(HMENU, HMENU, int);
-extern HWND     WscrScrollCreate(HWND , int , int , int , int , int );
-extern ATOM     WscrScrollRegister();
-extern HANDLE   WscrGetFont(int );
-extern HWND     WscrFindHwndPg(PAGE *);
-extern HWND     WscrFindHwnd(char *);
-extern HWND     WscrGetMainWnd();  /* JMP 25-01-00 */
-
-extern U_ch     *WscrClipGet();
-
-extern HWND     WscrCreateHeader(HWND, int, int, int, int );
-extern HWND     WscrCreateToolbar(HWND , WTOOLBAR *);
-extern HWND     WscrStatusCreate(HWND );
-
-extern COLORREF WscrChooseColor(HWND, COLORREF, COLORREF *);
-extern int WscrGetFilename(HWND , int, U_ch *, U_ch *, U_ch *, U_ch *);
-extern int WscrChooseFont(HWND , LOGFONT *);
-extern char **WscrListPrinters();
-
-/* DDE */
-HCONV               WscrDdeConnect();
-HDDEDATA CALLBACK   DdeCallback();
-HDDEDATA CALLBACK   DdeSrvCallback ();
-unsigned char       *WscrDdeGetItem();
-unsigned char       *WscrDdeGet();
-
-extern WDDLG *WDDlgCreate();
-extern WDDLG *WDDlgCreateInfoBox();
-
-extern HPEN        WprCreateDashPen();
-extern HDC         WscrEMFCreatehDC();
-extern HMETAFILE   WprWMFEnd();
-#ifdef WIN32
-extern HENHMETAFILE WprEMFEnd();
-#endif
-
-HWND WscrCreateHiddenWindow(WSCRPROCFN);
-
-#else /* SCRPROTO */
-
 #include <s_prowin.h>
 #include <s_prowis.h>
 
 extern HWND WscrMain(int, U_ch **);
-
-#endif /* SCRPROTO */
 
 #endif // _WSCR_
 #endif // DOS

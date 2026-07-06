@@ -19,8 +19,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 &RT buffer statique contenant le nom du device
 &SA STD_doscpin(), STD_doscpout(), STD_dosformat()
 ─────────────────────────────────────────────────────────────────────── */
-char *STD_unit(disk, type)
-int     disk,  type;
+char *STD_unit(int disk, int type)
 {
     static char buf[25];
 #ifdef DOS
@@ -56,9 +55,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_dosformat()
 ─────────────────────────────────────────────────────────────────────── */
-STD_doscpout(from, to, unit, type)
-char    *from, *to;
-int     unit, type;
+int STD_doscpout(char *from, char *to, int unit, int type)
 {
     char    buf[200];
 #ifdef DOS
@@ -93,9 +90,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 &RT void
 &SA STD_doscpout(), STD_unit(), STD_dosformat()
 ─────────────────────────────────────────────────────────────────────── */
-STD_doscpin(from, to, unit, type)
-char    *from, *to;
-int     unit, type;
+int STD_doscpin(char *from, char *to, int unit, int type)
 {
     char    buf[200];
 #ifdef DOS
@@ -132,8 +127,7 @@ type vaut 0 pour une disquette 3.5" 1,44 MB, 1 pour une disquette
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_doscpout()
 ─────────────────────────────────────────────────────────────────────── */
-STD_dosformat(unit, type)
-int     unit, type;
+int STD_dosformat(int unit, int type)
 {
     char    buf[80];
 
@@ -164,7 +158,7 @@ Après exit, l'application reprend à l'endroit où elle avait été quittée.
 &RT void
 &SA STD_doscpin(), STD_unit(), STD_dosformat()
 ─────────────────────────────────────────────────────────────────────── */
-STD_subshell()
+int STD_subshell(void)
 {
 #ifdef DOS
 #if !defined(DOSWIN) && !defined(DOSW32) && !defined(WINDOWS)

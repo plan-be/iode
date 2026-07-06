@@ -24,9 +24,7 @@ int     lig,
 int     col
 )
 #else
-MAT     *M_set(m2, m1, lig, col)
-MAT     *m2, *m1;
-int     lig, col;
+MAT     *M_set(MAT *m2, MAT *m1, int lig, int col)
 #endif
 {
     int i, j, k, l;

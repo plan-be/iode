@@ -25,7 +25,7 @@ dans un format caractère.
 
 ================================================================== */
 
-WscrGetOSVersion(char *version)
+int WscrGetOSVersion(char *version)
 {
     OSVERSIONINFO   osv;
     int             rc;
@@ -79,7 +79,7 @@ dans un format caractère. Remplace WscrGetOSVersion().
 
 ================================================================== */
 
-WscrGetOSVersionEx(char *version)
+int WscrGetOSVersionEx(char *version)
 {
     OSVERSIONINFO   osv;
     int             rc, Platform, MinorV, MajorV;

@@ -112,9 +112,7 @@
 &SA A_init(), A_help(), A_usage()
 ========================================================================= */
 
-A_check(args, adef)
-char    **args;
-ADEF    *adef;
+int A_check(char **args, ADEF *adef)
 {
     int i;
 
@@ -130,9 +128,7 @@ ADEF    *adef;
 }
 
 /*NH*/
-A_check1(args, adef)
-char    **args;
-ADEF    *adef;
+int A_check1(char **args, ADEF *adef)
 {
     int pos, nb;
 
@@ -157,9 +153,7 @@ err :
 }
 
 /*NH*/
-A_checkdef(adef, arg)
-ADEF    *adef;
-char    *arg;
+int A_checkdef(ADEF *adef, char *arg)
 {
     int i;
 

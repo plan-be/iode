@@ -72,8 +72,7 @@ Ces variables sont définies dans la section [CSV] du fichier .ini.
 &SA A2mCsvReadIni(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mToCsv(a2mfile, outfile)
-char    *a2mfile, *outfile;
+int A2mToCsv(char * a2mfile, char * outfile)
 {
     A2MFILE *af;
     A2MOBJ  *ao;
@@ -98,8 +97,7 @@ char    *a2mfile, *outfile;
 }
 
 /*NH*/
-A2mCsvInit(outfile)
-char    *outfile;
+int A2mCsvInit(char * outfile)
 {
     extern int  A2M_CUROBJ;
 
@@ -110,7 +108,7 @@ char    *outfile;
 }
 
 /*NH*/
-A2mCsvEnd()
+int A2mCsvEnd(void)
 {
     fclose(A2M_fdcsv);
     A2M_fdcsv = 0;
@@ -118,8 +116,7 @@ A2mCsvEnd()
 }
 
 /*NH*/
-A2mCsvPrintObj(ao)
-A2MOBJ  *ao;
+int A2mCsvPrintObj(A2MOBJ * ao)
 {
     char        msg[80];
     extern int  A2M_CUROBJ;
@@ -140,9 +137,7 @@ A2MOBJ  *ao;
 }
 
 /*NH*/
-A2mCsvPrintPar(ap, tbl, tcol)
-A2MPAR  *ap;
-int     tbl, tcol;
+int A2mCsvPrintPar(A2MPAR * ap, int tbl, int tcol)
 {
     int     i;
 
@@ -166,9 +161,7 @@ int     tbl, tcol;
 }
 
 /*NH*/
-A2mCsvPrintStr(ap, n)
-A2MPAR  *ap;
-int     n;
+int A2mCsvPrintStr(A2MPAR * ap, int n)
 {
     A2MSTR  *as = ap->ap_strs[n];
     int     i;
@@ -196,8 +189,7 @@ int     n;
 }
 
 /*NH*/
-A2mCsvPrintChar(ch)
-int     ch;
+int A2mCsvPrintChar(int ch)
 {
     if(ch == A2M_CSV_QUOTE)
 	fprintf(A2M_fdcsv, "%c%c",A2M_CSV_QUOTE, A2M_CSV_QUOTE);
@@ -210,8 +202,7 @@ int     ch;
 }
 
 /*NH*/
-A2mCsvPrintTbl(at)
-A2MTBL  *at;
+int A2mCsvPrintTbl(A2MTBL * at)
 {
     A2MTC   *tc;
     int     i, j;
@@ -236,16 +227,14 @@ A2MTBL  *at;
 }
 
 /*NH*/
-A2mCsvPrintGrf(ag)
-A2MGRF  *ag;
+int A2mCsvPrintGrf(A2MGRF * ag)
 {
     fprintf(A2M_fdcsv, "\"*** GRAPH ***\"\n");
     return(0);
 }
 
 /*NH*/
-A2mCsvAFrame(filename)
-char    *filename;
+int A2mCsvAFrame(char * filename)
 {
     fprintf(A2M_fdcsv, "\"*** IMAGE %s ***\"\n", filename);
     return(0);
@@ -279,8 +268,7 @@ d'interprétation et d'impression.
 
 &SA A2mToGdi(), A2mToRtf(), A2mToMif(), A2mToCsv(), A2mPrintError()
 ==================================================================== */
-A2mCsvReadIni(filename)
-char    *filename;
+int A2mCsvReadIni(char * filename)
 {
     U_ch    buf[256];
 

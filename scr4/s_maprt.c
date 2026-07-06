@@ -25,12 +25,7 @@ cas de succès.
 
 ======================================================================= */
 
-M_tprintf(fd, m1, title, t_line, t_col)
-FILE *fd;
-MAT  *m1;
-char *title;
-char **t_line;
-char **t_col;
+int M_tprintf(FILE *fd, MAT *m1, char *title, char **t_line, char **t_col)
 {
     int i, j, nc_tbl;
 
@@ -92,10 +87,7 @@ cas de succès.
 
 ======================================================================= */
 
-M_printf(fd, m1, title)
-FILE *fd;
-MAT  *m1;
-char *title;
+int M_printf(FILE *fd, MAT *m1, char *title)
 {
     int i, j, nc_tbl;
 

@@ -33,8 +33,7 @@ La matrice source n'est pas modifiée.
 
 ======================================================================= */
 
-MREAL M_det_1(m1)
-MAT *m1;
+MREAL M_det_1(MAT *m1)
 {
     int i,j,m,n;
     MREAL p, q, det = 0;
@@ -84,10 +83,7 @@ err:
  This tests for errors in the value of dim
 */
 
-M_det_init(dim, m1, det)
-int     dim;
-MAT     *m1;
-MREAL    *det;
+int M_det_init(int dim, MAT *m1, MREAL *det)
 {
     if (dim < 1) return(-1);
     else
@@ -115,8 +111,7 @@ La matrice est modifiée.
 
 ======================================================================= */
 
-MREAL    M_det_2(m1)
-MAT     *m1;
+MREAL    M_det_2(MAT *m1)
 {
     MREAL    p_det, det, mult;
     int     row, r_row, sing;
@@ -187,11 +182,7 @@ err:
    determinant is zero (sing == 1 is returned).
 */
 
-M_det_pivot(dim, row, m1, p_det, sing)
-int     dim, row;
-MAT     *m1;
-MREAL    *p_det;
-int     *sing;
+int M_det_pivot(int dim, int row, MAT *m1, MREAL *p_det, int *sing)
 {
     int   n_row;
     MREAL  *v_n_row, *v_row;

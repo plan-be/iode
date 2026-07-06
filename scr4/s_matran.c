@@ -26,8 +26,7 @@ MAT     *m2,
 MAT     *m1
 )
 #else
-MAT *M_trans(m2, m1)
-MAT   *m2, *m1;
+MAT *M_trans(MAT *m2, MAT *m1)
 #endif
 {
    int          i, j;

@@ -49,9 +49,7 @@ Fonction de décompactage de string compacté à laide de GzipEncodeStr.
 &RT 0 en cas de succès, < 0 en cas d'erreur
 &SA GZipEncodeStrNA(), GzipDecodeStr()
 ────────────────────────────────────────────────────────────────── */
-GzipDecodeStrNA(instr, inlen, outstr)
-unsigned char   *instr, *outstr;
-unsigned long   inlen;
+int GzipDecodeStrNA(unsigned char *instr, unsigned long inlen, unsigned char *outstr)
 {
     int             rc;
     long            outlen;
@@ -100,8 +98,7 @@ SCR_GZIP_LEVEL détermine le niveau de compression (1-9).
 &RT GZFILE * cas de succès, NULL en cas d'erreur
 &SA GzipOpen(), GzipRead(), GzipWrite(), GzipSeek()
 ────────────────────────────────────────────────────────────────── */
-GZIPFILE *GzipCreate(filename)
-unsigned char   *filename;
+GZIPFILE *GzipCreate(unsigned char *filename)
 {
     char        buf[10];
     gzFile      gzf;
@@ -129,8 +126,7 @@ fopen() et fread().
 &RT GZFILE * cas de succès, NULL en cas d'erreur
 &SA GzipOpen(), GzipRead(), GzipWrite(), GzipSeek()
 ────────────────────────────────────────────────────────────────── */
-GZIPFILE *GzipOpen(filename)
-unsigned char   *filename;
+GZIPFILE *GzipOpen(unsigned char *filename)
 {
     char        buf[10];
     gzFile      gzf;
@@ -153,8 +149,7 @@ Fonction de fermeture d'un fichier ouvert par la fonction GzipCreate() ou GzipOp
 &RT 0
 &SA GzipOpen(), GzipCreate()
 ────────────────────────────────────────────────────────────────── */
-GzipClose(gzf)
-GZIPFILE    *gzf;
+int GzipClose(GZIPFILE *gzf)
 {
     if(gzf) gzclose(gzf);
     return(0);
@@ -171,10 +166,7 @@ Fonction d'écriture dans un fichier créé par la fonction GzipCreate().
 &RT Nombre de bytes écrits (non compactés).
 &SA GzipCreate(), GzipPutc()
 ────────────────────────────────────────────────────────────────── */
-GzipWrite(gzf, buf, len)
-GZIPFILE        *gzf;
-const voidp     buf;
-unsigned int    len;
+int GzipWrite(GZIPFILE *gzf, const voidp buf, unsigned int len)
 {
     return(gzwrite((gzFile) gzf, (const voidp) buf, len));
 }
@@ -189,10 +181,7 @@ Fonction de lecture dans un fichier ouvert par la fonction GzipOpen().
 &RT Nombre de bytes lus (non compactés).
 &SA GzipOpen(), GzipGetc(), GzipSeek()
 ────────────────────────────────────────────────────────────────── */
-GzipRead(gzf, buf, len)
-GZIPFILE        *gzf;
-U_ch            *buf;
-unsigned int    len;
+int GzipRead(GZIPFILE *gzf, U_ch *buf, unsigned int len)
 {
     return(gzread((gzFile) gzf, (void *) buf, len));
 }
@@ -211,10 +200,7 @@ Cette fonction peut être très lente.
 &RT -1 en cas d'erreur, la position nouvelle depuis le début du fichier si Ok
 &SA GzipOpen(), GzipGetc(), GzipRead()
 ────────────────────────────────────────────────────────────────── */
-long GzipSeek(gzf, offset, whence)
-GZIPFILE        *gzf;
-long            offset;
-int             whence;
+long GzipSeek(GZIPFILE *gzf, long offset, int whence)
 {
     return(gzseek((gzFile) gzf, (z_off_t)offset, whence));
 }
@@ -228,8 +214,7 @@ Cette fonction lit le byte suivant dans le fichier (non comprimé).
 &RT Caractère lu ou -1 en cas de fin de fichier ou d'erreur
 &SA GzipOpen(), GzipRead(), GzipSeek()
 ────────────────────────────────────────────────────────────────── */
-GzipGetc(gzf)
-GZIPFILE    *gzf;
+int GzipGetc(GZIPFILE *gzf)
 {
     return(gzgetc((gzFile) gzf));
 }
@@ -243,9 +228,7 @@ Fonction d'écriture d'un byte dans un fichier créé par la fonction GzipCreate
 &RT Le caractère écrit ou -1 en cas d'erreur
 &SA GzipCreate(), GzipWrite()
 ────────────────────────────────────────────────────────────────── */
-GzipPutc(gzf, ch)
-GZIPFILE    *gzf;
-int         ch;
+int GzipPutc(GZIPFILE *gzf, int ch)
 {
     return(gzputc((gzFile) gzf, ch));
 }

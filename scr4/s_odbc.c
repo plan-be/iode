@@ -13,11 +13,23 @@
 SQLHENV     OHenv = 0;
 char        OCharBuf[256];
 SQLSMALLINT OShortBuf;
-SQLINTEGER  OLongBuf;
+SQLLEN      OLongBuf;
 SQLUSMALLINT ORowStatusArray[2];
 //extern int  ODebugDetail;
 int     ODebugDetail = 0;   // JMP 08/12/2021 : moved from s_dbbvars.c
                             // JMP 15/03/2023 : remis dans s_dbvars.c sinon s_dbc ne le connait pas 
+
+int OGetInfos(ODSN *odsn);
+int OConvertTypeSQL2SCR(OCOL *ocol);
+int OFreeOTBL(OTBL *otbl);
+int OBindCol(OCSR *ocsr, int colnb, char *ptr);
+int OFreeOCSR(OCSR *ocsr);
+int ONext_(OCSR *ocsr, int prev);
+int OPrevious_(OCSR *ocsr, int next);
+int OPrintRow(OCSR *ocsr);
+int OPrintRowFd(FILE *fd, OCSR *ocsr);
+int DebugOpen(void);
+int DebugClose(void);
 
 /* ====================================================================
 Initialise une session ODBC. Cette fonction doit être appelée avant
@@ -28,7 +40,7 @@ Elle peut être appelée plusieurs fois consécutivement.
 &SA OEnd()
 =======================================================================*/
 
-OInit()
+int OInit()
 {
     // Allocate an Environment Handle
     if(OHenv) return(0);
@@ -60,7 +72,7 @@ Elle peut être appelée plusieurs fois consécutivement.
 &SA OInit()
 =======================================================================*/
 
-OEnd()
+int OEnd()
 {
    // Free up all ODBC related resources
    if(OHenv == 0) return(0);
@@ -165,7 +177,7 @@ Ferme une Data Source. odsn peut être nul.
 &SA OOpenDSN()
 =======================================================================*/
 
-OCloseDSN(ODSN *odsn)
+int OCloseDSN(ODSN *odsn)
 {
     int     i;
 
@@ -321,13 +333,13 @@ OIDX *OGetTableIndices(ODSN *odsn, char *tblname)
     OIDX        *oidx = 0;
     int         i, j, pos, nidx;
 
-    if(odsn == 0) return((OTBL *)0);
+	if(odsn == 0) return((OIDX *)0);
     DebugB("OGetTableIndices %s ...", tblname);
     // Allocate a new Statement Handle on the scanned hdbc
     if(odsn->hstmt == 0) {
 	if((SQLAllocHandle(SQL_HANDLE_STMT, odsn->hdbc, &(odsn->hstmt))) != SQL_SUCCESS) {
 	    DebugE("failed");
-	    return((OTBL **)0);
+	    return((OIDX *)0);
 	    }
 	}
 
@@ -340,7 +352,7 @@ OIDX *OGetTableIndices(ODSN *odsn, char *tblname)
     if(retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
 	OSetError("SQLStatistics", odsn->hstmt);
 	DebugE("SQLStatistics failed");
-	return((OTBL *)0);
+	return((OIDX *)0);
 	}
 
     /* Fetch Result Set - First Row describes next rows, thus skipped */
@@ -393,7 +405,7 @@ Libère l'espace alloué pour la définition d'une table par OGetTableInfo().
 
 &SA OGetTableInfo()
 =======================================================================*/
-OFreeOTBL(OTBL *otbl)
+int OFreeOTBL(OTBL *otbl)
 {
     int     i;
 
@@ -427,7 +439,7 @@ Libère l'espace alloué pour la définition des index d'une table par OGetTable
 
 &SA OGetTableInfo()
 =======================================================================*/
-OFreeOIDX(OIDX *oidx)
+int OFreeOIDX(OIDX *oidx)
 {
     int     i, j;
 
@@ -463,7 +475,7 @@ OCSR *OQueryWithNames(ODSN *odsn, char *qury, int withnames)
     OTBL        *otbl;
     SQLRETURN   nReturn;
     SWORD       i, swColType, swColScale, swColNull, swColLength;
-    UDWORD      udwColDef;
+	SQLULEN     udwColDef;
     long        dwColDef;
     char        szBuffer[128];
     int         len, pos;
@@ -648,7 +660,7 @@ cas.
 &SA OQuery(), ONext(), OPrevious(), OGetCol()
 =======================================================================*/
 
-OBindCol(OCSR *ocsr, int colnb, char *ptr)
+int OBindCol(OCSR *ocsr, int colnb, char *ptr)
 {
     SQLRETURN   nReturn;
 
@@ -657,7 +669,7 @@ OBindCol(OCSR *ocsr, int colnb, char *ptr)
 		    ocsr->otbl->cols[colnb].Ctype,
 		    ptr,
 		    ocsr->otbl->cols[colnb].Clen,
-		    &(ocsr->otbl->cols[colnb].datalen));
+		    (SQLLEN *)&(ocsr->otbl->cols[colnb].datalen));
     if(nReturn == SQL_ERROR) {
 	OSetError("Bind", ocsr->hstmt);
 	return(-1);
@@ -718,7 +730,7 @@ char *OGetCol(OCSR *ocsr, int colnb)
     retourne 1 si le champs est de type MEMO
 	     0 sinon
 =======================================================================*/
-OGetColVar(OCSR *ocsr, int colnb)
+int OGetColVar(OCSR *ocsr, int colnb)
 {
     if(ocsr->otbl->ncols <= colnb) return(0);
     return(ocsr->otbl->cols[colnb].Cvar);
@@ -730,7 +742,7 @@ OGetColVar(OCSR *ocsr, int colnb)
     Attribue un nouveau pointeur à un champs MEMO
 
 =======================================================================*/
-OSetPtrVCol(OCSR *ocsr, int colnb, char *ptr)
+int OSetPtrVCol(OCSR *ocsr, int colnb, char *ptr)
 {
     if(ocsr->otbl->ncols <= colnb || /* JMP 30-03-00 */
        ocsr->otbl->cols[colnb].datalen <= 0)
@@ -740,9 +752,10 @@ OSetPtrVCol(OCSR *ocsr, int colnb, char *ptr)
 	SCR_free(ocsr->otbl->cols[colnb].Cvptr);
 	ocsr->otbl->cols[colnb].Cvptr = ptr;
     }
+	return(0);
 }
 
-OGetColLen(OCSR *ocsr, int colnb)
+int OGetColLen(OCSR *ocsr, int colnb)
 {
     if(ocsr->otbl->ncols <= colnb ||
        ocsr->otbl->cols[colnb].datalen <= 0)
@@ -752,7 +765,7 @@ OGetColLen(OCSR *ocsr, int colnb)
 }
 
 /*NH*/
-OGetVCols(OCSR *ocsr)
+int OGetVCols(OCSR *ocsr)
 {
     int         i;
     OCOL        *ocol;
@@ -794,7 +807,7 @@ ocsr->otbl.
 &SA OQuery(), OPrevious(), OSql(), OBindCol(), OGetCol()
 =======================================================================*/
 
-ONext(OCSR *ocsr)
+int ONext(OCSR *ocsr)
 {
     return(ONext_(ocsr, 1));
 }
@@ -821,7 +834,7 @@ ocsr->otbl.
 &SA OQuery(), ONext(), OSql(), OBindCol(), OGetCol()
 =======================================================================*/
 
-OPrevious(OCSR *ocsr)
+int OPrevious(OCSR *ocsr)
 {
     return(OPrevious_(ocsr, 1));
 }
@@ -841,7 +854,7 @@ Libère le "curseur" alloué par OQuery().
 &SA OQuery(), ONext(), OPrevious()
 =======================================================================*/
 
-OFreeOCSR(OCSR *ocsr)
+int OFreeOCSR(OCSR *ocsr)
 {
     int     i;
 
@@ -898,7 +911,7 @@ Exécute la commande SQL sql.
 &SA OQuery()
 =======================================================================*/
 
-OSql(ODSN *odsn, char *sql)
+int OSql(ODSN *odsn, char *sql)
 {
     SQLRETURN   nReturn;
     SQLHSTMT    hstmt;
@@ -990,7 +1003,7 @@ char *OSetErrorDb(char *msg, SQLHANDLE hstmt)
 }
 
 /*NH*/
-OConvertTypeSQL2SCR(OCOL *ocol)
+int OConvertTypeSQL2SCR(OCOL *ocol)
 {
     switch(ocol->sqltype) {
 	case SQL_WCHAR:
@@ -1125,7 +1138,7 @@ le résultat de la recherche est affichée dans le standard output.
 &SA OQuery()
 =======================================================================*/
 
-OExecSQLFile(char *filename, char *dsn, char *user, char *pwd, int Verbose)
+int OExecSQLFile(char *filename, char *dsn, char *user, char *pwd, int Verbose)
 {
     FILE    *fd;
     ODSN    *odsn;
@@ -1190,7 +1203,7 @@ fin:
 }
 
 /*NH*/
-OGetInfos(ODSN *odsn)
+int OGetInfos(ODSN *odsn)
 {
     short           lg;
     char            buf[256];
@@ -1224,7 +1237,7 @@ de debugging.
 &RT 0 en cas de succès, -1 en cas d'erreur
 =======================================================================*/
 
-OSqlNative(ODSN *odsn, char *sqlin, char *sqlout, int maxlg)
+int OSqlNative(ODSN *odsn, char *sqlin, char *sqlout, int maxlg)
 {
     SQLINTEGER  lg;
 
@@ -1266,7 +1279,7 @@ ACCESS.
     fonctionne correctement
 =======================================================================*/
 
-OAddMSAccessDSN(char *dsn, char *descr, char *file)
+int OAddMSAccessDSN(char *dsn, char *descr, char *file)
 {
     char    txt[512];
     int     rc, i;
@@ -1280,7 +1293,7 @@ OAddMSAccessDSN(char *dsn, char *descr, char *file)
 
 
 /*NH*/
-OWrite(OTBL *otbl)
+int OWrite(OTBL *otbl)
 {
     SQLRETURN   retcode;
     char        *buf = 0;
@@ -1315,7 +1328,7 @@ OWrite(OTBL *otbl)
 				       0,
 				       otbl->cols[i].Cptr,
 				       0,
-				       &(otbl->cols[i].datalen));
+				       (SQLLEN *)&(otbl->cols[i].datalen));
 	    if(retcode == SQL_ERROR) {
 		OSetError("Bind(OWrite)", otbl->whstmt);
 		return(-2);
@@ -1531,7 +1544,7 @@ Retourne un int, seul champ de la requête query.
 &RT le résultat de la requête ou -1 en cas d'erreur
 =======================================================================*/
 
-OQueryShort(ODSN *odsn, char *query)
+int OQueryShort(ODSN *odsn, char *query)
 {
     OCSR    *ocsr;
     short   res = -1;
@@ -1616,7 +1629,7 @@ ended:
 /* BP_M 22-12-2011 18:33 */
 
 /*NH*/
-ONext_(OCSR *ocsr, int prev)
+int ONext_(OCSR *ocsr, int prev)
 {
     SQLRETURN   retcode;
     int         i;
@@ -1656,7 +1669,7 @@ ag:
 }
 
 /*NH*/
-OPrevious_(OCSR *ocsr, int next)
+int OPrevious_(OCSR *ocsr, int next)
 {
     SQLRETURN   retcode;
     extern FILE *DebugFd;
@@ -1693,7 +1706,7 @@ ag:
 }
 
 /*NH*/
-ODelete(OCSR *ocsr)
+int ODelete(OCSR *ocsr)
 {
     SQLRETURN   retcode;
     char        *buf = 0;
@@ -1711,7 +1724,7 @@ ODelete(OCSR *ocsr)
 }
 
 /*NH*/
-ORefresh(OCSR *ocsr)
+int ORefresh(OCSR *ocsr)
 {
     SQLRETURN   retcode;
     char        *buf = 0;
@@ -1727,7 +1740,7 @@ ORefresh(OCSR *ocsr)
 }
 
 /*NH*/
-OFormatFld(char *buf, OCSR *ocsr, int fldnb)
+int OFormatFld(char *buf, OCSR *ocsr, int fldnb)
 {
     short   *sh;
     long    val;
@@ -1774,6 +1787,7 @@ OFormatFld(char *buf, OCSR *ocsr, int fldnb)
 	    sprintf(buf, "Unknown type");
 	    break;
     }
+    return(0);
 }
 
 
@@ -1797,7 +1811,7 @@ Ajoute ou remplace les records définis dans le fichier csv csvfile.
 &SA OQuery()
 =======================================================================*/
 
-OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, int Verbose, int insrepl)
+int OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, int Verbose, int insrepl)
 {
     FILE    *fd;
     ODSN    *odsn;
@@ -1844,7 +1858,7 @@ OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, in
 
 	// Créée la VALUES clause
 	tbl = SCR_vtoms3(buf, ";", 0);
-	if(SCR_tbl_size(tbl) != SCR_tbl_size(fldnames)) {
+	if(SCR_tbl_size((unsigned char **)tbl) != SCR_tbl_size((unsigned char **)fldnames)) {
 	    if(Verbose) Wprintf("\n ***** Line %d : incorrect # of fields \n\n", linenb);
 	    goto fin;
 	    }
@@ -1931,11 +1945,11 @@ OInsertRecords(char *filename, char *dsn, char *table, char *user, char *pwd, in
 		break;
 	    }
 
-	SCR_free_tbl(tbl);
+	SCR_free_tbl((unsigned char **)tbl);
 	}
 fin:
     OCloseDSN(odsn);
-    SCR_free_tbl(fldnames);
+	SCR_free_tbl((unsigned char **)fldnames);
     SCR_free(fldlist);
     fclose(fd);
     if(Verbose)

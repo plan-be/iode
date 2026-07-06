@@ -27,8 +27,7 @@ MAT     *m2,
 MAT     *m3
 )
 #else
-MAT *M_xpri_max_(m3, m1, m2)
-MAT   *m1, *m2, *m3;
+MAT *M_xpri_max_(MAT *m3, MAT *m1, MAT *m2)
 #endif
 {
     int   i, j, k, l;

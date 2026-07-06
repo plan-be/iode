@@ -28,9 +28,9 @@ extern int DT_nb_2902(long d1,long d2);
 extern int DT_nb_n2902(long d1,long d2);
 extern int DT_month_days(long date);
 extern long DT_secs_1180(long dt, long tim);
-extern long DT_current_sec();
+extern long DT_current_sec(void);
 extern long DT_secs_1100(long dt, long tim);
-extern long DT_current_sec_2000();
+extern long DT_current_sec_2000(void);
 extern int DT_week_number(long date);
 extern int DT_calendar(long date,int bline,int bcol);
 extern long SCR_date_to_long(char *string);
@@ -43,8 +43,8 @@ extern int SCR_check_time(long hour);
 extern int SCR_check_fmt_time(char *str,char *fmt);
 
 /* s_date.c */
-extern long _SCR_current_date();
-extern long _SCR_current_time();
+extern long _SCR_current_date(void);
+extern long _SCR_current_time(void);
 extern char *SCR_long_to_date(long val, char* string);
 extern char *SCR_long_to_time(long val, char* string);
 extern char *SCR_long_to_fdate(long date, char* str, char* fmt);
@@ -56,8 +56,8 @@ extern long DT_num_time(long nbs);
 extern long DT_diff_date_time(long d2, long t2, long d1, long t1);
 
 /* s_date_.c */
-extern long SCR_current_date();
-extern long SCR_current_time();
+extern long SCR_current_date(void);
+extern long SCR_current_time(void);
 
 #ifdef __cplusplus
 }

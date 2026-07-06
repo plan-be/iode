@@ -2,7 +2,7 @@
 #ifndef PRWINDOWS
 
 /*NH*/
-A2mToGdiPrinter()
+int A2mToGdiPrinter(void)
 {
     return(-1);
 }
@@ -11,6 +11,10 @@ A2mToGdiPrinter()
 
 #include <scr4w.h>
 #include "s_a2m.h"
+
+int A2mGdiSetMargins(A2MMARGINS *am);
+int A2mGdiWriteLine(A2MLINE *al);
+int A2mGdiSetBrush(int props);
 
 /* Variables générales */
 int     A2M_GDI_CURX, A2M_GDI_CURY, A2M_GDI_H, A2M_GDI_W;
@@ -40,7 +44,7 @@ int A2mGdiPrinterInit(HWND hWndOwner, int Dlg, U_ch* JobTitle)
 }
 
 /*NH*/
-A2mGdiAllInit()
+int A2mGdiAllInit()
 {
     A2M_GDI_MARGX = WprLOGX / 2;             /* 0.5" marges gauche et droite */
     A2M_GDI_MARGY = WprLOGY / 4;             /* 0.25" marges haut et bas */
@@ -55,7 +59,7 @@ A2mGdiAllInit()
 }
 
 /*NH*/
-A2mGdiPrinterEnd()
+int A2mGdiPrinterEnd()
 {
     WprPrinterEnd();
     A2mGdiAllEnd();
@@ -63,7 +67,7 @@ A2mGdiPrinterEnd()
 }
 
 /*NH*/
-A2mGdiAllEnd()
+int A2mGdiAllEnd()
 {
     SCR_free(A2M_OBJS);
     A2M_OBJS = 0;
@@ -198,7 +202,7 @@ int A2mToGdiPrinter(HWND hWndOwner, int Dlg, U_ch* JobTitle, U_ch* a2mfile)
 }
 
 /*NH*/
-A2mGdiPrintObj(A2MOBJ *ao)
+int A2mGdiPrintObj(A2MOBJ *ao)
 {
     int     i, h, toth;
     char    msg[80];
@@ -244,7 +248,7 @@ A2mGdiPrintObj(A2MOBJ *ao)
 }
 
 /*NH*/
-A2mCalcObjSize(A2MOBJ *ao, int  w)
+int A2mCalcObjSize(A2MOBJ *ao, int  w)
 {
     A2MPAR  *ap;
     A2MTBL  *at;
@@ -311,7 +315,7 @@ A2mCalcObjSize(A2MOBJ *ao, int  w)
 }
 
 /*NH*/
-A2mGdiWriteObj(A2MOBJ *ao)
+int A2mGdiWriteObj(A2MOBJ *ao)
 {
     A2MPAR  *ap;
     A2MTBL  *at;
@@ -411,7 +415,7 @@ int A2mGdiPrepPar2(A2MPAR* ap, int w)
     return(0);
 }
 /*NH*/
-A2mPtsToPix(int pts)
+int A2mPtsToPix(int pts)
 {
     return((WprLOGX * pts) / 72);
 }
@@ -465,7 +469,7 @@ int A2mGdiWriteLine(A2MLINE* al)
 }
 
 /*NH*/
-A2mGdiCalcLineWH(A2MSTR **as, int from, int *w, int *h)
+int A2mGdiCalcLineWH(A2MSTR **as, int from, int *w, int *h)
 {
     int     i;
 
@@ -485,7 +489,7 @@ A2mGdiCalcLineWH(A2MSTR **as, int from, int *w, int *h)
 /* Returns next NEWLINE index */
 
 /*NH*/
-A2mGdiPrintLine(A2MSTR **as, int from, int x, int y)
+int A2mGdiPrintLine(A2MSTR **as, int from, int x, int y)
 {
     int     i, cy;
 
@@ -618,8 +622,10 @@ int A2mGdiCalcSizes(A2MPAR* ap)
     if(ap->ap_wmax < wmax) ap->ap_wmax = wmax;
     if(ap->ap_wmin < wmin) ap->ap_wmin = wmin;
     if(ap->ap_h == 0) {
+	long lineH = 0;
 	A2mGdiSetFont(&(ap->ap_ppr.pp_fnt));
-	WprGetStringWidth("I", &wmin, &(ap->ap_h));
+	WprGetStringWidth("I", &wmin, &lineH);
+	ap->ap_h = (short)lineH;
 	}
     return(0);
 }
@@ -1025,14 +1031,14 @@ int A2mPageTitle(U_ch* txt, int yt, int yr, int just)
 }
 
 /*NH*/
-A2mPageHead()
+int A2mPageHead()
 {
     A2mPageTitle(A2M_PGHEAD, -2 * A2M_GDI_MARGY/3, -A2M_GDI_MARGY/3, 1);
     return(0);
 }
 
 /*NH*/
-A2mPageFoot()
+int A2mPageFoot()
 {
     A2mPageTitle(A2M_PGFOOT, A2M_GDI_H + (5 * A2M_GDI_MARGY) / 3,
 			     A2M_GDI_H + (7 * A2M_GDI_MARGY) / 6,   2);
@@ -1068,8 +1074,7 @@ d'interprétation et d'impression.
 &SA A2mToGdi(), A2mToRtf(), A2mToMif(), A2mToHtml(), A2mPrintError()
 ==================================================================== */
 
-A2mGdiReadIni(filename)
-char    *filename;
+int A2mGdiReadIni(char * filename)
 {
     U_ch    buf[255];
 
@@ -1104,8 +1109,7 @@ char    *filename;
 extern int (*A2M_GDI_GRF_FNS[])();
 
 /*NH*/
-A2mGdiPrepGrf(ag)
-A2MGRF  *ag;
+int A2mGdiPrepGrf(A2MGRF * ag)
 {
     if(ag == 0) return(0);
     ag->ag_spacea = (8 * WprLOGY) / 72;
@@ -1125,8 +1129,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mGdiWriteGrf(ag)
-A2MGRF  *ag;
+int A2mGdiWriteGrf(A2MGRF * ag)
 {
     if(ag == 0) return(0);
     A2M_GRF_FNS = A2M_GDI_GRF_FNS;
@@ -1137,7 +1140,7 @@ A2MGRF  *ag;
 int     A2M_GDI_GRW, A2M_GDI_GRH;
 
 /*NH*/
-A2mGdiTsf(double x1, double y1, int *gx1, int *gy1)
+int A2mGdiTsf(double x1, double y1, int *gx1, int *gy1)
 {
     *gx1 = A2M_GDI_MARGX + (x1 * WprLOGX) / 72;
     *gy1 = A2M_GDI_MARGY + A2M_GDI_CURY + A2M_GDI_GRH - (y1 * WprLOGX) / 72;
@@ -1145,8 +1148,7 @@ A2mGdiTsf(double x1, double y1, int *gx1, int *gy1)
 }
 
 /*NH*/
-A2mGdiGrfInit(ag)
-A2MGRF  *ag;
+int A2mGdiGrfInit(A2MGRF * ag)
 {
     A2mGdiGrfPrepare();
     if(ag->ag_title) {          /* JMP 19-02-98 */
@@ -1166,8 +1168,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mGdiGrfEnd(ag)
-A2MGRF  *ag;
+int A2mGdiGrfEnd(A2MGRF * ag)
 {
     if(ag->ag_footnote == 0) return(0);
     A2M_GDI_CURY += ag->ag_h + ag->ag_footnote->ap_spaceb;
@@ -1177,9 +1178,7 @@ A2MGRF  *ag;
 }
 
 /*NH*/
-A2mGdiGrfLine(axis, x1, y1, x2, y2, props)
-double  x1, y1, x2, y2;
-int     axis, props;
+int A2mGdiGrfLine(int axis, double x1, double y1, double x2, double y2, int props)
 {
     int     gx1, gy1, gx2, gy2;
 
@@ -1202,10 +1201,7 @@ int     axis, props;
 }
 
 /*NH
-A2mGdiGrfText(axis, x, y, string, align, color)
-int     axis;
-double  x, y;
-char    *string, *align, *color;
+int A2mGdiGrfText(int axis, double x, double y, char * string, char * align, char * color)
 {
     double  y_0;
     int     gx1, gy1;
@@ -1218,7 +1214,7 @@ char    *string, *align, *color;
 */
 
 /*NH*/
-A2mGdiGrfPar(axis, x, y, par, align, color)
+int A2mGdiGrfPar(axis, x, y, par, align, color)
 double  x, y;
 char    *align, *color;
 A2MPAR  *par;
@@ -1252,21 +1248,19 @@ A2MPAR  *par;
 }
 
 /*NH*/
-A2mGdiGrfGroupObj()
+int A2mGdiGrfGroupObj()
 {
     return(0);
 }
 
 /*NH*/
-A2mGdiGrfGroup()
+int A2mGdiGrfGroup()
 {
     return(0);
 }
 
 /*NH*/
-A2mGdiGrfBox(axis, x, y, w, h, props)
-double  x, y, w, h;
-int     axis, props;
+int A2mGdiGrfBox(int axis, double x, double y, double w, double h, int props)
 {
     double      y_0 = 0;
     int         gx1, gy1, gx2, gy2;
@@ -1293,9 +1287,7 @@ int     axis, props;
 }
 
 /*NH*/
-A2mGdiGrfPolyLine(axis, nobs, vals, props)
-int     axis, nobs, props;
-double  *vals;
+int A2mGdiGrfPolyLine(int axis, int nobs, double * vals, int props)
 {
     int     i;
     double  y_0;
@@ -1315,9 +1307,7 @@ double  *vals;
 }
 
 /*NH*/
-A2mGdiGrfPolyBar(axis, nobs, vals, width, props)
-int     axis, nobs, props;
-double  *vals, width;
+int A2mGdiGrfPolyBar(int axis, int nobs, double * vals, double width, int props)
 {
     int     i;
 
@@ -1332,8 +1322,7 @@ double  *vals, width;
 /*********** TEMPORARY OBJECTS ******************/
 
 /*NH*/
-A2mGdiSetBrush(props)
-int     props;
+int A2mGdiSetBrush(int props)
 {
     int     col, brush;
 
@@ -1379,8 +1368,7 @@ int     props;
 }
 
 /*NH*/
-A2mGdiSetPen(props)
-int     props;
+int A2mGdiSetPen(int props)
 {
     if(A2M_GDI_COLOR) {
 	switch(props) {
@@ -1420,7 +1408,7 @@ int     props;
 }
 
 /*NH*/
-A2mGdiGrfPrepare()
+int A2mGdiGrfPrepare()
 {
     return(0);
 }
@@ -1428,20 +1416,20 @@ A2mGdiGrfPrepare()
 /******* FUNCTION TABLE FOR GDI **********/
 
 int (*A2M_GDI_GRF_FNS[])() = {
-    A2mGdiGrfInit,
-    A2mGdiGrfEnd,
+	(int (*)())A2mGdiGrfInit,
+	(int (*)())A2mGdiGrfEnd,
     0,          /*A2mGdiGrfPen,*/
     0,          /*A2mGdiGrfBrush,*/
-    A2mGdiGrfLine,
+	(int (*)())A2mGdiGrfLine,
     0,          /*A2mGdiGrfText,*/
     0,
-    A2mGdiGrfPar,
+	(int (*)())A2mGdiGrfPar,
     A2mGdiGrfGroupObj,
     A2mGdiGrfGroup,
-    A2mGdiGrfBox,
-    A2mGdiGrfPolyLine,
-    A2mGdiGrfPolyBar,
-    A2mGdiGrfPrepare,
+	(int (*)())A2mGdiGrfBox,
+	(int (*)())A2mGdiGrfPolyLine,
+	(int (*)())A2mGdiGrfPolyBar,
+	(int (*)())A2mGdiGrfPrepare,
     0,          /*A2mGdiGrfGetPen, */
     0           /*A2mGdiGrfGetBrush */
 };

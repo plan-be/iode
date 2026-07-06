@@ -20,6 +20,8 @@
 
 #include <stdlib.h>
 
+extern int Wprintf(char *, ...);
+
 
 /*==================================================================
 Fonction appelée en cas d'erreur de swap. code est un numéro
@@ -38,9 +40,7 @@ La fonction de librairie effectue les opérations suivantes :
 &TX
 =============================================================== */
 
-SW_abort(code, text)
-int     code;
-char    *text;
+int SW_abort(int code, char *text)
 {
     Wprintf("\nSwap panic : %s\n", text); /* JMP 16-02-97 */
     SW_end();

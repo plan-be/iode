@@ -1,33 +1,12 @@
 #include "s_a2m.h"
-/*
-A2mToChrt(char *a2mfile)
-{
-    A2MFILE *af;
-    A2MOBJ  *ao;
-    int     hdl;
 
-    af = A2mOpen(a2mfile, 0);
-    if(af == 0) return(-1);
+int ChrtInit(void);
+int ChrtEnd(int hdl);
+int ChrtParams(int hdl, char *txt, double ym, double yM, double xm, double xM);
+int ChrtAdd(int hdl, char *title, int axis, int type, int nobs, double *vals);
 
-    hdl = A2mChrtInit();
-    if(hdl < 0) {
-	A2mClose(af);
-	return(-2);
-	}
-
-    while(1) {
-	ao = A2mRead(af);
-	if(ao == 0) break;
-	A2mChrtPrintObj(hdl, ao);
-	}
-
-    A2mChrtEnd(hdl);
-    A2mClose(af);
-    return(0);
-}
-*/
 /*NH*/
-int A2mChrtInit()
+int A2mChrtInit(char* outfile)
 {
     return(0);
 }

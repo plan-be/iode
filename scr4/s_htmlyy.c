@@ -59,7 +59,8 @@ HFILE   *hfd;
     YYFILE  *yy;
 
     if(sorted == 0) {
-	qsort(JHYY_TBL, sizeof(JHYY_TBL) / sizeof(YYKEYS), sizeof(YYKEYS), JHYYstrcmp);
+    qsort(JHYY_TBL, sizeof(JHYY_TBL) / sizeof(YYKEYS), sizeof(YYKEYS),
+          (int (*)(const void *, const void *))JHYYstrcmp);
 	sorted = 1;
 	}
 

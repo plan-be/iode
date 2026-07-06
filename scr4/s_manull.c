@@ -11,8 +11,7 @@ et retournée, sinon la fonction retourne 0.
 &SA M_free(), M_alloc()
 ======================================================================= */
 
-M_clear(m1)
-MAT   *m1;
+int M_clear(MAT *m1)
 {
     register int    i, j;
 

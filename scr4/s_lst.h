@@ -15,25 +15,7 @@ typedef struct _lst_ {
 extern int LST_NO_TABS;
 
 /* ====== FUNCTIONS ========*/
-
-#ifndef SCRPROTO
-extern LST *LST_create();
-extern int LST_add();
-extern int LST_del();
-extern int LST_copy();
-extern int LST_move();
-extern void *LST_get();
-extern int LST_set();
-extern LST *LST_read_in();
-extern LST *LST_read_file();
-extern LST *LST_vtol();
-extern unsigned char *LST_ltov();
-
-#else
-
 #include <s_prolst.h>   /* JMP 30-12-97 */
-
-#endif /* SCRPROTO*/
 
 #include "s_alldoc.h"
 

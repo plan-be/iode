@@ -20,12 +20,9 @@ d'archive arname.
 &SA AR_error(), AR_extract(), AR_list()
 ======================================================================= */
 
-AR_add(arname, files, n)
-char    *arname;
-char    **files;
-int     n;
+int AR_add(char *arname, char **files, int n)
 {
-    FILE    *fd, *AR_open();
+	FILE    *fd;
     int     i;
 
     AR_ERRNO = 0;
@@ -44,9 +41,7 @@ int     n;
     return(0);
 }
 /*NH*/
-AR_add_1(fdar, filename)
-FILE    *fdar;
-char    *filename;
+int AR_add_1(FILE *fdar, char *filename)
 {
     long    rsize, psize, pos;
     FILE    *fdin;
@@ -73,9 +68,7 @@ char    *filename;
 }
 
 /*NH*/
-AR_series(fd, ch)
-FILE    *fd;
-int     ch;
+int AR_series(FILE *fd, int ch)
 {
     int     chn, nb = 1;
 
@@ -91,9 +84,7 @@ int     ch;
 	}
 }
 /*NH*/
-AR_dump(fd, fd2, rsize, psize)
-FILE    *fd, *fd2;
-long    *psize, *rsize;
+int AR_dump(FILE *fd, FILE *fd2, long *psize, long *rsize)
 {
     int     ch, suite, i;
 

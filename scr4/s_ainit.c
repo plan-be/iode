@@ -81,9 +81,7 @@ char    *string;
 &EX
 	#include <s_args.h>
 
-	main(argc, argv)
-	int     argc;
-	char    *argv[];
+	int main(int argc, char *[] argv)
 	{
 	    int     i;
 
@@ -126,8 +124,7 @@ char    **argv;
 /* ============================================================
     Passes the arguments and performs the expand of $ and @
    ============================================================ */
-int A_initv1(argv)
-char    **argv;
+int A_initv1(char ** argv)
 {
     int     i;
 
@@ -148,8 +145,7 @@ char    **argv;
 	arg : IN : ptr to the argument
    =============================================================== */
 
-int A_add(arg)
-char    *arg;
+int A_add(char * arg)
 {
     char    *tmp, *exp, word[A_MAX_ARG + 1];
     FILE    *fd;
@@ -239,8 +235,7 @@ exemple).
 &TX
 =======================================================================*/
 
-A_to_be_exp(str)
-char    *str;
+int A_to_be_exp(char * str)
 {
     int     i = 0;
 
@@ -257,8 +252,7 @@ char    *str;
     Add an argument in the table A_VAL and increment A_NB_VAL.
    ============================================================= */
 
-int A_add1(arg)
-char    *arg;
+int A_add1(char * arg)
 {
 
     SCR_add_ptr((U_ch ***)&A_VAL, &A_NB_VAL, arg);
@@ -271,11 +265,7 @@ char    *arg;
     Read next word in file.
 =========================== */
 
-A_read(type, buf, word, max_lg)
-int     type;
-char    **buf;
-char    *word;
-int     max_lg;
+int A_read(int type, char ** buf, char * word, int max_lg)
 {
     int     lg = 0, c, q = 0;
 
@@ -317,8 +307,7 @@ int     max_lg;
 
 /*NH*/
 
-A_is_sep(ch)
-int     ch;
+int A_is_sep(int ch)
 {
     int     i;
 
@@ -339,8 +328,7 @@ int     ch;
 &TX
 ======================================================================= */
 
-A_free(args)
-U_ch    **args;
+int A_free(U_ch ** args)
 {
     SCR_free_tbl(args);
     return(0);
@@ -360,9 +348,7 @@ U_ch    **args;
 &TX
 ======================================================================== */
 
-A_find(args, string)
-char    **args;
-char    *string;
+int A_find(char ** args, char * string)
 {
     int     i;
 
@@ -385,9 +371,7 @@ char    *string;
 &EX
 	#include <s_args.h>
 
-	main(argc, argv)
-	int     argc;
-	char    *argv[];
+	int main(int argc, char *[] argv)
 	{
 	    int     i, nb, pos;
 	    char    **args;
@@ -407,9 +391,7 @@ char    *string;
 &SA A_init(), A_find()
 ====================================================================== */
 
-A_nb(args, pos)
-char    **args;
-int     pos;
+int A_nb(char ** args, int pos)
 {
     int     i;
 
@@ -436,9 +418,7 @@ int     pos;
 	    printf("Usage : ...\n");
 	}
 
-	main(argc, argv)
-	int     argc;
-	char    *argv[];
+	int main(int argc, char *[] argv)
 	{
 	    char    **args;
 
@@ -451,12 +431,12 @@ int     pos;
 ======================================================================== */
 
 #ifdef SCRPROTO
-A_help(
+int A_help(
 char    **args,
 int     (*fn)(void)
 )
 #else
-A_help(args, fn)
+int A_help(args, fn)
 char    **args;
 int     (*fn)();
 #endif

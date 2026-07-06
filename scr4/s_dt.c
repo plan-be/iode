@@ -17,8 +17,7 @@ Retourne l'année d'une date.
 &TX
 &SA
 ----------------------------------------------------------------------- */
-DT_year(date)
-long    date;
+int DT_year(long date)
 {
     return((int)(date / 10000L));
 }
@@ -30,8 +29,7 @@ Retourne le mois d'une date.
 &TX
 &SA
 ----------------------------------------------------------------------- */
-DT_month(date)
-long    date;
+int DT_month(long date)
 {
     return((int)((date / 100L) % 100L));
 }
@@ -43,8 +41,7 @@ Retourne le jour d'une date.
 &TX
 &SA
 ----------------------------------------------------------------------- */
-DT_day(date)
-long    date;
+int DT_day(long date)
 {
     return((int)(date % 100L));
 }
@@ -114,8 +111,7 @@ Indique si l'année donnée sous forme d'un long est bissextile ou non.
 &TX
 ======================================================================= */
 
-DT_bix(year)
-long    year;
+int DT_bix(long year)
 {
     return(year % 400L == 0L || (year % 4L == 0L && year % 100L != 0L));
 }
@@ -164,8 +160,7 @@ Retourne le jour de la semaine correspondant à la date donnée
     4 (jeudi)
 &TX
 ======================================================================= */
-DT_day_w(date)
-long    date;
+int DT_day_w(long date)
 {
     return((int)((DT_date_num(date) - 1L) % 7L + 1L));
 }
@@ -293,8 +288,7 @@ contraintes. Elles est utilisée dans DT_bus().
 &RT 1 si le jour est férié, 0 sinon.
 &SA DT_bus()
 ======================================================================= */
-DT_leave(date)
-long    date;
+int DT_leave(long date)
 {
     long    d[3];
 
@@ -315,8 +309,7 @@ jours).
 &SA DT_diff_dates
 ----------------------------------------------------------------------- */
 
-DT_diff_months(d1, d2)
-long    d1, d2;
+int DT_diff_months(long d1, long d2)
 {
     long    vd1[3], vd2[3];
 
@@ -428,8 +421,7 @@ long    jul;
     return(DT_num_date(tmp));
 }
 /*NH*/
-DT_nb_2902(d1, d2)
-long    d1, d2;
+int DT_nb_2902(long d1, long d2)
 {
     int     i = 0;
     long    vd1[3], vd2[3];
@@ -448,8 +440,7 @@ long    d1, d2;
     return(i);
 }
 /*NH*/
-DT_nb_n2902(d1, d2)
-long    d1, d2;
+int DT_nb_n2902(long d1, long d2)
 {
     int     i = 0;
     long    vd1[3], vd2[3];
@@ -476,8 +467,7 @@ Retourne le nombre de jour du mois dans lequel se situe une date.
 &TX
 ----------------------------------------------------------------------- */
 
-DT_month_days(date)
-long    date;
+int DT_month_days(long date)
 {
     long    d[3];
 
@@ -571,7 +561,7 @@ l'année suivante.
 
 ----------------------------------------------------------------------- */
 
-DT_week_number(long date)
+int DT_week_number(long date)
 {
     long    jday, wday1, w;
 

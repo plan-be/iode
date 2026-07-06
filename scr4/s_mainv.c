@@ -43,8 +43,7 @@ MAT *M_inv_1(
     MAT     *m1
 )
 #else
-MAT *M_inv_1(m2, m1)
-MAT *m2, *m1;
+MAT *M_inv_1(MAT *m2, MAT *m1)
 #endif
 {
     int     i, j, m;
@@ -114,9 +113,7 @@ err:
    This test for errors in the value of dim
 */
 
-M_inv_init(dim, m2, m1)  /* inv  mat */
-int     dim;
-MAT     *m2, *m1;
+int M_inv_init(int dim, MAT *m2, MAT *m1)  /* inv  mat */
 {
     int   i;
 
@@ -169,8 +166,7 @@ MAT *M_inv_2(
     MAT     *m
 )
 #else
-MAT *M_inv_2(m2, m)
-MAT    *m2, *m;
+MAT *M_inv_2(MAT *m2, MAT *m)
 #endif
 
 {
@@ -293,9 +289,7 @@ err:
    matrix is singular && no inverse exists.
 */
 
-M_inv_pivot(r_row, m1, m2)
-int     r_row;
-MAT     *m1, *m2;
+int M_inv_pivot(int r_row, MAT *m1, MAT *m2)
 {
     int   error, n_row, dim;
     MREAL  *v_n_row, *v_r_row;

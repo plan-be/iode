@@ -159,8 +159,7 @@ buffers associés.
 
 &SA CppOpen()
 ================================================================ */
-int CppClose(cpp)
-CPPFILE *cpp;
+int CppClose(CPPFILE * cpp)
 {
     CppCloseNoDef(cpp);
     CppFreeDefines();
@@ -168,8 +167,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-int CppCloseNoDef(cpp)
-CPPFILE *cpp;
+int CppCloseNoDef(CPPFILE * cpp)
 {
     if(cpp == 0) return(0);
     CppCloseNoDef(cpp->incl);
@@ -221,9 +219,7 @@ Résultat :
 &SA CppGetc(), CppUngetc(), CppOpen(), CppClose(), CppRecordLILO()
 ================================================================ */
 
-int CppRecord(cpp, buf)
-CPPFILE *cpp;
-U_ch    *buf;
+int CppRecord(CPPFILE * cpp, U_ch * buf)
 {
     int     i, j, lg;
 
@@ -277,9 +273,7 @@ Résultat :
 &SA CppGetc(), CppUngetc(), CppOpen(), CppClose(), CppRecord()
 ================================================================ */
 
-int CppRecordLILO(cpp, buf)
-CPPFILE *cpp;
-U_ch    *buf;
+int CppRecordLILO(CPPFILE * cpp, U_ch * buf)
 {
     int     i, j, lg;
 
@@ -297,9 +291,7 @@ U_ch    *buf;
 }
 
 /*NH*/
-CppRecordRealloc(cpp, lg)
-CPPFILE *cpp;
-int     lg;
+int CppRecordRealloc(CPPFILE * cpp, int lg)
 {
     if(cpp->rec_max > cpp->rec_nb + lg) return(0);
     cpp->rec = (U_ch *)SCR_realloc(cpp->rec, 1, cpp->rec_max,
@@ -348,9 +340,7 @@ Résultat :
 &SA CppGetc(), CppRecord(), CppOpen(), CppClose()
 ================================================================ */
 
-int CppUngetc(cpp, ch)
-CPPFILE *cpp;
-int     ch;
+int CppUngetc(CPPFILE * cpp, int ch)
 {
     U_ch    buf[2];
 
@@ -377,8 +367,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-int CppCloseLast(cpp)
-CPPFILE *cpp;
+int CppCloseLast(CPPFILE * cpp)
 {
     CPPFILE     *cpp1 = cpp;
 
@@ -442,8 +431,7 @@ Trois cas sont à prendre en considération :
 &SA CppOpen(), CppUngetc(), CppClose(), CppSkipSpaces()
 ================================================================ */
 
-CppGetc(cpp)
-CPPFILE *cpp;
+int CppGetc(CPPFILE * cpp)
 {
     int     ch, ch1, prev, skip;
     char    str[256];
@@ -492,8 +480,7 @@ ag:
 }
 
 /*NH*/
-int CppIfdef(cpp)
-CPPFILE *cpp;
+int CppIfdef(CPPFILE * cpp)
 {
     U_ch    str[256];
     int     i;
@@ -510,8 +497,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-int CppElse(cpp)
-CPPFILE *cpp;
+int CppElse(CPPFILE * cpp)
 {
     int     skip = cpp->skip;
 
@@ -523,8 +509,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-int CppEndif(cpp)
-CPPFILE *cpp;
+int CppEndif(CPPFILE * cpp)
 {
     cpp->skip = 0;
     CppSkipToEol(cpp);
@@ -533,8 +518,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-CppGetNext(cpp)
-CPPFILE *cpp;
+int CppGetNext(CPPFILE * cpp)
 {
     int     ch;
     CPPFILE *cpp1 = cpp;
@@ -571,8 +555,7 @@ U_ch    **CPP_DEFS = 0;
 int     CPP_NB_DEFS = 0;
 
 /*NH*/
-CppAddDefine(str)
-U_ch    *str;
+int CppAddDefine(U_ch * str)
 {
     CPP_DEFS = (U_ch **)SCR_realloc(CPP_DEFS, 2 * sizeof(U_ch *),
 				CPP_NB_DEFS, CPP_NB_DEFS + 1);
@@ -583,8 +566,7 @@ U_ch    *str;
 }
 
 /*NH*/
-CppFindDefine(str)
-U_ch    *str;
+int CppFindDefine(U_ch * str)
 {
     int     i;
 
@@ -646,8 +628,7 @@ CppFreeDefines(). La fonction CppClose() ne libère pas cet espace.
 &SA CppOpen(), CppClose(), CppFreeDefine()
 ================================================================ */
 
-int CppDefine(name, txt)
-U_ch    *name, *txt;
+int CppDefine(U_ch * name, U_ch * txt)
 {
     int     i;
 
@@ -659,8 +640,7 @@ U_ch    *name, *txt;
 }
 
 /*NH*/
-int CppReadDefine(cpp)
-CPPFILE *cpp;
+int CppReadDefine(CPPFILE * cpp)
 {
     U_ch    str[256], *def = 0;
     int     i, ch, j = 0;
@@ -691,8 +671,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-int CppReadUndef(cpp)
-CPPFILE *cpp;
+int CppReadUndef(CPPFILE * cpp)
 {
     U_ch    str[256];
     int     i;
@@ -707,9 +686,7 @@ CPPFILE *cpp;
 }
 
 /*NH*/
-CppApplyDefine(cpp, str)
-CPPFILE     *cpp;
-U_ch        *str;
+int CppApplyDefine(CPPFILE * cpp, U_ch * str)
 {
     int     i;
 
@@ -720,8 +697,7 @@ U_ch        *str;
 }
 
 /*NH*/
-int CppInclude(cpp)
-CPPFILE *cpp;
+int CppInclude(CPPFILE * cpp)
 {
     U_ch    filename[256];
     int     i = 0, lg;

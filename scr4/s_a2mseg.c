@@ -9,8 +9,7 @@ int A2M_FONTSIZE = 10, A2M_FONTINCR = 2, A2M_TFONTSIZE = 8,
 //int A2M_MAXPARLEVEL = 3;
 int A2M_MAXPARLEVEL = 7; // JMP 11/1/2017
 
-int A2mCreateParCatalog(af)
-A2MFILE *af;
+int A2mCreateParCatalog(A2MFILE * af)
 {
     CPPFILE *cpp = af->af_cpp;
     U_ch    buf[512];
@@ -163,9 +162,7 @@ A2MFILE *af;
     return(0);
 }
 
-A2mSetParProps(tag, pp)
-char    *tag;
-A2MPPR  *pp;
+int A2mSetParProps(char * tag, A2MPPR * pp)
 {
     int     pprnb;
 
@@ -180,17 +177,12 @@ A2MPPR  *pp;
     return(0);
 }
 
-int A2mSetFontProps(ctag, fnt)
-U_ch    *ctag;
-A2MFNT  *fnt;
+int A2mSetFontProps(U_ch * ctag, A2MFNT * fnt)
 {
     return(0);
 }
 
-int A2mSetFont(ap, as, fnt)
-A2MPAR  *ap;
-A2MSTR  *as;
-A2MFNT  *fnt;
+int A2mSetFont(A2MPAR * ap, A2MSTR * as, A2MFNT * fnt)
 {
     A2MFNT  *asfnt;
 
@@ -217,8 +209,7 @@ A2MFNT  *fnt;
 /* Génère des segments de strings avec des séparateurs
     uniquement où c'est permis et adaptation des fonts */
 
-int A2mSplitStrs(ap)
-A2MPAR  *ap;
+int A2mSplitStrs(A2MPAR * ap)
 {
     A2MSTR  **as2 = 0, *as;
     A2MFNT  fnt;
@@ -265,11 +256,7 @@ A2MPAR  *ap;
     return(0);
 }
 
-int A2mSplitStr(pas2, pn, txt, fnt)
-A2MSTR  ***pas2;
-int     *pn;
-U_ch    *txt;
-A2MFNT  *fnt;
+int A2mSplitStr(A2MSTR *** pas2, int * pn, U_ch * txt, A2MFNT * fnt)
 {
     A2MSTR  *as;
     int     i = 0;
@@ -305,9 +292,7 @@ A2MFNT  *fnt;
 int A2M_NUMB[10];
 int A2M_NUMBERS = 1;
 
-int A2mCalcNumbering(numb, txt)
-int     numb;
-U_ch    *txt;
+int A2mCalcNumbering(int numb, U_ch * txt)
 {
     U_ch    buf[20];
     int     i;
@@ -333,9 +318,7 @@ U_ch    *txt;
     return(0);
 }
 
-int A2mFrCatFile(fdout, outfile, ext)
-FILE    *fdout;
-char    *outfile, *ext;
+int A2mFrCatFile(FILE * fdout, char * outfile, char * ext)
 {
     char    buf[256];
     FILE    *fd;

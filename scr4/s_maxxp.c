@@ -25,8 +25,7 @@ MAT *m2,
 MAT *m1
 )
 #else
-MAT *M_xxprim(m2, m1)
-MAT *m2, *m1;
+MAT *M_xxprim(MAT *m2, MAT *m1)
 #endif
 {
     int   i, j, k;

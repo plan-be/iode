@@ -16,18 +16,18 @@
 #define closesocket close
 
 
-WSockGetLastError()
+int WSockGetLastError(void)
 {
     return(errno);
 }
 
 
-WSockStartup()
+int WSockStartup(void)
 {
     return(0);
 }
 
-WSockCleanup()
+int WSockCleanup(void)
 {
     return(0);
 }
@@ -39,12 +39,12 @@ WSockCleanup()
 #include "scr4w.h"
 #include <winsock.h>
 
-WSockGetLastError()
+int WSockGetLastError(void)
 {
     return(WSAGetLastError());
 }
 
-WSockStartup()
+int WSockStartup(void)
 {
     WSADATA     WSAData;
 
@@ -53,7 +53,7 @@ WSockStartup()
     return(0);
 }
 
-WSockCleanup()
+int WSockCleanup(void)
 {
     WSACleanup();
     return(0);
@@ -62,6 +62,17 @@ WSockCleanup()
 #endif
 
 #include "scr4_srv.h"
+
+extern int WSock1Register(int cltsock);
+extern int WSock1SetCurrent(int cltsock);
+extern int WSock1UnRegister(int cltsock);
+
+int WSockFlush(int sock);
+int WSockWrite(int cltsock, char *txt, int lg);
+int WSockCrypt(U_ch *res, U_ch *buf, int lg);
+int WSockRead(int cltsock, char *txt, int lg);
+int WSockDecrypt(U_ch *res, U_ch *buf, int lg);
+int WSockReadRecord(int cltsock, char *txt);
 
 /************ INTERFACE STANDARDISE ***************************/
 
@@ -86,15 +97,10 @@ Connecte à un serveur (STREAM).
 &EN -4 : erreur au connect
 ================================================================= */
 
-int WSockConnect(servername, port)
-char    *servername;
-int     port;
+int WSockConnect(char *servername, int port)
 {
     struct sockaddr_in  in;
     struct hostent     *hp;
-#if !defined(DOSW32) && !defined(SCRW32)
-    struct hostent     *gethostbyname();
-#endif
     int                 WinSocket = 0, rc = 0, cursock;
     unsigned long       imode = 1;
 
@@ -169,7 +175,7 @@ opérations de début et de fin.
 
 =================================================================*/
 
-WSockClose(int cltsock)
+int WSockClose(int cltsock)
 {
     int     rc, cursock;
 
@@ -195,7 +201,7 @@ Fonction client et serveur. Retourne l'adresse IP et le nom de la machine parten
 &RT 0 en cas de succès, code d'erreur sinon
 =================================================================*/
 
-WSockGetPeer(int cltsock, char *ip, char *name)
+int WSockGetPeer(int cltsock, char *ip, char *name)
 {
     struct sockaddr pname;
     //struct hostent  *host;
@@ -226,7 +232,7 @@ La variable WSOCK_BUFSIZE définit la taille d'un buffer.
 &EN 0 : succès
 ================================================================= */
 
-WSockFlush(int sock)
+int WSockFlush(int sock)
 {
     int     rc, lg, cursock;
 
@@ -255,7 +261,7 @@ La variable WSOCK_BUFSIZE permet de bufferiser les écritures.
 &EN 0 : succès
 ================================================================= */
 
-WSockBWrite(int sock, char *txt, int lg)
+int WSockBWrite(int sock, char *txt, int lg)
 {
     int     rc, cursock = WSock1SetCurrent(sock);
 
@@ -314,7 +320,7 @@ La variable WSOCK_BUFSIZE permet de bufferiser les écritures.
 &EN 0 : succès
 ===================================================================== */
 
-WSockWrite(int cltsock, char *txt, int lg)
+int WSockWrite(int cltsock, char *txt, int lg)
 {
     int         rc, cursock;
     static U_ch *res = 0;
@@ -362,7 +368,7 @@ record lui-même.
 &EN 0 : ok
 ================================================================= */
 
-WSockBWriteRecord(int cltsock, char *txt, int lg)
+int WSockBWriteRecord(int cltsock, char *txt, int lg)
 {
     int     rc;
     //long    llg;
@@ -394,7 +400,7 @@ record lui-même.
 &EN 0 : ok
 ================================================================= */
 
-WSockWriteRecord(int cltsock, char *txt, int lg)
+int WSockWriteRecord(int cltsock, char *txt, int lg)
 {
     int     rc;
 
@@ -416,10 +422,7 @@ Formatte et bufferise sur le socket décrit par cltsock.
 &EN 0 : succès
 ================================================================= */
 
-WSockBPrintf(cltsock, format, a1, a2, a3, a4, a5, a6, a7, a8, a9)
-int     cltsock;
-char    *format;
-char    *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9;
+int WSockBPrintf(int cltsock, char *format, char *a1, char *a2, char *a3, char *a4, char *a5, char *a6, char *a7, char *a8, char *a9)
 {
     char    buf[2048];
 
@@ -441,10 +444,7 @@ Ecrit sur le socket décrit par cltsock.
 &EN 0 : succès
 ================================================================= */
 
-WSockPrintf(cltsock, format, a1, a2, a3, a4, a5, a6, a7, a8, a9)
-int     cltsock;
-char    *format;
-char    *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9;
+int WSockPrintf(int cltsock, char *format, char *a1, char *a2, char *a3, char *a4, char *a5, char *a6, char *a7, char *a8, char *a9)
 {
     int     rc;
 
@@ -457,7 +457,7 @@ int CHECK_READ = 0;
 extern int ISC_SOCKET, ISC_NB_CONN;
 extern S4C **ISC_S4C;
 
-ISC_check_read()
+int ISC_check_read(void)
 {
     char    buf[512];
     int     i, t_socket = ISC_SOCKET;
@@ -490,7 +490,7 @@ lu.
 &EN > 0 : nombre de bytes lus
 ================================================================= */
 
-WSockRead(int cltsock, char *txt, int lg)
+int WSockRead(int cltsock, char *txt, int lg)
 {
     int     rc, cursock, nb_try = 0, moderecv, nb_try2 = 0;
     int     tmp_check_read = -1;
@@ -666,7 +666,7 @@ lecture sur le socket contiendra toujours les bytes lus.
 &EN >= 0 : nombre de bytes lus
 ================================================================= */
 
-WSockPeek(int cltsock, char *txt, int lg)
+int WSockPeek(int cltsock, char *txt, int lg)
 {
     int     rc;
 
@@ -698,7 +698,7 @@ Lit exactement lg bytes sur le socket cltsock.
 &EN 0 : succès
 ================================================================= */
 
-WSockReadLgBytes(int cltsock, char *txt, int lg)
+int WSockReadLgBytes(int cltsock, char *txt, int lg)
 {
     int     rc, nb = 0;
 
@@ -731,7 +731,7 @@ sur socket cltsock.
 &EN >= 0 : nombre de bytes du record
 ================================================================= */
 
-WSockReadRecord(int cltsock, char *txt)
+int WSockReadRecord(int cltsock, char *txt)
 {
     int     rc;
     //long    lg;
@@ -760,7 +760,7 @@ sur socket cltsock.
 &EN 0 : nombre de bytes du record
 ================================================================= */
 
-WSockReadRecordAlloc(int cltsock, char **txt)
+int WSockReadRecordAlloc(int cltsock, char **txt)
 {
     int     rc;
     //long    lg;
@@ -790,7 +790,7 @@ cas, min 20 bytes). Le string ne peut excéder 2048 bytes.
 &EN >= 0 : nombre de bytes lus
 ================================================================= */
 
-WSockReadString(int cltsock, char *txt)
+int WSockReadString(int cltsock, char *txt)
 {
     int     rc, lg = 0, i;
 
@@ -823,9 +823,6 @@ Retourne l'adresse IP d'un host.
 int WSockGetIp(char *servername, int *ip)
 {
     struct hostent     *hp;
-#if !defined(DOSW32) && !defined(SCRW32)
-    struct hostent     *gethostbyname();
-#endif
     int                 i, rc = 0;
 
     // Initiate Winsock.
@@ -1031,7 +1028,7 @@ static unsigned char WSOCK_DECRTB[][256] = {
 
 
 /*NH*/
-WSockCryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
+int WSockCryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
 {
     int             i, cpos;
     unsigned char   b0, b1, b2, cprec, byte;
@@ -1076,7 +1073,7 @@ WSockCryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
 }
 
 /*NH*/
-WSockDecryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
+int WSockDecryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
 {
     int             i, cpos;
     unsigned char   b0, b1, b2, cprec;
@@ -1118,13 +1115,13 @@ WSockDecryptEx(U_ch *res, U_ch *buf, int lg, int setpos)
 }
 
 /*NH*/
-WSockCrypt(U_ch *res, U_ch *buf, int lg)
+int WSockCrypt(U_ch *res, U_ch *buf, int lg)
 {
     return(WSockCryptEx(res, buf, lg, 0));
 }
 
 /*NH*/
-WSockDecrypt(U_ch *res, U_ch *buf, int lg)
+int WSockDecrypt(U_ch *res, U_ch *buf, int lg)
 {
     return(WSockDecryptEx(res, buf, lg, 0));
 }

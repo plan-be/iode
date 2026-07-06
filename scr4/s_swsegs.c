@@ -78,8 +78,7 @@ void SW_Debug(int size)
 }
 
 /*NH*/
-SW_create_seg(size)
-SWSIZE  size;
+int SW_create_seg(SWSIZE size)
 {
     char    *ptr1, *ptr2;
 
@@ -109,7 +108,7 @@ SWSIZE  size;
 }
 
 /*NH*/
-SW_del_seg()
+int SW_del_seg(void)
 {
     SW_Debug(0);
 #ifndef NOEMS
@@ -125,7 +124,7 @@ SW_del_seg()
 }
 
 /*NH*/
-SW_oldest_seg()
+int SW_oldest_seg(void)
 {
     long    age = AGE(0);
     int     old = 0, i;
@@ -143,7 +142,7 @@ SW_oldest_seg()
 #ifndef NOEMS
 
 /*NH*/
-SW_oldest_ems_seg()
+int SW_oldest_ems_seg(void)
 {
     long    age = SW_AGE, age1;
     int     old = 0, i, old1;
@@ -162,8 +161,7 @@ SW_oldest_ems_seg()
 #endif
 
 /*NH*/
-void SW_swap_ems(seg_nb)
-int     seg_nb;
+void SW_swap_ems(int seg_nb)
 {
 #ifndef NOEMS
     int     physp, ems_seg;

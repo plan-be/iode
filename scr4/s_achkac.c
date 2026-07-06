@@ -12,9 +12,7 @@
 &SA A_check()
 ======================================================================*/
 
-A_check_access(argc, argv)
-int     argc;
-char    *argv[];
+int A_check_access(int argc, char *argv[])
 {
     int     i;
 

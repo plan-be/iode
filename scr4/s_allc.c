@@ -65,7 +65,7 @@ AllocDocFile(char *ptr, char *file, int line)
     return(ptr);
 }
 */
-AllocDocFree(ALLOCDOC *ad)
+int AllocDocFree(ALLOCDOC *ad)
 {
     if(ad == 0) return(0);
 
@@ -399,7 +399,7 @@ char *SCR_realloc_doc(void* old_ptr, unsigned int el_size, unsigned int old_coun
 
 
 /*NH*/
-SCR_alloc_chunck(int nb)
+int SCR_alloc_chunck(int nb)
 {
     int     i;
 

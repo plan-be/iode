@@ -83,22 +83,38 @@ extern int (**A2M_GRF_FNS)(...);
 extern int (**A2M_GRF_FNS)();
 #endif
 
-#define A2mDEVGrfInit       (A2M_GRF_FNS[0])
-#define A2mDEVGrfEnd        (A2M_GRF_FNS[1])
-#define A2mDEVGrfPen        (A2M_GRF_FNS[2])
-#define A2mDEVGrfBrush      (A2M_GRF_FNS[3])
-#define A2mDEVGrfLine       (A2M_GRF_FNS[4])
-#define A2mDEVGrfText       (A2M_GRF_FNS[5])
-#define A2mDEVGrfLabel      (A2M_GRF_FNS[6])
-#define A2mDEVGrfPar        (A2M_GRF_FNS[7])
-#define A2mDEVGrfGroupObj   (A2M_GRF_FNS[8])
-#define A2mDEVGrfGroup      (A2M_GRF_FNS[9])
-#define A2mDEVGrfBox        (A2M_GRF_FNS[10])
-#define A2mDEVGrfPolyLine   (A2M_GRF_FNS[11])
-#define A2mDEVGrfPolyBar    (A2M_GRF_FNS[12])
-#define A2mDEVGrfPrepare    (A2M_GRF_FNS[13])
-#define A2mDEVGrfGetPen     (A2M_GRF_FNS[14])
-#define A2mDEVGrfGetBrush   (A2M_GRF_FNS[15])
+#define A2mDEVGrfInit(ag) \
+    (((int (*)(A2MGRF *))A2M_GRF_FNS[0])(ag))
+#define A2mDEVGrfEnd(ag) \
+    (((int (*)(A2MGRF *))A2M_GRF_FNS[1])(ag))
+#define A2mDEVGrfPen(pen) \
+    (((int (*)(A2MPEN *))A2M_GRF_FNS[2])(pen))
+#define A2mDEVGrfBrush(brush) \
+    (((int (*)(A2MBRUSH *))A2M_GRF_FNS[3])(brush))
+#define A2mDEVGrfLine(axis, x1, y1, x2, y2, props) \
+    (((int (*)(int, double, double, double, double, int))A2M_GRF_FNS[4])(axis, x1, y1, x2, y2, props))
+#define A2mDEVGrfText(axis, x, y, string, align, color) \
+    (((int (*)(int, double, double, char *, char *, char *))A2M_GRF_FNS[5])(axis, x, y, string, align, color))
+#define A2mDEVGrfLabel(axis, x, y, line, bar, title) \
+    (((int (*)(int, double, double, char, char, char *))A2M_GRF_FNS[6])(axis, x, y, line, bar, title))
+#define A2mDEVGrfPar(axis, x, y, par, align, color) \
+    (((int (*)(int, double, double, A2MPAR *, char *, char *))A2M_GRF_FNS[7])(axis, x, y, par, align, color))
+#define A2mDEVGrfGroupObj() \
+    (((int (*)(void))A2M_GRF_FNS[8])())
+#define A2mDEVGrfGroup() \
+    (((int (*)(void))A2M_GRF_FNS[9])())
+#define A2mDEVGrfBox(axis, x, y, w, h, props) \
+    (((int (*)(int, double, double, double, double, int))A2M_GRF_FNS[10])(axis, x, y, w, h, props))
+#define A2mDEVGrfPolyLine(axis, nobs, vals, props) \
+    (((int (*)(int, int, double *, int))A2M_GRF_FNS[11])(axis, nobs, vals, props))
+#define A2mDEVGrfPolyBar(axis, nobs, vals, width, props) \
+    (((int (*)(int, int, double *, double, int))A2M_GRF_FNS[12])(axis, nobs, vals, width, props))
+#define A2mDEVGrfPrepare() \
+    (((int (*)(void))A2M_GRF_FNS[13])())
+#define A2mDEVGrfGetPen(props, pen) \
+    (((int (*)(int, A2MPEN *))A2M_GRF_FNS[14])(props, pen))
+#define A2mDEVGrfGetBrush(props, brush) \
+    (((int (*)(int, A2MBRUSH *))A2M_GRF_FNS[15])(props, brush))
 
 /****** STRUCTURES ************/
 
@@ -416,23 +432,7 @@ extern "C" {
 #endif
 
 /************ FUNCTIONS PROTOTYPES *******************/
-
-#ifndef SCRPROTO
-
-A2MFILE *A2mOpen();
-A2MFILE *A2mMemBegin();
-A2MOBJ  *A2mRead();
-A2MSTR  **A2mAddParLine();
-A2MPAR  *A2mNewPar();
-U_ch    *A2mError();
-A2MPAR  *A2mTxt2Par();
-void A2mMessage(char *msg);
-void (*A2mMessage_super)(char* msg); 
-void A2mMessage_toggle(int IsOn);
-
-#else
 #include <s_proa2m.h>
-#endif
 
 #endif
 

@@ -1,13 +1,13 @@
 #if !defined(DOSWIN) && !defined(SCRW32)
 
 /*NH*/
-WscrDdeServer()
+int WscrDdeServer(void)
 {
     return(-1);
 }
 
 /*NH*/
-WscrDdeServerEnd()
+int WscrDdeServerEnd(void)
 {
     return(-1);
 }

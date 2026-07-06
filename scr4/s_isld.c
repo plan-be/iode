@@ -22,10 +22,6 @@ char    *filename;
     int     i, reclen, c;
     ISFIELD *isf;
     long    bufl, nb_read = 0;
-#ifndef WATCOM
-    long    atol();
-    double  SCR_atof();
-#endif
     float   buff;
     short   bufs;
     double  bufd;
@@ -263,10 +259,6 @@ char    *filename;
     int     i;
     ISFIELD *isf;
     long    bufl, nb_read = 0;
-#ifndef WATCOM
-    long    atol();
-    double  SCR_atof();
-#endif
     float   buff;
     short   bufs;
     double  bufd;
