@@ -1621,6 +1621,88 @@ def test_to_frame_timeit():
     logging.info(f"{stmt} (shape ({len(variables)}, {variables.nb_periods})): "
                  f"{t} ({nb_times} times) -> {t / nb_times} per loop")
 
+# MISC 
+# ----
+
+def test_super(capsys):
+    from iode.super import register_super_function, backup_super_functions, restore_super_functions
+
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
+    scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
+    tables.load(f"{SAMPLE_DATA_DIR}/fun.tbl")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    backup_super_funcs = backup_super_functions()
+
+    # ==== Error ====
+    @register_super_function('error')
+    def error_super_test(level: int, msg: str) -> int:
+        raise RuntimeError(f"ERROR (level {level}) -> {msg}")
+
+    with pytest.raises(RuntimeError, match=r"ERROR \(level 2\) -> This is a test error"):
+        error_super_test(2, "This is a test error")
+    
+    # === Warning ===
+    @register_super_function('warning')
+    def warning_super_test(msg: str):
+        warnings.warn(f"WARNING -> {msg}")
+
+    with pytest.warns(UserWarning, match=r"WARNING -> Report: Macro 'macro' is not defined"):
+        execute_command("%macro%")
+
+    # ==== Message ====
+    @register_super_function('message')
+    def msg_super_test(msg: str):
+        print(f"MESSAGE: {msg}")
+
+    # empty captured output before executing the command
+    captured = capsys.readouterr()
+
+    execute_command("$show This is a test message")
+    captured = capsys.readouterr()
+    msg = "MESSAGE: [1] - $show This is a test message\n"
+    msg += "MESSAGE: This is a test message\n"
+    assert captured.out == msg
+
+    # ==== Pause ====
+    skip_pause(False)
+    @register_super_function('pause')
+    def pause_super_test():
+        print("PAUSE: Press Enter to continue...")
+
+    # $msg: This command displays the text of the argument and 
+    #       waits for a key press before continuing
+    execute_command("$msg This is a test message")
+    captured = capsys.readouterr()
+    msg = "MESSAGE: [1] - $msg This is a test message\n"
+    msg += "MESSAGE: This is a test message\n"
+    msg += "PAUSE: Press Enter to continue...\n"
+    assert captured.out == msg
+
+    skip_pause(True)
+
+    # ==== Confirm ====
+    @register_super_function('confirm')
+    def confirm_super_test(msg: str) -> int:
+        print(f"CONFIRM: {msg}")
+
+    # $ask <label> <question> calls the super function 'confirm' 
+    commands =  "$ask yes Is it true?\n"
+    commands += "$show No it's not\n"
+    commands += "$label yes\n"
+    commands += "$show Yes it is"
+    
+    execute_command(commands)
+    captured = capsys.readouterr()
+    msg =  "MESSAGE: [1] - $ask yes Is it true?\n"
+    msg += "CONFIRM: Is it true?\n"
+    msg += "MESSAGE: [4] - $show Yes it is\n"
+    msg += "MESSAGE: Yes it is\n"
+    assert captured.out == msg
+
+    restore_super_functions(backup_super_funcs)
+
 def test_deprecated_not_in_dir():
     """Test that deprecated functions and objects are not visible in dir(iode)."""
     import iode
