@@ -589,14 +589,31 @@ class MainWindow(AbstractMainWindow):
             if answer == QMessageBox.StandardButton.Discard:
                 return
 
-        dir = QFileDialog.getExistingDirectory(self, "Open Directory", self.project_path, 
-                                               QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks)
+        # open a dialog to select a directory as project
+        # show the files within the directories but do not allow 
+        # to select a file (only directories can be selected) 
+        dialog = QFileDialog()
+        dialog.setWindowTitle("Open Directory Project")
+        # to set that the user may only select directories and not files
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        # to show the files within the directories but do not allow to select a file
+        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+        # set the initial directory to the current project path
+        if self.project_path:
+            dialog.setDirectory(self.project_path)
+        else:
+            dialog.setDirectory(QDir.home())
+
+        selected_dir = None
+        if dialog.exec():
+            selected_dir = dialog.selectedFiles()[0]
+
         # check if user clicked on the Cancel button
-        if not dir:
+        if not selected_dir:
             return
 
         # update current project path + open it in the Iode GUI File Explorer
-        self.project_path = dir
+        self.project_path = selected_dir
         Context.called_from_python_script = False
         self.open_directory(self.project_path)
 
