@@ -14,7 +14,7 @@ from iode.util import join_lines, table2str, JUSTIFY
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
 from iode.objects.equation import Equation
 
-from iode.util import suppress_msgs, enable_msgs
+from iode.util import skip_message
 from iode.iode_cython import Equation as CythonEquation
 from iode.iode_cython import Equations as CythonEquations
 
@@ -984,17 +984,17 @@ class Equations(IodeDatabase):
 
         try:
             if quiet:
-                suppress_msgs()
+                skip_message(True)
             success = True
             for eq_name in list_eqs:
                 eq = self[eq_name]
                 success &= eq._estimate(from_period, to_period)
             if quiet:
-                enable_msgs()
+                skip_message(False)
             return success
         except Exception as e:
             if quiet:
-                enable_msgs()
+                skip_message(False)
             raise e
 
     def estimate_step_wise(self, eq_names: Union[str, List[str]], from_period: Union[str, Period]=None, 

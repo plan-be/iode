@@ -1,18 +1,21 @@
 # distutils: language = c++
 
 from libcpp.string cimport string
-from util cimport IODE_IS_A_NUMBER, IodeSuppressMsgs, IodeResetMsgs
-from util cimport RP_define, RP_macro_exists, RP_get_macro
+from util cimport skip_message, skip_pause, skip_msg_box
+from util cimport IODE_IS_A_NUMBER, RP_define, RP_macro_exists, RP_get_macro
 
 
 def cython_is_NA(value: float) -> bool:
     return not IODE_IS_A_NUMBER(value)
 
-def cython_suppress_msgs():
-    IodeSuppressMsgs()
-
-def cython_enable_msgs():
-    IodeResetMsgs()
+def cython_skip_message(value: bool):
+    skip_message(value)
+    
+def cython_skip_pause(value: bool):
+    skip_pause(value)
+    
+def cython_skip_msg_box(value: bool):
+    skip_msg_box(value)
 
 def cython_define(name: str, macro: str) -> bool:
     arg: str = name + " " + macro

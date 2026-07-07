@@ -117,12 +117,12 @@ public:
 
 	void U_test_suppress_kmsg_msgs()
 	{
-	    kmsg_toggle(0);
+	    skip_message(false);
 	}
 
 	void U_test_reset_kmsg_msgs()
 	{
-	    kmsg_toggle(1);
+	    skip_message(true);
 	}
 
 	void U_test_CreateObjects()
@@ -3875,7 +3875,7 @@ TEST_F(LegacyAPITest, Tests_B_PRINT_Table_DEF)
     B_WsLoad(in_filename, TABLES);
     B_WsLoad(in_filename, VARIABLES);
 
-    kmsg_toggle(1);
+    skip_message(true);
     char output_filename[256];
 
     B_TABLE_TITLE = 1;
@@ -3892,7 +3892,7 @@ TEST_F(LegacyAPITest, Tests_B_PRINT_Table_DEF)
     W_close();
     compare_files(output_test_dir, "tables_full_defs.csv", output_test_dir, "tables_full_defs.ref.csv");
 
-    kmsg_toggle(0);
+    skip_message(false);
 }
 
 

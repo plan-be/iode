@@ -316,11 +316,11 @@ int RP_silent(char* arg, int unused)
         case '0' :
         case 'n':
         case 'N':
-            kmsg_toggle(1);
+            skip_message(true);
             break;
 
         default :
-            kmsg_toggle(0);
+            skip_message(false);
             break;
     }
     return 0;

@@ -60,7 +60,7 @@ from .lec import execute_lec
 from .gui import view_workspace
 
 # miscellaneous
-from .util import is_NA, define, macro, enable_msgs, suppress_msgs
+from .util import is_NA, define, macro, skip_message, skip_pause, skip_msg_box
 from .common import FileType
 from .super import *
 
@@ -110,7 +110,7 @@ __all__ = [
     'view_workspace', 
 
     # miscellaneous
-    'is_NA', 'define', 'macro', 'enable_msgs', 'suppress_msgs', 
+    'is_NA', 'define', 'macro', 'skip_message', 'skip_pause', 'skip_msg_box', 
 ]
 
 # ==== DEPRECATED API ====

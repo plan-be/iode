@@ -49,8 +49,8 @@
  *      void (*kpanic_super)(void);
  *      int  (*kconfirm_super)(const char* msg);
  *      int  (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
- *      int   kmsgbox_continue = 0;
- *      int   kpause_continue = 0;
+ *      int   KMSGBOX_CONTINUE = 0;
+ *      int   KPAUSE_CONTINUE = 0;
  *      void (*krecordkey_super)(const int ch);
  *      void (*krecordtext_super)(const unsigned char* text);
  *      void (*ksettitle_super)(void);
@@ -78,6 +78,26 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/report/undoc/undoc.h"
+
+
+/**
+ *  Suppress or restore default kmsg() behaviour.
+ */
+void skip_message(const bool value)
+{
+    MSG_DISABLED = value;
+    A2mMessage_toggle(value ? 0 : 1);
+}
+
+void skip_pause(const bool value)
+{
+    KPAUSE_CONTINUE = value;
+}
+
+void skip_msg_box(const bool value)
+{
+    KMSGBOX_CONTINUE = value;
+}
 
 
 /**
@@ -122,14 +142,12 @@ int kerror(const int level, const char* fmt, ...)
  *  Sub of kmsgbox() and kwarning().
  *  
  *  The default behaviour is :
- *      - if the global int kpause_continue is not null, does not wait the user to press ENTER after having printed the message.
- *      - if kpause_continue is null, waits for a user input.
- *    
- *  
+ *      - if the global int KPAUSE_CONTINUE is not null, does not wait the user to press ENTER after having printed the message.
+ *      - if KPAUSE_CONTINUE is null, waits for a user input.
  */
 void kpause()
 {
-    if(kpause_continue) 
+    if(KPAUSE_CONTINUE) 
         return;
     
     if(kpause_super != 0) 
@@ -149,7 +167,7 @@ void kpause()
  *  Displays a message and optionally asks the user to press ENTER before continuing.
  *  
  *  The default behaviour is :
- *     - if the global int kpause_continue is not null, does not wait the user to press ENTER after having printed the message.
+ *     - if the global int KPAUSE_CONTINUE is not null, does not wait the user to press ENTER after having printed the message.
  *  
  *  If the function pointer kwarning_super is not null, it is called instead.
  *  
@@ -223,16 +241,6 @@ void kmsg_null(const char* msg)
 {
 }
 
-/**
- *  Suppress or restore default kmsg() behaviour.
- *  
- *  @param [in] IsOn int    0: suppress the messages, 1: restore the default function
-  */
-void kmsg_toggle(const int value)
-{
-    MSG_DISABLED = (value == 0) ? 1 : 0;
-}
-
 
 /**
  *  Displays a message and optionally asks confirmation before continuing.
@@ -280,8 +288,8 @@ int kconfirm(const char *fmt,...)
  *  Displays a message box with optional buttons. 
  *  
  *  The default behaviour is :
- *      - if the global int kmsgbox_continue is not null, return(1) without waiting for the user to press ENTER 
- *      - if kmsgbox_continue is null, calls kpause() (i.e. waits for the user).
+ *      - if the global int KMSGBOX_CONTINUE is not null, return(1) without waiting for the user to press ENTER 
+ *      - if KMSGBOX_CONTINUE is null, calls kpause() (i.e. waits for the user).
  *    
  *  If the function pointer kmsgbox_super is not null, it is called instead.
  *  
@@ -299,7 +307,7 @@ int kmsgbox(const unsigned char* str, const unsigned char* v, const unsigned cha
     {
         printf("%s\n", v);
 
-        if(!kmsgbox_continue) 
+        if(!KMSGBOX_CONTINUE) 
             kpause();
         
         return 1;

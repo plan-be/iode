@@ -38,6 +38,9 @@ Fixed Bugs
 Miscellaneous 
 -------------
 
+- PYTHON: utility functions `enable_msgs` and `suppress_msgs` are deprecated. 
+  The new utility function :py:`skip_message` replaces them.
+
 - C++ API: replaced pointer attributes Sample* by smart pointer shared_ptr<Sample>. 
   That should not impact the output of estimations or simulations.
 

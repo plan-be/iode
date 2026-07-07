@@ -23,8 +23,6 @@
 int IodeInit();
 int IodeEnd();
 void kmsg_null(const char* msg);
-void IodeSuppressMsgs();
-void IodeResetMsgs();
 
 /* b_dde.c */
 int IodeDdeLocale(char *buf);

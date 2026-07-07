@@ -725,7 +725,6 @@ GRAPHICAL USER INTERFACE
 
    view_workspace
 
-
 *****
 PRINT
 *****
@@ -754,5 +753,6 @@ MISCELLANEOUS
    :toctree: _generated
 
    is_NA
-   suppress_msgs
-   enable_msgs
+   skip_pause
+   skip_message
+   skip_msg_box

@@ -18,9 +18,9 @@ TEST(BigFilesTest, Tests_BIG_WS)
     KDBVariablesPtr kdb_shallow_copy = nullptr;
     std::chrono::duration<double> elapsed;
 
-    kpause_continue = 1;
+    KPAUSE_CONTINUE = 1;
     // suppress messages from kmsg()
-    kmsg_toggle(0);
+    skip_message(false);
 
 	std::string current_file = __FILE__;
 	std::filesystem::path cwd(current_file);

@@ -4,7 +4,6 @@ cdef extern from "api/all.h":
     cdef void    kmsg(const char* fmt) noexcept
     cdef void    kpanic() except *
     cdef int     kconfirm(const char* fmt) noexcept
-    cdef void    kpause() noexcept
     cdef int     kmsgbox(const unsigned char* title, const unsigned char* msg, 
                          const unsigned char** buts) noexcept
 

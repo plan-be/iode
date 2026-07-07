@@ -47,9 +47,9 @@ public:
 		// set *_super fn pointers
 		IODE_assign_super_API();
 
-		kpause_continue = 1;
+		KPAUSE_CONTINUE = 1;
 		// suppress messages from kmsg()
-		kmsg_toggle(0);
+		skip_message(false);
 		
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api

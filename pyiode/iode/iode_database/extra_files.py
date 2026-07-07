@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union, List
 
-from iode.util import enable_msgs, suppress_msgs
+from iode.util import skip_message
 from iode.iode_cython import cython_load_extra_files, cython_reset_extra_files
 
 
@@ -59,16 +59,16 @@ def load_extra_files(extra_files: Union[str, Path, List[Union[str, Path]]], quie
     extra_files = [Path(extra_file) for extra_file in extra_files]
 
     if quiet:
-        suppress_msgs()
+        skip_message(True)
     
     try:
         extra_files = cython_load_extra_files(extra_files)
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return extra_files
     except Exception as e:
         if quiet:
-            enable_msgs()
+            skip_message(False)
         raise e
 
 
