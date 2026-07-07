@@ -75,7 +75,7 @@ int RP_label(char* arg, int unused=-1);
 int RP_goto_label(char* command, char* parm);
 int RP_goto(char* arg, int unused=-1);
 int RP_message(char* arg, int unused=-1);
-int RP_warning(char* arg, int unused=-1);
+int RP_message_and_pause(char* arg, int unused=-1);
 int RP_silent(char* arg, int unused=-1);
 int RP_beep(char* arg, int unused=-1);
 int RP_ask(char* arg, int unused=-1);
