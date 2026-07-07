@@ -12,6 +12,9 @@ Improvements
 
 - DOC: added new section *Methods And Algorithms* in the documentation.
 
+- GUI: when opening a project via the "Open Project" menu, also show the files 
+  within the directories (closes :issue:`1257`)
+
 Fixed Bugs 
 ----------
 
