@@ -24,42 +24,7 @@
  *      @return     int             return code: 0 on success
  *      
  *  Note that RP_exec_fn() calls the function with a second parameter "type" which, being
- *  not needed by these functions, is ignored.
- *    
- *  List of functions
- *  -----------------
- *      int RP_vseps(char* seps)                         $vseps <seps>
- *      int RP_repeatstring(char* buf, int unused)                   $repeatstring <string>
- *      int RP_repeat(char* buf, int unused)                         $repeat <command>
- *      int RP_onerror_1(char* arg)                      Sub function of RP_onerror() which assigns the 2 global variables RP_RT and RP_PRINT.
- *      int RP_onerror(char* arg, int unused)                        $onerror [{return|abort|quitode}] [{display|print|noprint}]
- *      int RP_abort(char* arg, int unused)                          $abort 
- *      int RP_quitode(char* arg, int unused)                        $quitode or $quit
- *      int RP_return(char* arg, int unused)                         $return
- *      int RP_label(char* arg, int unused)                          $label <label>
- *      int RP_goto_label(char *command, char *parm)     Search in the current REPFILE (CUR_REPFILE) the line beginning with "$command parm" or "#command parm", where command can be "label" or "next".
- *      int RP_goto(char* arg, int unused)                           $goto label [value]
- *      int RP_message(char* arg, int unused)                        $show message
- *      int RP_warning(char* arg, int unused)                        $msg text
- *      int RP_silent(char* arg, int unused)                         $silent {0|1|N|n|Y|y]
- *      int RP_beep()                                    $beep
- *      int RP_ask(char* arg, int unused)                            $ask <label> <question>
- *      int B_ReportPrompt(char* arg)                    #prompt <macro_name> <question>
- *      int RP_setdebug(char* arg, int unused)                       $debug {0|n|N|1|2|f|F}
- *      int RP_setindent(char* arg, int unused)                      $indent {0|n|N|1}
- *      int RP_setmultiline(char* arg, int unused)                   $multiline {0|n|N|1} 
- *      int RP_noparsingchar(char* arg)                  $noparsing [0|n|N|1]
- *      int RP_shift(char* arg)                          $shift [n] or $shift_args [n]
- *      int RP_chdir(char* arg, int unused)                          $chdir <dirname>
- *      int RP_rmdir(char* arg, int unused)                          $rmdir <dirname>
- *      int RP_mkdir(char* arg, int unused)                          $mkdir <dirname>
- *      int RP_settime(char* arg, int unused)                        $settime <period>
- *      int RP_incrtime(char* arg, int unused)                       $incrtime [n]
- *      int RP_system(char* arg, int unused)                         $system <command>
- *      int B_shellexec(char *arg, int unused)                       $shellexec <command>
- *      int B_Sleep(char* arg, int unused)                           $sleep <msecs>
- *      int B_GraphDefault(char* type, int unused)                   $graphdefault {l|L|s|S|b|B} 
- *  
+ *  not needed by these functions, is ignored. 
  */
 #include "scr4/scr4.h"
 
@@ -331,12 +296,13 @@ int RP_message(char* arg, int unused)
 
 
 // $msg text
-int RP_warning(char* arg, int unused)            
+int RP_message_and_pause(char* arg, int unused)            
 {
     if(arg == NULL || arg[0] == 0) return 0; /* JMP 11-07-96 */
 
     if(strlen(arg) > 512) arg[512] = 0;
-    kwarning("%s", arg); 
+    kmsg("%s", arg); 
+    kpause();
     return 0;
 }
 

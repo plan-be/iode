@@ -276,7 +276,7 @@ All functions have the same syntax:
 |`int RP_goto_label(char *command, char *parm)`|Search in the current REPFILE (CUR\_REPFILE) the line beginning with "$command parm" or "\#command parm", where command can be "label" or "next".|
 |`int RP_goto(char* arg, int unused)`|$goto label \[value\]|
 |`int RP_message(char* arg, int unused)`|$show message|
-|`int RP_warning(char* arg, int unused)`|$msg text|
+|`int RP_message_and_pause(char* arg, int unused)`|$msg text|
 |`int RP_beep()`|$beep|
 |`int RP_ask(char* arg, int unused)`|$ask <label> <question>|
 |`int B_ReportPrompt(char* arg)`|\#prompt <macro\_name> <question>|
