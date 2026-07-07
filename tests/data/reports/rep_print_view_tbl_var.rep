@@ -1,0 +1,110 @@
+$ report testing IODE interactive commands PrintTbl, PrintVar, ViewTbl and ViewVar
+
+$indent
+$noparsing
+$goto continue {%0% >= 2}
+    $show Syntax: rep_fns input_dir output_dir
+    $show Syntax error. Report aborted.
+    $return
+$label continue
+$define data_dir %1%
+$define output_dir %2%
+
+$ cleanup
+$WsClearAll
+
+$WsLoadCmt %data_dir%/fun.cmt
+$WsLoadEqs %data_dir%/fun.eqs
+$WsLoadIdt %data_dir%/fun.idt
+$WsLoadLst %data_dir%/fun.lst
+$WsLoadScl %data_dir%/fun.scl
+$WsLoadTbl %data_dir%/fun.tbl
+$WsLoadVar %data_dir%/fun.var
+
+$PrintNbDec 4
+
+$ ================ PRINT ================
+
+$ ---------------- TABLES ----------------
+
+$PrintDest %output_dir%/tbl_c8_1.csv CSV 
+
+$ $PrintTbl: build and print (a) table(s) in a file
+$ Syntax: $PrintTbl gsample table1 [other tables]
+
+$ case 1: - simple time series (current workspace) 
+$         - 6 periods 
+$ columns: (00, 01, 02, 03, 04, 05)
+$PrintTbl 2000:6 C8_1
+
+$ case 2: - two time series (current workspace) 
+$         - 5 periods 
+$ columns: (10, 10/09, 11, 11/10, 12, 12/11, 13, 13/12, 14, 14/13)
+$PrintTbl (2010;2010/2009):5 C8_1
+
+$ $PrintTblFile: define the files to use when printing a comparison 
+$                table between several files (n = 2, 3, 4, 5).
+$                In the print sample, [1] represents the current workspace.
+$                The other files are [2|3|4|5] (e.g. 90:2^[1;2]).
+$ WARNING: After a call to $PrintTbl, you must redefine the files to compare. 
+$          $PrintTbl "consumes" the files specified previously with $PrintTblFile.
+$PrintTblFile 2 %data_dir%/ref.av
+
+$ case 3: - simple time series 
+$         - current workspace + one extra file 
+$         - 5 periods     
+$ columns: (10[1], 10[2],  11[1], 11[2], 12[1], 12[2], 13[1], 13[2], 14[1], 14[2]) 
+$PrintTbl 2010[1;2]:5 C8_1
+
+$ case 4: - simple time series 
+$         - current workspace + 4 extra files 
+$         - 1 period
+$ columns: (10[1], 10[2], 10[3], 10[4], 10[5])
+$PrintTblFile 2 %data_dir%/ref.av
+$PrintTblFile 3 %data_dir%/fun.av
+$PrintTblFile 4 %data_dir%/fun2.av
+$PrintTblFile 5 %data_dir%/a.var
+$PrintTbl 2010[1;2;3;4;5]:1 C8_1
+
+$ case 5: - multiple patterns (separated by ';')
+$         - current workspace + 1 extra file
+$ columns: (00[1], 02[1], 04//03[1], 06[1], 06[2], 08[1+2], 10/09[1^2])
+$PrintTblFile 2 %data_dir%/ref.av
+$PrintTbl 2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2] C8_1
+
+$ ---------------- VARIABLES ----------------
+
+$ $PrintVar: build and print a comparison table of series in a file
+$ Syntax: $PrintVar gsample var1;var2;...
+
+$PrintDest %output_dir%/tbl_vars.csv CSV 
+$PrintVar 2000:6 ACAF;ACAG;AOUC;ACAF+ACAG+AOUC 
+
+$ ================ VIEW ================
+
+$ ---------------- TABLES ----------------
+
+$ $ViewTbl: compute and display (a) table(s)
+$ Syntax: $ViewTbl gsample table1 [other tables]
+
+$ compute according to current workspace
+$ViewTbl 2000:6 C8_1
+$ViewTbl (2010;2010/2009):5 C8_1
+
+$ compute for current workspace + one extra file
+$PrintTblFile 2 %data_dir%/ref.av
+$ViewTbl 2010[1;2]:5 C8_1
+
+$PrintTblFile 2 %data_dir%/ref.av
+$ViewTbl 2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2] C8_1
+
+$ ---------------- VARIABLES ----------------
+
+$ $ViewVar: build and display a comparison table of series
+$ Syntax: $ViewVar gsample lec1 [lec2 ...]
+
+$ViewVar 2000:6 ACAF;ACAG;AOUC;ACAF+ACAG+AOUC 
+
+$ cleanup
+$WsClearAll
+
