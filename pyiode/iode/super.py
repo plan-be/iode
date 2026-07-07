@@ -1,11 +1,6 @@
 import sys
 import warnings
 from iode.iode_cython import register_super_function
-from iode.iode_cython import skip_pause
-from iode.iode_cython import skip_msg_box
-
-
-__all__ = ['skip_pause', 'skip_msg_box']
 
 
 @register_super_function('warning')

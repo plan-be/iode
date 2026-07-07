@@ -37,7 +37,7 @@ TEST_F(ReportTest, Tests_B_REP_LINE)
     char    fullfilename[256], cmd[1024];
 
     std::cout << "Tests B_ReportLine()" << std::endl;
-    kmsg_toggle(1);
+    skip_message(true);
 
     // Simple test of a call to B_ReportLine(). 
     // More elaborate commands are tested with B_ReportExec()
@@ -65,7 +65,7 @@ TEST_F(ReportTest, Tests_B_REP_ENGINE)
     char    cmd[1024];
 
     std::cout << "Tests B_ReportExec(\"rep_expand.rep\")" << std::endl;
-    kmsg_toggle(1);
+    skip_message(true);
 
     // Report rep_expand.rep: expand %% {lec}, {$cmd}, {$!cmd} and @fn().
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -81,7 +81,7 @@ TEST_F(ReportTest, Tests_B_REP_OEM850)
     char    cmd[1024];
 
     std::cout << "Tests B_ReportExec(\"oem850.rep\")" << std::endl;
-    kmsg_toggle(1);
+    skip_message(true);
 
     // Execution of the report oem850.rep
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -97,7 +97,7 @@ TEST_F(ReportTest, Tests_B_REP_FNS)
     char    cmd[1024];
 
     std::cout << "Tests B_ReportExec(\"rep_fns.rep\")" << std::endl;
-    kmsg_toggle(1);
+    skip_message(true);
 
     // Execution of the report rep_fns.rep
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -114,7 +114,7 @@ TEST_F(ReportTest, Tests_B_REP_PROC)
     char    cmd[1024];
 
     std::cout << "Tests B_ReportExec(\"rep_proc.rep\")" << std::endl;
-    kmsg_toggle(1);
+    skip_message(true);
 
     // Execution of the report rep_fns.rep
     RP_STDOUT = 1;      // Enable report to stdout for this test
@@ -141,7 +141,7 @@ TEST_F(ReportTest, Tests_Data_Exist)
 TEST_F(ReportTest, Tests_Print_Eqs)
 {
     char cmd[1024];
-    kmsg_toggle(1);
+    skip_message(true);
 
     std::cout << "Testing IODE command $PrintObjDefEqs" << std::endl;
 
@@ -169,13 +169,13 @@ TEST_F(ReportTest, Tests_Print_Eqs)
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "/rep_print_def_eqs.a2m", output_test_dir, "/rep_print_def_eqs.ref.a2m");
 
-    kmsg_toggle(0);
+    skip_message(false);
 }
 
 TEST_F(ReportTest, Tests_Print_Tbl)
 {
     char cmd[1024];
-    kmsg_toggle(1);
+    skip_message(true);
 
     std::cout << "Testing IODE command $PrintObjDefTbl" << std::endl;
 
@@ -193,5 +193,5 @@ TEST_F(ReportTest, Tests_Print_Tbl)
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "/rep_print_def_tbl.a2m", output_test_dir, "/rep_print_def_tbl.ref.a2m");
 
-    kmsg_toggle(0);
+    skip_message(false);
 }

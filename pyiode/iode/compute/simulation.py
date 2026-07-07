@@ -3,7 +3,7 @@ from textwrap import fill
 from collections.abc import Iterable
 from typing import List, Union
 
-from iode.util import suppress_msgs, enable_msgs
+from iode.util import skip_message
 from iode.time.period import Period
 from iode.iode_cython import SimulationSort, SimulationInitialization
 from iode.iode_cython import Simulation as CythonSimulation
@@ -1144,7 +1144,7 @@ class Simulation:
                             f"Got value of type {type(list_eqs)} instead.")
         
         if quiet:
-            suppress_msgs()
+            skip_message(True)
 
         try:
             success = self._cy_simulation.model_compile(list_eqs)
@@ -1153,7 +1153,7 @@ class Simulation:
             success = False
 
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return success
 
     def model_simulate(self, from_period: Union[str, Period], to_period: Union[str, Period], 
@@ -1285,7 +1285,7 @@ class Simulation:
                             f"Got value of type {type(list_eqs)} instead.")
 
         if quiet:
-            suppress_msgs()
+            skip_message(True)
 
         try: 
             success = self._cy_simulation.model_simulate(from_period, to_period, list_eqs)
@@ -1294,7 +1294,7 @@ class Simulation:
             success = False
 
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return success
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str='_PRE', inter_name: str='_INTER', 
@@ -1391,7 +1391,7 @@ class Simulation:
                             f"Got value of type {type(list_eqs)} instead.")
 
         if quiet:
-            suppress_msgs()
+            skip_message(True)
 
         try:
             success = self._cy_simulation.model_calculate_SCC(nb_iterations, pre_name, inter_name, post_name, list_eqs)
@@ -1400,7 +1400,7 @@ class Simulation:
             success = False
 
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return success
 
     def model_simulate_SCC(self, from_period: Union[str, Period], to_period: Union[str, Period], pre_name: str='_PRE', 
@@ -1551,7 +1551,7 @@ class Simulation:
             to_period = str(to_period)
 
         if quiet:
-            suppress_msgs()
+            skip_message(True)
 
         try:
             success = self._cy_simulation.model_simulate_SCC(from_period, to_period, pre_name, inter_name, post_name)
@@ -1560,7 +1560,7 @@ class Simulation:
             success = False
         
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return success
 
     def __str__(self) -> str:

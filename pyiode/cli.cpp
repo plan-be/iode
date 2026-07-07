@@ -92,13 +92,13 @@ void always_continue(bool value)
 {
     if(value)
     {
-        kmsgbox_continue = 1;
-        kpause_continue = 1;
+        KMSGBOX_CONTINUE = 1;
+        KPAUSE_CONTINUE = 1;
     }
     else
     {
-        kmsgbox_continue = 0;
-        kpause_continue = 0;
+        KMSGBOX_CONTINUE = 0;
+        KPAUSE_CONTINUE = 0;
     }
 }
 

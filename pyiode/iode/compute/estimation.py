@@ -7,7 +7,7 @@ if sys.version_info.minor >= 11:
 else:
     Self = Any
 
-from iode.util import suppress_msgs, enable_msgs
+from iode.util import skip_message
 from iode.time.period import Period
 from iode.time.sample import Sample
 from iode.objects.equation import Equation
@@ -1280,7 +1280,7 @@ class EditAndEstimateEquations:
         Scalar(0.0109855, 1, 0.00481857)
         """
         if quiet:
-            suppress_msgs()
+            skip_message(True)
 
         try:
             self._cy_estimation.estimate(maxit, epsilon)
@@ -1290,7 +1290,7 @@ class EditAndEstimateEquations:
             success = False
         
         if quiet:
-            enable_msgs()
+            skip_message(False)
         return success
 
     @property

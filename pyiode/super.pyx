@@ -2,8 +2,6 @@ from libc.string cimport strlen
 from libcpp.string cimport string
 
 from pyiode.super cimport K_end_ws
-from pyiode.super cimport kmsgbox_continue
-from pyiode.super cimport kpause_continue
 from pyiode.objects.table cimport CTable
 
 
@@ -106,12 +104,6 @@ cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg,
     cdef bytes b_title = bytes(title[:length_title])
     cdef bytes b_msg = bytes(msg[:length_msg])
     return __registry_super_functions['msgbox'](b_title.decode('cp850'), b_msg.decode('cp850'))
-
-def skip_pause(value: bool):
-    kpause_continue = <bint>value
-
-def skip_msg_box(value: bool):
-    kmsgbox_continue = <bint>value
 
 cdef int c_PrintObjDef_super(char* arg, int unused):
     return __registry_super_functions['PrintObjDef']()

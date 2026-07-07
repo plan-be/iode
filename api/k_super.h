@@ -5,10 +5,10 @@
 #include "api/time/sample.h"
 
 
-inline int     MSG_DISABLED = 0;    // if 1, kmsg() is disabled
+inline bool    MSG_DISABLED = false;
 
-inline int     kmsgbox_continue = 0;
-inline int     kpause_continue = 0;
+inline bool     KMSGBOX_CONTINUE = false;
+inline bool     KPAUSE_CONTINUE = false;
 
 inline int     (*kerror_super)(const int level, const char* fmt) = nullptr;
 inline void    (*kwarning_super)(const char* msg) = nullptr;
@@ -31,11 +31,14 @@ inline int     (*kshellexec_super )(const char*) = nullptr;
 inline int     (*ODE_end_super)(const int) = nullptr;
 
 /* k_super.c */
+void    skip_message(const bool value);
+void    skip_pause(const bool value);
+void    skip_msg_box(const bool value);
+
 int     kerror(const int level, const char* fmt, ...);
 void    kwarning(const char* fmt, ...);
 void    kpause();
 void    kmsg(const char* fmt, ...);
-void    kmsg_toggle(const int value);
 int     kwprintf(const char* msg, ...);
 void    kpanic(void);
 int     kconfirm(const char* fmt, ...);

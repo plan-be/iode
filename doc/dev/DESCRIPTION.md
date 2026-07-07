@@ -227,7 +227,7 @@ Functions used in any context of IODE (GUI or not\-GUI).
 |`void kpause()`|Displays the message "Press ENTER to continue" and waits for the user to press ENTER.|
 |`void kwarning(char* fmt, ...)`|Displays a message and optionally asks the user to press ENTER before continuing.|
 |`void kmsg(char* fmt, ...)`|Displays a message.|
-|`void kmsg_toggle(int IsOn)`|Suppresses or restores the message output by replacing kmsg\_super()|
+|`void skip_message(int IsOn)`|Suppresses or restores the message output by replacing kmsg\_super()|
 |`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
 |`int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
 |`void krecordkey(int key)`|Records a key in the keyboard buffer.|
@@ -253,14 +253,14 @@ Functions used only in a GUI context.
 |:---|
 |`int (*kerror_super)(int level, char*msg);`|
 |`void (*kpause_super)();`|
-|`int kpause_continue = 0;`|
+|`int KPAUSE_CONTINUE = 0;`|
 |`void (*kwarning_super)(char* msg);`|
 |`void (*kmsg_super)(char* msg);`|
 |`int (*kwprintf_super)(char* msg);`|
 |`void (*kpanic_super)(void);`|
 |`int (*kconfirm_super)(char* msg);`|
 |`int (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);`|
-|`int kmsgbox_continue = 0;`|
+|`int KMSGBOX_CONTINUE = 0;`|
 |`void (*krecordkey_super)(int ch);`|
 |`void (*ksettitle_super)(void);`|
 |`int (*ktermvkey_super)(int vkey);`|
@@ -568,9 +568,6 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 |:---|:---|
 |`int IodeInit()`|Initialise an IODE session.|
 |`int IodeEnd()`|Terminate an IODE session.|
-|**MESSAGES**||
-|` void IodeSuppressMsgs()`|Suppress all messages from the A2M interpretor and from the IODE functions.|
-|` void IodeResetMsgs()`|Reset the messages from the A2M interpretor and from the IODE functions.|
 
 ## Group "DDE communcations" {#T66}
 

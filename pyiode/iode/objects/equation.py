@@ -11,7 +11,7 @@ from iode.common import EqMethod, EqTest
 from iode.time.period import Period
 from iode.time.sample import Sample
 
-from iode.util import enable_msgs, suppress_msgs
+from iode.util import skip_message
 from iode.iode_cython import Sample as CythonSample
 from iode.iode_cython import Equation as CythonEquation
 
@@ -455,15 +455,15 @@ class Equation:
         equations[self.endogenous] = self
 
         if quiet:
-            suppress_msgs()
+            skip_message(True)
         try:
             success = self._estimate(from_period, to_period, maxit, epsilon)
             if quiet:
-                enable_msgs()
+                skip_message(False)
             return success
         except Exception as e:
             if quiet:
-                enable_msgs()
+                skip_message(False)
             raise e
     
     def _estimate_step_wise(self, from_period: Union[str, Period]=None, to_period: Union[str, Period]=None, 

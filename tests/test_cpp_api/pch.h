@@ -31,9 +31,9 @@ public:
 	KDBTest()
 	{
 		cpp_iode_init();
-		kpause_continue = 1;
+		KPAUSE_CONTINUE = 1;
 		// suppress messages from kmsg()
-		kmsg_toggle(0);
+		skip_message(false);
 
 		// clear global workspaces
 		global_ws_cmt->clear();

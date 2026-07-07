@@ -2,7 +2,6 @@ import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
 from iode.util import register_super_function
-from iode.super import skip_pause, skip_msg_box
 
 from qtpy.QtWidgets import QMainWindow, QMessageBox
 

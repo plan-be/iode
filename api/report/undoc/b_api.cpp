@@ -11,13 +11,7 @@
  *  List of functions
  *  -----------------
  *      int IodeInit()              | Initialise an IODE session.
- *      int IodeEnd()               | Terminate an IODE session.
- *   
- *   MESSAGES
- *  
- *      void IodeSuppressMsgs()     | Suppress all messages from the A2M interpretor and from the IODE functions.
- *      void IodeResetMsgs()        | Reset the messages from the A2M interpretor and from the IODE functions.
- *   
+ *      int IodeEnd()               | Terminate an IODE session. 
  */
 #include "scr4/s_args.h"
 
@@ -97,24 +91,4 @@ int IodeEnd()
     L_NAMES.clear();
     
     return 0;
-}
-
-
-// ---------------
-// OUTPUT MESSAGES
-// ---------------
-   
-// Suppress all messages from the A2M interpretor and from the IODE functions.
-void IodeSuppressMsgs()
-{
-    kmsg_toggle(0);
-    A2mMessage_toggle(0);
-    //IodeSetMsgs(0);
-}
-
-// Reset the messages from the A2M interpretor and from the IODE functions.
-void IodeResetMsgs()
-{
-    kmsg_toggle(1);
-    A2mMessage_toggle(1);
-}   
+}  

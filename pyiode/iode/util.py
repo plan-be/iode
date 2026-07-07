@@ -6,9 +6,9 @@ import warnings
 
 from typing import List, Dict, Any
 
-from iode.iode_cython import (cython_is_NA, cython_suppress_msgs, cython_enable_msgs, 
-                              cython_define, cython_macro_exists, cython_macro, 
-                              IodeFileType, IodeType)
+from iode.iode_cython import (cython_is_NA, cython_skip_message, cython_skip_pause, 
+                              cython_skip_msg_box, cython_define, cython_macro_exists, 
+                              cython_macro, IodeFileType, IodeType)
 from .common import IODE_FILE_TYPES
 
 # import constants, functions and classes hidden from users but maybe useful for developers
@@ -126,18 +126,66 @@ def macro(name: str) -> str:
     return cython_macro(name)
 
 
+def skip_message(value: bool = False):
+    """
+    Whether to silent the output of an IODE report.
+
+    Parameters
+    ----------
+    value: bool
+        set silent mode if True, otherwise print output as usual. 
+        Default to False.
+    """
+    cython_skip_message(value)
+
+
+def skip_pause(value: bool = True):
+    """
+    Whether to skip the pause made by the IODE commands `$msg` or after a warning 
+    (when running an IODE report).
+
+    Making a pause until the user press a key when running an IODE report in the Graphical 
+    User Interface can be useful to check the output after estimations or simulation.
+    And the other hand, the user may also want to skip the pause when running an IODE report.
+
+    Parameters
+    ----------
+    value: bool
+        skip the pause if True, otherwise wait for the user to press a key. 
+        Default to True.
+    """
+    cython_skip_pause(value)
+
+
+def skip_msg_box(value: bool = True):
+    """
+    Skip the display af a dialog box in the Graphical User Interface.
+
+    Parameters
+    ----------
+    value: bool
+        skip the display of the message dialog box if True. 
+        Default to True.
+    """
+    cython_skip_msg_box(value)
+
+
 def suppress_msgs():
     """
     Suppress the output during an IODE session
     """
-    cython_suppress_msgs()
+    warnings.warn("The function 'suppress_msgs()' is deprecated. "
+                  "Use 'skip_message(True)' instead.", DeprecationWarning)
+    skip_message(True)
 
 
 def enable_msgs():
     """
     Reset the normal output mechanism during an IODE session
     """
-    cython_enable_msgs()
+    warnings.warn("The function 'enable_msgs()' is deprecated. " 
+                  "Use 'skip_message(False)' instead.", DeprecationWarning)
+    skip_message(False)
 
 
 def split_list(list_txt: str):
