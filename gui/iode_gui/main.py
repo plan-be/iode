@@ -47,11 +47,11 @@ from qtpy.QtGui import QPixmap
 from typing import Union, List, Optional
 from pathlib import Path
 
+from iode.super import backup_super_functions, restore_super_functions
+
 from iode_gui import GUI_RESOURCES_DIR
 from iode_gui.utils import ORGANIZATION_NAME, Context
 from iode_gui.main_window import MainWindow
-from iode_gui.super import gui_assign_super
-
 
 _iode_databases_names = {'comments', 'equations', 'identities', 'lists', 
                          'scalars', 'tables', 'variables'}
@@ -156,7 +156,12 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
 
     Context.set_called_from_python_script(called_from_python_script)
     main_window = MainWindow(None, project_dir, files_to_load, vars_to_import)
+
+    backup_super_funcs = backup_super_functions()
+
+    from iode_gui.super import gui_assign_super
     gui_assign_super(main_window)
+
     main_window.show()
     splash.finish(main_window)
     
@@ -168,6 +173,8 @@ def open_application(project_dir: Union[str, Path]=None, files_to_load: List[Uni
         QMessageBox.critical(None, f"{type(e).__name__}", 
                             f"An error occurred:\n\n{error_message}")
         exit_code = 1
+    finally:
+        restore_super_functions(backup_super_funcs)
 
     # NOTE: pull modified or reassigned variables from the IPython kernel back to 
     #       the caller frame
