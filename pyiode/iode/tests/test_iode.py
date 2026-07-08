@@ -1692,13 +1692,38 @@ def test_super(capsys):
     commands += "$show No it's not\n"
     commands += "$label yes\n"
     commands += "$show Yes it is"
-    
+
     execute_command(commands)
     captured = capsys.readouterr()
     msg =  "MESSAGE: [1] - $ask yes Is it true?\n"
     msg += "CONFIRM: Is it true?\n"
     msg += "MESSAGE: [4] - $show Yes it is\n"
     msg += "MESSAGE: Yes it is\n"
+    assert captured.out == msg
+
+    # === ViewTable ===
+    @register_super_function('ViewTable')
+    def ViewTable_super_test(table_name: str, generalized_sample: str, nb_decimals: int) -> int:
+        if table_name not in tables:
+            warnings.warn("WARNING", "Could not compute the table '" + table_name + 
+                          "' with sample '" + generalized_sample + "'")
+            return 1
+        
+        table = tables[table_name]
+        computed_table = table.compute(generalized_sample, nb_decimals=nb_decimals)
+        print(f"Table '{table_name}' computed successfully")
+        for row in computed_table.lines:
+            print(row)
+        return 0
+
+    execute_command("$ViewTbl (2010;2010/2009):5 C8_1")
+    captured = capsys.readouterr()
+    msg = "MESSAGE: [1] - $ViewTbl (2010;2010/2009):5 C8_1\n"
+    msg += "Table 'C8_1' computed successfully\n"
+    msg += "Output potentiel\n"
+    msg += "Stock de capital\n"
+    msg += "Intensité de capital\n"
+    msg += "Productivité totale des facteurs\n"
     assert captured.out == msg
 
     restore_super_functions(backup_super_funcs)
