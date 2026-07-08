@@ -223,7 +223,7 @@ cdef int c_ViewTable_super(CTable* tbl, char* smpl, char* c_name):
     generalized_sample: str = b_generalized_sample.decode()
     nb_decimals: int = 6
 
-    table_found: bool = contain_table(name)
+    table_found: bool = contain_table(s_name)
     if not table_found:
         # temporary add the passed IODE table to the global database of tables
         success = add_table(s_name, tbl)

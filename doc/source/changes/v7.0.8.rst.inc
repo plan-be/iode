@@ -35,6 +35,9 @@ Fixed Bugs
 - GUI: fixed insert new IODE tables through the "Add Tables" button 
   (closes issue:`1251`)
 
+- GUI: fixed computing and displaying an IODE table when running `$ViewTable` from 
+  an IODE report (closes :issue:`1231`)
+
 Miscellaneous 
 -------------
 
