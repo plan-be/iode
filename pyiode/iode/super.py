@@ -1,6 +1,11 @@
 import sys
 import warnings
 from iode.iode_cython import register_super_function
+from iode.iode_cython import backup_super_functions
+from iode.iode_cython import restore_super_functions
+
+
+__all__ = []
 
 
 @register_super_function('warning')

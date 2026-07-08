@@ -1,7 +1,7 @@
 import sys
 from iode import (IodeType, comments, equations, identities, lists, scalars, 
 				  tables, variables)
-from iode.util import register_super_function
+from iode.super import register_super_function
 
 from qtpy.QtWidgets import QMainWindow, QMessageBox
 
