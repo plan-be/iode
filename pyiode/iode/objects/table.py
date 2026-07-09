@@ -855,6 +855,10 @@ class Table:
         Whether or not to add a 'DATE' line to the table.
         This line contains the date when the table has been computed.
         Defaults to False.
+    search_comment : bool, optional
+        Whether or not to search for the comment associated with a variable in the IODE comments.
+        This search is done to set the title of each row of the table.
+        Defaults to True.
 
     Returns
     -------
@@ -1023,7 +1027,8 @@ class Table:
     <BLANKLINE>
     """
     def __init__(self, nb_columns: int=2, table_title: str='', lecs_or_vars: Union[str, List[str]]=None, 
-                 lines_titles: List[str]=None, mode: bool=False, files: bool=False, date: bool=False) -> Self:
+                 lines_titles: List[str]=None, mode: bool=False, files: bool=False, date: bool=False, 
+                 search_comment: bool=True) -> Self:
         if nb_columns < 1:
             raise ValueError(f"'nb_columns': Expected value greater than 0. Got value '{nb_columns}'.")
 
@@ -1053,7 +1058,8 @@ class Table:
                 raise ValueError(f"'lecs_or_vars' and 'lines_titles': The list of LEC expressions (length={len(lecs)}) " 
                                  f"and the list of line titles (length={len(lines_titles)}) must have the same length")
             
-        self._cy_table = CythonTable(nb_columns, table_title, lecs_or_vars, lines_titles, mode, files, date)
+        self._cy_table = CythonTable(nb_columns, table_title, lecs_or_vars, lines_titles, 
+                                     mode, files, date, search_comment)
 
     @classmethod
     def from_cython_obj(cls, obj: CythonTable) -> Self:

@@ -200,7 +200,8 @@ cdef class Table:
         self.c_table = NULL
 
     def __init__(self, nb_columns: int, table_title: str, lecs_or_vars: Union[None, List[str]], 
-                 lines_titles: Union[None, List[str]], mode: bool, files: bool, date: bool) -> Table:
+                 lines_titles: Union[None, List[str]], mode: bool, files: bool, date: bool, 
+                 search_comment: bool) -> Table:
         cdef vector[string] cpp_variables = []
         cdef vector[string] cpp_lines_titles = []
         cdef vector[string] cpp_lecs = []
@@ -209,12 +210,13 @@ cdef class Table:
             variables = lecs_or_vars
             if isinstance(variables, str):
                 self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), 
-                                                   <string>variables.encode(), <bint>mode, <bint>files, <bint>date)
+                                                   <string>variables.encode(), <bint>mode, <bint>files, 
+                                                   <bint>date, <bint>search_comment)
             else:
                 for variable in variables:
                     cpp_variables.push_back(variable.encode())
                 self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_variables, 
-                                                   <bint>mode, <bint>files, <bint>date)
+                                                   <bint>mode, <bint>files, <bint>date, <bint>search_comment)
         else:            
             for line_title in lines_titles:
                 cpp_lines_titles.push_back(line_title.encode())
@@ -224,7 +226,7 @@ cdef class Table:
                 cpp_lecs.push_back(lec.encode())
 
             self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_lines_titles, 
-                                               cpp_lecs, <bint>mode, <bint>files, <bint>date)
+                                               cpp_lecs, <bint>mode, <bint>files, <bint>date, <bint>search_comment)
         
         self.c_table_name = b''
         self.c_table = self.tbl_ptr.get()
