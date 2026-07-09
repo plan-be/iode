@@ -296,13 +296,12 @@ int RP_message(char* arg, int unused)
 
 
 // $msg text
-int RP_message_and_pause(char* arg, int unused)            
+int RP_information(char* arg, int unused)            
 {
     if(arg == NULL || arg[0] == 0) return 0; /* JMP 11-07-96 */
 
     if(strlen(arg) > 512) arg[512] = 0;
-    kmsg("%s", arg); 
-    kpause();
+    kinformation("%s", arg); 
     return 0;
 }
 

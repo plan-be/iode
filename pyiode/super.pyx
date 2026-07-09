@@ -8,11 +8,10 @@ from pyiode.objects.table cimport CTable
 cdef extern from "super.h":
     cdef void c_kwarning_super(const char* msg) noexcept
     cdef void c_kmsg_super(const char* msg) noexcept
+    cdef void c_kinformation_super(const char* msg) noexcept
     cdef int c_kconfirm_super(const char* msg) noexcept
     cdef void c_kpanic_super() except *
     cdef void c_kpause_super() noexcept
-    cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
-                             const unsigned char** buts) noexcept
     cdef bint contain_table(string& name) except +
     cdef bint add_table(string& name, CTable* value) except +
     cdef void remove_table(string& name) except +
@@ -55,7 +54,7 @@ cdef extern from "super.h":
 __registry_funcs = {}
 
 # Define a set of allowed keys
-allowed_keys = {'error', 'warning', 'message', 'confirm', 'panic', 'pause', 'msgbox',
+allowed_keys = {'error', 'warning', 'message', 'confirm', 'panic', 'pause', 'information',
                 'PrintObjDef', 'ViewPrintGr', 'ViewPrintTbl', 'ViewByTbl', 
                 'DataSearch', 'DataDuplicate', 'DataList', 'DataCompare', 
                 'DataCalcLst', 'DataListSort', 'DataEditGraph', 'DataScan', 
@@ -102,6 +101,11 @@ cdef void c_kmsg_super(const char* msg) noexcept:
     cdef bytes b_msg = bytes(msg[:length])
     __registry_funcs['message'](b_msg.decode('cp850'))
 
+cdef void c_kinformation_super(const char* msg) noexcept:
+    cdef size_t length = strlen(msg)
+    cdef bytes b_msg = bytes(msg[:length])
+    __registry_funcs['information'](b_msg.decode('cp850'))
+
 cdef int c_kconfirm_super(const char* msg) noexcept:
     cdef size_t length = strlen(msg)
     cdef bytes b_msg = bytes(msg[:length])
@@ -113,14 +117,6 @@ cdef void c_kpanic_super():
 
 cdef void c_kpause_super() noexcept:
     __registry_funcs['pause']()
-
-cdef int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, 
-                         const unsigned char** buts) noexcept:
-    cdef size_t length_title = strlen(<char*>title)
-    cdef size_t length_msg = strlen(<char*>msg)
-    cdef bytes b_title = bytes(title[:length_title])
-    cdef bytes b_msg = bytes(msg[:length_msg])
-    return __registry_funcs['msgbox'](b_title.decode('cp850'), b_msg.decode('cp850'))
 
 cdef int c_PrintObjDef_super(char* arg, int unused):
     return __registry_funcs['PrintObjDef']()

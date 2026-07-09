@@ -5,7 +5,7 @@ from pyiode.tests.tests cimport kmsg
 # from pyiode.tests.tests cimport kpanic
 from pyiode.tests.tests cimport kconfirm
 from pyiode.tests.tests cimport kpause
-from pyiode.tests.tests cimport kmsgbox
+from pyiode.tests.tests cimport kinformation
 
 
 def iode_error(message: str):
@@ -27,5 +27,5 @@ def iode_panic():
 def iode_pause():
     kpause()
 
-def iode_msgbox(title: str, message: str) -> int:
-    return kmsgbox(title.encode('utf-8'), message.encode('utf-8'), NULL)
+def iode_information(message: str):
+    kinformation(message.encode('utf-8'))

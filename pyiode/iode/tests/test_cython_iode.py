@@ -58,7 +58,7 @@ def test_iode_print_preferences():
 
 def test_iode_errors_warnings_messages_from_C_API(capsys):
     from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm, 
-                                  iode_pause, iode_msgbox)
+                                  iode_pause, iode_information)
 
     with pytest.raises(RuntimeError) as excinfo:
         iode_error(message='test error')
@@ -78,6 +78,8 @@ def test_iode_errors_warnings_messages_from_C_API(capsys):
     # Do not call iode_kpause since it will pause the Python interpreter
     # iode_pause()
 
-    iode_msgbox('MSG BOX', 'test msgbox')
+    iode_information('test information')
     captured = capsys.readouterr()
-    assert captured.out == "MSG BOX: test msgbox\n"
+    msg = "test information\n"
+    msg += "Press Enter to continue..."
+    assert captured.out == msg

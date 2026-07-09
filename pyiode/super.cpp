@@ -17,13 +17,13 @@ int error_as_cpp_exception(const int level, const char* msg)
 
 void python_assign_super()
 {
-	kerror_super   = error_as_cpp_exception;
-    kwarning_super = c_kwarning_super;
-    kmsg_super     = c_kmsg_super;
-    kconfirm_super = c_kconfirm_super;
-    kpanic_super   = c_kpanic_super;
-	kpause_super   = c_kpause_super;
-	kmsgbox_super  = c_kmsgbox_super;
+	kerror_super        = error_as_cpp_exception;
+    kwarning_super      = c_kwarning_super;
+    kmsg_super          = c_kmsg_super;
+    kconfirm_super      = c_kconfirm_super;
+    kpanic_super        = c_kpanic_super;
+	kpause_super        = c_kpause_super;
+	kinformation_super  = c_kinformation_super;
 
 	SB_PrintObjDef_super    = c_PrintObjDef_super;
 	SB_ViewPrintGr_super    = c_ViewPrintGr_super;

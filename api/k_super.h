@@ -5,7 +5,7 @@
 #include "api/time/sample.h"
 
 
-inline bool    MSG_DISABLED = false;
+inline bool     MSG_DISABLED = false;
 
 inline bool     KMSGBOX_CONTINUE = false;
 inline bool     KPAUSE_CONTINUE = false;
@@ -17,7 +17,7 @@ inline void    (*kmsg_super)(const char* fmt) = nullptr;
 inline int     (*kwprintf_super)(const char* msg) = nullptr;
 inline void    (*kpanic_super)() = nullptr;
 inline int     (*kconfirm_super)(const char* msg) = nullptr;
-inline int     (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts) = nullptr;
+inline void    (*kinformation_super)(const char* fmt) = nullptr;
 inline void    (*krecordkey_super)(const int ch) = nullptr;
 inline void    (*krecordtext_super)(const unsigned char* text) = nullptr;
 inline void    (*ksettitle_super)(void) = nullptr;
@@ -38,11 +38,11 @@ void    skip_msg_box(const bool value);
 int     kerror(const int level, const char* fmt, ...);
 void    kwarning(const char* fmt, ...);
 void    kpause();
+void    kinformation(const char* fmt, ...);
 void    kmsg(const char* fmt, ...);
 int     kwprintf(const char* msg, ...);
 void    kpanic(void);
 int     kconfirm(const char* fmt, ...);
-int     kmsgbox(const unsigned char *str, const unsigned char *v, const unsigned char **buts);
 void    krecordkey(const int key);
 void    krecordtext(const unsigned char* text);
 void    ksettitle(void);

@@ -17,7 +17,7 @@
  *     void kwarning(const char* fmt, ...)                      Displays a message and optionally asks the user to press ENTER before continuing.
  *     void kmsg(const char* fmt, ...)                          Displays a message.
  *     int kconfirm(char *fmt,...)                              Displays a message and optionally asks confirmation before continuing.
- *     int kmsgbox(const unsigned char *str,                    Displays a message box with optional buttons.
+ *     int kinformation(const unsigned char *str,                    Displays a message box with optional buttons.
  *                 const unsigned char *v, 
  *                 const unsigned char **buts)  
  *     void krecordkey(const int key)                           Records a key in the keyboard buffer. 
@@ -48,7 +48,7 @@
  *      int  (*kwprintf_super)(const char* msg);
  *      void (*kpanic_super)(void);
  *      int  (*kconfirm_super)(const char* msg);
- *      int  (*kmsgbox_super)(const unsigned char* str, const unsigned char* v, const unsigned char** buts);
+ *      void (*kinformation_super)(const char* msg);
  *      int   KMSGBOX_CONTINUE = 0;
  *      int   KPAUSE_CONTINUE = 0;
  *      void (*krecordkey_super)(const int ch);
@@ -139,7 +139,7 @@ int kerror(const int level, const char* fmt, ...)
 
 /**
  *  Displays the message "Press ENTER to continue" and then waits for the user to press ENTER.
- *  Sub of kmsgbox() and kwarning().
+ *  Sub of kinformation() and kwarning().
  *  
  *  The default behaviour is :
  *      - if the global int KPAUSE_CONTINUE is not null, does not wait the user to press ENTER after having printed the message.
@@ -285,33 +285,37 @@ int kconfirm(const char *fmt,...)
 
 
 /**
- *  Displays a message box with optional buttons. 
+ *  Similar to kpause but print a message before waiting for the user to press ENTER. 
  *  
- *  The default behaviour is :
- *      - if the global int KMSGBOX_CONTINUE is not null, return(1) without waiting for the user to press ENTER 
- *      - if KMSGBOX_CONTINUE is null, calls kpause() (i.e. waits for the user).
- *    
- *  If the function pointer kmsgbox_super is not null, it is called instead.
+ *  If the function pointer kinformation_super is not null, it is called instead.
  *  
- *  @param [in] str  char*  title of the message box (GUI version only)
- *  @param [in] v    char*  text of the message
- *  @param [in] buts char** table of buttons (GUI version only)       
- *  @return          int    1 or returned value of kmsgbox_super()
- *  
+ *  @param [in] msg  char*  text of the message
  */
-int kmsgbox(const unsigned char* str, const unsigned char* v, const unsigned char** buts)
+void kinformation(const char* fmt, ...)
 {
-    if(kmsgbox_super != 0) 
-        return((*kmsgbox_super)(str, v, buts));
-    else 
-    {
-        printf("%s\n", v);
+    char    buf[10240];
+    va_list myargs;
 
-        if(!KMSGBOX_CONTINUE) 
-            kpause();
-        
-        return 1;
-    }    
+    if(MSG_DISABLED) 
+        return;
+
+    va_start(myargs, fmt);
+#ifdef _MSC_VER   
+    vsnprintf_s(buf, sizeof(buf) - 1, _TRUNCATE, fmt, myargs);
+#else
+    vsnprintf_s(buf, sizeof(buf) - 1, fmt, myargs);
+#endif    
+    va_end(myargs);
+    if(kinformation_super != 0) 
+        (*kinformation_super)(buf);
+    else
+    {
+        printf("%s\n", buf);
+
+        int ch = 0;
+        while(ch != '\n') 
+            ch = getchar();
+    } 
 }
 
 

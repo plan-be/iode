@@ -229,7 +229,7 @@ Functions used in any context of IODE (GUI or not\-GUI).
 |`void kmsg(char* fmt, ...)`|Displays a message.|
 |`void skip_message(int IsOn)`|Suppresses or restores the message output by replacing kmsg\_super()|
 |`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
-|`int kmsgbox(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
+|`int kinformation(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
 |`void krecordkey(int key)`|Records a key in the keyboard buffer.|
 |`int Wprintf(char* fmt, ...)`|Displays a message.|
 |`int SCR_panic()`|Exits the program (normally on a "memory full" event).|
@@ -259,7 +259,7 @@ Functions used only in a GUI context.
 |`int (*kwprintf_super)(char* msg);`|
 |`void (*kpanic_super)(void);`|
 |`int (*kconfirm_super)(char* msg);`|
-|`int (*kmsgbox_super)(unsigned char *str, unsigned char *v, unsigned char **buts);`|
+|`int (*kinformation_super)(const char* msg);`|
 |`int KMSGBOX_CONTINUE = 0;`|
 |`void (*krecordkey_super)(int ch);`|
 |`void (*ksettitle_super)(void);`|
