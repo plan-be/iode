@@ -67,7 +67,8 @@ public:
 	}
 
 protected:
-	void compare_files(const std::string& filepath1, const std::string& filepath2)
+	void compare_files(const std::string& filepath1, const std::string& filepath2, 
+		std::set<int> ignore_lines = std::set<int>())
 	{	
 		std::string error_msg;
 
@@ -79,11 +80,11 @@ protected:
 			throw std::runtime_error("The file " + filepath2 + " does not exist");
 
 		// open the files
-	    std::ifstream file1(filepath1);
+		std::ifstream file1(filepath1);
 		if(!file1.is_open())
 			throw std::runtime_error("Could not open the file " + filepath1);
 
-	    std::ifstream file2(filepath2);
+		std::ifstream file2(filepath2);
 		if(!file2.is_open())
 			throw std::runtime_error("Could not open the file " + filepath2);
 
@@ -145,6 +146,18 @@ protected:
 		while (std::getline(smallest_file, line))
 		{
 			std::getline(longest_file, line2);
+
+			if(ignore_lines.contains(pos))
+			{
+				ignore_lines.erase(pos);
+				std::cout << "Ignoring line (" << pos << "):" << std::endl;
+				std::cout << "file 1: " << line << std::endl;
+				std::cout << "file 2: " << line2 << std::endl;
+				std::cout << std::endl;
+				pos++;
+				continue;
+			}
+
 			if(line != line2)
 			{
 				is_different = true;
@@ -204,6 +217,7 @@ protected:
 		error_msg += "while the file " + filename2 + " has " + std::to_string(nb_lines_file2) + " lines";
 		EXPECT_EQ(nb_lines_file1, nb_lines_file2) << error_msg;
 	}
+
 };
 
 
