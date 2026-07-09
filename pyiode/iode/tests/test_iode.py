@@ -311,6 +311,24 @@ def test_execute_identity():
 # Tables
 # ------
 
+def test_table_search_comment():
+    comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
+    variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
+
+    # specify list of line titles and list of LEC expressions
+    lines_lecs = ["GOSG", "YSSG+COTRES", "RIDG"]
+    table = Table(nb_columns=2, table_title='search for comment ? YES', lecs_or_vars=lines_lecs, 
+                 lines_titles=lines_lecs, mode=False, files=False, date=False, search_comment=True)
+    assert str(table[4][0]) == '"' + comments["GOSG"] + '"'
+    assert str(table[5][0]) == '"YSSG+COTRES"'
+    assert str(table[6][0]) == '"' + comments["RIDG"] + '"'
+
+    table = Table(nb_columns=2, table_title='search for comment ? NO', lecs_or_vars=lines_lecs, 
+                 lines_titles=lines_lecs, mode=False, files=False, date=False, search_comment=False)
+    assert str(table[4][0]) == '"GOSG"'
+    assert str(table[5][0]) == '"YSSG+COTRES"'
+    assert str(table[6][0]) == '"RIDG"'
+
 def test_table_language():
     table = Table()
     # wrong value for languague
