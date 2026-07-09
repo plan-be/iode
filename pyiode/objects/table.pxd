@@ -83,9 +83,12 @@ cdef extern from "api/objs/tables.h":
         char chart_shadow
 
         # Constructor
-        CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, bint date) except +
-        CTable(int nb_columns, string& def_, vector[string]& titles, vector[string]& lecs, bint mode, bint files, bint date) except +
-        CTable(int nb_columns, string& def_, string& lecs, bint mode, bint files, bint date) except +
+        CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, 
+               bint date, bint search_comment) except +
+        CTable(int nb_columns, string& def_, vector[string]& titles, vector[string]& lecs, 
+               bint mode, bint files, bint date, bint search_comment) except +
+        CTable(int nb_columns, string& def_, string& lecs, bint mode, bint files, bint date, 
+               bint search_comment) except +
         # Copy constructor
         CTable(const CTable& table) except +
 
