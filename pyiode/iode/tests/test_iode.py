@@ -1744,6 +1744,16 @@ def test_super(capsys):
     msg += "Productivité totale des facteurs\n"
     assert captured.out == msg
 
+    execute_command("$ViewVar 2000:6 ACAF;ACAG;AOUC;ACAF+ACAG+AOUC")
+    captured = capsys.readouterr()
+    msg = "MESSAGE: [1] - $ViewVar 2000:6 ACAF;ACAG;AOUC;ACAF+ACAG+AOUC\n"
+    msg += "Table 'TABLE_OF_VARIABLES' computed successfully\n"
+    msg += "ACAF\n"
+    msg += "ACAG\n"
+    msg += "AOUC\n"
+    msg += "ACAF+ACAG+AOUC\n"
+    assert captured.out == msg
+
     restore_super_functions(backup_super_funcs)
 
 def test_deprecated_not_in_dir():
