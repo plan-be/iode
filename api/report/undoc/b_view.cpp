@@ -106,18 +106,19 @@ int B_ViewPrintVar(char* arg, int mode)
 
     int rc;
     int chunk_size = 50;
+    bool search_comment = false;
     for (size_t start = 0; start < vars.size(); start += chunk_size) 
     {
         auto end = std::min(start + chunk_size, vars.size());
         std::vector<std::string> chunks(vars.begin() + start, vars.begin() + end);
         if(mode == 0)
         {
-            Table tbl(2, "", chunks, chunks, false, false, false);
+            Table tbl(2, "", chunks, chunks, false, false, false, search_comment);
             rc = T_view_tbl(&tbl, (char*) sample.c_str(), "TABLE_OF_VARIABLES");
         }
         else 
         {
-            Table tbl(2, "", chunks, chunks, true, true, true);
+            Table tbl(2, "", chunks, chunks, true, true, true, search_comment);
             rc = T_print_tbl(&tbl, (char*) sample.c_str());
         }
 
