@@ -402,7 +402,7 @@ Table::Table(const int nb_columns): nb_columns(nb_columns)
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
-	bool mode, bool files, bool date): nb_columns(nb_columns)
+	bool mode, bool files, bool date, const bool search_comment): nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
 
@@ -424,7 +424,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        if(global_ws_cmt->contains(var))
+        if(search_comment && global_ws_cmt->contains(var))
         {
             comment = global_ws_cmt->get(var);
             line_name = trim(comment);
@@ -454,7 +454,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
-	const std::vector<std::string>& lecs, bool mode, bool files, bool date)
+	const std::vector<std::string>& lecs, bool mode, bool files, bool date, const bool search_comment)
     : nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
@@ -484,7 +484,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        if(global_ws_cmt->contains(line_name))
+        if(search_comment && global_ws_cmt->contains(line_name))
         {
             comment = global_ws_cmt->get(line_name);
             line_name = trim(comment);
@@ -514,7 +514,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
-	bool mode, bool files, bool date): nb_columns(nb_columns)
+	bool mode, bool files, bool date, const bool search_comment): nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
 
@@ -535,7 +535,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        if(global_ws_cmt->contains(lec))
+        if(search_comment && global_ws_cmt->contains(lec))
         {
             comment = global_ws_cmt->get(lec);
             line_name = trim(comment);
