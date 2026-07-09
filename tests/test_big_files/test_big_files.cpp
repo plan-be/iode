@@ -19,7 +19,6 @@ TEST(BigFilesTest, Tests_BIG_WS)
     std::chrono::duration<double> elapsed;
 
     skip_pause(true);
-    // suppress messages from kmsg()
     skip_message(true);
 
 	std::string current_file = __FILE__;
@@ -271,6 +270,5 @@ TEST(BigFilesTest, Tests_BIG_WS)
     }
 
 	skip_pause(false);
-	// restore messages from kmsg()
     skip_message(false);
 }
