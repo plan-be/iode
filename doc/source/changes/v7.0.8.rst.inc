@@ -30,13 +30,19 @@ Fixed Bugs
 - PYTHON: fixed calling `execute_command(f"$WsLoadXxx filepath")` not 
   changing the workspace at the Python level (closes :issue:`1230`)
 
+- GUI: fixed computing and displaying an IODE table when running `$ViewTable` from 
+  an IODE report (closes :issue:`1231`)
+
 - PYTHON: fixed IODE command $DataExistXxx returning always 1 (closes :issue:`1237`)
 
 - GUI: fixed insert new IODE tables through the "Add Tables" button 
-  (closes issue:`1251`)
+  (closes :issue:`1251`)
 
-- GUI: fixed computing and displaying an IODE table when running `$ViewTable` from 
-  an IODE report (closes :issue:`1231`)
+- GUI: fixed IODE commands $PrintVar printing the wrong line's titles 
+  (closes :issue:`1255`)
+
+- GUI: fixed IODE commands $ViewVar not displaying the correct names of 
+  passed variables (closes :issue:`1273`)
 
 Miscellaneous 
 -------------
