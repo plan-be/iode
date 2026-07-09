@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <set>
 #include <algorithm> 	// for std::min, std::max
 
 
@@ -83,7 +84,8 @@ public:
 	}
 
 protected:
-	void compare_files(const std::string& filepath1, const std::string& filepath2)
+	void compare_files(const std::string& filepath1, const std::string& filepath2, 
+		std::set<int> ignore_lines = std::set<int>())
 	{	
 		std::string error_msg;
 
@@ -161,6 +163,18 @@ protected:
 		while (std::getline(smallest_file, line))
 		{
 			std::getline(longest_file, line2);
+
+			if(ignore_lines.contains(pos))
+			{
+				ignore_lines.erase(pos);
+				std::cout << "Ignoring line (" << pos << "):" << std::endl;
+				std::cout << "file 1: " << line << std::endl;
+				std::cout << "file 2: " << line2 << std::endl;
+				std::cout << std::endl;
+				pos++;
+				continue;
+			}
+
 			if(line != line2)
 			{
 				is_different = true;
@@ -221,15 +235,16 @@ protected:
 		EXPECT_EQ(nb_lines_file1, nb_lines_file2) << error_msg;
 	}
 
-    void compare_files(char* filepath1, char* filepath2)
+    void compare_files(char* filepath1, char* filepath2, std::set<int> ignore_lines = std::set<int>())
     {
-        compare_files(std::string(filepath1), std::string(filepath2));
+        compare_files(std::string(filepath1), std::string(filepath2), ignore_lines);
     }
 
-    void compare_files(char* dir1, char* filepath1, char* dir2, char* filepath2)
+    void compare_files(char* dir1, char* filepath1, char* dir2, char* filepath2, 
+		std::set<int> ignore_lines = std::set<int>())
     {
         std::string fullpath1 = std::string(dir1) + std::string(filepath1);
         std::string fullpath2 = std::string(dir2) + std::string(filepath2);
-        compare_files(fullpath1, fullpath2);
+        compare_files(fullpath1, fullpath2, ignore_lines);
     }
 };
