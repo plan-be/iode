@@ -18,7 +18,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
     KDBVariablesPtr kdb_shallow_copy = nullptr;
     std::chrono::duration<double> elapsed;
 
-    KPAUSE_CONTINUE = 1;
+    skip_pause(true);
     // suppress messages from kmsg()
     skip_message(true);
 
@@ -270,6 +270,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::cout << "To run these tests, run the script tests/generate_big_vars_ws.py" << std::endl;
     }
 
+	skip_pause(false);
 	// restore messages from kmsg()
     skip_message(false);
 }
