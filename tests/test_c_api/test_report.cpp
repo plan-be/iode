@@ -195,3 +195,24 @@ TEST_F(ReportTest, Tests_Print_Tbl)
 
     skip_message(false);
 }
+
+TEST_F(ReportTest, Tests_Print_Tbl_Var)
+{
+    char cmd[1024];
+
+    std::cout << "Testing IODE commands $PrintTbl and $PrintVar" << std::endl;
+
+    // Execution of the report rep_fns.rep
+    RP_STDOUT = 1;      // Enable report to stdout for this test
+    sprintf(cmd,  "%s/rep_print_view_tbl_var.rep %s %s", report_test_dir, input_test_dir, output_test_dir);
+    int rc = B_ReportExec(cmd);
+    EXPECT_EQ(rc, 0);
+    
+    compare_files(output_test_dir, "/tbl_c8_1.csv", output_test_dir, "/tbl_c8_1.ref.csv");
+    
+    // skiping lines 10 and 11 because they contain the path to the file used to load the 
+    // Variables workspace and the date when the output file was generated, which can be 
+    // different from the reference output file 
+    std::set<int> ignore_lines = {10, 11};
+    compare_files(output_test_dir, "/tbl_vars.csv", output_test_dir, "/tbl_vars.ref.csv", ignore_lines);
+}
