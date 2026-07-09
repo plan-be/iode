@@ -467,8 +467,6 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    std::string lec;
-    std::string line_name;
     std::vector<std::string> v_lecs = expand_lecs(lecs);
     if(v_lecs.size() != titles.size())
     {
@@ -477,25 +475,30 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         throw std::invalid_argument(error_msg);
     }
 
-    std::string comment;
+    Comment comment;
+    std::string lec;
+    std::string title;
+    std::string line_name;
     for(int i = 0; i < (int) titles.size(); i++)
     {
+        title = titles[i];
+        lec = v_lecs[i];
+
         append_line(TABLE_LINE_CELL);
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        if(search_comment && global_ws_cmt->contains(line_name))
+        if(search_comment && global_ws_cmt->contains(title))
         {
-            comment = global_ws_cmt->get(line_name);
+            comment = global_ws_cmt->get(title);
             line_name = trim(comment);
         }
         else
-            line_name = titles[i];
+            line_name = title;
 
         line.cells[0].set_text(line_name);
 
         // ---- LEC expression (right column) ----
-        lec = v_lecs[i];
         for(int j = 1; j < nb_columns; j++)
             line.cells[j].set_lec(lec);
     }
