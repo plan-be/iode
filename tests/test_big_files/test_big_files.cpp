@@ -20,7 +20,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
 
     KPAUSE_CONTINUE = 1;
     // suppress messages from kmsg()
-    skip_message(false);
+    skip_message(true);
 
 	std::string current_file = __FILE__;
 	std::filesystem::path cwd(current_file);
@@ -269,4 +269,7 @@ TEST(BigFilesTest, Tests_BIG_WS)
         std::cout << "File big.av not found. Skipping big files tests." << std::endl;
         std::cout << "To run these tests, run the script tests/generate_big_vars_ws.py" << std::endl;
     }
+
+	// restore messages from kmsg()
+    skip_message(false);
 }
