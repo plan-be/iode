@@ -191,6 +191,54 @@ TEST_F(TablesTest, AddGetTable)
     global_ws_tbl->remove(name);
 }
 
+TEST_F(TablesTest, ConstructorSearchComment)
+{
+    std::string title;
+    bool search_comment;
+    std::string line_title;
+
+    global_ws_cmt->load(str_input_test_dir + "fun.ac");
+    global_ws_var->load(str_input_test_dir + "fun.av");
+
+    int nb_columns = 2;
+    std::vector<std::string> v_lecs = {"GOSG", "YSSG+COTRES", "RIDG"};
+    bool mode = true;
+    bool files = true;
+    bool date = true;
+
+    // test with search_comment = true (default value)
+    search_comment = true;
+    title = "search for comment ? YES";
+    Table tbl(nb_columns, title, v_lecs, mode, files, date, search_comment);
+
+    for(int i = 0; i < v_lecs.size(); i++)
+    {
+        std::string lec = v_lecs[i];
+        TableLine& line = tbl.lines[i + 4]; // +4 to skip title and separator lines
+        EXPECT_EQ(line.get_type(), TABLE_LINE_CELL);
+        line_title = line.cells[0].get_content();
+        if(global_ws_cmt->contains(lec))
+            ASSERT_EQ(line_title, global_ws_cmt->get(lec));
+        else
+            ASSERT_EQ(line_title, lec);
+    }
+
+    // test with search_comment = false 
+    // (IODE commands $PrintVar and $ViewVar -> B_ViewPrintVar())
+    search_comment = false;
+    title = "search for comment ? NO";
+    Table tbl_as_it(nb_columns, title, v_lecs, mode, files, date, search_comment);
+
+    for(int i = 0; i < v_lecs.size(); i++)
+    {
+        std::string lec = v_lecs[i];
+        TableLine& line = tbl_as_it.lines[i + 4]; // +4 to skip title and separator lines
+        EXPECT_EQ(line.get_type(), TABLE_LINE_CELL);
+        line_title = line.cells[0].get_content();
+        ASSERT_EQ(line_title, lec);
+    }
+}
+
 TEST_F(TablesTest, CopyConstructor)
 {
     int nb_columns = tbl_ptr->nb_columns;
