@@ -1694,8 +1694,8 @@ def test_super(capsys):
     execute_command("$msg This is a test message")
     captured = capsys.readouterr()
     msg = "MESSAGE: [1] - $msg This is a test message\n"
-    msg += "MESSAGE: This is a test message\n"
-    msg += "PAUSE: Press Enter to continue...\n"
+    msg += "This is a test message\n"
+    msg += "Press Enter to continue..."
     assert captured.out == msg
 
     skip_pause(True)

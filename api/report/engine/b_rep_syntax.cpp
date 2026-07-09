@@ -52,7 +52,7 @@ extern std::map<std::string, BFNS> B_fns =
     {"show",                   {"show",                     RP_message,             RP_message,         0,        0}},
     {"silent",                 {"silent",                   RP_silent,              RP_silent,          0,        0}},
 //  {"showoff                  {"showoff",                  RP_message_off,         RP_message_off,     0,        0}},
-    {"msg",                    {"msg",                      RP_message_and_pause,   RP_message_and_pause, 0,        0}},
+    {"msg",                    {"msg",                      RP_information,         RP_information,     0,        0}},
     {"beep",                   {"beep",                     RP_beep,                RP_beep,            0,        0}},
     {"system",                 {"system",                   RP_system,              RP_system,          0,        0}},
     {"chdir",                  {"chdir",                    RP_chdir,               RP_chdir,           0,        0}},

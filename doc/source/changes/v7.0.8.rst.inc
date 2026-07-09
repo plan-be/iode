@@ -44,6 +44,9 @@ Fixed Bugs
 - GUI: fixed IODE commands $ViewVar not displaying the correct names of 
   passed variables (closes :issue:`1273`)
 
+- GUI: fixed IODE command $msg not displaying the message in the open box dialog 
+  (closes :issue:`1277`)
+
 Miscellaneous 
 -------------
 

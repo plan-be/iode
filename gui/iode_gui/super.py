@@ -75,10 +75,9 @@ def panic_super_GUI():
 def pause_super_GUI():
 	QMessageBox.information(None, "PAUSE", "Click OK to continue")
 
-@register_super_function('msgbox')
-def msgbox_super_GUI(title: str, msg: str) -> int:
-	QMessageBox.information(None, title, msg)
-	return 1
+@register_super_function('information')
+def information_super_GUI(msg: str):
+	QMessageBox.information(None, "MESSAGE", msg)
 
 # ========================================================================= #
 # See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c #

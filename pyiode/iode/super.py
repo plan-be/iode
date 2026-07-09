@@ -36,10 +36,10 @@ def py_panic(msg: str):
 def py_pause():
     input("Press Enter to continue...")
 
-@register_super_function('msgbox')
-def py_kmsgbox(title: str, msg: str) -> int:
-    print(f'{title}: {msg}')
-    return 1
+@register_super_function('information')
+def py_kinformation(msg: str):
+    print(msg)
+    input("Press Enter to continue...")
 
 @register_super_function('PrintObjDef')
 def PrintObjDef_super() -> int:

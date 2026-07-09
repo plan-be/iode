@@ -1,11 +1,11 @@
 #include "api/all.h"
 
 void c_kwarning_super(const char* msg);
+void c_kinformation_super(const char* msg);
 void c_kmsg_super(const char* msg);
 int c_kconfirm_super(const char* msg);
 void c_kpanic_super();
 void c_kpause_super();
-int c_kmsgbox_super(const unsigned char* title, const unsigned char* msg, const unsigned char** buts);
 
 // ========================================================================= //
 // See C API -> report/engine/b_rep_super.c and report/engine/b_rep_syntax.c //
