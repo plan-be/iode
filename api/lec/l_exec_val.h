@@ -79,7 +79,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(const int t, std::deque<double>& stack)
+    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
     {
         double value = (L_VAL_FN[pos])(t);
         stack.push_back(value);

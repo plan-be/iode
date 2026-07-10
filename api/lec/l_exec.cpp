@@ -99,7 +99,7 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  * 
  *      double*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
  *      double   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
- *      SMPL*       L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
+ *      SMPL*    L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
  *      - the first byte (type) is an identifier (+, ln, VAR, ...)
@@ -114,12 +114,11 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  */
 double L_exec_sub(unsigned char* expr, int lg, int t)
 {
-    int j;
     int type;
     int previous_j;
     int pos_stack = 0;  
     std::deque<double> stack;
-    for(j = 0; j < lg ;) 
+    for(int j = 0; j < lg ;) 
     {
         type = expr[j];
 
@@ -128,21 +127,21 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
             // extract LEC long constant from the buffer -> update j
             LEC_CONST_LONG al_lconst((unsigned char*) expr, j);
             // add the constant to the stack
-            al_lconst.add_to_stack(stack);
+            al_lconst.add_to_stack(stack, t);
         }
         else if(type == L_DCONST)
         {
             // extract LEC double constant from the buffer -> update j
             LEC_CONST_REAL al_dconst((unsigned char*) expr, j);
             // add the constant to the stack
-            al_dconst.add_to_stack(stack); 
+            al_dconst.add_to_stack(stack, t); 
         }
         else if(type == L_COEF)
         {
             // extract LEC coefficient from the buffer -> update j
             LEC_COEF al_coef((unsigned char*) expr, j);
             // add the coefficient value to the stack
-            bool ok = al_coef.add_to_stack(stack);
+            bool ok = al_coef.add_to_stack(stack, t);
             if(!ok) 
             {
                 std::string error_msg = get_l_exec_sub_error_message(expr, t);
@@ -155,7 +154,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
             // extract LEC Period from the buffer -> update j
             LEC_PERIOD al_period((unsigned char*) expr, j);
             // add the period position to the stack
-            al_period.add_to_stack(stack);
+            al_period.add_to_stack(stack, t);
         }
         // key = variable or variable[period] 
         else if(type == L_VAR || type == L_VART) 
@@ -176,17 +175,19 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
 
         else if(is_fn(type)) 
         {
+            previous_j = j;
             // extract LEC function from the buffer -> update j
             LEC_FN al_fn((unsigned char*) expr, j);
             // execute the function on the stack
-            al_fn.execute(stack);
+            al_fn.execute(expr, previous_j, t, stack);
         }
         else if(is_op(type))
         {
+            previous_j = j;
             // extract LEC operator from the buffer -> update j
             LEC_OP al_op((unsigned char*) expr, j);
             // execute the operator on the stack
-            al_op.execute(stack);
+            al_op.execute(expr, previous_j, t, stack);
         }
         else if(is_tfn(type)) 
         {
@@ -198,10 +199,11 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         }
         else if(is_val(type)) 
         {
+            previous_j = j;
             // extract LEC value from the buffer -> update j
             LEC_VAL_FN al_val((unsigned char*) expr, j);
             // execute the value function on the stack
-            al_val.execute(t, stack);
+            al_val.execute(expr, previous_j, t, stack);
         }
         else if(is_mtfn(type)) 
         {
@@ -221,7 +223,6 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
 
     return stack.back();
 }
-
 
 /**
  *  Execution of a compiled and linked CLEC expression.
