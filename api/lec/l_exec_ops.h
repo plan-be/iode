@@ -105,7 +105,7 @@ public:
     }
 
     // executes the operator with the given arguments on the stack
-    void execute(std::deque<double>& stack)
+    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
     {
         double b = stack.back();
         stack.pop_back();

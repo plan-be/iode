@@ -150,7 +150,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack)
+    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
     {
         int from = -1, to = -1;
         // NOTE: for time functions:

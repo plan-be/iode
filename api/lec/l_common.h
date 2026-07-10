@@ -13,6 +13,13 @@
 #include <deque>        // for the execution stack
 
 
+enum GenericLecType
+{
+    GEN_LEC_OTHER,
+    GEN_LEC_VALUE,
+    GEN_LEC_EXECUTABLE
+};
+
 constexpr int L_SPECIAL = 10;
 
 /* LEC:SPECIAL */
@@ -89,10 +96,12 @@ void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg);
 struct LEC_ABSTRACT
 {
     int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)
+    GenericLecType generic_type;      
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
 
 protected:
-    LEC_ABSTRACT(const int type) : type(type) {}
+    LEC_ABSTRACT(const int type, const GenericLecType generic_type) 
+        : type(type), generic_type(generic_type) {}
 
 public:
     // length in bytes of the executable representation of the atomic lec
@@ -108,18 +117,26 @@ public:
     }
 };
 
-struct LEC_CONST_REAL: public LEC_ABSTRACT
+struct LEC_VALUE: public LEC_ABSTRACT
+{
+    LEC_VALUE(const int type) : LEC_ABSTRACT(type, GEN_LEC_VALUE) {}
+    LEC_VALUE(const LEC_VALUE& other) = default;
+
+    virtual bool add_to_stack(std::deque<double>& stack, const int t) const = 0;
+};
+
+struct LEC_CONST_REAL: public LEC_VALUE
 {
     double value;
 
 public:
-    LEC_CONST_REAL(const double value) : LEC_ABSTRACT(L_DCONST), value(value) 
+    LEC_CONST_REAL(const double value) : LEC_VALUE(L_DCONST), value(value) 
     {
         representation = std::to_string(value);
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_CONST_REAL(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_DCONST)
+    LEC_CONST_REAL(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_DCONST)
     {
         // the first byte is the type, we can skip it since we already know it's L_DCONST
         pos_buffer++;
@@ -128,9 +145,10 @@ public:
         representation = std::to_string(value);
     }
 
-    void add_to_stack(std::deque<double>& stack) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
         stack.push_back(value);
+        return true;
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -146,18 +164,18 @@ public:
     }
 };
 
-struct LEC_CONST_LONG: public LEC_ABSTRACT
+struct LEC_CONST_LONG: public LEC_VALUE
 { 
     long value;
 
 public:
-    LEC_CONST_LONG(const long value) : LEC_ABSTRACT(L_LCONST), value(value) 
+    LEC_CONST_LONG(const long value) : LEC_VALUE(L_LCONST), value(value) 
     {
         representation = std::to_string(value);
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_CONST_LONG(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_LCONST)
+    LEC_CONST_LONG(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_LCONST)
     {
         // the first byte is the type, we can skip it since we already know it's L_LCONST
         pos_buffer++;
@@ -166,9 +184,10 @@ public:
         representation = std::to_string(value);
     }
 
-    void add_to_stack(std::deque<double>& stack) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
         stack.push_back(static_cast<double>(value));
+        return true;
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -184,18 +203,18 @@ public:
     }
 };
 
-struct LEC_COEF: public LEC_ABSTRACT
+struct LEC_COEF: public LEC_VALUE
 {
     int pos;          // position of the coefficient in V_EXEC_POS
 
 public:
-    LEC_COEF(const std::string& name, const int pos) : LEC_ABSTRACT(L_COEF), pos(pos) 
+    LEC_COEF(const std::string& name, const int pos) : LEC_VALUE(L_COEF), pos(pos) 
     {
         representation = name;
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_COEF(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_COEF)
+    LEC_COEF(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_COEF)
     {
         // the first byte is the type, we can skip it since we already know it's L_COEF
         pos_buffer++;
@@ -203,7 +222,7 @@ public:
         pos_buffer += sizeof(int);
     }
 
-    bool add_to_stack(std::deque<double>& stack) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
         double value = L_getscl(L_EXEC_DBS, V_EXEC_POS[pos]);
         if(!IODE_IS_A_NUMBER(value)) 
@@ -225,7 +244,7 @@ public:
     }
 };
 
-struct LEC_VAR: public LEC_ABSTRACT
+struct LEC_VAR: public LEC_VALUE
 {
     int pos;            // position of the variable in L_NAMES
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
@@ -235,7 +254,7 @@ struct LEC_VAR: public LEC_ABSTRACT
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const int pos, const short lag, const Period& per)
-        : LEC_ABSTRACT(type), pos(pos), lag(lag), ref(0), per(per) 
+        : LEC_VALUE(type), pos(pos), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -243,7 +262,7 @@ public:
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_VAR(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_VAR)
+    LEC_VAR(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_VAR)
     {
         type = (int) buffer[pos_buffer];
         pos_buffer++;
@@ -264,7 +283,7 @@ public:
             ref += per.difference(sample.start_period);
     }
 
-    bool add_to_stack(std::deque<double>& stack, const int t) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
         double* d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[pos]);
         if(!d_ptr) 
@@ -305,18 +324,19 @@ public:
 };
 
 // NOTE: pos is set in function L_link_sample_expr()
-struct LEC_PERIOD: public LEC_ABSTRACT
+struct LEC_PERIOD: public LEC_VALUE
 {
     Period period;
     short pos;
 
 public:
-    LEC_PERIOD(const Period& period, const short pos) : LEC_ABSTRACT(L_PERIOD), pos(pos), period(period) 
+    LEC_PERIOD(const Period& period, const short pos) 
+        : LEC_VALUE(L_PERIOD), pos(pos), period(period) 
     {
         representation = period.to_string();
     }
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_PERIOD(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_PERIOD)
+    LEC_PERIOD(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_PERIOD)
     {
         // the first byte is the type, we can skip it since we already know it's L_PERIOD
         pos_buffer++;
@@ -332,9 +352,10 @@ public:
         pos = period.difference(sample.start_period);
     }
 
-    void add_to_stack(std::deque<double>& stack) const
+    bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
         stack.push_back(static_cast<double>(pos));
+        return true;
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
@@ -355,7 +376,7 @@ public:
 struct LEC_OTHER: public LEC_ABSTRACT
 {
 public:
-    LEC_OTHER(const int type) : LEC_ABSTRACT(type)
+    LEC_OTHER(const int type) : LEC_ABSTRACT(type, GEN_LEC_OTHER)
     {
         switch(type)
         {
@@ -390,7 +411,8 @@ public:
     }
 
     // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_OTHER(const unsigned char* buffer, int& pos_buffer) : LEC_ABSTRACT(L_SPECIAL)
+    LEC_OTHER(const unsigned char* buffer, int& pos_buffer) 
+        : LEC_ABSTRACT(L_SPECIAL, GEN_LEC_OTHER)
     {
         type = (int) buffer[pos_buffer];
         pos_buffer++;
@@ -442,7 +464,10 @@ struct LEC_EXECUTABLE: public LEC_ABSTRACT
     std::string fn_name;    // name of the function (for debugging purposes)
 
 protected:
-    LEC_EXECUTABLE(const int type, const int nb_args) : LEC_ABSTRACT(type), nb_args(nb_args), pos(-1) {}
+    LEC_EXECUTABLE(const int type, const int nb_args) 
+        : LEC_ABSTRACT(type, GEN_LEC_EXECUTABLE), nb_args(nb_args), pos(-1) {}
+
+    virtual void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) = 0;
 };
 
 
