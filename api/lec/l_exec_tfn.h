@@ -100,6 +100,8 @@ public:
         fn_name = L_TFN_NAMES[pos];
     }
 
+    LEC_TFN(const LEC_TFN& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_TFN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_TFN, 0)
     {
@@ -112,6 +114,14 @@ public:
 
         pos = type - L_TFN;
         representation = L_TFN_NAMES[pos];
+    }
+
+    bool operator==(const LEC_TFN& other) const
+    {
+        if(!is_same_type(other))
+            return false;
+        
+        return this->len_args == other.len_args;
     }
 
     void link_sample_expr(KDBVariablesPtr dbv, unsigned char* buffer, int pos_buffer)

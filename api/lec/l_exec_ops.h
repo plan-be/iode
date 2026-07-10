@@ -90,6 +90,8 @@ public:
         fn_name = L_OPS_NAMES[pos];
     }
 
+    LEC_OP(const LEC_OP& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_OP(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_OP, 2)
     {
@@ -97,6 +99,11 @@ public:
         pos_buffer++;
         pos = type - L_OP;
         representation = L_OPS_NAMES[pos];
+    }
+
+    bool operator==(const LEC_OP& other) const
+    {
+        return is_same_type(other);
     }
 
     int get_length() const override 

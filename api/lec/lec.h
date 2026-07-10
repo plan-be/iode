@@ -32,6 +32,7 @@ struct CLEC
     // 'executable' LEC expression
     int len_expr = 0;
     unsigned char* expression = NULL;
+    std::vector<ATOMIC_LEC> v_expression;
 
     // list of pairs <scalar and variable name, positions in database>
     // NOTE: we don't use a std::map as we need to keep the order of the 
@@ -39,9 +40,11 @@ struct CLEC
     std::vector<std::pair<std::string, int>> objs;
 
 public:
-    CLEC(const std::string& lec, unsigned char* expr, int len) 
+    CLEC(const std::string& lec, std::vector<ATOMIC_LEC> v_expression, 
+        unsigned char* expr, int len) 
     {
         this->lec = lec;
+        this->v_expression = v_expression;
 
         len_expr = len;
 
@@ -60,6 +63,7 @@ public:
         this->duplicated_endo = other.duplicated_endo;
 
         this->lec = other.lec;
+        this->v_expression = other.v_expression;
 
         if(other.expression)
         {
@@ -79,6 +83,7 @@ public:
 
     ~CLEC() 
     { 
+        v_expression.clear();
         if(expression) 
             delete[] expression; 
     }
@@ -92,6 +97,7 @@ public:
         this->duplicated_endo = other.duplicated_endo;
 
         this->lec = other.lec;
+        this->v_expression = other.v_expression;
 
         if(other.expression)
         {
@@ -119,6 +125,15 @@ public:
     {
         if(this->duplicated_endo != other.duplicated_endo)
             return false;
+
+        if(this->v_expression.size() != other.v_expression.size())
+            return false;
+
+        for(size_t i = 0; i < this->v_expression.size(); ++i)
+        {
+            if(this->v_expression[i] != other.v_expression[i])
+                return false;
+        }
 
         if(this->len_expr != other.len_expr)
             return false;

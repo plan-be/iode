@@ -101,6 +101,8 @@ public:
         len_args = (short) (sizeof(short) * L_MIN_MTARGS[pos]);
     }
 
+    LEC_MTFN(const LEC_MTFN& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_MTFN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_MTFN, 0), nv_args(0)
     {
@@ -115,6 +117,20 @@ public:
 
         pos = type - L_MTFN;
         representation = L_MTFN_NAMES[pos];
+    }
+
+    bool operator==(const LEC_MTFN& other) const
+    {
+        if(!is_same_type(other))
+            return false;
+        
+        if(this->nv_args != other.nv_args)
+            return false;
+
+        if(this->len_args != other.len_args)
+            return false;
+
+        return true;
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override

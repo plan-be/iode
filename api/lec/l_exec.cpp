@@ -125,21 +125,21 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         if(type == L_LCONST)
         {
             // extract LEC long constant from the buffer -> update j
-            LEC_CONST_LONG al_lconst((unsigned char*) expr, j);
+            LEC_CONST_LONG al_lconst(expr, j);
             // add the constant to the stack
             al_lconst.add_to_stack(stack, t);
         }
         else if(type == L_DCONST)
         {
             // extract LEC double constant from the buffer -> update j
-            LEC_CONST_REAL al_dconst((unsigned char*) expr, j);
+            LEC_CONST_REAL al_dconst(expr, j);
             // add the constant to the stack
             al_dconst.add_to_stack(stack, t); 
         }
         else if(type == L_COEF)
         {
             // extract LEC coefficient from the buffer -> update j
-            LEC_COEF al_coef((unsigned char*) expr, j);
+            LEC_COEF al_coef(expr, j);
             // add the coefficient value to the stack
             bool ok = al_coef.add_to_stack(stack, t);
             if(!ok) 
@@ -152,7 +152,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         else if(type == L_PERIOD)
         {
             // extract LEC Period from the buffer -> update j
-            LEC_PERIOD al_period((unsigned char*) expr, j);
+            LEC_PERIOD al_period(expr, j);
             // add the period position to the stack
             al_period.add_to_stack(stack, t);
         }
@@ -160,7 +160,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         else if(type == L_VAR || type == L_VART) 
         {
             // extract LEC Variable from the buffer -> update j
-            LEC_VAR al_var((unsigned char*) expr, j);
+            LEC_VAR al_var(expr, j);
             // add the variable value to the stack
             bool ok = al_var.add_to_stack(stack, t);
             if(!ok) 
@@ -177,7 +177,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC function from the buffer -> update j
-            LEC_FN al_fn((unsigned char*) expr, j);
+            LEC_FN al_fn(expr, j);
             // execute the function on the stack
             al_fn.execute(expr, previous_j, t, stack);
         }
@@ -185,7 +185,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC operator from the buffer -> update j
-            LEC_OP al_op((unsigned char*) expr, j);
+            LEC_OP al_op(expr, j);
             // execute the operator on the stack
             al_op.execute(expr, previous_j, t, stack);
         }
@@ -193,7 +193,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC time function from the buffer -> update j
-            LEC_TFN al_tfn((unsigned char*) expr, j);
+            LEC_TFN al_tfn(expr, j);
             // execute the time function on the stack
             al_tfn.execute(expr, previous_j, t, stack);
         }
@@ -201,7 +201,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC value from the buffer -> update j
-            LEC_VAL_FN al_val((unsigned char*) expr, j);
+            LEC_VAL_FN al_val(expr, j);
             // execute the value function on the stack
             al_val.execute(expr, previous_j, t, stack);
         }
@@ -209,7 +209,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC multi-time function from the buffer -> update j
-            LEC_MTFN al_mtfn((unsigned char*) expr, j);
+            LEC_MTFN al_mtfn(expr, j);
             // execute the multi-time function on the stack
             al_mtfn.execute(expr, previous_j, t, stack);
         }

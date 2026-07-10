@@ -102,6 +102,12 @@ struct LEC_ABSTRACT
 protected:
     LEC_ABSTRACT(const int type, const GenericLecType generic_type) 
         : type(type), generic_type(generic_type) {}
+    LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
+
+    bool is_same_type(const LEC_ABSTRACT& other) const
+    {
+        return this->type == other.type;
+    }
 
 public:
     // length in bytes of the executable representation of the atomic lec
@@ -135,6 +141,8 @@ public:
         representation = std::to_string(value);
     }
 
+    LEC_CONST_REAL(const LEC_CONST_REAL& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_CONST_REAL(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_DCONST)
     {
@@ -143,6 +151,11 @@ public:
         memcpy(&value, buffer + pos_buffer, sizeof(double));
         pos_buffer += sizeof(double);
         representation = std::to_string(value);
+    }
+
+    bool operator==(const LEC_CONST_REAL& other) const
+    {
+        return is_same_type(other) && this->value == other.value;
     }
 
     bool add_to_stack(std::deque<double>& stack, const int t) const override
@@ -174,6 +187,8 @@ public:
         representation = std::to_string(value);
     }
 
+    LEC_CONST_LONG(const LEC_CONST_LONG& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_CONST_LONG(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_LCONST)
     {
@@ -182,6 +197,11 @@ public:
         memcpy(&value, buffer + pos_buffer, sizeof(long));
         pos_buffer += sizeof(long);
         representation = std::to_string(value);
+    }
+
+    bool operator==(const LEC_CONST_LONG& other) const
+    {
+        return is_same_type(other) && this->value == other.value;
     }
 
     bool add_to_stack(std::deque<double>& stack, const int t) const override
@@ -213,6 +233,8 @@ public:
         representation = name;
     }
 
+    LEC_COEF(const LEC_COEF& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_COEF(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_COEF)
     {
@@ -220,6 +242,11 @@ public:
         pos_buffer++;
         memcpy(&pos, buffer + pos_buffer, sizeof(int));
         pos_buffer += sizeof(int);
+    }
+
+    bool operator==(const LEC_COEF& other) const
+    {
+        return is_same_type(other) && this->pos == other.pos;
     }
 
     bool add_to_stack(std::deque<double>& stack, const int t) const override
@@ -261,6 +288,8 @@ public:
         representation = name;
     }
 
+    LEC_VAR(const LEC_VAR& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_VAR(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_VAR)
     {
@@ -274,6 +303,23 @@ public:
         pos_buffer += sizeof(short);
         memcpy(&per, buffer + pos_buffer, sizeof(Period));
         pos_buffer += sizeof(Period);
+    }
+
+    bool operator==(const LEC_VAR& other) const
+    {
+        if(!is_same_type(other))
+            return false;
+        
+        if(this->pos != other.pos)
+            return false;
+        
+        if(this->lag != other.lag)
+            return false;
+
+        if(this->ref != other.ref) 
+            return false;
+        
+        return this->per == other.per;
     }
 
     void calculate_ref(const Sample& sample)
@@ -335,6 +381,9 @@ public:
     {
         representation = period.to_string();
     }
+
+    LEC_PERIOD(const LEC_PERIOD& other) = default;
+    
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_PERIOD(const unsigned char* buffer, int& pos_buffer) : LEC_VALUE(L_PERIOD)
     {
@@ -345,6 +394,17 @@ public:
         memcpy(&pos, buffer + pos_buffer, sizeof(short));
         pos_buffer += sizeof(short);
         representation = period.to_string();
+    }
+
+    bool operator==(const LEC_PERIOD& other) const
+    {
+        if(!is_same_type(other))
+            return false;
+        
+        if(this->period != other.period)
+            return false;
+        
+        return this->pos == other.pos;
     }
 
     void calculate_pos(const Sample& sample)
@@ -410,6 +470,8 @@ public:
         }
     }
 
+    LEC_OTHER(const LEC_OTHER& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_OTHER(const unsigned char* buffer, int& pos_buffer) 
         : LEC_ABSTRACT(L_SPECIAL, GEN_LEC_OTHER)
@@ -443,6 +505,11 @@ public:
         }
     }
 
+    bool operator==(const LEC_OTHER& other) const
+    {
+        return is_same_type(other);
+    }
+
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
     {
         // we don't save open and close parentheses in the executable expression
@@ -465,7 +532,7 @@ struct LEC_EXECUTABLE: public LEC_ABSTRACT
 
 protected:
     LEC_EXECUTABLE(const int type, const int nb_args) 
-        : LEC_ABSTRACT(type, GEN_LEC_EXECUTABLE), nb_args(nb_args), pos(-1) {}
+    : LEC_ABSTRACT(type, GEN_LEC_EXECUTABLE), nb_args(nb_args), pos(-1) {}
 
     virtual void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) = 0;
 };
