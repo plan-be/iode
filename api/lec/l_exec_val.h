@@ -64,6 +64,8 @@ public:
         fn_name = L_VAL_FN_NAMES[pos];
     }
 
+    LEC_VAL_FN(const LEC_VAL_FN& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_VAL_FN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_VAL, 1)
     {
@@ -71,6 +73,11 @@ public:
         pos_buffer++;
         pos = type - L_VAL;
         representation = L_VAL_FN_NAMES[pos];
+    }
+
+    bool operator==(const LEC_VAL_FN& other) const
+    {
+        return is_same_type(other);
     }
 
     int get_length() const override 

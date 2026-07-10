@@ -204,6 +204,8 @@ public:
         fn_name = L_FN_NAMES[pos];
     }
 
+    LEC_FN(const LEC_FN& other) = default;
+
     // extract from the buffer starting at pos_buffer and update pos_buffer
     LEC_FN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_FN, 0)
     {
@@ -212,6 +214,11 @@ public:
         nb_args = (int) buffer[pos_buffer];
         pos_buffer++;
         pos = type - L_FN;
+    }
+
+    bool operator==(const LEC_FN& other) const
+    {
+        return is_same_type(other);
     }
 
     void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override

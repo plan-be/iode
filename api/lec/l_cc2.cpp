@@ -149,7 +149,7 @@ std::shared_ptr<CLEC> L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& le
         return clec;
     }
     
-    clec = std::make_shared<CLEC>(lec, buffer, pos_buffer);
+    clec = std::make_shared<CLEC>(lec, expr, buffer, pos_buffer);
     SW_nfree(buffer);
     L_NAMES.clear();
 
