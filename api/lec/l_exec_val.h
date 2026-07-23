@@ -80,7 +80,7 @@ public:
         return is_same_type(other);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 1;
     }

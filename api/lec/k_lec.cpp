@@ -129,6 +129,9 @@ char* L_expand(char* list_name)
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 
     const std::shared_ptr<CLEC> eqclec, const int coefs)
 {
+    if(!eqclec) 
+        return false;
+
     // create a char* array containing a copy of the string eqlec
     int lg = (int) eqlec.size();
     lg = std::max(512, 4 * lg);
@@ -172,4 +175,150 @@ bool print_lec_definition(const std::string& name, const std::string& eqlec,
 
     delete[] c_lec;
     return true;
+}
+
+/**
+ * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogenous container).
+ * 
+ * @param [in]  expr    std::vector<ATOMIC_LEC>&   vector of atomic lec elements (result of generate_lec_expression(), normally L_EXPR)
+ * @param [in]  lec     std::string&               original LEC expression string
+*/
+void CLEC::initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
+{
+    if(expr.empty())
+        throw std::invalid_argument("CLEC constructor: empty expression vector.");
+
+    int pos_buffer = 0;             // position (in number of bytes) in the buffer
+    int pos_expr = 0;               // position in the vector of atomic lec elements
+    int alen = 0;                   // current allocated size of the buffer (in bytes)
+    unsigned char* buffer = NULL;   // buffer to save the "executable" expression (will be copied in the CLEC struct at the end)
+    
+    for(ATOMIC_LEC& al : expr) 
+    {
+        // end of expression -> stop
+        if(std::holds_alternative<LEC_OTHER>(al) && std::get<LEC_OTHER>(al).type == L_EOE)
+            break;
+
+        // if the current size of the buffer is not sufficient to save the next element, 
+        // reallocate it by chunks of 512 bytes
+        if(pos_buffer + 30 >= alen) 
+        {
+            buffer = (unsigned char*) SW_nrealloc(buffer, alen, alen + 512);
+            alen += 512;
+        }
+
+        if(std::holds_alternative<LEC_TFN>(al))
+        {
+            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+
+            // compute the length in bytes of the function arguments 
+            // (i.e. the sub-expression in the buffer) 
+            int start_pos = L_sub_expr(expr, pos_expr - 1);
+            short len = this->calculate_length(expr, start_pos, pos_expr);
+            if(len < 0 || len > pos_buffer) 
+            {
+                std::string error_msg = "CLEC constructor: Could not compute the length in bytes of ";
+                error_msg += "arguments of function '" + al_tfn.representation + "'.";
+                SW_nfree(buffer);
+                throw std::runtime_error(error_msg);
+            }
+
+            al_tfn.len_args = len;
+        }
+        
+        if(std::holds_alternative<LEC_MTFN>(al))
+        {
+            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+
+            int nv_args = L_MIN_MTARGS[al_mtfn.pos];
+            al_mtfn.nv_args = nv_args;
+
+            al_mtfn.v_len_args.clear();
+            int new_pos = pos_expr - 1;
+            for(int j = 0; j < nv_args; j++) 
+            {
+                // compute the length in bytes of the function argument 
+                // representing a sub-expression in the buffer 
+                int start_pos = L_sub_expr(expr, new_pos);
+                short len = this->calculate_length(expr, start_pos, new_pos + 1);
+                if(len < 0) 
+                {
+                    std::string error_msg = "CLEC constructor: Could not compute the length in bytes of ";
+                    error_msg += "arguments of function '" + al_mtfn.representation + "'.";
+                    SW_nfree(buffer);
+                    throw std::runtime_error(error_msg);
+                }
+                al_mtfn.v_len_args.push_back(len);
+                new_pos = start_pos - 1;
+            }
+        }
+
+        // for each variant type -> save the executable representation of the atomic lec in the buffer 
+        // and update the position in the buffer
+        std::visit([&buffer, &pos_buffer](auto& arg) { arg.add_to_buffer(buffer, pos_buffer); }, al);
+
+        pos_expr++;
+    }
+
+    if(pos_buffer == 0)
+    {
+        std::string error_msg = "CLEC constructor: Could not compile the LEC expression: ";
+        error_msg += "'" + lec + "'.";
+        SW_nfree(buffer);
+        throw std::runtime_error(error_msg);
+    }
+    
+    this->v_expression = expr;
+    this->len_expr = pos_buffer;
+    this->expression = new unsigned char[pos_buffer];
+    memset(this->expression, 0, pos_buffer);
+    memcpy(this->expression, buffer, pos_buffer);
+
+    // initialize all names with position -1 (not found)
+    for(const std::string& name : L_NAMES)
+        this->objs.push_back({name, -1});
+
+    SW_nfree(buffer);
+    L_EXPR.clear();
+}
+
+CLEC::CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
+{
+    initialize(L_EXPR, lec);
+}
+
+CLEC::CLEC(const std::string& lec)
+{
+    if(L_open_string((char*) lec.c_str()) != 0) 
+        throw std::runtime_error("Error opening LEC string");
+
+    if(generate_lec_expression() != 0)
+        throw std::runtime_error("Error generating LEC expression");
+    
+    initialize(L_EXPR, lec);
+    L_close();
+}
+
+/**
+ * Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
+ * 
+ * Generates a CLEC form with the result and set clec->duplicated_endo to 1 if the
+ * generated form is of the form "0 := LHS - RHS")
+*/
+CLEC::CLEC(const std::string& eq, const std::string& endo)
+{
+    int duplicated_endo = 0;
+    std::string lec = eq;
+
+    L_invert(eq, endo, &duplicated_endo);
+    if(L_errno != 0) 
+    {
+        L_EXPR.clear();
+        std::string error_msg = "Equation: cannot invert LEC expression '" + eq + "'\n";
+        error_msg += "with respect to endogenous variable '" + endo + "' -> " + L_error();
+        throw std::runtime_error(error_msg);
+    }
+
+    initialize(L_EXPR, lec);
+    this->duplicated_endo = (char) duplicated_endo;
 }

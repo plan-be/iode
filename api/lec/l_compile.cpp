@@ -1,25 +1,3 @@
-/**
- *  @header4iode
- *  
- *  First step of LEC compilation. 
- *  
- *  During this stage, 2 tables, one with atomic expressions (ALEC *L_EXPR) and 
- *  one with names found in the expression (L_NAMES) will be filled. 
- *  L_EXPR is filled in the order in which the execution must take place. 
- *  
- *  The 2 tables are reallocated by blocks according to the size of the LEC expression. 
- *  
- *  The second step is described in l_cc2.c and generates a "CLEC expression", 
- *  which is basically the serialization of the combination of L_EXPR and L_NAMES.
- *  
- *  Main functions
- * 
- *      - int L_cc1()               First step of LEC compilation: creates 
- *                                              - L_EXPR  = ordered list of atomic expressions with references to L_NAMES
- *                                              - L_NAMES = list of names in the LEC expression
- *      - int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)   Computes the position of the beginning of a sub-expression
- */
-
 #include "api/lec/lec.h"
 
 
@@ -537,22 +515,24 @@ static int L_analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
- *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES. 
- *  They are the input of L_cc2() which will serialize L_EXPR into a CLEC (Compiled LEC) structure.
+ *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES:
  *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
  *      - L_NAMES contains the names included in the lec expression
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
-int L_cc1()
+int generate_lec_expression(const bool reset_lnames)
 {
     int type;
     int start = 1;
-    int beg = 1;    /* indicate if next token is an oper or an expr */
+    int beg = 1;        // indicate if next token is an oper or an expr
+    int L_PAR = 0;      // Current parenthesis depth
 
+    // reset global variables
     L_errno = 0;
     L_EXPR.clear();
-    int L_PAR = 0;                      // Current parenthesis depth
+    if(reset_lnames)
+        L_NAMES.clear();
 
     /* LOOP ON TOKEN */
     while(true) 

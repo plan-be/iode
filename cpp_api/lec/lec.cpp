@@ -12,8 +12,13 @@ static std::shared_ptr<CLEC> link_lec(const std::string& lec)
 {
     char* error_msg = to_char_array("Could not compile LEC expression " + lec);
 
-    std::shared_ptr<CLEC> clec = L_cc(lec);
-    if(!clec)
+    std::shared_ptr<CLEC> clec = nullptr; 
+    
+    try
+    {
+        clec = std::make_shared<CLEC>(lec);
+    }
+    catch(const std::exception&)
     {
         kerror(0, error_msg);
         return nullptr;

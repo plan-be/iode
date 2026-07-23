@@ -96,14 +96,19 @@ double C_evallec(char* lec, int t)
     SCR_strip((unsigned char*) tmplec);
     if(tmplec[0]) 
     {
-        std::shared_ptr<CLEC> clec = L_cc(tmplec);
-        if(!clec) 
+        std::shared_ptr<CLEC> clec = nullptr; 
+        try
+        {
+            clec = std::make_shared<CLEC>(tmplec);
+        }
+        catch(const std::exception&) 
         {
             std::string error_msg = "Syntax error " + std::string(L_error());
             error_manager.append_error(error_msg);
             return x;
         }
-        if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
+
+        if(!L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, t);
     }
 

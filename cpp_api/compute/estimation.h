@@ -259,10 +259,14 @@ public:
 
         // check the LEC expression for each instrument.
         // Return an error if one instrument is invalid.
+        std::shared_ptr<CLEC> clec = nullptr;
         for(const std::string& instr: v_instrs) 
         {
-            std::shared_ptr<CLEC> clec = L_cc(instr);
-            if(!clec) 
+            try
+            {
+                clec = std::make_shared<CLEC>(instr);
+            }
+            catch(const std::exception&)
             {
                 this->instruments = "";
                 std::string error_msg = "Estimation : Instrument '" + instr + "' : error " + std::string(L_error());

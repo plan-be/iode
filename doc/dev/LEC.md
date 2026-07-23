@@ -187,7 +187,7 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`int L_cc1()`|Creates L\_EXPR(ordered list of atomic expressions with references to L\_NAMES) and L\_NAMES (list of names in the LEC expression)|
+|`int generate_lec_expression()`|Creates L\_EXPR(ordered list of atomic expressions with references to L\_NAMES) and L\_NAMES (list of names in the LEC expression)|
 |`int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
 
 ### l\_cc2.c {#T17}

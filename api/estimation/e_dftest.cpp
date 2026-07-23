@@ -72,9 +72,17 @@ static int E_GetSmpl(std::shared_ptr<Sample>& smpl, char* c_name)
 int E_GetLecName(char* lec, char* name)
 {
     name[0] = 0;
-    std::shared_ptr<CLEC> clec = L_cc(lec);
-    if(!clec) 
+
+    std::shared_ptr<CLEC> clec = nullptr;
+    try
+    {
+        clec = std::make_shared<CLEC>(lec);
+    }
+    catch(const std::exception&)
+    {
+        clec = nullptr;
         return -1;
+    }
 
     for(auto& [obj_name, _]: clec->objs) 
     {   

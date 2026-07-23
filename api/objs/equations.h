@@ -175,7 +175,10 @@ public:
     {
         this->endo = other.endo; 
         this->lec = other.lec;
-        this->clec = std::make_shared<CLEC>(*other.clec);
+        if(other.clec)
+            this->clec = std::make_shared<CLEC>(*other.clec);
+        else
+            this->clec = nullptr;
         this->solved = other.solved;
         this->method = other.method;
         if(this->method < 0 || this->method >= IODE_NB_EQ_METHODS)
@@ -211,20 +214,28 @@ public:
 
     // -- clec --
 
-    void compile()
+    bool compile()
     {
         if(this->lec.empty())
-            throw std::invalid_argument("LEC expression is empty");
-
-        this->clec = nullptr;
-        std::shared_ptr<CLEC> new_clec = L_solve(this->lec, this->endo);
-        if(!new_clec)
         {
-            std::string error_msg = "Cannot compile the LEC expression '" + lec + "' "; 
-            error_msg += "of the equation named '" + endo + "'";
-            throw std::invalid_argument(error_msg);
+            kwarning("LEC expression is empty");
+            return false;
         }
-        this->clec = new_clec;
+        
+        try
+        {
+            std::shared_ptr<CLEC> new_clec = std::make_shared<CLEC>(this->lec, this->endo);
+            // update the 'clec' attribute only if the compilation was successful
+            this->clec = new_clec;
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "Error compiling LEC expression: " + this->lec + "\n" + e.what();
+            kwarning(error_msg.c_str());
+            return false;
+        }
+
+        return true;
     }
 
     // -- lec --
@@ -234,10 +245,15 @@ public:
         if(lec.empty())
             throw std::invalid_argument("Passed LEC expression is empty");
         
+        std::string previous_lec = this->lec;
         this->lec = lec;
 
         // recompile the CLEC form of the equation each time the LEC form is updated
-        this->compile();
+        bool success = this->compile();
+        
+        // if compilation failed, revert to the previous LEC expression
+        if(!success)
+            this->lec = previous_lec;
     }
 
     // -- method --
@@ -514,12 +530,18 @@ public:
             return false;
 
         // recompile the LEC expression of both equations
-        std::shared_ptr<CLEC> cl1 = L_solve(this->lec, this->endo);
-        std::shared_ptr<CLEC> cl2 = L_solve(other.lec, this->endo);
-
-        // compilation failed for at least one of the two LEC expressions
-        if(!cl1 || !cl2)
+        std::shared_ptr<CLEC> cl1 = nullptr;
+        std::shared_ptr<CLEC> cl2 = nullptr;
+        try
+        {
+            cl1 = std::make_shared<CLEC>(this->lec, this->endo);
+            cl2 = std::make_shared<CLEC>(other.lec, this->endo);
+        }
+        catch(const std::exception&)
+        {
+            // compilation failed for at least one of the two LEC expressions
             return false;
+        }
 
         bool clec_equal = (*cl1 == *cl2);
         

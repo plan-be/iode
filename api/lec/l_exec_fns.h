@@ -228,7 +228,7 @@ public:
         pos_buffer++;
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 2;   // 1 byte for type and 1 byte for nb_args
     }

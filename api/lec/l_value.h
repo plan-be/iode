@@ -42,7 +42,7 @@ public:
         pos_buffer += sizeof(double);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 1 + sizeof(double);
     }
@@ -88,7 +88,7 @@ public:
         pos_buffer += sizeof(long);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 1 + sizeof(long);
     }
@@ -136,7 +136,7 @@ public:
         pos_buffer += sizeof(int);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 1 + sizeof(int);
     }
@@ -230,7 +230,7 @@ public:
         pos_buffer += sizeof(Period);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         int len = 1;                // for type
         len += sizeof(int);         // for pos
@@ -298,7 +298,7 @@ public:
         pos_buffer += sizeof(short);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         return 1 + sizeof(Period) + sizeof(short);
     }
