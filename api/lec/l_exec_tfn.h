@@ -152,7 +152,7 @@ public:
         pos_buffer += sizeof(short) + 1;
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         // 2 for type and nb_args + sizeof(short) for len_args + 
         // len_args for the arguments

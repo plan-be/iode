@@ -748,6 +748,8 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
     {
         idt_name = dbi_ptr->get_name(order[i]);
         idt_clec = dbi_ptr->get_obj_ptr(idt_name)->get_compiled_lec();
+        if(!idt_clec) 
+            return -1;
         clec_copy = std::make_shared<CLEC>(*idt_clec);
         if(L_link(dbv_ptr, dbs_ptr, clec_copy)) 
             return -1;

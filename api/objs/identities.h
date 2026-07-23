@@ -23,10 +23,7 @@ public:
 
     Identity(const Identity& other)
     {
-        this->lec = other.lec;
-
-        this->clec = nullptr;
-        this->clec = std::make_shared<CLEC>(*other.clec);
+        set_lec(other.lec);
     }
 
     ~Identity() = default;
@@ -38,15 +35,37 @@ public:
 
     void set_lec(const std::string& lec) 
     {
+        try
+        {
+            // compile the LEC expression
+            this->clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "Identity::set_lec(): cannot create CLEC: " + std::string(e.what());
+            kwarning(error_msg.c_str());
+            this->clec = nullptr;
+            this->lec = "";
+            return;
+        }
+
         this->lec = lec;
-        // compile the LEC expression
-        this->clec = L_cc(lec);
     }
 
     std::shared_ptr<CLEC> get_compiled_lec()
     {
-        // recompile the LEC expression
-        this->clec = L_cc(lec);
+        try
+        {
+            // recompile the LEC expression
+            this->clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::exception& e)
+        {
+            std::string error_msg = "Identity::get_compiled_lec(): cannot create CLEC: " + std::string(e.what());
+            kwarning(error_msg.c_str());
+            this->clec = nullptr;
+        }
+
         return this->clec;
     }
 
@@ -55,8 +74,7 @@ public:
     // required to be used in std::map
     Identity& operator=(const Identity& other)
     {
-        this->lec = other.lec;
-        this->clec = std::make_shared<CLEC>(*other.clec);
+        set_lec(other.lec);
         return *this;
     }
 
@@ -66,12 +84,18 @@ public:
             return false;
 
         // recompile the LEC expression of both identities 
-        std::shared_ptr<CLEC> cl1 = L_cc(this->lec);
-        std::shared_ptr<CLEC> cl2 = L_cc(other.lec);
-
-        // compilation failed for at least one of the two LEC expressions
-        if(!cl1 || !cl2)
+        std::shared_ptr<CLEC> cl1 = nullptr;
+        std::shared_ptr<CLEC> cl2 = nullptr;
+        try
+        {
+            cl1 = std::make_shared<CLEC>(this->lec);
+            cl2 = std::make_shared<CLEC>(other.lec);
+        }
+        catch(const std::exception&)
+        {
+            // compilation failed for at least one of the two LEC expressions
             return false;
+        }
         
         return *cl1 == *cl2;
     }

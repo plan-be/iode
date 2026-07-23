@@ -67,9 +67,18 @@ bool Identity::to_binary(char** pack) const
     if(lec.empty()) 
         return false;
 
-    std::shared_ptr<CLEC> clec = L_cc(c_lec);
-    if(!clec)  
+    std::shared_ptr<CLEC> clec = nullptr;
+    try
+    {
+        clec = std::make_shared<CLEC>(c_lec);
+    }
+    catch(const std::exception& e)
+    {
+        std::string error_msg = "Identity::to_binary(): cannot compile the LEC expression: "; 
+        error_msg += std::string(e.what());
+        kwarning(error_msg.c_str());
         return false;
+    }  
     
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, c_lec, (int) strlen(c_lec) + 1);

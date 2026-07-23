@@ -217,25 +217,31 @@ public:
 
 	void U_test_lec(char* title, char* lec, int t, double expected_val)
 	{
-        double  calc_val;
-	    int     rc;
-	    std::shared_ptr<CLEC> clec;
-	
-	    Period per = global_ws_var->get_sample()->start_period.shift(t);
-	
-	    clec = L_cc(lec);
-        EXPECT_TRUE(clec != NULL);
-	    rc = L_link(global_ws_var, global_ws_scl, clec);
+        // make sure that 't' is valid
+        Period per = global_ws_var->get_sample()->start_period.shift(t);
+        
+        // make sure that the LEC expression is valid
+	    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
+
+	    int rc = L_link(global_ws_var, global_ws_scl, clec);
 	    EXPECT_EQ(rc, 0);
-	    calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
+
+	    double calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
 	double U_test_calc_lec(char* lec, int t)
 	{
-	    std::shared_ptr<CLEC> clec = L_cc(lec);
-	    if(!clec) 
+        // make sure that the 'lec' expression is valid
+	    std::shared_ptr<CLEC> clec = nullptr; 
+        try
+        {
+            clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::exception&)
+        {
             return IODE_NAN;
+        }
         
 	    if(L_link(global_ws_var, global_ws_scl, clec)) 
             return IODE_NAN;
@@ -980,22 +986,19 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     Variable A = global_ws_var->get("A");
     Variable B = global_ws_var->get("B");
 
-    clec = L_cc((char*) lec.c_str());
-    EXPECT_TRUE(clec != nullptr);
+    clec = std::make_shared<CLEC>(lec);
     EXPECT_EQ(clec->duplicated_endo, 0);
     EXPECT_EQ(clec->len_expr, 27);
     EXPECT_EQ(clec->objs.size(), 1);
     EXPECT_TRUE(lec_contains(clec, "A"));
     
     // Using macros in LEC
-    clec = L_cc("1 + vmax($LST1)");
-    EXPECT_TRUE(clec != NULL);
+    clec = std::make_shared<CLEC>("1 + vmax($LST1)");
     EXPECT_EQ(clec->objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 
-    clec = L_cc("1 + vmax($LST2)");
-    EXPECT_TRUE(clec != NULL);
+    clec = std::make_shared<CLEC>("1 + vmax($LST2)");
     EXPECT_EQ(clec->objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
@@ -1006,7 +1009,7 @@ TEST_F(LegacyAPITest, Tests_CLEC_Copy)
     U_test_print_title("Tests CLEC copy");
 
     std::string lec = "A + 1";
-    std::shared_ptr<CLEC> clec = L_cc((char*) lec.c_str());
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
     std::shared_ptr<CLEC> copy_clec = std::make_shared<CLEC>(*clec);
 
     EXPECT_TRUE(copy_clec != nullptr);

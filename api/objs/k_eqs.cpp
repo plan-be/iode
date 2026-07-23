@@ -242,7 +242,7 @@ bool Equation::to_binary(char** pack) const
     std::string comment_oem = utf8_to_oem(this->comment);
     std::string instruments_oem = utf8_to_oem(this->instruments);
     
-    std::shared_ptr<CLEC> clec = L_solve(lec_oem, this->endo);
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec_oem, this->endo);
     if(!clec)  
         return false;
 
@@ -392,12 +392,6 @@ bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
  * @return                          true if the serialization succeeded, false otherwise
  *                                  -> false if the equation does not contain a LEC formula 
  *                                  -> false if the LEC formula cannot be compiled
- *  
- * @details - The endo is needed to "solve" the LEC equation. L_solve() try to analytically
- *            solve the equation to obtain a formula in the form :
- *                ENDO := f(x)
- *          - If it is not possible, a Newton-Raphson like algorithm will be used to solve 
- *            the equation for each iteration of the simulation process.
  */
 bool KDBEquations::obj_to_binary(char** pack, const std::string& name)
 {

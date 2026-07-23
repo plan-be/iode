@@ -277,6 +277,16 @@ def test_print_equation():
                       "         date = 12-06-1998)")
     assert str(eq_ACAF) == string_eq_ACAF
 
+def test_set_lec():
+    eq_ACAF = Equation("ACAF", "(ACAF / VAF[-1]) := acaf1 + acaf2 * GOSF[-1] + acaf4 * (TIME=1995)")
+    # wrong name for the endogenous variable
+    error_msg = ("Error compiling LEC expression: (ACAF_ / VAF[-1]) := "
+                 "acaf2 * GOSF[-1] + acaf4 * (TIME=1995)\n"
+                 "Equation: cannot invert LEC expression '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'\n"
+                 "with respect to endogenous variable 'ACAF' -> endo not found")
+    with pytest.warns(RuntimeWarning, match=re.escape(error_msg)):
+        eq_ACAF.lec = "(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
+
 # Identities
 # ----------
 

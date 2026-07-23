@@ -63,6 +63,9 @@ struct SLEC
 */
 static int L_count_endo(const std::vector<ATOMIC_LEC>& v_al, const std::string& endo)
 {
+    if(L_NAMES.empty())
+        return 0;
+
     int count = 0;
     for(const ATOMIC_LEC& al : v_al)
     {
@@ -219,13 +222,13 @@ ag:
  * @param [in] lec           char*   LEC expression to compile
  * @return                   ALEC*   allocated table of ALEC's or NULL on error
 */
-static std::vector<ATOMIC_LEC> L_cc1_alloc(const std::string& lec)
+static std::vector<ATOMIC_LEC> generate_lec_expression_alloc(const std::string& lec)
 {
     std::vector<ATOMIC_LEC> v_al;
     if(L_open_string((char*) lec.c_str())) 
         return v_al;
     
-    if(L_cc1() != 0) 
+    if(generate_lec_expression(false) != 0) 
         return v_al;
     
     L_close();
@@ -247,7 +250,7 @@ static std::vector<ATOMIC_LEC> L_cc1_alloc(const std::string& lec)
  * @return                    int     error code or 0 on success
  *                                      
 */
-static int L_cc1_eq(SLEC* sl, const std::string& lec)
+static int generate_lec_expression_eq(SLEC* sl, const std::string& lec)
 {
     L_NAMES.clear();
 
@@ -263,14 +266,14 @@ static int L_cc1_eq(SLEC* sl, const std::string& lec)
     std::string rhs = lec.substr(pos + 2);
 
     // Compiles left member
-    sl->sl_left_expr = L_cc1_alloc(lhs);
+    sl->sl_left_expr = generate_lec_expression_alloc(lhs);
     sl->sl_left_expr.pop_back();                // drop the last element (L_EOE)        
     L_EXPR.clear();                             // Clean up L_EXPR
     if(sl->sl_left_expr.empty()) 
         return L_errno;
     
     // Compiles the right member
-    sl->sl_right_expr = L_cc1_alloc(rhs);
+    sl->sl_right_expr = generate_lec_expression_alloc(rhs);
     sl->sl_right_expr.pop_back();               // drop the last element (L_EOE)
     L_EXPR.clear();
     if(sl->sl_right_expr.empty()) 
@@ -401,13 +404,13 @@ static void L_append_const(int a)
  * @param [out]  duplicated_endo    int*    0 if the equation has been inverted, 1 if endo is present more than once.
  * @return                  int     0 on success and L_errno on error
 */
-static int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo)
+int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo)
 { 
     SLEC slec;
     SLEC *sl = &slec;
 
     // Compiles the 2 members of eq and put the result in slec
-    if(L_cc1_eq(sl, eq)) 
+    if(generate_lec_expression_eq(sl, eq)) 
         return L_errno;
     
     /* FIND MEMBER CONTAINING ENDO AND SET INFO IN sl */
@@ -591,42 +594,6 @@ static int L_invert(const std::string& eq, const std::string& endo, int* duplica
     
     return L_errno;
 }
-
-
-/**
- * Compiles a LEC equation and tries to analytically solve the equation with respect to endo.
- * 
- * Generates a CLEC form with the result and set clec->duplicated_endo to 1 if the
- * generated form is of the form "0 := LHS - RHS")
- * 
- * @param [in] eq       char*
- * @param [in] endo     char* 
- * @return              CLEC*
-*/
-std::shared_ptr<CLEC> L_solve(const std::string& eq, const std::string& endo)
-{
-    int duplicated_endo = 0;
-    std::shared_ptr<CLEC> clec = nullptr;
-    std::string lec = eq;
-
-    L_invert(eq, endo, &duplicated_endo);
-    switch(L_errno) 
-    {
-        case 0              :
-            clec = L_cc2(L_EXPR, lec);
-            if(clec) 
-                clec->duplicated_endo = (char) duplicated_endo;
-            break;
-        case L_DUP_ERR      :
-        case L_INVERT_ERR   :
-        default             :
-            break;
-    }
-    
-    L_EXPR.clear();
-    return clec;
-}
-
 
 
 /**

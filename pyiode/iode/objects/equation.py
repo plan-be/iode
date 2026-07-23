@@ -808,9 +808,9 @@ class Equation:
         '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
         >>> # wrong name for the endogenous variable
         >>> eq_ACAF.lec = "(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)"
-        Traceback (most recent call last):
-        ... 
-        ValueError: Cannot compile the LEC expression '(ACAF_ / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)' of the equation named 'ACAF'
+        >>> # in case of failure, the previous value of lec has been kept
+        >>> eq_ACAF.lec
+        '(ACAF / VAF[-1]) := acaf2 * GOSF[-1] + acaf4 * (TIME=1995)'
         """
         return self._cy_equation.get_lec()
 

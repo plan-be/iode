@@ -1,7 +1,9 @@
 #pragma once
-#include "api/lec/l_common.h"
+#include <string>
+#include "scr4/s_yy.h"              // YYKEYS
 
-inline int L_errno = 0;     // LEC error number (during compilation)
+inline int L_errno = 0;             // LEC error number (during compilation)
+inline YYFILE* L_YY = nullptr;      // LEC stream the compiler is reading from
 
 enum LecError
 {
@@ -26,7 +28,7 @@ enum LecError
 };
 
 // LEC error messages corresponding to L_errno
-inline const char* L_ERR_TEXT[] = 
+inline const std::string L_ERR_TEXT[] = 
 {
     "syntax error",
     "unpaired parentheses",
@@ -48,4 +50,16 @@ inline const char* L_ERR_TEXT[] =
     "macro undefined"
 };
 
-char* L_error(void);
+/**
+ *  Returns the last LEC compilation error message.
+ */
+inline std::string L_error()
+{ 
+    if(L_errno <= 0) 
+        return "";
+    
+    if(!L_YY)
+        return L_ERR_TEXT[L_errno - 1];
+    else
+        return std::string(YY_error(L_YY)) + ":" + L_ERR_TEXT[L_errno - 1];
+}

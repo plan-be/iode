@@ -309,8 +309,20 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     if(lec == NULL || lec[0] == 0) 
         return vec;
     
-    std::shared_ptr<CLEC> clec = L_cc(lec);
-    if(clec != 0 && !L_link(dbv, dbs, clec)) 
+    std::shared_ptr<CLEC> clec = nullptr; 
+    try
+    {
+        clec = std::make_shared<CLEC>(lec);
+    }
+    catch(const std::exception& e) 
+    {
+        std::string error_msg = "Syntax error in LEC expression '" + std::string(lec) + "': ";
+        error_msg += e.what();
+        kwarning(error_msg.c_str());
+        return vec;
+    }
+
+    if(!L_link(dbv, dbs, clec)) 
     {
         int nb = dbv->get_sample()->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));

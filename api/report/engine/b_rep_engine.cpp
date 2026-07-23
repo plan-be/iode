@@ -747,14 +747,17 @@ double RP_evallec(char* c_lec)
     std::shared_ptr<CLEC> clec = nullptr;
     if(lec[0]) 
     {
-        clec = L_cc(lec);
-        if(!clec) 
+        try
+        {
+            clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::exception&) 
         {
             error_manager.append_error("Syntax error " + std::string(L_error()));
             return(x);
         }
 
-        if(clec != 0 && !L_link(global_ws_var, global_ws_scl, clec))
+        if(!L_link(global_ws_var, global_ws_scl, clec))
             x = L_exec(global_ws_var, global_ws_scl, clec, RP_T);
     }
 

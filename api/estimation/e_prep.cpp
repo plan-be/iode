@@ -122,8 +122,11 @@ int Estimation::E_prep_lecs(char** lecs)
         } 
 
         lecs[i][pos] = 0;
-        clec = L_cc(lecs[i]);
-        if(!clec)
+        try
+        {
+            clec = std::make_shared<CLEC>(lecs[i]);
+        }
+        catch(const std::exception&)
         {
             error_manager.append_error("Estimation: Syntax Error");
             return -1;
@@ -154,8 +157,12 @@ int Estimation::E_prep_lecs(char** lecs)
         
         lecs[i][pos] = ':';
 
-        clec = L_cc(lecs[i] + pos + 2);
-        if(!clec)
+        try
+        {
+
+            clec = std::make_shared<CLEC>(lecs[i] + pos + 2);
+        }
+        catch(const std::exception&)
         {
             error_manager.append_error("Estimation: Syntax Error");
             return -1;
@@ -245,8 +252,11 @@ int Estimation::E_prep_instrs(char** instrs)
    
     for(i = 0 ; i < E_NINSTR ; i++) 
     {
-        clec = L_cc(instrs[i]);
-        if(!clec) 
+        try
+        {
+            clec = std::make_shared<CLEC>(instrs[i]);
+        }
+        catch(const std::exception&) 
         {
             error_manager.append_error("Estimation: Syntax Error");
             goto fin;

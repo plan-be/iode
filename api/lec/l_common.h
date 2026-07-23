@@ -60,7 +60,6 @@ inline bool is_executable(const int type)
 /*----------------- GLOBALS ----------------------*/
 
 inline int L_curt = 0;              // current value of t
-inline YYFILE* L_YY = nullptr;      // LEC stream the compiler is reading from
 
 inline std::vector<std::string> L_NAMES;    // Table of names encountered in the current LEC expression (vars and scalars)
 
@@ -118,7 +117,7 @@ protected:
 
 public:
     // length in bytes of the executable representation of the atomic lec
-    virtual int get_length() const = 0;
+    virtual short get_length() const = 0;
 
     // copies the executable representation of the atomic lec to the buffer at the given position and 
     // updates the position in the buffer
@@ -235,7 +234,7 @@ public:
             LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         // we don't save open and close parentheses in the executable expression
         return (type == L_OPENP || type == L_CLOSEP) ? 0 : 1;

@@ -265,8 +265,20 @@ int B_DataCalcVar(char* arg, int unused)
 
     if(lec[0]) 
     {
-        std::shared_ptr<CLEC> clec = L_cc(lec);
-        if(clec && !L_link(kdb, global_ws_scl, clec)) 
+        std::shared_ptr<CLEC> clec = nullptr; 
+        try
+        {
+            clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::runtime_error& e)
+        {
+            std::string error_msg = "Error in LEC formula '" + std::string(lec) + "':\n";
+            error_msg += e.what();
+            kwarning(error_msg.c_str());
+            return -1;
+        }
+
+        if(!L_link(kdb, global_ws_scl, clec)) 
         {
             double d;
             for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 

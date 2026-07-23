@@ -248,13 +248,22 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     oss << std::setw(20) << std::fixed << std::setprecision(8) << value;
 
     std::string formula = lec + " := " + oss.str() + " * " + div_lec;
-    std::shared_ptr<CLEC> clec = L_solve(to_char_array(formula), to_char_array(var_name));
+    std::shared_ptr<CLEC> clec = nullptr; 
+    
+    try
+    {
+        clec = std::make_shared<CLEC>(formula, var_name);
+    }
+    catch(const std::exception&)
+    {
+        return false;
+    }
 
     int var_pos = global_ws_var->index_of(var_name);
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used
-    if(!clec || clec->duplicated_endo)
+    if(clec->duplicated_endo)
     {
         if(clec && clec->duplicated_endo) 
             clec.reset();
@@ -263,11 +272,20 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
         oss << std::fixed << std::setprecision(15) << value;
 
         formula = lec + " := " + oss.str() + " * " + div_lec;
-        clec = L_cc(formula);
-        if(!clec)
+
+        try
+        {
+            clec = std::make_shared<CLEC>(formula);
+        }
+        catch(const std::exception&)
+        {
+            return false;
+        }
+
+        res = L_link(global_ws_var, global_ws_scl, clec);
+        if(res != 0)
             return false;
 
-        L_link(global_ws_var, global_ws_scl, clec);
         // Newton-Raphson method
         res = L_zero(global_ws_var, global_ws_scl, clec, period_pos, var_pos, var_pos);
     }

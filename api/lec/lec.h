@@ -39,24 +39,51 @@ struct CLEC
     //       names as they appear in the expression (for the link step) 
     std::vector<std::pair<std::string, int>> objs;
 
-public:
-    CLEC(const std::string& lec, std::vector<ATOMIC_LEC> v_expression, 
-        unsigned char* expr, int len) 
+private:
+    /**
+     * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
+     * adding the size reclaimed by each ALEC atomic expression.
+     * 
+     * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
+     * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
+     * @param [in] to       int     ending position in ALEC of that expression
+     * @return              short   size in bytes of the expression in CLEC form
+    */
+    short calculate_length(const std::vector<ATOMIC_LEC>& expr, const int from, const int to)
     {
-        this->lec = lec;
-        this->v_expression = v_expression;
-
-        len_expr = len;
-
-        expression = new unsigned char[len];
-        memset(expression, 0, len);
-        if(expr)
-            memcpy(expression, expr, len);
-
-        // initialize all names with position -1 (not found)
-        for(const std::string& name : L_NAMES)
-            objs.push_back({name, -1});
+        if(expr.empty()) 
+            return 0;
+        
+        short len = 0;
+        for(int i = from; i < to; i++) 
+        {
+            const ATOMIC_LEC& al = expr[i];
+            len += std::visit([](auto& arg) { return arg.get_length(); }, al);
+            if(std::holds_alternative<LEC_TFN>(al))
+            {
+                const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+                len -= al_tfn.len_args;
+            }
+            if(std::holds_alternative<LEC_MTFN>(al))
+            {
+                const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+                len -= al_mtfn.len_args;
+            }
+        }
+        
+        return len;
     }
+
+    // Generates an "executable" LEC expression (heterogenous container)
+    // WARNING: to be run AFTER generate_lec_expression() in order to fill L_EXPR and L_NAMES first
+    void initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+    
+public:
+    CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+
+    CLEC(const std::string& lec);
+
+    CLEC(const std::string& eq, const std::string& endo);
 
     CLEC(const CLEC& other) 
     {
@@ -175,13 +202,8 @@ public:
 /* ---------------------- FUNCS ---------------------- */
 
 /* l_cc1.c */
-int L_cc1();
+int generate_lec_expression(const bool reset_lnames = true);
 int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
-
-/* l_cc2.c */
-std::shared_ptr<CLEC> L_cc2(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
-std::shared_ptr<CLEC> L_cc_stream(const std::string& lec);
-std::shared_ptr<CLEC> L_cc(const std::string& lec);
 
 /* l_link.c */
 int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl);
@@ -210,8 +232,8 @@ int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std);
 void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
-std::shared_ptr<CLEC> L_solve(const std::string& eq, const std::string& endo);
 int L_split_eq(const std::string& eq);
+int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo);
 
 /* l_newton.c */
 double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 

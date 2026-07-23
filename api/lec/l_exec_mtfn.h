@@ -165,7 +165,7 @@ public:
         pos_buffer += 2 + (1 + nv_args) * sizeof(short);
     }
 
-    int get_length() const override 
+    short get_length() const override 
     {
         // 3 bytes for type, nb_args and nv_args + sizeof(short) for len_args + 
         // len_args for the arguments
