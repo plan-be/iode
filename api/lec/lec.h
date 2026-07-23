@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/lec/l_common.h"
+#include "api/lec/l_value.h"
 #include "api/lec/l_exec_fns.h"
 #include "api/lec/l_exec_ops.h"
 #include "api/lec/l_exec_tfn.h"
@@ -9,7 +10,6 @@
 #include "api/lec/l_err.h"
 #include "api/lec/l_token.h"
 
-#include <algorithm>            // for std::min, std::max
 #include <variant>              // for std::variant
 
 /*----------------- GLOBALS ----------------------*/
@@ -21,7 +21,7 @@ inline std::vector<ATOMIC_LEC> L_EXPR;      // Table of pairs <type, atomic elem
 
 /*---------------- STRUCTS ------------------------*/
 
-struct CLEC 
+struct CLEC
 {
     // duplicate endogenous variable in the LEC expression
     char duplicated_endo = 0;
