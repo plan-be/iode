@@ -32,26 +32,27 @@ inline bool is_mtfn(const int op)
     return op >= L_MTFN; 
 }
 
-int L_calcvals(unsigned char* expr, short lg, int t, std::deque<double>& stack, int* p_nargs, double* res, int nbvals);
-double L_calccorr(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int from, int to, int t, 
-    std::deque<double>& stack, int nargs);
-double L_calccovar(unsigned char* expr1, short lg1, unsigned char* expr2, short lg2, int from, int to, int t, 
-    std::deque<double>& stack, int nargs, int center);
+int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, int* p_nargs, 
+    double* res, int nbvals);
+double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, int from, 
+    int to, int t, std::deque<double>& stack, int nargs);
+double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, int from, 
+    int to, int t, std::deque<double>& stack, int nargs, int center);
 
-double L_corr(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar0(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_var(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_index(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_interpol(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hpstd(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_corr(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar0(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_var(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_index(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_interpol(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_app(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dapp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hpstd(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
 
-inline double(*L_MTFN_FN[])(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) = 
+inline double(*L_MTFN_FN[])(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_corr,         // L_CORR      L_M
     L_covar,        // L_COVAR     L_M
@@ -173,7 +174,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
+    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
     {
         int from = -1, to = -1;
         // NOTE: in function L_extract_time_range():
@@ -183,10 +184,10 @@ public:
         if(type != L_INTERPOL && type != L_APP)
             L_extract_time_range(t, stack, nb_args - 1, from, to);
 
-        // NOTE: 'j + 3 + sizeof(short)' corresponds to the position of the sub-expression
+        // NOTE: 'start + 3 + sizeof(short)' corresponds to the position of the sub-expression
         //       in the buffer (after type, nb_args, nv_args and len_args)
-        j += 3 + sizeof(short);
-        double result = (L_MTFN_FN[pos])(expr + j, nv_args, from, to, t, stack, nb_args);
+        start += 3 + sizeof(short);
+        double result = (L_MTFN_FN[pos])(clec, start, nv_args, from, to, t, stack, nb_args);
         stack.push_back(result);
     }
 };

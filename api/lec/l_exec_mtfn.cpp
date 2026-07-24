@@ -12,7 +12,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+ *      double <fnname>(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -47,14 +47,14 @@
  *  @return         
  *  
  */
-double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, 
+double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, 
     int from, int to, int t, std::deque<double>& stack, int nargs) 
 {
-    double mean_x = L_mean(expr1, len1, from, to, t, stack, nargs - 1);
+    double mean_x = L_mean(clec, start_1, length_1, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
         return IODE_NAN;
     
-    double mean_y = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    double mean_y = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_y)) 
         return IODE_NAN;
 
@@ -62,11 +62,11 @@ double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short 
     double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        x = L_exec_sub(expr1, len1, j);
+        x = clec.execute_sub_expression(start_1, length_1, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = L_exec_sub(expr2, len2, j);
+        y = clec.execute_sub_expression(start_2, length_2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -110,15 +110,15 @@ double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short 
  *  @return            double           computed correlation 
  *  
  */
-double L_corr(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_corr(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
-    unsigned char* expr1 = expr + sizeof(short); 
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
-    double result = L_calccorr(expr1, len1, expr2, len2, from, to, t, stack, nargs);
+    double result = L_calccorr(clec, start_1, length_1, start_2, length_2, 
+                               from, to, t, stack, nargs);
     return result;
 }
 
@@ -145,18 +145,18 @@ double L_corr(unsigned char* expr, short nvargs, int from, int to, int t, std::d
  *  @return             double          computed covariance.
  *  
  */
-double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, 
+double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, 
     int from, int to, int t, std::deque<double>& stack, int nargs, int orig) 
 {   
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
  
-    double mean_x = L_mean(expr1, len1, from, to, t, stack, nargs - 1);
+    double mean_x = L_mean(clec, start_1, length_1, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
         return IODE_NAN;
     
-    double mean_y = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    double mean_y = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_y)) 
         return IODE_NAN;
 
@@ -164,11 +164,11 @@ double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short
     double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        x = L_exec_sub(expr1, len1, j);
+        x = clec.execute_sub_expression(start_1, length_1, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = L_exec_sub(expr2, len2, j);
+        y = clec.execute_sub_expression(start_2, length_2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -194,15 +194,15 @@ double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-double L_covar(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) 
+double L_covar(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs) 
 {
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
-    unsigned char* expr1 = expr + sizeof(short); 
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
-    double result = L_calccovar(expr1, len1, expr2, len2, from, to, t, stack, nargs, 0);
+    double result = L_calccovar(clec, start_1, length_1, start_2, length_2, 
+                                from, to, t, stack, nargs, 0);
     return result;
 }
 
@@ -215,15 +215,15 @@ double L_covar(unsigned char* expr, short nvargs, int from, int to, int t, std::
  *  @see L_calccovar() for the formulas.
  *  
  */
-double L_covar0(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) 
+double L_covar0(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs) 
 {
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
-    unsigned char* expr1 = expr + sizeof(short); 
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
-    double result = L_calccovar(expr1, len1, expr2, len2, from, to, t, stack, nargs, 1);
+    double result = L_calccovar(clec, start_1, length_1, start_2, length_2, 
+                                from, to, t, stack, nargs, 1);
     return result;
 }
 
@@ -244,13 +244,13 @@ double L_covar0(unsigned char* expr, short nvargs, int from, int to, int t, std:
  *  @see L_covar() for more details.
  *  
  */
-double L_var(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_var(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    short len1;
-    memcpy(&len1, expr, sizeof(short));
-
-    unsigned char* expr1 = expr + sizeof(short); 
-    double result = L_calccovar(expr1, len1, expr1, len1, from, to, t, stack, nargs + 1, 0);
+    int start_1;
+    short length_1; 
+    clec.get_sub_expression_length(start, start_1, length_1);
+    double result = L_calccovar(clec, start_1, length_1, start_1, length_1, from, to, t, stack, nargs + 1, 0);
     return result;
 }
 
@@ -265,9 +265,10 @@ double L_var(unsigned char* expr, short nvargs, int from, int to, int t, std::de
  *  @see L_calccovar() for the formula.
  *  
  */
-double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    double var = L_var(expr, nvargs, from, to, t, stack, nargs);
+    double var = L_var(clec, start, nvargs, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(var) || var < 0.0) 
         return IODE_NAN;
     return sqrt(var);
@@ -302,26 +303,25 @@ double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std:
  *  @return            double           computed covariance
  */  
 
- double L_index(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+ double L_index(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
 
-    double x = L_exec_sub(expr1, len1, t);
+    double x = clec.execute_sub_expression(start_1, length_1, t);
     if(!IODE_IS_A_NUMBER(x)) 
         return IODE_NAN;
 
     double y;
     for(int j = from; j <= to; j++) 
     {
-        y = L_exec_sub(expr2, len2, j);
+        y = clec.execute_sub_expression(start_2, length_2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -347,19 +347,18 @@ double L_stddev(unsigned char* expr, short nvargs, int from, int to, int t, std:
  *  
  *  @see L_corr() for the parameter definition
  */
-double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
-{    
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
+{
+    int start_1, start_2;    
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
 
-    double x = L_exec_sub(expr1, len1, t);
+    double x = clec.execute_sub_expression(start_1, length_1, t);
     if(!IODE_IS_A_NUMBER(x)) 
         return IODE_NAN;
 
@@ -367,7 +366,7 @@ double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::de
     if(k < 0 || k > nb / 4) 
         return IODE_NAN;
 
-    double mean_x = L_mean(expr2, len2, from, to, t, stack, nargs - 1);
+    double mean_x = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
         return IODE_NAN;
 
@@ -375,11 +374,11 @@ double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::de
     double sum_xy = 0.0, sum_xy0 = 0.0;
     for(int j = from; j <= to - k; j++) 
     {
-        x = L_exec_sub(expr2, len2, j);
+        x = clec.execute_sub_expression(start_2, length_2, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = L_exec_sub(expr2, len2, j + k);
+        y = clec.execute_sub_expression(start_2, length_2, j + k);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -388,7 +387,7 @@ double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::de
 
     for(int j = from; j <= to; j++) 
     {
-        x = L_exec_sub(expr2, len2, j);
+        x = clec.execute_sub_expression(start_1, length_2,j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
@@ -414,7 +413,8 @@ double L_acf(unsigned char* expr, short nvargs, int from, int to, int t, std::de
  *  @return             double           computed correlation 
  *  
  */
-int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)
+int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, 
+    int* vt, double* vy, int notnul)
 {
     vy[0] = vy[1] = IODE_NAN;
     int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
@@ -422,7 +422,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stac
     // 1. Calculate value after t
     for(vt[1] = t + 1; vt[1] < nb_obs; vt[1]++) 
     {
-        vy[1] = L_exec_sub(expr1, len1, vt[1]);
+        vy[1] = clec.execute_sub_expression(start, length, vt[1]);
         if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) 
             break;
     }
@@ -430,7 +430,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stac
     // 2. Calculate value before t
     for(vt[0] = t - 1; vt[0] >= 0; vt[0]--) 
     {
-        vy[0] = L_exec_sub(expr1, len1, vt[0]);
+        vy[0] = clec.execute_sub_expression(start, length, vt[0]);
         if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
             break;
     }
@@ -451,7 +451,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stac
         vy[0] = IODE_NAN;
         for(vt[0] = vt[1] - 1; vt[0] >= 0; vt[0]--) 
         {
-            vy[0] = L_exec_sub(expr1, len1, vt[0]);
+            vy[0] = clec.execute_sub_expression(start, length, vt[0]);
             if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
                 break;
         }
@@ -464,7 +464,7 @@ int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stac
         vy[1] = IODE_NAN;
         for(vt[1] = vt[0] + 1; vt[1] < nb_obs; vt[1]++) 
         {
-            vy[1] = L_exec_sub(expr1, len1, vt[1]);
+            vy[1] = clec.execute_sub_expression(start, length, vt[1]);
             if(IODE_IS_A_NUMBER(vy[1])) 
                 break;
         }
@@ -482,21 +482,22 @@ int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stac
  *  @return     double  value of expr[t] or interpolated value
  *  
  */
-double L_interpol(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_interpol(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {   
-    short len1;
-    memcpy(&len1, expr, sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
+    int start_1;
+    short length_1; 
+    clec.get_sub_expression_length(start, start_1, length_1);
 
     // 1. Calculate value in t
-    double x = L_exec_sub(expr1, len1, t);
+    double x = clec.execute_sub_expression(start_1, length_1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(expr1, len1, t, stack, vt, vy, 0);
+    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 0);
     
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
@@ -514,30 +515,29 @@ double L_interpol(unsigned char* expr, short nvargs, int from, int to, int t, st
     return interpol;
 }
 
-double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_app(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {   
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
     // 1. Calculate value in t
-    double x = L_exec_sub(expr1, len1, t);
+    double x = clec.execute_sub_expression(start_1, length_1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(expr1, len1, t, stack, vt, vy, 1);
+    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 1);
     
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
         return IODE_NAN;
     
     // ---- Valeurs apparentées ----
-    double ayt = L_exec_sub(expr2, len2, t);
+    double ayt = clec.execute_sub_expression(start_1, length_2, t);
     if(!IODE_IS_A_NUMBER(ayt)) 
         return IODE_NAN;
     
@@ -545,9 +545,9 @@ double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::de
     int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
-        ay[0] = L_exec_sub(expr2, len2, vt[0]);
+        ay[0] = clec.execute_sub_expression(start_2, length_2, vt[0]);
     if(vt[1] < nb_obs) 
-        ay[1] = L_exec_sub(expr2, len2, vt[1]);
+        ay[1] = clec.execute_sub_expression(start_2, length_2, vt[1]);
 
     // ---- Deux valeurs trouvées dans la série initiale ----
     // !! Les deux valeurs doivent exister dans la série apparentée
@@ -600,30 +600,29 @@ double L_app(unsigned char* expr, short nvargs, int from, int to, int t, std::de
     return IODE_NAN;
 }
 
-double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_dapp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {   
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+    int start_1, start_2;
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
     // 1. Calculate value in t
-    double x = L_exec_sub(expr1, len1, t);
+    double x = clec.execute_sub_expression(start_1, length_1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(expr1, len1, t, stack, vt, vy, 0);
+    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 0);
 
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
         return IODE_NAN;
 
     // ---- Valeurs apparentées ----
-    double ayt = L_exec_sub(expr2, len2, t);
+    double ayt = clec.execute_sub_expression(start_2, length_2, t);
     if(!IODE_IS_A_NUMBER(ayt)) 
         return IODE_NAN;
     
@@ -631,9 +630,9 @@ double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::d
     int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
-        ay[0] = L_exec_sub(expr2, len2, vt[0]);
+        ay[0] = clec.execute_sub_expression(start_2, length_2, vt[0]);
     if(vt[1] < nb_obs) 
-        ay[1] = L_exec_sub(expr2, len2, vt[1]);
+        ay[1] = clec.execute_sub_expression(start_2, length_2, vt[1]);
 
     if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) 
     {
@@ -658,15 +657,14 @@ double L_dapp(unsigned char* expr, short nvargs, int from, int to, int t, std::d
     return IODE_NAN;
 }
 
-double L_hpall(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs, int std)
-{    
-    short len1, len2;
-    memcpy(&len1, expr, sizeof(short));
-    memcpy(&len2, expr + len1 + sizeof(short), sizeof(short));
-    unsigned char* expr1 = expr + sizeof(short);
-    unsigned char* expr2 = expr + len1 + 2 * sizeof(short);
+double L_hpall(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
+    std::deque<double>& stack, int nargs, int std)
+{   
+    int start_1, start_2; 
+    short length_1, length_2;
+    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
 
-    double value = L_exec_sub(expr1, len1, t);
+    double value = clec.execute_sub_expression(start_1, length_1, t);
     if(!IODE_IS_A_NUMBER(value)) 
         return IODE_NAN;
 
@@ -682,7 +680,7 @@ double L_hpall(unsigned char* expr, short len, int from, int to, int t, std::deq
         return IODE_NAN;
     
     for(int j = from; j <= to; j++) 
-        itmp[j - from] = L_exec_sub(expr2, len2, j);
+        itmp[j - from] = clec.execute_sub_expression(start_2, length_2, j);
 
     int nbna, dim;
     HP_test(itmp, otmp, nb, &nbna, &dim);
@@ -702,13 +700,15 @@ double L_hpall(unsigned char* expr, short len, int from, int to, int t, std::deq
     return value;
 }
 
-double L_hp(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_hp(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(expr, len, from, to, t, stack, nargs, 0));
+    return(L_hpall(clec, start, length, from, to, t, stack, nargs, 0));
 }
 
 
-double L_hpstd(unsigned char* expr, short len, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_hpstd(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
+    std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(expr, len, from, to, t, stack, nargs, 1));
+    return(L_hpall(clec, start, length, from, to, t, stack, nargs, 1));
 }

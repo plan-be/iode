@@ -234,7 +234,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
+    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 

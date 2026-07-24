@@ -317,16 +317,16 @@ Functions to evaluate LEC "time functions" with possibly multiple arguments.
 
 |Syntax|Description|
 |:---|:---|
-|`static double L_calccorr(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, std::deque<double>& stack, int nargs)`||
+|`static double L_calccorr(AbstractCLEC& clec, int start_1, short len1, int start_2, short len2, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_corr(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_calccovar(unsigned char* expr1, short len1, unsigned char* expr2, short len2, int t, std::deque<double>& stack, int nargs, int orig)`||
+|`static double L_calccovar(AbstractCLEC& clec, int start_1, short len1, int start_2, short len2, int t, std::deque<double>& stack, int nargs, int orig)`||
 |`static double L_covar(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_covar0(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_var(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_stddev(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_index(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_acf(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static int L_calcvals(unsigned char* expr1, short len1, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)`||
+|`static int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)`||
 |`static double L_interpol(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_app(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
 |`static double L_dapp(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
