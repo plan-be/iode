@@ -74,7 +74,25 @@ int CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* i
         KSIM_POSXK[i] = i;
         KSIM_POSXK_REV[i] = i;
         eq_name = dbe->get_name(i);
-        eq_ptr = dbe->get_obj_ptr(eq_name); 
+        eq_ptr = dbe->get_obj_ptr(eq_name);
+        if(!eq_ptr)
+        {
+            std::string error_msg = "'" + eq_name + "': cannot find equation";
+            error_manager.append_error(error_msg);
+            return -1;
+        }
+
+        // try to compile the equation if it has not been compiled yet
+        if(!eq_ptr->clec)
+            eq_ptr->compile();
+         
+        if(!eq_ptr->clec)
+        {
+            std::string error_msg = "'" + eq_name + "': cannot link equation";
+            error_manager.append_error(error_msg);
+            return -1;
+        }
+
         L_link_endos(dbe, eq_ptr->clec);
     }
 
@@ -162,7 +180,7 @@ int CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDB
         
         eq_ptr = dbe->get_obj_ptr(eq_name);
         eq_ptr->compile();
-        rc = L_link(dbv, dbs, eq_ptr->clec);
+        rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";

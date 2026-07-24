@@ -757,7 +757,7 @@ double RP_evallec(char* c_lec)
             return(x);
         }
 
-        if(!L_link(global_ws_var, global_ws_scl, clec))
+        if(!clec->link(global_ws_var, global_ws_scl))
             x = L_exec(global_ws_var, global_ws_scl, clec, RP_T);
     }
 

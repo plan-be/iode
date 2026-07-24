@@ -751,7 +751,7 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
         if(!idt_clec) 
             return -1;
         clec_copy = std::make_shared<CLEC>(*idt_clec);
-        if(L_link(dbv_ptr, dbs_ptr, clec_copy)) 
+        if(clec_copy->link(dbv_ptr, dbs_ptr)) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 

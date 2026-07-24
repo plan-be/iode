@@ -322,7 +322,7 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
         return vec;
     }
 
-    if(!L_link(dbv, dbs, clec)) 
+    if(!clec->link(dbv, dbs)) 
     {
         int nb = dbv->get_sample()->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));

@@ -765,9 +765,9 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
 	// Compiles the LEC string 
 	std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
     
-	// L_link(): Links the CLEC expression to KDB's of variables and of scalars.
-	// The CLEC object is modified (inplace) by L_link()
-	int res = L_link(global_ws_var, global_ws_scl, clec);
+	// link(): Links the CLEC expression to KDB's of variables and of scalars.
+	// The CLEC object is modified (inplace) by link()
+	int res = clec->link(global_ws_var, global_ws_scl);
     if(res != 0)
     {
         std::string error_msg = "Cannot calculate variable values: ";

@@ -15,19 +15,18 @@
 
 /**
  * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
- * and their positions are saved in CLEC->objs.
+ * and their positions are saved in this CLEC->objs.
  *
  * If a name is not found, an error message is added to the stack via IodeErrorManager::append_error 
  * and L_errno is set to L_NOT_FOUND_ERR.
  *
  * @param [in]      dbv     KDB*    KDB of variables
  * @param [in]      dbs     KDB*    KDB of scalars
- * @param [in, out] cl      CLEC*   Compiled LEC
  * @return                  int     0 on success,  L_NOT_FOUND_ERR on error
 */
-static int L_link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl)
+int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    for(auto& [name, pos] : cl->objs) 
+    for(auto& [name, pos] : this->objs) 
     {
         if(is_coefficient(name))
             pos = L_findscl(dbs, name);
@@ -175,42 +174,36 @@ void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
 
 
 /**
- * Second step of linking CLEC. Each time displacement in the CLEC struct is aligned to the dbv's Sample.
+ * Second step of linking CLEC. Each time displacement in this CLEC struct is aligned to the dbv's Sample.
  * For example, the position of A[1970Y1] in the vector A depends on the sample of dbv.
  *
  * @param [in]      dbv     KDB*    KDB of variables
- * @param [in, out] cl      CLEC*   Compiled LEC
  */
-static void L_link_sample(KDBVariablesPtr dbv, std::shared_ptr<CLEC>& cl)
+void CLEC::link_sample(KDBVariablesPtr dbv)
 {
-    if(!cl) 
+    if(!this->expression) 
         return;
 
-    L_link_sample_expr(dbv, cl->expression, (short) cl->len_expr);
-    return;
+    L_link_sample_expr(dbv, this->expression, (short) this->len_expr);
 }
 
 
 /**
- * Links a CLEC expression to KDB's of variables and of scalars. If some Period's are present in CLEC,
+ * Links this CLEC expression to KDB's of variables and of scalars. If some Period's are present in CLEC,
  * they are aligned to the Sample of dbv.
  * 
- * The CLEC, although modified by L_link(), can be relinked later with other KDB's. 
+ * The CLEC, although modified by link(), can be relinked later with other KDB's. 
  *
  * @param [in]      dbv  KDB*        KDB of variables to link to CLEC
  * @param [in]      dbs  KDB*        KDB of scalars to link to CLEC
- * @param [in, out] cl   CLEC*       CLEC expression whose content must be linked to dbv and dbs
  * @return               int         0 on success, L_errno on error
 */
-int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl)
+int CLEC::link(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    if(!cl) 
-        return 0;
-    
-    if(L_link_names(dbv, dbs, cl)) 
+    if(this->link_names(dbv, dbs)) 
         return L_errno;
     
-    L_link_sample(dbv, cl);
+    this->link_sample(dbv);
     return 0;
 }
 
@@ -218,15 +211,18 @@ int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl)
 /*---- PSEUDO LINKING FOR THE CONSTRUCTION OF THE MODEL SCC ----*/
 
 /**
- * For each variable in CLEC (v_names) that exists as equation in dbe, set its position (v_names.pos) to the position in dbe.
- *
- * @param [in]      dbe     KDB*     KDB of equations
- * @param [in, out] cl      CLEC*    Compiled lec
- *
+ * Pseudo linking used to calculate the strong connex components of a model (SCC).
+ * 
+ * The endogenous variables are assigned the position of their equation in dbe. 
+ * This process constructs a sort of incidence matrix of the model by assigning to the position of the endogenous variables 
+ * in the CLEC l_names of each equation (therefore, the KDB of vars and scalars are not needed here).
+ * 
+ * @param [in]      dbe     KDB*    KDB of equations
+ * @param [in, out] clec    CLEC*   pointer to the CLEC to be linked
  */
-static void L_link1_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl)
-{
-    for(auto& [name, pos] : cl->objs) 
+void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& clec)
+{   
+    for(auto& [name, pos] : clec->objs) 
     {
         if(is_coefficient(name))
             pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
@@ -236,23 +232,4 @@ static void L_link1_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl)
         if(pos < 0)  // Not found => exogenous var
             pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
     }
-}
-
-/**
- * Pseudo linking used to calculate the strong connex components of a model (SCC).
- * 
- * The endogenous variables are assigned the position of their equation in dbe. 
- * This process constructs a sort of incidence matrix of the model by assigning to the position of the endogenous variables 
- * in the CLEC l_names of each equation (therefore, the KDB of vars and scalars are not needed here).
- *  
- * @param [in]      dbe     KDB*    KDB of equations
- * @param [in, out] cl      CLEC*   compiled LEC expression
- * @return                  int     0 on success, L_errno on error
- */
-void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl)
-{
-    if (!cl) 
-        return;
-    
-    L_link1_endos(dbe, cl);
 }

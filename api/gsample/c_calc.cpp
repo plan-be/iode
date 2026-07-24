@@ -81,7 +81,7 @@ static int COL_link(const int i, std::shared_ptr<CLEC>& clec)
         return -1;
     }
 
-    int res = L_link(kdbv, global_ws_scl, clec);
+    int res = clec->link(kdbv, global_ws_scl);
     return res;
 }
 

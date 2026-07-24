@@ -24,7 +24,7 @@ static std::shared_ptr<CLEC> link_lec(const std::string& lec)
         return nullptr;
     } 
     
-    int res = L_link(global_ws_var, global_ws_scl, clec);
+    int res = clec->link(global_ws_var, global_ws_scl);
     if(res != 0)
     {
         kerror(0, error_msg);
