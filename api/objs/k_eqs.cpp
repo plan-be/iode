@@ -146,7 +146,7 @@ bool Equation::print_definition() const
 
     // W_Print(...) functions expect OEM encoding, so convert lec from UTF-8 to OEM before printing 
     std::string lec_oem = utf8_to_oem(lec);
-    bool success = print_lec_definition(endo, lec_oem, clec, B_EQS_LEC);
+    bool success = clec->print_definition(endo, lec_oem, B_EQS_LEC);
     if(B_EQS_INFOS < 1) 
         return true;
     

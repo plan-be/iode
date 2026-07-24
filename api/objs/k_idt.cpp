@@ -221,7 +221,7 @@ bool KDBIdentities::print_obj_def(const std::string& name)
     std::shared_ptr<CLEC> clec = this->get_obj_ptr(name)->get_compiled_lec();
 
     W_printf((char*) ".par1 enum_1\n");
-    print_lec_definition(name, tmp, clec, B_EQS_LEC);
+    clec->print_definition(name, tmp, B_EQS_LEC);
 
     return true;
 }
