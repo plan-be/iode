@@ -78,7 +78,6 @@ inline std::vector<int> V_EXEC_POS;
 /* l_exec.cpp */
 int L_intlag(double lag);
 bool L_stack_is_nan(const std::deque<double>& stack);
-double L_exec_sub(unsigned char* expr, int lg, int t);
 
 /* l_debug.cpp */
 void L_debug(char*, ...);
@@ -98,6 +97,19 @@ void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg);
 
 
 /*----------------- STRUCTS ----------------------*/
+
+// Abstract class to be passed ot the execute() method of the sub-classes of LEC_EXECUTABLE
+struct AbstractCLEC
+{
+public:
+    AbstractCLEC() {}
+    
+    virtual double execute_sub_expression(const int pos, const int length, const int t) = 0;
+
+    // for MTFN functions
+    virtual void get_sub_expression_length(const int start, int& start_1, short& length_1) = 0; 
+    virtual void split_sub_expression(const int start, int& start_1, short& length_1, int& start_2, short& length_2) = 0;
+};
 
 struct LEC_ABSTRACT
 {
@@ -147,7 +159,7 @@ protected:
     LEC_EXECUTABLE(const int type, const int nb_args) 
     : LEC_ABSTRACT(type, GEN_LEC_EXECUTABLE), nb_args(nb_args), pos(-1) {}
 
-    virtual void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) = 0;
+    virtual void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT

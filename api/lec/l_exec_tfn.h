@@ -37,21 +37,21 @@ inline bool is_tfn(const int op)
 
 void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from, int& to);
 
-double L_lag(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_diff(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_rapp(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_dln(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_grt(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_mavg(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_vmax(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_vmin(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_sum(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_prod(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_mean(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_stderr(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_lastobs(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_lag(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_diff(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_rapp(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dln(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_grt(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mavg(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmax(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmin(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_sum(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_prod(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mean(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stderr(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_lastobs(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
 
-inline double(*L_TFN_FN[])(unsigned char* expr, short lg, int from, int to, int t, std::deque<double>& stack, int nargs) = 
+inline double(*L_TFN_FN[])(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_lag,          // L_LAG       L_TFN + 0 
     L_diff,         // L_DIFF      L_TFN + 1 
@@ -160,7 +160,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(unsigned char* expr, int j, int t, std::deque<double>& stack) override
+    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
     {
         int from = -1, to = -1;
         // NOTE: for time functions:
@@ -171,11 +171,11 @@ public:
            type == L_STDERR || type == L_LASTOBS)
             L_extract_time_range(t, stack, nb_args, from, to);
 
-        // NOTE: 'j + 2 + sizeof(short)' corresponds to the position of the sub-expression 
+        // NOTE: 'start + 2 + sizeof(short)' corresponds to the position of the sub-expression 
         //       in the buffer (after type, nb_args and len_args)
-        j += 2 + sizeof(short);
+        start += 2 + sizeof(short);
 
-        double result = (L_TFN_FN[pos])(expr + j, len_args, from, to, t, stack, nb_args);
+        double result = (L_TFN_FN[pos])(clec, start, len_args, from, to, t, stack, nb_args);
         stack.push_back(result);
     }
 };

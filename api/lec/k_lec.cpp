@@ -278,12 +278,12 @@ void CLEC::initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
     L_EXPR.clear();
 }
 
-CLEC::CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
+CLEC::CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec) : AbstractCLEC()
 {
     initialize(L_EXPR, lec);
 }
 
-CLEC::CLEC(const std::string& lec)
+CLEC::CLEC(const std::string& lec) : AbstractCLEC()
 {
     if(L_open_string((char*) lec.c_str()) != 0) 
         throw std::runtime_error("Error opening LEC string");
@@ -301,7 +301,7 @@ CLEC::CLEC(const std::string& lec)
  * Generates a CLEC form with the result and set clec->duplicated_endo to 1 if the
  * generated form is of the form "0 := LHS - RHS")
 */
-CLEC::CLEC(const std::string& eq, const std::string& endo)
+CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
 {
     int duplicated_endo = 0;
     std::string lec = eq;

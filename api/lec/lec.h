@@ -21,7 +21,7 @@ inline std::vector<ATOMIC_LEC> L_EXPR;      // Table of pairs <type, atomic elem
 
 /*---------------- STRUCTS ------------------------*/
 
-struct CLEC
+struct CLEC: public AbstractCLEC
 {
     // duplicate endogenous variable in the LEC expression
     char duplicated_endo = 0;
@@ -313,6 +313,35 @@ public:
      * @return            double              result of the calculation, IODE_NAN on error
      */
     double execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t);
+
+    /**
+     * @brief Execution of a CLEC sub expression.
+     * 
+     * @param pos       first position of the sub expression in the CLEC expression
+     * @param length    length of the sub expression
+     * @param t         time of calculation (index in dbv sample)
+     * @return double 
+     */
+    double execute_sub_expression(const int pos, const int length, const int t);
+
+    /**
+     * @brief Get the length of the sub expression
+     * 
+     * @param start 
+     * @return short 
+     */
+    void get_sub_expression_length(const int start, int& start_1, short& length_1);
+
+    /**
+     * @brief extract the lengths of the two sub expressions and the starting position 
+     *        of the second sub expression.
+     * 
+     * @param start 
+     * @param length_1 
+     * @param length_2 
+     * @param start_2 
+     */
+    void split_sub_expression(const int start, int& start_1, short& length_1, int& start_2, short& length_2);
 };
 
 /* ---------------------- FUNCS ---------------------- */

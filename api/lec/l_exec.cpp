@@ -92,6 +92,25 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
     return error_msg;
 }
 
+void CLEC::get_sub_expression_length(const int start, int& start_1, short& length_1)
+{
+    memcpy(&length_1, this->expression + start, sizeof(short));
+    start_1 = start + sizeof(short);
+}
+
+void CLEC::split_sub_expression(const int start, int& start_1, short& length_1, 
+    int& start_2, short& length_2)
+{
+    // sub expression 1
+    memcpy(&length_1, this->expression + start, sizeof(short));
+    start_1 = start + sizeof(short);
+
+    // sub expression 2
+    start_2 = start + length_1 + sizeof(short);
+    memcpy(&length_2, this->expression + start_2, sizeof(short));
+    start_2 += sizeof(short);
+}
+
 /**
  *  Execution of a CLEC sub expression.
  * 
@@ -105,46 +124,46 @@ static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
  *      - the first byte (type) is an identifier (+, ln, VAR, ...)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
- *      
- *  @param [in] expr    unsigned char*  pointer to the beginning of the sub expression (heterogeneous container)
- *  @param [in] lg      int             length of the sub expression
+ *  
+ *  @param [in] start   int             position of the sub expression in the CLEC->expression buffer
+ *  @param [in] length  int             length of the sub expression
  *  @param [in] t       int             time (index in dbv) of execution
  *  @return             double          result of the computation
  *  
  */
-double L_exec_sub(unsigned char* expr, int lg, int t)
+double CLEC::execute_sub_expression(const int start, const int length, const int t)
 {
     int type;
     int previous_j;
     int pos_stack = 0;  
     std::deque<double> stack;
-    for(int j = 0; j < lg ;) 
+    for(int j = start; j < start + length ;) 
     {
-        type = expr[j];
+        type = this->expression[j];
 
         if(type == L_LCONST)
         {
             // extract LEC long constant from the buffer -> update j
-            LEC_CONST_LONG al_lconst(expr, j);
+            LEC_CONST_LONG al_lconst(this->expression, j);
             // add the constant to the stack
             al_lconst.add_to_stack(stack, t);
         }
         else if(type == L_DCONST)
         {
             // extract LEC double constant from the buffer -> update j
-            LEC_CONST_REAL al_dconst(expr, j);
+            LEC_CONST_REAL al_dconst(this->expression, j);
             // add the constant to the stack
             al_dconst.add_to_stack(stack, t); 
         }
         else if(type == L_COEF)
         {
             // extract LEC coefficient from the buffer -> update j
-            LEC_COEF al_coef(expr, j);
+            LEC_COEF al_coef(this->expression, j);
             // add the coefficient value to the stack
             bool ok = al_coef.add_to_stack(stack, t);
             if(!ok) 
             {
-                std::string error_msg = get_l_exec_sub_error_message(expr, t);
+                std::string error_msg = get_l_exec_sub_error_message(this->expression + start, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
@@ -152,7 +171,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         else if(type == L_PERIOD)
         {
             // extract LEC Period from the buffer -> update j
-            LEC_PERIOD al_period(expr, j);
+            LEC_PERIOD al_period(this->expression, j);
             // add the period position to the stack
             al_period.add_to_stack(stack, t);
         }
@@ -160,12 +179,12 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         else if(type == L_VAR || type == L_VART) 
         {
             // extract LEC Variable from the buffer -> update j
-            LEC_VAR al_var(expr, j);
+            LEC_VAR al_var(this->expression, j);
             // add the variable value to the stack
             bool ok = al_var.add_to_stack(stack, t);
             if(!ok) 
             {
-                std::string error_msg = get_l_exec_sub_error_message(expr, t);
+                std::string error_msg = get_l_exec_sub_error_message(this->expression + start, t);
                 kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
             }
@@ -177,41 +196,41 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
         {
             previous_j = j;
             // extract LEC function from the buffer -> update j
-            LEC_FN al_fn(expr, j);
+            LEC_FN al_fn(this->expression, j);
             // execute the function on the stack
-            al_fn.execute(expr, previous_j, t, stack);
+            al_fn.execute(*this, previous_j, t, stack);
         }
         else if(is_op(type))
         {
             previous_j = j;
             // extract LEC operator from the buffer -> update j
-            LEC_OP al_op(expr, j);
+            LEC_OP al_op(this->expression, j);
             // execute the operator on the stack
-            al_op.execute(expr, previous_j, t, stack);
+            al_op.execute(*this, previous_j, t, stack);
         }
         else if(is_tfn(type)) 
         {
             previous_j = j;
             // extract LEC time function from the buffer -> update j
-            LEC_TFN al_tfn(expr, j);
+            LEC_TFN al_tfn(this->expression, j);
             // execute the time function on the stack
-            al_tfn.execute(expr, previous_j, t, stack);
+            al_tfn.execute(*this, previous_j, t, stack);
         }
         else if(is_val(type)) 
         {
             previous_j = j;
             // extract LEC value from the buffer -> update j
-            LEC_VAL_FN al_val(expr, j);
+            LEC_VAL_FN al_val(this->expression, j);
             // execute the value function on the stack
-            al_val.execute(expr, previous_j, t, stack);
+            al_val.execute(*this, previous_j, t, stack);
         }
         else if(is_mtfn(type)) 
         {
             previous_j = j;
             // extract LEC multi-time function from the buffer -> update j
-            LEC_MTFN al_mtfn(expr, j);
+            LEC_MTFN al_mtfn(this->expression, j);
             // execute the multi-time function on the stack
-            al_mtfn.execute(expr, previous_j, t, stack);
+            al_mtfn.execute(*this, previous_j, t, stack);
         }
         else 
         {
@@ -229,7 +248,7 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
  *  
  *  - Assign global variables that could be used by calculation functions.
  *  - initiate the exception handling on floating point errors
- *  - call L_exec_sub() which is the real (recursive) calculator
+ *  - call execute_sub_expression() which is the real (recursive) calculator
  *  
  *  @param [in] dbv  KDBVariablesPtr  input variable KDB
  *  @param [in] dbs  KDBScalarsPtr    input scalars KDB
@@ -266,7 +285,7 @@ double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
     if(setjmp(L_JMP))
         return (double) IODE_NAN; // On FPE, return IODE_NAN
     
-    double value = L_exec_sub(this->expression, this->len_expr, t);
+    double value = this->execute_sub_expression(0, this->len_expr, t);
     return value;
 }
 
