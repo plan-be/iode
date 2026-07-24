@@ -300,6 +300,19 @@ public:
      * @return            bool          true on success, false on failure
      */
     bool print_definition(const std::string& name, const std::string& eqlec, const int coefs);
+
+    /**
+     * Executes this compiled and linked CLEC expression.
+     *
+     * Assigns global variables that could be used by calculation functions and initiates 
+     * the exception handling on floating point errors, then calls the expression evaluator.
+     *
+     * @param [in] dbv    KDBVariablesPtr     input variable KDB
+     * @param [in] dbs    KDBScalarsPtr       input scalars KDB
+     * @param [in] t      int                 time of calculation (index in dbv sample)
+     * @return            double              result of the calculation, IODE_NAN on error
+     */
+    double execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -324,7 +337,6 @@ int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
         int matherr(struct exception *e);
 #endif
 void L_fperror(int sig);
-double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t);
 double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 
 /* l_hodrick.c */

@@ -226,7 +226,7 @@ public:
 	    int rc = clec->link(global_ws_var, global_ws_scl);
 	    EXPECT_EQ(rc, 0);
 
-	    double calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
+	    double calc_val = clec->execute(global_ws_var, global_ws_scl, t);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
@@ -246,7 +246,7 @@ public:
 	    if(clec->link(global_ws_var, global_ws_scl) != 0) 
             return IODE_NAN;
         
-	    double res = L_exec(global_ws_var, global_ws_scl, clec, t);
+	    double res = clec->execute(global_ws_var, global_ws_scl, t);
 	    return res;
 	}
 

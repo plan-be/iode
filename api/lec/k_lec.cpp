@@ -263,6 +263,7 @@ void CLEC::initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
         throw std::runtime_error(error_msg);
     }
     
+    this->lec = lec;
     this->v_expression = expr;
     this->len_expr = pos_buffer;
     this->expression = new unsigned char[pos_buffer];
