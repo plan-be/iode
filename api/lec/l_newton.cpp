@@ -107,38 +107,33 @@
  *  List of functions
  *  ----------------- 
  *
- *      double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
+ *      double zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, int t, int varnb, int eqvarnb)    Solves numerically a LEC equation for one period of time with respect to a given variable. 
  *                                                                                      If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
- *      double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
+ *      double newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, int t, int varnb, int eqvarnb)  Tries to solve a LEC equation by the Newton-Raphson method. 
  *  
  */
 #include <math.h>
 #include "api/lec/lec.h"
 #include "api/simulation/simulation.h"
 
-
-static double  L_newton_1();
-
 /**
- *  Solves numerically a LEC equation for one period of time with respect to a given variable (varnb).  
+ *  Solves numerically this LEC equation for one period of time with respect to a given variable (varnb).  
  *  If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
  *  
  *  
- *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
- *  @param [in] KDB*    dbs     KDB of Scalar with which the equation has been linked
- *  @param [in] CLEC*   clec    compiled LEC expression 
- *  @param [in] int     t       time of calculation (index in dbv Sample)
- *  @param [in] int     varnb   position of the endogenous variable in dbv
- *  @param [in] int     eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
- *  @return     double          root of the equation (varnb value that solves the equation)
+ *  @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+ *  @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+ *  @param [in] int             t       time of calculation (index in dbv Sample)
+ *  @param [in] int             varnb   position of the endogenous variable in dbv
+ *  @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+ *  @return     double                  root of the equation (varnb value that solves the equation)
  *  
  */
-double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
-    const int varnb, const int eqvarnb)
+double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const int varnb, const int eqvarnb)
 {
-    double x = L_newton(dbv, dbs, clec, t, varnb, eqvarnb);
+    double x = this->newton(dbv, dbs, t, varnb, eqvarnb);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = L_secant(dbv, dbs, clec, t, varnb, eqvarnb);
+        x = this->secant(dbv, dbs, t, varnb, eqvarnb);
     return x;
 }
 
@@ -146,7 +141,7 @@ double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC
 /**
  *  Tries to solve a LEC equation by the Newton-Raphson method.
  *  
- *  Subfunction of L_newton().
+ *  Subfunction of newton().
  *  
  *  The convergence threshold eps is set to 1e-6 by default. However, if algo is set to 1 and 
  *  the absolute value of the endogenous variable before the first iteration is > 1.0, 
@@ -159,10 +154,10 @@ double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC
  *  @global [in]    int  KSIM_DEBUG        if not null, calls L_debug() to save a trace of the result 
  *  @global [in]    int  KSIM_NEWTON_DEBUG if not null, calls L_debug() to save a trace of each iteration of the solver
  *  
- *  See L_zero() for the description of the other parameters.
+ *  See zero() for the description of the other parameters.
  */
-static double L_newton_1(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, 
-    const int t, const int varnb, const int eqvarnb)
+double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
+    const int varnb, const int eqvarnb)
 {
     double  oldx, x, fx, fxh, ax, afx, dx = 0.0, ox;
     double  h = CSimulation::KSIM_NEWTON_STEP;
@@ -180,7 +175,7 @@ static double L_newton_1(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs,
 
     // Case 1: equation Y : = f(X) analytically solved
     // or Case 3 (endo-exo)
-    if(varnb == eqvarnb || clec->duplicated_endo) 
+    if(varnb == eqvarnb || this->duplicated_endo) 
     {
         shift = 0.0;
         ax = fabs(x);
@@ -206,7 +201,8 @@ static double L_newton_1(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs,
         d_ptr[0] = x;
         ax = fabs(x);
 
-        fx = L_exec(dbv, dbs, clec, t);
+        auto this_shared = std::make_shared<CLEC>(*this);
+        fx = L_exec(dbv, dbs, this_shared, t);
         if(CSimulation::KSIM_NEWTON_DEBUG) 
             L_debug("   - f(%lg) = %lg\n", x, fx);
 
@@ -237,7 +233,8 @@ static double L_newton_1(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs,
 
         d_ptr = L_getvar(dbv, varnb) + t;
         d_ptr[0] = x + h;
-        fxh = L_exec(dbv, dbs, clec, t);
+        auto this_shared2 = std::make_shared<CLEC>(*this);
+        fxh = L_exec(dbv, dbs, this_shared2, t);
         if(!IODE_IS_A_NUMBER(fxh)) {
             if(CSimulation::KSIM_NEWTON_DEBUG) 
                 L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
@@ -257,7 +254,8 @@ static double L_newton_1(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs,
         ox = x;
         x -= dx;
         d_ptr[0] = x;
-        fx = L_exec(dbv, dbs, clec, t);
+        auto this_shared3 = std::make_shared<CLEC>(*this);
+        fx = L_exec(dbv, dbs, this_shared3, t);
         if(!IODE_IS_A_NUMBER(fx)) 
             x = ox - dx / 4;
         it++;
@@ -273,19 +271,19 @@ err:
 
 
 /**
- *  Tries to solve a LEC equation by the Newton-Raphson method. 
+ *  Tries to solve this LEC equation by the Newton-Raphson method. 
  *  
- *  Calls first L_newton_1() with the algo param fixed to 0 (convergence criterion set to 1e-6).
- *  If no solution is found, calls L_newton_1() with algo = 1 to multiply eps by the endogenous value.
+ *  Calls first newton_sub() with the algo param fixed to 0 (convergence criterion set to 1e-6).
+ *  If no solution is found, calls newton_sub() with algo = 1 to multiply eps by the endogenous value.
  *  
- *  See L_zero() for the parameter description.
+ *  See zero() for the parameter description.
  *    
  */
-double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+double CLEC::newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
     const int varnb, const int eqvarnb)
 {
-    double x = L_newton_1(0, dbv, dbs, clec, t, varnb, eqvarnb);
+    double x = this->newton_sub(0, dbv, dbs, t, varnb, eqvarnb);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = L_newton_1(1, dbv, dbs, clec, t, varnb, eqvarnb);
+        x = this->newton_sub(1, dbv, dbs, t, varnb, eqvarnb);
     return x;
 }

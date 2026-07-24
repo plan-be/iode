@@ -6,9 +6,9 @@
  *  List of functions
  *  -----------------
  *
- *      static double L_fx(double x, int t)                                             Computes the value of f(x) in time t
- *      static int L_bracket(double* x1, double* x2, int t)                             Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
- *      double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, CLEC* clec, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation clec by a secant method. 
+ *      static double L_fx(double x, int t)                             Computes the value of f(x) in time t
+ *      static int L_bracket(double* x1, double* x2, int t)             Tries to find 2 values x1 and x2 such as the sign of L_fx(x1) is opposite to the sign of L_fx(x2).
+ *      double secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, int t, int varnb, int eqvarnb)  Tries to find a solution to the equation by a secant method. 
  */
 #include <math.h>
 #include "api/lec/lec.h"
@@ -105,10 +105,10 @@ static int L_bracket(double* x1, double* x2, int t)
 
 
 /**
- *  Tries to find a solution to the equation clec by a secant method.
+ *  Tries to find a solution to this LEC equation by a secant method.
  *
  *  That basic secant method first requires to determine an interval [xl, xr] containing a root of 
- *  the equation clec (xl/xr stands for x-left/right).
+ *  the equation (xl/xr stands for x-left/right).
  *  In other words, the sign of f(xl) must be opposite to that of f(xr).
  *  
  *  Then the size of that interval is decreased until |xl - xr| becomes << eps by applying the formula below:
@@ -118,19 +118,19 @@ static int L_bracket(double* x1, double* x2, int t)
  *   
  *      
  *  
- *  @param [in] KDB*    dbv     KDB of VAR with which the equation has been linked
- *  @param [in] KDB*    dbs     KDB of Scalar with which the equation has been linked
- *  @param [in] CLEC*   clec    compiled LEC expression 
- *  @param [in] int     t       time of calculation (index in dbv Sample)
- *  @param [in] int     varnb   position of the endogenous variable in dbv
- *  @param [in] int     eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+ *  @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+ *  @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+ *  @param [in] int             t       time of calculation (index in dbv Sample)
+ *  @param [in] int             varnb   position of the endogenous variable in dbv
+ *  @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
  *  
- *  @return     double          root of the equation (varnb value that solves the equation)
+ *  @return     double                  root of the equation (varnb value that solves the equation)
  *
  */
-double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
+double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
     const int varnb, const int eqvarnb)
 {
+    auto this_shared = std::make_shared<CLEC>(*this);
     int     it = 0;
     double  x1, x2, xl, xh, xr,
             dx, tmp,
@@ -139,7 +139,7 @@ double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CL
 
     LN_DBV = dbv;
     LN_DBS = dbs;
-    LN_CLEC = clec;
+    LN_CLEC = this_shared;
     LN_VARNB = varnb;
 
     d_ptr = L_getvar(dbv, varnb);
@@ -149,7 +149,7 @@ double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CL
 
     // if endogenous is not changed and endo appears more than once in clec,
     // clec is of the form 0 := lhx - rhs. Hence, shift = 0 instead of endo(t)
-    if(varnb == eqvarnb || clec->duplicated_endo) 
+    if(varnb == eqvarnb || this_shared->duplicated_endo) 
     {
         LN_SHIFT = 0.0;
         x1 = fabs(x1);
