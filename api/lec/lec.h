@@ -41,6 +41,25 @@ struct CLEC
 
 private:
     /**
+     * Tries to solve this LEC equation by the Newton-Raphson method (internal helper).
+     * 
+     * Subfunction used by newton() method. The convergence threshold eps is set to 1e-6 by default.
+     * However, if algo is set to 1 and the absolute value of the endogenous variable before the 
+     * first iteration is > 1.0, then eps is multiplied by the endogenous value.
+     *
+     * @param  [in]    int  algo              if not null, the convergence criteria eps is multiplied by the 
+     *                                         value of f(x) if ||f(x)|| > 1.0.
+     * @param [in]    KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+     * @param [in]    KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+     * @param [in]    int             t       time of calculation (index in dbv Sample)
+     * @param [in]    int             varnb   position of the endogenous variable in dbv
+     * @param [in]    int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+     * @return        double                  approximated root or NaN if no solution found
+     */
+    double newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
+        const int varnb, const int eqvarnb);
+
+    /**
      * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
      * and their positions are saved in this CLEC->objs.
      *
@@ -226,6 +245,50 @@ public:
         }
         return list;
     }
+
+    /**
+     * Solves numerically this LEC equation for one period of time with respect to a given variable (varnb).
+     * If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method.
+     *
+     * @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+     * @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+     * @param [in] int             t       time of calculation (index in dbv Sample)
+     * @param [in] int             varnb   position of the endogenous variable in dbv
+     * @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+     * @return     double                  root of the equation (varnb value that solves the equation)
+     */
+    double zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const int varnb, const int eqvarnb);
+
+    /**
+     * Tries to solve this LEC equation by the Newton-Raphson method.
+     *
+     * Calls first the Newton-Raphson method with convergence criterion set to 1e-6.
+     * If no solution is found, calls again with a multiplied epsilon by the endogenous value.
+     *
+     * @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+     * @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+     * @param [in] int             t       time of calculation (index in dbv Sample)
+     * @param [in] int             varnb   position of the endogenous variable in dbv
+     * @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+     * @return     double                  approximated root of the equation
+     */
+    double newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const int varnb, const int eqvarnb);
+
+    /**
+     * Tries to find a solution to this LEC equation by a secant (bisection) method.
+     *
+     * The basic secant method first requires to determine an interval [xl, xr] containing a root of
+     * the equation (xl/xr stands for x-left/right). Then the size of that interval is decreased
+     * until convergence.
+     *
+     * @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
+     * @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
+     * @param [in] int             t       time of calculation (index in dbv Sample)
+     * @param [in] int             varnb   position of the endogenous variable in dbv
+     * @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
+     * @return     double                  root of the equation (varnb value that solves the equation)
+     */
+    double secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const int varnb, const int eqvarnb);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -260,16 +323,6 @@ void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 /* l_eqs.c */
 int L_split_eq(const std::string& eq);
 int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo);
-
-/* l_newton.c */
-double L_zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
-    const int varnb, const int eqvarnb);
-double L_newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
-    const int varnb, const int eqvarnb);
-
-/* l_secant.c */
-double L_secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t, 
-    const int varnb, const int eqvarnb);
 
 /* k_lec.c */
 bool print_lec_definition(const std::string& name, const std::string& eqlec, 

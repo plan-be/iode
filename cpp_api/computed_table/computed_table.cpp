@@ -287,7 +287,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
             return false;
 
         // Newton-Raphson method
-        res = L_zero(global_ws_var, global_ws_scl, clec, period_pos, var_pos, var_pos);
+        res = clec->zero(global_ws_var, global_ws_scl, period_pos, var_pos, var_pos);
     }
     else
     {

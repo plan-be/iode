@@ -716,7 +716,7 @@ fin:
  *  Tries to find a value for varnb[t] that satifies the equality in the equation eqnb. 
  *  
  *  If the varnb is not the endogenous variable of the equation eqnb or if the equation was not analytically 
- *  solved with respect to its endogenous, the funtion L_zero() is called to (try to) solve the equation numerically.
+ *  solved with respect to its endogenous, the funtion zero() is called to (try to) solve the equation numerically.
  *  
  *  The equation must be linked before the call to calculate_CLEC().
  *  
@@ -748,7 +748,7 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
     eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->duplicated_endo || varnb != eqvarnb)
-        x = L_zero(KSIM_DBV, KSIM_DBS, clec, t, varnb, eqvarnb);
+        x = clec->zero(KSIM_DBV, KSIM_DBS, t, varnb, eqvarnb);
     else
         x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
     
