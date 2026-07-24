@@ -282,7 +282,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
             return false;
         }
 
-        res = L_link(global_ws_var, global_ws_scl, clec);
+        res = clec->link(global_ws_var, global_ws_scl);
         if(res != 0)
             return false;
 
@@ -292,7 +292,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     else
     {
         // inverse formula
-        L_link(global_ws_var, global_ws_scl, clec);
+        clec->link(global_ws_var, global_ws_scl);
         res = L_exec(global_ws_var, global_ws_scl, clec, period_pos);
     }
 

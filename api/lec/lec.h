@@ -41,6 +41,27 @@ struct CLEC
 
 private:
     /**
+     * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
+     * and their positions are saved in this CLEC->objs.
+     *
+     * If a name is not found, an error message is added to the stack via IodeErrorManager::append_error 
+     * and L_errno is set to L_NOT_FOUND_ERR.
+     *
+     * @param [in]      dbv     KDB*    KDB of variables
+     * @param [in]      dbs     KDB*    KDB of scalars
+     * @return                  int     0 on success,  L_NOT_FOUND_ERR on error
+    */
+    int link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs);
+
+    /**
+     * Second step of linking CLEC. Each time displacement in this CLEC struct is aligned to the dbv's Sample.
+     * For example, the position of A[1970Y1] in the vector A depends on the sample of dbv.
+     *
+     * @param [in]      dbv     KDB*    KDB of variables
+     */
+    void link_sample(KDBVariablesPtr dbv);
+
+    /**
      * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
      * adding the size reclaimed by each ALEC atomic expression.
      * 
@@ -176,6 +197,14 @@ public:
         return this->objs == other.objs;
     }
 
+    // Links this CLEC expression to KDB's of variables and of scalars.
+    // If some Period's are present in CLEC, they are aligned to the Sample of dbv.
+    // The CLEC, although modified by link(), can be relinked later with other KDB's.
+    // @param [in]      dbv  KDB*        KDB of variables to link to CLEC
+    // @param [in]      dbs  KDB*        KDB of scalars to link to CLEC
+    // @return               int         0 on success, L_errno on error
+    int link(KDBVariablesPtr dbv, KDBScalarsPtr dbs);
+
     std::vector<std::string> get_scalars() const
     {
         std::vector<std::string> list;
@@ -204,9 +233,6 @@ public:
 /* l_cc1.c */
 int generate_lec_expression(const bool reset_lnames = true);
 int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
-
-/* l_link.c */
-int L_link(KDBVariablesPtr dbv, KDBScalarsPtr dbs, std::shared_ptr<CLEC>& cl);
 
 /* l_exec.c */
 #ifdef _MSC_VER

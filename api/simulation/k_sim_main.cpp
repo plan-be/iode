@@ -608,7 +608,7 @@ int CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPt
         
         eq_ptr = dbe->get_obj_ptr(eq_name);
         eq_ptr->compile();
-        rc = L_link(dbv, dbs, eq_ptr->clec);
+        rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
         {
             std::string err_msg = std::string("'") + eq_name + "': cannot link equation";

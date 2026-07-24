@@ -691,4 +691,4 @@ int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
 
 // lec/l_link.c
 // NOTE: declare here to avoid circular dependency between equations.h and lec.h
-void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& cl);
+void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& clec);

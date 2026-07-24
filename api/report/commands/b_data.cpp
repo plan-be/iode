@@ -278,7 +278,7 @@ int B_DataCalcVar(char* arg, int unused)
             return -1;
         }
 
-        if(!L_link(kdb, global_ws_scl, clec)) 
+        if(!clec->link(kdb, global_ws_scl)) 
         {
             double d;
             for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 

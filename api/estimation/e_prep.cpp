@@ -138,7 +138,7 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1; // JMP 13/11/2012
         }
 
-        if(L_link(E_DBV, E_DBS, clec) != 0) 
+        if(clec->link(E_DBV, E_DBS) != 0) 
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
@@ -174,7 +174,7 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1; // JMP 13/11/2012
         } 
 
-        if(L_link(E_DBV, E_DBS, clec) != 0)
+        if(clec->link(E_DBV, E_DBS) != 0)
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
@@ -262,7 +262,7 @@ int Estimation::E_prep_instrs(char** instrs)
             goto fin;
         }
 
-        if(L_link(E_DBV, E_DBS, clec) != 0) 
+        if(clec->link(E_DBV, E_DBS) != 0) 
         {
             error_manager.append_error("Estimation: Link Error");
             goto fin;

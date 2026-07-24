@@ -223,7 +223,7 @@ public:
         // make sure that the LEC expression is valid
 	    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
 
-	    int rc = L_link(global_ws_var, global_ws_scl, clec);
+	    int rc = clec->link(global_ws_var, global_ws_scl);
 	    EXPECT_EQ(rc, 0);
 
 	    double calc_val = L_exec(global_ws_var, global_ws_scl, clec, t);
@@ -243,7 +243,7 @@ public:
             return IODE_NAN;
         }
         
-	    if(L_link(global_ws_var, global_ws_scl, clec)) 
+	    if(clec->link(global_ws_var, global_ws_scl) != 0) 
             return IODE_NAN;
         
 	    double res = L_exec(global_ws_var, global_ws_scl, clec, t);
