@@ -289,6 +289,17 @@ public:
      * @return     double                  root of the equation (varnb value that solves the equation)
      */
     double secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const int varnb, const int eqvarnb);
+
+    /**
+     * Prints this LEC expression. Sets the endogenous variable (name) in bold.
+     *
+     * @param [in] name   std::string&  endogenous name
+     * @param [in] eqlec  std::string&  LEC expression
+     * @param [in] coefs  int           if 1: replace scalars by their value
+     *                                  if 2: replace scalars by their value and their t-test
+     * @return            bool          true on success, false on failure
+     */
+    bool print_definition(const std::string& name, const std::string& eqlec, const int coefs);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -323,7 +334,3 @@ void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 /* l_eqs.c */
 int L_split_eq(const std::string& eq);
 int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo);
-
-/* k_lec.c */
-bool print_lec_definition(const std::string& name, const std::string& eqlec, 
-    const std::shared_ptr<CLEC> eqclec, const int coefs);

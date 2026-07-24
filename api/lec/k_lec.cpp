@@ -117,29 +117,24 @@ char* L_expand(char* list_name)
 }
 
 /**
- *  Print a LEC expression. Set the engogenous (name) in bold.
+ *  Prints this LEC expression. Sets the endogenous variable (name) in bold.
  *  
- *  @param [in] name   char* name    endogenous name   
- *  @param [in] eqlec  char* eqlec   LEC expression 
- *  @param [in] eqclec CLEC* eqclec  CLEC (compiled LEC) equivalent to LEC
- *  @param [in] coefs  int   coefs   if 1: replace scalars by their value   
+ *  @param [in] name   std::string&  endogenous name   
+ *  @param [in] eqlec  std::string&  LEC expression 
+ *  @param [in] coefs  int           if 1: replace scalars by their value   
  *                                   if 2: replace scalars by their value and their t-test   
- *  @return            bool
+ *  @return            bool          true on success, false on failure
  */
-bool print_lec_definition(const std::string& name, const std::string& eqlec, 
-    const std::shared_ptr<CLEC> eqclec, const int coefs)
+bool CLEC::print_definition(const std::string& name, const std::string& eqlec, const int coefs)
 {
-    if(!eqclec) 
-        return false;
-
     // create a char* array containing a copy of the string eqlec
     int lg = (int) eqlec.size();
     lg = std::max(512, 4 * lg);
     char* c_lec = new char[lg];
     strcpy(c_lec, eqlec.c_str());
     
-    // create a copy of the CLEC* eqclec
-    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eqclec);
+    // create a copy of this CLEC
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*this);
 
     char buf[80];
     sprintf(buf, "%cb%s%cB", A2M_ESCCH, name.c_str(), A2M_ESCCH);
