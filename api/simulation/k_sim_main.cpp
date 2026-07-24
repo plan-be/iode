@@ -750,7 +750,7 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     if(clec->duplicated_endo || varnb != eqvarnb)
         x = clec->zero(KSIM_DBV, KSIM_DBS, t, varnb, eqvarnb);
     else
-        x = L_exec(KSIM_DBV, KSIM_DBS, clec, t);
+        x = clec->execute(KSIM_DBV, KSIM_DBS, t);
     
     if(!IODE_IS_A_NUMBER(x) && msg)
     {
