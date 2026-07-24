@@ -231,20 +231,15 @@ double L_exec_sub(unsigned char* expr, int lg, int t)
  *  - initiate the exception handling on floating point errors
  *  - call L_exec_sub() which is the real (recursive) calculator
  *  
- *  @param [in] dbv  KDB*       input variable KDB
- *  @param [in] dbs  KDB*       input scalars KDB    
- *  @param [in] expr CLEC*      compiled and linked (with dbv and dbs) LEC
- *  @param [in] t    int        time of calculation (index in dbv sample)
- *  @return          double     result of the calculation 
- *                              IODE_NAN on error (and L_errno is set)
+ *  @param [in] dbv  KDBVariablesPtr  input variable KDB
+ *  @param [in] dbs  KDBScalarsPtr    input scalars KDB
+ *  @param [in] t    int              time of calculation (index in dbv sample)
+ *  @return          double           result of the calculation, IODE_NAN on error (L_errno is set)
  */
-double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC> clec, const int t)
+double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
 {
-    if(!clec) 
-        return IODE_NAN;
-
     // leave if empty CLEC expression
-    if(clec->expression == nullptr || clec->len_expr == 0)
+    if(this->expression == nullptr || this->len_expr == 0)
         return IODE_NAN;
 
     // Use globals to limit the number of parameters in function calls
@@ -252,7 +247,7 @@ double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC
     L_EXEC_DBS = dbs;
 
     V_EXEC_POS.clear();
-    for(const auto& [_, pos] : clec->objs)
+    for(const auto& [_, pos] : this->objs)
         V_EXEC_POS.push_back(pos);
     
     L_curt = t;         // Global with the current t of execution
@@ -271,7 +266,7 @@ double L_exec(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::shared_ptr<CLEC
     if(setjmp(L_JMP))
         return (double) IODE_NAN; // On FPE, return IODE_NAN
     
-    double value = L_exec_sub(clec->expression, clec->len_expr, t);
+    double value = L_exec_sub(this->expression, this->len_expr, t);
     return value;
 }
 
@@ -327,7 +322,7 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
         int nb = dbv->get_sample()->nb_periods;
         vec = (double*) SW_nalloc(nb * sizeof(double));
         for(int t = 0 ; t < nb ; t++)
-            vec[t] = L_exec(dbv, dbs, clec, t);
+            vec[t] = clec->execute(dbv, dbs, t);
     }
 
     return vec;

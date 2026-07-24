@@ -40,7 +40,7 @@ double execute_lec(const std::string& lec, const int t)
     if(!clec) 
         return IODE_NAN;
 
-    double value = L_exec(global_ws_var, global_ws_scl, clec, t);
+    double value = clec->execute(global_ws_var, global_ws_scl, t);
     return value;
 }
 
@@ -71,7 +71,7 @@ std::vector<double> execute_lec(const std::string& lec)
 
     res.reserve(nb_per);
     for(int t = 0; t < nb_per; t++) 
-        res.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
+        res.push_back(clec->execute(global_ws_var, global_ws_scl, t));
     
     return res;
 }

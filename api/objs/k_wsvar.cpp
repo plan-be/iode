@@ -776,8 +776,7 @@ Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const int 
     }
 
     for (int t = t_first; t <= t_last; t++) 
-        var.push_back(L_exec(global_ws_var, global_ws_scl, clec, t));
-    return var;	
+        var.push_back(clec->execute(global_ws_var, global_ws_scl, t));	
 }
 
 Variable KDBVariables::calculate_var_from_lec(const std::string& lec, const std::string& first_period, const std::string& last_period)

@@ -49,7 +49,7 @@ static double L_fx(double x, int t)
     oldx = d_ptr[t];
     d_ptr[t] = x;
 
-    fx = L_exec(LN_DBV, LN_DBS, LN_CLEC, t);
+    fx = LN_CLEC->execute(LN_DBV, LN_DBS, t);
     d_ptr[t] = oldx;
     return(fx - LN_SHIFT);
 }

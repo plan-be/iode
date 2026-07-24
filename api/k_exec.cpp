@@ -756,7 +756,7 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = L_exec(dbv_ptr, dbs_ptr, clec_copy, t);
+            d = clec_copy->execute(dbv_ptr, dbs_ptr, t);
             dbv_ptr->get_var_ptr(idt_name)[t] = d;
         }
     }

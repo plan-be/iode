@@ -283,7 +283,7 @@ int B_DataCalcVar(char* arg, int unused)
             double d;
             for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 
             {
-                d = L_exec(kdb, global_ws_scl, clec, t);
+                d = clec->execute(kdb, global_ws_scl, t);
                 kdb->get_var_ptr(name)[t] = d;
             }
         }

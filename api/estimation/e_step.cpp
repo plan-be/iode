@@ -109,7 +109,7 @@ double C_evallec(char* lec, int t)
         }
 
         if(!clec->link(global_ws_var, global_ws_scl))
-            x = L_exec(global_ws_var, global_ws_scl, clec, t);
+            x = clec->execute(global_ws_var, global_ws_scl, t);
     }
 
     return x;

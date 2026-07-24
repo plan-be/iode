@@ -201,8 +201,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         d_ptr[0] = x;
         ax = fabs(x);
 
-        auto this_shared = std::make_shared<CLEC>(*this);
-        fx = L_exec(dbv, dbs, this_shared, t);
+        fx = this->execute(dbv, dbs, t);
         if(CSimulation::KSIM_NEWTON_DEBUG) 
             L_debug("   - f(%lg) = %lg\n", x, fx);
 
@@ -233,8 +232,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
 
         d_ptr = L_getvar(dbv, varnb) + t;
         d_ptr[0] = x + h;
-        auto this_shared2 = std::make_shared<CLEC>(*this);
-        fxh = L_exec(dbv, dbs, this_shared2, t);
+        fxh = this->execute(dbv, dbs, t);
         if(!IODE_IS_A_NUMBER(fxh)) {
             if(CSimulation::KSIM_NEWTON_DEBUG) 
                 L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
@@ -254,9 +252,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         ox = x;
         x -= dx;
         d_ptr[0] = x;
-        auto this_shared3 = std::make_shared<CLEC>(*this);
-        fx = L_exec(dbv, dbs, this_shared3, t);
-        if(!IODE_IS_A_NUMBER(fx)) 
+        fx = this->execute(dbv, dbs, t); 
             x = ox - dx / 4;
         it++;
     }

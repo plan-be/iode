@@ -146,7 +146,7 @@ int Estimation::E_prep_lecs(char** lecs)
 
         for(t = 0 ; t < E_T ; t++) 
         {
-            x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
+            x = clec->execute(E_DBV, E_DBS, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
                 error_manager.append_error("Estimation: NaN Generated");
@@ -270,13 +270,7 @@ int Estimation::E_prep_instrs(char** instrs)
 
         for(t = 0 ; t < E_T ; t++) 
         {
-            x = L_exec(E_DBV, E_DBS, clec, t + E_FROM);
-            if(!IODE_IS_A_NUMBER(x)) 
-            {
-                error_manager.append_error("Estimation: NaN Generated");
-                goto fin;
-            }
-            MATE(minstr, t, i + 1) = x;
+            x = clec->execute(E_DBV, E_DBS, t + E_FROM);
         }
     }
 

@@ -293,7 +293,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     {
         // inverse formula
         clec->link(global_ws_var, global_ws_scl);
-        res = L_exec(global_ws_var, global_ws_scl, clec, period_pos);
+        res = clec->execute(global_ws_var, global_ws_scl, period_pos);
     }
 
     if(!IODE_IS_A_NUMBER(res))
