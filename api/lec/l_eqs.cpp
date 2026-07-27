@@ -86,88 +86,72 @@ static int L_count_endo(const std::vector<ATOMIC_LEC>& v_al, const std::string& 
 }
 
 /**
- * If sl->sl_expr[sl->sl_side_with_endo] is not trivial, splits 
- * sl->sl_expr[sl->sl_side_with_endo] into two parts and replaces 
- * sl->sl_expr[sl->sl_side_with_endo] and sl->sl_expr[sl->sl_side_without_endo] 
- * by these 2 expressions.
+ * If equation side with endo is not trivial, splits it into two parts 
+ * and replaces left side and right side of the equation with the two parts.
  * 
  * ------------------------------------------------------
  * Example: 
  *
- * Expression containing the endogenous : "EXO + ln ENDO"
+ * -> equation side containing the endogenous : "EXO + ln ENDO"
+ * -> at the end of the process, the SLEC struct will contain:
+ * left side:  "EXO" 
+ * right side: "ln ENDO"
  * 
- * At the beginning of the function:
- * 
- *  sl->sl_expr[sl->sl_side_with_endo]:  | EXO  |
- *              | (    |
- *              | ENDO |
- *              | )    |
- *              | ln   |
- *              | +    |
- * 
- *  At the end of the function:
- *     sl->sl_left_expr =   EXO
- *     sl->sl_right_expr =  | (    |
- *                | ENDO |
- *                | )    |
- *                | ln   |
- *     sl->sl_side_with_endo = EQ_RHS
- *     sl->sl_side_without_endo = EQ_LHS
- * -------------------------------------------------------
- * 
- * @param [in, out]     sl  SLEC*   current state of the equation
- * @return                  int     0 on success, L_DUP_ERR if the sub expression cannot be determined
+ * @param [in, out] sl  SLEC&   current state of the equation
+ * @return              bool    false if there was nothing to split, true if the  
+ *                              expression was split or if an error occurred
 */
-static int L_split_expr(SLEC* sl)
+static bool L_split_expr(SLEC& slec)
 {
     int start_sub_expr = -1;
 
-    // ALEC containing the sl->sl_endo
+    // vector of atomic lec containing the endogenous variable
     std::vector<ATOMIC_LEC> v_al;
-    if(sl->sl_side_with_endo == EQ_LHS)
-        v_al = sl->sl_left_expr;
+    if(slec.sl_side_with_endo == EQ_LHS)
+        v_al = slec.sl_left_expr;
     else
-        v_al = sl->sl_right_expr;
+        v_al = slec.sl_right_expr;
     
 ag:
     if(v_al.size() == 0)
     {
         L_errno = L_DUP_ERR;
-        return L_errno; 
+        return true; 
     }
 
     const ATOMIC_LEC& al = v_al.back();
 
     int type = std::visit([](auto&& arg) -> int { return arg.type; }, al);
 
-    // if the last element is L_CLOSEP, the first on must be L_OPENP (?)
     if(type == L_CLOSEP)
     {
-        // drop the first element of v_al
+        // if the last element is a close parenthesis, the first must be an open parenthesis
+        // -> drop the first element of v_al (open parenthesis)
         v_al.erase(v_al.begin());
-        // drop the last element of v_al
+        // -> drop the last element of v_al (close parenthesis)
         v_al.pop_back();
-        // we try the next element 
+        // try the next element 
         goto ag;
     }
 
     // if the last element is L_VAR, we have only one item and the process is terminated (?)
     if(type == L_VAR)
-        return 1;
+        return false;
 
     if(!is_executable(type))
     {
         L_errno = L_DUP_ERR;
-        return L_errno; 
+        return true; 
     }
 
     // cast to LEC_EXECUTABLE to get the number of arguments
     const LEC_EXECUTABLE& al_exec = reinterpret_cast<const LEC_EXECUTABLE&>(al);
 
-    sl->sl_op = type;
-    sl->sl_nargs = al_exec.nb_args;
+    slec.sl_op = type;
+    slec.sl_nargs = al_exec.nb_args;
 
-    // QUESTION: why ?
+    // remove the last element of v_al (the operator/function) 
+    // -> previously stored in slec.sl_op and slec.sl_nargs
     v_al.pop_back();
 
     // Search the beginning of the sub expression
@@ -175,67 +159,37 @@ ag:
     if(start_sub_expr < 0)
     {
         L_errno = L_DUP_ERR;
-        return L_errno; 
+        return true; 
     }
 
-    sl->sl_left_expr.clear();
-    sl->sl_right_expr.clear();
+    slec.sl_left_expr.clear();
+    slec.sl_right_expr.clear();
 
     auto it_sub_expr = v_al.begin() + start_sub_expr;
 
-    // We move the elements before the sub expression to sl->sl_left_expr
+    // We move the elements before the sub expression to slec.sl_left_expr
     if(it_sub_expr != v_al.begin())
-        sl->sl_left_expr.insert(sl->sl_left_expr.end(), v_al.begin(), it_sub_expr);
+        slec.sl_left_expr.insert(slec.sl_left_expr.end(), v_al.begin(), it_sub_expr);
 
-    // and the elements after the sub expression to sl->sl_right_expr
+    // and the elements after the sub expression to slec.sl_right_expr
     if(it_sub_expr != v_al.end())
-        sl->sl_right_expr.insert(sl->sl_right_expr.end(), it_sub_expr, v_al.end());
+        slec.sl_right_expr.insert(slec.sl_right_expr.end(), it_sub_expr, v_al.end());
 
     v_al.clear(); // we clear v_al to avoid confusion (we won't use it anymore)
 
     // find the member where endo is present
-    if(L_count_endo(sl->sl_left_expr, sl->sl_endo) > 0) 
+    if(L_count_endo(slec.sl_left_expr, slec.sl_endo) > 0) 
     {       
-        sl->sl_side_with_endo = EQ_LHS ;                                   
-        sl->sl_side_without_endo = EQ_RHS;                               
+        slec.sl_side_with_endo = EQ_LHS;                                   
+        slec.sl_side_without_endo = EQ_RHS;                               
     }
     else 
     {
-        sl->sl_side_with_endo = EQ_RHS ;
-        sl->sl_side_without_endo = EQ_LHS;
+        slec.sl_side_with_endo = EQ_RHS;
+        slec.sl_side_without_endo = EQ_LHS;
     }
 
-    return 0;
-}
-
-/**
- * Compiles a LEC expression and allocates the ALEC table resulting from the compilation. 
- * 
- * As this function is used to compile *equations*, it is called twice, once for the left member (LHS)
- * and once for the right member (RHS). 
- * For that reason:
- *      nb_names = 0 for first call (no names are already known) 
- *      nb_names = L_NB_NAMES for second member (all names in LHS are already in L_NAMES).
-      
- * L_errno contains 0 or the error number.
- * 
- * @param [in] lec           char*   LEC expression to compile
- * @return                   ALEC*   allocated table of ALEC's or NULL on error
-*/
-static std::vector<ATOMIC_LEC> initialize_alloc(const std::string& lec)
-{
-    std::vector<ATOMIC_LEC> v_al;
-
-    try
-    {
-        CLEC clec(lec, false);
-        // make a copy of v_expression
-        v_al = clec.v_expression;
-    }
-    catch(const std::exception&) 
-    {}
-
-    return v_al;
+    return true;
 }
 
 
@@ -246,12 +200,12 @@ static std::vector<ATOMIC_LEC> initialize_alloc(const std::string& lec)
  * The result is stored in a SLEC struct (see above).
  * Only the step 1 of the compilation is performed at this stage.
  * 
- * @param [in, out]     sl    SLEC*   struct where the A
+ * @param [in, out]     sl    SLEC&   struct where the A
  * @param [in]          lec   char*   LEC expression of the equation
  * @return                    int     error code or 0 on success
  *                                      
 */
-static int initialize_eq(SLEC* sl, const std::string& lec)
+static int initialize_eq(SLEC& slec, const std::string& lec)
 {
     L_NAMES.clear();
 
@@ -263,21 +217,21 @@ static int initialize_eq(SLEC* sl, const std::string& lec)
         return L_errno;
     }
     // make a copy of the equation to modify it
-    std::string lhs = lec.substr(0, pos);
-    std::string rhs = lec.substr(pos + 2);
+    std::string lhs_lec = lec.substr(0, pos);
+    std::string rhs_lec = lec.substr(pos + 2);
 
     // Compiles left member
-    sl->sl_left_expr = initialize_alloc(lhs);
-    sl->sl_left_expr.pop_back();                // drop the last element (L_EOE)        
-    L_EXPR.clear();                             // Clean up L_EXPR
-    if(sl->sl_left_expr.empty()) 
+    CLEC lhs(lhs_lec, true);
+    slec.sl_left_expr = lhs.v_expression;
+    slec.sl_left_expr.pop_back();                // drop the last element (L_EOE)        
+    if(slec.sl_left_expr.empty()) 
         return L_errno;
     
     // Compiles the right member
-    sl->sl_right_expr = initialize_alloc(rhs);
-    sl->sl_right_expr.pop_back();               // drop the last element (L_EOE)
-    L_EXPR.clear();
-    if(sl->sl_right_expr.empty()) 
+    CLEC rhs(rhs_lec, true);
+    slec.sl_right_expr = rhs.v_expression;
+    slec.sl_right_expr.pop_back();               // drop the last element (L_EOE)
+    if(slec.sl_right_expr.empty()) 
         return L_errno;
 
     return 0;
@@ -287,12 +241,12 @@ static int initialize_eq(SLEC* sl, const std::string& lec)
 /**
  * Appends the member mbr (LHS or RHS) contained in sl to L_EXPR. 
  * 
- * @param [in] sl   SLEC*   
+ * @param [in] sl   SLEC&   
  * @param [in] mbr  int     position of the member to append 
 */
-static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
+static void L_append(const SLEC& slec, const EQ_HAND_SIDE mbr)
 {
-    std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
+    const std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? slec.sl_left_expr : slec.sl_right_expr;
     L_EXPR.insert(L_EXPR.end(), v_al.begin(), v_al.end());
 }
 
@@ -300,12 +254,12 @@ static void L_append(SLEC* sl, const EQ_HAND_SIDE mbr)
 /**
  * Adds L_EXPR the member mbr (LHS or RHS) contained in sl at the beginning of L_EXPR.
  * 
- * @param [in] sl   SLEC*   container of the compiled equation
+ * @param [in] sl   SLEC&   container of the compiled equation
  * @param [in] mbr  int     member of sl to copy to L_EXPR
 */
-static void L_front(SLEC* sl, const EQ_HAND_SIDE mbr)
+static void L_front(const SLEC& slec, const EQ_HAND_SIDE mbr)
 {
-    std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? sl->sl_left_expr : sl->sl_right_expr;
+    const std::vector<ATOMIC_LEC>& v_al = (mbr == EQ_LHS) ? slec.sl_left_expr : slec.sl_right_expr;
     L_EXPR.insert(L_EXPR.begin(), v_al.begin(), v_al.end());
 }
 
@@ -387,11 +341,12 @@ static void L_append_const(int a)
  * 
  * The result is stored in L_EXPR (table of ALEC's).
  * 
- * If the endogenous variable is found more than once, the equation (say "LHS := RHS") is replaced by "0 := LHS - RHS" and duplicated_endo is set to 1.
+ * If the endogenous variable is found more than once, the equation (say "LHS := RHS") is replaced by 
+ * "0 := LHS - RHS" and duplicated_endo is true.
  *
  * For example,
- *   L_invert("ln X := a + b * ln Y", "X", &duplicated_endo) => "exp(a + b * ln Y)"    with duplicated_endo = 0
- *   L_invert("ln X := a + b * X ",   "X", &duplicated_endo) => "ln X - (a + b * X)"   with duplicated_endo = 1
+ *   L_invert("ln X := a + b * ln Y", "X", &duplicated_endo) => "exp(a + b * ln Y)"    with duplicated_endo = false
+ *   L_invert("ln X := a + b * X ",   "X", &duplicated_endo) => "ln X - (a + b * X)"   with duplicated_endo = true
  * 
  * 
  * L_errno can take the values below:
@@ -400,25 +355,25 @@ static void L_append_const(int a)
  *		- L_ASSIGN_ERR : sign := not found
  *      - other        : standard compilation errors or 0 on success
  *    
- * @param [in]   eq         char*   text of the LEC equation
- * @param [in]   endo       char*   name of the endogenous variable 
- * @param [out]  duplicated_endo    int*    0 if the equation has been inverted, 1 if endo is present more than once.
- * @return                  int     0 on success and L_errno on error
+ * @param [in]   eq                 char*       text of the LEC equation
+ * @param [in]   endo               char*       name of the endogenous variable 
+ * @param [out]  duplicated_endo    bool&       false if the equation has been inverted, 
+ *                                              true if endo is present more than once.
+ * @return                          int         0 on success and L_errno on error
 */
-int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo)
+int L_invert(const std::string& eq, const std::string& endo, bool& duplicated_endo)
 { 
     SLEC slec;
-    SLEC *sl = &slec;
 
     // Compiles the 2 members of eq and put the result in slec
-    if(initialize_eq(sl, eq)) 
+    if(initialize_eq(slec, eq)) 
         return L_errno;
     
-    /* FIND MEMBER CONTAINING ENDO AND SET INFO IN sl */
-    *duplicated_endo = 0;
-    sl->sl_endo = endo;
-    int count0 = L_count_endo(sl->sl_left_expr, sl->sl_endo);
-    int count1 = L_count_endo(sl->sl_right_expr, sl->sl_endo);
+    // FIND MEMBER CONTAINING ENDO AND SET INFO IN slec
+    duplicated_endo = false;
+    slec.sl_endo = endo;
+    int count0 = L_count_endo(slec.sl_left_expr, slec.sl_endo);
+    int count1 = L_count_endo(slec.sl_right_expr, slec.sl_endo);
 
     // If endo is not present in the equation, we cannot invert it
     if(count0 + count1 == 0) 
@@ -431,11 +386,11 @@ int L_invert(const std::string& eq, const std::string& endo, int* duplicated_end
     // to invert and we just move all the equation in L_EXPR and return
     if(count0 + count1 >= 2) 
     {
-        // Result = {sl->sl_left_expr, sl->sl_right_expr, L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
-        *duplicated_endo = 1;
+        // Result = {slec.sl_left_expr, slec.sl_right_expr, L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
+        duplicated_endo = true;
         L_EXPR.clear();
-        L_append(sl, EQ_LHS);    
-        L_append(sl, EQ_RHS);
+        L_append(slec, EQ_LHS);    
+        L_append(slec, EQ_RHS);
         L_append_op(L_MINUS);
         L_append_other(L_EOE);
         return 0;
@@ -444,153 +399,188 @@ int L_invert(const std::string& eq, const std::string& endo, int* duplicated_end
     // endo present in the left hand side
     if(count0 == 0) 
     {
-        sl->sl_side_with_endo = EQ_RHS;
-        sl->sl_side_without_endo = EQ_LHS;
+        slec.sl_side_with_endo = EQ_RHS;
+        slec.sl_side_without_endo = EQ_LHS;
     }
     // endo present in the right hand side
     else 
     {
-        sl->sl_side_with_endo = EQ_LHS;
-        sl->sl_side_without_endo = EQ_RHS;
+        slec.sl_side_with_endo = EQ_LHS;
+        slec.sl_side_without_endo = EQ_RHS;
     }
 
     // Create an empty L_EXPR and move the member not containing the endo into L_EXPR
     L_EXPR.clear();
-    L_append(sl, sl->sl_side_without_endo);
-    if(sl->sl_side_without_endo == EQ_LHS) 
-        sl->sl_left_expr.clear();
+    L_append(slec, slec.sl_side_without_endo);
+    if(slec.sl_side_without_endo == EQ_LHS) 
+        slec.sl_left_expr.clear();
     else 
-        sl->sl_right_expr.clear();
+        slec.sl_right_expr.clear();
 
-    // sl->sl_expr[sl->sl_side_with_endo] is the expression containing endo 
-    // and must thus be inverted
-    /* LOOP ON OPERATORS */
-    while(L_split_expr(sl) == 0)
+    // if the equation side containing the endogenous variable is not trivial 
+    // -> it must thus be inverted
+    // NOTE: L_split_expr will split the equation side containing the endogenous variable 
+    //       into 2 parts and store them in slec.sl_left_expr and slec.sl_right_expr
+    while(L_split_expr(slec))
     {
-        switch(sl->sl_op) 
+        switch(slec.sl_op) 
         {
+            // x + y = z  =>  x = z - y
             case L_PLUS   :             
-                L_append(sl, sl->sl_side_without_endo);
+                L_append(slec, slec.sl_side_without_endo);
                 L_append_op(L_MINUS);
                 break;
+            // x * y = z  =>  x = z / y
             case L_TIMES  :
-                L_append(sl, sl->sl_side_without_endo);
+                L_append(slec, slec.sl_side_without_endo);
                 L_append_op(L_DIVIDE);
                 break;
             case L_MINUS  :
-                if(sl->sl_side_with_endo == EQ_RHS) 
+                // y - x = z  =>  x = y - z
+                if(slec.sl_side_with_endo == EQ_RHS)     // x is after the minus sign
                 {
-                    L_front(sl, sl->sl_side_without_endo);
+                    L_front(slec, slec.sl_side_without_endo);
                     L_append_op(L_MINUS);
                 }
+                // x - y = z  =>  x = z + y
                 else 
                 {
-                    L_append(sl, sl->sl_side_without_endo);
+                    L_append(slec, slec.sl_side_without_endo);
                     L_append_op(L_PLUS);
                 }
                 break;
             case L_DIVIDE :
-                if(sl->sl_side_with_endo == EQ_RHS) 
+                // y / x = z  =>  x = y / z
+                if(slec.sl_side_with_endo == EQ_RHS)     // x is after the divide sign
                 {
-                    L_front(sl, sl->sl_side_without_endo);
+                    L_front(slec, slec.sl_side_without_endo);
                     L_append_op(L_DIVIDE);
                 }
+                // x / y = z  =>  x = z * y
                 else 
                 {
-                    L_append(sl, sl->sl_side_without_endo);
+                    L_append(slec, slec.sl_side_without_endo);
                     L_append_op(L_TIMES);
                 }
                 break;
-            case L_LN     :
+            // ln(x) = z  =>  x = exp(z)
+            case L_LN :
                 L_append_fn(L_EXPN, 1);
                 break;
-            case L_EXPN   :
+            // exp(x) = z  =>  x = ln(z)
+            case L_EXPN :
                 L_append_fn(L_LN, 1);
                 break;
+            // +x = z  =>  x = z
             case L_UPLUS  :
                 break;
+            // -x = z  =>  x = -z
             case L_UMINUS :
                 L_append_fn(L_UMINUS, 1);
                 break;
-            case L_COS    :
+            // cos(x) = z  =>  x = arccos(z)
+            case L_COS :
                 L_append_fn(L_ACOS, 1);
                 break;
-            case L_ACOS   :
+            // arccos(x) = z  =>  x = cos(z)
+            case L_ACOS :
                 L_append_fn(L_COS, 1);
                 break;
-            case L_SIN    :
+            // sin(x) = z  =>  x = arcsin(z)
+            case L_SIN :
                 L_append_fn(L_ASIN, 1);
                 break;
-            case L_ASIN   :
+            // arcsin(x) = z  =>  x = sin(z)
+            case L_ASIN :
                 L_append_fn(L_SIN, 1);
                 break;
-            case L_TAN    :
+            // tan(x) = z  =>  x = arctan(z)
+            case L_TAN :
                 L_append_fn(L_ATAN, 1);
                 break;
-            case L_ATAN   :
+            // arctan(x) = z  =>  x = tan(z)
+            case L_ATAN :
                 L_append_fn(L_TAN, 1);
                 break;
-            case L_SQRT   :
+            // sqrt(x) = z  =>  x = z ^ 2
+            case L_SQRT :
                 L_append_const(2);
                 L_append_fn(L_EXP, 2);
                 break;
-            case L_EXP    :
-                if(sl->sl_side_with_endo == EQ_LHS) 
+            case L_EXP :
+                // NOTE: log_b(a) = ln(a) / ln(b)
+                // y ^ x = z
+                // y = log_x(z) = ln(z) / ln(x)
+                // ln(x) = ln(z) / y
+                // x = exp(ln(z) / y)
+                if(slec.sl_side_with_endo == EQ_LHS)     // x is after the exponentiation operator
                 {
                     L_append_fn(L_LN, 1);
-                    L_append(sl, sl->sl_side_without_endo);
+                    L_append(slec, slec.sl_side_without_endo);
                     L_append_op(L_DIVIDE);
                     L_append_fn(L_EXPN, 1);
                 }
+                // x ^ y = z  =>  x = log_y(z)
                 else 
                 {
-                    L_front(sl, sl->sl_side_without_endo);
+                    L_front(slec, slec.sl_side_without_endo);
                     L_append_fn(L_LOG, 2);
                 }
                 break;
-            case L_LOG    :
+            // log(x) = z  =>  x = 10 ^ z
+            case L_LOG :
                 L_append_fn(L_EXP, 1);
-                break; /* JMP 22-06-00 */
-            case L_DIFF   :
-                if(sl->sl_nargs == 2) L_append(sl, sl->sl_side_without_endo);
-                L_append(sl, sl->sl_side_with_endo);
-                L_append_fn(L_LAG, sl->sl_nargs);
+                break;
+            // d(x) = x[t] - x[t-lag] = z[t]  =>  x[t] = z[t] + x[t-lag]
+            case L_DIFF :
+                if(slec.sl_nargs == 2) L_append(slec, slec.sl_side_without_endo);
+                L_append(slec, slec.sl_side_with_endo);
+                L_append_fn(L_LAG, slec.sl_nargs);
                 L_append_op(L_PLUS);
                 break;
-            case L_DLN    :
-                if(sl->sl_nargs == 2) L_append(sl, sl->sl_side_without_endo);
-                L_append(sl, sl->sl_side_with_endo);
-                L_append_fn(L_LAG, sl->sl_nargs);
+            // dln(x) = ln(x[t]) - ln(x[t-lag]) = z[t]  
+            // ln(x[t]) = z[t] + ln(x[t-lag])
+            // x[t] = exp(z[t] + ln(x[t-lag]))    
+            case L_DLN :
+                if(slec.sl_nargs == 2) L_append(slec, slec.sl_side_without_endo);
+                L_append(slec, slec.sl_side_with_endo);
+                L_append_fn(L_LAG, slec.sl_nargs);
                 L_append_fn(L_LN, 1);
                 L_append_op(L_PLUS);
                 L_append_fn(L_EXPN, 1);
                 break;
-            case L_GRT    :
+            // grt(x) = 100 * (x[t] / x[t-lag] - 1) = z[t]
+            // (x[t] / x[t-lag] - 1) = z[t] / 100
+            // x[t] / x[t-lag] = (z[t] / 100) + 1
+            // x[t] = ((z[t] / 100) + 1) * x[t-lag]
+            case L_GRT :
                 L_append_const(100);
                 L_append_op(L_DIVIDE);
                 L_append_const(1);
                 L_append_op(L_PLUS);
-                if(sl->sl_nargs == 2) L_append(sl, sl->sl_side_without_endo);
-                L_append(sl, sl->sl_side_with_endo);
-                L_append_fn(L_LAG, sl->sl_nargs);
+                if(slec.sl_nargs == 2) L_append(slec, slec.sl_side_without_endo);
+                L_append(slec, slec.sl_side_with_endo);
+                L_append_fn(L_LAG, slec.sl_nargs);
                 L_append_op(L_TIMES);
                 break;
-            case L_RAPP   :
-                if(sl->sl_nargs == 2) L_append(sl, sl->sl_side_without_endo);
-                L_append(sl, sl->sl_side_with_endo);
-                L_append_fn(L_LAG, sl->sl_nargs);
+            // rapp(x) = x[t] / x[t-lag] = z[t]
+            // x[t] = z[t] * x[t-lag]
+            case L_RAPP :
+                if(slec.sl_nargs == 2) L_append(slec, slec.sl_side_without_endo);
+                L_append(slec, slec.sl_side_with_endo);
+                L_append_fn(L_LAG, slec.sl_nargs);
                 L_append_op(L_TIMES);
                 break;
             default :
-                sl->sl_left_expr.clear();
-                sl->sl_right_expr.clear();
+                slec.sl_left_expr.clear();
+                slec.sl_right_expr.clear();
                 L_errno = L_INVERT_ERR;
                 return L_errno;
         }
     }
 
-    sl->sl_left_expr.clear();
-    sl->sl_right_expr.clear();
+    slec.sl_left_expr.clear();
+    slec.sl_right_expr.clear();
     L_append_other(L_EOE);
     
     return L_errno;

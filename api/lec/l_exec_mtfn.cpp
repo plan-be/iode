@@ -12,11 +12,10 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs)
+ *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
- *      nvargs = number of variables arguments (generally not used)
  *      t      = time of calculation
  *      stack  = pointer to the top of the stack of intermediate values / results
  *      nargs  = number of arguments of the calling function that determines the calculation interval.
@@ -30,6 +29,14 @@
 
 /* =============================== MTFN ============================== */
 
+static int get_nb_obs()
+{
+    std::shared_ptr<Sample> smpl_ptr = L_EXEC_DBV->get_sample();
+    if(!smpl_ptr)
+        return 0;
+    return smpl_ptr->nb_periods;
+}
+
 /**
  *  Sub function of L_corr() that calculates the correlation between 2 series defined the CLEC sub-expressions 
  *  expr1 and expr2.
@@ -37,24 +44,20 @@
  *  General formula:
  *      corr(from, to, expr1, expr2) = covar(from, to, expr1, expr2) / sqrt(var(from, to, expr1) * var(from, to, expr2))
  *  
- *  @param [in] expr1   unsigned char*  first CLEC sub-expression
- *  @param [in] len1    short           length of expr1    
- *  @param [in] expr2   unsigned char*  second CLEC sub-expression
- *  @param [in] len2    short           length of expr2
  *  @param [in] t       int             time of of the returned value
  *  @param [in] stack   double*         pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
  *  @return         
  *  
  */
-double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, 
+double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
     int from, int to, int t, std::deque<double>& stack, int nargs) 
 {
-    double mean_x = L_mean(clec, start_1, length_1, from, to, t, stack, nargs - 1);
+    double mean_x = L_mean(clec, pos1, length1, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
-        return IODE_NAN;
+    return IODE_NAN;
     
-    double mean_y = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
+    double mean_y = L_mean(clec, pos2, length2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_y)) 
         return IODE_NAN;
 
@@ -62,11 +65,11 @@ double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, 
     double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        x = clec.execute_sub_expression(start_1, length_1, j);
+        x = clec.execute_sub_expression(pos1, length1, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = clec.execute_sub_expression(start_2, length_2, j);
+        y = clec.execute_sub_expression(pos2, length2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -101,8 +104,6 @@ double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, 
  *  General formula:
  *      corr(from, to X, Y) = covar(from, to, X, Y) / sqrt(var(from, to, X) * var(from, to, Y))
  * 
- *  @param [in] expr   unsigned char*   CLEC sub-expression
- *  @param [in] nvargs short            number of variables arguments (unused)
  *  @param [in] t      int              time of calculation
  *  @param [in] stack  double*          pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs  int              number of arguments of the calling function that determines the calculation interval.
@@ -110,15 +111,20 @@ double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, 
  *  @return            double           computed correlation 
  *  
  */
-double L_corr(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
+    if(v_length.size() < 2)
+    {
+        kwarning("L_corr(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
-    double result = L_calccorr(clec, start_1, length_1, start_2, length_2, 
-                               from, to, t, stack, nargs);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double result = L_calccorr(clec, pos1, length1, pos2, length2, from, to, t, stack, nargs);
     return result;
 }
 
@@ -135,28 +141,24 @@ double L_corr(AbstractCLEC& clec, int start, short nvargs, int from, int to, int
  *          Ym is the mean of Y on [from, to]
  *          n is the number of observations in [from, to]
  *  
- *  @param [in] expr1   unsigned char*  first CLEC sub-expression
- *  @param [in] len1    short           length of expr1    
- *  @param [in] expr2   unsigned char*  second CLEC sub-expression
- *  @param [in] len2    short           length of expr2
  *  @param [in] t       int             time of of the returned value
  *  @param [in] stack   double*         pointer to the top of the stack of intermediate values / results
  *  @param [in] nargs   int             number of arguments of the calling function that determines the calculation interval.
  *  @return             double          computed covariance.
  *  
  */
-double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, 
+double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
     int from, int to, int t, std::deque<double>& stack, int nargs, int orig) 
 {   
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
  
-    double mean_x = L_mean(clec, start_1, length_1, from, to, t, stack, nargs - 1);
+    double mean_x = L_mean(clec, pos1, length1, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
         return IODE_NAN;
     
-    double mean_y = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
+    double mean_y = L_mean(clec, pos2, length2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_y)) 
         return IODE_NAN;
 
@@ -164,11 +166,11 @@ double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2,
     double sum_xx = 0.0, sum_yy = 0.0, sum_xy = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        x = clec.execute_sub_expression(start_1, length_1, j);
+        x = clec.execute_sub_expression(pos1, length1, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = clec.execute_sub_expression(start_2, length_2, j);
+        y = clec.execute_sub_expression(pos2, length2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -194,15 +196,20 @@ double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2,
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-double L_covar(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs) 
 {
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
+    if(v_length.size() < 2)
+    {
+        kwarning("L_covar(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
-    double result = L_calccovar(clec, start_1, length_1, start_2, length_2, 
-                                from, to, t, stack, nargs, 0);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double result = L_calccovar(clec, pos1, length1, pos2, length2, from, to, t, stack, nargs, 0);
     return result;
 }
 
@@ -215,15 +222,20 @@ double L_covar(AbstractCLEC& clec, int start, short nvargs, int from, int to, in
  *  @see L_calccovar() for the formulas.
  *  
  */
-double L_covar0(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs) 
 {
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
+    if(v_length.size() < 2)
+    {
+        kwarning("L_covar0(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
-    double result = L_calccovar(clec, start_1, length_1, start_2, length_2, 
-                                from, to, t, stack, nargs, 1);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double result = L_calccovar(clec, pos1, length1, pos2, length2, from, to, t, stack, nargs, 1);
     return result;
 }
 
@@ -244,13 +256,18 @@ double L_covar0(AbstractCLEC& clec, int start, short nvargs, int from, int to, i
  *  @see L_covar() for more details.
  *  
  */
-double L_var(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {
-    int start_1;
-    short length_1; 
-    clec.get_sub_expression_length(start, start_1, length_1);
-    double result = L_calccovar(clec, start_1, length_1, start_1, length_1, from, to, t, stack, nargs + 1, 0);
+    if(v_length.size() == 0)
+    {
+        kwarning("L_var(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
+
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double result = L_calccovar(clec, pos1, length1, pos1, length1, from, to, t, stack, nargs + 1, 0);
     return result;
 }
 
@@ -265,10 +282,10 @@ double L_var(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
  *  @see L_calccovar() for the formula.
  *  
  */
-double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {
-    double var = L_var(clec, start, nvargs, from, to, t, stack, nargs);
+    double var = L_var(clec, expr_pos, v_length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(var) || var < 0.0) 
         return IODE_NAN;
     return sqrt(var);
@@ -303,25 +320,31 @@ double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, i
  *  @return            double           computed covariance
  */  
 
- double L_index(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+ double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
+    if(v_length.size() < 2)
+    {
+        kwarning("L_index(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
 
-    double x = clec.execute_sub_expression(start_1, length_1, t);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double x = clec.execute_sub_expression(pos1, length1, t);
     if(!IODE_IS_A_NUMBER(x)) 
         return IODE_NAN;
 
     double y;
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
     for(int j = from; j <= to; j++) 
     {
-        y = clec.execute_sub_expression(start_2, length_2, j);
+        y = clec.execute_sub_expression(pos2, length2, j);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -347,18 +370,22 @@ double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, i
  *  
  *  @see L_corr() for the parameter definition
  */
-double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {
-    int start_1, start_2;    
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
+    if(v_length.size() < 2)
+    {
+        kwarning("L_acf(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
     int nb = 1 + to - from;
     if(nb == 0) 
         return IODE_NAN;
 
-    double x = clec.execute_sub_expression(start_1, length_1, t);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double x = clec.execute_sub_expression(pos1, length1, t);
     if(!IODE_IS_A_NUMBER(x)) 
         return IODE_NAN;
 
@@ -366,7 +393,9 @@ double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
     if(k < 0 || k > nb / 4) 
         return IODE_NAN;
 
-    double mean_x = L_mean(clec, start_2, length_2, from, to, t, stack, nargs - 1);
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double mean_x = L_mean(clec, pos2, length2, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
         return IODE_NAN;
 
@@ -374,11 +403,11 @@ double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
     double sum_xy = 0.0, sum_xy0 = 0.0;
     for(int j = from; j <= to - k; j++) 
     {
-        x = clec.execute_sub_expression(start_2, length_2, j);
+        x = clec.execute_sub_expression(pos2, length2, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
-        y = clec.execute_sub_expression(start_2, length_2, j + k);
+        y = clec.execute_sub_expression(pos2, length2, j + k);
         if(!IODE_IS_A_NUMBER(y)) 
             return IODE_NAN;
 
@@ -387,7 +416,7 @@ double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
 
     for(int j = from; j <= to; j++) 
     {
-        x = clec.execute_sub_expression(start_1, length_2,j);
+        x = clec.execute_sub_expression(pos2, length2, j);
         if(!IODE_IS_A_NUMBER(x)) 
             return IODE_NAN;
         
@@ -403,8 +432,6 @@ double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
  *
  *  TODO: describe this better 
  *  
- *  @param [in]  expr1  unsigned char*   CLEC sub-expression (heterogeous container)
- *  @param [in]  len1   short            length of expr1 in bytes
  *  @param [in]  t      int              time of calculation
  *  @param [in]  stack  double*          pointer to the top of the stack of intermediate values / results
  *  @param [out] vt     double*          
@@ -413,16 +440,16 @@ double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
  *  @return             double           computed correlation 
  *  
  */
-int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, 
+int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>& stack, 
     int* vt, double* vy, int notnul)
 {
     vy[0] = vy[1] = IODE_NAN;
-    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    int nb_obs = get_nb_obs();
 
     // 1. Calculate value after t
     for(vt[1] = t + 1; vt[1] < nb_obs; vt[1]++) 
     {
-        vy[1] = clec.execute_sub_expression(start, length, vt[1]);
+        vy[1] = clec.execute_sub_expression(start, end, vt[1]);
         if(IODE_IS_A_NUMBER(vy[1]) && (notnul == 0 || fabs(vy[1]) > 1e-15)) 
             break;
     }
@@ -430,7 +457,7 @@ int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<do
     // 2. Calculate value before t
     for(vt[0] = t - 1; vt[0] >= 0; vt[0]--) 
     {
-        vy[0] = clec.execute_sub_expression(start, length, vt[0]);
+        vy[0] = clec.execute_sub_expression(start, end, vt[0]);
         if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
             break;
     }
@@ -451,7 +478,7 @@ int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<do
         vy[0] = IODE_NAN;
         for(vt[0] = vt[1] - 1; vt[0] >= 0; vt[0]--) 
         {
-            vy[0] = clec.execute_sub_expression(start, length, vt[0]);
+            vy[0] = clec.execute_sub_expression(start, end, vt[0]);
             if(IODE_IS_A_NUMBER(vy[0]) && (notnul == 0 || fabs(vy[0]) > 1e-15)) 
                 break;
         }
@@ -464,7 +491,7 @@ int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<do
         vy[1] = IODE_NAN;
         for(vt[1] = vt[0] + 1; vt[1] < nb_obs; vt[1]++) 
         {
-            vy[1] = clec.execute_sub_expression(start, length, vt[1]);
+            vy[1] = clec.execute_sub_expression(start, end, vt[1]);
             if(IODE_IS_A_NUMBER(vy[1])) 
                 break;
         }
@@ -482,29 +509,33 @@ int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<do
  *  @return     double  value of expr[t] or interpolated value
  *  
  */
-double L_interpol(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {   
-    int start_1;
-    short length_1; 
-    clec.get_sub_expression_length(start, start_1, length_1);
+    if(v_length.size() == 0)
+    {
+        kwarning("L_interpol(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
 
     // 1. Calculate value in t
-    double x = clec.execute_sub_expression(start_1, length_1, t);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double x = clec.execute_sub_expression(pos1, length1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 0);
+    L_calcvals(clec, pos1, length1, t, stack, vt, vy, 0);
     
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
         return IODE_NAN;
     
     // 3. Calculate result
-    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    int nb_obs = get_nb_obs();
     if(vt[0] < 0) 
         return vy[1];
     if(vt[1] >= nb_obs) 
@@ -515,39 +546,45 @@ double L_interpol(AbstractCLEC& clec, int start, short nvargs, int from, int to,
     return interpol;
 }
 
-double L_app(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
 {   
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
-
+    if(v_length.size() == 0)
+    {
+        kwarning("L_app(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
+    
     // 1. Calculate value in t
-    double x = clec.execute_sub_expression(start_1, length_1, t);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double x = clec.execute_sub_expression(pos1, length1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 1);
+    L_calcvals(clec, pos1, length1, t, stack, vt, vy, 1);
     
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
         return IODE_NAN;
     
     // ---- Valeurs apparentées ----
-    double ayt = clec.execute_sub_expression(start_1, length_2, t);
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double ayt = clec.execute_sub_expression(pos2, length2, t);
     if(!IODE_IS_A_NUMBER(ayt)) 
         return IODE_NAN;
     
     double ay[2];
-    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    int nb_obs = get_nb_obs();
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
-        ay[0] = clec.execute_sub_expression(start_2, length_2, vt[0]);
+        ay[0] = clec.execute_sub_expression(pos2, length2, vt[0]);
     if(vt[1] < nb_obs) 
-        ay[1] = clec.execute_sub_expression(start_2, length_2, vt[1]);
+        ay[1] = clec.execute_sub_expression(pos2, length2, vt[1]);
 
     // ---- Deux valeurs trouvées dans la série initiale ----
     // !! Les deux valeurs doivent exister dans la série apparentée
@@ -600,39 +637,45 @@ double L_app(AbstractCLEC& clec, int start, short nvargs, int from, int to, int 
     return IODE_NAN;
 }
 
-double L_dapp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, 
+double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     std::deque<double>& stack, int nargs)
-{   
-    int start_1, start_2;
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
-
+{  
+    if(v_length.size() == 0)
+    {
+        kwarning("L_dapp(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
+    
     // 1. Calculate value in t
-    double x = clec.execute_sub_expression(start_1, length_1, t);
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    double x = clec.execute_sub_expression(pos1, length1, t);
     if(IODE_IS_A_NUMBER(x)) 
         return x;
 
     // 2. Calculate values around t
     int vt[2];
     double vy[2];
-    L_calcvals(clec, start_1, length_1, t, stack, vt, vy, 0);
+    L_calcvals(clec, pos1, length1, t, stack, vt, vy, 0);
 
     // if NO value after AND before t, return IODE_NAN
     if(!IODE_IS_A_NUMBER(vy[0]) && !IODE_IS_A_NUMBER(vy[1])) 
         return IODE_NAN;
 
     // ---- Valeurs apparentées ----
-    double ayt = clec.execute_sub_expression(start_2, length_2, t);
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double ayt = clec.execute_sub_expression(pos2, length2, t);
     if(!IODE_IS_A_NUMBER(ayt)) 
         return IODE_NAN;
     
     double ay[2];
-    int nb_obs = (L_getsmpl(L_EXEC_DBV))->nb_periods;
+    int nb_obs = get_nb_obs();
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
-        ay[0] = clec.execute_sub_expression(start_2, length_2, vt[0]);
+        ay[0] = clec.execute_sub_expression(pos2, length2, vt[0]);
     if(vt[1] < nb_obs) 
-        ay[1] = clec.execute_sub_expression(start_2, length_2, vt[1]);
+        ay[1] = clec.execute_sub_expression(pos2, length2, vt[1]);
 
     if(IODE_IS_A_NUMBER(ay[0]) && IODE_IS_A_NUMBER(ay[1])) 
     {
@@ -657,14 +700,10 @@ double L_dapp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int
     return IODE_NAN;
 }
 
-double L_hpall(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs, int std)
+double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
+    int from, int to, int t, std::deque<double>& stack, int nargs, int std)
 {   
-    int start_1, start_2; 
-    short length_1, length_2;
-    clec.split_sub_expression(start, start_1, length_1, start_2, length_2);
-
-    double value = clec.execute_sub_expression(start_1, length_1, t);
+    double value = clec.execute_sub_expression(pos1, length1, t);
     if(!IODE_IS_A_NUMBER(value)) 
         return IODE_NAN;
 
@@ -680,7 +719,7 @@ double L_hpall(AbstractCLEC& clec, int start, short length, int from, int to, in
         return IODE_NAN;
     
     for(int j = from; j <= to; j++) 
-        itmp[j - from] = clec.execute_sub_expression(start_2, length_2, j);
+        itmp[j - from] = clec.execute_sub_expression(pos2, length2, j);
 
     int nbna, dim;
     HP_test(itmp, otmp, nb, &nbna, &dim);
@@ -700,15 +739,37 @@ double L_hpall(AbstractCLEC& clec, int start, short length, int from, int to, in
     return value;
 }
 
-double L_hp(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+    int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(clec, start, length, from, to, t, stack, nargs, 0));
+    if(v_length.size() == 0)
+    {
+        kwarning("L_hp(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
+
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double result = L_hpall(clec, pos1, length1, pos2, length2, from, to, t, stack, nargs, 0);
+    return result;
 }
 
 
-double L_hpstd(AbstractCLEC& clec, int start, short length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+    int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    return(L_hpall(clec, start, length, from, to, t, stack, nargs, 1));
+    if(v_length.size() == 0)
+    {
+        kwarning("L_hpstd(): could not extract sub-expression range");
+        return IODE_NAN;
+    }
+
+    int pos1 = expr_pos;
+    int length1 = v_length[0];
+    int pos2 = expr_pos + length1;
+    int length2 = v_length[1];
+    double result = L_hpall(clec, pos1, length1, pos2, length2, from, to, t, stack, nargs, 1);
+    return result;
 }

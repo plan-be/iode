@@ -11,14 +11,6 @@
 #include "api/lec/l_err.h"
 
 
-
-enum GenericLecType
-{
-    GEN_LEC_OTHER,
-    GEN_LEC_VALUE,
-    GEN_LEC_EXECUTABLE
-};
-
 constexpr int L_SPECIAL = 10;
 
 /* LEC:SPECIAL */
@@ -86,84 +78,68 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 
 double *L_getvar(KDBVariablesPtr kdb, int pos);
 double L_getscl(KDBScalarsPtr kdb, int pos);
-Sample *L_getsmpl(KDBVariablesPtr kdb);
-int L_findscl(KDBScalarsPtr kdb, const std::string& name);
-int L_findvar(KDBVariablesPtr kdb, const std::string& name);
-
-/* l_link.cpp */
-void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg);
 
 
 /*----------------- STRUCTS ----------------------*/
 
-// Abstract class to be passed ot the execute() method of the sub-classes of LEC_EXECUTABLE
+// Abstract class to be passed ot the execute() method of the sub-classes of TP_LEC_EXECUTABLE
 struct AbstractCLEC
 {
 public:
     AbstractCLEC() {}
-    
-    virtual double execute_sub_expression(const int pos, const int length, const int t) = 0;
 
-    // for MTFN functions
-    virtual void get_sub_expression_length(const int start, int& start_1, short& length_1) = 0; 
-    virtual void split_sub_expression(const int start, int& start_1, short& length_1, int& start_2, short& length_2) = 0;
+    virtual void link_sample(KDBVariablesPtr dbv, const int start, const int length) = 0;
+    virtual double execute_sub_expression(const int start, const int length, const int t) = 0;
 };
 
 struct LEC_ABSTRACT
 {
-    int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)
-    GenericLecType generic_type;      
+    int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)    
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
 
 protected:
-    LEC_ABSTRACT(const int type, const GenericLecType generic_type) 
-        : type(type), generic_type(generic_type) {}
+    LEC_ABSTRACT(const int type) : type(type) {}
     LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
 
     bool is_same_type(const LEC_ABSTRACT& other) const
     {
         return this->type == other.type;
     }
-
-public:
-    // length in bytes of the executable representation of the atomic lec
-    virtual short get_length() const = 0;
-
-    // copies the executable representation of the atomic lec to the buffer at the given position and 
-    // updates the position in the buffer
-    virtual void add_to_buffer(unsigned char* buffer, int& pos_buffer) const 
-    {
-        // save the type of the expression element (1 byte)
-        buffer[pos_buffer] = type;
-        pos_buffer++;
-    }
 };
 
-struct LEC_VALUE: public LEC_ABSTRACT
+template<typename... Args>
+struct TP_LEC_VALUE: public LEC_ABSTRACT
 {
-    LEC_VALUE(const int type) : LEC_ABSTRACT(type, GEN_LEC_VALUE) {}
-    LEC_VALUE(const LEC_VALUE& other) = default;
+    TP_LEC_VALUE(const int type) : LEC_ABSTRACT(type) {}
+    TP_LEC_VALUE(const TP_LEC_VALUE& other) = default;
 
-    virtual bool add_to_stack(std::deque<double>& stack, const int t) const = 0;
+    virtual bool add_to_stack(std::deque<double>& stack, Args... args) const = 0;
 };
 
 struct LEC_EXECUTABLE: public LEC_ABSTRACT
 {
-    int nb_args;        // number of arguments of the function
-    int pos;            // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
+    int nb_args;            // number of arguments of the function
+    int pos;                // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
     std::string fn_name;    // name of the function (for debugging purposes)
 
 protected:
     LEC_EXECUTABLE(const int type, const int nb_args) 
-    : LEC_ABSTRACT(type, GEN_LEC_EXECUTABLE), nb_args(nb_args), pos(-1) {}
+        : LEC_ABSTRACT(type), nb_args(nb_args), pos(-1) {}
+};
 
-    virtual void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) = 0;
+template<typename... Args>
+struct TP_LEC_EXECUTABLE: public LEC_EXECUTABLE
+{
+protected:
+    TP_LEC_EXECUTABLE(const int type, const int nb_args) : LEC_EXECUTABLE(type, nb_args) {}
+
+    virtual void execute(std::deque<double>& stack, Args... args) = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT
 {
 public:
-    LEC_OTHER(const int type) : LEC_ABSTRACT(type, GEN_LEC_OTHER)
+    LEC_OTHER(const int type) : LEC_ABSTRACT(type)
     {
         switch(type)
         {
@@ -199,54 +175,8 @@ public:
 
     LEC_OTHER(const LEC_OTHER& other) = default;
 
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_OTHER(const unsigned char* buffer, int& pos_buffer) 
-        : LEC_ABSTRACT(L_SPECIAL, GEN_LEC_OTHER)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-
-        switch(type)
-        {
-            case L_EOE: 
-                representation = "EOE"; 
-                break;
-            case L_COMMA: 
-                representation = ","; 
-                break;
-            case L_OPENB: 
-                representation = "["; 
-                break;
-            case L_CLOSEB: 
-                representation = "]"; 
-                break;
-            case L_OCPAR: 
-                representation = "()"; 
-                break;
-            case L_COLON: 
-                representation = ":"; 
-                break;
-            default: 
-                throw std::invalid_argument("Invalid type for LEC_OTHER: " + std::to_string(type));
-                break;
-        }
-    }
-
     bool operator==(const LEC_OTHER& other) const
     {
         return is_same_type(other);
-    }
-
-    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
-    {
-        // we don't save open and close parentheses in the executable expression
-        if(type != L_OPENP && type != L_CLOSEP)
-            LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
-    }
-
-    short get_length() const override 
-    {
-        // we don't save open and close parentheses in the executable expression
-        return (type == L_OPENP || type == L_CLOSEP) ? 0 : 1;
     }
 };

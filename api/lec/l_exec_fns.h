@@ -193,48 +193,27 @@ inline std::vector<std::string> L_FN_NAMES =
     "div0"          // L_DIV0      L_FN + 36
 };
 
-struct LEC_FN: public LEC_EXECUTABLE
+struct LEC_FN: public TP_LEC_EXECUTABLE<>
 {
 public:
-    LEC_FN(const int type, const int nb_args) : LEC_EXECUTABLE(type, nb_args)
+    LEC_FN(const int type, const int nb_args) : TP_LEC_EXECUTABLE<>(type, nb_args)
     {
         if(!is_fn(type))
             throw std::invalid_argument("Invalid function type for LEC FUNC: " + std::to_string(type));
         pos = type - L_FN;
         fn_name = L_FN_NAMES[pos];
+        representation = fn_name;
     }
 
     LEC_FN(const LEC_FN& other) = default;
-
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_FN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_FN, 0)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-        nb_args = (int) buffer[pos_buffer];
-        pos_buffer++;
-        pos = type - L_FN;
-    }
 
     bool operator==(const LEC_FN& other) const
     {
         return is_same_type(other);
     }
 
-    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
-    {
-        LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
-        buffer[pos_buffer] = nb_args;
-        pos_buffer++;
-    }
-
-    short get_length() const override 
-    {
-        return 2;   // 1 byte for type and 1 byte for nb_args
-    }
-
     // executes the function with the given arguments on the stack
-    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
+    void execute(std::deque<double>& stack) override
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 

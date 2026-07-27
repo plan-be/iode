@@ -4,7 +4,6 @@
  *  Functions to link CLEC variables and scalars to KDB's of variables and scalars.
  *  This process is required before computing the value of a CLEC instance.
  *
- *  Three functions, implemented in k_lec.c, are called during the link process: L_findvar(), L_findscl() L_getsmpl(). 
  *  The positions of variables and scalars returned by these functions will be used at execution time by L_getvar() and L_getscl().
  */
 #include "api/b_errors.h"
@@ -29,9 +28,10 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     for(auto& [name, pos] : this->objs) 
     {
         if(is_coefficient(name))
-            pos = L_findscl(dbs, name);
+            pos = dbs->index_of(name);
         else
-            pos = L_findvar(dbv, name);
+            pos = dbv->index_of(name);
+        
         if(pos < 0) 
         {
             std::string msg = "linking LEC failed: '" + name + "' not found";
@@ -52,15 +52,31 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
  * In the LEC expression "A[2001Y1] + 2002Y1":
  *      - A[2001Y1] will be interpreted as the value of the 2d element of A
  *      - 2002Y1 will be replaced by 2 (2000Y1 == 0, 2001Y1 == 1,...)
- * 
- * @param [in]      dbv     KDB*    KDB of variables (only its Sample is needed here)
- * @param [in, out] expr    char*   pointer to the CLEC (sub-)expression
- * @param [in]      lg      int     length of expr
-*/
-void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
+ *
+ * @param [in]      dbv     KDB*    KDB of variables
+ */
+void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
 {
-    Sample* smpl = L_getsmpl(dbv);
-    if(!smpl)
+    if(this->v_expression.size() == 0) 
+        return;
+
+    if(start < 0 || start >= this->v_expression.size())
+    {
+        std::string msg = "Invalid start position for linking CLEC sub-expression: " + std::to_string(start);
+        kwarning(msg.c_str());
+        return;
+    }
+
+    int end = start + length - 1;
+    if(end >= this->v_expression.size())
+    {
+        std::string msg = "Invalid end position for linking CLEC sub-expression: " + std::to_string(end);
+        kwarning(msg.c_str());
+        return;
+    }
+    
+    std::shared_ptr<Sample> smpl_ptr = dbv->get_sample();
+    if(!smpl_ptr)
     {
         std::string msg = "Cannot link a LEC sub-expression because the sample ";
         msg += "of the passed Variables database is empty";
@@ -68,123 +84,45 @@ void L_link_sample_expr(KDBVariablesPtr dbv, unsigned char* expr, short lg)
         return;
     }
 
-    int j;
-    int type;
-    int previous_j;
-    for(j = 0 ; j < lg ;) 
+    for(int expr_pos = start; expr_pos <= end;)
     {
-        type = expr[j];
-        switch(type) 
+        ATOMIC_LEC& al = this->v_expression[expr_pos];
+        expr_pos++;
+
+        if(std::holds_alternative<LEC_VAR>(al))
         {
-            case L_VAR :
+            LEC_VAR& al_var = std::get<LEC_VAR>(al);
+            // calculate the reference of the variable
+            al_var.calculate_ref(*smpl_ptr);
+        }
+        else if(std::holds_alternative<LEC_PERIOD>(al))
+        {
+            LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
+            // calculate the position of the period in the sample
+            al_period.calculate_pos(*smpl_ptr);
+        }
+        else if(std::holds_alternative<LEC_TFN>(al))
+        {
+            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            // recursive call to link_sample()
+            int tfn_length = al_tfn.length_expr;
+            if(tfn_length > 0)
             {
-                // extract LEC Variable from the buffer -> update j
-                LEC_VAR al_var(expr, j);
-                // calculate the reference of the variable
-                al_var.calculate_ref(*smpl);
-                // move back to the beginning of the LEC_VAR in the buffer
-                j -= al_var.get_length();
-                // save the updated LEC Variable back to the buffer
-                al_var.add_to_buffer(expr, j);
-                break;
+                this->link_sample(dbv, expr_pos, tfn_length);
+                expr_pos += tfn_length;
             }
-            case L_COEF :
+        }
+        else if(std::holds_alternative<LEC_MTFN>(al))
+        {
+            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+            // recursive call to link_sample()
+            for(const int& mtfn_length : al_mtfn.v_length_expr)
             {
-                // extract LEC Coefficient from the buffer -> update j
-                LEC_COEF al_coef(expr, j);
-                break;
-            }
-            case L_DCONST :
-            {
-                // extract LEC Double Constant from the buffer -> update j
-                LEC_CONST_REAL al_real(expr, j);
-                break;
-            }
-            case L_LCONST :
-            {
-                // extract LEC Long Constant from the buffer -> update j
-                LEC_CONST_LONG al_long(expr, j);
-                break;
-            }
-            case L_PERIOD :
-            {
-                // extract LEC Period from the buffer -> update j
-                LEC_PERIOD al_period(expr, j);
-                // calculate the position of the period in the sample
-                al_period.calculate_pos(*smpl);
-                // move back to the beginning of the LEC_PERIOD in the buffer
-                j -= al_period.get_length();
-                // save the updated LEC Period back to the buffer
-                al_period.add_to_buffer(expr, j);
-                break;
-            }
-            default :
-            {
-                if(is_special_lec_elem(type)) 
-                {
-                    j++;
-                    break; 
-                }
-
-                if(is_fn(type)) 
-                {
-                    // extract LEC Function from the buffer -> update j
-                    LEC_FN al_fn(expr, j);
-                    break; 
-                }
-
-                if(is_op(type)) 
-                {
-                    // extract LEC Operator from the buffer -> update j
-                    LEC_OP al_op(expr, j);
-                    break; 
-                }
-
-                if(is_tfn(type)) 
-                {
-                    previous_j = j;
-                    // extract LEC TFN from the buffer -> update j
-                    LEC_TFN al_tfn(expr, j);
-                    // recursive call to L_link_sample_expr()
-                    al_tfn.link_sample_expr(dbv, expr, previous_j);
-                    break;
-                }
-
-                if(is_val(type)) 
-                {
-                    // extract LEC VAL_FN from the buffer -> update j
-                    LEC_VAL_FN al_val_fn(expr, j);
-                    break; 
-                }
-
-                if(is_mtfn(type)) 
-                {
-                    // extract LEC TFN from the buffer -> update j
-                    LEC_MTFN al_mtfn(expr, j);
-                    // TODO : find a way to link sample in multi-arg functions
-                    // ...
-                    break;
-                }
-
-                throw std::runtime_error("Unexpected type in L_link_sample_expr: " + std::to_string(type));
+                this->link_sample(dbv, expr_pos, mtfn_length);
+                expr_pos += mtfn_length;
             }
         }
     }
-}
-
-
-/**
- * Second step of linking CLEC. Each time displacement in this CLEC struct is aligned to the dbv's Sample.
- * For example, the position of A[1970Y1] in the vector A depends on the sample of dbv.
- *
- * @param [in]      dbv     KDB*    KDB of variables
- */
-void CLEC::link_sample(KDBVariablesPtr dbv)
-{
-    if(!this->expression) 
-        return;
-
-    L_link_sample_expr(dbv, this->expression, (short) this->len_expr);
 }
 
 
@@ -203,7 +141,7 @@ int CLEC::link(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     if(this->link_names(dbv, dbs)) 
         return L_errno;
     
-    this->link_sample(dbv);
+    this->link_sample(dbv, 0, (int) this->v_expression.size());
     return 0;
 }
 

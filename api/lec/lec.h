@@ -17,21 +17,20 @@
 using ATOMIC_LEC = std::variant<LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, 
                                 LEC_OTHER, LEC_OP, LEC_FN, LEC_TFN, LEC_VAL_FN, LEC_MTFN>;
 
-inline std::vector<ATOMIC_LEC> L_EXPR;      // Table of pairs <type, atomic elements> 
+inline std::vector<ATOMIC_LEC> L_EXPR;      // Table of pairs <type, atomic elements>  
 
 /*---------------- STRUCTS ------------------------*/
 
 struct CLEC: public AbstractCLEC
 {
     // duplicate endogenous variable in the LEC expression
-    char duplicated_endo = 0;
+    bool duplicated_endo = false;
 
     // original LEC expression as a string (for debugging purposes)
     std::string lec;
 
-    // 'executable' LEC expression
-    int len_expr = 0;
-    unsigned char* expression = NULL;
+    // 'executable' LEC expression as a vector of atomic expressions 
+    // (for execution purposes)
     std::vector<ATOMIC_LEC> v_expression;
 
     // list of pairs <scalar and variable name, positions in database>
@@ -78,41 +77,7 @@ private:
      *
      * @param [in]      dbv     KDB*    KDB of variables
      */
-    void link_sample(KDBVariablesPtr dbv);
-
-    /**
-     * Calculates the number of bytes required to save a sequence of ALEC atomic expressions into a CLEC struct by
-     * adding the size reclaimed by each ALEC atomic expression.
-     * 
-     * @param [in] expr     ALEC*   pointer to a table of ALEC atomic expressions
-     * @param [in] from     int     starting position in ALEC of the expression whose size is to be evaluated
-     * @param [in] to       int     ending position in ALEC of that expression
-     * @return              short   size in bytes of the expression in CLEC form
-    */
-    short calculate_length(const std::vector<ATOMIC_LEC>& expr, const int from, const int to)
-    {
-        if(expr.empty()) 
-            return 0;
-        
-        short len = 0;
-        for(int i = from; i < to; i++) 
-        {
-            const ATOMIC_LEC& al = expr[i];
-            len += std::visit([](auto& arg) { return arg.get_length(); }, al);
-            if(std::holds_alternative<LEC_TFN>(al))
-            {
-                const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
-                len -= al_tfn.len_args;
-            }
-            if(std::holds_alternative<LEC_MTFN>(al))
-            {
-                const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
-                len -= al_mtfn.len_args;
-            }
-        }
-        
-        return len;
-    }
+    void link_sample(KDBVariablesPtr dbv, const int start, const int length);
 
     /**
      *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
@@ -123,45 +88,34 @@ private:
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
-    int initialize(const bool reset_lnames);
+    int initialize(const bool side_of_eq);
 
-    // Generates an "executable" LEC expression (heterogenous container)
     // WARNING: to be run AFTER initialize() in order to fill L_EXPR and L_NAMES first
-    void finalize(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+    void reorder_expression(std::vector<ATOMIC_LEC>& expr);
     
+    void initialize_names()
+    {
+        // initialize all names with position -1 (not found)
+        for(const std::string& name : L_NAMES)
+            this->objs.push_back({name, -1});
+    } 
+
 public:
-    CLEC(const std::string& lec, const bool reset_lnames = true);
+    CLEC(const std::string& lec, const bool side_of_eq = false);
 
     CLEC(const std::string& eq, const std::string& endo);
 
     CLEC(const CLEC& other) 
     {
-        this->duplicated_endo = other.duplicated_endo;
-
         this->lec = other.lec;
+        this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
-
-        if(other.expression)
-        {
-            this->len_expr = other.len_expr;
-            this->expression = new unsigned char[this->len_expr];
-            memset(this->expression, 0, this->len_expr);
-            memcpy(this->expression, other.expression, this->len_expr);
-        }
-        else
-        {
-            this->len_expr = 0;
-            this->expression = nullptr;
-        }
-
         this->objs = other.objs;
     }
 
     ~CLEC() 
     { 
         v_expression.clear();
-        if(expression) 
-            delete[] expression; 
     }
 
     // assignment operator (deep copy)
@@ -169,27 +123,10 @@ public:
     {
         if(this == &other)
             return *this;
-
-        this->duplicated_endo = other.duplicated_endo;
-
+    
         this->lec = other.lec;
+        this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
-
-        if(other.expression)
-        {
-            this->len_expr = other.len_expr;
-            this->expression = new unsigned char[this->len_expr];
-            memset(this->expression, 0, this->len_expr);
-            memcpy(this->expression, other.expression, this->len_expr);
-        }
-        else
-        {
-            this->len_expr = 0;
-            if(this->expression)
-                delete[] this->expression;
-            this->expression = nullptr;
-        }
-
         this->objs = other.objs;
 
         return *this;
@@ -211,15 +148,7 @@ public:
                 return false;
         }
 
-        if(this->len_expr != other.len_expr)
-            return false;
-
-        if(this->expression && other.expression)
-        {
-            if(memcmp(this->expression, other.expression, this->len_expr) != 0)
-                return false;
-        }
-        else if(this->expression || other.expression) // only one of the two is null
+        if(this->objs.size() != other.objs.size())
             return false;
 
         return this->objs == other.objs;
@@ -331,26 +260,7 @@ public:
      * @param t         time of calculation (index in dbv sample)
      * @return double 
      */
-    double execute_sub_expression(const int pos, const int length, const int t);
-
-    /**
-     * @brief Get the length of the sub expression
-     * 
-     * @param start 
-     * @return short 
-     */
-    void get_sub_expression_length(const int start, int& start_1, short& length_1);
-
-    /**
-     * @brief extract the lengths of the two sub expressions and the starting position 
-     *        of the second sub expression.
-     * 
-     * @param start 
-     * @param length_1 
-     * @param length_2 
-     * @param start_2 
-     */
-    void split_sub_expression(const int start, int& start_1, short& length_1, int& start_2, short& length_2);
+    double execute_sub_expression(const int start, const int length, const int t);
 };
 
 /* ---------------------- FUNCS ---------------------- */
@@ -382,4 +292,4 @@ void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim);
 
 /* l_eqs.c */
 int L_split_eq(const std::string& eq);
-int L_invert(const std::string& eq, const std::string& endo, int* duplicated_endo);
+int L_invert(const std::string& eq, const std::string& endo, bool& duplicated_endo);
