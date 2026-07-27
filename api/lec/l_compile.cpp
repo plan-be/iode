@@ -521,7 +521,7 @@ static int L_analyze_lag()
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
-int generate_lec_expression(const bool reset_lnames)
+int CLEC::initialize(const bool reset_lnames)
 {
     int type;
     int start = 1;

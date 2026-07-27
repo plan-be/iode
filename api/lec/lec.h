@@ -114,14 +114,23 @@ private:
         return len;
     }
 
+    /**
+     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
+     *  
+     *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES:
+     *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
+     *      - L_NAMES contains the names included in the lec expression
+     *  
+     *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
+     */
+    int initialize(const bool reset_lnames);
+
     // Generates an "executable" LEC expression (heterogenous container)
-    // WARNING: to be run AFTER generate_lec_expression() in order to fill L_EXPR and L_NAMES first
-    void initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
+    // WARNING: to be run AFTER initialize() in order to fill L_EXPR and L_NAMES first
+    void finalize(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
     
 public:
-    CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec);
-
-    CLEC(const std::string& lec);
+    CLEC(const std::string& lec, const bool reset_lnames = true);
 
     CLEC(const std::string& eq, const std::string& endo);
 
@@ -346,8 +355,7 @@ public:
 
 /* ---------------------- FUNCS ---------------------- */
 
-/* l_cc1.c */
-int generate_lec_expression(const bool reset_lnames = true);
+/* l_compile.cpp */
 int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close = -1);
 
 /* l_exec.c */
