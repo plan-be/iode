@@ -33,7 +33,7 @@ public:
 		cpp_iode_init();
 		KPAUSE_CONTINUE = 1;
 		// suppress messages from kmsg()
-		skip_message(false);
+		skip_message(true);
 
 		// clear global workspaces
 		global_ws_cmt->clear();
