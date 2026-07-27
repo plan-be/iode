@@ -50,7 +50,7 @@ public:
 
 		KPAUSE_CONTINUE = 1;
 		// suppress messages from kmsg()
-		skip_message(false);
+		skip_message(true);
 		
 		// NOTE: we assume that: 
 		//       - current path is binaryDir/tests/test_cpp_api
