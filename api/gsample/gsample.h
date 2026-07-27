@@ -171,7 +171,6 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(clec)
     {
         std::cout << "lec: " << clec->lec << std::endl;
-        std::cout << ", length expression: " << clec->len_expr;
         std::cout << " , nb_names: " << clec->objs.size() << ", v_names: ";
         for(auto& [name, _]: clec->objs)
             std::cout << name << ", ";
@@ -184,7 +183,6 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(dclec)
     {
         std::cout << "lec: " << dclec->lec << std::endl;
-        std::cout << "length expression: " << dclec->len_expr;
         std::cout << " , nb_names: " << dclec->objs.size() << ", v_names: ";
         for(auto& [name, _]: dclec->objs)
             std::cout << name << ", ";

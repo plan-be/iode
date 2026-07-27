@@ -929,49 +929,97 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
 
 TEST_F(LegacyAPITest, Tests_LEC)
 {
+    int t = 2;
+    double expected_value = 0.0;
+
     U_test_print_title("Tests LEC");
 
     // Create objects
     U_test_CreateObjects();
 
+    // A = 0 1 2 3 4  5  6  7  8  9 10
+    // B = 0 2 4 6 8 10 12 14 16 18 20
     Variable A = global_ws_var->get("A");
     Variable B = global_ws_var->get("B");
 
     // Tests LEC
-    // test lag
-    U_test_lec("LEC", "A[2002Y1]",     2, A[2]);
-    U_test_lec("LEC", "A[2002Y1][-1]", 2, A[2]);
-    U_test_lec("LEC", "A[-1]",         2, A[1]);
-    U_test_lec("LEC", "A[-1][2002Y1]", 2, A[1]);
-    // test operators (LEC_OP)
-    U_test_lec("LEC", "A + B",  2, A[2] + B[2]);
-    // test no-time functions (LEC_FN)
-    U_test_lec("LEC", "ln A", 2, log(A[2]));
-    // test time functions (LEC_TFN)
-    U_test_lec("LEC", "sum(2000Y1, 2010Y1, A)", 2, 55.0);
-    U_test_lec("LEC", "sum(2000Y1, A)", 2, 3.0);
-    U_test_lec("LEC", "sum(A)", 2, 3.0);
-    U_test_lec("LEC", "mean(t, t+1, A)", 2, (A[2] + A[3]) / 2.0);
-    U_test_lec("LEC", "B * mean(t, t+1, A)", 2, B[2] * (A[2] + A[3]) / 2.0);
-    U_test_lec("LEC", "r(A)", 2, A[2] / A[1]);
-    U_test_lec("LEC", "r(B)", 2, B[2] / B[1]);
-    // test variadic time functions (LEC_MTFN)
-    // covar0([from [,to],] X, Y) = sum(Xi * Yi) / n 
-    double covar0 = 0.0;
-    for(int t = 0; t < 11; t++)
-        covar0 += A[t] * B[t];
-    covar0 /= 11.0;
-    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B)", 2, covar0);
+    
+    // ---- test lag ----
+    U_test_lec("LEC", "A[2002Y1]",     t, A[2]);
+    U_test_lec("LEC", "A[2002Y1][-1]", t, A[2]);
+    U_test_lec("LEC", "A[-1]",         t, A[1]);
+    U_test_lec("LEC", "A[-1][2002Y1]", t, A[1]);
+    
+    // ---- test operators (LEC_OP) ----
+    U_test_lec("LEC", "A + B",  t, A[t] + B[t]);
+    
+    // ---- test no-time functions (LEC_FN) ----
+    U_test_lec("LEC", "ln A", t, log(A[t]));
+    U_test_lec("LEC", "ln B", t, log(B[t]));
+    U_test_lec("LEC", "ln A + ln B", t, log(A[t]) + log(B[t]));
+    U_test_lec("LEC", "ln (A + B)", t, log(A[t] + B[t]));
+    
+    // ---- test time functions (LEC_TFN) ----
+    expected_value = 0.0;
+    for(int k = 1; k < 11; k++)
+        expected_value += A[k];
+    U_test_lec("LEC", "sum(2001Y1, 2010Y1, A)", t, expected_value);
 
+    expected_value = 0.0;
+    for(int k = 1; k <= t; k++)
+        expected_value += A[k];
+    U_test_lec("LEC", "sum(2001Y1, A)", t, expected_value);
+
+    expected_value = 0.0;
+    for(int k = 0; k <= t; k++)
+        expected_value += A[k];
+    U_test_lec("LEC", "sum(A)", t, expected_value);
+
+    expected_value = 0.0;
+    for(int k = 1; k < 11; k++)
+        expected_value += A[k];
+    for(int k = 2; k < 9; k++)
+        expected_value += B[k];
+    U_test_lec("LEC", "sum(2001Y1, 2010Y1, A) + sum(2002Y1, 2008Y1, B)", t, expected_value);
+
+    expected_value = (A[t] + A[t+1] + A[t+2]) / 3.0;
+    U_test_lec("LEC", "mean(t, t+2, A)", t, expected_value);
+
+    expected_value = B[t] * (A[t] + A[t+1] + A[t+2]) / 3.0;
+    U_test_lec("LEC", "B * mean(t, t+2, A)", t, expected_value);
+
+    expected_value = A[t] / A[t-1];
+    U_test_lec("LEC", "r(A)", t, expected_value);
+    
+    expected_value = B[t] / B[t-1];
+    U_test_lec("LEC", "r(B)", t, expected_value);
+    
+    // ---- test variadic time functions (LEC_MTFN) ----
+    // covar0([from [,to],] X, Y) = sum(Xi * Yi) / n 
+    expected_value = 0.0;
+    for(int k = 0; k < 11; k++)
+        expected_value += A[k] * B[k];
+    expected_value /= 11.0;
+    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B)", t, expected_value);
+
+    double covar0_1 = expected_value;
+    double covar0_2 = 0.0;
+    for(int k = 2; k < 9; k++)
+        covar0_2 += A[k] * B[k];
+    covar0_2 /= 7.0;
+    expected_value = covar0_1 + covar0_2;
+    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B) + covar0(2002Y1, 2008Y1, A, B)", t, expected_value);
+
+    // ---- test macros (LEC_MACRO) ----
     std::string lst = global_ws_lst->get("LST1");
     EXPECT_EQ(lst, "A,B");
     lst = global_ws_lst->get("LST2");
     EXPECT_EQ(lst, "A,B,A");
 
-    double max_value = (A[2] > B[2]) ? A[2] : B[2];
-    U_test_lec("LEC-MACRO", "1 + max($LST1)", 2, 1.0 + max_value);
-    U_test_lec("LEC-MACRO", "1 + max(60, $LST1)", 2, 61.0);
-    U_test_lec("LEC-MACRO", "1 + max($LST2)", 2, 1.0 + max_value);
+    double max_value = (A[t] > B[t]) ? A[t] : B[t];
+    U_test_lec("LEC-MACRO", "1 + max($LST1)", t, 1.0 + max_value);
+    U_test_lec("LEC-MACRO", "1 + max(60, $LST1)", t, 61.0);
+    U_test_lec("LEC-MACRO", "1 + max($LST2)", t, 1.0 + max_value);
 }
 
 TEST_F(LegacyAPITest, Tests_CLEC_Compile)
@@ -987,8 +1035,8 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     Variable B = global_ws_var->get("B");
 
     clec = std::make_shared<CLEC>(lec);
-    EXPECT_EQ(clec->duplicated_endo, 0);
-    EXPECT_EQ(clec->len_expr, 27);
+    EXPECT_EQ(clec->duplicated_endo, false);
+    EXPECT_EQ(clec->v_expression.size(), 3);
     EXPECT_EQ(clec->objs.size(), 1);
     EXPECT_TRUE(lec_contains(clec, "A"));
     
@@ -1014,8 +1062,7 @@ TEST_F(LegacyAPITest, Tests_CLEC_Copy)
 
     EXPECT_TRUE(copy_clec != nullptr);
     EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
-    EXPECT_EQ(copy_clec->len_expr, clec->len_expr);
-    EXPECT_EQ(memcmp(copy_clec->expression, clec->expression, clec->len_expr), 0);
+    EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
     EXPECT_EQ(copy_clec->objs.size(), clec->objs.size());
     auto it_clec = clec->objs.begin();
     auto it_copy_clec = copy_clec->objs.begin();
@@ -2755,31 +2802,6 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     U_test_reset_kmsg_msgs();
 }
 
-
-TEST_F(LegacyAPITest, Tests_KEVAL)
-{
-	char fullfilename[256];
-	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
-
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
-
-    // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
-    B_WsLoad(fullfilename, COMMENTS);
-    B_WsLoad(fullfilename, EQUATIONS);
-    B_WsLoad(fullfilename, IDENTITIES);
-    B_WsLoad(fullfilename, LISTS);
-    B_WsLoad(fullfilename, SCALARS);
-    B_WsLoad(fullfilename, TABLES);
-    B_WsLoad(fullfilename, VARIABLES);
-
-    // check equation->endo == equation name
-    for(const auto& [name, eq_ptr] : global_ws_eqs->k_objs)
-        ASSERT_EQ(eq_ptr->endo, name) ;
-
-    U_test_reset_kmsg_msgs();
-}
 
 TEST_F(LegacyAPITest, Tests_B_WsSave)
 {

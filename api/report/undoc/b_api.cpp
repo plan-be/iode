@@ -88,6 +88,8 @@ int IodeEnd()
     error_manager.clear();
     SCR_free(ODE_INIFILE);
     ODE_INIFILE = 0;
+    
+    L_EXPR.clear();
     L_NAMES.clear();
     
     return 0;

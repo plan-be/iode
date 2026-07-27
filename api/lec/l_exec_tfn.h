@@ -37,21 +37,21 @@ inline bool is_tfn(const int op)
 
 void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from, int& to);
 
-double L_lag(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_diff(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_rapp(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_dln(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_grt(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_mavg(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_vmax(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_vmin(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_sum(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_prod(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_mean(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_stderr(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_lastobs(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_lastobs(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs);
 
-inline double(*L_TFN_FN[])(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs) = 
+inline double(*L_TFN_FN[])(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_lag,          // L_LAG       L_TFN + 0 
     L_diff,         // L_DIFF      L_TFN + 1 
@@ -87,80 +87,38 @@ inline std::vector<std::string> L_TFN_NAMES =
     "lastobs"       // L_LASTOBS   L_TFN + 13 
 };
 
-struct LEC_TFN: public LEC_EXECUTABLE
+struct LEC_TFN: public TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>
 {
-    short len_args;    // length in bytes of the function arguments (i.e. the sub-expression in the buffer)
-     
+    // length as number of atomic lec elements of the sub-expression argument of the function
+    int length_expr = 0;
+    
 public:
-    LEC_TFN(const int type, const int nb_args) : LEC_EXECUTABLE(type, nb_args), len_args(0)
+    LEC_TFN(const int type, const int nb_args) 
+        : TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>(type, nb_args)
     {
         if(!is_tfn(type))
             throw std::invalid_argument("Invalid time function type for LEC TIME FUNC: " + std::to_string(type));
         pos = type - L_TFN;
         fn_name = L_TFN_NAMES[pos];
+        representation = fn_name;
     }
 
     LEC_TFN(const LEC_TFN& other) = default;
-
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_TFN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_TFN, 0)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-        nb_args = (int) buffer[pos_buffer];
-        pos_buffer++;
-        memcpy(&len_args, buffer + pos_buffer, sizeof(short));
-        pos_buffer += sizeof(short) + len_args; 
-
-        pos = type - L_TFN;
-        representation = L_TFN_NAMES[pos];
-    }
 
     bool operator==(const LEC_TFN& other) const
     {
         if(!is_same_type(other))
             return false;
         
-        return this->len_args == other.len_args;
-    }
+        if(this->length_expr != other.length_expr)
+            return false;
 
-    void link_sample_expr(KDBVariablesPtr dbv, unsigned char* buffer, int pos_buffer)
-    {
-        // NOTE: 'j + 2 + sizeof(short)' corresponds to the position of the sub-expression 
-        //       in the buffer (after type, nb_args and len_args)
-        pos_buffer += 2 + sizeof(short);
-        L_link_sample_expr(dbv, buffer + pos_buffer , len_args);
-    }
-
-    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
-    {
-        LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
-
-        // move function arguments in the buffer to put type and nb of args before them
-        // a) go 'len_args + 1' bytes backward
-        int new_pos_buffer = pos_buffer - (len_args + 1);
-        unsigned char* tmp = buffer + new_pos_buffer;
-        // b) move tmp[0:len_args] to tmp[shift:shift+len_args] 
-        int shift = 2 + sizeof(short);
-        for(int i = len_args - 1; i >= 0; i--)
-            tmp[i + shift] = tmp[i];
-
-        tmp[0] = type;
-        tmp[1] = nb_args;
-        memcpy(tmp + 2, &len_args, sizeof(short));
-
-        pos_buffer += sizeof(short) + 1;
-    }
-
-    short get_length() const override 
-    {
-        // 2 for type and nb_args + sizeof(short) for len_args + 
-        // len_args for the arguments
-        return 2 + sizeof(short) + len_args;
+        return true;
     }
 
     // executes the function with the given arguments on the stack
-    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
+    // NOTE: expr_pos is the position of the first atomic lec element of the sub expression
+    void execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) override
     {
         int from = -1, to = -1;
         // NOTE: for time functions:
@@ -171,11 +129,11 @@ public:
            type == L_STDERR || type == L_LASTOBS)
             L_extract_time_range(t, stack, nb_args, from, to);
 
-        // NOTE: 'start + 2 + sizeof(short)' corresponds to the position of the sub-expression 
-        //       in the buffer (after type, nb_args and len_args)
-        start += 2 + sizeof(short);
-
-        double result = (L_TFN_FN[pos])(clec, start, len_args, from, to, t, stack, nb_args);
+        double result = (L_TFN_FN[pos])(clec, expr_pos, length_expr, from, to, t, stack, nb_args);
         stack.push_back(result);
+
+        // update the position of the expression to the next atomic lec 
+        // at the end of the function's argument
+        expr_pos += length_expr;
     }
 };

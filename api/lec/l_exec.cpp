@@ -77,40 +77,6 @@ bool L_stack_is_nan(const std::deque<double>& stack)
     return false;
 }
 
-
-static std::string get_l_exec_sub_error_message(unsigned char* expr, int t)
-{
-    std::string sub_expression = std::string((char*) expr);
-    std::string error_msg = "Could not execute compiled LEC sub expression ";
-    if(sub_expression.empty())
-        error_msg += "at period position " + std::to_string(t) + ": empty expression";
-    else
-    {
-        error_msg += "'" + sub_expression + "' at period position ";
-        error_msg += std::to_string(t) + ": invalid expression";
-    }
-    return error_msg;
-}
-
-void CLEC::get_sub_expression_length(const int start, int& start_1, short& length_1)
-{
-    memcpy(&length_1, this->expression + start, sizeof(short));
-    start_1 = start + sizeof(short);
-}
-
-void CLEC::split_sub_expression(const int start, int& start_1, short& length_1, 
-    int& start_2, short& length_2)
-{
-    // sub expression 1
-    memcpy(&length_1, this->expression + start, sizeof(short));
-    start_1 = start + sizeof(short);
-
-    // sub expression 2
-    start_2 = start + length_1 + sizeof(short);
-    memcpy(&length_2, this->expression + start_2, sizeof(short));
-    start_2 += sizeof(short);
-}
-
 /**
  *  Execution of a CLEC sub expression.
  * 
@@ -118,123 +84,110 @@ void CLEC::split_sub_expression(const int start, int& start_1, short& length_1,
  * 
  *      double*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
  *      double   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
- *      SMPL*    L_getsmpl(dbv)     : returns a pointer to the sample of dbv, the database of variables
  *
  *  The process iterates on the compiled LEC expression. 
  *      - the first byte (type) is an identifier (+, ln, VAR, ...)
  *      - according to the identifier, one or more values are read from the stack, 
  *          the function/operator is called and the result is placed on the stack
  *  
- *  @param [in] start   int             position of the sub expression in the CLEC->expression buffer
- *  @param [in] length  int             length of the sub expression
- *  @param [in] t       int             time (index in dbv) of execution
- *  @return             double          result of the computation
+ *  @param [in] expr_pos int            position of the sub expression in the CLEC->expression buffer
+ *  @param [in] length   int            length of the sub expression
+ *  @param [in] t        int            time (index in dbv) of execution
+ *  @return              double         result of the computation
  *  
  */
 double CLEC::execute_sub_expression(const int start, const int length, const int t)
 {
-    int type;
-    int previous_j;
-    int pos_stack = 0;  
-    std::deque<double> stack;
-    for(int j = start; j < start + length ;) 
+    if(start < 0 || start >= this->v_expression.size())
     {
-        type = this->expression[j];
+        std::string error_msg = "Invalid start position for sub expression: " + std::to_string(start);
+        kwarning(error_msg.c_str());
+        return (double) IODE_NAN;
+    }
 
-        if(type == L_LCONST)
+    int end = start + length - 1;
+    if(end >= this->v_expression.size())
+    {
+        std::string error_msg = "Invalid end position for sub expression: " + std::to_string(end);
+        kwarning(error_msg.c_str());
+        return (double) IODE_NAN;
+    }
+
+    std::deque<double> stack;
+    for(int expr_pos = start; expr_pos <= end;)
+    {
+        ATOMIC_LEC& al = this->v_expression[expr_pos];
+        expr_pos++;
+
+        // ---- atomic LEC of type other ----
+
+        if(std::holds_alternative<LEC_OTHER>(al))
+            continue;
+
+        // ---- atomic LEC of type value ----
+
+        if(std::holds_alternative<LEC_CONST_REAL>(al))
         {
-            // extract LEC long constant from the buffer -> update j
-            LEC_CONST_LONG al_lconst(this->expression, j);
-            // add the constant to the stack
-            al_lconst.add_to_stack(stack, t);
+            const LEC_CONST_REAL& al_dconst = std::get<LEC_CONST_REAL>(al);
+            al_dconst.add_to_stack(stack); 
         }
-        else if(type == L_DCONST)
+        else if(std::holds_alternative<LEC_CONST_LONG>(al))
         {
-            // extract LEC double constant from the buffer -> update j
-            LEC_CONST_REAL al_dconst(this->expression, j);
-            // add the constant to the stack
-            al_dconst.add_to_stack(stack, t); 
+            const LEC_CONST_LONG& al_lconst = std::get<LEC_CONST_LONG>(al);
+            al_lconst.add_to_stack(stack);
         }
-        else if(type == L_COEF)
+        else if(std::holds_alternative<LEC_COEF>(al))
         {
-            // extract LEC coefficient from the buffer -> update j
-            LEC_COEF al_coef(this->expression, j);
-            // add the coefficient value to the stack
-            bool ok = al_coef.add_to_stack(stack, t);
+            const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
+            bool ok = al_coef.add_to_stack(stack);
             if(!ok) 
-            {
-                std::string error_msg = get_l_exec_sub_error_message(this->expression + start, t);
-                kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
-            }
         }
-        else if(type == L_PERIOD)
+        else if(std::holds_alternative<LEC_PERIOD>(al))
         {
-            // extract LEC Period from the buffer -> update j
-            LEC_PERIOD al_period(this->expression, j);
-            // add the period position to the stack
-            al_period.add_to_stack(stack, t);
+            const LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
+            al_period.add_to_stack(stack);
         }
-        // key = variable or variable[period] 
-        else if(type == L_VAR || type == L_VART) 
+        else if(std::holds_alternative<LEC_VAR>(al))
         {
-            // extract LEC Variable from the buffer -> update j
-            LEC_VAR al_var(this->expression, j);
-            // add the variable value to the stack
+            const LEC_VAR& al_var = std::get<LEC_VAR>(al);
             bool ok = al_var.add_to_stack(stack, t);
             if(!ok) 
-            {
-                std::string error_msg = get_l_exec_sub_error_message(this->expression + start, t);
-                kerror(0, (char*) error_msg.c_str());
                 return (double) IODE_NAN;
-            }
         }
 
-        // ---- executable LEC elements ----
+        // ---- atomic LEC of type executable ----
 
-        else if(is_fn(type)) 
+        else if(std::holds_alternative<LEC_FN>(al))
         {
-            previous_j = j;
-            // extract LEC function from the buffer -> update j
-            LEC_FN al_fn(this->expression, j);
-            // execute the function on the stack
-            al_fn.execute(*this, previous_j, t, stack);
+            LEC_FN& al_fn = std::get<LEC_FN>(al);
+            al_fn.execute(stack);
         }
-        else if(is_op(type))
+        else if(std::holds_alternative<LEC_OP>(al))
         {
-            previous_j = j;
-            // extract LEC operator from the buffer -> update j
-            LEC_OP al_op(this->expression, j);
-            // execute the operator on the stack
-            al_op.execute(*this, previous_j, t, stack);
+            LEC_OP& al_op = std::get<LEC_OP>(al);
+            al_op.execute(stack);
         }
-        else if(is_tfn(type)) 
+        else if(std::holds_alternative<LEC_TFN>(al))
         {
-            previous_j = j;
-            // extract LEC time function from the buffer -> update j
-            LEC_TFN al_tfn(this->expression, j);
-            // execute the time function on the stack
-            al_tfn.execute(*this, previous_j, t, stack);
+            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            al_tfn.execute(stack, t, expr_pos, *this);
         }
-        else if(is_val(type)) 
+        else if(std::holds_alternative<LEC_VAL_FN>(al))
         {
-            previous_j = j;
-            // extract LEC value from the buffer -> update j
-            LEC_VAL_FN al_val(this->expression, j);
-            // execute the value function on the stack
-            al_val.execute(*this, previous_j, t, stack);
+            LEC_VAL_FN& al_val = std::get<LEC_VAL_FN>(al);
+            al_val.execute(stack, t);
         }
-        else if(is_mtfn(type)) 
+        else if(std::holds_alternative<LEC_MTFN>(al))
         {
-            previous_j = j;
-            // extract LEC multi-time function from the buffer -> update j
-            LEC_MTFN al_mtfn(this->expression, j);
-            // execute the multi-time function on the stack
-            al_mtfn.execute(*this, previous_j, t, stack);
+            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+            al_mtfn.execute(stack, t, expr_pos, *this);
         }
         else 
         {
-            std::string error_msg = "Could not execute compiled LEC sub expression: invalid atomic lec type " + std::to_string(type);
+            int type = std::visit([](auto&& arg) -> int { return arg.type; }, al);
+            std::string error_msg = "Could not execute compiled LEC sub expression: ";
+            error_msg += "invalid atomic lec type " + std::to_string(type);
             kerror(0, (char*) error_msg.c_str());
             return (double) IODE_NAN;
         }
@@ -258,7 +211,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
 double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
 {
     // leave if empty CLEC expression
-    if(this->expression == nullptr || this->len_expr == 0)
+    if(this->v_expression.size() == 0)
         return IODE_NAN;
 
     // Use globals to limit the number of parameters in function calls
@@ -285,7 +238,7 @@ double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
     if(setjmp(L_JMP))
         return (double) IODE_NAN; // On FPE, return IODE_NAN
     
-    double value = this->execute_sub_expression(0, this->len_expr, t);
+    double value = this->execute_sub_expression(0, (int) v_expression.size(), t);
     return value;
 }
 

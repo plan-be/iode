@@ -56,6 +56,11 @@ public:
         level = new_level;
     }
 
+    bool is_enabled() const 
+    {
+        return level != LOG_NONE;
+    }
+
     void info(const std::string& message) 
     {
         if(log_file.is_open() && level == LOG_INFO)

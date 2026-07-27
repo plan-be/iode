@@ -5,9 +5,6 @@
  *  
  *      double *L_getvar(KDBVariablesPtr kdb, int pos)    Retrieves a pointer to the first element of a VAR.
  *      double L_getscl(KDBScalarsPtr kdb, int pos)       Retrieves a scalar value.
- *      Sample *L_getsmpl(KDBVariablesPtr kdb)            Retrieves the sample of a KDB.
- *      int L_findscl(KDBScalarsPtr kdb, char *name)      Retrieves a scalar position.
- *      int L_findvar(KDBVariablesPtr kdb, char* name)    Retrieves a variable position.
  */
 
 #include "api/pch.h"
@@ -47,60 +44,17 @@ double L_getscl(KDBScalarsPtr kdb, int pos)
 {
     std::string name = kdb->get_name(pos);
     std::shared_ptr<Scalar> scl = kdb->get_obj_ptr(name);
-    return(scl->value);
+    return scl->value;
 }
 
 
 /**
- *  Implementation of L_getsmpl() in the context of IODE objects. 
- *  Retrieves the pointer to the sample a the KDB.
- *  
- *  @param [in] kdb     KDB*    KDB of VAR from which the Period has to be retrieved
- *  @return             Sample* pointer to the Sample struct (not allocated)
- *  
- */
-Sample* L_getsmpl(KDBVariablesPtr kdb)
-{
-    std::shared_ptr<Sample> sample = kdb->get_sample();
-    return sample ? sample.get() : nullptr;
-}
-
-
-/**
- *  Implementation of L_findscl() in the context of IODE objects. Retrieves a scalar position.
- *  
- *  @param [in] kdb     KDB*        KDB of Scalar from which the scalar postion has to be retrieved
- *  @param [in] name    char*       name of the scalar
- *  @return             int         position of name in KDB 
- *  
- */
-int L_findscl(KDBScalarsPtr kdb, const std::string& name)
-{
-    return kdb->index_of(name);
-}
-
-
-/**
- *  Implementation of L_findvar() in the context of IODE objects. Retrieves a variable position.
- *  
- *  @param [in] kdb     KDB*        KDB of VAR from which the position has to be retrieved
- *  @param [in] name    char*       name of the VAR
- *  @return             int         position of name in KDB 
- *  
- */
-int L_findvar(KDBVariablesPtr kdb, const std::string& name)
-{
-    return kdb->index_of(name);
-}
-
-/**
- *  Implentation of L_expand()
+ *  Implementation of L_expand()
  *  
  *  @param [in] name 
  *  @return 
  *  
  */
- 
 char* L_expand(char* list_name)
 {
     if(L_expand_super) 
@@ -172,121 +126,109 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     return true;
 }
 
-/**
- * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogenous container).
- * 
- * @param [in]  expr    std::vector<ATOMIC_LEC>&   vector of atomic lec elements (result of initialize(), normally L_EXPR)
- * @param [in]  lec     std::string&               original LEC expression string
-*/
-void CLEC::finalize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
+void CLEC::reorder_expression(std::vector<ATOMIC_LEC>& expr)
 {
     if(expr.empty())
         throw std::invalid_argument("CLEC constructor: empty expression vector.");
 
-    int pos_buffer = 0;             // position (in number of bytes) in the buffer
-    int pos_expr = 0;               // position in the vector of atomic lec elements
-    int alen = 0;                   // current allocated size of the buffer (in bytes)
-    unsigned char* buffer = NULL;   // buffer to save the "executable" expression (will be copied in the CLEC struct at the end)
-    
-    for(ATOMIC_LEC& al : expr) 
+    for(ATOMIC_LEC& al : expr)
     {
-        // end of expression -> stop
-        if(std::holds_alternative<LEC_OTHER>(al) && std::get<LEC_OTHER>(al).type == L_EOE)
-            break;
-
-        // if the current size of the buffer is not sufficient to save the next element, 
-        // reallocate it by chunks of 512 bytes
-        if(pos_buffer + 30 >= alen) 
+        if(std::holds_alternative<LEC_OTHER>(al))
         {
-            buffer = (unsigned char*) SW_nrealloc(buffer, alen, alen + 512);
-            alen += 512;
+            LEC_OTHER& al_other = std::get<LEC_OTHER>(al);
+            // end of expression -> stop
+            if(al_other.type == L_EOE)
+                break;
         }
+        
+        this->v_expression.push_back(al);
 
         if(std::holds_alternative<LEC_TFN>(al))
         {
             LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
 
-            // compute the length in bytes of the function arguments 
-            // (i.e. the sub-expression in the buffer) 
-            int start_pos = L_sub_expr(expr, pos_expr - 1);
-            short len = this->calculate_length(expr, start_pos, pos_expr);
-            if(len < 0 || len > pos_buffer) 
+            // compute the start and end positions of the arguments of the function 
+            // NOTE: - 2 because the last element of v_expression is always (should be) 
+            //       of type L_EOE (End Of Expression)
+            int args_end = (int) this->v_expression.size() - 2;  
+            int args_start = L_sub_expr(this->v_expression, args_end);
+            if(args_start < 0 || args_end < args_start) 
             {
-                std::string error_msg = "CLEC constructor: Could not compute the length in bytes of ";
-                error_msg += "arguments of function '" + al_tfn.representation + "'.";
-                SW_nfree(buffer);
+                std::string error_msg = "CLEC constructor: Could not determine the start and end ";
+                error_msg += "positions of the arguments of function '" + al_tfn.representation + "'.";
                 throw std::runtime_error(error_msg);
             }
+            al_tfn.length_expr = args_end - args_start + 1;
 
-            al_tfn.len_args = len;
+            // insert current LEC_TFN element before its arguments in the vector
+            this->v_expression.pop_back();
+            this->v_expression.insert(this->v_expression.begin() + args_start, al);
         }
-        
+
         if(std::holds_alternative<LEC_MTFN>(al))
         {
             LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
 
             int nv_args = L_MIN_MTARGS[al_mtfn.pos];
             al_mtfn.nv_args = nv_args;
+            al_mtfn.v_length_expr.clear();
 
-            al_mtfn.v_len_args.clear();
-            int new_pos = pos_expr - 1;
+            // compute the start and end positions of the arguments of the function
+            int args_start;
+            // NOTE: - 2 because the last element of v_expression is always (should be) 
+            //       of type L_EOE (End Of Expression)
+            int args_end = (int) this->v_expression.size() - 2;
             for(int j = 0; j < nv_args; j++) 
             {
-                // compute the length in bytes of the function argument 
-                // representing a sub-expression in the buffer 
-                int start_pos = L_sub_expr(expr, new_pos);
-                short len = this->calculate_length(expr, start_pos, new_pos + 1);
-                if(len < 0) 
+                // compute the start and end positions of the nth sub-expression of the function 
+                args_start = L_sub_expr(this->v_expression, args_end);
+                if(args_start < 0 || args_end < args_start) 
                 {
-                    std::string error_msg = "CLEC constructor: Could not compute the length in bytes of ";
-                    error_msg += "arguments of function '" + al_mtfn.representation + "'.";
-                    SW_nfree(buffer);
+                    std::string error_msg = "CLEC constructor: Could not determine the start and end ";
+                    error_msg += "positions of the arguments of function '" + al_mtfn.representation + "'.";
                     throw std::runtime_error(error_msg);
                 }
-                al_mtfn.v_len_args.push_back(len);
-                new_pos = start_pos - 1;
+                int length_expr = args_end - args_start + 1;
+                // NOTE: push front because the arguments are processed in reverse order
+                al_mtfn.v_length_expr.push_front(length_expr);
+                args_end = args_start - 1;
             }
+
+            // insert current LEC_MTFN element before its arguments in the vector
+            this->v_expression.pop_back();
+            this->v_expression.insert(this->v_expression.begin() + args_start, al);
         }
-
-        // for each variant type -> save the executable representation of the atomic lec in the buffer 
-        // and update the position in the buffer
-        std::visit([&buffer, &pos_buffer](auto& arg) { arg.add_to_buffer(buffer, pos_buffer); }, al);
-
-        pos_expr++;
     }
-
-    if(pos_buffer == 0)
-    {
-        std::string error_msg = "CLEC constructor: Could not compile the LEC expression: ";
-        error_msg += "'" + lec + "'.";
-        SW_nfree(buffer);
-        throw std::runtime_error(error_msg);
-    }
-    
-    this->lec = lec;
-    this->v_expression = expr;
-    this->len_expr = pos_buffer;
-    this->expression = new unsigned char[pos_buffer];
-    memset(this->expression, 0, pos_buffer);
-    memcpy(this->expression, buffer, pos_buffer);
-
-    // initialize all names with position -1 (not found)
-    for(const std::string& name : L_NAMES)
-        this->objs.push_back({name, -1});
-
-    SW_nfree(buffer);
-    L_EXPR.clear();
 }
 
-CLEC::CLEC(const std::string& lec, const bool reset_lnames) : AbstractCLEC()
+/**
+ * @brief Construct a new CLEC object
+ * 
+ * @param lec           std::string&  LEC expression to compile
+ * @param side_of_eq    bool          if true, the LEC expression is the left or right side of an equation
+ */
+CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
 {
+    this->lec = lec;
+
     if(L_open_string((char*) lec.c_str()) != 0) 
         throw std::runtime_error("Error opening LEC string");
 
-    if(initialize(reset_lnames) != 0)
+    if(initialize(side_of_eq) != 0)
         throw std::runtime_error("Error generating LEC expression");
     
-    finalize(L_EXPR, lec);
+    if(side_of_eq)
+    {
+        // copy the vector of atomic lec as is
+        this->v_expression = L_EXPR;
+    }
+    else
+    {
+        reorder_expression(L_EXPR);
+        initialize_names();
+    }
+
+    L_EXPR.clear();
     L_close();
 }
 
@@ -298,10 +240,10 @@ CLEC::CLEC(const std::string& lec, const bool reset_lnames) : AbstractCLEC()
 */
 CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
 {
-    int duplicated_endo = 0;
-    std::string lec = eq;
-
-    L_invert(eq, endo, &duplicated_endo);
+    this->lec = eq;
+    
+    bool duplicated_endo = false;
+    L_invert(eq, endo, duplicated_endo);
     if(L_errno != 0) 
     {
         L_EXPR.clear();
@@ -309,7 +251,10 @@ CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
         error_msg += "with respect to endogenous variable '" + endo + "' -> " + L_error();
         throw std::runtime_error(error_msg);
     }
+    this->duplicated_endo = duplicated_endo;
 
-    finalize(L_EXPR, lec);
-    this->duplicated_endo = (char) duplicated_endo;
+    reorder_expression(L_EXPR);
+    initialize_names();
+
+    L_EXPR.clear();
 }

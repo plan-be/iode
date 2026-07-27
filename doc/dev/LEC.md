@@ -343,12 +343,3 @@ Hodrick\-Prescott filter. These functions are subfunctions of L\_hp\*() defined 
 ### k\_lec.c {#T30}
 
 Implemention of the LEC library virtual functions for Scalar and VAR references.
-
-|Syntax|Description|
-|:---|:---|
-|`double *L_getvar(KDBVariablesPtr kdb, int pos)`|Retrieves a pointer to the first element of a VAR.|
-|`double L_getscl(KDBScalarsPtr kdb, int pos)`|Retrieves a scalar value.|
-|`Sample *L_getsmpl(KDB* kdb)`|Retrieves the sample of a KDB.|
-|`int L_findscl(KDBScalarsPtr kdb, char *name)`|Retrieves a scalar position.|
-|`int L_findvar(KDBVariablesPtr kdb, char* name)`|Retrieves a variable position.|
-

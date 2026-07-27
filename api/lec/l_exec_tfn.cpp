@@ -14,7 +14,7 @@
  *
  * Function signature:
  *
- *      double <fnname>(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+ *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
  *  
  *  where:
  *      - expr points to the current position in the CLEC expression (in "sum(A + B))", expr points to "A + B")
@@ -96,15 +96,13 @@ void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from
  *  If narg == 1, the argument is the expression 
  *  If narg == 2, the first argument (lag) is on the stack
  *  
- *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
- *  @param [in] len     short           length of expr
  *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
  *  @param [in] stack   double*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (1 or 2)
  *  @return             double          result of "expr in t"
  *  
  */
-double L_lag(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -114,7 +112,7 @@ double L_lag(AbstractCLEC& clec, int start, int length, int from, int to, int t,
         lag = L_intlag(x);
     } 
     
-    double value = clec.execute_sub_expression(start, length, t - lag);
+    double value = clec.execute_sub_expression(expr_pos, length, t - lag);
     return value;
 }
 
@@ -126,7 +124,7 @@ double L_lag(AbstractCLEC& clec, int start, int length, int from, int to, int t,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_diff(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -136,11 +134,11 @@ double L_diff(AbstractCLEC& clec, int start, int length, int from, int to, int t
         lag = L_intlag(x);
     }
     
-    double v1 = clec.execute_sub_expression(start, length, t);
+    double v1 = clec.execute_sub_expression(expr_pos, length, t);
     if(!IODE_IS_A_NUMBER(v1)) 
         return IODE_NAN;
     
-    double v2 = clec.execute_sub_expression(start, length, t - lag);
+    double v2 = clec.execute_sub_expression(expr_pos, length, t - lag);
     if(!IODE_IS_A_NUMBER(v2)) 
         return IODE_NAN;
     
@@ -154,7 +152,7 @@ double L_diff(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_rapp(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -164,11 +162,11 @@ double L_rapp(AbstractCLEC& clec, int start, int length, int from, int to, int t
         lag = L_intlag(x);
     }
     
-    double v1 = clec.execute_sub_expression(start, length, t);
+    double v1 = clec.execute_sub_expression(expr_pos, length, t);
     if(!IODE_IS_A_NUMBER(v1)) 
         return IODE_NAN;
     
-    double v2 = clec.execute_sub_expression(start, length, t - lag);
+    double v2 = clec.execute_sub_expression(expr_pos, length, t - lag);
     if(!IODE_IS_A_NUMBER(v2)) 
         return IODE_NAN;
 
@@ -183,7 +181,7 @@ double L_rapp(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_dln(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -193,11 +191,11 @@ double L_dln(AbstractCLEC& clec, int start, int length, int from, int to, int t,
         lag = L_intlag(x);
     }
 
-    double v1 = clec.execute_sub_expression(start, length, t);
+    double v1 = clec.execute_sub_expression(expr_pos, length, t);
     if(!IODE_IS_A_NUMBER(v1)) 
         return IODE_NAN;
     
-    double v2 = clec.execute_sub_expression(start, length, t - lag);
+    double v2 = clec.execute_sub_expression(expr_pos, length, t - lag);
     if(!IODE_IS_A_NUMBER(v2)) 
         return IODE_NAN;
     
@@ -211,9 +209,9 @@ double L_dln(AbstractCLEC& clec, int start, int length, int from, int to, int t,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_grt(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    double v1 = L_rapp(clec, start, length, from, to, t, stack, nargs);
+    double v1 = L_rapp(clec, expr_pos, length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(v1)) 
         return IODE_NAN;
     return (v1 - 1.0) * 100.0;
@@ -226,7 +224,7 @@ double L_grt(AbstractCLEC& clec, int start, int length, int from, int to, int t,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_mavg(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -242,7 +240,7 @@ double L_mavg(AbstractCLEC& clec, int start, int length, int from, int to, int t
     double v1 = 0.0;
     for(int j = 0; j < lag; j++) 
     {
-        tmp = clec.execute_sub_expression(start, length, t - j);
+        tmp = clec.execute_sub_expression(expr_pos, length, t - j);
         if(!IODE_IS_A_NUMBER(tmp)) 
             return IODE_NAN;
         v1 += tmp;
@@ -259,24 +257,22 @@ double L_mavg(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *      - If nargs = 2, 'from' is on the stack and 'to'=t
  *      - If nargs = 3, 'from' and 'to' are on the stack
  *  
- *  @param [in] expr    unsigned char*  compiled clec sub-expression to compute
- *  @param [in] len     short           length of expr
  *  @param [in] t       int             position in the current KDB Sample for which the expression will be calculated
  *  @param [in] stack   double*         top of the stack of values
  *  @param [in] nargs   int             number of arguments of the function (2 or 3)
  *  @return             double          the maximum of expr on the period [p1, p2]
  *  
  */
-double L_vmax(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    double value = clec.execute_sub_expression(start, length, from);
+    double value = clec.execute_sub_expression(expr_pos, length, from);
     if(!IODE_IS_A_NUMBER(value)) 
         return IODE_NAN;
  
     double max = value;
     for(int j = from + 1; j <= to; j++) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(!IODE_IS_A_NUMBER(value)) 
             return IODE_NAN;
         if(value > max) 
@@ -292,16 +288,16 @@ double L_vmax(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  
  *  @see L_vmax() for more details.
  */
-double L_vmin(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
-    double value = clec.execute_sub_expression(start, length, from);
+    double value = clec.execute_sub_expression(expr_pos, length, from);
     if(!IODE_IS_A_NUMBER(value)) 
         return IODE_NAN;
 
     double min = value;
     for(int j = from + 1; j <= to; j++) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(!IODE_IS_A_NUMBER(value)) 
             return IODE_NAN;
         if(value < min) 
@@ -317,13 +313,13 @@ double L_vmin(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  
  *  @see L_vmax() for more details.
  */
-double L_sum(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {   
     double value;
     double sum = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(!IODE_IS_A_NUMBER(value)) 
             return IODE_NAN;
         sum += value;
@@ -338,13 +334,13 @@ double L_sum(AbstractCLEC& clec, int start, int length, int from, int to, int t,
  *  
  *  @see L_vmax() for more details.
  */
-double L_prod(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {
     double value;
     double prod = 1.0;
     for(int j = from; j <= to; j++) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(!IODE_IS_A_NUMBER(value)) 
             return IODE_NAN;
         prod *= value;
@@ -362,9 +358,9 @@ double L_prod(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  @note not a function because it is also used by MTFN functions
  */
 
-double L_mean(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {   
-    double sum = L_sum(clec, start, length, from, to, t, stack, nargs);
+    double sum = L_sum(clec, expr_pos, length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(sum)) 
         return IODE_NAN;
 
@@ -379,13 +375,13 @@ double L_mean(AbstractCLEC& clec, int start, int length, int from, int to, int t
  *  @see L_vmax() for more details.
  *  
  */
-double L_stderr(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {   
     double value;
     double sum = 0.0, sum2 = 0.0;
     for(int j = from; j <= to; j++) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(!IODE_IS_A_NUMBER(value)) 
             return IODE_NAN;
         sum += value;
@@ -407,12 +403,12 @@ double L_stderr(AbstractCLEC& clec, int start, int length, int from, int to, int
  *  @see L_vmax() for more details.
  *  
  */
-double L_lastobs(AbstractCLEC& clec, int start, int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_lastobs(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
 {   
     double value;
     for(int j = to; j >= from; j--) 
     {
-        value = clec.execute_sub_expression(start, length, j);
+        value = clec.execute_sub_expression(expr_pos, length, j);
         if(IODE_IS_A_NUMBER(value)) 
             return value;
     }

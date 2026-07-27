@@ -79,40 +79,27 @@ inline std::vector<std::string> L_OPS_NAMES =
     "^"             // L_EXP       L_OP + 12
 };
 
-struct LEC_OP: public LEC_EXECUTABLE
+struct LEC_OP: public TP_LEC_EXECUTABLE<>
 {
 public:
-    LEC_OP(const int type) : LEC_EXECUTABLE(type, 2)
+    LEC_OP(const int type) : TP_LEC_EXECUTABLE<>(type, 2)
     {
         if(!is_op(type))
             throw std::invalid_argument("Invalid operator type for LEC OPERATOR: " + std::to_string(type));
         pos = type - L_OP;
         fn_name = L_OPS_NAMES[pos];
+        representation = fn_name;
     }
 
     LEC_OP(const LEC_OP& other) = default;
-
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_OP(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_OP, 2)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-        pos = type - L_OP;
-        representation = L_OPS_NAMES[pos];
-    }
 
     bool operator==(const LEC_OP& other) const
     {
         return is_same_type(other);
     }
 
-    short get_length() const override 
-    {
-        return 1;
-    }
-
     // executes the operator with the given arguments on the stack
-    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
+    void execute(std::deque<double>& stack) override
     {
         double b = stack.back();
         stack.pop_back();

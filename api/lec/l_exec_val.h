@@ -53,40 +53,27 @@ inline std::vector<std::string> L_VAL_FN_NAMES =
     "euro"          // L_EURO      L_VAL + 4
 };
 
-struct LEC_VAL_FN: public LEC_EXECUTABLE
+struct LEC_VAL_FN: public TP_LEC_EXECUTABLE<const int>
 {
 public:
-    LEC_VAL_FN(const int type) : LEC_EXECUTABLE(type, 1)
+    LEC_VAL_FN(const int type) : TP_LEC_EXECUTABLE<const int>(type, 1)
     {
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
         pos = type - L_VAL;
         fn_name = L_VAL_FN_NAMES[pos];
+        representation = fn_name;
     }
 
     LEC_VAL_FN(const LEC_VAL_FN& other) = default;
-
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_VAL_FN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_VAL, 1)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-        pos = type - L_VAL;
-        representation = L_VAL_FN_NAMES[pos];
-    }
 
     bool operator==(const LEC_VAL_FN& other) const
     {
         return is_same_type(other);
     }
 
-    short get_length() const override 
-    {
-        return 1;
-    }
-
     // executes the function with the given arguments on the stack
-    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
+    void execute(std::deque<double>& stack, int t) override
     {
         double value = (L_VAL_FN[pos])(t);
         stack.push_back(value);

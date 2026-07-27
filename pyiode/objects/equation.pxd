@@ -13,10 +13,8 @@ from pyiode.time.sample cimport CSample
 
 cdef extern from "api/all.h":
     cdef struct CLEC:
-        char duplicated_endo
         string lec
-        int len_expr
-        unsigned char* expression
+        bool duplicated_endo
         vector[pair[string, int]] objs
 
     int B_EqsStepWise(char* arg)    

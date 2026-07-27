@@ -32,27 +32,28 @@ inline bool is_mtfn(const int op)
     return op >= L_MTFN; 
 }
 
-int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, int* p_nargs, 
-    double* res, int nbvals);
-double L_calccorr(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, int from, 
-    int to, int t, std::deque<double>& stack, int nargs);
-double L_calccovar(AbstractCLEC& clec, int start_1, short length_1, int start_2, short length_2, int from, 
-    int to, int t, std::deque<double>& stack, int nargs, int center);
+int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>& stack, int* p_nargs, double* res, int nbvals);
+double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
+    std::deque<double>& stack, int nargs);
+double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
+    std::deque<double>& stack, int nargs, int center);
+double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
+    std::deque<double>& stack, int nargs, int std);
 
-double L_corr(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar0(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_var(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_stddev(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_index(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_acf(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_interpol(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_app(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_dapp(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hpstd(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
 
-inline double(*L_MTFN_FN[])(AbstractCLEC& clec, int start, short nvargs, int from, int to, int t, std::deque<double>& stack, int nargs) = 
+inline double(*L_MTFN_FN[])(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs) = 
 { 
     L_corr,         // L_CORR      L_M
     L_covar,        // L_COVAR     L_M
@@ -84,41 +85,29 @@ inline std::vector<std::string> L_MTFN_NAMES =
     "hpstd"         // L_HPSTD     L_M
 };
 
-struct LEC_MTFN: public LEC_EXECUTABLE
+struct LEC_MTFN: public TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>
 {
-    int nv_args;        // number of variables arguments (i.e. variadic arguments)
-    short len_args;     // length in bytes of the function arguments (i.e. the sub-expression in the buffer)
-    std::vector<short> v_len_args; // length in bytes of each function argument (i.e. the sub-expression in the buffer)
+    // number of variables arguments (i.e. variadic arguments)
+    int nv_args;
 
+    // vector of lengths as number of atomic lec elements for each sub-expression 
+    // argument of the function
+    std::deque<int> v_length_expr;
+    
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
-        : LEC_EXECUTABLE(type, nb_args), nv_args(nv_args)
+        : TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>(type, nb_args), nv_args(nv_args)
     {
         if(!is_mtfn(type))
             throw std::invalid_argument("Invalid multi-time function type for LEC MULTI-TIME FUNC: " + std::to_string(type));
+        
         pos = type - L_MTFN;
         fn_name = L_MTFN_NAMES[pos];
-        // minimum length in bytes of the function arguments (i.e. the sub-expression in the buffer)
-        len_args = (short) (sizeof(short) * L_MIN_MTARGS[pos]);
+        representation = fn_name;
+        v_length_expr.resize(nv_args, 0);
     }
 
     LEC_MTFN(const LEC_MTFN& other) = default;
-
-    // extract from the buffer starting at pos_buffer and update pos_buffer
-    LEC_MTFN(const unsigned char* buffer, int& pos_buffer) : LEC_EXECUTABLE(L_MTFN, 0), nv_args(0)
-    {
-        type = (int) buffer[pos_buffer];
-        pos_buffer++;
-        nb_args = (int) buffer[pos_buffer];
-        pos_buffer++;
-        nv_args = (int) buffer[pos_buffer];
-        pos_buffer++;
-        memcpy(&len_args, buffer + pos_buffer, sizeof(short));  
-        pos_buffer += sizeof(short) + len_args;      
-
-        pos = type - L_MTFN;
-        representation = L_MTFN_NAMES[pos];
-    }
 
     bool operator==(const LEC_MTFN& other) const
     {
@@ -128,53 +117,15 @@ public:
         if(this->nv_args != other.nv_args)
             return false;
 
-        if(this->len_args != other.len_args)
+        if(this->v_length_expr != other.v_length_expr)
             return false;
 
         return true;
     }
 
-    void add_to_buffer(unsigned char* buffer, int& pos_buffer) const override
-    {
-        LEC_ABSTRACT::add_to_buffer(buffer, pos_buffer);
-
-        // move function variadic arguments in the buffer to put type, nb_args 
-        // and nv_args before them after the loop
-        long tot_len = 0;
-        unsigned char* tmp = nullptr;
-        for(int j = 0; j < nv_args; j++) 
-        {
-            long len = v_len_args[j];
-            tot_len += len;
-            // a) go 'len + 1' bytes backward
-            int new_pos_buffer = pos_buffer - (tot_len + 1);
-            tmp = buffer + new_pos_buffer;
-            // b) move tmp[0:len] to tmp[shift:shift+sub_len] 
-            int shift = 3 + (nv_args - j + 1) * sizeof(short);
-            for(int i = len - 1; i >= 0; i--)
-                tmp[i + shift] = tmp[i];
-            // save the length in bytes of the function ?? arguments
-            memcpy(tmp + shift - sizeof(short), &len, sizeof(short));
-        }
-
-        tmp[0] = type;
-        tmp[1] = nb_args;
-        tmp[2] = nv_args;
-        tot_len += nv_args * sizeof(short);
-        memcpy(tmp + 3, &tot_len, sizeof(short));
-
-        pos_buffer += 2 + (1 + nv_args) * sizeof(short);
-    }
-
-    short get_length() const override 
-    {
-        // 3 bytes for type, nb_args and nv_args + sizeof(short) for len_args + 
-        // len_args for the arguments
-        return 3 + sizeof(short) + len_args;
-    }
-
     // executes the function with the given arguments on the stack
-    void execute(AbstractCLEC& clec, int start, int t, std::deque<double>& stack) override
+    // NOTE: expr_pos is the position of the first atomic lec element of the first sub expression
+    void execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) override
     {
         int from = -1, to = -1;
         // NOTE: in function L_extract_time_range():
@@ -184,10 +135,12 @@ public:
         if(type != L_INTERPOL && type != L_APP)
             L_extract_time_range(t, stack, nb_args - 1, from, to);
 
-        // NOTE: 'start + 3 + sizeof(short)' corresponds to the position of the sub-expression
-        //       in the buffer (after type, nb_args, nv_args and len_args)
-        start += 3 + sizeof(short);
-        double result = (L_MTFN_FN[pos])(clec, start, nv_args, from, to, t, stack, nb_args);
+        double result = (L_MTFN_FN[pos])(clec, expr_pos, v_length_expr, from, to, t, stack, nb_args);
         stack.push_back(result);
+
+        // update the position of the expression to the next atomic lec 
+        // at the end of the function's arguments
+        for(const int& length_expr : v_length_expr)
+            expr_pos += length_expr;
     }
 };

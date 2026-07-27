@@ -98,8 +98,7 @@ TEST_F(KDBIdentitiesTest, Get)
     expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
 
     EXPECT_EQ(clec->duplicated_endo, expected_clec->duplicated_endo);
-    EXPECT_EQ(clec->len_expr, expected_clec->len_expr);
-    EXPECT_EQ(memcmp(clec->expression, expected_clec->expression, clec->len_expr), 0);
+    EXPECT_EQ(clec->v_expression.size(), expected_clec->v_expression.size());
     EXPECT_EQ(clec->objs.size(), expected_clec->objs.size());
     auto it_clec = clec->objs.begin();
     auto it_expected_clec = expected_clec->objs.begin();    

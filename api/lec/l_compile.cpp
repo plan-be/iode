@@ -521,7 +521,7 @@ static int L_analyze_lag()
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
-int CLEC::initialize(const bool reset_lnames)
+int CLEC::initialize(const bool side_of_eq)
 {
     int type;
     int start = 1;
@@ -531,7 +531,10 @@ int CLEC::initialize(const bool reset_lnames)
     // reset global variables
     L_errno = 0;
     L_EXPR.clear();
-    if(reset_lnames)
+
+    // NOTE: if the LEC expression is the left or right side of an equation, 
+    //       we don't reset L_NAMES
+    if(!side_of_eq)
         L_NAMES.clear();
 
     /* LOOP ON TOKEN */
