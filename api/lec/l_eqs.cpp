@@ -222,18 +222,19 @@ ag:
  * @param [in] lec           char*   LEC expression to compile
  * @return                   ALEC*   allocated table of ALEC's or NULL on error
 */
-static std::vector<ATOMIC_LEC> generate_lec_expression_alloc(const std::string& lec)
+static std::vector<ATOMIC_LEC> initialize_alloc(const std::string& lec)
 {
     std::vector<ATOMIC_LEC> v_al;
-    if(L_open_string((char*) lec.c_str())) 
-        return v_al;
-    
-    if(generate_lec_expression(false) != 0) 
-        return v_al;
-    
-    L_close();
 
-    v_al = L_EXPR;
+    try
+    {
+        CLEC clec(lec, false);
+        // make a copy of v_expression
+        v_al = clec.v_expression;
+    }
+    catch(const std::exception&) 
+    {}
+
     return v_al;
 }
 
@@ -250,7 +251,7 @@ static std::vector<ATOMIC_LEC> generate_lec_expression_alloc(const std::string& 
  * @return                    int     error code or 0 on success
  *                                      
 */
-static int generate_lec_expression_eq(SLEC* sl, const std::string& lec)
+static int initialize_eq(SLEC* sl, const std::string& lec)
 {
     L_NAMES.clear();
 
@@ -266,14 +267,14 @@ static int generate_lec_expression_eq(SLEC* sl, const std::string& lec)
     std::string rhs = lec.substr(pos + 2);
 
     // Compiles left member
-    sl->sl_left_expr = generate_lec_expression_alloc(lhs);
+    sl->sl_left_expr = initialize_alloc(lhs);
     sl->sl_left_expr.pop_back();                // drop the last element (L_EOE)        
     L_EXPR.clear();                             // Clean up L_EXPR
     if(sl->sl_left_expr.empty()) 
         return L_errno;
     
     // Compiles the right member
-    sl->sl_right_expr = generate_lec_expression_alloc(rhs);
+    sl->sl_right_expr = initialize_alloc(rhs);
     sl->sl_right_expr.pop_back();               // drop the last element (L_EOE)
     L_EXPR.clear();
     if(sl->sl_right_expr.empty()) 
@@ -410,7 +411,7 @@ int L_invert(const std::string& eq, const std::string& endo, int* duplicated_end
     SLEC *sl = &slec;
 
     // Compiles the 2 members of eq and put the result in slec
-    if(generate_lec_expression_eq(sl, eq)) 
+    if(initialize_eq(sl, eq)) 
         return L_errno;
     
     /* FIND MEMBER CONTAINING ENDO AND SET INFO IN sl */

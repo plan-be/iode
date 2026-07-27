@@ -175,10 +175,10 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
 /**
  * Second stage of LEC compilation. Generates an "executable" LEC expression (heterogenous container).
  * 
- * @param [in]  expr    std::vector<ATOMIC_LEC>&   vector of atomic lec elements (result of generate_lec_expression(), normally L_EXPR)
+ * @param [in]  expr    std::vector<ATOMIC_LEC>&   vector of atomic lec elements (result of initialize(), normally L_EXPR)
  * @param [in]  lec     std::string&               original LEC expression string
 */
-void CLEC::initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
+void CLEC::finalize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
 {
     if(expr.empty())
         throw std::invalid_argument("CLEC constructor: empty expression vector.");
@@ -278,20 +278,15 @@ void CLEC::initialize(std::vector<ATOMIC_LEC>& expr, const std::string& lec)
     L_EXPR.clear();
 }
 
-CLEC::CLEC(std::vector<ATOMIC_LEC>& expr, const std::string& lec) : AbstractCLEC()
-{
-    initialize(L_EXPR, lec);
-}
-
-CLEC::CLEC(const std::string& lec) : AbstractCLEC()
+CLEC::CLEC(const std::string& lec, const bool reset_lnames) : AbstractCLEC()
 {
     if(L_open_string((char*) lec.c_str()) != 0) 
         throw std::runtime_error("Error opening LEC string");
 
-    if(generate_lec_expression() != 0)
+    if(initialize(reset_lnames) != 0)
         throw std::runtime_error("Error generating LEC expression");
     
-    initialize(L_EXPR, lec);
+    finalize(L_EXPR, lec);
     L_close();
 }
 
@@ -315,6 +310,6 @@ CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
         throw std::runtime_error(error_msg);
     }
 
-    initialize(L_EXPR, lec);
+    finalize(L_EXPR, lec);
     this->duplicated_endo = (char) duplicated_endo;
 }
