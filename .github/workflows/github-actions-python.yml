@@ -77,17 +77,27 @@ jobs:
             run: | 
               cmake --version
               cmake --preset ${{ env.os }}-${{ inputs.build-config }}
-          - name: Build the SCR4, C and C++ API libs
-            uses: ./.github/actions/build_api
-            with:
-              os-env: ${{ env.os }}
-              build-config: ${{ inputs.build-config }}
-          - name: Test the C/C++ APIs
+          - name: Build SCR4
+            shell: bash
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_scr4 
+          - name: Build C IODE API
+            shell: bash
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_c_api 
+          - name: Build C++ IODE API
+            shell: bash
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cpp_api 
+          - name: Build C/C++ Tests
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
-            uses: ./.github/actions/test_api
-            with:
-              os-env: ${{ env.os }}
-              build-config: ${{ inputs.build-config }}
+            shell: bash
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target test_all 
+          - name: Run C API Tests
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
+            shell: bash
+            run: ctest --preset c-api-${{ env.os }}-${{ inputs.build-config }}
+          - name: Run C++ API Tests
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
+            shell: bash
+            run: ctest --preset cpp-api-${{ env.os }}-${{ inputs.build-config }}
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v3
             with:
@@ -150,13 +160,16 @@ jobs:
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell: bash -el {0}
             run: pip install iode
+          # requires Python + numpy, pandas and iode packages installed
           - name: Generate big.var and big.av test files
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell:  bash -el {0}
             run: python tests/test_big_files/generate_big_vars_ws.py
-          - name: Test loading and saving a big Variables database
+          - name: Build C/C++ Tests for big databases
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
-            uses: ./.github/actions/test_big_files
-            with:
-              os-env: ${{ env.os }}
-              build-config: ${{ inputs.build-config }}
+            shell: bash
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target test_${{ inputs.build-config }}_big_files 
+          - name: Run C/C++ API Tests for big databases
+            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
+            shell: bash
+            run: ctest --preset cpp-api-${{ env.os }}-${{ inputs.build-config }}-big-databases

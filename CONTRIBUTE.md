@@ -525,8 +525,6 @@ root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noar
 
 The Github Actions workflows for IODE are defined in the directory ./.github/workflows.
 
-The sub-directory ./.github/actions contains the local actions (used in workflows).
-
 The jobs declared in ./.github/workflows/github-actions-debug.yml are triggered according to keywords present 
 in the name of the pushed branch:
 - `build_and_test_api`  -> NOT triggered if the branch name contains the word `gui`, `python`, `doc` or `nsis`
