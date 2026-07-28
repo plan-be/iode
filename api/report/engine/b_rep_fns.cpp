@@ -117,7 +117,7 @@
 #include "scr4/s_prost.h"
 #include "scr4/s_prodt.h"
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/pack.h"
@@ -137,11 +137,8 @@
 #ifdef _MSC_VER
     #include <direct.h>
 #else
-    #include <unistd.h>
 #endif
 #include <time.h>
-
-#include <algorithm>    // for std::min, std::max
 
 
 /*--------------------------- STRING MANIPULATIONS -------------------------------*/

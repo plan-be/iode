@@ -8,17 +8,13 @@
  *  
  *  @See GB for details
  */
-#include <math.h>
-#include <string.h>
-
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
 #include "api/objs/variables.h"
 
 #include "api/report/undoc/undoc.h"
-#include <algorithm>    // for std::min, std::max
 
 double  SEASON_EPS = 5.0;
 

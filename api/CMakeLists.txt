@@ -8,6 +8,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_D
 
 add_library(iode_c_api STATIC "")
 
+# Precompiled headers for faster compilation
+target_precompile_headers(iode_c_api PRIVATE pch.h)
+
 # Add source to this project's library.
 add_subdirectory(utils)
 add_subdirectory(ascii)

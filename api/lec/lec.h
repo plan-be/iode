@@ -1,5 +1,6 @@
 #pragma once
 
+#include "api/pch.h"
 #include "api/lec/l_common.h"
 #include "api/lec/l_value.h"
 #include "api/lec/l_exec_fns.h"
@@ -10,7 +11,6 @@
 #include "api/lec/l_err.h"
 #include "api/lec/l_token.h"
 
-#include <variant>              // for std::variant
 
 /*----------------- GLOBALS ----------------------*/
 

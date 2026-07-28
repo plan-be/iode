@@ -65,14 +65,9 @@
  *  
  */ 
 #include <stdarg.h>
-#include <stdlib.h>
-#ifdef _MSC_VER
-    #include <Windows.h>
-#endif
-
 #include "scr4/s_args.h"
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"

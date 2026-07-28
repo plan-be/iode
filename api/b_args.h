@@ -1,7 +1,6 @@
 #pragma once
-
 #include "scr4/s_args.h"
-#include "api/constants.h"
+#include "api/pch.h"
 
 char **B_ainit_chk(char* arg, ADEF* adef, int nb);
 char **B_vtom_chk(char* arg, int nb);

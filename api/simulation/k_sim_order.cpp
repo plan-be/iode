@@ -16,7 +16,7 @@
  *      int get_eq_position(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
  *      void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"

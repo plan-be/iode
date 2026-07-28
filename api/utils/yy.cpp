@@ -5,8 +5,8 @@
  * Some of these functions parse files and/or strings using the SCR4 group of functions "YY". 
  * See http://www.xon.be/scr4/libs1/libs157.htm for more details.
  */
+#include "api/pch.h"
 #include "api/k_super.h"
-#include "api/constants.h"
 #include "api/objs/tables.h"
 #include "api/utils/yy.h"
 

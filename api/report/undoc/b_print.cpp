@@ -17,9 +17,10 @@
  *    int B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
  *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
  */
+#include "api/pch.h"
 #include "scr4/s_prost.h"
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/b_args.h"
 #include "api/b_a2mini.h"
 #include "api/b_errors.h"
@@ -38,7 +39,6 @@
 #include "api/write/write.h"
 #include "api/report/undoc/undoc.h"
 
-#include <algorithm>    // for std::min, std::max
 
 /*================================= UTILITIES ===============================*/
 

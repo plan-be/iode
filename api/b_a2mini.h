@@ -1,8 +1,7 @@
 #pragma once
 
 #include "scr4/s_a2m.h"
-
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/write/write.h"
 
 #define W_GDI       A2M_DESTGDIPRT

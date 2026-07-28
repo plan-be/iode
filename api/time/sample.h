@@ -1,7 +1,7 @@
 #pragma once
+#include "api/pch.h"
 #include "api/utils/utils.h"
 #include "api/time/period.h"
-#include <stdexcept>
 
 
 struct Sample

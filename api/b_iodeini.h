@@ -1,7 +1,5 @@
 #pragma once
 
-#include "api/constants.h"
-
 inline char* ODE_INIFILE = 0;          // Name of the iode.ini file
 
 void B_IodeIniFile();

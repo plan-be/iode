@@ -39,7 +39,6 @@
  */
 #include <s_a2m.h>
 
-#include "api/constants.h"
 #include "api/b_a2mini.h"
 #include "api/write/write.h"
 #include "b_iodeini.h"

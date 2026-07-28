@@ -10,6 +10,7 @@
  *      int L_findvar(KDBVariablesPtr kdb, char* name)    Retrieves a variable position.
  */
 
+#include "api/pch.h"
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"
 #include "api/objs/lists.h"
@@ -17,7 +18,6 @@
 #include "api/objs/variables.h"
 #include "api/print/print.h"
 
-#include <algorithm>    // for std::max
 
 
 /**

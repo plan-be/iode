@@ -78,7 +78,7 @@
  *  The solution is reached when the difference between 2 iterations is under a defined threshold for each endogenous {y1...yn}.
  */
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/b_errors.h"
 #include "api/lec/lec.h"
@@ -88,7 +88,6 @@
 #include "api/objs/lists.h"
 #include "api/objs/variables.h"
 #include "api/simulation/simulation.h"
-#include <algorithm>    // for std::min, std::max
 
 
 extern "C" int SCR_vtime;

@@ -8,7 +8,7 @@
  *      int IMP_readrule(char* filename)                                Reads a "rule file" and stores its contents in 2 global variables IMP_rule and IMP_pat.
  *      int IMP_change(char** rule, char** pat, char* in, char* out)    Modifies an object name according to the rule definitions.
  */
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/write/write.h"
 #include "api/io/import.h"

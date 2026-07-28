@@ -24,7 +24,7 @@
  * @note The "modern" terminology for pack and unpack is "serialize" and "deserialize".
  * @see scr4/s_swap.h (http://www.xon.be/scr4/libs1/libs1236.htm) for more details.
  */
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/lec/lec.h"
 #include "api/objs/pack.h"
 #include "api/objs/structs_32.h"

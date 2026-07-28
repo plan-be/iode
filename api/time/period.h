@@ -1,12 +1,8 @@
 #pragma once
 
-#include <ctype.h>
+#include "api/pch.h"
 #include "api/utils/utils.h"
 
-#include <string>
-#include <map>
-#include <array>
-#include <stdexcept>
 
 /**
  *  Variables for period definitions: 
