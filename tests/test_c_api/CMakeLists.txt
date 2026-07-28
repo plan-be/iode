@@ -4,6 +4,9 @@ add_executable(${test_c_api} pch.cpp test_period.cpp test_sample.cpp test_c_api.
                                   test_kdb_comments.cpp test_kdb_equations.cpp test_kdb_identities.cpp 
                                   test_kdb_lists.cpp test_kdb_scalars.cpp test_kdb_tables.cpp 
                                   test_kdb_variables.cpp test_report.cpp)
+
+# Precompiled headers for faster compilation
+target_precompile_headers(${test_c_api} PRIVATE pch.h)
 target_link_libraries(${test_c_api} PUBLIC gtest_main iode_cpp_api)
 target_link_options(${test_c_api} PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 
