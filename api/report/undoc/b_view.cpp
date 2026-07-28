@@ -24,7 +24,7 @@
  */
 #include "scr4/s_args.h"
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -36,7 +36,6 @@
 #include "api/report/engine/engine.h"
 #include "api/report/undoc/undoc.h"
 
-#include <algorithm>    // for std::min
 
 
 int B_viewmode;         // 0: displays the graph/table on screen, 1: print graph/table

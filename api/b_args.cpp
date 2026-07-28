@@ -16,13 +16,11 @@
 #include "scr4/s_prost.h"
 #include "scr4/s_strs.h"
 
-#include "api/constants.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
-#include <algorithm>    // for std::min, std::max
 
 
 /**

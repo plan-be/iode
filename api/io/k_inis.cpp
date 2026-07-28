@@ -12,11 +12,10 @@
  *  -----------------
  *  See k_idif.c for a similar group of functions.
  */
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/io/import.h"
-#include <algorithm>    // for std::min, std::max
 
 
 int ImportObjsNIS::read_header(YYFILE* yy, Sample* smpl)

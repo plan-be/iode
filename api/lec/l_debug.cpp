@@ -15,7 +15,7 @@
  *  TODO: replace by a "super" function 
  */
 
-#include <stdio.h>
+#include "api/pch.h"
 #include <stdarg.h>
 
 #include "api/lec/lec.h"

@@ -8,7 +8,7 @@
  *  -----------------
  *      int B_EqsStepWise(char* arg, int unused) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/b_args.h"
 #include "api/k_super.h"
 #include "api/objs/objs.h"

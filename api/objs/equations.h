@@ -1,8 +1,7 @@
 #pragma once
-
 #include "scr4/s_prodt.h"
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/k_super.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
@@ -11,11 +10,6 @@
 #include "api/objs/objs.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
-
-#include <string>
-#include <array>
-#include <vector>
-#include <utility>      // std::pair
 
 /*----------------------- DEFINE ----------------------------*/
 

@@ -22,11 +22,8 @@
 #include "scr4/s_prost.h"       // SCR_free, SCR_stracpy, SCR_strip
 #include "scr4/s_prodir.h"      // SCR_split_dir
 #include "scr4/s_proini.h"      // IniReadTxtParm, IniWriteParm
-#ifdef _MSC_VER
-    #include <Windows.h>
-#endif
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/b_iodeini.h"
 
 

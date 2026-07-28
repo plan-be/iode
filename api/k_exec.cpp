@@ -64,8 +64,8 @@
  *      - if a calculated VAR already exists in the current WS, its values are left unchanged outside the calculation sample
  *      - if the VAR is created, the values outside the calculation sample are set to IODE_NAN.                                                                                                                Missing vars and scalars are collected from vfiles and sfiles.
  */
+#include "api/pch.h"
 #include "api/b_errors.h"
-#include "api/constants.h"
 #include "api/objs/pack.h"
 #include "api/lec/lec.h"
 #include "api/write/write.h"
@@ -76,8 +76,6 @@
 #include "api/utils/utils.h"
 #include "api/k_exec.h"
 
-#include <string>
-#include <vector>
 
 
 /**

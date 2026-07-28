@@ -1,7 +1,7 @@
 #pragma once
 #include "scr4/s_yy.h"      // YYKEYS
 
-#include "api/constants.h"
+#include "api/pch.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/kdb.h"
@@ -10,8 +10,6 @@
 #include "api/utils/utils.h"
 #include "api/lec/l_err.h"
 
-#include <deque>            // for the execution stack
-#include <algorithm>        // for std::min, std::max
 
 
 enum GenericLecType
