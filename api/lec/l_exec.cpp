@@ -80,11 +80,6 @@ bool L_stack_is_nan(const std::deque<double>& stack)
 /**
  *  Execution of a CLEC sub expression.
  * 
- *  The variable, scalar and sample values are retrieved by calling 3 user defined functions (see also k_lec.c):
- * 
- *      double*  L_getvar(dbv, pos) : returns the pointer to the variable at position pos in dbv.
- *      double   L_getscl(dbs, pos) : returns the value of the scalar at position pos in dbs.
- *
  *  The process iterates on the compiled LEC expression. 
  *      - the first byte (type) is an identifier (+, ln, VAR, ...)
  *      - according to the identifier, one or more values are read from the stack, 
@@ -217,10 +212,6 @@ double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
     // Use globals to limit the number of parameters in function calls
     L_EXEC_DBV = dbv;   
     L_EXEC_DBS = dbs;
-
-    V_EXEC_POS.clear();
-    for(const auto& [_, pos] : this->objs)
-        V_EXEC_POS.push_back(pos);
     
     L_curt = t;         // Global with the current t of execution
     

@@ -117,7 +117,7 @@ static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
-        for(auto [name, _]: clec->objs) 
+        for(auto [name, _]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
                 continue;
@@ -150,7 +150,7 @@ static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
     {
         clec = idt->get_compiled_lec();
         CLEC clec_copy(*clec);
-        for(auto& [name, _]: clec_copy.objs) 
+        for(auto& [name, _]: clec_copy.map_objs) 
         {
             if(!is_coefficient(name)) 
                 continue;
@@ -230,7 +230,7 @@ static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
             clec = idt->get_compiled_lec();
 
             bool break_reached = false;
-            for(auto& [name, _]: clec->objs) 
+            for(auto& [name, _]: clec->map_objs) 
             {
                 // name represents a coefficient -> continue looping
                 if(is_coefficient(name)) 

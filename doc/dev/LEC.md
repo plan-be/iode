@@ -187,7 +187,7 @@ Main functions:
 
 |Syntax|Description|
 |:---|:---|
-|`int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
+|`int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
 
 ### l\_eqs.c {#T18}
 

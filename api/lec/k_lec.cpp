@@ -1,12 +1,4 @@
-/**
- * @header4iode
- *
- * Functions implementing the interface between the LEC functions and the IODE KDB's.
- *  
- *      double *L_getvar(KDBVariablesPtr kdb, int pos)    Retrieves a pointer to the first element of a VAR.
- *      double L_getscl(KDBScalarsPtr kdb, int pos)       Retrieves a scalar value.
- */
-
+#pragma once
 #include "api/pch.h"
 #include "api/lec/lec.h"
 #include "api/objs/objs.h"
@@ -14,38 +6,6 @@
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 #include "api/print/print.h"
-
-
-
-/**
- *  Implementation of L_getvar() in the context of IODE objects. Retrieves a pointer to the first element of a VAR.
- *  
- *  @param [in] kdb     KDB*        KDB of variables from which the variable value has to be retrieved
- *  @param [in] pos     int         pos of the var in kdb
- *  @return             IODE_READ   pointer to the first value of the variable
- *  
- */
-double* L_getvar(KDBVariablesPtr kdb, int pos)
-{
-    std::string name = kdb->get_name(pos);
-    return kdb->get_var_ptr(name);
-}
-
-
-/**
- *  Implementation of L_getscl() in the context of IODE objects. Retrieves a scalar value.
- *  
- *  @param [in] kdb     KDB*        KDB of Scalar from which the scalar value has to be retrieved
- *  @param [in] pos     int         pos of the Scalar in kdb
- *  @return             IODE_READ   value of the scalar
- *  
- */
-double L_getscl(KDBScalarsPtr kdb, int pos)
-{
-    std::string name = kdb->get_name(pos);
-    std::shared_ptr<Scalar> scl = kdb->get_obj_ptr(name);
-    return scl->value;
-}
 
 
 /**
@@ -98,7 +58,7 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     std::string sname;
     std::shared_ptr<Scalar> scl = nullptr;
     char tcoef[128], ttest[128];
-    for(const auto& [sname, _] : clec->objs) 
+    for(const auto& [sname, _] : clec->map_objs) 
     {
         buf[0] = 0;
         if(coefs && is_coefficient(sname)) 
@@ -151,7 +111,7 @@ void CLEC::reorder_expression(std::vector<ATOMIC_LEC>& expr)
             // NOTE: - 2 because the last element of v_expression is always (should be) 
             //       of type L_EOE (End Of Expression)
             int args_end = (int) this->v_expression.size() - 2;  
-            int args_start = L_sub_expr(this->v_expression, args_end);
+            int args_start = find_sub_expr_start(this->v_expression, args_end);
             if(args_start < 0 || args_end < args_start) 
             {
                 std::string error_msg = "CLEC constructor: Could not determine the start and end ";
@@ -181,7 +141,7 @@ void CLEC::reorder_expression(std::vector<ATOMIC_LEC>& expr)
             for(int j = 0; j < nv_args; j++) 
             {
                 // compute the start and end positions of the nth sub-expression of the function 
-                args_start = L_sub_expr(this->v_expression, args_end);
+                args_start = find_sub_expr_start(this->v_expression, args_end);
                 if(args_start < 0 || args_end < args_start) 
                 {
                     std::string error_msg = "CLEC constructor: Could not determine the start and end ";
@@ -217,16 +177,11 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
     if(initialize(side_of_eq) != 0)
         throw std::runtime_error("Error generating LEC expression");
     
+    // copy the vector of atomic lec as is
     if(side_of_eq)
-    {
-        // copy the vector of atomic lec as is
         this->v_expression = L_EXPR;
-    }
     else
-    {
         reorder_expression(L_EXPR);
-        initialize_names();
-    }
 
     L_EXPR.clear();
     L_close();
@@ -241,9 +196,11 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
 CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
 {
     this->lec = eq;
+    this->duplicated_endo = false;
     
-    bool duplicated_endo = false;
-    L_invert(eq, endo, duplicated_endo);
+    SLEC slec(eq, endo);
+    slec.invert_equation(this->duplicated_endo);
+    slec.merge_names(*this);
     if(L_errno != 0) 
     {
         L_EXPR.clear();
@@ -251,10 +208,7 @@ CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
         error_msg += "with respect to endogenous variable '" + endo + "' -> " + L_error();
         throw std::runtime_error(error_msg);
     }
-    this->duplicated_endo = duplicated_endo;
 
     reorder_expression(L_EXPR);
-    initialize_names();
-
     L_EXPR.clear();
 }

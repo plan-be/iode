@@ -494,7 +494,7 @@ public:
     {
         std::pair<std::string, std::string> lrhs;
 
-        // same as L_split_eq()
+        // same as split_eq()
         size_t pos = this->lec.find(":=");
         // test if := not found -> return
         if(pos == std::string::npos) 

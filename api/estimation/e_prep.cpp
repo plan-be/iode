@@ -114,7 +114,7 @@ int Estimation::E_prep_lecs(char** lecs)
 
     for(i = 0 ; i < E_NEQ ; i++) 
     {
-        pos = L_split_eq(lecs[i]);
+        pos = split_eq(lecs[i]);
         if(pos < 0)
         {
             error_manager.append_error("Estimation: Syntax Error");
@@ -199,7 +199,7 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 {
     std::string name;
     Scalar scl(0.9, 1.0);
-    for(auto& [name, _]: clec->objs) 
+    for(auto& [name, _]: clec->map_objs) 
     {
         if(is_coefficient(name) && !dbs.contains(name))
             dbs.add(name, scl);
@@ -320,7 +320,7 @@ int Estimation::E_prep_coefs()
     
     // Compute the nb of coefficients E_NC
     for(int i = 0 ; i < E_NEQ ; i++) 
-        E_NC += (int) E_CRHS[i]->objs.size();
+        E_NC += (int) E_CRHS[i]->map_objs.size();
     
     // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
     E_C_NBS = (int *) SW_nalloc(E_NC * sizeof(int));
@@ -338,7 +338,7 @@ int Estimation::E_prep_coefs()
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = E_CRHS[i];                                   // linked before
-        for(auto& [name, pos]: clec->objs) 
+        for(auto& [name, pos]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
             {

@@ -40,7 +40,7 @@ static int check_scl_var(char *eqs)
         return -1;
 
     std::shared_ptr<CLEC> cl = eq_ptr->clec;
-    for(auto& [cl_name, _]: cl->objs) 
+    for(auto& [cl_name, _]: cl->map_objs) 
     {
         if(is_coefficient(cl_name)) 
         {
