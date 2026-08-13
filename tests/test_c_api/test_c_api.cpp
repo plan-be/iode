@@ -1037,17 +1037,17 @@ TEST_F(LegacyAPITest, Tests_CLEC_Compile)
     clec = std::make_shared<CLEC>(lec);
     EXPECT_EQ(clec->duplicated_endo, false);
     EXPECT_EQ(clec->v_expression.size(), 3);
-    EXPECT_EQ(clec->objs.size(), 1);
+    EXPECT_EQ(clec->map_objs.size(), 1);
     EXPECT_TRUE(lec_contains(clec, "A"));
     
     // Using macros in LEC
     clec = std::make_shared<CLEC>("1 + vmax($LST1)");
-    EXPECT_EQ(clec->objs.size(), 2);
+    EXPECT_EQ(clec->map_objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 
     clec = std::make_shared<CLEC>("1 + vmax($LST2)");
-    EXPECT_EQ(clec->objs.size(), 2);
+    EXPECT_EQ(clec->map_objs.size(), 2);
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 }
@@ -1063,10 +1063,10 @@ TEST_F(LegacyAPITest, Tests_CLEC_Copy)
     EXPECT_TRUE(copy_clec != nullptr);
     EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
     EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
-    EXPECT_EQ(copy_clec->objs.size(), clec->objs.size());
-    auto it_clec = clec->objs.begin();
-    auto it_copy_clec = copy_clec->objs.begin();
-    for(int i = 0; i < clec->objs.size(); i++, it_clec++, it_copy_clec++)
+    EXPECT_EQ(copy_clec->map_objs.size(), clec->map_objs.size());
+    auto it_clec = clec->map_objs.begin();
+    auto it_copy_clec = copy_clec->map_objs.begin();
+    for(int i = 0; i < clec->map_objs.size(); i++, it_clec++, it_copy_clec++)
     {
         EXPECT_EQ(it_clec->first, it_copy_clec->first);
         EXPECT_EQ(it_clec->second, it_copy_clec->second);

@@ -95,7 +95,7 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
     eq_name = KSIM_DBV->get_name(posendo);
     eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
     std::shared_ptr<CLEC> clec = eq_ptr->clec;
-    for(auto& [name, pos]: clec->objs) 
+    for(auto& [name, pos]: clec->map_objs) 
     {
         if(is_coefficient(name)) 
             continue;
@@ -111,7 +111,7 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
     std::shared_ptr<CLEC> eclec;
-    for(auto& [name, pos]: clec->objs) 
+    for(auto& [name, pos]: clec->map_objs) 
     {
         eq_name = KSIM_DBE->get_name(poseq);
         eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);

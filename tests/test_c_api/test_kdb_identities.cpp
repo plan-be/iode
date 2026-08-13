@@ -99,10 +99,10 @@ TEST_F(KDBIdentitiesTest, Get)
 
     EXPECT_EQ(clec->duplicated_endo, expected_clec->duplicated_endo);
     EXPECT_EQ(clec->v_expression.size(), expected_clec->v_expression.size());
-    EXPECT_EQ(clec->objs.size(), expected_clec->objs.size());
-    auto it_clec = clec->objs.begin();
-    auto it_expected_clec = expected_clec->objs.begin();    
-    for(int i = 0; i < clec->objs.size(); i++, it_clec++, it_expected_clec++)
+    EXPECT_EQ(clec->map_objs.size(), expected_clec->map_objs.size());
+    auto it_clec = clec->map_objs.begin();
+    auto it_expected_clec = expected_clec->map_objs.begin();    
+    for(int i = 0; i < clec->map_objs.size(); i++, it_clec++, it_expected_clec++)
     {
         EXPECT_EQ(it_clec->first, it_expected_clec->first);
         EXPECT_EQ(it_clec->second, it_expected_clec->second);

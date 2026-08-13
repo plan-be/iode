@@ -14,8 +14,6 @@ from pyiode.time.sample cimport CSample
 cdef extern from "api/all.h":
     cdef struct CLEC:
         string lec
-        bool duplicated_endo
-        vector[pair[string, int]] objs
 
     int B_EqsStepWise(char* arg)    
     double estimate_step_wise(CSample* smpl, char* eqname, char* cond, char* test);    

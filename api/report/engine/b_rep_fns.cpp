@@ -1102,7 +1102,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
     {
         std::string lec = kdb->get_obj_ptr(name)->lec;
         eq = SCR_stracpy((unsigned char*) lec.c_str());
-        poscolon = L_split_eq((char*) eq);
+        poscolon = split_eq((char*) eq);
         if(poscolon > 0) 
         {
             if(lhsrhs == 0) 
@@ -1210,10 +1210,9 @@ U_ch *RPF_sample(U_ch** args)
  */
 int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const int type)
 {
-
-    int k;
+    int k = 0;
     std::string tbl_name;
-    for(auto& [name, _]: clec->objs) 
+    for(const std::string& name: clec->v_objs) 
     {
         if(is_coefficient(name) && type != 'S') 
             continue;

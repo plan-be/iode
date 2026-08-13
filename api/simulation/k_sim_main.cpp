@@ -747,7 +747,7 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
     eqvarnb = KSIM_DBV->index_of(eq_name);
     if(clec->duplicated_endo || varnb != eqvarnb)
-        x = clec->zero(KSIM_DBV, KSIM_DBS, t, varnb, eqvarnb);
+        x = clec->zero(KSIM_DBV, KSIM_DBS, t, KSIM_DBV->get_name(varnb), KSIM_DBV->get_name(eqvarnb));
     else
         x = clec->execute(KSIM_DBV, KSIM_DBS, t);
     

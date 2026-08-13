@@ -102,7 +102,7 @@ static void K_clecscan(const KDB& kdb, const std::shared_ptr<CLEC> cl, KDBVariab
     if(!cl) 
         return;
 
-    for(auto& [name, _] : cl->objs) 
+    for(auto& [name, _] : cl->map_objs) 
     {
         if(is_coefficient(name))
             // add dummy value for the scalar. The value is not relevant 

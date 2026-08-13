@@ -11,6 +11,17 @@
 #include "api/lec/l_err.h"
 
 
+/*----------------- GLOBALS ----------------------*/
+
+inline int L_curt = 0;              // current value of t
+
+inline KDBScalarsPtr   L_EXEC_DBS = nullptr; 
+inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
+
+inline char**  KEXEC_VFILES = NULL;
+inline char**  KEXEC_SFILES = NULL;
+inline int     KEXEC_TRACE = 0;
+
 constexpr int L_SPECIAL = 10;
 
 /* LEC:SPECIAL */
@@ -47,22 +58,6 @@ inline bool is_executable(const int type)
     return type >= L_FN;
 }
 
-/*----------------- GLOBALS ----------------------*/
-
-inline int L_curt = 0;              // current value of t
-
-inline std::vector<std::string> L_NAMES;    // Table of names encountered in the current LEC expression (vars and scalars)
-
-inline KDBScalarsPtr   L_EXEC_DBS = nullptr; 
-inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
-
-inline char**  KEXEC_VFILES = NULL;
-inline char**  KEXEC_SFILES = NULL;
-inline int     KEXEC_TRACE = 0;
-
-inline std::vector<int> V_EXEC_POS;
-
-
 /* ---------------------- FUNCS ---------------------- */
 
 /* l_exec.cpp */
@@ -75,9 +70,6 @@ void L_debug(char*, ...);
 /* k_lec.cpp */
 char* L_expand(char* list_name);
 inline char *(*L_expand_super)(char* list_name) = nullptr;
-
-double *L_getvar(KDBVariablesPtr kdb, int pos);
-double L_getscl(KDBScalarsPtr kdb, int pos);
 
 
 /*----------------- STRUCTS ----------------------*/

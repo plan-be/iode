@@ -213,15 +213,15 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
     {
         clec = eq->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.resize(clec->objs.size() + 1, 0);
+        eq_predecessors.resize(clec->map_objs.size() + 1, 0);
 
         /* LOG NB AND POS OF ENDO VARS */
         // eq_predecessors[0] = (maximum) nb of (possible) predecessors of the ith equation
-        eq_predecessors[0] = (int) clec->objs.size();
+        eq_predecessors[0] = (int) clec->map_objs.size();
 
         j = 1;
         eq_pos = -1;
-        for(const auto& [name, pos]: clec->objs) 
+        for(const auto& [name, pos]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
                 continue;

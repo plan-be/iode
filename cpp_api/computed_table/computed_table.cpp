@@ -258,8 +258,6 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     {
         return false;
     }
-
-    int var_pos = global_ws_var->index_of(var_name);
     
     // if the formula is not inversible regarding to the variable var_name, 
     // the Newton-Raphson method is used
@@ -287,7 +285,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
             return false;
 
         // Newton-Raphson method
-        res = clec->zero(global_ws_var, global_ws_scl, period_pos, var_pos, var_pos);
+        res = clec->zero(global_ws_var, global_ws_scl, period_pos, var_name, var_name);
     }
     else
     {
@@ -327,7 +325,6 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     TableCell& cell_ref = line_ref.cells[1];
 
     // RULE 4: Only the first variable found in the LEC expression is updated
-    // see https://iode.plan.be/doku.php?id=edit_tables for the rules
     std::string var_to_update = cell_ref.get_variables_from_lec().at(0);
 
     // get period position 

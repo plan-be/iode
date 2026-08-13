@@ -262,7 +262,7 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
     
     std::string lec = global_ws_eqs->get_obj_ptr(name)->lec;
     char* c_lec = (char*) lec.c_str();
-    int i = L_split_eq(c_lec);
+    int i = split_eq(c_lec);
     if(i < 0) 
         return -1;
     i = std::min(i, 70);

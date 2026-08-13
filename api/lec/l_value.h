@@ -52,10 +52,10 @@ public:
 
 struct LEC_COEF: public TP_LEC_VALUE<>
 {
-    int pos;          // position of the coefficient in V_EXEC_POS
+    std::string name;   // name of the coefficient (IODE Scalar)
 
 public:
-    LEC_COEF(const std::string& name, const int pos) : TP_LEC_VALUE<>(L_COEF), pos(pos) 
+    LEC_COEF(const std::string& name) : TP_LEC_VALUE<>(L_COEF), name(name) 
     {
         representation = name;
     }
@@ -64,13 +64,13 @@ public:
 
     bool operator==(const LEC_COEF& other) const
     {
-        return is_same_type(other) && this->pos == other.pos;
+        return is_same_type(other) && this->name == other.name;
     }
 
     bool add_to_stack(std::deque<double>& stack) const override
     {
-        double value = L_getscl(L_EXEC_DBS, V_EXEC_POS[pos]);
-        if(!IODE_IS_A_NUMBER(value))
+        std::shared_ptr<Scalar> scl = L_EXEC_DBS->get_obj_ptr(name);
+        if(!scl)
         {
             std::string error_msg = "LEC compilation: Could not retrieve the value ";
             error_msg += "of the coefficient '" + representation + "'.";
@@ -78,22 +78,22 @@ public:
             return false;
         }
 
-        stack.push_back(value);
+        stack.push_back(scl->value);
         return true;
     }
 };
 
 struct LEC_VAR: public TP_LEC_VALUE<const int>
 {
-    int pos;            // position of the variable in L_NAMES
+    std::string name;   // name of the variable (IODE Variable)
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
     short ref;          
     Period per;         // period of the variable (if any)
 
 public:
     // type = L_VAR or L_VART (variable with time) 
-    LEC_VAR(const int type, const std::string& name, const int pos, const short lag, const Period& per)
-        : TP_LEC_VALUE<const int>(type), pos(pos), lag(lag), ref(0), per(per) 
+    LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
+        : TP_LEC_VALUE<const int>(type), name(name), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -107,7 +107,7 @@ public:
         if(!is_same_type(other))
             return false;
         
-        if(this->pos != other.pos)
+        if(this->name != other.name)
             return false;
         
         if(this->lag != other.lag)
@@ -128,7 +128,7 @@ public:
 
     bool add_to_stack(std::deque<double>& stack, const int t) const override
     {
-        double* d_ptr = L_getvar(L_EXEC_DBV, V_EXEC_POS[pos]);
+        double* d_ptr = L_EXEC_DBV->get_var_ptr(name);
         if(!d_ptr)
         {
             std::string error_msg = "LEC compilation: Could not retrieve the value of ";

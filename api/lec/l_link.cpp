@@ -1,11 +1,4 @@
-/**
- *  @header4iode
- *
- *  Functions to link CLEC variables and scalars to KDB's of variables and scalars.
- *  This process is required before computing the value of a CLEC instance.
- *
- *  The positions of variables and scalars returned by these functions will be used at execution time by L_getvar() and L_getscl().
- */
+#pragma once
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
 #include "api/lec/lec.h"
@@ -25,7 +18,7 @@
 */
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    for(auto& [name, pos] : this->objs) 
+    for(auto& [name, pos] : this->map_objs) 
     {
         if(is_coefficient(name))
             pos = dbs->index_of(name);
@@ -160,7 +153,7 @@ int CLEC::link(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
  */
 void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& clec)
 {   
-    for(auto& [name, pos] : clec->objs) 
+    for(auto& [name, pos] : clec->map_objs) 
     {
         if(is_coefficient(name))
             pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)

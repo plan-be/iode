@@ -14,28 +14,20 @@ public:
 std::vector<LSTACK> L_OPS;      // Stack of operators and functions used by L_analyse
 
 
-/**
- *  Adds a series or scalar name in L_NAMES.
- *  
- *  @param [in]     name    char*   VAR of Scalar name
- *  @return                 int     position of name in L_NAMES
- *  
- */
-static int L_add_coef_or_var_name(const std::string& name)
+void CLEC::add_coef_or_var_name(const std::string& name)
 {
-    // Check if name already exists
-    for(int i = 0; i < (int) L_NAMES.size(); i++)
+    // check if the name is already in v_objs
+    for(const auto& obj_name : v_objs)
     {
-        if(L_NAMES[i] == name)
-            return i;
+        if (obj_name == name)
+            return; // name already exists, do not add it again
     }
 
-    // Add new name to the vector
-    L_NAMES.push_back(name);
-    return (int) L_NAMES.size() - 1;
+    v_objs.push_back(name);
+    map_objs[name] = -1;
 }
 
-static int L_save_var()
+int CLEC::save_var()
 {
     int type = L_TOKEN.tk_def;
     std::string name(L_TOKEN.tk_name);
@@ -64,8 +56,8 @@ static int L_save_var()
         }
         case L_COEF:         // coefficient
         {
-            int pos = L_add_coef_or_var_name(name);
-            LEC_COEF al(name, pos);
+            add_coef_or_var_name(name);
+            LEC_COEF al(name);
             L_EXPR.push_back(al);
             break;
         }
@@ -82,15 +74,15 @@ static int L_save_var()
             // IODE Variable
             if(type == L_VAR || type == L_VART)
             {
-                int pos = L_add_coef_or_var_name(name);
-                LEC_VAR al(type, name, pos, 0, Period());
+                add_coef_or_var_name(name);
+                LEC_VAR al(type, name, 0, Period());
                 L_EXPR.push_back(al);
                 break;
             }
 
             // if the token is not recognized, return a warning and skip it
             success = false;
-            std::string msg = "L_save_var(): Unexpected token type '" + std::to_string(type) + "' in LEC expression. ";
+            std::string msg = "save_var(): Unexpected token type '" + std::to_string(type) + "' in LEC expression. ";
             msg += "This token will be ignored.";
             kwarning(msg.c_str());
             break;
@@ -110,7 +102,7 @@ static int L_save_var()
  *                              0 if priority(op) > priority(last op) 
  *                              0 if there is no op on the stack or if the last op is an open parenthesis
  */
-static bool L_priority_sup(int op)
+bool CLEC::priority_sup(int op)
 {
     if(L_OPS.size() <= 0) 
         return false;
@@ -140,7 +132,7 @@ static bool L_priority_sup(int op)
  *  @return     int     0 on success
  *                      L_ARGS_ERR if the number of args does not follow the syntax (L_MAX_* and L_MIN_*).
  */
-static int L_save_op()
+int CLEC::save_op()
 {
     int pos = -1;
     LSTACK ls = L_OPS.back();
@@ -212,7 +204,7 @@ static int L_save_op()
     }
 
     // if the function/operator is not recognized, return a warning and skip it
-    std::string msg = "L_save_op(): Unexpected function or operator '" + std::to_string(op) + "' in LEC expression. ";
+    std::string msg = "save_op(): Unexpected function or operator '" + std::to_string(op) + "' in LEC expression. ";
     msg += "This function or operator will be ignored.";
     kwarning(msg.c_str());
     return -1;
@@ -236,15 +228,15 @@ static int L_save_op()
  *  @return                     0 on success
  *                              L_errno on error
  */
-static int L_add_stack(int op_group, int& L_PAR)
+int CLEC::add_stack(int op_group, int& L_PAR)
 {
     int type = L_TOKEN.tk_def;
 
     if(op_group == L_OP)
     {
-        while(L_priority_sup(type))
+        while(priority_sup(type))
         {
-            if(L_save_op() != 0) 
+            if(save_op() != 0) 
                 return L_errno;
         }
     }
@@ -265,7 +257,7 @@ static int L_add_stack(int op_group, int& L_PAR)
         {
             L_PAR++;
             L_OPS.push_back(LSTACK(L_OPENP));
-            if(L_save_op() != 0) 
+            if(save_op() != 0) 
                 return L_errno;
             
             // NOTE: we put the open parenthesis on L_OPS as a marker to be found in case 
@@ -284,10 +276,10 @@ static int L_add_stack(int op_group, int& L_PAR)
                 if(last_op.type == L_OPENP) 
                 {
                     last_op.type = L_CLOSEP;
-                    return L_save_op();
+                    return save_op();
                 }
 
-                if(L_save_op() != 0) 
+                if(save_op() != 0) 
                     return L_errno;
             }
 
@@ -297,7 +289,7 @@ static int L_add_stack(int op_group, int& L_PAR)
 
         case L_COMMA :
         {
-            if(L_add_stack(L_CLOSEP, L_PAR)) 
+            if(add_stack(L_CLOSEP, L_PAR)) 
                 return L_errno;
 
             LSTACK& last_op = L_OPS.back();
@@ -308,7 +300,7 @@ static int L_add_stack(int op_group, int& L_PAR)
             }
 
             last_op.nb_args++;
-            return L_add_stack(L_OPENP, L_PAR);
+            return add_stack(L_OPENP, L_PAR);
         }
 
         case L_OCPAR :      // open-close parentheses () 
@@ -339,11 +331,11 @@ static int L_add_stack(int op_group, int& L_PAR)
  *  @return     int 0 on success
  *                  L_errno on error
  */
-static int L_empty_ops_stack()
+int CLEC::empty_ops_stack()
 {
     while(L_OPS.size() > 0)
     {
-        if(L_save_op() != 0) 
+        if(save_op() != 0) 
             return L_errno;
     }
 
@@ -365,9 +357,9 @@ static int L_empty_ops_stack()
  *  @param [in]  lag int    lag to add to each var (for ex when treating an sub- sub- expression).
  *  @return          int    0 on success, L_errno if the sub expression cannot be identified          
  */
-static int L_lag_expr(int lag)
+int CLEC::lag_expr(int lag)
 {
-    int start_sub_expr = L_sub_expr(L_EXPR);
+    int start_sub_expr = find_sub_expr_start(L_EXPR);
     if(start_sub_expr < 0) 
         return L_errno;
 
@@ -408,9 +400,9 @@ static int L_lag_expr(int lag)
  *  
  *  @return          int    0 on success, L_errno if the sub expression cannot be identified          
  */
-static int L_time_expr()
+int CLEC::time_expr()
 {
-    int start_sub_expr = L_sub_expr(L_EXPR);
+    int start_sub_expr = find_sub_expr_start(L_EXPR);
     if(start_sub_expr < 0) 
         return L_errno;
 
@@ -457,7 +449,7 @@ static int L_time_expr()
  *                      L_LAG_ERR on error
  *  
  */
-static int L_analyze_lag()
+int CLEC::analyze_lag()
 {
     int type = L_get_token();
     switch(type) 
@@ -484,13 +476,13 @@ static int L_analyze_lag()
             int lag = L_YY->yy_long;
             if(op == L_MINUS) 
                 lag = -lag;
-            L_lag_expr(lag);
+            lag_expr(lag);
             break;
         }  
         // case 2: time expression like in A[2000Y1]
         case L_PERIOD :
             // apply the time expression
-            L_time_expr();
+            time_expr();
             break;
         // default: error
         default :
@@ -515,9 +507,9 @@ static int L_analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
- *  At the end of this function, 2 tables are created: L_EXPR and L_NAMES:
- *      - L_EXPR contains atomic expressions in the execution order including references to L_NAMES 
- *      - L_NAMES contains the names included in the lec expression
+ *  At the end of this function, 2 tables are created: L_EXPR and map_objs:
+ *      - L_EXPR contains atomic expressions in the execution order including references to map_objs 
+ *      - map_objs contains the names included in the lec expression
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
@@ -533,9 +525,9 @@ int CLEC::initialize(const bool side_of_eq)
     L_EXPR.clear();
 
     // NOTE: if the LEC expression is the left or right side of an equation, 
-    //       we don't reset L_NAMES
+    //       we don't reset map_objs
     if(!side_of_eq)
-        L_NAMES.clear();
+        map_objs.clear();
 
     /* LOOP ON TOKEN */
     while(true) 
@@ -558,7 +550,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_save_var()) 
+                if(save_var()) 
                     return L_errno;
                 beg = 0;
                 break;
@@ -583,7 +575,7 @@ again:
                     goto again;
                 }
                 beg = 1;
-                if(L_add_stack(type, L_PAR)) 
+                if(add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_FN :         // not time function
@@ -595,7 +587,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type, L_PAR)) 
+                if(add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_OCPAR :      // open-close parentheses "()""
@@ -604,7 +596,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type, L_PAR)) 
+                if(add_stack(type, L_PAR)) 
                     return L_errno;
                 beg = 0;
                 break;
@@ -614,7 +606,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type, L_PAR)) 
+                if(add_stack(type, L_PAR)) 
                     return L_errno;
                 break;
             case L_COMMA :      // Comma
@@ -623,7 +615,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_add_stack(type, L_PAR)) 
+                if(add_stack(type, L_PAR)) 
                     return L_errno;
                 beg = 1;
                 break;
@@ -633,7 +625,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(L_analyze_lag()) 
+                if(analyze_lag()) 
                     return L_errno;
                 beg = 0;
                 break;
@@ -653,7 +645,7 @@ again:
                 if(L_PAR != 0) 
                     L_errno = L_PAR_ERR;
                 else 
-                    L_empty_ops_stack();
+                    empty_ops_stack();
                 return L_errno;
             case YY_ERROR :
                 return L_errno;
@@ -672,18 +664,18 @@ again:
  *  Browses backwards all elements of the expression until having reached a level 0 of parentheses or 
  *  all arguments of an operator or function.
  *    
- *  @param [in] al  ALEC*   pointer to an element of L_EXPR
- *  @param [in] i   int     position in al of the element where the expression is "closed"
- *  @return                 position in al of the element where the expression starts
+ *  @param [in] v_alec  std::vector<ATOMIC_LEC>&    vector of atomic LEC elements
+ *  @param [in] close   int                         position in v_alec where the expression is "closed"
+ *  @return                                         position in v_alec where the expression starts
  */
-int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)
+int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)
 {
     if(v_alec.empty())
         return -1;
 
     if(close < -1 || close >= (int) v_alec.size())
     {
-        std::string error_msg = "Invalid position for close in L_sub_expr: " + std::to_string(close) + ".\n";
+        std::string error_msg = "Invalid position for close in sub_expr: " + std::to_string(close) + ".\n";
         error_msg += "Valid values are between -1 and " + std::to_string(v_alec.size() - 1) + ".";
         throw std::out_of_range(error_msg);
     }
@@ -711,11 +703,11 @@ int L_sub_expr(const std::vector<ATOMIC_LEC>& v_alec, int close)
         if(nb_parents > 0) 
             continue;
         
-        // QUESTION: why calling L_sub_expr twice ?
+        // QUESTION: why calling sub_expr twice ?
         if(std::holds_alternative<LEC_OP>(al))
         {
-            pos = L_sub_expr(v_alec, pos - 1);
-            pos = L_sub_expr(v_alec, pos - 1);
+            pos = find_sub_expr_start(v_alec, pos - 1);
+            pos = find_sub_expr_start(v_alec, pos - 1);
             return pos;
         }
 

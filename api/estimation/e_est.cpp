@@ -269,7 +269,7 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
     CLEC* clec = E_CRHS[eq_nb];
 
-    for(auto& [name, pos]: clec->objs)
+    for(auto& [name, pos]: clec->map_objs)
     {
         if(is_coefficient(name) && E_C_NBS[coef_nb] == pos) 
             return 1;
