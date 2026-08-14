@@ -36,6 +36,9 @@ struct CLEC: public AbstractCLEC
     // original LEC expression as a string (for debugging purposes)
     std::string lec;
 
+    // parser for the LEC expression
+    LecParser parser;
+
     // 'executable' LEC expression as a vector of atomic expressions 
     // (for execution purposes)
     std::vector<ATOMIC_LEC> v_expression;
@@ -129,7 +132,7 @@ private:
      * 
      * @return int  0 on success, -1 on error
      */
-    int save_var();
+    int save_var(TOKEN& token);
 
     /**
      * Check if the operator op has a lower execution priority than the last operator on the stack L_OPS.
@@ -149,13 +152,14 @@ private:
     int save_op();
 
     /**
-     * Adds the current operator (stored in L_TOKEN.tk_def) to L_OPS, the stack of operators.
+     * Adds the current operator (stored in token.type) to L_OPS, the stack of operators.
      * 
      * @param [in]      op_group  int   group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...)
+     * @param [in]      func_type int   type of the function (ex. L_SIN, L_COS...).
      * @param [in,out]  L_PAR     int&  current parenthesis depth (used for checking balanced parentheses)
      * @return                    int   0 on success, L_errno on error
      */
-    int add_stack(int op_group, int& L_PAR);
+    int add_stack(int op_group, int func_type, int& L_PAR);
 
     /**
      * Empties the stack of operators L_OPS by adding all operators and the number of their arguments to L_EXPR.
@@ -177,7 +181,7 @@ private:
      * 
      * @return  int     0 on success, L_errno if the sub expression cannot be identified
      */
-    int time_expr();
+    int time_expr(TOKEN& token);
 
     /**
      * Analyses a lag expression between [], like in A[2021Y1] or VAR[-2].
@@ -194,9 +198,9 @@ private:
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
-    int initialize(const bool side_of_eq);
+    int parse(const bool side_of_eq);
 
-    // WARNING: to be run AFTER initialize() in order to fill L_EXPR and map_objs first
+    // WARNING: to be run AFTER parse() in order to fill L_EXPR and map_objs first
     void reorder_expression(std::vector<ATOMIC_LEC>& expr);
 
 public:
