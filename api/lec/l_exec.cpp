@@ -134,7 +134,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_COEF>(al))
         {
             const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            bool ok = al_coef.add_to_stack(stack);
+            bool ok = al_coef.add_to_stack(stack, exec_dbs);
             if(!ok) 
                 return (double) IODE_NAN;
         }
@@ -146,7 +146,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_VAR>(al))
         {
             const LEC_VAR& al_var = std::get<LEC_VAR>(al);
-            bool ok = al_var.add_to_stack(stack, t);
+            bool ok = al_var.add_to_stack(stack, exec_dbv, t);
             if(!ok) 
                 return (double) IODE_NAN;
         }
@@ -171,7 +171,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_VAL_FN>(al))
         {
             LEC_VAL_FN& al_val = std::get<LEC_VAL_FN>(al);
-            al_val.execute(stack, t);
+            al_val.execute(stack, t, exec_t);
         }
         else if(std::holds_alternative<LEC_MTFN>(al))
         {
@@ -209,11 +209,9 @@ double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
     if(this->v_expression.size() == 0)
         return IODE_NAN;
 
-    // Use globals to limit the number of parameters in function calls
-    L_EXEC_DBV = dbv;   
-    L_EXEC_DBS = dbs;
-    
-    L_curt = t;         // Global with the current t of execution
+    exec_t = t;
+    this->exec_dbv = dbv;
+    this->exec_dbs = dbs;
     
     // Reset _errno
     L_errno = 0;

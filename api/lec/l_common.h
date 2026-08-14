@@ -13,11 +13,6 @@
 
 /*----------------- GLOBALS ----------------------*/
 
-inline int L_curt = 0;              // current value of t
-
-inline KDBScalarsPtr   L_EXEC_DBS = nullptr; 
-inline KDBVariablesPtr L_EXEC_DBV = nullptr;   
-
 inline char**  KEXEC_VFILES = NULL;
 inline char**  KEXEC_SFILES = NULL;
 inline int     KEXEC_TRACE = 0;
@@ -77,6 +72,14 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 // Abstract class to be passed ot the execute() method of the sub-classes of TP_LEC_EXECUTABLE
 struct AbstractCLEC
 {
+    // current time of execution (t) of the LEC
+    int exec_t = 0;
+    
+    // pointers to the KDBs of scalars and variables used for execution 
+    // of the compiled LEC
+    KDBScalarsPtr exec_dbs = nullptr; 
+    KDBVariablesPtr exec_dbv = nullptr; 
+
 public:
     AbstractCLEC() {}
 

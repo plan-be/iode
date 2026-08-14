@@ -28,14 +28,14 @@ inline bool is_val(const int op)
 }
 
 
-double L_pi(int t);
-double L_euro(int t);
-double L_e(int t);
-double L_time(int t);
-double L_i(int t);
+double L_pi(int t, int exec_t);
+double L_euro(int t, int exec_t);
+double L_e(int t, int exec_t);
+double L_time(int t, int exec_t);
+double L_i(int t, int exec_t);
 
 // l_exec_val.c
-inline double(*L_VAL_FN[])(int t) = 
+inline double(*L_VAL_FN[])(int t, int exec_t) = 
 { 
     L_pi,           // L_PI        L_VAL + 0
     L_e,            // L_E         L_VAL + 1
@@ -53,10 +53,10 @@ inline std::vector<std::string> L_VAL_FN_NAMES =
     "euro"          // L_EURO      L_VAL + 4
 };
 
-struct LEC_VAL_FN: public TP_LEC_EXECUTABLE<const int>
+struct LEC_VAL_FN: public TP_LEC_EXECUTABLE<int, int>
 {
 public:
-    LEC_VAL_FN(const int type) : TP_LEC_EXECUTABLE<const int>(type, 1)
+    LEC_VAL_FN(const int type) : TP_LEC_EXECUTABLE<int, int>(type, 1)
     {
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
@@ -73,9 +73,9 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(std::deque<double>& stack, int t) override
+    void execute(std::deque<double>& stack, int t, int exec_t) override
     {
-        double value = (L_VAL_FN[pos])(t);
+        double value = (L_VAL_FN[pos])(t, exec_t);
         stack.push_back(value);
     }
 };
