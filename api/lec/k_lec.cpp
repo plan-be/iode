@@ -171,10 +171,10 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
 {
     this->lec = lec;
 
-    if(L_open_string((char*) lec.c_str()) != 0) 
+    if(parser.open_string((char*) lec.c_str()) != 0) 
         throw std::runtime_error("Error opening LEC string");
 
-    if(initialize(side_of_eq) != 0)
+    if(parse(side_of_eq) != 0)
         throw std::runtime_error("Error generating LEC expression");
     
     // copy the vector of atomic lec as is
@@ -184,7 +184,7 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
         reorder_expression(L_EXPR);
 
     L_EXPR.clear();
-    L_close();
+    parser.close();
 }
 
 /**

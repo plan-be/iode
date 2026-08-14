@@ -14,11 +14,11 @@
 
 struct TOKEN 
 {
-    float   tk_real;
-    long    tk_long;
-    Period  tk_period;
-    int     tk_def;
-    char    tk_name[L_MAX_NAME + 1];
+    int     type;
+    float   real_value;
+    long    long_value;
+    Period  period;
+    char    name[L_MAX_NAME + 1];
 };
 
 // --- LEC tokens ---
@@ -121,31 +121,91 @@ inline YYKEYS L_TABLE[] =
     (unsigned char*) "i",            L_I
 };
 
-inline TOKEN L_TOKEN;        // global variable containing the last read token
-
-/*---------------- FUNCTIONS ------------------------*/
-
-int L_nb_tokens(void);
-int L_get_token(void);
-int L_open_all(char* filename, int type);
-void L_close(void);
-
-inline int YY_compare(const void *a, const void *b)
+/**
+ * @brief Get total number of registered tokens.
+ * 
+ * @return int 
+ */
+inline int nb_tokens()
 {
-    return YY_strcmp((const char*) a, (const char*) b);
+    return (int) (sizeof(L_TABLE) / sizeof(YYKEYS));
 }
 
-inline int L_open_file(char* filename)  
-{
-    return L_open_all(filename, YY_FILE);
-} 
+/*---------------- CLASS LECPARSER -------------------*/
 
-inline int L_open_string(char* text)
+struct LecParser
 {
-    return L_open_all(text, YY_MEM);
-}     
+private:
+    // Static helper function for sorting
+    static int yy_compare(const void *a, const void *b)
+    {
+        return YY_strcmp((const char*) a, (const char*) b);
+    }
 
-inline int L_open_stdin() 
-{
-    return L_open_all((char*) 0, YY_STDIN);
-}         
+    // Private helper methods
+    int lex();
+    int read();
+    void unread();
+    int macro();
+    int read_string();
+    int getc();
+    void ungetc(int ch);
+    int get_int(TOKEN& token);
+    int string();
+    void skip();
+
+public:
+    /**
+     * Opens a file or a string for reading and assigns the open stream to L_YY.
+     * 
+     * @param [in] filename  char*   pointer to the filename or to the string to be opened
+     * @param [in] type      int     YY_MEM if the LEC expression is in the string pointed to by filename
+     *                               YY_FILE if filename is the name of the file containing the LEC expression
+     * @return               int     0 on success, -1 if the file cannot be opened
+     */
+    int open_all(char* filename, int type);
+
+    /**
+     * Close the current stream.
+     */
+    void close();
+
+    /**
+     * Main function to browse a LEC expression token by token.
+     * 
+     * @param[in, out]  group   - group the token read belongs to (L_FN, L_OP...) or specific token type
+     *                          - L_SYNTAX_ERR if the token is not valid
+     *                          - L_MACRO_ERR if the next token was an incorrect macro
+     * @return          TOKEN   the token read from the stream
+     */
+    TOKEN read_next_token(int& group);
+
+    /**
+     * Convenience method to open a file for reading.
+     * @param [in] filename  char*  name of the file to open
+     * @return               int    0 on success, -1 on error
+     */
+    int open_file(char* filename)
+    {
+        return open_all(filename, YY_FILE);
+    }
+
+    /**
+     * Convenience method to open a string for reading.
+     * @param [in] text  char*  string to parse
+     * @return           int    0 on success, -1 on error
+     */
+    int open_string(char* text)
+    {
+        return open_all(text, YY_MEM);
+    }
+
+    /**
+     * Convenience method to open stdin for reading.
+     * @return  int  0 on success, -1 on error
+     */
+    int open_stdin()
+    {
+        return open_all((char*) 0, YY_STDIN);
+    }
+};

@@ -1,7 +1,6 @@
 #include "api/lec/lec.h"
 
 
-// stack of operators used by L_analyse 
 struct LSTACK 
 {        
     int type;           // operator or function type 
@@ -11,7 +10,7 @@ public:
     LSTACK(int type, int nb_args=0) : type(type), nb_args(nb_args) {}
 };
 
-std::vector<LSTACK> L_OPS;      // Stack of operators and functions used by L_analyse
+std::vector<LSTACK> L_OPS;      // Stack of operators and functions
 
 
 void CLEC::add_coef_or_var_name(const std::string& name)
@@ -27,30 +26,30 @@ void CLEC::add_coef_or_var_name(const std::string& name)
     map_objs[name] = -1;
 }
 
-int CLEC::save_var()
+int CLEC::save_var(TOKEN& token)
 {
-    int type = L_TOKEN.tk_def;
-    std::string name(L_TOKEN.tk_name);
+    int type = token.type;
+    std::string name(token.name);
 
     bool success = true;
     switch(type) 
     {
         case L_PERIOD :     // period
         {
-            Period period(L_TOKEN.tk_period.year, L_TOKEN.tk_period.periodicity, L_TOKEN.tk_period.step);
-            LEC_PERIOD al(period, -1);      // the position of the period will be set later
+            // the position of the period in the Variables sample will be set later
+            LEC_PERIOD al(token.period, -1);
             L_EXPR.push_back(al);
             break;
         }
         case L_DCONST:      // double constant
         {
-            LEC_CONST_REAL al(L_TOKEN.tk_real);
+            LEC_CONST_REAL al(token.real_value);
             L_EXPR.push_back(al);
             break;
         }
         case L_LCONST:      // long constant
         {
-            LEC_CONST_LONG al(L_TOKEN.tk_long);
+            LEC_CONST_LONG al(token.long_value);
             L_EXPR.push_back(al);
             break;
         }
@@ -212,9 +211,9 @@ int CLEC::save_op()
 
 
 /**
- *  Adds the current operator (stored in L_TOKEN.tk_def) to L_OPS, the stack of operators. If needed, reallocates L_OPS.
+ *  Adds the current operator (stored in token.type) to L_OPS, the stack of operators. If needed, reallocates L_OPS.
  *  Note that *op_group* does represent a group of operators (L_OP, L_FNS...), not a specific operators. 
- *  The last read *operator* is in L_TOKEN.tk_def.
+ *  The last read *operator* is in token.type.
  *  
  *  First, saves in L_EXPR the operator(s) of lower priorities that are on the top of L_OPS.
  *  
@@ -223,18 +222,17 @@ int CLEC::save_op()
  *              '+' is put on the top of L_OPS
  *  
  *  @param [in] op_group  int   group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
- *                              The operator itself is in L_TOKEN.
+ *                              The operator itself is in token.
+ *  @param [in] func_type int   type of the function (ex. L_SIN, L_COS...).
  *  @param [in] L_PAR     int   current parenthesis depth (used for checking balanced parentheses)
  *  @return                     0 on success
  *                              L_errno on error
  */
-int CLEC::add_stack(int op_group, int& L_PAR)
+int CLEC::add_stack(int op_group, int func_type, int& L_PAR)
 {
-    int type = L_TOKEN.tk_def;
-
     if(op_group == L_OP)
     {
-        while(priority_sup(type))
+        while(priority_sup(func_type))
         {
             if(save_op() != 0) 
                 return L_errno;
@@ -248,7 +246,7 @@ int CLEC::add_stack(int op_group, int& L_PAR)
         case L_TFN :
         case L_MTFN :
         {
-            LSTACK ls(type, 1);
+            LSTACK ls(func_type, 1);
             L_OPS.push_back(ls);
             break;
         }
@@ -289,7 +287,7 @@ int CLEC::add_stack(int op_group, int& L_PAR)
 
         case L_COMMA :
         {
-            if(add_stack(L_CLOSEP, L_PAR)) 
+            if(add_stack(L_CLOSEP, func_type, L_PAR)) 
                 return L_errno;
 
             LSTACK& last_op = L_OPS.back();
@@ -300,7 +298,7 @@ int CLEC::add_stack(int op_group, int& L_PAR)
             }
 
             last_op.nb_args++;
-            return add_stack(L_OPENP, L_PAR);
+            return add_stack(L_OPENP, func_type, L_PAR);
         }
 
         case L_OCPAR :      // open-close parentheses () 
@@ -400,7 +398,7 @@ int CLEC::lag_expr(int lag)
  *  
  *  @return          int    0 on success, L_errno if the sub expression cannot be identified          
  */
-int CLEC::time_expr()
+int CLEC::time_expr(TOKEN& token)
 {
     int start_sub_expr = find_sub_expr_start(L_EXPR);
     if(start_sub_expr < 0) 
@@ -425,7 +423,7 @@ int CLEC::time_expr()
             continue;
         
         // applies time expression
-        lvar.per = L_TOKEN.tk_period;
+        lvar.per = token.period;
     }
 
     return 0;
@@ -451,14 +449,15 @@ int CLEC::time_expr()
  */
 int CLEC::analyze_lag()
 {
-    int type = L_get_token();
-    switch(type) 
+    int group = 0;
+    TOKEN token = parser.read_next_token(group);
+    switch(group) 
     {
         // case 1: lag or lead like in A[-2]
         case L_OP :
         {
             // check that the operator is a '+' or a '-'
-            int op = L_TOKEN.tk_def;
+            int op = token.type;
             if(op != L_MINUS && op != L_PLUS)
             {
                 L_errno = L_LAG_ERR;
@@ -466,7 +465,8 @@ int CLEC::analyze_lag()
             }
 
             // check that the next token is a long constant (the lag)
-            if(L_get_token() != L_LCONST)
+            token = parser.read_next_token(group);
+            if(group != L_LCONST)
             {
                 L_errno = L_LAG_ERR;
                 return L_errno;
@@ -482,7 +482,7 @@ int CLEC::analyze_lag()
         // case 2: time expression like in A[2000Y1]
         case L_PERIOD :
             // apply the time expression
-            time_expr();
+            time_expr(token);
             break;
         // default: error
         default :
@@ -495,8 +495,8 @@ int CLEC::analyze_lag()
         return L_errno;
     
     // check that the lag expression is closed by a ']'
-    type = L_get_token();
-    if(type == L_CLOSEB) 
+    token = parser.read_next_token(group);
+    if(group == L_CLOSEB) 
         return 0;
 
     L_errno = L_LAG_ERR;
@@ -513,9 +513,9 @@ int CLEC::analyze_lag()
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
-int CLEC::initialize(const bool side_of_eq)
+int CLEC::parse(const bool side_of_eq)
 {
-    int type;
+    int group;
     int start = 1;
     int beg = 1;        // indicate if next token is an oper or an expr
     int L_PAR = 0;      // Current parenthesis depth
@@ -530,14 +530,16 @@ int CLEC::initialize(const bool side_of_eq)
         map_objs.clear();
 
     /* LOOP ON TOKEN */
+    TOKEN token;
     while(true) 
     {
-        type = L_get_token();       // Group of operators, not the operator itself
+        // Group of operators, not the operator itself
+        token = parser.read_next_token(group);
         if(L_errno) 
             return L_errno;
         
 again:
-        switch(type) 
+        switch(group) 
         {
             case L_PERIOD:      // period
             case L_LCONST :     // long constant
@@ -550,20 +552,20 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(save_var()) 
+                if(save_var(token)) 
                     return L_errno;
                 beg = 0;
                 break;
             case L_OP :         // Operator
                 if(beg != 0) 
                 {
-                    switch(L_TOKEN.tk_def) 
+                    switch(token.type) 
                     {
                         case L_MINUS :
-                            L_TOKEN.tk_def = L_UMINUS;
+                            token.type = L_UMINUS;
                             break;
                         case L_PLUS :
-                            L_TOKEN.tk_def = L_UPLUS;
+                            token.type = L_UPLUS;
                             break;
                         default :
                         {
@@ -571,11 +573,11 @@ again:
                             return L_errno;
                         }
                     }
-                    type = L_FN;
+                    group = L_FN;
                     goto again;
                 }
                 beg = 1;
-                if(add_stack(type, L_PAR)) 
+                if(add_stack(group, token.type, L_PAR)) 
                     return L_errno;
                 break;
             case L_FN :         // not time function
@@ -587,7 +589,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(add_stack(type, L_PAR)) 
+                if(add_stack(group, token.type, L_PAR)) 
                     return L_errno;
                 break;
             case L_OCPAR :      // open-close parentheses "()""
@@ -596,7 +598,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(add_stack(type, L_PAR)) 
+                if(add_stack(group, token.type, L_PAR)) 
                     return L_errno;
                 beg = 0;
                 break;
@@ -606,7 +608,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(add_stack(type, L_PAR)) 
+                if(add_stack(group, token.type, L_PAR)) 
                     return L_errno;
                 break;
             case L_COMMA :      // Comma
@@ -615,7 +617,7 @@ again:
                     L_errno = L_SYNTAX_ERR;
                     return L_errno;
                 }
-                if(add_stack(type, L_PAR)) 
+                if(add_stack(group, token.type, L_PAR)) 
                     return L_errno;
                 beg = 1;
                 break;

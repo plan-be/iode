@@ -127,7 +127,7 @@ std::vector<std::string> build_lec_functions_list()
 
     std::string name;
     std::regex re("^\\w{2,}");
-    for(int i=0; i < L_nb_tokens(); i++)
+    for(int i=0; i < nb_tokens(); i++)
     {
         name = std::string((char*) L_TABLE[i].yk_word);
         if(std::regex_match(name, re)) func_list.push_back(name);

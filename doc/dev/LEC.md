@@ -177,7 +177,7 @@ Main functions:
 |:---|:---|
 |`int L_open_all(char* file_or_string, int type)`|Opens a file or a string for reading and assigns the open stream to L\_YY.|
 |`void L_close()`|Close the stream L\_YY.|
-|`int L_get_token()`|Main function to browse a LEC expression (in L\_YY) token by token.|
+|`int L_read_next_token()`|Main function to browse a LEC expression (in L\_YY) token by token.|
 
 ### l\_compile.c {#T16}
 
