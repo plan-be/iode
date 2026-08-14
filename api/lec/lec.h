@@ -23,8 +23,6 @@ enum EQ_HAND_SIDE
 using ATOMIC_LEC = std::variant<LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, 
                                 LEC_OTHER, LEC_OP, LEC_FN, LEC_TFN, LEC_VAL_FN, LEC_MTFN>;
 
-inline std::vector<ATOMIC_LEC> L_EXPR;      // Table of pairs <type, atomic elements>  
-
 /*---------------- STRUCTS ------------------------*/
 
 
@@ -128,7 +126,7 @@ private:
     int bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::string& var_name, double shift);
 
     /**
-     * Saves the current variable or constant token to L_EXPR.
+    * Saves the current variable or constant token to v_expression.
      * 
      * @return int  0 on success, -1 on error
      */
@@ -144,7 +142,7 @@ private:
     bool priority_sup(int op);
 
     /**
-     * Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters.
+    * Adds the last "operator" on top of L_OPS to v_expression, as well as the number of parameters.
      * Checks if the number of arguments are in line with the definitions.
      * 
      * @return  int     0 on success, L_ARGS_ERR if the number of args does not follow the syntax
@@ -162,7 +160,7 @@ private:
     int add_stack(int op_group, int func_type, int& L_PAR);
 
     /**
-     * Empties the stack of operators L_OPS by adding all operators and the number of their arguments to L_EXPR.
+    * Empties the stack of operators L_OPS by adding all operators and the number of their arguments to v_expression.
      * 
      * @return  int     0 on success, L_errno on error
      */
@@ -192,16 +190,16 @@ private:
 
     /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
-     *  At the end of this function, 2 tables are created: L_EXPR and map_objs:
-     *      - L_EXPR contains atomic expressions in the execution order including references to map_objs 
+     *  At the end of this function, 2 tables are created: v_expression and map_objs:
+     *      - v_expression contains atomic expressions in the execution order including references to map_objs 
      *      - map_objs contains the names included in the lec expression
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
     int parse(const bool side_of_eq);
 
-    // WARNING: to be run AFTER parse() in order to fill L_EXPR and map_objs first
-    void reorder_expression(std::vector<ATOMIC_LEC>& expr);
+    // WARNING: to be run AFTER parse() in order to fill v_expression and map_objs first
+    void reorder_expression();
 
 public:
     CLEC(const std::string& lec, const bool side_of_eq = false);
@@ -408,47 +406,47 @@ private:
     int count_endo(const EQ_HAND_SIDE mbr);
 
     /**
-     * Appends the member (LHS or RHS) contained in slec to L_EXPR.
+    * Appends the member (LHS or RHS) contained in slec to expr.
      * 
      * @param [in]  mbr     EQ_HAND_SIDE    position of the member to append
      */
-    void append_member(const EQ_HAND_SIDE mbr);
+    void append_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr);
 
     /**
-     * Prepends the member (LHS or RHS) contained in slec to L_EXPR.
+    * Prepends the member (LHS or RHS) contained in slec to expr.
      * 
      * @param [in]  mbr     EQ_HAND_SIDE    member to prepend
      */
-    void prepend_member(const EQ_HAND_SIDE mbr);
+    void prepend_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr);
 
     /**
-     * Appends an LEC_OTHER element to L_EXPR.
+    * Appends an LEC_OTHER element to expr.
      * 
      * @param [in]  type    int     type of LEC_OTHER element
      */
-    void append_other(int type);
+    void append_other(int type, std::vector<ATOMIC_LEC>& expr);
 
     /**
-     * Appends an operator to L_EXPR.
+    * Appends an operator to expr.
      * 
      * @param [in]  op  int     operator
      */
-    void append_op(int op);
+    void append_op(int op, std::vector<ATOMIC_LEC>& expr);
 
     /**
-     * Appends a function and its number of arguments to L_EXPR.
+    * Appends a function and its number of arguments to expr.
      * 
      * @param [in]  op      int     function id
      * @param [in]  nargs   int     number of arguments of the function
      */
-    void append_fn(int op, int nargs);
+    void append_fn(int op, int nargs, std::vector<ATOMIC_LEC>& expr);
 
     /**
-     * Appends a long constant to L_EXPR.
+    * Appends a long constant to expr.
      * 
      * @param [in]  a   int     value of the constant
      */
-    void append_const(int a);
+    void append_const(int a, std::vector<ATOMIC_LEC>& expr);
 
 public:
     /**   
@@ -464,9 +462,10 @@ public:
      * Tries to analytically solve an equation with respect to a specified endogenous variable.
      * The result is a LEC expression (not equation) that can be used in simulations.
      * 
-     * @param [out]  duplicated_endo    bool&           false if inverted, true if endo appears multiple times
+    * @param [out]  duplicated_endo    bool&           false if inverted, true if endo appears multiple times
+    * @param [out]  clec               CLEC&           target CLEC receiving the generated expression in v_expression
      */
-    int invert_equation(bool& duplicated_endo);
+    int invert_equation(bool& duplicated_endo, CLEC& clec);
 
     /**
      * @brief Moves the objects' names (variables and scalars) to the clec attribute of 

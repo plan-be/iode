@@ -86,11 +86,18 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     return true;
 }
 
-void CLEC::reorder_expression(std::vector<ATOMIC_LEC>& expr)
+void CLEC::reorder_expression()
 {
-    if(expr.empty())
-        throw std::invalid_argument("CLEC constructor: empty expression vector.");
+    // nothing to reorder
+    if(this->v_expression.empty())
+        return;
 
+    // create a copy of the expression vector to reorder
+    std::vector<ATOMIC_LEC> expr = this->v_expression;
+    this->v_expression.clear();
+
+    // reorder the expression vector to ensure that the arguments of each function 
+    // are placed after the function in the vector of atomic LEC elements
     for(ATOMIC_LEC& al : expr)
     {
         if(std::holds_alternative<LEC_OTHER>(al))
@@ -177,13 +184,9 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
     if(parse(side_of_eq) != 0)
         throw std::runtime_error("Error generating LEC expression");
     
-    // copy the vector of atomic lec as is
-    if(side_of_eq)
-        this->v_expression = L_EXPR;
-    else
-        reorder_expression(L_EXPR);
+    if(!side_of_eq)
+        reorder_expression();
 
-    L_EXPR.clear();
     parser.close();
 }
 
@@ -199,16 +202,15 @@ CLEC::CLEC(const std::string& eq, const std::string& endo) : AbstractCLEC()
     this->duplicated_endo = false;
     
     SLEC slec(eq, endo);
-    slec.invert_equation(this->duplicated_endo);
+    slec.invert_equation(this->duplicated_endo, *this);
     slec.merge_names(*this);
     if(L_errno != 0) 
     {
-        L_EXPR.clear();
+        this->v_expression.clear();
         std::string error_msg = "Equation: cannot invert LEC expression '" + eq + "'\n";
         error_msg += "with respect to endogenous variable '" + endo + "' -> " + L_error();
         throw std::runtime_error(error_msg);
     }
 
-    reorder_expression(L_EXPR);
-    L_EXPR.clear();
+    reorder_expression();
 }

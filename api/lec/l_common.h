@@ -13,9 +13,7 @@
 
 /*----------------- GLOBALS ----------------------*/
 
-inline char**  KEXEC_VFILES = NULL;
-inline char**  KEXEC_SFILES = NULL;
-inline int     KEXEC_TRACE = 0;
+inline int KEXEC_TRACE = 0;
 
 constexpr int L_SPECIAL = 10;
 
@@ -74,7 +72,7 @@ struct AbstractCLEC
 {
     // current time of execution (t) of the LEC
     int exec_t = 0;
-    
+
     // pointers to the KDBs of scalars and variables used for execution 
     // of the compiled LEC
     KDBScalarsPtr exec_dbs = nullptr; 
