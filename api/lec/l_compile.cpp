@@ -38,26 +38,26 @@ int CLEC::save_var(TOKEN& token)
         {
             // the position of the period in the Variables sample will be set later
             LEC_PERIOD al(token.period, -1);
-            L_EXPR.push_back(al);
+            this->v_expression.push_back(al);
             break;
         }
         case L_DCONST:      // double constant
         {
             LEC_CONST_REAL al(token.real_value);
-            L_EXPR.push_back(al);
+            this->v_expression.push_back(al);
             break;
         }
         case L_LCONST:      // long constant
         {
             LEC_CONST_LONG al(token.long_value);
-            L_EXPR.push_back(al);
+            this->v_expression.push_back(al);
             break;
         }
         case L_COEF:         // coefficient
         {
             add_coef_or_var_name(name);
             LEC_COEF al(name);
-            L_EXPR.push_back(al);
+            this->v_expression.push_back(al);
             break;
         }
         default :
@@ -66,7 +66,7 @@ int CLEC::save_var(TOKEN& token)
             if(is_val(type))
             {
                 LEC_VAL_FN al(type);
-                L_EXPR.push_back(al);
+                this->v_expression.push_back(al);
                 break;
             }
 
@@ -75,7 +75,7 @@ int CLEC::save_var(TOKEN& token)
             {
                 add_coef_or_var_name(name);
                 LEC_VAR al(type, name, 0, Period());
-                L_EXPR.push_back(al);
+                this->v_expression.push_back(al);
                 break;
             }
 
@@ -122,7 +122,7 @@ bool CLEC::priority_sup(int op)
 
 
 /**
- *  Adds the last "operator" on top of L_OPS to L_EXPR, as well as the number of parameters. 
+ *  Adds the last "operator" on top of L_OPS to v_expression, as well as the number of parameters. 
  *  Checks if the number of arguments are in line with the definitions.
  *  
  *  The operator is saved in type. 
@@ -142,7 +142,7 @@ int CLEC::save_op()
     if(op == L_OPENP || op == L_CLOSEP)
     {
         LEC_OTHER al(op);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
@@ -156,14 +156,14 @@ int CLEC::save_op()
         }
 
         LEC_FN al(op, nb_args);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
     if(is_op(op)) 
     {
         LEC_OP al(op);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
@@ -177,14 +177,14 @@ int CLEC::save_op()
         }
 
         LEC_TFN al(op, nb_args);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
     if(is_val(op)) 
     {
         LEC_VAL_FN al(op);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
@@ -198,7 +198,7 @@ int CLEC::save_op()
         }
 
         LEC_MTFN al(op, nb_args, 0);
-        L_EXPR.push_back(al);
+        this->v_expression.push_back(al);
         return 0;
     }
 
@@ -215,10 +215,10 @@ int CLEC::save_op()
  *  Note that *op_group* does represent a group of operators (L_OP, L_FNS...), not a specific operators. 
  *  The last read *operator* is in token.type.
  *  
- *  First, saves in L_EXPR the operator(s) of lower priorities that are on the top of L_OPS.
+ *  First, saves in v_expression the operator(s) of lower priorities that are on the top of L_OPS.
  *  
  *  Example: if op is '+' and last op is '*': 
- *              '*' if moved to L_EXPR because '+' has a lower priority.
+ *              '*' if moved to v_expression because '+' has a lower priority.
  *              '+' is put on the top of L_OPS
  *  
  *  @param [in] op_group  int   group the operator to be added belongs to (L_OP, L_FN, L_TFN, L_MTFN, L_OPENP, COMMA...).
@@ -324,7 +324,7 @@ int CLEC::add_stack(int op_group, int func_type, int& L_PAR)
 
 /**
  *  Empties the stack of operators L_OPS by adding all operators and the 
- *  number of their arguments to L_EXPR.
+ *  number of their arguments to v_expression.
  *  
  *  @return     int 0 on success
  *                  L_errno on error
@@ -338,14 +338,14 @@ int CLEC::empty_ops_stack()
     }
 
     LEC_OTHER al(L_EOE);     // end of expression
-    L_EXPR.push_back(al);
+    this->v_expression.push_back(al);
     return 0;
 }
 
 
 /**
  *  Applies a lag on each variable in the last sub expression. 
- *  The last expression on L_EXPR is either an atomic expression (e.g. "A" or "A[1960Y1]") 
+ *  The last expression in v_expression is either an atomic expression (e.g. "A" or "A[1960Y1]") 
  *  or an expression between parentheses (e.g. "(A + B + 2)").
  *  
  *  Ex. 
@@ -357,11 +357,11 @@ int CLEC::empty_ops_stack()
  */
 int CLEC::lag_expr(int lag)
 {
-    int start_sub_expr = find_sub_expr_start(L_EXPR);
+    int start_sub_expr = find_sub_expr_start(this->v_expression);
     if(start_sub_expr < 0) 
         return L_errno;
 
-    for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
+    for(auto it = this->v_expression.begin() + start_sub_expr; it != this->v_expression.end(); it++)
     {
         ATOMIC_LEC& al = *it;
 
@@ -389,7 +389,7 @@ int CLEC::lag_expr(int lag)
 
 /**
  *  Applies a time expression (for ex. "1960Y1") on each variable in the last sub expression. 
- *  The last expression on L_EXPR is either an atomic expression (e.g. "A" or "A[1960Y1]") or 
+ *  The last expression in v_expression is either an atomic expression (e.g. "A" or "A[1960Y1]") or 
  *  an expression between parentheses (e.g. "(A + B + 2)").
  *  
  *  Ex. 
@@ -400,11 +400,11 @@ int CLEC::lag_expr(int lag)
  */
 int CLEC::time_expr(TOKEN& token)
 {
-    int start_sub_expr = find_sub_expr_start(L_EXPR);
+    int start_sub_expr = find_sub_expr_start(this->v_expression);
     if(start_sub_expr < 0) 
         return L_errno;
 
-    for(auto it = L_EXPR.begin() + start_sub_expr; it != L_EXPR.end(); it++)
+    for(auto it = this->v_expression.begin() + start_sub_expr; it != this->v_expression.end(); it++)
     {
         ATOMIC_LEC& al = *it;
 
@@ -507,8 +507,8 @@ int CLEC::analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
- *  At the end of this function, 2 tables are created: L_EXPR and map_objs:
- *      - L_EXPR contains atomic expressions in the execution order including references to map_objs 
+ *  At the end of this function, 2 tables are created: v_expression and map_objs:
+ *      - v_expression contains atomic expressions in the execution order including references to map_objs 
  *      - map_objs contains the names included in the lec expression
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
@@ -522,7 +522,7 @@ int CLEC::parse(const bool side_of_eq)
 
     // reset global variables
     L_errno = 0;
-    L_EXPR.clear();
+    this->v_expression.clear();
 
     // NOTE: if the LEC expression is the left or right side of an equation, 
     //       we don't reset map_objs
@@ -636,7 +636,7 @@ again:
                 if(start) 
                 {
                     LEC_OTHER al(L_EOE);
-                    L_EXPR.push_back(al);
+                    this->v_expression.push_back(al);
                     return L_errno;
                 }
                 if(beg == 1) 
@@ -662,7 +662,7 @@ again:
 }
 
 /**
- *  Computes the position of the beginning of the sub-expression starting at ALEC al + i (al comes from L_EXPR).
+ *  Computes the position of the beginning of the sub-expression starting at ALEC al + i (al comes from v_alec).
  *  Browses backwards all elements of the expression until having reached a level 0 of parentheses or 
  *  all arguments of an operator or function.
  *    

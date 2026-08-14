@@ -198,85 +198,85 @@ SLEC::SLEC(const std::string& lec, const std::string& endo)
 
 
 /**
- * Appends the member mbr (LHS or RHS) contained in sl to L_EXPR. 
+ * Appends the member mbr (LHS or RHS) contained in sl to expr. 
  * 
  * @param [in] mbr  int     position of the member to append 
 */
-void SLEC::append_member(const EQ_HAND_SIDE mbr)
+void SLEC::append_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr)
 {
     std::shared_ptr<CLEC> clec_ptr = (mbr == EQ_LHS) ? left_clec : right_clec;
     if(!clec_ptr)
         return;
-    L_EXPR.insert(L_EXPR.end(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
+    expr.insert(expr.end(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
 }
 
 
 /**
- * Adds L_EXPR the member mbr (LHS or RHS) contained in sl at the beginning of L_EXPR.
+ * Adds expr the member mbr (LHS or RHS) contained in sl at the beginning of expr.
  * 
- * @param [in] mbr  int     member of sl to copy to L_EXPR
+ * @param [in] mbr  int     member of sl to copy to expr
 */
-void SLEC::prepend_member(const EQ_HAND_SIDE mbr)
+void SLEC::prepend_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr)
 {
     std::shared_ptr<CLEC> clec_ptr = (mbr == EQ_LHS) ? left_clec : right_clec;
     if(!clec_ptr)
         return;
-    L_EXPR.insert(L_EXPR.begin(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
+    expr.insert(expr.begin(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
 }
 
 
-void SLEC::append_other(int type)
+void SLEC::append_other(int type, std::vector<ATOMIC_LEC>& expr)
 {
     LEC_OTHER al_other(type);
-    L_EXPR.push_back(al_other);
+    expr.push_back(al_other);
 }
 
 
 /**
- * Appends an operator to L_EXPR.
+ * Appends an operator to expr.
  * 
  * @param [in]  op  int     operator
 */
-void SLEC::append_op(int op)
+void SLEC::append_op(int op, std::vector<ATOMIC_LEC>& expr)
 {
     LEC_OP al_op(op);
-    L_EXPR.push_back(al_op);
+    expr.push_back(al_op);
 }
 
 
 /**
- * Appends a function and its number of arguments to L_EXPR.
+ * Appends a function and its number of arguments to expr.
  *
  * @param [in] op     int   function id
  * @param [in] nargs  int   number of arguments of the function
 */
-void SLEC::append_fn(int op, int nargs)
+void SLEC::append_fn(int op, int nargs, std::vector<ATOMIC_LEC>& expr)
 {
     if(is_fn(op))
     {
         LEC_FN al_fn(op, nargs);
-        L_EXPR.push_back(al_fn);
+        expr.push_back(al_fn);
         return;
     }
 
     if(is_tfn(op))
     {
         LEC_TFN al_tfn(op, nargs);
-        L_EXPR.push_back(al_tfn);
+        expr.push_back(al_tfn);
         return;
     }
 
     if(is_val(op))
     {
         LEC_VAL_FN al_val_fn(op);
-        L_EXPR.push_back(al_val_fn);
+        expr.push_back(al_val_fn);
         return;
     }
 
     if(is_mtfn(op))
     {
         LEC_MTFN al_mtfn(op, nargs, 0);
-        L_EXPR.push_back(al_mtfn);
+        expr.push_back(al_mtfn);
         return;
     }
 
@@ -285,14 +285,14 @@ void SLEC::append_fn(int op, int nargs)
 
 
 /**
- * Appends a long constant to L_EXPR.
+ * Appends a long constant to expr.
  * 
  * @param [in] a    int     value of the constant
 */
-void SLEC::append_const(int a)
+void SLEC::append_const(int a, std::vector<ATOMIC_LEC>& expr)
 {
     LEC_CONST_LONG al(a);
-    L_EXPR.push_back(al);
+    expr.push_back(al);
 }
 
 
@@ -300,7 +300,7 @@ void SLEC::append_const(int a)
  * Tries to analytically solve an equation with respect to a specified endogenous variable. The result
  * is thus the equivalent of a LEC *expression*, not *equation*. That transformed expression is used in simuations.
  * 
- * The result is stored in L_EXPR (table of ALEC's).
+ * The result is stored in clec.v_expression.
  * 
  * If the endogenous variable is found more than once, the equation (say "LHS := RHS") is replaced by 
  * "0 := LHS - RHS" and duplicated_endo is true.
@@ -320,7 +320,7 @@ void SLEC::append_const(int a)
  *                                              true if endo is present more than once.
  * @return                          int         0 on success and L_errno on error
 */
-int SLEC::invert_equation(bool& duplicated_endo)
+int SLEC::invert_equation(bool& duplicated_endo, CLEC& clec)
 {
     if(L_errno != 0)
         return L_errno;
@@ -339,16 +339,16 @@ int SLEC::invert_equation(bool& duplicated_endo)
     }
 
     // If endo is present more than once, we cannot determine the sub expression 
-    // to invert and we just move all the equation in L_EXPR and return
+    // to invert and we just move all the equation in clec.v_expression and return
     if(count0 + count1 >= 2) 
     {
         // Result = {left_clec, right_clec, L_MINUS, L_EOE} i.e. F(x) = LHS - RHS 
         duplicated_endo = true;
-        L_EXPR.clear();
-        append_member(EQ_LHS);    
-        append_member(EQ_RHS);
-        append_op(L_MINUS);
-        append_other(L_EOE);
+        clec.v_expression.clear();
+        append_member(EQ_LHS, clec.v_expression);    
+        append_member(EQ_RHS, clec.v_expression);
+        append_op(L_MINUS, clec.v_expression);
+        append_other(L_EOE, clec.v_expression);
         return 0;
     }
 
@@ -365,9 +365,9 @@ int SLEC::invert_equation(bool& duplicated_endo)
         side_without_endo = EQ_RHS;
     }
 
-    // Create an empty L_EXPR and move the member not containing the endo into L_EXPR
-    L_EXPR.clear();
-    append_member(side_without_endo);
+    // Create an empty expression and move the member not containing the endo into it.
+    clec.v_expression.clear();
+    append_member(side_without_endo, clec.v_expression);
     if(side_without_endo == EQ_LHS) 
         left_clec->v_expression.clear();
     else 
@@ -383,85 +383,85 @@ int SLEC::invert_equation(bool& duplicated_endo)
         {
             // x + y = z  =>  x = z - y
             case L_PLUS   :             
-                append_member(side_without_endo);
-                append_op(L_MINUS);
+                append_member(side_without_endo, clec.v_expression);
+                append_op(L_MINUS, clec.v_expression);
                 break;
             // x * y = z  =>  x = z / y
             case L_TIMES  :
-                append_member(side_without_endo);
-                append_op(L_DIVIDE);
+                append_member(side_without_endo, clec.v_expression);
+                append_op(L_DIVIDE, clec.v_expression);
                 break;
             case L_MINUS  :
                 // y - x = z  =>  x = y - z
                 if(side_with_endo == EQ_RHS)     // x is after the minus sign
                 {
-                    prepend_member(side_without_endo);
-                    append_op(L_MINUS);
+                    prepend_member(side_without_endo, clec.v_expression);
+                    append_op(L_MINUS, clec.v_expression);
                 }
                 // x - y = z  =>  x = z + y
                 else 
                 {
-                    append_member(side_without_endo);
-                    append_op(L_PLUS);
+                    append_member(side_without_endo, clec.v_expression);
+                    append_op(L_PLUS, clec.v_expression);
                 }
                 break;
             case L_DIVIDE :
                 // y / x = z  =>  x = y / z
                 if(side_with_endo == EQ_RHS)     // x is after the divide sign
                 {
-                    prepend_member(side_without_endo);
-                    append_op(L_DIVIDE);
+                    prepend_member(side_without_endo, clec.v_expression);
+                    append_op(L_DIVIDE, clec.v_expression);
                 }
                 // x / y = z  =>  x = z * y
                 else 
                 {
-                    append_member(side_without_endo);
-                    append_op(L_TIMES);
+                    append_member(side_without_endo, clec.v_expression);
+                    append_op(L_TIMES, clec.v_expression);
                 }
                 break;
             // ln(x) = z  =>  x = exp(z)
             case L_LN :
-                append_fn(L_EXPN, 1);
+                append_fn(L_EXPN, 1, clec.v_expression);
                 break;
             // exp(x) = z  =>  x = ln(z)
             case L_EXPN :
-                append_fn(L_LN, 1);
+                append_fn(L_LN, 1, clec.v_expression);
                 break;
             // +x = z  =>  x = z
             case L_UPLUS  :
                 break;
             // -x = z  =>  x = -z
             case L_UMINUS :
-                append_fn(L_UMINUS, 1);
+                append_fn(L_UMINUS, 1, clec.v_expression);
                 break;
             // cos(x) = z  =>  x = arccos(z)
             case L_COS :
-                append_fn(L_ACOS, 1);
+                append_fn(L_ACOS, 1, clec.v_expression);
                 break;
             // arccos(x) = z  =>  x = cos(z)
             case L_ACOS :
-                append_fn(L_COS, 1);
+                append_fn(L_COS, 1, clec.v_expression);
                 break;
             // sin(x) = z  =>  x = arcsin(z)
             case L_SIN :
-                append_fn(L_ASIN, 1);
+                append_fn(L_ASIN, 1, clec.v_expression);
                 break;
             // arcsin(x) = z  =>  x = sin(z)
             case L_ASIN :
-                append_fn(L_SIN, 1);
+                append_fn(L_SIN, 1, clec.v_expression);
                 break;
             // tan(x) = z  =>  x = arctan(z)
             case L_TAN :
-                append_fn(L_ATAN, 1);
+                append_fn(L_ATAN, 1, clec.v_expression);
                 break;
             // arctan(x) = z  =>  x = tan(z)
             case L_ATAN :
-                append_fn(L_TAN, 1);
+                append_fn(L_TAN, 1, clec.v_expression);
                 break;
             // sqrt(x) = z  =>  x = z ^ 2
             case L_SQRT :
-                append_const(2);
-                append_fn(L_EXP, 2);
+                append_const(2, clec.v_expression);
+                append_fn(L_EXP, 2, clec.v_expression);
                 break;
             case L_EXP :
                 // NOTE: log_b(a) = ln(a) / ln(b)
@@ -471,61 +471,61 @@ int SLEC::invert_equation(bool& duplicated_endo)
                 // x = exp(ln(z) / y)
                 if(side_with_endo == EQ_LHS)     // x is after the exponentiation operator
                 {
-                    append_fn(L_LN, 1);
-                    append_member(side_without_endo);
-                    append_op(L_DIVIDE);
-                    append_fn(L_EXPN, 1);
+                    append_fn(L_LN, 1, clec.v_expression);
+                    append_member(side_without_endo, clec.v_expression);
+                    append_op(L_DIVIDE, clec.v_expression);
+                    append_fn(L_EXPN, 1, clec.v_expression);
                 }
                 // x ^ y = z  =>  x = log_y(z)
                 else 
                 {
-                    prepend_member(side_without_endo);
-                    append_fn(L_LOG, 2);
+                    prepend_member(side_without_endo, clec.v_expression);
+                    append_fn(L_LOG, 2, clec.v_expression);
                 }
                 break;
             // log(x) = z  =>  x = 10 ^ z
             case L_LOG :
-                append_fn(L_EXP, 1);
+                append_fn(L_EXP, 1, clec.v_expression);
                 break;
             // d(x) = x[t] - x[t-lag] = z[t]  =>  x[t] = z[t] + x[t-lag]
             case L_DIFF :
-                if(nb_args == 2) append_member(side_without_endo);
-                append_member(side_with_endo);
-                append_fn(L_LAG, nb_args);
-                append_op(L_PLUS);
+                if(nb_args == 2) append_member(side_without_endo, clec.v_expression);
+                append_member(side_with_endo, clec.v_expression);
+                append_fn(L_LAG, nb_args, clec.v_expression);
+                append_op(L_PLUS, clec.v_expression);
                 break;
             // dln(x) = ln(x[t]) - ln(x[t-lag]) = z[t]  
             // ln(x[t]) = z[t] + ln(x[t-lag])
             // x[t] = exp(z[t] + ln(x[t-lag]))    
             case L_DLN :
-                if(nb_args == 2) append_member(side_without_endo);
-                append_member(side_with_endo);
-                append_fn(L_LAG, nb_args);
-                append_fn(L_LN, 1);
-                append_op(L_PLUS);
-                append_fn(L_EXPN, 1);
+                if(nb_args == 2) append_member(side_without_endo, clec.v_expression);
+                append_member(side_with_endo, clec.v_expression);
+                append_fn(L_LAG, nb_args, clec.v_expression);
+                append_fn(L_LN, 1, clec.v_expression);
+                append_op(L_PLUS, clec.v_expression);
+                append_fn(L_EXPN, 1, clec.v_expression);
                 break;
             // grt(x) = 100 * (x[t] / x[t-lag] - 1) = z[t]
             // (x[t] / x[t-lag] - 1) = z[t] / 100
             // x[t] / x[t-lag] = (z[t] / 100) + 1
             // x[t] = ((z[t] / 100) + 1) * x[t-lag]
             case L_GRT :
-                append_const(100);
-                append_op(L_DIVIDE);
-                append_const(1);
-                append_op(L_PLUS);
-                if(nb_args == 2) append_member(side_without_endo);
-                append_member(side_with_endo);
-                append_fn(L_LAG, nb_args);
-                append_op(L_TIMES);
+                append_const(100, clec.v_expression);
+                append_op(L_DIVIDE, clec.v_expression);
+                append_const(1, clec.v_expression);
+                append_op(L_PLUS, clec.v_expression);
+                if(nb_args == 2) append_member(side_without_endo, clec.v_expression);
+                append_member(side_with_endo, clec.v_expression);
+                append_fn(L_LAG, nb_args, clec.v_expression);
+                append_op(L_TIMES, clec.v_expression);
                 break;
             // rapp(x) = x[t] / x[t-lag] = z[t]
             // x[t] = z[t] * x[t-lag]
             case L_RAPP :
-                if(nb_args == 2) append_member(side_without_endo);
-                append_member(side_with_endo);
-                append_fn(L_LAG, nb_args);
-                append_op(L_TIMES);
+                if(nb_args == 2) append_member(side_without_endo, clec.v_expression);
+                append_member(side_with_endo, clec.v_expression);
+                append_fn(L_LAG, nb_args, clec.v_expression);
+                append_op(L_TIMES, clec.v_expression);
                 break;
             default :
                 L_errno = L_INVERT_ERR;
@@ -533,7 +533,7 @@ int SLEC::invert_equation(bool& duplicated_endo)
         }
     }
 
-    append_other(L_EOE);    
+    append_other(L_EOE, clec.v_expression);    
     return L_errno;
 }
 

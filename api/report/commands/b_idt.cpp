@@ -20,6 +20,9 @@
 #include "api/report/commands/commands.h"
 
 
+static char**  KEXEC_VFILES = NULL;
+static char**  KEXEC_SFILES = NULL;
+
 /**
  *  Report function to execute identities. Used in conjunction with report functions
  *      B_IdtExecuteVarFiles(char* arg, int unused)
