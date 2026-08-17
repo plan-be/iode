@@ -715,7 +715,9 @@ class Scalars(IodeDatabase):
         Name: qc0_, dtype: float64
         """
         data = {name: self._get_object(name)._as_tuple() for name in self.names}
-        return pd.DataFrame.from_dict(data, orient='index', dtype="float64", columns=["value", "relax", "std"])
+        df = pd.DataFrame.from_dict(data, orient='index')
+        df.columns = ["value", "relax", "std"]
+        return df.astype("float64")
 
     @property
     def df(self) -> pd.DataFrame:

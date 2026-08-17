@@ -1037,19 +1037,36 @@ class Variables(IodeDatabase):
             The periods to update/add. 
             If `key_periods` is None, values for the whole sample is updated/added.
         """
+        if values is None:
+            raise ValueError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                             f"Got None as value.")
+    
+        if not self.sample:
+            raise RuntimeError(f"Cannot add or update the IODE variable '{key_name}'.\n"
+                               f"The sample of the current Variables database is not defined.")   
+
         if isinstance(key_name, str):
             key_name = key_name.strip()
 
         if isinstance(values, int):
             values = float(values)
-        
-        if values is None:
-            raise ValueError(f"Cannot add or update the IODE variable '{key_name}'.\n"
-                             f"Got None as value.")
 
-        if not self.sample:
+        # NOTE: - required since pandas 3.0
+        #       - copy=True since extracting data from a Series using .values or to_numpy(), 
+        #         returns a numpy array that is read-only by default -> make cython code from 
+        #         variables_database.pyx to raise the error "ValueError: buffer source array is read-only".
+        if isinstance(values, pd.Series):
+            values = values.to_numpy(copy=True, dtype=np.float64)
+
+        if isinstance(values, pd.DataFrame):
             raise RuntimeError(f"Cannot add or update the IODE variable '{key_name}'.\n"
-                               f"The sample of the current Variables database is not defined.")   
+                               "Expected a pandas Series or a numpy ndarray as values. "
+                               "Got a pandas DataFrame instead")
+
+        if isinstance(values, np.ndarray):
+            # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
+            if not values.flags['C_CONTIGUOUS']:
+                values = np.ascontiguousarray(values)
 
         if key_periods is not None:
             if isinstance(key_periods, str):
@@ -1103,10 +1120,6 @@ class Variables(IodeDatabase):
                     raise TypeError(f"Cannot update the IODE variable '{name}'.\nExpected 'value' of type str, int, "
                                     f"float, list/tuple of float, numpy array, pandas Series or Variables.\nGot 'value' of type "
                                     f"{type(values).__name__} instead")                    
-                if isinstance(values, np.ndarray):
-                    # NOTE: do not call np.ascontiguousarray by default as it makes a copy of the data
-                    if not values.flags['C_CONTIGUOUS']:
-                        values = np.ascontiguousarray(values)
                 if isinstance(values, Variables):
                     sample: Sample = Sample(*key_periods)
                     if values.sample != sample:
@@ -1920,18 +1933,6 @@ class Variables(IodeDatabase):
                 self.from_numpy(value, names, key_periods[0], key_periods[-1])
             return
 
-        # if value is a pandas DataFrame
-        if isinstance(value, pd.DataFrame):
-            value = self._check_pandas_dataframe(value, names, key_periods)
-            if isinstance(value, pd.DataFrame):
-                data = value.to_numpy(copy=False)
-                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
-                if not data.flags['C_CONTIGUOUS']:
-                    data = np.ascontiguousarray(data)
-                for name, _data in zip(names, data):
-                    self._set_variable(name, _data, key_period_bounds)
-                return
-
         # if value is pandas Series
         if isinstance(value, pd.Series):
             value = self._check_pandas_series(value, names, key_periods)
@@ -1942,13 +1943,17 @@ class Variables(IodeDatabase):
                 for name in names:
                     self._set_variable(name, value[name], key_period_bounds)
             else:
-                data = value.to_numpy(copy=False)
-                # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
-                if not data.flags['C_CONTIGUOUS']:
-                    data = np.ascontiguousarray(data)
-                self._set_variable(names[0], data, key_period_bounds)
+                self._set_variable(names[0], value, key_period_bounds)
             return
         
+        # if value is a pandas DataFrame
+        if isinstance(value, pd.DataFrame):
+            value = self._check_pandas_dataframe(value, names, key_periods)
+            if isinstance(value, pd.DataFrame):
+                for name, series in value.iterrows():
+                    self._set_variable(name, series, key_period_bounds)
+                return
+
         if la is not None and isinstance(value, Array):
             value = self._check_larray_array(value, names, key_periods)
             data = value.data
@@ -2096,7 +2101,11 @@ class Variables(IodeDatabase):
             # NOTE: _check_pandas_dataframe() may squeeze the DataFrame to a Series
             other = _self._check_pandas_dataframe(other, self_names, self_periods)
             if isinstance(other, pd.DataFrame):
-                data = other.to_numpy(copy=False)
+                # NOTE: - required since pandas 3.0
+                #       - copy=True since extracting data from a DataFrame using .values or to_numpy(), 
+                #         returns a numpy array that is read-only by default -> make cython code from 
+                #         variables_database.pyx to raise the error "ValueError: buffer source array is read-only".
+                data = other.to_numpy(copy=True)
                 # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
                 if not data.flags['C_CONTIGUOUS']:
                     data = np.ascontiguousarray(data)
@@ -2105,7 +2114,11 @@ class Variables(IodeDatabase):
 
         if isinstance(other, pd.Series):
             other = _self._check_pandas_series(other, self_names, self_periods)
-            data = other.to_numpy(copy=False)
+            # NOTE: - required since pandas 3.0
+            #       - copy=True since extracting data from a Series using .values or to_numpy(), 
+            #         returns a numpy array that is read-only by default -> make cython code from 
+            #         variables_database.pyx to raise the error "ValueError: buffer source array is read-only".
+            data = other.to_numpy(copy=True)
             # see https://cython.readthedocs.io/en/stable/src/userguide/memoryviews.html#pass-data-from-a-c-function-via-pointer
             if not data.flags['C_CONTIGUOUS']:
                 data = np.ascontiguousarray(data)

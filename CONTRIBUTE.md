@@ -26,8 +26,8 @@
    - qtconsole
    - ipython
    - pytest
-   - numpy >= 2.0
-   - pandas >= 2.0
+   - numpy >= 2.4
+   - pandas >= 3.0
    - larray
    - sphinx 
    - numpydoc

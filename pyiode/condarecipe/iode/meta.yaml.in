@@ -39,8 +39,8 @@ requirements:
   host:
     - python ={{ PY_VER }}
     - scikit-build-core >=0.10
-    - numpy >=2.0
-    - pandas >=2.0
+    - numpy >=2.4
+    - pandas >=3.0
     - cython ==3.1.4
     - mypy >=1.10
     - pip
@@ -56,8 +56,8 @@ requirements:
 
   run:
     - python ={{ PY_VER }}
-    - numpy >=2.0
-    - pandas >=2.0
+    - numpy >=2.4
+    - pandas >=3.0
     - matplotlib-base
 
 test:

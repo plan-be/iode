@@ -482,12 +482,12 @@ class Lists(IodeDatabase):
         >>> s = pd.Series(data=data, index=names, dtype=str, name="Lists")
         >>> # display the pandas series
         >>> s          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        SEMICOLON_LST                        A;B;C;D;E;F
-        COMMA_LST                            A,B,C,D,E,F
-        WHITESPACE_LST                       A B C D E F
-        TAB_LST               A    B    C    D    E    F
-        MIX_LST                         A;B,C D    E;F
-        Name: Lists, dtype: object
+        SEMICOLON_LST                    A;B;C;D;E;F
+        COMMA_LST                        A,B,C,D,E,F
+        WHITESPACE_LST                   A B C D E F
+        TAB_LST           A    B    C    D    E    F
+        MIX_LST                     A;B,C D    E;F  
+        Name: Lists, dtype: str
 
         >>> # load into the IODE Lists database
         >>> lists.from_series(s)
