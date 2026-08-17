@@ -513,6 +513,7 @@ generate_stub_files.py
 
 # DOC
 /doc/**/*.txt
+!/doc/**/requirements*.txt
 
 /doc/source/conf.py
 /doc/source/_autosummary

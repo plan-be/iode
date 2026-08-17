@@ -13,6 +13,11 @@ else()
 # see https://cmake.org/cmake/help/latest/command/configure_file.html#command:configure_file 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/source/conf.py.in ${CMAKE_CURRENT_SOURCE_DIR}/source/conf.py)
 
+# concatenate files requirements-cython.txt and requirements-python.txt to generate requirements.txt
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/requirements-cython.txt CYTHON_REQS)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/requirements-python.txt PYTHON_REQS)
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt "${CYTHON_REQS}\n${PYTHON_REQS}")
+
 add_custom_target(iode_doc
     COMMAND make html
     DEPENDS source/conf.py
