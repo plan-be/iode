@@ -1,8 +1,3 @@
-# dependencies to build the C++/Cython sources for the iode module
-cython == 3.1.4
-scikit-build-core >= 0.10
-mypy >=1.10
-
 # dependencies to run the iode module and the tests
 numpy >= 2.4
 pandas >= 3.0
