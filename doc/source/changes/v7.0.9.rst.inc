@@ -1,7 +1,7 @@
 Version 7.0.9
 =============
 
-In development
+Released on 17/08/2026
 
 
 Miscellaneous 
