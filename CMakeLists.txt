@@ -50,6 +50,10 @@ set(IODE_RESOUCES_DIR "${PROJECT_SOURCE_DIR}/resources")
 include(CTest)
 
 # ---- compile options ----
+# Note: clang-cl is supported and will be detected as MSVC by CMake
+# Use CMAKE_CXX_COMPILER_ID to distinguish if needed:
+#   - MSVC: Microsoft Visual C++ compiler (cl.exe)
+#   - Clang: Clang compiler in MSVC-compatible mode (clang-cl.exe)
 if(MSVC)
   add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
   # to use std::min/max -> prevent windows.h to define min and max as macros
@@ -171,10 +175,11 @@ endif()
 #      o Memory leaks
 #   In order to use AddressSanitizer you will need to compile and link your program the -fsanitize=address flag. 
 #   See https://github.com/google/sanitizers/wiki/AddressSanitizer for more details
-# Note: sanitizer options are availalbe for cl, clang and gcc
+# Note: sanitizer options are available for cl, clang-cl and gcc
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND IODE_ENABLE_SANITIZER)
 if(MSVC)
-  # Note: incompatible options when using Visual Studio:
+  # Note: applies to both MSVC (cl.exe) and clang-cl
+  # incompatible options when using Visual Studio:
   #         o The /RTC options are incompatible with AddressSanitizer and should be disabled.
   #         See https://docs.microsoft.com/en-us/cpp/sanitizers/asan-known-issues?view=msvc-170#incompatible-options
   string(REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})

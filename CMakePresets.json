@@ -54,6 +54,28 @@
             }
         },
         {
+            "name": "windows-clang",
+            "hidden": true,
+            "displayName": "Windows Clang",
+            "description": "Target Windows with Clang-CL compiler.",
+            "generator": "Ninja",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": [
+                        "Windows"
+                    ]
+                }
+            }
+        },
+        {
             "name": "debug",
             "hidden": true,
             "displayName": "Debug Config",
@@ -154,6 +176,43 @@
             }
         },
         {
+            "name": "windows-clang-debug",
+            "inherits": [
+                "windows-clang",
+                "debug"
+            ],
+            "displayName": "Windows Clang Debug",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        },
+        {
+            "name": "windows-clang-debug-sanitize",
+            "inherits": [
+                "windows-clang",
+                "debug",
+                "sanitize"
+            ],
+            "displayName": "Windows Clang Debug Sanitize",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        },
+        {
+            "name": "windows-clang-release",
+            "inherits": [
+                "windows-clang",
+                "release"
+            ],
+            "displayName": "Windows Clang Release",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        },
+        {
             "inherits": "linux-debug",
             "displayName": "TEST C API LINUX x64",
             "name": "linux-debug/tests/test_c_api"
@@ -232,6 +291,46 @@
             "inherits": "windows-debug-sanitize",
             "displayName": "TEST CPP API Windows Sanitize",
             "name": "windows-debug-sanitize/tests/test_cpp_api"
+        },
+        {
+            "inherits": "windows-clang-debug",
+            "displayName": "TEST C API Windows Clang x64",
+            "name": "windows-clang-debug/tests/test_c_api"
+        },
+        {
+            "inherits": "windows-clang-release",
+            "displayName": "TEST C API Windows Clang x64",
+            "name": "windows-clang-release/tests/test_c_api"
+        },
+        {
+            "inherits": "windows-clang-debug",
+            "displayName": "TEST CPP API Windows Clang x64",
+            "name": "windows-clang-debug/tests/test_cpp_api"
+        },
+        {
+            "inherits": "windows-clang-release",
+            "displayName": "TEST CPP API Windows Clang x64",
+            "name": "windows-clang-release/tests/test_cpp_api"
+        },
+        {
+            "inherits": "windows-clang-debug",
+            "displayName": "TEST CPP API Windows Clang x64 FOR BIG DATABASES",
+            "name": "windows-clang-debug/tests/test_big_files"
+        },
+        {
+            "inherits": "windows-clang-release",
+            "displayName": "TEST CPP API Windows Clang x64 FOR BIG DATABASES",
+            "name": "windows-clang-release/tests/test_big_files"
+        },
+        {
+            "inherits": "windows-clang-debug-sanitize",
+            "displayName": "TEST C API Windows Clang Sanitize",
+            "name": "windows-clang-debug-sanitize/tests/test_c_api"
+        },
+        {
+            "inherits": "windows-clang-debug-sanitize",
+            "displayName": "TEST CPP API Windows Clang Sanitize",
+            "name": "windows-clang-debug-sanitize/tests/test_cpp_api"
         }
     ],
     "buildPresets": [
@@ -258,6 +357,18 @@
         {
             "name": "windows-release",
             "configurePreset": "windows-release"
+        },
+        {
+            "name": "windows-clang-debug",
+            "configurePreset": "windows-clang-debug"
+        },
+        {
+            "name": "windows-clang-debug-sanitize",
+            "configurePreset": "windows-clang-debug-sanitize"
+        },
+        {
+            "name": "windows-clang-release",
+            "configurePreset": "windows-clang-release"
         }
     ],
     "testPresets": [
@@ -367,6 +478,54 @@
             "inherits": "test-default",
             "displayName": "TEST CPP API Windows Sanitize",
             "configurePreset": "windows-debug-sanitize/tests/test_cpp_api"
+        },
+        {
+            "name": "c-api-windows-clang-debug",
+            "inherits": "test-default",
+            "displayName": "TEST C API Windows Clang x64",
+            "configurePreset": "windows-clang-debug/tests/test_c_api"
+        },
+        {
+            "name": "c-api-windows-clang-release",
+            "inherits": "test-default",
+            "displayName": "TEST C API Windows Clang x64",
+            "configurePreset": "windows-clang-release/tests/test_c_api"
+        },
+        {
+            "name": "cpp-api-windows-clang-debug",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows Clang x64",
+            "configurePreset": "windows-clang-debug/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-windows-clang-debug-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows Clang x64 FOR BIG DATABASES",
+            "configurePreset": "windows-clang-debug/tests/test_big_files"
+        },
+        {
+            "name": "cpp-api-windows-clang-release",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows Clang x64",
+            "configurePreset": "windows-clang-release/tests/test_cpp_api"
+        },
+        {
+            "name": "cpp-api-windows-clang-release-big-databases",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows Clang x64 FOR BIG DATABASES",
+            "configurePreset": "windows-clang-release/tests/test_big_files"
+        },
+        {
+            "name": "c-api-windows-clang-debug-sanitize",
+            "inherits": "test-default",
+            "displayName": "TEST C API Windows Clang Sanitize",
+            "configurePreset": "windows-clang-debug-sanitize/tests/test_c_api"
+        },
+        {
+            "name": "cpp-api-windows-clang-debug-sanitize",
+            "inherits": "test-default",
+            "displayName": "TEST CPP API Windows Clang Sanitize",
+            "configurePreset": "windows-clang-debug-sanitize/tests/test_cpp_api"
         }
     ]
 }
