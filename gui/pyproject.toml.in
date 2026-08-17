@@ -36,7 +36,7 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy", "pandas", "matplotlib", "iode", "qtpy", "qtconsole", "ipython" ]
+dependencies = [ "numpy>=2.4", "pandas>=3.0", "matplotlib", "iode", "qtpy", "qtconsole", "ipython" ]
 
 [project.optional-dependencies]
 test = ["pytest"]

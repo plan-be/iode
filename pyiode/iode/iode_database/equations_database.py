@@ -1344,7 +1344,7 @@ class Equations(IodeDatabase):
         D        ln D := t
         E         1/E := B
         F    d(F) := t + 1
-        dtype: object
+        dtype: str
 
         >>> # load into the IODE Equations database
         >>> equations.from_series(s)
@@ -1699,7 +1699,9 @@ class Equations(IodeDatabase):
         dtype.update({"date": str})
         # note: [:1] to skip endogenous value which is the same as name
         data = {name: self._get_object(name)._as_tuple()[1:] for name in self.names}
-        return pd.DataFrame.from_dict(data, orient='index', columns=list(dtype.keys())).astype(dtype)
+        df = pd.DataFrame.from_dict(data, orient='index')
+        df.columns = list(dtype.keys())
+        return df.astype(dtype)
 
     @property
     def df(self) -> pd.DataFrame:

@@ -438,13 +438,13 @@ class Comments(IodeDatabase):
         >>> s = pd.Series(data=data, index=names, dtype=str, name="Comments")
         >>> # display the pandas series
         >>> s          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        A0     A zero
+        A0    A zero
         A1     A one
         B0    B zero
         B1     B one
         C0    C zero
         C1     C one
-        Name: Comments, dtype: object
+        Name: Comments, dtype: str
 
         >>> # load into the IODE Comments database
         >>> comments.from_series(s)

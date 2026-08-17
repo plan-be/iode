@@ -713,7 +713,7 @@ class Identities(IodeDatabase):
         GRT_T          grt t
         MAVG_T        mavg t
         DER_LOG_T    d(ln t)
-        Name: Identities, dtype: object
+        Name: Identities, dtype: str
 
         >>> # load into the IODE Identities database
         >>> identities.from_series(s)
