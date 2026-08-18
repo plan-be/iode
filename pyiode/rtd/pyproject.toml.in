@@ -1,0 +1,42 @@
+# configuration file for the iode python package (ReadTheDocs)
+
+[build-system]
+requires = ["setuptools>=77", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iode"
+version = "${CMAKE_PROJECT_VERSION}"
+description = "IODE is a package dedicated to econometric models and to the management of statistical series"
+readme = "README.md"
+requires-python = ">=${MINIMUM_PYTHON_VERSION}"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "Alix Damman", email = "ald@plan.be" },
+    { name = "Yannick Van den Abbeel", email = "yvda@plan.be" },
+    { name = "Jean-Marc Paul", email = "jmarc.paul@gmail.com" },
+    { name = "Geert Bryon", email = "gb@plan.be" },
+]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Operating System :: Microsoft :: Windows',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Software Development :: Libraries',
+]
+
+
+# runtime dependency specification
+dependencies = [ "numpy>=2.4", "pandas>=3.0", "matplotlib" ]
+
+[project.urls]
+Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
+
+[tool.setuptools]
+packages = ["iode"]
