@@ -15,20 +15,17 @@ build:
     # golang: "1.20"
   # install Ubuntu apt packages
   apt_packages:
-    - gcc
-    - g++
-    - build-essential
     - cmake
     - ninja-build
-    - ccache
   jobs:
     pre_create_environment:
-      # Set up ccache to speed up compilation (cache compiled object files)
-      - export PATH="/usr/lib/ccache:$PATH"
-      - export CC="ccache gcc"
-      - export CXX="ccache g++"
       # to generate the pyproject.toml file using CMake
       - cmake --preset linux-release
+      # copy the generated pyproject.toml file from pyiode/rtd to pyiode/iode
+      - cp pyiode/rtd/pyproject.toml pyiode/pyproject.toml
+      # copy the generated iode_cython.py file (from Windows) from folder 
+      # pyiode/rtd to pyiode/iode
+      - cp pyiode/rtd/iode_cython.py pyiode/iode/iode_cython.py
 
 # Build documentation in the "doc/source" directory with Sphinx
 sphinx:
@@ -56,6 +53,6 @@ formats:
 # See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
 python:
   install:
-    - requirements: doc/requirements.txt
+    - requirements: doc/requirements-python.txt
     - method: pip
       path: pyiode
