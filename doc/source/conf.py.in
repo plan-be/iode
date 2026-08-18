@@ -25,7 +25,8 @@ iode.TableLine = TableLine
 iode.ComputedTable = ComputedTable
 
 
-# -- Project information -----------------------------------------------------
+# Project information 
+# -----------------------------------------------------
 
 project = 'iode'
 copyright = '${CURRENT_YEAR}, Jean-Marc Paul, Geert Bryon, Alix Damman, Yannick Van den Abbeel'

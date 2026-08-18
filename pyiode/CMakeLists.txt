@@ -13,6 +13,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_SOU
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/condarecipe/iode/meta.yaml.in ${CMAKE_CURRENT_SOURCE_DIR}/condarecipe/iode/meta.yaml)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/iode/__init__.py.in ${CMAKE_CURRENT_SOURCE_DIR}/iode/__init__.py)
 configure_file(${CMAKE_SOURCE_DIR}/generate_stub_files.py.in ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rtd/pyproject.toml.in ${CMAKE_CURRENT_SOURCE_DIR}/rtd/pyproject.toml)
+
 
 if(Python_FOUND)
   message(CHECK_START "Search for Cython")
@@ -125,7 +127,8 @@ if(Python_FOUND)
     add_custom_command(TARGET iode_cython POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_BINARY_DIR}/iode
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:iode_cython> ${CMAKE_CURRENT_SOURCE_DIR}/iode/iode_cython.pyd
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py)
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/generate_stub_files.py
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate_cython_stubs.py)
     
     install(TARGETS iode_cython LIBRARY DESTINATION iode)
   else()
