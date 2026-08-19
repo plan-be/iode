@@ -679,6 +679,7 @@ inline std::size_t hash_value(KDBEquations const& cpp_kdb)
 }
 
 /* k_eqs.c */
+int KE_compile(KDBEquations& dbe);
 int E_split_eq(char* lec, char** lhs, char** rhs);
 int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec);
 int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);

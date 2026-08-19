@@ -1164,10 +1164,9 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     KDBVariablesPtr kdb_var;
     KDBEquationsPtr kdbe;
     KDBScalarsPtr   kdbs;
+    bool    success;
     Sample* smpl;
     char*   filename = "fun";
-    U_ch**  endo_exo;
-    int     rc;
     List    lst, expected_lst;
     void    (*kmsg_super_ptr)(const char*);
 
@@ -1187,26 +1186,23 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     // Check list _DIVER does not exist before simulation
     EXPECT_FALSE(global_ws_lst->contains("_DIVER"));
 
-    // Simulation instance
-    CSimulation simu;
-
     // Simulation parameters
     smpl = new Sample("2000Y1", "2002Y1");
-    CSimulation::KSIM_START = VAR_INIT_TM1;
-    CSimulation::KSIM_EPS = 0.0001;
-    CSimulation::KSIM_MAXIT = 100;
-    CSimulation::KSIM_RELAX = 0.7;
-    CSimulation::KSIM_SORT = SORT_BOTH;
-    CSimulation::KSIM_PASSES = 5;
-    CSimulation::KSIM_DEBUG = 1;
+    global_simu->init_algo = VAR_INIT_TM1;
+    global_simu->epsilon = 0.0001;
+    global_simu->max_iter = 100;
+    global_simu->relax = 0.7;
+    global_simu->sorting_algo = SORT_BOTH;
+    global_simu->nb_passes = 5;
+    global_simu->debug = 1;
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
 
     // Test simulation : divergence
-    CSimulation::KSIM_MAXIT = 2;
-    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, NULL);
-    EXPECT_NE(rc, 0);
+    global_simu->max_iter = 2;
+    success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
+    EXPECT_FALSE(success);
 
     // Check _PRE list after simulation (prolog)
     EXPECT_TRUE(global_ws_lst->contains("_PRE"));
@@ -1221,9 +1217,9 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     EXPECT_EQ(lst, expected_lst);
 
     // Test with with convergence (increase MAXIT)
-    CSimulation::KSIM_MAXIT = 100;
-    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, NULL);
-    EXPECT_EQ(rc, 0);
+    global_simu->max_iter = 100;
+    success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
+    EXPECT_TRUE(success);
 
     // Test Endo-exo
 
@@ -1234,16 +1230,15 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     // Simulate with exchange UY - XNATY
-    endo_exo = SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
-    rc = simu.simulate(kdbe, kdb_var, kdbs, smpl, (char**) endo_exo);
+    global_simu->v_endo_exo = (char**) SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
+    success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
 
     // Check result
-    EXPECT_EQ(rc, 0);
+    EXPECT_TRUE(success);
     EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
 
     // Cleanup
-    SCR_free_tbl(endo_exo);
     delete smpl;
     kmsg_super = kmsg_super_ptr; // reset default value
 }
@@ -2351,20 +2346,20 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     EXPECT_NE(kdbe.get(), nullptr);
 
     // B_ModelSimulateParms()
-    CSimulation::KSIM_START = VAR_INIT_TM1;
-    CSimulation::KSIM_EPS = 0.00001;
-    CSimulation::KSIM_MAXIT = 1000;
-    CSimulation::KSIM_RELAX = 1.0;
-    CSimulation::KSIM_SORT = 0;
-    CSimulation::KSIM_PASSES = 3;
-    CSimulation::KSIM_DEBUG = 1;
+    global_simu->init_algo = VAR_INIT_TM1;
+    global_simu->epsilon = 0.00001;
+    global_simu->max_iter = 1000;
+    global_simu->relax = 1.0;
+    global_simu->sorting_algo = 0;
+    global_simu->nb_passes = 3;
+    global_simu->debug = 1;
     rc = B_ModelSimulateParms("0.0001 0.7 100 Triang 0 no 5 no");
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(CSimulation::KSIM_EPS, 0.0001);
-    EXPECT_EQ(CSimulation::KSIM_MAXIT, 100);
-    EXPECT_EQ(CSimulation::KSIM_RELAX, 0.7);
-    EXPECT_EQ(CSimulation::KSIM_DEBUG, 0);
-    EXPECT_EQ(CSimulation::KSIM_PASSES, 5);
+    EXPECT_EQ(global_simu->epsilon, 0.0001);
+    EXPECT_EQ(global_simu->max_iter, 100);
+    EXPECT_EQ(global_simu->relax, 0.7);
+    EXPECT_EQ(global_simu->debug, 0);
+    EXPECT_EQ(global_simu->nb_passes, 5);
 
     // TODO: check result of one ENDO
     // B_ModelSimulate()

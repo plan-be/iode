@@ -1,45 +1,51 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr
 
 from pyiode.compute.simulation cimport CSimulation, RPF_SimNIterInt, RPF_SimNormReal
 from pyiode.compute.simulation cimport B_ModelSimulateSaveNIters, B_ModelSimulateSaveNorms
+from pyiode.compute.simulation cimport global_simu as cpp_global_simu
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
-cdef class Simulation:
+cdef class CythonSimulation:
+    cdef shared_ptr[CSimulation] simu_ptr
     cdef CSimulation* c_simulation
 
     def __cinit__(self):
-        self.c_simulation = new CSimulation()
+        self.simu_ptr = cpp_global_simu
+        self.c_simulation = self.simu_ptr.get()
 
     def __dealloc__(self):
-        if self.c_simulation is not NULL:
-            del self.c_simulation
-            self.c_simulation = NULL
+        self.simu_ptr.reset()
+        self.c_simulation = NULL
+
+    def reset(self):
+        self.c_simulation.reset()
 
     def get_convergence_threshold(self) -> float:
-        return self.c_simulation.get_convergence_threshold()
+        return self.c_simulation.epsilon
 
     def set_convergence_threshold(self, value: float):
-        self.c_simulation.set_convergence_threshold(value)
+        self.c_simulation.epsilon = value
 
     def get_relax(self) -> float:
-        return self.c_simulation.get_relax()
+        return self.c_simulation.relax
 
     def set_relax(self, value: float):
-        self.c_simulation.set_relax(value)
+        self.c_simulation.relax = value
 
     def get_max_nb_iterations(self) -> int:
-        return self.c_simulation.get_max_nb_iterations()
+        return self.c_simulation.max_iter
 
     def set_max_nb_iterations(self, value: int):
-        self.c_simulation.set_max_nb_iterations(value)
+        self.c_simulation.max_iter = value
 
     def get_max_nb_iterations_newton(self) -> int:
-        return self.c_simulation.get_max_nb_iterations_newton()
+        return self.c_simulation.newton_max_iter
 
     def set_max_nb_iterations_newton(self, value: int):
-        self.c_simulation.set_max_nb_iterations_newton(value)
+        self.c_simulation.newton_max_iter = value
 
     def get_sort_algorithm(self) -> str:
         return f"{SimulationSort(<int>(self.c_simulation.get_sort_algorithm())).name}"
@@ -74,10 +80,10 @@ cdef class Simulation:
         self.c_simulation.set_debug_newton(value)
 
     def get_nb_passes(self) -> int:
-        return self.c_simulation.get_nb_passes()
+        return self.c_simulation.nb_passes
 
     def set_nb_passes(self, value: int):
-        self.c_simulation.set_nb_passes(value)
+        self.c_simulation.nb_passes = value
 
     def get_nb_iterations(self, period: str) -> int:
         cdef bytes b_period = period.encode('utf-8')
@@ -104,20 +110,20 @@ cdef class Simulation:
         return res == 0
 
     def model_exchange(self, list_exo: str) -> bool:
-        return self.c_simulation.model_exchange(list_exo.encode())
+        return self.c_simulation.exchange(list_exo.encode())
 
     def model_compile(self, list_eqs: str) -> bool:
-        return self.c_simulation.model_compile(list_eqs.encode())
+        return self.c_simulation.compile(list_eqs.encode())
 
     def model_simulate(self, from_period: str, to_period: str, list_eqs: str) -> bool:
-        return self.c_simulation.model_simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
+        return self.c_simulation.simulate(from_period.encode(), to_period.encode(), list_eqs.encode())
 
     def model_calculate_SCC(self, nb_iterations: int, pre_name: str, inter_name: str, 
                             post_name: str, list_eqs: str) -> bool:
-        return self.c_simulation.model_calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
+        return self.c_simulation.calculate_SCC(nb_iterations, pre_name.encode(), inter_name.encode(), 
                                                      post_name.encode(), list_eqs.encode())
 
     def model_simulate_SCC(self, from_period: str, to_period: str, pre_name: str, 
                            inter_name: str, post_name: str) -> bool:
-        return self.c_simulation.model_simulate_SCC(from_period.encode(), to_period.encode(), pre_name.encode(), 
+        return self.c_simulation.simulate_SCC(from_period.encode(), to_period.encode(), pre_name.encode(), 
                                                     inter_name.encode(), post_name.encode())

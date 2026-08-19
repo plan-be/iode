@@ -21,6 +21,7 @@ IODE_DEFAULT_DATABASE_FILENAME: str = None
 NA: float = None
 NAN_REP: str = None
 allowed_keys: set = None
+la: None = None
 
 class AdjustmentMethod(enum.IntEnum):
     ERROR_CORRECTION = enum.auto()
@@ -306,6 +307,104 @@ class CythonIodeDatabase:
         pass
 
     def size(self):
+        pass
+
+    def __reduce__(self):
+        pass
+
+
+class CythonSimulation:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get_convergence_threshold(self):
+        pass
+
+    def get_debug(self):
+        pass
+
+    def get_debug_newton(self):
+        pass
+
+    def get_initialization_method(self):
+        pass
+
+    def get_initialization_method_long(self):
+        pass
+
+    def get_max_nb_iterations(self):
+        pass
+
+    def get_max_nb_iterations_newton(self):
+        pass
+
+    def get_nb_iterations(self, period):
+        pass
+
+    def get_nb_passes(self):
+        pass
+
+    def get_norm(self, period):
+        pass
+
+    def get_relax(self):
+        pass
+
+    def get_sort_algorithm(self):
+        pass
+
+    def get_sort_algorithm_long(self):
+        pass
+
+    def model_calculate_SCC(self, nb_iterations, pre_name, inter_name, post_name, list_eqs):
+        pass
+
+    def model_compile(self, list_eqs):
+        pass
+
+    def model_exchange(self, list_exo):
+        pass
+
+    def model_simulate(self, from_period, to_period, list_eqs):
+        pass
+
+    def model_simulate_SCC(self, from_period, to_period, pre_name, inter_name, post_name):
+        pass
+
+    def reset(self):
+        pass
+
+    def save_nb_iterations(self, var_name):
+        pass
+
+    def save_norms(self, var_name):
+        pass
+
+    def set_convergence_threshold(self, value):
+        pass
+
+    def set_debug(self, value):
+        pass
+
+    def set_debug_newton(self, value):
+        pass
+
+    def set_initialization_method(self, value):
+        pass
+
+    def set_max_nb_iterations(self, value):
+        pass
+
+    def set_max_nb_iterations_newton(self, value):
+        pass
+
+    def set_nb_passes(self, value):
+        pass
+
+    def set_relax(self, value):
+        pass
+
+    def set_sort_algorithm(self, value):
         pass
 
     def __reduce__(self):
@@ -719,101 +818,6 @@ class Scalars:
         pass
 
     def __hash__(self):
-        pass
-
-    def __reduce__(self):
-        pass
-
-
-class Simulation:
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def get_convergence_threshold(self):
-        pass
-
-    def get_debug(self):
-        pass
-
-    def get_debug_newton(self):
-        pass
-
-    def get_initialization_method(self):
-        pass
-
-    def get_initialization_method_long(self):
-        pass
-
-    def get_max_nb_iterations(self):
-        pass
-
-    def get_max_nb_iterations_newton(self):
-        pass
-
-    def get_nb_iterations(self, period):
-        pass
-
-    def get_nb_passes(self):
-        pass
-
-    def get_norm(self, period):
-        pass
-
-    def get_relax(self):
-        pass
-
-    def get_sort_algorithm(self):
-        pass
-
-    def get_sort_algorithm_long(self):
-        pass
-
-    def model_calculate_SCC(self, nb_iterations, pre_name, inter_name, post_name, list_eqs):
-        pass
-
-    def model_compile(self, list_eqs):
-        pass
-
-    def model_exchange(self, list_exo):
-        pass
-
-    def model_simulate(self, from_period, to_period, list_eqs):
-        pass
-
-    def model_simulate_SCC(self, from_period, to_period, pre_name, inter_name, post_name):
-        pass
-
-    def save_nb_iterations(self, var_name):
-        pass
-
-    def save_norms(self, var_name):
-        pass
-
-    def set_convergence_threshold(self, value):
-        pass
-
-    def set_debug(self, value):
-        pass
-
-    def set_debug_newton(self, value):
-        pass
-
-    def set_initialization_method(self, value):
-        pass
-
-    def set_max_nb_iterations(self, value):
-        pass
-
-    def set_max_nb_iterations_newton(self, value):
-        pass
-
-    def set_nb_passes(self, value):
-        pass
-
-    def set_relax(self, value):
-        pass
-
-    def set_sort_algorithm(self, value):
         pass
 
     def __reduce__(self):

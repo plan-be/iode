@@ -1,19 +1,18 @@
 #include "pch.h"
 
 
-class SimulationTest : public KDBTest, public ::testing::Test
+class SimulationTest : public TestAbstract, public ::testing::Test
 {
 protected:
-    Simulation sim;
     std::string from;
     std::string to;
     std::string endo_exo;
 
     void SetUp() override
     {
-        global_ws_eqs->load(input_test_dir + "fun.ae");
-        global_ws_scl->load(input_test_dir + "fun.as");
-        global_ws_var->load(input_test_dir + "fun.av");
+        global_ws_eqs->load(str_input_test_dir + "fun.ae");
+        global_ws_scl->load(str_input_test_dir + "fun.as");
+        global_ws_var->load(str_input_test_dir + "fun.av");
 
         from = "2000Y1";
         to = "2002Y1";
@@ -21,13 +20,13 @@ protected:
         endo_exo = "UY-XNATY";
 
         // Simulation std parameters
-        CSimulation::KSIM_START = VAR_INIT_TM1;
-        CSimulation::KSIM_EPS = 0.0001;
-        CSimulation::KSIM_MAXIT = 100;
-        CSimulation::KSIM_RELAX = 0.7;
-        CSimulation::KSIM_SORT = SORT_BOTH;
-        CSimulation::KSIM_PASSES = 5;
-        CSimulation::KSIM_DEBUG = 1;
+        global_simu->init_algo = VAR_INIT_TM1;
+        global_simu->epsilon = 0.0001;
+        global_simu->max_iter = 100;
+        global_simu->relax = 0.7;
+        global_simu->sorting_algo = SORT_BOTH;
+        global_simu->nb_passes = 5;
+        global_simu->debug = 1;
     }
 
     // void TearDown() override {}
@@ -37,44 +36,44 @@ TEST_F(SimulationTest, ModelExchange)
 {
     bool success;
 
-    success = sim.model_exchange(endo_exo);
+    success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
-    EXPECT_EQ(SCR_tbl_size((unsigned char**) CSimulation::KSIM_EXO), 1);
-    EXPECT_EQ(std::string(CSimulation::KSIM_EXO[0]), "UY-XNATY");
+    EXPECT_EQ(SCR_tbl_size((unsigned char**) global_simu->v_endo_exo), 1);
+    EXPECT_EQ(std::string(global_simu->v_endo_exo[0]), "UY-XNATY");
 
-    // reset KSIM_EXO
-    success = sim.model_exchange();
+    // reset v_endo_exo
+    success = global_simu->exchange();
     EXPECT_FALSE(success);
-    EXPECT_TRUE(CSimulation::KSIM_EXO == NULL);
+    EXPECT_TRUE(global_simu->v_endo_exo == NULL);
 }
 
 TEST_F(SimulationTest, Simulation)
 {
     bool success;
 
-    sim.set_sort(SimuSortAlgorithm::SORT_NONE);
-    sim.set_sort(SimuSortAlgorithm::SORT_CONNEX);
-    sim.set_sort(SimuSortAlgorithm::SORT_BOTH);
+    global_simu->set_sort(SimuSortAlgorithm::SORT_NONE);
+    global_simu->set_sort(SimuSortAlgorithm::SORT_CONNEX);
+    global_simu->set_sort(SimuSortAlgorithm::SORT_BOTH);
 
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1_A);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_TM1_NA);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_ASIS);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_A);
-    sim.set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_NA);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_TM1);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_TM1_A);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_TM1_NA);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_ASIS);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_A);
+    global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_NA);
 
     // Invalid arguments
     // invalid sample definition
-    success = sim.model_simulate("2000U1", to);
+    success = global_simu->simulate("2000U1", to);
     EXPECT_FALSE(success);
     // invalid list of equations
-    success = sim.model_simulate(from, to, "$UNKNOWN_LIST");
+    success = global_simu->simulate(from, to, "$UNKNOWN_LIST");
     EXPECT_FALSE(success);
 
     // Test simulation: divergence
-    CSimulation::KSIM_MAXIT = 2;
-    success = sim.model_simulate(from, to);
+    global_simu->max_iter = 2;
+    success = global_simu->simulate(from, to);
     EXPECT_FALSE(success);
 
     // Check _PRE list after simulation (prolog)
@@ -88,8 +87,8 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_EQ(lsdivider_lineer, expected_lsdivider_lineer);
 
     // Test with with convergence (increase MAXIT)
-    CSimulation::KSIM_MAXIT = 100;
-    success = sim.model_simulate(from, to);
+    global_simu->max_iter = 100;
+    success = global_simu->simulate(from, to);
     EXPECT_TRUE(success);
 
     // Check result
@@ -104,9 +103,9 @@ TEST_F(SimulationTest, Simulation)
     global_ws_var->set_var("UY", "2001Y1", 670.0);
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
-    success = sim.model_exchange(endo_exo);
+    success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
-    success = sim.model_simulate(from, to);
+    success = global_simu->simulate(from, to);
     EXPECT_TRUE(success);
 
     // Check result
@@ -122,14 +121,14 @@ TEST_F(SimulationTest, CalculateSCC)
 
     // Invalid arguments
     // PRE list name empty
-    success = sim.model_calculate_SCC(10, "");
+    success = global_simu->calculate_SCC(10, "");
     EXPECT_FALSE(success);
     // invalid list of equations
-    success = sim.model_calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST");
+    success = global_simu->calculate_SCC(10, "_PRE", "_INTER", "_POST", "$UNKNOWN_LIST");
     EXPECT_FALSE(success);
 
     // SCC decomposition
-    success = sim.model_calculate_SCC(10);
+    success = global_simu->calculate_SCC(10);
     EXPECT_TRUE(success);
 
     std::string list_pre = global_ws_lst->get("_PRE");
@@ -165,19 +164,19 @@ TEST_F(SimulationTest, SimulateSCC)
 
     // Invalid arguments
     // invalid sample definition
-    success = sim.model_simulate_SCC("2000U1", to);
+    success = global_simu->simulate_SCC("2000U1", to);
     EXPECT_FALSE(success);
     // invalid pre-recursive list
-    success = sim.model_simulate_SCC(from, to, "UNKNOWN_LIST");
+    success = global_simu->simulate_SCC(from, to, "UNKNOWN_LIST");
     EXPECT_FALSE(success);
 
     // SCC decomposition
-    success = sim.model_calculate_SCC(10);
+    success = global_simu->calculate_SCC(10);
     EXPECT_TRUE(success);
 
     // SCC simulation
-    CSimulation::KSIM_MAXIT = 100;
-    success = sim.model_simulate_SCC(from, to);
+    global_simu->max_iter = 100;
+    success = global_simu->simulate_SCC(from, to);
     EXPECT_TRUE(success);
 
     // Check result
@@ -192,9 +191,9 @@ TEST_F(SimulationTest, SimulateSCC)
     global_ws_var->set_var("UY", "2001Y1", 670.0);
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
-    success = sim.model_exchange(endo_exo);
+    success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
-    success = sim.model_simulate_SCC(from, to);
+    success = global_simu->simulate_SCC(from, to);
     EXPECT_TRUE(success);
 
     // Check result

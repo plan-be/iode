@@ -8,7 +8,7 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_compute_model import Ui_MenuComputeModel
 
 import warnings
-from iode import IodeType, Simulation
+from iode import IodeType, simulation
 
 
 class MenuComputeModel(MixinSettingsDialog):
@@ -29,8 +29,7 @@ class MenuComputeModel(MixinSettingsDialog):
             equations_list: str = self.ui.textEdit_equations_list.toPlainText().strip()
 
             warnings.simplefilter("error")
-            simu = Simulation()
-            simu.model_compile(equations_list)         
+            simulation.model_compile(equations_list)         
             warnings.simplefilter("default")
 
             self.accept()

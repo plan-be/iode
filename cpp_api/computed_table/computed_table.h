@@ -53,6 +53,12 @@ struct ComputedTable
     std::vector<std::vector<double>> values;
 
 private:
+    int     newton_max_iter = 50;        // Newton-Raphson convergence threshold
+    double  newton_epsilon = 1e-6;       // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
+    double  newton_step = 1e-6;          // Newton-Raphson: save a trace of the sub-iterations
+
+
+private:
     /**
      * @warning to be called only by the constructors 
      */

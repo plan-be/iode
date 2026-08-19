@@ -4,9 +4,9 @@
  *  Functions to reorder a model to optimize the simulation algorithm. 
  *  
  *      1. Decomposes the model in 3 blocks:   
- *          - prolog (KSIM_PRE), 
- *          - interdep (KSIM_INTER)
- *          - epilog (KSIM_POST)
+ *          - prolog (nb_pre), 
+ *          - interdep (nb_inter)
+ *          - epilog (nb_post)
  *      2. "pseudo-triangulates" the interdep block, i.e. inverts the equation order 
  *         to optimize the incidence matrix (i.e.: minimizing the nb of 1 above the diagonal).
  *  
@@ -58,27 +58,27 @@ int CSimulation::add_post(std::vector<std::vector<int>>& successors, int i, int 
  *  
  *  Loops on the equations. 
  *  If all endogenous in an equation are already in a block, then put the equation in the next available 
- *  position in KSIM_ORDER and mark the equation as ordered (KSIM_ORDERED[i] = 1;
+ *  position in v_order and mark the equation as ordered (v_ordered[i] = 1;
  *  
  *  Method
  *  ------
  *       For each equation eq, loop on varj, the variables present in eq (stored in predecessors[i]):
- *			if varj == predecessors[i][j+1] or varj < 0 (exo) or KSIM_ORDERED[varj] == 1: 
+ *			if varj == predecessors[i][j+1] or varj < 0 (exo) or v_ordered[varj] == 1: 
  *               skip the equation
  *			else 
- *				KSIM_ORDERED[varj] = 1
- *				KSIM_ORDER[from + nb] = i
+ *				v_ordered[varj] = 1
+ *				v_order[from + nb] = i
  *	
- *       If no new equation had been set in KSIM_ORDER during the loop, end of the process (the block is completed)
+ *       If no new equation had been set in v_order during the loop, end of the process (the block is completed)
  *       Else restart the loop on the equations
  *  
  *  @param [in]         KDB*    dbe             KDB of equations
  *  @param [in]         int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
- *  @param [in]         int     from            first available place in KSIM_ORDER
+ *  @param [in]         int     from            first available place in v_order
  *  @return             int                     number of equations in the computed block
  *
- *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
- *  @global [in, out]   int*    KSIM_ORDERED    vector with 1 for the equations already placed in KSIM_ORDER
+ *  @global [in, out]   int*    v_order      vector containing the order of execution of the model (after reordering)
+ *  @global [in, out]   int*    v_ordered    vector with 1 for the equations already placed in v_order
  *  
  */
 int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int from)
@@ -94,10 +94,10 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
     {
         int j = 0;
         new_eq_added = false;
-        for(int i = 0; i < KSIM_DBE->size(); i++) 
+        for(int i = 0; i < sim_dbe->size(); i++) 
         {
             // Equation already ordered (i.e. in the PRE or POST list)
-            if(KSIM_ORDERED[i] == 1) 
+            if(v_ordered[i] == 1) 
                 continue;
             
             std::vector<int>& eq_predecessors = predecessors[i];
@@ -110,7 +110,7 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
                     if(eq_predecessors[j + 1] < 0) 
                         continue;
                     // Var[j+1] = already ordered
-                    if(KSIM_ORDERED[eq_predecessors[j + 1]] == 1) 
+                    if(v_ordered[eq_predecessors[j + 1]] == 1) 
                         continue;
                     // Var[j+1] non-exogenous and not ordered 
                     // -> equation cannot be added to the PRE or POST list 
@@ -122,8 +122,8 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
             if(predecessors[i].size() == 0 || j == nb_predecessors) 
             {
                 new_eq_added = true;
-                KSIM_ORDERED[i] = 1;
-                KSIM_ORDER[from + nb] = i;
+                v_ordered[i] = 1;
+                v_order[from + nb] = i;
                 nb++;
             }
         }
@@ -134,18 +134,18 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
 
 
 /**
- *  Builds the interdependent block and places the equation numbers at the end of KSIM_ORDER.
- *  The final execution order KSIM_ORDER is composed as follows:
+ *  Builds the interdependent block and places the equation numbers at the end of v_order.
+ *  The final execution order v_order is composed as follows:
  *  
- *      KSIM_PRE eqs
- *  	KSIM_POST eqs
- *  	KSIM_INTER eqs
+ *      nb_pre eqs
+ *  	nb_post eqs
+ *  	nb_inter eqs
  *    
  *  @param [in] KDB*    dbe             model   
  *  @param [in] int**   predecessors    vector of vectors containing the endogenous variables of each equation in dbe
  *  @return     int                     number of equations in the interdep block
  *
- *  @global [in, out]   int*    KSIM_ORDER      vector containing the order of execution of the model (after reordering)
+ *  @global [in, out]   int*    v_order      vector containing the order of execution of the model (after reordering)
  *  
  */
 int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors)
@@ -153,9 +153,9 @@ int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<i
     int nb = 0;
     for(int i = 0; i < dbe->size(); i++) 
     {
-        if(KSIM_ORDERED[i]) 
+        if(v_ordered[i]) 
             continue;
-        KSIM_ORDER[KSIM_PRE + KSIM_POST + nb] = i;
+        v_order[nb_pre + nb_post + nb] = i;
         nb++;
     }
     return nb;
@@ -171,7 +171,8 @@ int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<i
  */
 int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
-    SW_nfree(KSIM_ORDERED);
+    SW_nfree(v_ordered);
+    v_ordered = NULL;
     return 0;
 }
 
@@ -191,20 +192,20 @@ int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& 
  *  @param [in, out] int**   predecessors   vector of vectors of predecessors (1 vector for each eq (=endo))
  *  @param [in, out] int**   successors     vector of vectors of successors (1 vector for each endo)
  *
- *	@global [out]    char*   KSIM_ORDERED   allocated vector indicating which equations have already been placed in a block (pre, post, interdep).
+ *	@global [out]    char*   v_ordered   allocated vector indicating which equations have already been placed in a block (pre, post, interdep).
  *                                              -> Contains nb chars where nb is the number of equations in dbe. 
- *                                              -> Note that KSIM_ORDERED is not calculated in pre_order(), just allocated.
- *                                              -> KSIM_ORDERED[i] = 1 if equation i has already been put in a block (PRE...)
- *	@global [out]    int*    KSIM_ORDER     allocated vector containing the order of execution of the equations in the model.
+ *                                              -> Note that v_ordered is not calculated in pre_order(), just allocated.
+ *                                              -> v_ordered[i] = 1 if equation i has already been put in a block (PRE...)
+ *	@global [out]    int*    v_order     allocated vector containing the order of execution of the equations in the model.
  *                                              -> nb integers where nb is the number of equations in dbe (not calculated here)
- *                                              -> Note that KSIM_ORDER is not calculated here, only allocated 
+ *                                              -> Note that v_order is not calculated here, only allocated 
  *  
  */
 int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
     int nb = dbe->size();
-    KSIM_ORDER    = (int *)  SW_nalloc(sizeof(int) * nb);
-    KSIM_ORDERED  = (char *) SW_nalloc(sizeof(char) * nb);
+    v_order    = (int *)  SW_nalloc(sizeof(int) * nb);
+    v_ordered  = (char *) SW_nalloc(sizeof(char) * nb);
     
     int posj, eq_pos;
     int i = 0, j = 0;
@@ -229,7 +230,7 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
             // Recherche l'eq dont la variable j est endo
             posj = pos;
             
-            if(KSIM_POSXK[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
+            if(v_pos_endo_in_dbv[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
                 eq_pos = -1; // Endo de l'eq courante
             else 
             {
@@ -252,31 +253,31 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
 /**
  *  Reorders a model (i.e.: a list of equations) before the simulation to optimise the execution order of the set of equations.
  *  
- *  The prolog block consists of the first KSIM_PRE equations in KSIM_ORDER.
- *  The interdep block consists of the KSIM_INTER equations in KSIM_ORDER beginning at position KSIM_PRE + 1.
- *  The epilog block consists of the KSIM_EPILOG equations in KSIM_ORDER beginning at position KSIM_PRE + KSIM_INTER + 1.
+ *  The prolog block consists of the first nb_pre equations in v_order.
+ *  The interdep block consists of the nb_inter equations in v_order beginning at position nb_pre + 1.
+ *  The epilog block consists of the KSIM_EPILOG equations in v_order beginning at position nb_pre + nb_inter + 1.
  *  
- *  If KSIM_SORT == SORT_NONE:
- *      - no reordering is performed: KSIM_PRE = KSIM_POST = 0 and KSIM_INTER = nb
- *      - KSIM_ORDER = order defined by the positions of eqs in dbe
+ *  If sorting_algo == SORT_NONE:
+ *      - no reordering is performed: nb_pre = nb_post = 0 and nb_inter = nb
+ *      - v_order = order defined by the positions of eqs in dbe
  *  
- *  If KSIM_SORT == SORT_CONVEX or SORT_BOTH:
+ *  If sorting_algo == SORT_CONVEX or SORT_BOTH:
  *      - 3 blocks are created, based on predecessors and successors of each equation.
- *      - each block is defined by its size (KSIM_PRE, KSIM_POST and KSIM_INTER)
- *      - KSIM_ORDER contains the reordered equations: KSIM_PRE, then KSIM_INTER, then KSIM_POST
+ *      - each block is defined by its size (nb_pre, nb_post and nb_inter)
+ *      - v_order contains the reordered equations: nb_pre, then nb_inter, then nb_post
  *  
- *  If KSIM_SORT == SORT_BOTH:
+ *  If sorting_algo == SORT_BOTH:
  *      - after decomposing in 3 blocks, a reordering is made inside the interdep block to minimize the distance 
  *        between each equation and its explanatory variables (i.e. contained in the eq formula)
  *  
  *  @param [in] KDB*    dbe     KDB containing the equations defining the model
  *  @param [in] char**  eqs     list of equations to simulate
  *  
- *  @global [in]    int  KSIM_SORT   reordering algorithm (SORT_NONE, SORT_BOTH)
- *  @global [out]   int* KSIM_ORDER  positions in dbe of the equations (to simulate) in the execution order
- *  @global [out]   int  KSIM_PRE    number of equations in the "prolog" block 
- *  @global [out]   int  KSIM_INTER  number of equations in the "interdep" block
- *  @global [out]   int  KSIM_POST   number of equations in the "epilog"
+ *  @global [in]    int  sorting_algo   reordering algorithm (SORT_NONE, SORT_BOTH)
+ *  @global [out]   int* v_order  positions in dbe of the equations (to simulate) in the execution order
+ *  @global [out]   int  nb_pre    number of equations in the "prolog" block 
+ *  @global [out]   int  nb_inter  number of equations in the "interdep" block
+ *  @global [out]   int  nb_post   number of equations in the "epilog"
  *  
  */
 void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs)
@@ -284,23 +285,23 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     int  *tmp2, i, k;
     long cpu_order = 0; 
 
-    KSIM_CPU_SORT = 0;
-    KSIM_CPU_SCC = 0;
+    cpu_time_sorting = 0;
+    cpu_time_scc = 0;
 
     int nb = dbe->size();
     
     // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
-    if(KSIM_SORT == SORT_NONE) 
+    if(sorting_algo == SORT_NONE) 
     {
-        KSIM_PRE = KSIM_POST = 0;
-        KSIM_INTER = nb;
-        KSIM_ORDER = (int *) SW_nalloc(sizeof(int) * nb);
+        nb_pre = nb_post = 0;
+        nb_inter = nb;
+        v_order = (int *) SW_nalloc(sizeof(int) * nb);
         if(eqs.size() == 0)
-            for(i = 0; i < KSIM_INTER; i++) 
-                KSIM_ORDER[i] = i;
+            for(i = 0; i < nb_inter; i++) 
+                v_order[i] = i;
         else
-            for(i = 0; i < KSIM_INTER; i++) 
-                KSIM_ORDER[i] = dbe->index_of(eqs[i]);
+            for(i = 0; i < nb_inter; i++) 
+                v_order[i] = dbe->index_of(eqs[i]);
         return;
     }
 
@@ -313,38 +314,38 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     std::vector<std::vector<int>> predecessors(nb);
     std::vector<std::vector<int>> successors(nb);
     pre_order(dbe, predecessors, successors);
-    KSIM_PRE = build_pre_post_list(dbe, predecessors, 0);
-    KSIM_POST = build_pre_post_list(dbe, successors, KSIM_PRE);
+    nb_pre = build_pre_post_list(dbe, predecessors, 0);
+    nb_post = build_pre_post_list(dbe, successors, nb_pre);
 
     /* REVERSE FOR EXECUTION PURPOSE */
-    for(i = 0; i < KSIM_POST / 2; i++) 
+    for(i = 0; i < nb_post / 2; i++) 
     {
-        k = KSIM_ORDER[KSIM_PRE + i];
-        KSIM_ORDER[KSIM_PRE + i] = KSIM_ORDER[KSIM_PRE + (KSIM_POST - 1) - i];
-        KSIM_ORDER[KSIM_PRE + (KSIM_POST - 1) - i] = k;
+        k = v_order[nb_pre + i];
+        v_order[nb_pre + i] = v_order[nb_pre + (nb_post - 1) - i];
+        v_order[nb_pre + (nb_post - 1) - i] = k;
     }
 
-    KSIM_INTER = build_inter_list(dbe, predecessors);
+    nb_inter = build_inter_list(dbe, predecessors);
 
-    KSIM_CPU_SCC = WscrGetMS() - cpu_order;
+    cpu_time_scc = WscrGetMS() - cpu_order;
     kmsg("Calculating SCC... %ld ms -> #PRE %d - #INTER %d - #POST %d", 
-            KSIM_CPU_SCC, 
-            KSIM_PRE, 
-            KSIM_INTER, 
-            KSIM_POST);
+            cpu_time_scc, 
+            nb_pre, 
+            nb_inter, 
+            nb_post);
 
     /* A AMELIORER !! */
-    tmp2 = (int *) SW_nalloc(sizeof(int) * (KSIM_INTER + KSIM_POST));
-    memcpy(tmp2, KSIM_ORDER + KSIM_PRE, (KSIM_INTER + KSIM_POST) * sizeof(int));
-    memcpy(KSIM_ORDER + KSIM_PRE, tmp2 + KSIM_POST, KSIM_INTER * sizeof(int));
-    memcpy(KSIM_ORDER + KSIM_PRE + KSIM_INTER, tmp2, KSIM_POST * sizeof(int));
+    tmp2 = (int *) SW_nalloc(sizeof(int) * (nb_inter + nb_post));
+    memcpy(tmp2, v_order + nb_pre, (nb_inter + nb_post) * sizeof(int));
+    memcpy(v_order + nb_pre, tmp2 + nb_post, nb_inter * sizeof(int));
+    memcpy(v_order + nb_pre + nb_inter, tmp2, nb_post * sizeof(int));
     SW_nfree(tmp2);
 
-    if(KSIM_SORT == SORT_BOTH) 
+    if(sorting_algo == SORT_BOTH) 
     {
         kmsg("Reordering interdependent block...");
-        compute_tri(dbe, predecessors, KSIM_PASSES);
-        kmsg("Reordering interdependent block... %ld ms", KSIM_CPU_SORT);
+        compute_tri(dbe, predecessors, nb_passes);
+        kmsg("Reordering interdependent block... %ld ms", cpu_time_sorting);
     }
 
     post_order(dbe, predecessors, successors);
@@ -353,15 +354,15 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
 
 /**
  *  Tries to find the equation whose endogenous is the variable posendo. 
- *  Browses therefore the vector KSIM_POSXK which contains the (possibly modified) endogenous var positions 
+ *  Browses therefore the vector v_pos_endo_in_dbv which contains the (possibly modified) endogenous var positions 
  *  after the first endo-exo exchanges.
  *  
  *  @param  [in]    int     posendo   initial position of the endogenous variable
  *  @return         int               new position of that endo after the first endo-exo exchanges
- *                                    -1 if posendo is not found in KSIM_POSXK
+ *                                    -1 if posendo is not found in v_pos_endo_in_dbv
  *  
- *  @global [in]    int     KSIM_MAXDEPTH   nb of eqs dans the model (KSIM_DBE)
- *  @global [in]    int*    KSIM_POSXK      KSIM_POSXK[i] = position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
+ *  @global [in]    int     max_depth   nb of eqs dans the model (sim_dbe)
+ *  @global [in]    int*    v_pos_endo_in_dbv      v_pos_endo_in_dbv[i] = position in sim_dbv of the endo variable of equation "sim_dbe[i]"
  *  
  */
 int CSimulation::get_eq_position(int posendo)
@@ -369,11 +370,11 @@ int CSimulation::get_eq_position(int posendo)
     if(posendo < 0) 
         return -1;
     
-    if(posendo < KSIM_MAXDEPTH && KSIM_POSXK[posendo] == posendo) 
+    if(posendo < max_depth && v_pos_endo_in_dbv[posendo] == posendo) 
         return posendo;
 
-    // Recherche l'eq avec pour endogène posendo ie i tq posendo = KSIM_POSXK[i]
-    return KSIM_POSXK_REV[posendo]; 
+    // Recherche l'eq avec pour endogène posendo ie i tq posendo = v_pos_endo_in_dbv[i]
+    return v_pos_endo_in_dbe[posendo]; 
 }
 
 
@@ -381,55 +382,56 @@ int CSimulation::get_eq_position(int posendo)
  *  Initialise the pseudo-triangulation variables.
  *  
  *  @param [in]     KDB*    dbe         model   
- *  @global [out]   int*    KSIM_PERM   vector of equations permutations. Filled with -1 at start.
+ *  @global [out]   int*    v_permut   vector of equations permutations. Filled with -1 at start.
  *  
  */
 int CSimulation::compute_tri_begin(KDBEquationsPtr dbe)
 {
     int nb = dbe->size();
-    KSIM_PERM = (int *) SW_nalloc(sizeof(int) * nb);
+    v_permut = (int *) SW_nalloc(sizeof(int) * nb);
     
     for(int i = 0 ; i < nb ; i++) 
-        KSIM_PERM[i] = -1;
+        v_permut[i] = -1;
     
-    for(int i = 0 ; i < KSIM_INTER ; i++)
-        KSIM_PERM[KSIM_ORDER[KSIM_PRE + i]] = i;
+    for(int i = 0 ; i < nb_inter ; i++)
+        v_permut[v_order[nb_pre + i]] = i;
 
     return 0;
 }
 
 
 /**
- *  Saves int KSIM_ORDER the changes computed by the triangulation algorithm.
+ *  Saves int v_order the changes computed by the triangulation algorithm.
  *  
  *  @param [in]     KDB*    dbe         model   
- *  @global [out]   int*    KSIM_PERM   vector of equations permutations.
+ *  @global [out]   int*    v_permut   vector of equations permutations.
  *  
  */
 int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
 {
     for(int i = 0 ; i < dbe->size() ; i++)
-        if(KSIM_PERM[i] >= 0)
-            KSIM_ORDER[KSIM_PRE + KSIM_PERM[i]] = i;
+        if(v_permut[i] >= 0)
+            v_order[nb_pre + v_permut[i]] = i;
 
-    SW_nfree(KSIM_PERM);
+    SW_nfree(v_permut);
+    v_permut = NULL;
     return 0;
 }
 
 
 /**
  *  For each explanatory variable in equation  i, we look for the equation calculated the latest
- *  in the order of the model (after permutation as defined in the current state of KSIM_PERM).
+ *  in the order of the model (after permutation as defined in the current state of v_permut).
  *
  *    Let m be this position.
- *    If m < KSIM_PERM[i], ok, the explanatory var is caclulated before equation i => no change in KSIM_PERM
+ *    If m < v_permut[i], ok, the explanatory var is caclulated before equation i => no change in v_permut
  *    Otherwise, move everything forward from the current position of eqi to m and place eqi in place of m.
  *  
  *  @param [in]         KDB*    dbe     model   
  *  @param [in]         int     i       equation position in the dbe
  *  @param [in]         int*    vars    list of explanatory variables in equation i
  *
- *  @global [in, out]   int*    KSIM_PERM   vector of equations permutations. 
+ *  @global [in, out]   int*    v_permut   vector of equations permutations. 
  *  
  */
 void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& vars)
@@ -445,23 +447,23 @@ void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>
             continue;
 
         // position actuelle de l'eq j
-        posj = KSIM_PERM[vars[j]];
+        posj = v_permut[vars[j]];
 
         if(posj > m)
             m = posj;
     }
 
     // Si le numéro d'ordre max des eq dont dépend la courante est < numéro d'ordre de la courante : ok
-    int ksim_permi = KSIM_PERM[i];
+    int ksim_permi = v_permut[i];
     if(m < ksim_permi) 
         return;
 
     int nbe = dbe->size();
     for(int j = 0 ; j < nbe ; j++)
-        if(KSIM_PERM[j] > ksim_permi && KSIM_PERM[j] <= m)
-            KSIM_PERM[j]--;
+        if(v_permut[j] > ksim_permi && v_permut[j] <= m)
+            v_permut[j]--;
 
-    KSIM_PERM[i] = m;
+    v_permut[i] = m;
 }
 
 
@@ -474,7 +476,7 @@ void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>
  *  @param [in]         int**   predecessors    table of vectors, 1 vector per equation with the list explanatory variables  
  *  @param [in]         int     passes          how many times the heuristic algorithm must be run 
  *      
- *  @global [in, out]   int*    KSIM_PERM vector of equation positions after pseudo-triangulation
+ *  @global [in, out]   int*    v_permut vector of equation positions after pseudo-triangulation
  *  
  */
 void CSimulation::compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)
@@ -486,14 +488,14 @@ void CSimulation::compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>
     int var;
     for(int j = 0 ; j < passes ; j++) 
     {
-        for(int i = 0 ; i < KSIM_INTER ; i++) 
+        for(int i = 0 ; i < nb_inter ; i++) 
         {
-            var = KSIM_ORDER[KSIM_PRE + i];
+            var = v_order[nb_pre + i];
             compute_tri_perm1(dbe, var, predecessors[var]);
         }
     }
 
     compute_tri_end(dbe);
     
-    KSIM_CPU_SORT = WscrGetMS() - cpu_sort;
+    cpu_time_sorting = WscrGetMS() - cpu_sort;
 }

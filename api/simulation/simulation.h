@@ -44,176 +44,223 @@ const static std::vector<std::string> v_simulation_initialization
 class CSimulation
 {
 public:
-	static double  KSIM_EPS;          	// Model simulation convergence threshold
-	static double  KSIM_RELAX;        	// Model relaxation parameter ("damping")
-	static int     KSIM_MAXIT;     		// Maximum number of iteration to reach a solution
-	static int     KSIM_DEBUG;        	// Simulation: if not null : save 3 list _PRE, _INTER and _POST
-	static int     KSIM_PASSES;       	// Simulation: number of passes for the heuristic triangulation algorithm
-	static int     KSIM_SORT;         	// Simulation: reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
-	static int     KSIM_START;        	// Simulation: endogenous initial values
-	
-	static double  KSIM_NEWTON_EPS;    	// Newton-Raphson convergence threshold
-	static double  KSIM_NEWTON_STEP;   	// Newton-Raphson step to calculate the local derivative (f(x+h) - f(x)) / h
-	static int     KSIM_NEWTON_MAXIT; 	// Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
-	static int     KSIM_NEWTON_DEBUG; 	// Newton-Raphson: save a trace of the sub-iterations
-	
-	static char**  KSIM_EXO;
-	static char*   KSIM_PATH;
-	static double* KSIM_NORMS;     		// Convergence threshold reached at the end of each simulation period
-	static int*    KSIM_NITERS;    		// Numbers of iterations needed for each simulation period
-	static long*   KSIM_CPUS;      		// Elapsed time for each simulation period
-	static int     KSIM_CPU_SCC;   		// Elapsed time to compute SCC
-	static int     KSIM_CPU_SORT;  		// Elapsed time to sort interdep block
+	double  epsilon;          	    // Model simulation convergence threshold
+	double  relax;        	        // Model relaxation parameter ("damping")
+	int     max_iter;               // Maximum number of iteration to reach a solution
+	int     debug;        	        // if not null : save 3 list _PRE, _INTER and _POST
+	int     nb_passes;       	    // number of passes for the heuristic triangulation algorithm
+	int     sorting_algo;           // reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
+	int     init_algo;              // endogenous initial values
+		
+	char*   path;
+	char**  v_endo_exo;             // Allow exchange exogenous <-> endogenous roles in equations
+	double* v_norm;     		    // Convergence threshold reached at the end of each simulation period
+	int*    v_nb_iterations;        // Numbers of iterations needed for each simulation period
+	long*   v_cpu_time;      	    // Elapsed time for each simulation period
+	int     cpu_time_scc;           // Elapsed time to compute SCC
+	int     cpu_time_sorting;       // Elapsed time to sort interdep block
+
+    double  newton_epsilon;         // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
+    double  newton_step;            // Newton-Raphson: save a trace of the sub-iterations
+    int     newton_max_iter;        // Newton-Raphson convergence threshold
 
 protected:
-	KDBVariablesPtr  KSIM_DBV;         	// KDB of variables used for the simulation. Normally global_ws_var
-	KDBScalarsPtr    KSIM_DBS;         	// KDB of scalars used for the simulation. Normally global_ws_scl
-	KDBEquationsPtr  KSIM_DBE; 	// KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
+	KDBVariablesPtr  sim_dbv;       // KDB of variables used for the simulation. Normally global_ws_var
+	KDBScalarsPtr    sim_dbs;       // KDB of scalars used for the simulation. Normally global_ws_scl
+	KDBEquationsPtr  sim_dbe; 	    // KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
-	double  KSIM_NORM;              	// Error measure: maximum difference between 2 iterations 
+	double  norm = 0.0;             // Error measure: maximum difference between 2 iterations 
 
 	// EQUATION ORDERING
-	int  	KSIM_PRE;               	// number of equations in the "prolog" block
-	int  	KSIM_INTER;             	// number of equations in the "interdep" block
-	int  	KSIM_POST;              	// number of equations in the "epilog"
-	int*    KSIM_ORDER;             	// position in dbe of the equations (to simulate) in the execution order.
-	int  	KSIM_MAXDEPTH;          	// Number of equations in the model
-	int*    KSIM_POSXK;             	// Position in KSIM_DBV of the endo variable of equation "KSIM_DBE[i]"
-	int*    KSIM_POSXK_REV;         	// Position in KSIM_DBE of the equation whose endo is "KSIM_DBV[i]" (reverse of KSIM_POSXK)
+	int  	nb_pre = 0;             // number of equations in the "prolog" block
+	int  	nb_inter = 0;           // number of equations in the "interdep" block
+	int  	nb_post = 0;            // number of equations in the "epilog"
+	int*    v_order;                // position in dbe of the equations (to simulate) in the execution order.
+	int  	max_depth = 0;          // Number of equations in the model
+	int*    v_pos_endo_in_dbv;      // Position in sim_dbv of the endo variable of equation "sim_dbe[i]"
+	int*    v_pos_endo_in_dbe;      // Position in sim_dbe of the equation whose endo is "sim_dbv[i]" (reverse of v_pos_endo_in_dbv)
 
-	double* KSIM_XK;                	// Values of the endogenous variables (in the interdep block) at the end of the previous iteration 
-	double* KSIM_XK1;               	// Values of the endogenous variables (in the interdep block) during the current iteration
+	double* v_endo_values;          // Values of the endogenous variables (in the interdep block) at the end of the previous iteration               	
+	double* v_endo_values_1;        // Values of the endogenous variables (in the interdep block) during the current iteration
 
 private:
-  	int*	KSIM_PERM;      			// vector of permutation 
-  	char*	KSIM_ORDERED;   			// indicates if equation i is already in a block
+  	int*	v_permut;      	        // vector of permutation 
+  	char*	v_ordered;   	        // indicates if equation i is already in a block
+
+private:
+    void clear()
+    {
+        norm = 0.0;
+        nb_pre = 0;     
+        nb_inter = 0;   
+        nb_post = 0;        
+        max_depth = 0;  
+        cpu_time_scc = 0;    
+        cpu_time_sorting = 0;
+
+        if(path != NULL) SW_nfree(path);
+        if(v_endo_exo != NULL) SW_nfree(v_endo_exo);
+        if(v_endo_values != NULL) SW_nfree(v_endo_values);
+        if(v_endo_values_1 != NULL) SW_nfree(v_endo_values_1);	
+        if(v_pos_endo_in_dbv != NULL) SW_nfree(v_pos_endo_in_dbv);
+        if(v_pos_endo_in_dbe != NULL) SW_nfree(v_pos_endo_in_dbe);
+        if(v_order != NULL) SW_nfree(v_order);
+        if(v_permut != NULL) SW_nfree(v_permut);
+        if(v_ordered != NULL) SW_nfree(v_ordered);
+
+        path = NULL;
+        v_endo_exo = NULL;
+        v_endo_values = NULL;
+        v_endo_values_1 = NULL;
+        v_pos_endo_in_dbe = NULL;
+        v_pos_endo_in_dbv = NULL;
+        v_order = NULL;
+        v_permut = NULL;
+        v_ordered = NULL;	
+    }
+
+    // Constructors are private - use Create() factory method instead
+    // global or standalone database
+    CSimulation()
+    {   
+        path = NULL;
+        v_norm = NULL;
+        v_endo_exo = NULL;
+        v_nb_iterations = NULL;	
+        v_endo_values = NULL;
+        v_endo_values_1 = NULL;
+        v_pos_endo_in_dbe = NULL;
+        v_pos_endo_in_dbv = NULL;
+        v_order = NULL;
+        v_permut = NULL;
+        v_ordered = NULL;	
+        v_cpu_time = NULL;
+
+        reset();
+    }
 
 public:
-	CSimulation()
-	{
-		KSIM_PATH = NULL;
-		KSIM_XK = NULL;
-		KSIM_XK1 = NULL;
-		KSIM_POSXK = NULL;
-		KSIM_POSXK_REV = NULL;
-		KSIM_ORDER = NULL;	
-	}
+    /**
+     * Factory method to create a managed instance with std::shared_ptr
+     * 
+     * Usage: auto simu = CSimulation::Create();
+     * 
+     * @return std::shared_ptr<CSimulation> pointing to the newly created instance
+     */
+    static std::shared_ptr<CSimulation> Create()
+    {
+        return std::shared_ptr<CSimulation>(new CSimulation());
+    }
 
 	~CSimulation()
 	{
-		clear();
+		reset();
+
+        // WARNING: reset v_norm, v_nb_iterations and v_cpu_time here and 
+        //          NOT in reset() because they are used for reporting after 
+        //          the end of the simulation and should not be reset before that.
+        SCR_free(v_norm);
+        SCR_free(v_nb_iterations);
+        SCR_free(v_cpu_time);
+
+        v_norm = NULL;
+        v_nb_iterations = NULL;
+        v_cpu_time = NULL;
 	}
 
+    void reset()
+    {
+        clear();
+
+        epsilon = 0.001;
+        relax = 1.0;
+        max_iter = 100;
+        debug = 0;
+        nb_passes = 5;
+        sorting_algo = SORT_BOTH;
+        init_algo = VAR_INIT_TM1;
+
+        newton_debug = 0;
+        newton_epsilon = 1e-6; 
+        newton_step = 1e-6;    
+        newton_max_iter = 50;   
+    }
+
     // ==== GETTER AND SETTER ====
-    double get_convergence_threshold()
-    {
-        return KSIM_EPS;
-    }
-
-    void set_convergence_threshold(double threshold)
-    {
-        KSIM_EPS = threshold;
-    }
-
-    double get_relax()
-    {
-        return KSIM_RELAX;
-    }
-
-    void set_relax(double relax)
-    {
-        KSIM_RELAX = relax;
-    }
-
-    int get_max_nb_iterations()
-    {
-        return KSIM_MAXIT;
-    }
-
-    void set_max_nb_iterations(int nb_iterations)
-    {
-        KSIM_MAXIT = nb_iterations;
-    }
-
-    int get_max_nb_iterations_newton()
-    {
-        return KSIM_NEWTON_MAXIT;
-    }
-
-    void set_max_nb_iterations_newton(int nb_iterations)
-    {
-        KSIM_NEWTON_MAXIT = nb_iterations;
-    }
 
     SimuSortAlgorithm get_sort_algorithm()
     {
-        return (SimuSortAlgorithm) KSIM_SORT;
+        return (SimuSortAlgorithm) sorting_algo;
     }
 
     std::string get_sort_algorithm_as_string()
     {
-        return v_simulation_sort_algorithm[KSIM_SORT];
+        return v_simulation_sort_algorithm[sorting_algo];
     }
 
     void set_sort(SimuSortAlgorithm sort_algorithm)
     {
-        KSIM_SORT = sort_algorithm;
+        sorting_algo = sort_algorithm;
     }
 
     VariablesInitialization get_initialization_method()
     {
-        return (VariablesInitialization) KSIM_START;
+        return (VariablesInitialization) init_algo;
     }
 
     std::string get_initialization_method_as_string()
     {
-        return v_simulation_initialization[KSIM_START];
+        return v_simulation_initialization[init_algo];
     }
 
     void set_initialization_method(VariablesInitialization method)
     {
-        KSIM_START = method;
+        init_algo = method;
     }
 
     bool is_debug_active()
     {
-        return (bool) KSIM_DEBUG;
+        return debug > 0;
     }
 
     void set_debug(bool debug)
     {
-        KSIM_DEBUG = (int) debug;
+        this->debug = debug ? 1 : 0;
     }
 
     bool is_debug_newton_active()
     {
-        return (bool) KSIM_NEWTON_DEBUG;
+        return newton_debug > 0;
     }
 
     void set_debug_newton(bool debug)
     {
-        KSIM_NEWTON_DEBUG = (int) debug;
+        newton_debug = debug ? 1 : 0;
     }
 
-    // Number of passes for the heuristic triangulation algorithm
-    int get_nb_passes()
-    {
-        return KSIM_PASSES;
-    }
-
-    void set_nb_passes(int nb_passes)
-    {
-        KSIM_PASSES = nb_passes;
-    }
+    // ==== MODEL SIMULATION ====
 
 	/* k_sim_main.c */
-	int simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
-		char** endo_exo, const std::vector<std::string>& eqs = std::vector<std::string>());
+    bool exchange(const std::string& list_exo = "");
+
+    bool compile(const std::string& list_eqs = "");
+
+	bool simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
+		const std::vector<std::string>& eqs = std::vector<std::string>());
+
+    bool simulate(const std::string& from, const std::string& to, const std::string& list_eqs = "");
 
 	/* k_sim_scc.c */
-	int calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post);
-	int simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
-		             char** pre, char** inter, char** post);
+	bool calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post);
+
+    bool calculate_SCC(const int nb_iterations, const std::string& pre_name = "_PRE", const std::string& inter_name = "_INTER", 
+        const std::string& post_name = "_POST", const std::string& list_eqs = "");
+
+    bool simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
+            char** pre, char** inter, char** post);
+
+    bool simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name = "_PRE", 
+        const std::string& inter_name = "_INTER", const std::string& post_name = "_POST");
 
 protected:
 	/* k_sim_main.c */
@@ -231,21 +278,21 @@ protected:
 	///< Name of the endogenous of equation i (possibly after endo-exo)
 	std::string KSIM_NAME(const int i) const
 	{
-		return KSIM_DBV->get_name(KSIM_POSXK[i]);
+		return sim_dbv->get_name(v_pos_endo_in_dbv[i]);
 	}
 
 	///< get value of endo[i] in period nb t
 	double KSIM_VAL(const int i, const int t) const
 	{
-		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
-		return KSIM_DBV->get_value(name, t);
+		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
+		return sim_dbv->get_value(name, t);
 	}
 
 	///< set value of endo[i] in period nb t
 	void KSIM_SET_VAL(const int i, const int t, const double value)
 	{
-		std::string name = KSIM_DBV->get_name(KSIM_POSXK[i]);
-		*KSIM_DBV->get_var_ptr(name, t) = value;
+		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
+		*sim_dbv->get_var_ptr(name, t) = value;
 	}
 
     std::vector<std::string> eqs_to_vector(const std::string& list_eqs)
@@ -262,11 +309,11 @@ protected:
         }
 
         std::string eq_name;
-        v_eqs.reserve(KSIM_DBE->size());
+        v_eqs.reserve(sim_dbe->size());
         for(int i = 0; c_eqs[i] != NULL; i++)
         {
             eq_name = std::string(c_eqs[i]);
-            if(!KSIM_DBE->contains(eq_name))
+            if(!sim_dbe->contains(eq_name))
             {
                 std::string error_msg = "Equation '" + eq_name + "' not found in the model\n";
                 throw std::invalid_argument(error_msg);
@@ -278,23 +325,6 @@ protected:
     }
 
 private:
-	void clear()
-	{
-		SW_nfree(KSIM_XK);
-		SW_nfree(KSIM_XK1);
-		SW_nfree(KSIM_POSXK);
-		SW_nfree(KSIM_POSXK_REV);
-		SW_nfree(KSIM_ORDER);
-		SW_nfree(KSIM_PATH);
-
-		KSIM_PATH = NULL;
-		KSIM_XK = NULL;
-		KSIM_XK1 = NULL;
-		KSIM_POSXK = NULL;
-		KSIM_POSXK_REV = NULL;
-		KSIM_ORDER = NULL;	
-	}
-
 	/* k_sim_main.c */
 	void init_values(int t);
 	void restore_XK(int t);
@@ -321,5 +351,14 @@ private:
 	int find_path(int posendo, int posexo, int* depth);
 
 	/* k_sim_scc.c */
-	int simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl);
+	bool simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl);
 };
+
+/*----------------------- GLOBALS ----------------------------*/
+
+using SimulationPtr = std::shared_ptr<CSimulation>;
+
+// global shared pointer containing an instance of the CSimulation class
+// shared_ptr -> automatic memory management
+//            -> no need to delete KDB workspaces manually
+inline SimulationPtr global_simu = CSimulation::Create();

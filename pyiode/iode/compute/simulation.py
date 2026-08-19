@@ -6,7 +6,7 @@ from typing import List, Union, Self
 from iode.util import skip_message
 from iode.time.period import Period
 from iode.iode_cython import SimulationSort, SimulationInitialization
-from iode.iode_cython import Simulation as CythonSimulation
+from iode.iode_cython import CythonSimulation
 
 
 class Simulation:
@@ -114,7 +114,7 @@ class Simulation:
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables 
-    >>> from iode import Simulation
+    >>> from iode import simulation
     >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
     Loading .../fun.eqs
     274 objects loaded 
@@ -125,8 +125,9 @@ class Simulation:
     Loading .../fun.var
     394 objects loaded
 
-    >>> simu = Simulation()
-    >>> simu
+    >>> # reset to default values for the simulation parameters
+    >>> simulation.reset()  
+    >>> simulation
     Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
                sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
                False, nb_passes = 5, debug_newton = False)
@@ -134,6 +135,13 @@ class Simulation:
     def __init__(self, convergence_threshold: float=0.001, relax: float=1.0, max_nb_iterations: int=100, 
                   sort_algorithm: Union[SimulationSort, str]=SimulationSort.BOTH, initialization_method: Union[SimulationInitialization, str]=SimulationInitialization.TM1, 
                   debug: bool=False, nb_passes: int=5, debug_newton: bool=False):
+        warnings.warn(
+            "Constructor of Simulation is deprecated and will be removed in a future release.\n"
+            "Use the global variable 'simulation' instead.\n"
+            "To change the simulation parameters, use the method 'simulation.set_parameters'.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self._cy_simulation = CythonSimulation()
         self.convergence_threshold = convergence_threshold
         self.relax = relax
@@ -143,6 +151,153 @@ class Simulation:
         self.debug = debug
         self.nb_passes = nb_passes
         self.debug_newton = debug_newton
+
+    @classmethod
+    def get_instance(cls) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_simulation = CythonSimulation()
+        return instance
+
+    @classmethod
+    def from_cython_obj(cls, obj: CythonSimulation) -> Self:
+        instance = cls.__new__(cls)
+        instance._cy_simulation = obj
+        return instance
+
+    def set_parameters(self, convergence_threshold: float=0.001, relax: float=1.0, max_nb_iterations: int=100, 
+                       sort_algorithm: Union[SimulationSort, str]=SimulationSort.BOTH, initialization_method: Union[SimulationInitialization, str]=SimulationInitialization.TM1, 
+                       debug: bool=False, nb_passes: int=5, debug_newton: bool=False):
+        r"""
+        Update the parameters of the simulation.
+
+        Parameters
+        ----------
+        convergence_threshold: float
+            Convergence threshold below which the simulation results are considered enough close 
+            to the true solution for the current period. 
+            Default to 0.001.
+        relax: float
+            Relaxation parameter ("damping").
+            Its value must be in the range [0.1, 1.0].
+            Default to 1.0
+        max_nb_iterations: int
+            Maximum number of iterations to reach a solution. If, after the specified maximum number 
+            of iterations, the model has not converged, the process stops with an error message. 
+            This parameter prevents the process from looping indefinitely.  
+            Default to 100.
+        sort_algorithm: SimulationSort
+            Sorting algorithm used to reorganized the list of equations *before* the simulation is performed.
+            This reorganization can be usefully to to speed up the simulation.
+            Possible values are:
+                - NONE: do not use any sorting algorithm
+                - CONNEX: use the *Strongly Connected Component (SCC)* method only
+                - BOTH: use both the *SCC* and the *Pseudo-triangulation* methods
+            Default to BOTH.
+        initialization_method: SimulationInitialization
+            At the start of each period to be simulated, a starting value must be chosen for each endogenous variable. 
+            Possible values are:
+                - TM1: :math:`Y := Y[-1], if Y null or NA`
+                - TM1_A: :math:`Y := Y[-1], always`
+                - EXTRA: :math:`Y := extrapolation, if Y null or NA`
+                - EXTRA_A: :math:`Y := extrapolation, always`
+                - ASIS: :math:`Y unchanged`
+                - TM1_NA: :math:`Y := Y[-1], if Y = NA`
+                - EXTRA_NA: :math:`Y := extrapolation, if Y = NA`
+            Default to TM1.
+        debug: bool
+            Option to automatically generates IODE lists containing pre- and post-recursive equations: 
+            `_PRE`, `_INTER` and `_POST`.
+            Default to False.
+        nb_passes: int
+            Number of passes to make when the pseudo-triangulation sorting algorithm is used.
+            Default to 5.
+        debug_newton: bool
+            Save a trace of the sub-iterations when the Newton-Raphson algorithm is used.
+            Default to False.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables 
+        >>> from iode import simulation
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+
+        >>> simulation.reset()                                          
+        >>> simulation                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
+                sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
+                False, nb_passes = 5, debug_newton = False)
+
+        >>> simulation.set_parameters(convergence_threshold=1e-6, relax=0.9, max_nb_iterations=200, 
+        ...     sort_algorithm=SimulationSort.CONNEX, initialization_method=SimulationInitialization.EXTRA, 
+        ...     debug=True, nb_passes=10, debug_newton=True)
+        >>> simulation                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 1e-06, relax = 0.9, max_nb_iterations = 200,
+                sort_algorithm = 'CONNEX', initialization_method = 'EXTRA', debug =
+                True, nb_passes = 10, debug_newton = True)
+        
+        >>> # No arguments -> reset to default values
+        >>> simulation.set_parameters()
+        >>> simulation                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
+                sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
+                False, nb_passes = 5, debug_newton = False)
+        """
+        self.convergence_threshold = convergence_threshold
+        self.relax = relax
+        self.max_nb_iterations = max_nb_iterations
+        self.sort_algorithm = sort_algorithm
+        self.initialization_method = initialization_method
+        self.debug = debug
+        self.nb_passes = nb_passes
+        self.debug_newton = debug_newton
+
+    def reset(self):
+        r"""
+        Reset the simulation parameters to their default values.
+        Delete all pairs of endogenous-exogenous variables set for goal seeking.
+
+        Examples
+        --------
+        >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables 
+        >>> from iode import simulation
+        >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.eqs
+        274 objects loaded 
+        >>> scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.scl
+        161 objects loaded 
+        >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Loading .../fun.var
+        394 objects loaded
+
+        >>> simulation.set_parameters(convergence_threshold=1e-6, relax=0.9, max_nb_iterations=200, 
+        ...     sort_algorithm=SimulationSort.CONNEX, initialization_method=SimulationInitialization.EXTRA, 
+        ...     debug=True, nb_passes=10, debug_newton=True)
+        >>> simulation                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 1e-06, relax = 0.9, max_nb_iterations = 200,
+                sort_algorithm = 'CONNEX', initialization_method = 'EXTRA', debug =
+                True, nb_passes = 10, debug_newton = True)
+
+        >>> simulation.model_exchange("UY-XNATY")
+        True
+        
+        >>> # 1) reset all parameters to default values
+        >>> # 2) delete all pairs of endogenous-exogenous variables set for goal seeking
+        >>> simulation.reset()
+        >>> simulation                                          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
+                sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
+                False, nb_passes = 5, debug_newton = False)
+        """
+        self._cy_simulation.reset()
 
     @property
     def convergence_threshold(self) -> float:
@@ -162,12 +317,13 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
-        >>> simu.convergence_threshold
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
+        >>> simulation.convergence_threshold
         0.001
-        >>> simu.convergence_threshold = 1e-6
-        >>> simu.convergence_threshold
+        >>> simulation.convergence_threshold = 1e-6
+        >>> simulation.convergence_threshold
         1e-06
         """
         return self._cy_simulation.get_convergence_threshold()
@@ -208,12 +364,13 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
-        >>> simu.relax
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
+        >>> simulation.relax
         1.0
-        >>> simu.relax = 0.9
-        >>> simu.relax
+        >>> simulation.relax = 0.9
+        >>> simulation.relax
         0.9
         """
         return self._cy_simulation.get_relax()
@@ -239,13 +396,14 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.max_nb_iterations
+        >>> simulation.max_nb_iterations
         100
-        >>> simu.max_nb_iterations = 1000
-        >>> simu.max_nb_iterations
+        >>> simulation.max_nb_iterations = 1000
+        >>> simulation.max_nb_iterations
         1000
         """
         return self._cy_simulation.get_max_nb_iterations()
@@ -268,13 +426,14 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.max_nb_iterations_newton
+        >>> simulation.max_nb_iterations_newton
         50
-        >>> simu.max_nb_iterations_newton = 100
-        >>> simu.max_nb_iterations_newton
+        >>> simulation.max_nb_iterations_newton = 100
+        >>> simulation.max_nb_iterations_newton
         100
         """
         return self._cy_simulation.get_max_nb_iterations_newton()
@@ -339,31 +498,32 @@ class Simulation:
 
         Examples
         -------- 
-        >>> from iode import Simulation, SimulationSort
-        >>> simu = Simulation()
+        >>> from iode import simulation, SimulationSort
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm
         'BOTH'
 
-        >>> simu.sort_algorithm = "none"
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = "none"
+        >>> simulation.sort_algorithm
         'NONE'
-        >>> simu.sort_algorithm = SimulationSort.NONE
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = SimulationSort.NONE
+        >>> simulation.sort_algorithm
         'NONE'
 
-        >>> simu.sort_algorithm = "connex"
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = "connex"
+        >>> simulation.sort_algorithm
         'CONNEX'
-        >>> simu.sort_algorithm = SimulationSort.CONNEX
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = SimulationSort.CONNEX
+        >>> simulation.sort_algorithm
         'CONNEX'
 
-        >>> simu.sort_algorithm = "both"
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = "both"
+        >>> simulation.sort_algorithm
         'BOTH'
-        >>> simu.sort_algorithm = SimulationSort.BOTH
-        >>> simu.sort_algorithm
+        >>> simulation.sort_algorithm = SimulationSort.BOTH
+        >>> simulation.sort_algorithm
         'BOTH'
         """
         return self._cy_simulation.get_sort_algorithm()
@@ -376,31 +536,32 @@ class Simulation:
 
         Examples
         -------- 
-        >>> from iode import Simulation, SimulationSort
-        >>> simu = Simulation()
+        >>> from iode import simulation, SimulationSort
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm_long
         'BOTH (Connex compon. + Triangulation)'
 
-        >>> simu.sort_algorithm = "none"
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = "none"
+        >>> simulation.sort_algorithm_long
         'NONE (None)'
-        >>> simu.sort_algorithm = SimulationSort.NONE
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = SimulationSort.NONE
+        >>> simulation.sort_algorithm_long
         'NONE (None)'
 
-        >>> simu.sort_algorithm = "connex"
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = "connex"
+        >>> simulation.sort_algorithm_long
         'CONNEX (Connex compon. decomposition)'
-        >>> simu.sort_algorithm = SimulationSort.CONNEX
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = SimulationSort.CONNEX
+        >>> simulation.sort_algorithm_long
         'CONNEX (Connex compon. decomposition)'
 
-        >>> simu.sort_algorithm = "both"
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = "both"
+        >>> simulation.sort_algorithm_long
         'BOTH (Connex compon. + Triangulation)'
-        >>> simu.sort_algorithm = SimulationSort.BOTH
-        >>> simu.sort_algorithm_long
+        >>> simulation.sort_algorithm = SimulationSort.BOTH
+        >>> simulation.sort_algorithm_long
         'BOTH (Connex compon. + Triangulation)'
         """
         return self._cy_simulation.get_sort_algorithm_long()
@@ -448,59 +609,60 @@ class Simulation:
 
         Examples
         -------- 
-        >>> from iode import Simulation, SimulationInitialization
-        >>> simu = Simulation()
+        >>> from iode import simulation, SimulationInitialization
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.initialization_method
+        >>> simulation.initialization_method
         'TM1'
 
-        >>> simu.initialization_method = "TM1"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "TM1"
+        >>> simulation.initialization_method
         'TM1'
-        >>> simu.initialization_method = SimulationInitialization.TM1
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.TM1
+        >>> simulation.initialization_method
         'TM1'
 
-        >>> simu.initialization_method = "TM1_A"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "TM1_A"
+        >>> simulation.initialization_method
         'TM1_A'
-        >>> simu.initialization_method = SimulationInitialization.TM1_A
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.TM1_A
+        >>> simulation.initialization_method
         'TM1_A'
 
-        >>> simu.initialization_method = "EXTRA"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "EXTRA"
+        >>> simulation.initialization_method
         'EXTRA'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA
+        >>> simulation.initialization_method
         'EXTRA'
 
-        >>> simu.initialization_method = "EXTRA_A"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "EXTRA_A"
+        >>> simulation.initialization_method
         'EXTRA_A'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA_A
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA_A
+        >>> simulation.initialization_method
         'EXTRA_A'
 
-        >>> simu.initialization_method = "ASIS"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "ASIS"
+        >>> simulation.initialization_method
         'ASIS'
-        >>> simu.initialization_method = SimulationInitialization.ASIS
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.ASIS
+        >>> simulation.initialization_method
         'ASIS'
 
-        >>> simu.initialization_method = "TM1_NA"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "TM1_NA"
+        >>> simulation.initialization_method
         'TM1_NA'
-        >>> simu.initialization_method = SimulationInitialization.TM1_NA
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.TM1_NA
+        >>> simulation.initialization_method
         'TM1_NA'
 
-        >>> simu.initialization_method = "EXTRA_NA"
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = "EXTRA_NA"
+        >>> simulation.initialization_method
         'EXTRA_NA'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA_NA
-        >>> simu.initialization_method
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA_NA
+        >>> simulation.initialization_method
         'EXTRA_NA'
         """
         return self._cy_simulation.get_initialization_method()
@@ -513,59 +675,60 @@ class Simulation:
 
         Examples
         -------- 
-        >>> from iode import Simulation, SimulationInitialization
-        >>> simu = Simulation()
+        >>> from iode import simulation, SimulationInitialization
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method_long
         'TM1 (Y := Y[-1], if Y null or NA)'
 
-        >>> simu.initialization_method = "TM1"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "TM1"
+        >>> simulation.initialization_method_long
         'TM1 (Y := Y[-1], if Y null or NA)'
-        >>> simu.initialization_method = SimulationInitialization.TM1
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.TM1
+        >>> simulation.initialization_method_long
         'TM1 (Y := Y[-1], if Y null or NA)'
 
-        >>> simu.initialization_method = "TM1_A"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "TM1_A"
+        >>> simulation.initialization_method_long
         'TM1_A (Y := Y[-1], always)'
-        >>> simu.initialization_method = SimulationInitialization.TM1_A
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.TM1_A
+        >>> simulation.initialization_method_long
         'TM1_A (Y := Y[-1], always)'
 
-        >>> simu.initialization_method = "EXTRA"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "EXTRA"
+        >>> simulation.initialization_method_long
         'EXTRA (Y := extrapolation, if Y null or NA)'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA
+        >>> simulation.initialization_method_long
         'EXTRA (Y := extrapolation, if Y null or NA)'
 
-        >>> simu.initialization_method = "EXTRA_A"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "EXTRA_A"
+        >>> simulation.initialization_method_long
         'EXTRA_A (Y := extrapolation, always)'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA_A
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA_A
+        >>> simulation.initialization_method_long
         'EXTRA_A (Y := extrapolation, always)'
 
-        >>> simu.initialization_method = "ASIS"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "ASIS"
+        >>> simulation.initialization_method_long
         'ASIS (Y unchanged)'
-        >>> simu.initialization_method = SimulationInitialization.ASIS
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.ASIS
+        >>> simulation.initialization_method_long
         'ASIS (Y unchanged)'
 
-        >>> simu.initialization_method = "TM1_NA"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "TM1_NA"
+        >>> simulation.initialization_method_long
         'TM1_NA (Y := Y[-1], if Y = NA)'
-        >>> simu.initialization_method = SimulationInitialization.TM1_NA
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.TM1_NA
+        >>> simulation.initialization_method_long
         'TM1_NA (Y := Y[-1], if Y = NA)'
 
-        >>> simu.initialization_method = "EXTRA_NA"
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = "EXTRA_NA"
+        >>> simulation.initialization_method_long
         'EXTRA_NA (Y := extrapolation, if Y = NA)'
-        >>> simu.initialization_method = SimulationInitialization.EXTRA_NA
-        >>> simu.initialization_method_long
+        >>> simulation.initialization_method = SimulationInitialization.EXTRA_NA
+        >>> simulation.initialization_method_long
         'EXTRA_NA (Y := extrapolation, if Y = NA)'
         """
         return self._cy_simulation.get_initialization_method_long()
@@ -596,7 +759,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -609,12 +772,15 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
+        
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
 
-        >>> simu = Simulation()
         >>> # force IODE to create the three list _PRE, _INTER and _POST 
         >>> # when the method model_simulate is called 
-        >>> simu.debug = True
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> simulation.debug = True
+
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -661,10 +827,11 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.debug_newton
+        >>> simulation.debug_newton
         False
         """
         return self._cy_simulation.get_debug_newton()
@@ -689,13 +856,14 @@ class Simulation:
         
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()  
         >>> # default value
-        >>> simu.nb_passes 
+        >>> simulation.nb_passes 
         5
-        >>> simu.nb_passes = 10
-        >>> simu.nb_passes
+        >>> simulation.nb_passes = 10
+        >>> simulation.nb_passes
         10
         """
         return self._cy_simulation.get_nb_passes()
@@ -723,7 +891,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
@@ -733,8 +901,11 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -750,7 +921,7 @@ class Simulation:
         >>> success
         True
         >>> # get the number of iterations for the period 2000Y1
-        >>> simu.nb_iterations("2000Y1")
+        >>> simulation.nb_iterations("2000Y1")
         31
         """
         if isinstance(period, Period):
@@ -781,7 +952,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
@@ -791,8 +962,11 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -808,7 +982,7 @@ class Simulation:
         >>> success
         True
         >>> # save the number of iterations for each period in a new variable
-        >>> simu.save_nb_iterations("NB_ITER")
+        >>> simulation.save_nb_iterations("NB_ITER")
         >>> # check the new variable
         >>> variables["NB_ITER", "2000Y1:2015Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
         Workspace: Variables
@@ -844,7 +1018,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
@@ -854,8 +1028,11 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -871,7 +1048,7 @@ class Simulation:
         >>> success
         True
         >>> # get the norm value for the period 2000Y1
-        >>> round(simu.norm("2000Y1"), 10)
+        >>> round(simulation.norm("2000Y1"), 10)
         0.0008501467
         """
         if isinstance(period, Period):
@@ -900,7 +1077,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded
@@ -910,8 +1087,11 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -927,7 +1107,7 @@ class Simulation:
         >>> success
         True
         >>> # save the lowest norm value for each period in a new variable
-        >>> simu.save_norms("SIMU_NORM")
+        >>> simulation.save_norms("SIMU_NORM")
         >>> # check the new variable
         >>> variables["SIMU_NORM", "2000Y1:2015Y1"]       # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE 
         Workspace: Variables
@@ -969,7 +1149,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, scalars, variables 
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -1013,8 +1193,10 @@ class Simulation:
         UY            0.00    0.00    0.00  ...    0.00    0.00    0.00
         <BLANKLINE>
 
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -1056,14 +1238,14 @@ class Simulation:
         <BLANKLINE>
 
         >>> # exchange UY and XNATY
-        >>> success = simu.model_exchange("UY-XNATY")
+        >>> success = simulation.model_exchange("UY-XNATY")
         >>> success
         True
 
         >>> # update endogenous variable (now UY)
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 30 - #INTER 204 - #POST 40
@@ -1088,6 +1270,9 @@ class Simulation:
          name       2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
         XNATY         0.35    0.67    0.51  ...   -0.20   -0.20   -0.20
         <BLANKLINE>
+
+        >>> # clear the list of endogenous-exogenous pairs
+        >>> simulation.reset()
         """
         if list_exo is None:
             list_exo = ''
@@ -1187,7 +1372,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -1236,9 +1421,11 @@ class Simulation:
         XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
         <BLANKLINE>
 
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
         >>> # simulate the model (no reordering)
-        >>> simu = Simulation()
-        >>> success = simu.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -1335,7 +1522,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -1349,8 +1536,10 @@ class Simulation:
         Loading .../fun.var
         394 objects loaded
 
-        >>> simu = Simulation()
-        >>> success = simu.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        
+        >>> success = simulation.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -1445,7 +1634,7 @@ class Simulation:
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, identities, lists, scalars, variables 
-        >>> from iode import Simulation
+        >>> from iode import simulation
         >>> equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.eqs
         274 objects loaded 
@@ -1461,11 +1650,13 @@ class Simulation:
         >>> variables.load(f"{SAMPLE_DATA_DIR}/fun.var")        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Loading .../fun.var
         394 objects loaded
-        >>> simu = Simulation()
 
         Step 1 - Compute the Strongly Connex Components (SCC) decomposition
 
-        >>> success = simu.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+
+        >>> success = simulation.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
@@ -1520,7 +1711,7 @@ class Simulation:
         XNATY         0.22    0.70    0.40  ...   -0.20   -0.20   -0.20
         <BLANKLINE>
         
-        >>> success = simu.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simulation.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         2000Y1: 1 iters - error =   0.3155 - cpu=...ms
         2000Y1: 2 iters - error =    1.953 - cpu=...ms
@@ -1574,9 +1765,10 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
-        >>> print(simu)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        >>> print(simulation)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         --- Simulation ---
         convergence_threshold = 0.001
         relax = 1.0
@@ -1611,9 +1803,10 @@ class Simulation:
 
         Examples
         --------
-        >>> from iode import Simulation
-        >>> simu = Simulation()
-        >>> simu        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> from iode import simulation
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+        >>> simulation        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Simulation(convergence_threshold = 0.001, relax = 1.0, max_nb_iterations = 100,
                    sort_algorithm = 'BOTH', initialization_method = 'TM1', debug =
                    False, nb_passes = 5, debug_newton = False)
@@ -1628,3 +1821,5 @@ class Simulation:
         args += [f"debug_newton = {self.debug_newton}"]
         s = f"Simulation({', '.join(args)})"
         return fill(s, subsequent_indent=' ' * len("Simulation("), width=80)
+
+simulation: Simulation = Simulation.get_instance()

@@ -3,7 +3,7 @@ add_executable(${test_c_api} pch.cpp test_period.cpp test_sample.cpp test_c_api.
                                   test_equation.cpp test_identity.cpp test_scalar.cpp test_table.cpp 
                                   test_kdb_comments.cpp test_kdb_equations.cpp test_kdb_identities.cpp 
                                   test_kdb_lists.cpp test_kdb_scalars.cpp test_kdb_tables.cpp 
-                                  test_kdb_variables.cpp test_report.cpp)
+                                  test_kdb_variables.cpp test_report.cpp test_simulation.cpp)
 
 # Precompiled headers for faster compilation
 target_precompile_headers(${test_c_api} PRIVATE pch.h)

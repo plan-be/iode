@@ -16,7 +16,6 @@ set(CPP_KDB
     )
 
 set(CPP_COMPUTE
-    compute/simulation.h    compute/simulation.cpp
     compute/estimation.h    compute/estimation.cpp
     )
 

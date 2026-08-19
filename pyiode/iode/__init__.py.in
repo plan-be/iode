@@ -48,7 +48,7 @@ from .write import (write_close, write_destination, write_flush, write, write_co
                     write_paragraph, write_title, write_page_footer, write_page_header)
 
 # Simulation
-from .compute.simulation import Simulation
+from .compute.simulation import simulation
 
 # Estimation
 from .compute.estimation import dynamic_adjustment, dickey_fuller_test 
@@ -98,7 +98,7 @@ __all__ = [
     'write_paragraph', 'write_title', 'write_page_footer', 'write_page_header', 
 
     # Simulation
-    'Simulation', 
+    'simulation', 
 
     # Estimation
     'dynamic_adjustment', 'dickey_fuller_test', 
@@ -114,6 +114,10 @@ __all__ = [
 ]
 
 # ==== DEPRECATED API ====
-# Note: Deprecated functions and objects are no longer exposed via 
-# 'from iode import *' or 'dir(iode)'. 
+
+from .compute.simulation import Simulation
+__all__ += ['Simulation']
+
+# Note: Deprecated functions and objects from the *Jean-Marc* iode module 
+# are no longer exposed via 'from iode import *' or 'dir(iode)'. 
 # They can still be accessed via explicit import: 'from iode.deprecated import ...'

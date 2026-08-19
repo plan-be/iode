@@ -81,15 +81,15 @@
  *  Newton-Raphson algorithm
  *  ========================
  *  
- *  Search for x such as |f(x)| < KSIM_EPSNEWTON
+ *  Search for x such as |f(x)| < epsilonNEWTON
  *  
  *  We start by calculating shift = the difference between 0 and the value obtained 
  *  by the LEC formula of the equation (according to the case 1, 2 or 3).
  *  
- *  We then loop (maximum KSIM_NEWTON_MAXIT iterations) to search for x : 
+ *  We then loop (maximum newton_max_iter iterations) to search for x : 
  *      
  *      # check convergence
- *      if |f(x) - shift| < KSIM_NEWTON_EPS: x is a solution
+ *      if |f(x) - shift| < newton_epsilon: x is a solution
  *      
  *      # Define derivative step h 
  *      h = 1e-4    
@@ -129,9 +129,10 @@
  *  @return     double                      root of the equation (var_name value that solves the equation)
  *  
  */
-double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, const std::string& eq_var_name)
+double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, const int t, 
+    const std::string& var_name, const std::string& eq_var_name)
 {
-    double x = this->newton(dbv, dbs, t, var_name, eq_var_name);
+    double x = this->newton(dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
     if(!IODE_IS_A_NUMBER(x)) 
         x = this->secant(dbv, dbs, t, var_name, eq_var_name);
     return x;
@@ -147,28 +148,21 @@ double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std
  *  the absolute value of the endogenous variable before the first iteration is > 1.0, 
  *  then eps is multiplied by the endogenous value. 
  *  
- *  TODO: Some parameters (eps, h) are hard-coded and should be "globalised".
- *  
- *  @param  [in]    int  algo              if not null, the convergence criteria eps is multiplied by the 
- *                                         value of f(x) if ||f(x)|| > 1.0.
- *  @global [in]    int  KSIM_DEBUG        if not null, calls L_debug() to save a trace of the result 
- *  @global [in]    int  KSIM_NEWTON_DEBUG if not null, calls L_debug() to save a trace of each iteration of the solver
+ *  @param  [in]    int  algo         if not null, the convergence criteria eps is multiplied by the 
+ *                                    value of f(x) if ||f(x)|| > 1.0.
  *  
  *  See zero() for the description of the other parameters.
  */
-double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
-    const std::string& var_name, const std::string& eq_var_name)
+double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, 
+    const int t, const std::string& var_name, const std::string& eq_var_name)
 {
-    double h = CSimulation::KSIM_NEWTON_STEP;
-    double eps = CSimulation::KSIM_NEWTON_EPS;
-
     double* d_ptr = dbv->get_var_ptr(var_name, t);
     double x = d_ptr[0];
     double oldx = x;
     if(!IODE_IS_A_NUMBER(x)) 
     {
-        if(CSimulation::KSIM_DEBUG) L_debug("Eq %s - Endo %s -> x is NA\n", eq_var_name.c_str(), var_name.c_str());
-        return (double) IODE_NAN;
+        if(newton_debug) L_debug("Eq %s - Endo %s -> x is NA\n", eq_var_name.c_str(), var_name.c_str());
+        return IODE_NAN;
     }
 
     double ax = 0.0; 
@@ -186,7 +180,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         ax = fabs(shift);
     }
 
-    if(CSimulation::KSIM_NEWTON_DEBUG)
+    if(newton_debug)
         L_debug("Eq %s - Endo %s : shift=%lf\n", eq_var_name.c_str(), var_name.c_str(), shift);
 
     if(algo && ax > 1.0) 
@@ -198,19 +192,19 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
     double afx = 0.0; 
     double dx = 0.0; 
     double ox = 0.0;
-    while(it < CSimulation::KSIM_NEWTON_MAXIT) 
+    while(it < nb_max_iter) 
     {
         d_ptr = dbv->get_var_ptr(var_name, t);
         d_ptr[0] = x;
         ax = fabs(x);
 
         fx = this->execute(dbv, dbs, t);
-        if(CSimulation::KSIM_NEWTON_DEBUG) 
+        if(newton_debug) 
             L_debug("   - f(%lg) = %lg\n", x, fx);
 
         if(!IODE_IS_A_NUMBER(fx)) 
         {
-            if(CSimulation::KSIM_NEWTON_DEBUG) 
+            if(newton_debug) 
             {
                 L_debug("Eq %s - Endo %s : shift=%lf\n", eq_var_name.c_str(), var_name.c_str(), shift);
                 L_debug("   - f(%lg) = %lg\n", x, fx);
@@ -223,7 +217,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         afx = fabs(fx);
         if(afx < eps) 
         {
-            if(CSimulation::KSIM_NEWTON_DEBUG) 
+            if(newton_debug) 
                 L_debug("   -> %lf\n", x);
             return x;
         }
@@ -237,7 +231,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         d_ptr[0] = x + h;
         fxh = this->execute(dbv, dbs, t);
         if(!IODE_IS_A_NUMBER(fxh)) {
-            if(CSimulation::KSIM_NEWTON_DEBUG) 
+            if(newton_debug) 
                 L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
             goto err;
         }
@@ -245,11 +239,11 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         fxh -= shift;
         if(fabs(fxh - fx) < 1e-8) 
         {
-            if(CSimulation::KSIM_NEWTON_DEBUG) 
+            if(newton_debug) 
                 L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
             goto err;
         }
-        if(CSimulation::KSIM_NEWTON_DEBUG) 
+        if(newton_debug) 
             L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
         dx = h * fx / (fxh - fx);
         ox = x;
@@ -261,7 +255,7 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         it++;
     }
 
-    if(CSimulation::KSIM_NEWTON_DEBUG) 
+    if(newton_debug) 
         L_debug("    #it > %d\n", it);
 
 err:
@@ -279,11 +273,11 @@ err:
  *  See zero() for the parameter description.
  *    
  */
-double CLEC::newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
-    const std::string& var_name, const std::string& eq_var_name)
+double CLEC::newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, 
+    const int t, const std::string& var_name, const std::string& eq_var_name)
 {
-    double x = this->newton_sub(0, dbv, dbs, t, var_name, eq_var_name);
+    double x = this->newton_sub(0, dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = this->newton_sub(1, dbv, dbs, t, var_name, eq_var_name);
+        x = this->newton_sub(1, dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
     return x;
 }

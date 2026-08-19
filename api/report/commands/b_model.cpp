@@ -60,19 +60,17 @@ static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
         } 
     }
 
-    int rc = -1;
-    CSimulation simu;
+    bool success;
     if(v_eqs.size() == 0)
-        rc = simu.simulate(global_ws_eqs, global_ws_var, global_ws_scl, smpl, CSimulation::KSIM_EXO);
+        success = global_simu->simulate(global_ws_eqs, global_ws_var, global_ws_scl, smpl);
     else 
     {
         KDBEquationsPtr tdbe = global_ws_eqs->get_subset(s_eqs, false);
         if(tdbe->size() > 0)
-            rc = simu.simulate(tdbe, global_ws_var, global_ws_scl, smpl, 
-                                CSimulation::KSIM_EXO, v_eqs);
+            success = global_simu->simulate(tdbe, global_ws_var, global_ws_scl, smpl, v_eqs);
     }
 
-    return rc;
+    return success ? 0 : -1;
 }
 
 
@@ -143,20 +141,20 @@ int B_ModelSimulateParms(char* arg, int unused)
         goto fin;
     }
 
-    CSimulation::KSIM_EPS   = atof(args[0]);
-    CSimulation::KSIM_RELAX = atof(args[1]);
-    CSimulation::KSIM_MAXIT = atoi(args[2]);
+    global_simu->epsilon = atof(args[0]);
+    global_simu->relax = atof(args[1]);
+    global_simu->max_iter = atoi(args[2]);
     if(U_is_in(args[3][0], "bB")) 
         args[3][0] = 'T'; // JMP 20/02/2023 
-    CSimulation::KSIM_SORT  = B_argpos("CTN", args[3][0]);
-    CSimulation::KSIM_START = args[4][0] - '0';
-    CSimulation::KSIM_DEBUG = B_argpos("NY", args[5][0]);
-    if(nargs > 6) CSimulation::KSIM_PASSES = atoi(args[6]); //JMP 14/3/2012
+    global_simu->sorting_algo = B_argpos("CTN", args[3][0]);
+    global_simu->init_algo = args[4][0] - '0';
+    global_simu->debug = B_argpos("NY", args[5][0]);
+    if(nargs > 6) global_simu->nb_passes = atoi(args[6]); //JMP 14/3/2012
 
     if(nargs > 7)
-        CSimulation::KSIM_NEWTON_DEBUG = B_argpos("NY", args[7][0]); // JMP 6/3/2012
+        newton_debug = B_argpos("NY", args[7][0]); // JMP 6/3/2012
     else
-        CSimulation::KSIM_NEWTON_DEBUG = 0;
+        newton_debug = 0;
 
 fin :
     SCR_free_tbl((unsigned char**) args);
@@ -180,40 +178,16 @@ int B_ModelExchange(char* const_arg, int unused)
     // Copy for C++ strings = read only (const)
     arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
-    if(CSimulation::KSIM_EXO) 
+    if(global_simu->v_endo_exo) 
     {
-        SCR_free_tbl((unsigned char**) CSimulation::KSIM_EXO);
-        CSimulation::KSIM_EXO = NULL;
+        SCR_free_tbl((unsigned char**) global_simu->v_endo_exo);
+        global_simu->v_endo_exo = NULL;
     }
 
     if(arg && SCR_strip((unsigned char*) arg)[0]) 
-        CSimulation::KSIM_EXO = B_ainit_chk(arg, NULL, 0);
+        global_simu->v_endo_exo = B_ainit_chk(arg, NULL, 0);
     
     SCR_free(arg);
-    return 0;
-}
-
-
-/**
- *  Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
- *  
- *  Useful to reflect new values of lists when equations formulas contain macros ($LISTNAME). 
- *  
- *  @param [in, out] KDB*   dbe     KDB of equations to recompile
- *  @return          int            0 on success, -1 of dbe is null or empty
- */
-int KE_compile(KDBEquations& dbe)
-{
-    if(dbe.size() == 0) 
-    {
-        error_manager.append_error("Empty set of equations");
-        return -1;
-    }
-
-    // recompile all CLEC of the equations in the KDB
-    for(const auto& [name, eq] : dbe.k_objs)
-        eq->set_lec(eq->lec);
-    
     return 0;
 }
 
@@ -249,8 +223,6 @@ int B_ModelCompile(char* arg, int unused)
 
 /**
  *  Syntax: $ModelCalcSCC nbtris prename intername postname [eqs]
- *  
- *
  */
 int B_ModelCalcSCC(char *const_arg, int unused)
 {
@@ -283,9 +255,8 @@ int B_ModelCalcSCC(char *const_arg, int unused)
     else
         tdbe = global_ws_eqs->get_subset(list_eqs, false);
 
-    CSimulation simu;
-    int rc = simu.calculate_SCC(tdbe, tris, pre, inter, post);
-    return rc;
+    bool success = global_simu->calculate_SCC(tdbe, tris, pre, inter, post);
+    return success ? 0 : -1;
 }
 
 
@@ -293,8 +264,6 @@ int B_ModelCalcSCC(char *const_arg, int unused)
  *  Simulates a model based on 3 precalculated lists pre, post and inter.
  *  
  *  Syntax: $ModelSimulateSCC from to pre inter post
- *  
- *
  */
 int B_ModelSimulateSCC(char *const_arg, int unused)
 {
@@ -361,15 +330,14 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     KDBEquationsPtr tdbe = global_ws_eqs->get_subset(eqs, false);
 
     // Lance la simulation
-    CSimulation simu;
-    int rc = simu.simulate_SCC(tdbe, global_ws_var, global_ws_scl, smpl, pre, inter, post);
+    bool success = global_simu->simulate_SCC(tdbe, global_ws_var, global_ws_scl, smpl, pre, inter, post);
 
     // Cleanup
     SCR_free_tbl((unsigned char**) pre);
     SCR_free_tbl((unsigned char**) inter);
     SCR_free_tbl((unsigned char**) post);
 
-    return rc;
+    return success ? 0 : -1;
 }
 
 
@@ -484,7 +452,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  */
 int B_ModelSimulateSaveNIters(char *arg, int unused)
 {
-    return(B_CreateVarFromVecOfInts(arg, CSimulation::KSIM_NITERS));
+    return(B_CreateVarFromVecOfInts(arg, global_simu->v_nb_iterations));
 }
 
 
@@ -497,5 +465,5 @@ int B_ModelSimulateSaveNIters(char *arg, int unused)
  */
 int B_ModelSimulateSaveNorms(char *arg, int unused)
 {
-    return(B_CreateVarFromVecOfDoubles(arg, CSimulation::KSIM_NORMS));
+    return(B_CreateVarFromVecOfDoubles(arg, global_simu->v_norm));
 }
