@@ -8,7 +8,7 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_compute_simulation import Ui_MenuComputeSimulation
 
 import warnings
-from iode import (IodeType, Simulation, SimulationInitialization, SimulationSort,
+from iode import (IodeType, simulation, SimulationInitialization, SimulationSort,
                   SIMULATION_INITIALIZATION_METHODS, SIMULATION_SORT_ALGORITHMS, 
                   Sample, variables)
 
@@ -86,19 +86,18 @@ class MenuComputeSimulation(MixinSettingsDialog):
             Sample(from_period, to_period)
 
             warnings.simplefilter("error")
-            simu = Simulation()
-            simu.convergence_threshold = convergence
-            simu.max_nb_iterations = max_iterations
-            simu.debug = debug
-            simu.relax = relaxation
-            simu.initialization_method = initialization_method
-            simu.sort_algorithm = sort_algorithm
-            simu.nb_passes = nb_passes
+            simulation.convergence_threshold = convergence
+            simulation.max_nb_iterations = max_iterations
+            simulation.debug = debug
+            simulation.relax = relaxation
+            simulation.initialization_method = initialization_method
+            simulation.sort_algorithm = sort_algorithm
+            simulation.nb_passes = nb_passes
 
             if exchange_vars_list:
-                simu.model_exchange(exchange_vars_list)
+                simulation.model_exchange(exchange_vars_list)
 
-            simu.model_simulate(from_period, to_period, equations_list)
+            simulation.model_simulate(from_period, to_period, equations_list)
             warnings.simplefilter("default")
 
             self.accept()

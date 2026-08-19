@@ -1,7 +1,6 @@
 if(BUILD_TESTING)
-add_executable(${test_cpp_api} pch.cpp test_utils.cpp test_lec.cpp 
-               test_computed_table.cpp test_report.cpp test_simulation.cpp 
-               test_estimation.cpp test_kdb_global.cpp)
+add_executable(${test_cpp_api} pch.cpp test_utils.cpp test_lec.cpp test_computed_table.cpp 
+                               test_report.cpp test_estimation.cpp test_kdb_global.cpp)
 
 # Precompiled headers for faster compilation
 target_precompile_headers(${test_cpp_api} PRIVATE pch.h)

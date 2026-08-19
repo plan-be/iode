@@ -7,6 +7,7 @@ from typing import Union, Tuple, List, Dict, Optional
 from libcpp cimport bool
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr
 
 from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
@@ -17,25 +18,21 @@ cdef extern from "api/all.h":
     int B_ModelSimulateSaveNIters(char *arg)
     int B_ModelSimulateSaveNorms(char *arg)
 
-cdef extern from "cpp_api/compute/simulation.h":
-    cdef cppclass CSimulation "Simulation":
-        CSimulation() except +
+cdef extern from "api/simulation/simulation.h":
+    cdef cppclass CSimulation:
+        double  epsilon
+        double  relax
+        int     max_iter
+        int     nb_passes
+        double  newton_epsilon
+        double  newton_step
+        int     newton_max_iter
 
-        # Getter and Setter for convergence threshold
-        double get_convergence_threshold()
-        void set_convergence_threshold(double threshold) except +
+        # factory method
+        shared_ptr[CSimulation] Create() except +
 
-        # Getter and Setter for relax
-        double get_relax()
-        void set_relax(double relax) except +
-
-        # Getter and Setter for max number of iterations
-        int get_max_nb_iterations()
-        void set_max_nb_iterations(int nb_iterations) except +
-
-        # Getter and Setter for max number of iterations for Newton's method
-        int get_max_nb_iterations_newton()
-        void set_max_nb_iterations_newton(int nb_iterations) except +
+        # utility methods
+        void reset() except +
 
         # Getter and Setter for sort algorithm
         SimuSortAlgorithm get_sort_algorithm()
@@ -55,15 +52,15 @@ cdef extern from "cpp_api/compute/simulation.h":
         bool is_debug_newton_active()
         void set_debug_newton(bint debug) except +
 
-        # Getter and Setter for number of passes for the heuristic triangulation algorithm
-        int get_nb_passes()
-        void set_nb_passes(int nb_passes) except +
-
         # Model simulation methods
-        bool model_exchange(const string& list_exo) except +
-        bool model_compile(const string& list_eqs) except +
-        bool model_simulate(const string& from_period, const string& to_period, const string& list_eqs) except +
-        bool model_calculate_SCC(const int nb_iterations, const string& pre_name, const string& inter_name, 
+        bool exchange(const string& list_exo) except +
+        bool compile(const string& list_eqs) except +
+        bool simulate(const string& from_period, const string& to_period, const string& list_eqs) except +
+        bool calculate_SCC(const int nb_iterations, const string& pre_name, const string& inter_name, 
                                  const string& post_name, const string& list_eqs) except +
-        bool model_simulate_SCC(const string& from_period, const string& to_period, const string& pre_name, 
+        bool simulate_SCC(const string& from_period, const string& to_period, const string& pre_name, 
                                 const string& inter_name, const string& post_name) except +
+
+    # Define the global Comments instance
+    ctypedef shared_ptr[CSimulation] SimulationPtr
+    cdef SimulationPtr global_simu

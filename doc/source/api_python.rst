@@ -670,6 +670,8 @@ SIMULATION
    
    Simulation
 
+   Simulation.reset
+   Simulation.set_parameters
    Simulation.convergence_threshold
    Simulation.relax
    Simulation.sort_algorithm
@@ -686,6 +688,7 @@ SIMULATION
    Simulation.save_nb_iterations
    Simulation.norm
    Simulation.save_norms
+
    Simulation.model_exchange
    Simulation.model_compile
    Simulation.model_simulate

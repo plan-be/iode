@@ -14,6 +14,31 @@
 #include "equations.h"
 #include "api/report/undoc/undoc.h"
 
+
+/**
+ *  Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
+ *  
+ *  Useful to reflect new values of lists when equations formulas contain macros ($LISTNAME). 
+ *  
+ *  @param [in, out] KDB*   dbe     KDB of equations to recompile
+ *  @return          int            0 on success, -1 of dbe is null or empty
+ */
+int KE_compile(KDBEquations& dbe)
+{
+    if(dbe.size() == 0) 
+    {
+        error_manager.append_error("Empty set of equations");
+        return -1;
+    }
+
+    // recompile all CLEC of the equations in the KDB
+    for(const auto& [name, eq] : dbe.k_objs)
+        eq->set_lec(eq->lec);
+    
+    return 0;
+}
+
+
 /**
  *  Extracts the left and right sides of a lec equation. 
  *  

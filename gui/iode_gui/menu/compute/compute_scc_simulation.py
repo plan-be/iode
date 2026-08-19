@@ -7,7 +7,7 @@ from iode_gui.abstract_main_window import AbstractMainWindow
 from .ui_compute_scc_simulation import Ui_MenuComputeSCCSimulation
 
 import warnings
-from iode import (Simulation, SimulationInitialization, SIMULATION_INITIALIZATION_METHODS, 
+from iode import (simulation, SimulationInitialization, SIMULATION_INITIALIZATION_METHODS, 
                   Sample, lists, variables)
 
 
@@ -85,15 +85,14 @@ class MenuComputeSCCSimulation(MixinSettingsDialog):
             Sample(from_period, to_period)
 
             warnings.simplefilter("error")
-            simu = Simulation()
-            simu.convergence_threshold = convergence
-            simu.max_nb_iterations = max_iterations
-            simu.debug = debug
-            simu.relax = relaxation
-            simu.initialization_method = initialization_method
+            simulation.convergence_threshold = convergence
+            simulation.max_nb_iterations = max_iterations
+            simulation.debug = debug
+            simulation.relax = relaxation
+            simulation.initialization_method = initialization_method
 
-            simu.model_simulate_SCC(from_period, to_period, pre_recursive_list_name, 
-                                    inter_recursive_list_name, post_recursive_list_name)
+            simulation.model_simulate_SCC(from_period, to_period, pre_recursive_list_name, 
+                                          inter_recursive_list_name, post_recursive_list_name)
             warnings.simplefilter("default")
 
             self.accept()

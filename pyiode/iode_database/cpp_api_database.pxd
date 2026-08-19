@@ -133,7 +133,7 @@ cdef extern from "cpp_api/KDB/kdb_reference.h":
     void clear_reference_kdb(int index) except +
     void clear_all_reference_kdbs() except +
 
-cdef extern from "cpp_api/compute/simulation.h":
+cdef extern from "api/simulation/simulation.h":
     void eqs_estimate(const string& eqs, const string& from_period, const string& to_period, 
                       const int maxit, const double eps) except +
 

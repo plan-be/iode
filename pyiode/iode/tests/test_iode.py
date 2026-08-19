@@ -1335,50 +1335,48 @@ def test_simulation(capsys):
     scalars.load(f"{SAMPLE_DATA_DIR}/fun.scl")
     variables.load(f"{SAMPLE_DATA_DIR}/fun.var")
 
-    simu = Simulation()
-    simu.convergence_threshold = 0.01
-    simu.max_nb_iterations = 100
-    simu.debug = True
-    simu.relax = 1.0
-    simu.initialization_method = 'TM1'
+    simulation.set_parameters(convergence_threshold = 0.01, relax = 1.0, 
+        max_nb_iterations = 100, initialization_method = 'TM1', debug = True)
 
     with pytest.warns(RuntimeWarning, match=r"Cannot simulate SCC:\n"
                                             r"\tPre-recursive list '_PRE' not found!\n" 
                                             r"\tRecursive list '_INTER' not found!\n"
                                             r"\tPost-recursive list '_POST' not found!"):
-        simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
+        simulation.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     
-    simu.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
+    simulation.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
     with pytest.warns(RuntimeWarning, match=r"PMAB : becomes unavailable at 1960Y1"):
-        simu.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
+        simulation.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     
     # Test simulation: divergence (max nb iterations = 2)
-    simu = Simulation()
-    simu.convergence_threshold = 0.01
-    simu.max_nb_iterations = 2
-    simu.debug = True
-    simu.relax = 1.0
-    simu.initialization_method = 'TM1'
+    simulation.convergence_threshold = 0.01
+    simulation.max_nb_iterations = 2
+    simulation.debug = True
+    simulation.relax = 1.0
+    simulation.initialization_method = 'TM1'
 
     with pytest.warns(RuntimeWarning, match=r"errors:\nCannot simulate the model for the "
                                             r"sample '2000Y1:2010Y1':\nModel does not "
                                             r"converge after 2 iterations\n"):
-        simu.model_simulate("2000Y1", "2010Y1")
+        simulation.model_simulate("2000Y1", "2010Y1")
 
     # ======== test quiet mode ========
     captured = capsys.readouterr()
 
-    simu.model_calculate_SCC(10, quiet=True)
+    simulation.model_calculate_SCC(10, quiet=True)
     captured = capsys.readouterr()
     assert captured.out == ""
 
-    simu.model_simulate_SCC("2000Y1", "2015Y1", quiet=True)
+    simulation.model_simulate_SCC("2000Y1", "2015Y1", quiet=True)
     captured = capsys.readouterr()
     assert captured.out == ""
 
-    simu.model_simulate("2000Y1", "2015Y1", quiet=True)
+    simulation.model_simulate("2000Y1", "2015Y1", quiet=True)
     captured = capsys.readouterr()
     assert captured.out == ""
+
+    # reset to default values for the simulation parameters
+    simulation.set_parameters()
 
 
 # REPORT

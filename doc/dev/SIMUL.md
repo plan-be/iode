@@ -231,7 +231,7 @@ In the code, this is the case where varnb \!= eqvarnb.
 Search for x such as
 
 ```
-|f(x)| < KSIM_EPSNEWTON
+|f(x)| < epsilonNEWTON
 ```
 
 We start by calculating shift = the difference between 0 and the value obtained by the LEC formula of the equation (according to the case 1, 2 or 3 described above).
@@ -240,7 +240,7 @@ We then loop (maximum KSIM\_NEWTON\_MAXIT iterations) to find the solution x :
 
 ```
 // check convergence
-if |f(x) - shift| < KSIM_NEWTON_EPS: x is a solution
+if |f(x) - shift| < newton_epsilon: x is a solution
  
 // Define derivative step h 
 h = 1e-4    
@@ -304,7 +304,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 
 |Syntax|Description|
 |:---|:---|
-|`int model_calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
+|`int calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
 |`int simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** pre, char** inter, char** post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}

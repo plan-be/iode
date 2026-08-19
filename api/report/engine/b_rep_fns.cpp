@@ -1512,7 +1512,7 @@ U_ch *RPF_SimMaxit(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%d", CSimulation::KSIM_MAXIT);
+    sprintf((char*) buf, "%d", global_simu->max_iter);
     return(SCR_stracpy(buf));
 }
 
@@ -1528,7 +1528,7 @@ U_ch *RPF_SimEps(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%lg", CSimulation::KSIM_EPS);
+    sprintf((char*) buf, "%lg", global_simu->epsilon);
     return(SCR_stracpy(buf));
 }
 
@@ -1544,7 +1544,7 @@ U_ch *RPF_SimRelax(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%lf", CSimulation::KSIM_RELAX);
+    sprintf((char*) buf, "%lf", global_simu->relax);
     return(SCR_stracpy(buf));
 }
 
@@ -1560,7 +1560,7 @@ U_ch *RPF_SimSortNbPasses(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%d", CSimulation::KSIM_PASSES);
+    sprintf((char*) buf, "%d", global_simu->nb_passes);
     return(SCR_stracpy(buf));
 }
 
@@ -1577,7 +1577,7 @@ U_ch *RPF_SimSortAlgo(U_ch** unused)
     
     int     isort;
 
-    isort = CSimulation::KSIM_SORT;
+    isort = global_simu->sorting_algo;
     if(isort < 0 || isort > 2)
         isort = 1; // Default value
         
@@ -1596,7 +1596,7 @@ U_ch *RPF_SimInitValues(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%d", CSimulation::KSIM_START);
+    sprintf((char*) buf, "%d", global_simu->init_algo);
     return(SCR_stracpy(buf));
 }
 
@@ -1615,10 +1615,10 @@ double RPF_SimNormReal(U_ch** args)
     if(t < 0) return(-1.0);
 
     // Check si déjà simulation
-    if(CSimulation::KSIM_NORMS == 0) return(-1.0); // Pas encore de simulation
+    if(global_simu->v_norm == 0) return(-1.0); // Pas encore de simulation
 
     // Return norme t
-    return(CSimulation::KSIM_NORMS[t]);
+    return(global_simu->v_norm[t]);
 }
 
 /**
@@ -1656,10 +1656,10 @@ int RPF_SimNIterInt(U_ch** args)
     if(t < 0) return -1;
 
     // Check si déjà simulation
-    if(CSimulation::KSIM_NITERS == 0) return -1; // Pas encore de simulation
+    if(global_simu->v_nb_iterations == 0) return -1; // Pas encore de simulation
 
     // Return norme t
-    return(CSimulation::KSIM_NITERS[t]);
+    return(global_simu->v_nb_iterations[t]);
 }
 
 /**
@@ -1697,13 +1697,14 @@ int RPF_SimCpuInt(U_ch** args)
     int		t;
 
     t = RPF_CalcPeriod(args);
-    if(t < 0) return -1;
+    if(t < 0) 
+        return -1;
 
-    // Check si déjà simulation
-    if(CSimulation::KSIM_CPUS == 0) return -1; // Pas encore de simulation
+    // No simulation done yet
+    if(global_simu->v_cpu_time == NULL) 
+        return -1;
 
-    // Return norme t
-    return(CSimulation::KSIM_CPUS[t]);
+    return global_simu->v_cpu_time[t];
 }
 
 
@@ -1744,7 +1745,7 @@ U_ch *RPF_SimCpuSCC(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%d", CSimulation::KSIM_CPU_SCC);
+    sprintf((char*) buf, "%d", global_simu->cpu_time_scc);
     return(SCR_stracpy(buf));
 }
 
@@ -1759,7 +1760,7 @@ U_ch *RPF_SimCpuSort(U_ch** unused)
 {
     U_ch    buf[128];
 
-    sprintf((char*) buf, "%d", CSimulation::KSIM_CPU_SORT);
+    sprintf((char*) buf, "%d", global_simu->cpu_time_sorting);
     return(SCR_stracpy(buf));
 }
 

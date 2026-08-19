@@ -71,8 +71,8 @@
  *  
  *  See more explanation at the top of this module.
  *  
- *  @param [in] int     posendo     position of the endogenous variable in KSIM_DBV
- *  @param [in] int     posexo      position of the exogenous variable in KSIM_DBV
+ *  @param [in] int     posendo     position of the endogenous variable in sim_dbv
+ *  @param [in] int     posexo      position of the exogenous variable in sim_dbv
  *  @param [in] int*    depth       current level of recursivity (starts at 0 and increase each time KE)
  *  @return     int                 0 on success, -1 on error
  *  
@@ -83,17 +83,17 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
 {
     int poseq, posseq, posvar, rc = -1;
 
-    if(posexo < 0 || *depth > KSIM_MAXDEPTH) 
+    if(posexo < 0 || *depth > max_depth) 
         return -1;
 
     std::shared_ptr<Equation> eq_ptr;
 
     // Endo and exo are in same equation 
-    // => replace the endo var position in KSIM_POSXK by the exo var position 
+    // => replace the endo var position in v_pos_endo_in_dbv by the exo var position 
     std::string coef_name, eq_name;
     poseq = get_eq_position(posendo);
-    eq_name = KSIM_DBV->get_name(posendo);
-    eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
+    eq_name = sim_dbv->get_name(posendo);
+    eq_ptr = sim_dbe->get_obj_ptr(eq_name);
     std::shared_ptr<CLEC> clec = eq_ptr->clec;
     for(auto& [name, pos]: clec->map_objs) 
     {
@@ -102,8 +102,8 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
         
         if(pos == posexo) 
         {
-            KSIM_POSXK[poseq] = posexo;
-            KSIM_POSXK_REV[posexo] = poseq;
+            v_pos_endo_in_dbv[poseq] = posexo;
+            v_pos_endo_in_dbe[posexo] = poseq;
             return 0;
         }
     }
@@ -113,8 +113,8 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
     std::shared_ptr<CLEC> eclec;
     for(auto& [name, pos]: clec->map_objs) 
     {
-        eq_name = KSIM_DBE->get_name(poseq);
-        eq_ptr = KSIM_DBE->get_obj_ptr(eq_name);
+        eq_name = sim_dbe->get_name(poseq);
+        eq_ptr = sim_dbe->get_obj_ptr(eq_name);
         eclec = eq_ptr->clec;            
         CLEC clec(*eclec);
         
@@ -128,10 +128,10 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
             continue;
 
         /* if path already examined continue */
-        if(KSIM_PATH[posseq] == 1) 
+        if(path[posseq] == 1) 
             continue;
         else 
-            KSIM_PATH[posseq] = 1;
+            path[posseq] = 1;
 
         (*depth) ++;
         rc = find_path(pos, posexo, depth);
@@ -143,10 +143,10 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
         }
 
         // Path found
-        // Replace the endo of the KSIM_POSXK[poseq] by the j'd varname in current clec
+        // Replace the endo of the v_pos_endo_in_dbv[poseq] by the j'd varname in current clec
         posvar = pos;
-        KSIM_POSXK[poseq] = posvar;
-        KSIM_POSXK_REV[posvar] = poseq;
+        v_pos_endo_in_dbv[poseq] = posvar;
+        v_pos_endo_in_dbe[posvar] = poseq;
         
         // decrease the depth by 1
         (*depth) --;
@@ -161,14 +161,14 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
  *  Modify the model to solve it with respect to another set of variables, 
  *  the variable posendo becoming exogenous and the variable posexo becoming endogenous.
  *  
- *  If the function succeeds, the vector KSIM_POSXK is modified to reflect the new endogenous for each equation.
+ *  If the function succeeds, the vector v_pos_endo_in_dbv is modified to reflect the new endogenous for each equation.
  *   
- *  Note that KSIM_POSXK[i] contains for each eq of the model (defined by KSIM_DBE) 
- *  the position in KSIM_DBV of the endo variable of equation KSIM_DBE[i].
+ *  Note that v_pos_endo_in_dbv[i] contains for each eq of the model (defined by sim_dbe) 
+ *  the position in sim_dbv of the endo variable of equation sim_dbe[i].
  *  
  *  
- *  @param [in] int     posendo     position of the endogenous variable in KSIM_DBV
- *  @param [in] int     posexo      position of the exogenous variable in KSIM_DBV
+ *  @param [in] int     posendo     position of the endogenous variable in sim_dbv
+ *  @param [in] int     posexo      position of the exogenous variable in sim_dbv
  *  @return     int                 0 if the exchange is possible, 
  *                                  -1 otherwise: 
  *                                      endo or exo not found in equations, 
@@ -184,7 +184,7 @@ int CSimulation::exo_to_endo(int posendo, int posexo)
     if(endo < 0) 
     {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KSIM_DBV->get_name(posendo));
+        error_msg += std::string(sim_dbv->get_name(posendo));
         error_msg += " : no such equation in the Equations workspace";
         error_manager.append_error(error_msg);
         return -1;
@@ -194,20 +194,20 @@ int CSimulation::exo_to_endo(int posendo, int posexo)
     if(exo >= 0) 
     {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KSIM_DBV->get_name(posexo));
+        error_msg += std::string(sim_dbv->get_name(posexo));
         error_msg += " already endogeneous";
         error_manager.append_error(error_msg);
         return -1;
     }
 
     /* check if exo in equation */
-    memset(KSIM_PATH, 0, KSIM_MAXDEPTH);
+    memset(path, 0, max_depth);
     exo = find_path(posendo, posexo, &depth);
     if(exo < 0) 
     {
         std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(KSIM_DBV->get_name(posendo)) + "-"; 
-        error_msg += std::string(KSIM_DBV->get_name(posexo));
+        error_msg += std::string(sim_dbv->get_name(posendo)) + "-"; 
+        error_msg += std::string(sim_dbv->get_name(posexo));
         error_msg += " no exchange possible";
         error_manager.append_error(error_msg);
         return -1;

@@ -23,6 +23,8 @@ enum EQ_HAND_SIDE
 using ATOMIC_LEC = std::variant<LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, 
                                 LEC_OTHER, LEC_OP, LEC_FN, LEC_TFN, LEC_VAL_FN, LEC_MTFN>;
 
+inline int newton_debug = 0;
+
 /*---------------- STRUCTS ------------------------*/
 
 
@@ -95,7 +97,7 @@ private:
      * @param [in]    std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
      * @return        double                      approximated root or NaN if no solution found
      */
-    double newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
+    double newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, const int t, 
         const std::string& var_name, const std::string& eq_var_name);
 
     /**
@@ -304,7 +306,8 @@ public:
      * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
      * @return     double                      root of the equation (var_name value that solves the equation)
      */
-    double zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, const std::string& eq_var_name);
+    double zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, const int t, 
+        const std::string& var_name, const std::string& eq_var_name);
 
     /**
      * Tries to solve this LEC equation by the Newton-Raphson method.
@@ -319,7 +322,8 @@ public:
      * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
      * @return     double                      approximated root of the equation
      */
-    double newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, const std::string& eq_var_name);
+    double newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, const int t, 
+        const std::string& var_name, const std::string& eq_var_name);
 
     /**
      * Tries to find a solution to this LEC equation by a secant (bisection) method.
@@ -335,7 +339,8 @@ public:
      * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
      * @return     double                      root of the equation (var_name value that solves the equation)
      */
-    double secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, const std::string& eq_var_name);
+    double secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, 
+        const std::string& eq_var_name);
 
     /**
      * Prints this LEC expression. Sets the endogenous variable (name) in bold.

@@ -113,8 +113,8 @@ int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalars
  *  @return     double                  root of the equation (var_name value that solves the equation)
  *
  */
-double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, 
-    const std::string& var_name, const std::string& eq_var_name)
+double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, 
+    const std::string& eq_var_name)
 {
     if(!dbv || !dbs)
         return IODE_NAN;

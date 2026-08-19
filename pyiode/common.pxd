@@ -204,7 +204,7 @@ cdef extern from "api/all.h":
         AM_PARTIAL_ADJUSTMENT,
         AM_ERROR_CORRECTION_METHOD
 
-cdef extern from "cpp_api/compute/simulation.h":
+cdef extern from "api/simulation/simulation.h":
     cdef vector[string] v_simulation_sort_algorithm
 
 cdef extern from "cpp_api/compute/estimation.h":

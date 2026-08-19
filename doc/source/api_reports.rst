@@ -713,7 +713,7 @@ Models (Simulations)
     | :ref:`ModelCalcSCC <modelcalcscc>`                        | :meth:`Simulation.model_calculate_SCC` | | decomposes the model into SCC     |
     |                                                           |                                        | | and reorders it                   |
     +-----------------------------------------------------------+----------------------------------------+-------------------------------------+
-    | :ref:`ModelSimulateParms <modelsimulateparms>`            | :class:`Simulation`                    | prepares new simulation             |
+    | :ref:`ModelSimulateParms <modelsimulateparms>`            | :meth:`Simulation.set_parameters`      | update parameters of simulation     |
     +-----------------------------------------------------------+----------------------------------------+-------------------------------------+
     | :ref:`ModelSimulate <modelsimulate>`                      | :meth:`Simulation.model_simulate`      | | launches the simulation           |
     |                                                           |                                        | | of a model                        |
