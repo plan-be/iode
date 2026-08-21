@@ -304,7 +304,7 @@ The reordering algorithm being CPU intensive for very large models, it is better
 
 |Syntax|Description|
 |:---|:---|
-|`int calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
+|`int calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string& pre, const std::string& inter, const std::string& post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
 |`int simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, const std::vector<std::string>& pre, const std::vector<std::string>& inter, const std::vector<std::string>& post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}

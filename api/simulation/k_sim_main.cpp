@@ -756,7 +756,7 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
  *  @param [in] int     eqn         last equation pos in v_order (name = KSIM_NAME[v_order[eqn]])
  *  
  */
-void CSimulation::sub_build_lists_order(char* lstname, int eq1, int eqn)
+void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int eqn)
 {
     U_ch** lst = NULL;                     
     U_ch** tbl_todel = NULL;
@@ -768,7 +768,7 @@ void CSimulation::sub_build_lists_order(char* lstname, int eq1, int eqn)
     int maxl = 1000;
 
     // delete the list 'lstname' and all sub-lists
-    sprintf((char*) buf, "%s*", lstname);
+    sprintf((char*) buf, "%s*", (char*) lstname.c_str());
     lst_todel = (unsigned char*) K_expand(LISTS, NULL, (char*) buf, '*');
     if(lst_todel) 
     {
@@ -786,7 +786,7 @@ void CSimulation::sub_build_lists_order(char* lstname, int eq1, int eqn)
     SCR_add_ptr(&lst, &nlst, 0); 
 
     // Creates the list lstname (and possibly sub-lists lstname1,...) 
-    KL_lst(lstname, (char**) lst, maxl);
+    KL_lst((char*) lstname.c_str(), (char**) lst, maxl);
     SCR_free_tbl(lst);
 }
 
@@ -801,11 +801,11 @@ void CSimulation::sub_build_lists_order(char* lstname, int eq1, int eqn)
  *  @param [in] char*   post    name of the list containing the epilog
  *  
  */
-void CSimulation::build_lists_order(char* pre, char* inter, char *post)
+void CSimulation::build_lists_order(const std::string& pre, const std::string& inter, const std::string& post)
 {
-    sub_build_lists_order(pre,   0, 					   nb_pre - 1);
-    sub_build_lists_order(inter, nb_pre, 			   nb_pre + nb_inter - 1);
-    sub_build_lists_order(post,  nb_pre + nb_inter, nb_pre + nb_inter + nb_post - 1);
+    sub_build_lists_order(pre, 0, nb_pre - 1);
+    sub_build_lists_order(inter, nb_pre, nb_pre + nb_inter - 1);
+    sub_build_lists_order(post, nb_pre + nb_inter, nb_pre + nb_inter + nb_post - 1);
 }
 
 /**

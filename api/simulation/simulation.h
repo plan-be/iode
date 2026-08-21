@@ -224,7 +224,7 @@ public:
     bool simulate(const std::string& from, const std::string& to, const std::string& list_eqs = "");
 
 	/* k_sim_scc.c */
-	bool calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post);
+	bool calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string& pre, const std::string& inter, const std::string& post);
 
     bool calculate_SCC(const int nb_iterations, const std::string& pre_name = "_PRE", const std::string& inter_name = "_INTER", 
         const std::string& post_name = "_POST", const std::string& list_eqs = "");
@@ -238,7 +238,7 @@ public:
 protected:
 	/* k_sim_main.c */
 	double calculate_CLEC(int eqnb, int t, int varnb, int msg);
-	void build_lists_order(char* pre, char* inter, char* post);
+	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */
 	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
@@ -308,7 +308,7 @@ private:
 	int epilog(int t);
 	int diverge(int t, char* c_name, double eps);
 	int sub_simulate(int t);
-	void sub_build_lists_order(char* lstname, int eq1, int eqn);
+	void sub_build_lists_order(const std::string& lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
 	int pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
