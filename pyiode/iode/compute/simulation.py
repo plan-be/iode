@@ -1,7 +1,7 @@
 import warnings
 from textwrap import fill
 from collections.abc import Iterable
-from typing import List, Union
+from typing import List, Union, Self
 
 from iode.util import skip_message
 from iode.time.period import Period

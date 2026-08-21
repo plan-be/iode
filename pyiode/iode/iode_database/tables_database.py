@@ -1,16 +1,11 @@
-import sys
 from pathlib import Path
-from typing import Union, Tuple, List, Dict, Any
-
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Any, Self
 
 from iode.common import PrintTablesAs
 from iode.util import JUSTIFY, table2str, join_lines
 from iode.objects.table import Table
 from iode.iode_database.abstract_database import IodeDatabase, PositionalIndexer
+
 from iode.iode_cython import Table as CythonTable
 from iode.iode_cython import Tables as CythonTables
 
@@ -1403,3 +1398,5 @@ class Tables(IodeDatabase):
 
 
 tables: Tables = Tables.get_instance()
+
+

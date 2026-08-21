@@ -1,12 +1,7 @@
 # distutils: language = c++
 
 from typing import List, Dict, Any
-import sys
-if sys.version_info.minor >= 11:
-    from enum import IntEnum, StrEnum
-else:
-    from enum import Enum, IntEnum
-    StrEnum = Enum
+from enum import IntEnum, StrEnum
 
 from libcpp.string cimport string
 from libcpp.vector cimport vector

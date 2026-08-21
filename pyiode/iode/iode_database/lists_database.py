@@ -1,10 +1,5 @@
-import sys
 from pathlib import Path
-from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Optional, Any, Self
 
 import pandas as pd
 from iode.util import table2str, JUSTIFY, split_list
@@ -746,3 +741,5 @@ class Lists(IodeDatabase):
 
 
 lists: Lists = Lists.get_instance()
+
+

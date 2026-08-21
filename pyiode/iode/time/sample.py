@@ -1,11 +1,5 @@
-import sys
 import warnings
-from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
-
+from typing import Union, Tuple, List, Optional, Any, Self
 try:
     import larray as la
     Axis = la.Axis
@@ -14,7 +8,6 @@ except ImportError:
     Axis = Any
 
 from iode.time.period import Period
-
 from iode.iode_cython import Period as CythonPeriod
 from iode.iode_cython import Sample as CythonSample
 _ALLOWED_TYPES_FOR_Period = {'str', 'float', 'Period'}
@@ -242,3 +235,5 @@ class Sample:
 
     def __repr__(self) -> str:
         return self._cy_sample.__repr__()
+
+

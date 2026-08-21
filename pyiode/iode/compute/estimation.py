@@ -1,11 +1,6 @@
-import sys
 import warnings
 from collections.abc import Iterable
-from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Optional, Any, Self
 
 from iode.util import skip_message
 from iode.time.period import Period
@@ -1436,3 +1431,5 @@ class EditAndEstimateEquations:
             to_period = str(to_period)
         
         return self._cy_estimation.save(from_period, to_period)
+
+

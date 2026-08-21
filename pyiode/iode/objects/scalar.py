@@ -1,10 +1,5 @@
-import sys
 from copy import copy
-from typing import Union, Tuple, List, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Any, Self
 
 import numpy as np
 from iode.util import iode_number_to_str
@@ -211,5 +206,7 @@ class Scalar:
 
     def __hash__(self) -> int:
         return self._cy_scalar.__hash__()
+
+
 
 

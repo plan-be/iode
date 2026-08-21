@@ -1,11 +1,6 @@
-import sys
 import warnings
 from pathlib import Path
-from typing import Any, Tuple, List, Dict, Union
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Any, Tuple, List, Dict, Union, Self
 
 import numpy as np
 import pandas as pd
@@ -1280,5 +1275,7 @@ class ComputedTable:
 
     def __repr__(self) -> str:
         return str(self)
+
+
 
 
