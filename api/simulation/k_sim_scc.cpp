@@ -217,11 +217,12 @@ fin:
  *  @return             int                 0 on success, -1 on error
  *  
  */
-bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** pre, char** inter, char** post)
+bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
+    const std::vector<std::string>& pre, const std::vector<std::string>& inter, const std::vector<std::string>& post)
 {
-    nb_pre = SCR_tbl_size((unsigned char**) pre);
-    nb_inter = SCR_tbl_size((unsigned char**) inter);
-    nb_post = SCR_tbl_size((unsigned char**) post);
+    nb_pre = (int) pre.size();
+    nb_inter = (int) inter.size();
+    nb_post = (int) post.size();
 
     bool success = simulate_SCC_init(dbe, dbv, dbs, smpl);
     if(!success) 
@@ -232,11 +233,11 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
     v_order.clear();
     v_order.resize(nb_pre + nb_inter + nb_post, -1);
     for(int i = 0; i < nb_pre; i++)   
-        v_order[j++] = dbe->index_of(std::string(pre[i]));
+        v_order[j++] = dbe->index_of(pre[i]);
     for(int i = 0; i < nb_inter; i++) 
-        v_order[j++] = dbe->index_of(std::string(inter[i]));
+        v_order[j++] = dbe->index_of(inter[i]);
     for(int i = 0; i < nb_post; i++)  
-        v_order[j++] = dbe->index_of(std::string(post[i]));
+        v_order[j++] = dbe->index_of(post[i]);
 
     // Simulation
     int t = smpl->start_period.difference(dbv->get_sample()->start_period);
@@ -385,17 +386,39 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
 
     std::string list_pre = global_ws_lst->get(pre_name);
     char** c_pre = (char**) KL_expand(to_char_array(list_pre));
+    // convert to std::vector<std::string>
+    std::vector<std::string> pre;
+    int nb = SCR_tbl_size((unsigned char**) c_pre);
+    for(int i = 0; i < nb; i++) 
+        pre.push_back(std::string(c_pre[i]));
+    SCR_free_tbl((unsigned char**) c_pre); 
     
     std::string list_inter = global_ws_lst->get(inter_name);
     char** c_inter = (char**) KL_expand(to_char_array(list_inter));
-    
+    // convert to std::vector<std::string>
+    std::vector<std::string> inter;
+    nb = SCR_tbl_size((unsigned char**) c_inter);
+    for(int i = 0; i < nb; i++) 
+        inter.push_back(std::string(c_inter[i]));
+    SCR_free_tbl((unsigned char**) c_inter);
+
     std::string list_post = global_ws_lst->get(post_name);
     char** c_post = (char**) KL_expand(to_char_array(list_post));
-    
-    if(!(list_pre.back() == ';')) list_pre += ";";
-    if(!(list_inter.back() == ';')) list_inter += ";";
-    std::string list_eqs = list_pre + list_inter + list_post;
+    // convert to std::vector<std::string>
+    std::vector<std::string> post;
+    nb = SCR_tbl_size((unsigned char**) c_post);
+    for(int i = 0; i < nb; i++) 
+        post.push_back(std::string(c_post[i]));
+    SCR_free_tbl((unsigned char**) c_post);  
 
+    // union of pre, inter and post -> to create a subset of global_ws_eqs to simulate
+    std::set<std::string> v_eqs;
+    v_eqs.insert(pre.begin(), pre.end());
+    v_eqs.insert(inter.begin(), inter.end());
+    v_eqs.insert(post.begin(), post.end());
+    std::string list_eqs;
+    for(const auto& eq : v_eqs) 
+        list_eqs += eq + ";";
     if(list_eqs.empty())
     {
         error_msg += "\tEmpty list of equations";
@@ -409,7 +432,7 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     {
         KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
         if(tdbe->size() > 0)
-            success = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, c_pre, c_inter, c_post);
+            success = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, pre, inter, post);
     }
     catch(const std::exception& e)
     {
@@ -418,10 +441,6 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
         if(sample) delete sample;
         return false;
     }
-
-    SCR_free_tbl((unsigned char**) c_pre);
-    SCR_free_tbl((unsigned char**) c_inter);
-    SCR_free_tbl((unsigned char**) c_post);
 
     delete sample;
 

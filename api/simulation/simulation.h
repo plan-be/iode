@@ -230,7 +230,7 @@ public:
         const std::string& post_name = "_POST", const std::string& list_eqs = "");
 
     bool simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
-            char** pre, char** inter, char** post);
+            const std::vector<std::string>& pre, const std::vector<std::string>& inter, const std::vector<std::string>& post);
 
     bool simulate_SCC(const std::string& from, const std::string& to, const std::string& pre_name = "_PRE", 
         const std::string& inter_name = "_INTER", const std::string& post_name = "_POST");

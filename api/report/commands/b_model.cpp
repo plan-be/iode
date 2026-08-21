@@ -308,36 +308,49 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
+    int nb;
+
     std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(lsts[0]);
-    char** pre = (char**) KL_expand((char*) pre_lst->c_str());
+    char** c_pre = (char**) KL_expand((char*) pre_lst->c_str());
+    // convert to std::vector<std::string>
+    std::vector<std::string> pre;
+    nb = SCR_tbl_size((unsigned char**) c_pre);
+    for(int i = 0; i < nb; i++) 
+        pre.push_back(std::string(c_pre[i]));
+    SCR_free_tbl((unsigned char**) c_pre);
 
     std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(lsts[1]);
-    char** inter = (char**) KL_expand((char*) inter_lst->c_str());
+    char** c_inter = (char**) KL_expand((char*) inter_lst->c_str());
+    // convert to std::vector<std::string>
+    std::vector<std::string> inter;
+    nb = SCR_tbl_size((unsigned char**) c_inter);
+    for(int i = 0; i < nb; i++) 
+        inter.push_back(std::string(c_inter[i]));
+    SCR_free_tbl((unsigned char**) c_inter);
 
     std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(lsts[2]);
-    char** post = (char**) KL_expand((char*) post_lst->c_str());
+    char** c_post = (char**) KL_expand((char*) post_lst->c_str());
+    // convert to std::vector<std::string>
+    std::vector<std::string> post;
+    nb = SCR_tbl_size((unsigned char**) c_post);
+    for(int i = 0; i < nb; i++) 
+        post.push_back(std::string(c_post[i]));
+    SCR_free_tbl((unsigned char**) c_post);
 
     SCR_free_tbl((unsigned char**) lsts);
 
-    // Regroupe les listes dans une seule avant de faire K_quick_refer
-    char** c_eqs1 = (char**) SCR_union_quick((unsigned char**) pre, (unsigned char**) inter); // JMP 29/8/2012
-    char** c_eqs = (char**) SCR_union_quick((unsigned char**) c_eqs1, (unsigned char**) post);  // JMP 29/8/2012
-    SCR_free_tbl((unsigned char**) c_eqs1);
-    int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-    std::string eqs;
-    for(int i = 0; i < nb_eqs; i++) 
-        eqs += std::string(c_eqs[i]) + ";";
-    SCR_free_tbl((unsigned char**) c_eqs);
+    // union of pre, inter and post -> to create a subset of global_ws_eqs to simulate
+    std::set<std::string> v_eqs;
+    v_eqs.insert(pre.begin(), pre.end());
+    v_eqs.insert(inter.begin(), inter.end());
+    v_eqs.insert(post.begin(), post.end());
+    std::string list_eqs;
+    for(const auto& eq : v_eqs) 
+        list_eqs += eq + ";";
+    KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
 
-    KDBEquationsPtr tdbe = global_ws_eqs->get_subset(eqs, false);
-
-    // Lance la simulation
+    // Run the simulation
     bool success = global_simu->simulate_SCC(tdbe, global_ws_var, global_ws_scl, smpl, pre, inter, post);
-
-    // Cleanup
-    SCR_free_tbl((unsigned char**) pre);
-    SCR_free_tbl((unsigned char**) inter);
-    SCR_free_tbl((unsigned char**) post);
 
     return success ? 0 : -1;
 }
