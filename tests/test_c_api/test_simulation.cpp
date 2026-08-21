@@ -63,6 +63,8 @@ TEST_F(SimulationTest, Simulation)
     global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_A);
     global_simu->set_initialization_method(VariablesInitialization::VAR_INIT_EXTRA_NA);
 
+    global_simu->reset();
+
     // Invalid arguments
     // invalid sample definition
     success = global_simu->simulate("2000U1", to);
@@ -76,26 +78,50 @@ TEST_F(SimulationTest, Simulation)
     success = global_simu->simulate(from, to);
     EXPECT_FALSE(success);
 
-    // Check _PRE list after simulation (prolog)
-    std::string lst_pre = global_ws_lst->get("_PRE");
-    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(lst_pre, expected_lst_pre);
-
     // Check _DIVER list (divergent equations)
-    std::string lsdivider_lineer = global_ws_lst->get("_DIVER");
-    std::string expected_lsdivider_lineer = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_EQ(lsdivider_lineer, expected_lsdivider_lineer);
+    std::string lst_diver = global_ws_lst->get("_DIVER");
+    std::string expected_lst_diver = "WBG,YDH,QMT,QI5";
+    EXPECT_EQ(lst_diver, expected_lst_diver);
 
     // Test with with convergence (increase MAXIT)
     global_simu->max_iter = 100;
+    global_simu->set_debug(true);
     success = global_simu->simulate(from, to);
     EXPECT_TRUE(success);
 
+    std::string list_pre = global_ws_lst->get("_PRE");
+    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;";
+    expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    EXPECT_EQ(list_pre, expected_lst_pre);
+
+    std::string list_inter = global_ws_lst->get("_INTER");
+    std::string expected_lst_inter = "PMAB;PXAB;ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;";
+    expected_lst_inter += "YN;UY;WBF;WIND;WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;";
+    expected_lst_inter += "VAF;YDH;EXCC;EXC;ITF;PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;";
+    expected_lst_inter += "WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;";
+    expected_lst_inter += "SSH;RDEBT;YIDG;QAG;KNFF;KNI;KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;";
+    expected_lst_inter += "VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;";
+    expected_lst_inter += "QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;";
+    expected_lst_inter += "PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;";
+    expected_lst_inter += "QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;";
+    expected_lst_inter += "QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;";
+    expected_lst_inter += "WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
+    EXPECT_EQ(list_inter, expected_lst_inter);
+
+    std::string list_post = global_ws_lst->get("_POST");
+    std::string expected_lst_post = "IFU;SSHFF;PBBP;OCUF;IHU;IDF;DPUH;DPUF;DPU;BQY;ACAF;ZF;WNF_;WNF;WBU;VXB;SF;RIPBE;RIDGG;";
+    expected_lst_post += "RENT;QXB;QFND;QBNP;QBBPPOT_;PXB;PX;PG;PFND;PBNP;PAH;PAG;KNFFY;KL;GOSH;GAP;FLGR;FLF;DPUU;BENEF";
+    EXPECT_EQ(list_post, expected_lst_post);
+
     // Check result
     // exo
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.177102);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.186351);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.066228);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.628768);
     // endo
-    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e3) / 10e3, 0.40);
 
     // --- exchange UY - XNATY ---
     // Set values of endo UY
@@ -103,16 +129,51 @@ TEST_F(SimulationTest, Simulation)
     global_ws_var->set_var("UY", "2001Y1", 670.0);
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
+    global_ws_var->set_var("XNATY", "2000Y1", 0.0);
+    global_ws_var->set_var("XNATY", "2001Y1", 0.0);
+    global_ws_var->set_var("XNATY", "2002Y1", 0.0);
+
+    global_simu->reset();
+    global_simu->set_debug(true);
     success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
     success = global_simu->simulate(from, to);
     EXPECT_TRUE(success);
 
+    // exchange UY - XNATY -> NATY removed from block _PRE
+    list_pre = global_ws_lst->get("_PRE");
+    expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;POIL;PW3;PWMAB;PWMS;";
+    expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    EXPECT_EQ(list_pre, expected_lst_pre);
+
+    // exchange UY - XNATY -> replace UY by NATY in block _INTER
+    list_inter = global_ws_lst->get("_INTER");
+    expected_lst_inter = "PMAB;PXAB;ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;";
+    expected_lst_inter += "YN;NATY;WBF;WIND;WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;";
+    expected_lst_inter += "VAF;YDH;EXCC;EXC;ITF;PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;";
+    expected_lst_inter += "WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;";
+    expected_lst_inter += "SSH;RDEBT;YIDG;QAG;KNFF;KNI;KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;";
+    expected_lst_inter += "VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;";
+    expected_lst_inter += "QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;";
+    expected_lst_inter += "PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;";
+    expected_lst_inter += "QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;";
+    expected_lst_inter += "QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;";
+    expected_lst_inter += "WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
+    EXPECT_EQ(list_inter, expected_lst_inter);
+
+    // exchange UY - XNATY -> XNATY added to block _POST
+    list_post = global_ws_lst->get("_POST");
+    expected_lst_post = "IFU;SSHFF;PBBP;OCUF;IHU;IDF;DPUH;DPUF;DPU;BQY;ACAF;ZF;WNF_;WNF;WBU;VXB;SF;RIPBE;RIDGG;RENT;";
+    expected_lst_post += "QXB;QFND;QBNP;QBBPPOT_;PXB;PX;PG;PFND;PBNP;PAH;PAG;XNATY;KNFFY;KL;GOSH;GAP;FLGR;FLF;DPUU;BENEF";
+    EXPECT_EQ(list_post, expected_lst_post);
+
     // Check result
     EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.8007030);
-    
-    // TODO : check with list of equations
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2001Y1"), 670.0);
+    EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2002Y1"), 680.0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.801325);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e5) / 10e5, 0.633894);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e5) / 10e5, 0.395619);
 }
 
 TEST_F(SimulationTest, CalculateSCC)
@@ -162,6 +223,10 @@ TEST_F(SimulationTest, SimulateSCC)
 {
     bool success;
 
+    // SCC decomposition
+    success = global_simu->calculate_SCC(10);
+    EXPECT_TRUE(success);
+
     // Invalid arguments
     // invalid sample definition
     success = global_simu->simulate_SCC("2000U1", to);
@@ -169,10 +234,6 @@ TEST_F(SimulationTest, SimulateSCC)
     // invalid pre-recursive list
     success = global_simu->simulate_SCC(from, to, "UNKNOWN_LIST");
     EXPECT_FALSE(success);
-
-    // SCC decomposition
-    success = global_simu->calculate_SCC(10);
-    EXPECT_TRUE(success);
 
     // SCC simulation
     global_simu->max_iter = 100;
@@ -182,8 +243,12 @@ TEST_F(SimulationTest, SimulateSCC)
     // Check result
     // exo
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.173844);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.052155);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.610756);
     // endo
-    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e3) / 10e3, 0.40);
 
     // --- exchange UY - XNATY ---
     // Set values of endo UY
@@ -191,14 +256,27 @@ TEST_F(SimulationTest, SimulateSCC)
     global_ws_var->set_var("UY", "2001Y1", 670.0);
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
+    global_ws_lst->remove("_PRE");
+    global_ws_lst->remove("_INTER");
+    global_ws_lst->remove("_POST");
+    global_simu->reset();
+
+    // set exchange --> not taken into account in calculate_SCC() or simulate_SCC() !
     success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
+    // SCC decomposition
+    success = global_simu->calculate_SCC(10);
+    EXPECT_TRUE(success);
+    // SCC simulation
     success = global_simu->simulate_SCC(from, to);
     EXPECT_TRUE(success);
 
     // Check result
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.179951);
-    EXPECT_DOUBLE_EQ(global_ws_var->get_var("XNATY", "2000Y1"), 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.183956);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.047353);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.58507);
 
-    // TODO : check with list of equations
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e3) / 10e3, 0.40);
 }

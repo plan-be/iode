@@ -145,9 +145,13 @@ void CSimulation::restore_XK(int t)
 int CSimulation::prolog(int t)
 {
     double x;
+    std::string eq_name;
+    std::string var_name;
     for(int i = 0; i < nb_pre; i++)  
     {
-        x = calculate_CLEC(v_order[i], t, v_pos_endo_in_dbv[v_order[i]], 0);
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        x = calculate_CLEC(eq_name, var_name, t, 0);
         KSIM_SET_VAL(v_order[i], t, x);
     }
 
@@ -179,13 +183,17 @@ int CSimulation::sub_interdep_1(int t)
 
 
     norm = 0.0;
+    std::string eq_name;
+    std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK first */
         v_endo_values[j] = KSIM_VAL(v_order[i], t);
 
         /* execute lec */
-        x = calculate_CLEC(v_order[i], t, v_pos_endo_in_dbv[v_order[i]], 1);
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        x = calculate_CLEC(eq_name, var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
 
@@ -235,13 +243,17 @@ int CSimulation::sub_interdep_2(int t)
     double  d, pd;
 
     // Stage 1
+    std::string eq_name;
+    std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK for further use */
         v_endo_values[j] = KSIM_VAL(v_order[i], t);
 
         /* execute lec and save in v_endo_values_1 */
-        v_endo_values_1[j] = calculate_CLEC(v_order[i], t, v_pos_endo_in_dbv[v_order[i]], 1);
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        v_endo_values_1[j] = calculate_CLEC(eq_name, var_name, t, 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(v_endo_values_1[j])) 
             return -1;
@@ -323,9 +335,13 @@ int CSimulation::epilog(int t)
     int     i, j;
     double  x;
 
+    std::string eq_name;
+    std::string var_name;
     for(i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
-        x = calculate_CLEC(v_order[i], t, v_pos_endo_in_dbv[v_order[i]], 0);
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        x = calculate_CLEC(eq_name, var_name, t, 0);
         KSIM_SET_VAL(v_order[i], t, x);  
     }
 
@@ -359,13 +375,17 @@ int CSimulation::diverge(int t, char* c_name, double eps)
     if(global_ws_lst->contains(name))
         global_ws_lst->remove(name);
     
+    std::string eq_name;
+    std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK first */
         v_endo_values[j] = KSIM_VAL(v_order[i], t);
 
         /* execute lec */
-        x = calculate_CLEC(v_order[i], t, v_pos_endo_in_dbv[v_order[i]], 1);
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        x = calculate_CLEC(eq_name, var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
@@ -706,12 +726,8 @@ fin:
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
-double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
+double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string& var_name, int t, int msg)
 {
-    int eqvarnb = -1;
-    double x;
-
-    std::string eq_name = sim_dbe->get_name(eqnb);
     std::shared_ptr<Equation> eq = sim_dbe->get_obj_ptr(eq_name);
     if(!eq)
         return IODE_NAN;
@@ -720,15 +736,11 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     if(!eq_clec)
         return IODE_NAN;
     
+    double x = IODE_NAN;
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
-    eqvarnb = sim_dbv->index_of(eq_name);
-    if(clec->duplicated_endo || varnb != eqvarnb)
-    {
-        std::string var_name = sim_dbv->get_name(varnb);
-        std::string eq_var_name = sim_dbv->get_name(eqvarnb);
+    if(clec->duplicated_endo || var_name != eq_name)
         x = clec->zero(sim_dbv, sim_dbs, newton_step, newton_epsilon, newton_max_iter, 
-                       t, var_name, eq_var_name);
-    }
+                       t, var_name, eq_name);
     else
         x = clec->execute(sim_dbv, sim_dbs, t);
     
@@ -736,10 +748,9 @@ double CSimulation::calculate_CLEC(int eqnb, int t, int varnb, int msg)
     {
         Period period = sim_dbv->get_sample()->start_period.shift(t);
         kerror(0, "%s : becomes unavailable at %s%s",
-               sim_dbv->get_name(varnb), /* JMP 16-06-99 a la place de eqvarnb */
+               (char*) var_name.c_str(),
                (char*) period.to_string().c_str(),
-               ((clec->duplicated_endo || varnb != eqvarnb) ? "(Newton)" : "")
-              );
+               ((clec->duplicated_endo || var_name != eq_name) ? "(Newton)" : ""));
     }
     
     return x;

@@ -284,7 +284,7 @@ Main functions for model simulations.
 |:---|:---|
 |`int simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
 |`void clear()`|Frees all temporary allocated memory for the simulation.|
-|`double calculate_CLEC(int eqnb, int t, int varnb, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
+|`double calculate_CLEC(const std::string& eq_name, int t, const std::string& var_name, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
 
 #### k\_sim\_order.c {#T12}
 
