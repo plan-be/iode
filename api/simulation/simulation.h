@@ -237,12 +237,12 @@ public:
 
 protected:
 	/* k_sim_main.c */
-	double calculate_CLEC(int eqnb, int t, int varnb, int msg);
+	double calculate_CLEC(const std::string& eq_name, const std::string& var_name, int t, int msg);
 	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */
-	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	int get_eq_position(int posendo);
+	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */

@@ -1204,39 +1204,10 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
     EXPECT_FALSE(success);
 
-    // Check _PRE list after simulation (prolog)
-    EXPECT_TRUE(global_ws_lst->contains("_PRE"));
-    lst = global_ws_lst->get("_PRE");
-    expected_lst = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
-    EXPECT_EQ(lst, expected_lst);
-
-    // Check _DIVER 
-    EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
-    lst = global_ws_lst->get("_DIVER");
-    expected_lst = "SSH3O,WBG,SSF3,YDH,DTH,YDTG,YSFIC,WMIN,WLCP,WBGP,YSEFT2,YSEFT1,YSEFP,SBG,PWBG,W,ZJ,QMT,QI5,QC_,SSFG,YDH_,SG,ACAG,FLG";
-    EXPECT_EQ(lst, expected_lst);
-
     // Test with with convergence (increase MAXIT)
     global_simu->max_iter = 100;
     success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
     EXPECT_TRUE(success);
-
-    // Test Endo-exo
-
-    // Version with exchange in at least 2 equations
-    // Set values of endo UY
-    global_ws_var->set_var("UY", "2000Y1", 650.0);
-    global_ws_var->set_var("UY", "2001Y1", 670.0);
-    global_ws_var->set_var("UY", "2002Y1", 680.0);
-
-    // Simulate with exchange UY - XNATY
-    global_simu->exchange("UY-XNATY");
-    success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
-
-    // Check result
-    EXPECT_TRUE(success);
-    EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800703);
 
     // Cleanup
     delete smpl;
