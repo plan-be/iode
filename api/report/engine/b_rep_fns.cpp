@@ -1609,16 +1609,16 @@ U_ch *RPF_SimInitValues(U_ch** unused)
  */
 double RPF_SimNormReal(U_ch** args)
 {
-    int		t;
+    int t = RPF_CalcPeriod(args);
+    if(t < 0) 
+        return -1.0;
 
-    t = RPF_CalcPeriod(args);
-    if(t < 0) return(-1.0);
-
-    // Check si déjà simulation
-    if(global_simu->v_norm == 0) return(-1.0); // Pas encore de simulation
+    // Pas encore de simulation
+    if(global_simu->v_norm.empty()) 
+        return -1.0;
 
     // Return norme t
-    return(global_simu->v_norm[t]);
+    return global_simu->v_norm[t];
 }
 
 /**
@@ -1650,16 +1650,16 @@ U_ch *RPF_SimNorm(U_ch** args)
  */
 int RPF_SimNIterInt(U_ch** args)
 {
-    int		t;
+    int t = RPF_CalcPeriod(args);
+    if(t < 0) 
+        return -1;
 
-    t = RPF_CalcPeriod(args);
-    if(t < 0) return -1;
-
-    // Check si déjà simulation
-    if(global_simu->v_nb_iterations == 0) return -1; // Pas encore de simulation
+    // Pas encore de simulation
+    if(global_simu->v_nb_iterations.empty()) 
+        return -1;
 
     // Return norme t
-    return(global_simu->v_nb_iterations[t]);
+    return global_simu->v_nb_iterations[t];
 }
 
 /**
@@ -1701,7 +1701,7 @@ int RPF_SimCpuInt(U_ch** args)
         return -1;
 
     // No simulation done yet
-    if(global_simu->v_cpu_time == NULL) 
+    if(global_simu->v_cpu_time.empty()) 
         return -1;
 
     return global_simu->v_cpu_time[t];

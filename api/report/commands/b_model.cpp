@@ -173,19 +173,21 @@ fin :
  */
 int B_ModelExchange(char* const_arg, int unused)
 {
-    char    *arg;
-
     // Copy for C++ strings = read only (const)
-    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
+    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
-    if(global_simu->v_endo_exo) 
+    global_simu->v_endo_exo.clear();
+    if(arg && SCR_strip((unsigned char*) arg)[0])
     {
-        SCR_free_tbl((unsigned char**) global_simu->v_endo_exo);
-        global_simu->v_endo_exo = NULL;
-    }
-
-    if(arg && SCR_strip((unsigned char*) arg)[0]) 
-        global_simu->v_endo_exo = B_ainit_chk(arg, NULL, 0);
+        char** lst = B_ainit_chk(arg, NULL, 0);
+        if(lst != NULL)
+        {
+            int nb = SCR_tbl_size((unsigned char**) lst);
+            for(int i = 0; i < nb; i++)
+                global_simu->v_endo_exo.push_back(std::string(lst[i]));
+            SCR_free_tbl((unsigned char**) lst);
+        }
+    } 
     
     SCR_free(arg);
     return 0;
@@ -452,7 +454,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  */
 int B_ModelSimulateSaveNIters(char *arg, int unused)
 {
-    return(B_CreateVarFromVecOfInts(arg, global_simu->v_nb_iterations));
+    return(B_CreateVarFromVecOfInts(arg, global_simu->v_nb_iterations.empty() ? NULL : global_simu->v_nb_iterations.data()));
 }
 
 
@@ -465,5 +467,5 @@ int B_ModelSimulateSaveNIters(char *arg, int unused)
  */
 int B_ModelSimulateSaveNorms(char *arg, int unused)
 {
-    return(B_CreateVarFromVecOfDoubles(arg, global_simu->v_norm));
+    return(B_CreateVarFromVecOfDoubles(arg, global_simu->v_norm.empty() ? NULL : global_simu->v_norm.data()));
 }

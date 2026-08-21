@@ -128,10 +128,10 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
             continue;
 
         /* if path already examined continue */
-        if(path[posseq] == 1) 
+        if(v_path[posseq]) 
             continue;
         else 
-            path[posseq] = 1;
+            v_path[posseq] = true;
 
         (*depth) ++;
         rc = find_path(pos, posexo, depth);
@@ -201,7 +201,8 @@ int CSimulation::exo_to_endo(int posendo, int posexo)
     }
 
     /* check if exo in equation */
-    memset(path, 0, max_depth);
+    v_path.clear();
+    v_path.resize(max_depth, false);
     exo = find_path(posendo, posexo, &depth);
     if(exo < 0) 
     {

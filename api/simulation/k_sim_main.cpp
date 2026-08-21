@@ -124,8 +124,7 @@ void CSimulation::init_values(int t)
  *  
  *      ENDO[i,t]=v_endo_values[i]
  *  
- *  @param  [in]  int           t         index of the period where the data must be copied
- *  @global [in]  double*    v_endo_values   result of the last Gauss-Seidel iteration 
+ *  @param  [in]  int  t   index of the period where the data must be copied
  *  
  */
 void CSimulation::restore_XK(int t)
@@ -517,9 +516,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     bool success = true;
     int     i, t, bt, at, j, k, res, endo_exonb,
             posendo, posexo, posvar, cpu_iter;
-    char    **var = NULL;
     double  *x;
     std::string var_name, var_exo;
+    std::vector<std::string> pair_endo_exo;
 
     if(dbe->size() == 0) 
     {
@@ -548,18 +547,20 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
 
     // v_pos_endo_in_dbv[i] = pos in sim_dbv of the endo of equation i (endo var = eq name)
     // v_pos_endo_in_dbe[i] = pos in sim_dbe of the eq whose endo is var[i] 
-    v_pos_endo_in_dbv = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
-    v_pos_endo_in_dbe = (int *) SW_nalloc((int)(sizeof(int) * dbv->size()));
+    v_pos_endo_in_dbv.clear();
+    v_pos_endo_in_dbe.clear();
+    v_pos_endo_in_dbv.resize(dbe->size(), -1);
+    v_pos_endo_in_dbe.resize(dbv->size(), -1);
     for(i = 0 ; i < dbv->size(); i++) 
         v_pos_endo_in_dbe[i] = -1;
 
     // Initialize v_norm and v_nb_iterations (see definitions above) 
-    SCR_free(v_norm);
-    SCR_free(v_nb_iterations);
-    SCR_free(v_cpu_time);
-    v_norm = (double *) SCR_malloc(sizeof(double) * dbv->get_sample()->nb_periods);
-    v_nb_iterations = (int *) SCR_malloc(sizeof(int) * dbv->get_sample()->nb_periods);
-    v_cpu_time = (long *) SCR_malloc(sizeof(long) * dbv->get_sample()->nb_periods);
+    v_norm.clear();
+    v_nb_iterations.clear();
+    v_cpu_time.clear();
+    v_norm.resize(dbv->get_sample()->nb_periods, 0.0);
+    v_nb_iterations.resize(dbv->get_sample()->nb_periods, 0);
+    v_cpu_time.resize(dbv->get_sample()->nb_periods, 0);
 
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
@@ -595,22 +596,23 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
 
     // Optional goal seeking = exchange exo and endo roles in equations
     // Each couple endo-exo
-    if(v_endo_exo != NULL) 
+    if(!v_endo_exo.empty()) 
     {
-        endo_exonb = SCR_tbl_size((unsigned char**) v_endo_exo);
-        path = SW_nalloc(max_depth);
+        v_path.clear();
+        v_path.resize(max_depth, false);
+        endo_exonb = (int) v_endo_exo.size();
         for(i = 0; i < endo_exonb; i ++) 
         {
-            var = (char**) SCR_vtom((unsigned char*) v_endo_exo[i], (int) '-');
-            if(var == NULL || SCR_tbl_size((unsigned char**) var) != 2) 
+            pair_endo_exo = split(v_endo_exo[i], '-');
+            if(pair_endo_exo.size() != 2) 
             {
-                std::string err_msg = std::string(v_endo_exo[i]) + ": syntax error in goal seeking parameter";
+                std::string err_msg = v_endo_exo[i] + ": syntax error in goal seeking parameter";
                 error_manager.append_error(err_msg);
                 success = false;
                 goto fin;
             }
 
-            var_name = std::string(var[0]);
+            var_name = pair_endo_exo[0];
             posendo = sim_dbv->index_of(var_name);   // Position of the endogenous var in dbv
             if(posendo < 0) 
             {
@@ -622,7 +624,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
                 goto fin;
             }
 
-            var_name = std::string(var[1]);
+            var_name = pair_endo_exo[1];
             posexo = sim_dbv->index_of(var_name);  // Position of the exogenous var in dbv
             if(posexo < 0) 
             {
@@ -638,9 +640,6 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
                 success = false;
                 goto fin;
             }
-
-            SCR_free_tbl((unsigned char**) var);
-            var = NULL;
         }
     }
 
@@ -650,8 +649,10 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         build_lists_order("_PRE", "_INTER", "_POST");
 
     // SIMULATE 
-    v_endo_values  = (double *) SW_nalloc(sizeof(double) * nb_inter);
-    v_endo_values_1 = (double *) SW_nalloc(sizeof(double) * nb_inter);
+    v_endo_values.clear();
+    v_endo_values_1.clear();
+    v_endo_values.resize(nb_inter, 0.0);
+    v_endo_values_1.resize(nb_inter, 0.0);
 
     for(i = 0; i < smpl->nb_periods; i++, t++) 
     {
@@ -664,27 +665,23 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         
         v_cpu_time[t] = WscrGetMS() - cpu_iter;
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
-        if(v_endo_exo != NULL) 
+        if(!v_endo_exo.empty()) 
         {
             for(k = 0; k < endo_exonb; k ++) 
             {
-                var = (char**) SCR_vtom((unsigned char*) v_endo_exo[k], '-');
-                var_name = std::string(var[1]);
+                pair_endo_exo = split(v_endo_exo[k], '-');
+                var_name = pair_endo_exo[1];
                 posexo = sim_dbv->index_of(var_name);  // Position of the exogenous var in dbv
 
                 var_exo = sim_dbv->get_name(posexo);
                 x = sim_dbv->get_var_ptr(var_exo);
                 for(j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
                     x[j] = x[t];
-
-                SCR_free_tbl((unsigned char**) var);
-                var = NULL;
             }
         }
     }
 
 fin:
-    SCR_free_tbl((unsigned char**) var);
     clear();
     return success;
 }
@@ -818,18 +815,13 @@ void CSimulation::build_lists_order(char* pre, char* inter, char *post)
  */
 bool CSimulation::exchange(const std::string& list_endo_exo)
 {
-    if(v_endo_exo) 
-    {
-        SCR_free_tbl((unsigned char**) v_endo_exo);
-        v_endo_exo = NULL;
-    }
+    v_endo_exo.clear();
 
     if(list_endo_exo.empty())
         return false;
-    
-    char* c_list_endo_exo = to_char_array(list_endo_exo);
-    char** c_exo = B_ainit_chk(c_list_endo_exo, NULL, 0);
-    if(c_exo == NULL && !list_endo_exo.empty()) 
+
+    char** c_endo_exo = B_ainit_chk((char*) list_endo_exo.c_str(), NULL, 0);
+    if(c_endo_exo == NULL && !list_endo_exo.empty()) 
     {
         std::string error_msg = "Cannot exchange the model variables:\n";
         error_msg += "Invalid list of endogenous-exogenous pairs: " + list_endo_exo;
@@ -837,7 +829,11 @@ bool CSimulation::exchange(const std::string& list_endo_exo)
         return false;
     }
 
-    v_endo_exo = c_exo;
+    int nb = SCR_tbl_size((unsigned char**) c_endo_exo);
+    for(int i = 0; i < nb; i++) 
+        v_endo_exo.push_back(std::string(c_endo_exo[i]));
+    SCR_free_tbl((unsigned char**) c_endo_exo);
+    
     return true;
 }
 

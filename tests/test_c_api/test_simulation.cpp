@@ -38,13 +38,13 @@ TEST_F(SimulationTest, ModelExchange)
 
     success = global_simu->exchange(endo_exo);
     EXPECT_TRUE(success);
-    EXPECT_EQ(SCR_tbl_size((unsigned char**) global_simu->v_endo_exo), 1);
+    EXPECT_EQ(global_simu->v_endo_exo.size(), 1);
     EXPECT_EQ(std::string(global_simu->v_endo_exo[0]), "UY-XNATY");
 
     // reset v_endo_exo
     success = global_simu->exchange();
     EXPECT_FALSE(success);
-    EXPECT_TRUE(global_simu->v_endo_exo == NULL);
+    EXPECT_TRUE(global_simu->v_endo_exo.empty());
 }
 
 TEST_F(SimulationTest, Simulation)
