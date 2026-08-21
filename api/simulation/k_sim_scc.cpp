@@ -32,7 +32,8 @@
  *  @return     bool                
  *  
  */
-bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* inter, char* post)
+bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string& pre, 
+    const std::string& inter, const std::string& post)
 {
     int opasses = nb_passes;
     int osort = sorting_algo;
