@@ -1,15 +1,7 @@
-import sys
 import warnings
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from enum import IntEnum, StrEnum
-    from typing import Self
-else:
-    Self = Any
-    from enum import Enum
-    StrEnum = Enum
+from typing import Union, Tuple, List, Optional, Any, Self
 
 import numpy as np
 import pandas as pd
@@ -8257,3 +8249,5 @@ class Variables(IodeDatabase):
 
 
 variables: Variables = Variables.get_instance()
+
+

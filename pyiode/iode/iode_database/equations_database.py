@@ -1,11 +1,6 @@
-import sys
 import warnings
 from pathlib import Path
-from typing import Union, Tuple, List, Dict, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Optional, Any, Self
 
 import pandas as pd
 from iode.common import EqTest, PrintEquationsAs, PrintEquationsLecAs
@@ -2187,3 +2182,5 @@ class Equations(IodeDatabase):
 
 
 equations: Equations = Equations.get_instance()
+
+

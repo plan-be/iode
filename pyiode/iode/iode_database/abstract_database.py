@@ -1,12 +1,7 @@
 import warnings
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Union, Tuple, List, Dict, Optional, Any
-import sys
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Optional, Any, Self
 
 import numpy as np
 import pandas as pd
@@ -1604,3 +1599,5 @@ class IodeDatabase:
 
     def __hash__(self) -> int:
         return self._cy_database.__hash__()
+
+

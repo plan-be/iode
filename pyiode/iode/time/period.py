@@ -1,12 +1,7 @@
-import sys
 import warnings
-from typing import Union, Tuple, List, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Any, Self
 
-from iode.common import PeriodICITY_LIST
+from iode.common import PERIODICITY_LIST
 from iode.iode_cython import Period as CythonPeriod
 
 
@@ -78,8 +73,8 @@ class Period:
             year = period_or_year
             if len(periodicity) != 1:
                 raise ValueError("'periodicity': Expected string of length 1")
-            if periodicity not in PeriodICITY_LIST:
-                raise ValueError(f"Wrong periodicity. Valid values for the periodicity are: {', '.join(PeriodICITY_LIST)}")
+            if periodicity not in PERIODICITY_LIST:
+                raise ValueError(f"Wrong periodicity. Valid values for the periodicity are: {', '.join(PERIODICITY_LIST)}")
             self._cy_period = CythonPeriod(year, periodicity, step)
 
     @classmethod
@@ -278,5 +273,7 @@ class Period:
             return ""
         else:
             return f'Period("{self.year}{self.periodicity}{self.step}")'
+
+
 
 

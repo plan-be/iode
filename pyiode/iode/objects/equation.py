@@ -1,11 +1,6 @@
-import sys
 import warnings
 from copy import copy
-from typing import Union, Tuple, List, Dict, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Any, Self
 
 from iode.common import EqMethod, EqTest
 from iode.time.period import Period
@@ -1280,5 +1275,7 @@ class Equation:
 
     def __hash__(self) -> int:
         return self._cy_equation.__hash__()
+
+
 
 

@@ -1,10 +1,5 @@
-import sys
 from pathlib import Path
-from typing import Union, Tuple, List, Dict, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Optional, Any, Self
 
 import pandas as pd
 from iode.util import table2str, JUSTIFY
@@ -942,3 +937,5 @@ class Scalars(IodeDatabase):
 
 
 scalars: Scalars = Scalars.get_instance()
+
+

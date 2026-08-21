@@ -1,11 +1,6 @@
-import sys
 from pathlib import Path
 from collections.abc import Iterable
-from typing import Union, Tuple, List, Optional, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Optional, Any, Self
 
 import pandas as pd
 from iode.util import join_lines, table2str, JUSTIFY
@@ -967,3 +962,5 @@ class Identities(IodeDatabase):
 
 
 identities: Identities = Identities.get_instance()
+
+

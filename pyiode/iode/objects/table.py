@@ -1,12 +1,7 @@
-import sys
 import warnings
 from copy import copy
 from pathlib import Path
-from typing import Union, Tuple, List, Dict, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Dict, Any, Self
 
 from iode.common import TableLang
 from iode.iode_database.extra_files import load_extra_files
@@ -2502,3 +2497,5 @@ class Table:
         True
         """
         return self._cy_table.__hash__()
+
+

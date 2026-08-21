@@ -1,10 +1,5 @@
-import sys
 from copy import copy
-from typing import Union, Tuple, List, Any
-if sys.version_info.minor >= 11:
-    from typing import Self
-else:
-    Self = Any
+from typing import Union, Tuple, List, Any, Self
 
 from iode.iode_cython import Identity as CythonIdentity
 
@@ -166,5 +161,7 @@ class Identity:
 
     def __hash__(self) -> int:
         return hash(str(self))
+
+
 
 
