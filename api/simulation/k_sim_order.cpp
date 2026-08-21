@@ -58,15 +58,15 @@ int CSimulation::add_post(std::vector<std::vector<int>>& successors, int i, int 
  *  
  *  Loops on the equations. 
  *  If all endogenous in an equation are already in a block, then put the equation in the next available 
- *  position in v_order and mark the equation as ordered (v_ordered[i] = 1;
+ *  position in v_order and mark the equation as ordered (v_ordered[i] = true);
  *  
  *  Method
  *  ------
  *       For each equation eq, loop on varj, the variables present in eq (stored in predecessors[i]):
- *			if varj == predecessors[i][j+1] or varj < 0 (exo) or v_ordered[varj] == 1: 
+ *			if varj == predecessors[i][j+1] or varj < 0 (exo) or v_ordered[varj] == true: 
  *               skip the equation
  *			else 
- *				v_ordered[varj] = 1
+ *				v_ordered[varj] = true
  *				v_order[from + nb] = i
  *	
  *       If no new equation had been set in v_order during the loop, end of the process (the block is completed)
@@ -78,7 +78,7 @@ int CSimulation::add_post(std::vector<std::vector<int>>& successors, int i, int 
  *  @return             int                     number of equations in the computed block
  *
  *  @global [in, out]   int*    v_order      vector containing the order of execution of the model (after reordering)
- *  @global [in, out]   int*    v_ordered    vector with 1 for the equations already placed in v_order
+ *  @global [in, out]   std::vector<bool> v_ordered    vector with true for the equations already placed in v_order
  *  
  */
 int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int from)
@@ -97,7 +97,7 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
         for(int i = 0; i < sim_dbe->size(); i++) 
         {
             // Equation already ordered (i.e. in the PRE or POST list)
-            if(v_ordered[i] == 1) 
+            if(v_ordered[i]) 
                 continue;
             
             std::vector<int>& eq_predecessors = predecessors[i];
@@ -110,7 +110,7 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
                     if(eq_predecessors[j + 1] < 0) 
                         continue;
                     // Var[j+1] = already ordered
-                    if(v_ordered[eq_predecessors[j + 1]] == 1) 
+                    if(v_ordered[eq_predecessors[j + 1]]) 
                         continue;
                     // Var[j+1] non-exogenous and not ordered 
                     // -> equation cannot be added to the PRE or POST list 
@@ -122,7 +122,7 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
             if(predecessors[i].size() == 0 || j == nb_predecessors) 
             {
                 new_eq_added = true;
-                v_ordered[i] = 1;
+                v_ordered[i] = true;
                 v_order[from + nb] = i;
                 nb++;
             }
@@ -171,8 +171,7 @@ int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<i
  */
 int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
-    SW_nfree(v_ordered);
-    v_ordered = NULL;
+    v_ordered.clear();
     return 0;
 }
 
@@ -192,10 +191,10 @@ int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& 
  *  @param [in, out] int**   predecessors   vector of vectors of predecessors (1 vector for each eq (=endo))
  *  @param [in, out] int**   successors     vector of vectors of successors (1 vector for each endo)
  *
- *	@global [out]    char*   v_ordered   allocated vector indicating which equations have already been placed in a block (pre, post, interdep).
- *                                              -> Contains nb chars where nb is the number of equations in dbe. 
+ *	@global [out]    std::vector<bool> v_ordered   allocated vector indicating which equations have already been placed in a block (pre, post, interdep).
+ *                                              -> Contains nb bools where nb is the number of equations in dbe. 
  *                                              -> Note that v_ordered is not calculated in pre_order(), just allocated.
- *                                              -> v_ordered[i] = 1 if equation i has already been put in a block (PRE...)
+ *                                              -> v_ordered[i] = true if equation i has already been put in a block (PRE...)
  *	@global [out]    int*    v_order     allocated vector containing the order of execution of the equations in the model.
  *                                              -> nb integers where nb is the number of equations in dbe (not calculated here)
  *                                              -> Note that v_order is not calculated here, only allocated 
@@ -204,8 +203,12 @@ int CSimulation::post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& 
 int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
     int nb = dbe->size();
-    v_order    = (int *)  SW_nalloc(sizeof(int) * nb);
-    v_ordered  = (char *) SW_nalloc(sizeof(char) * nb);
+    
+    v_order.clear();
+    v_order.resize(nb, -1);
+
+    v_ordered.clear();
+    v_ordered.resize(nb, false);
     
     int posj, eq_pos;
     int i = 0, j = 0;
@@ -282,25 +285,24 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
  */
 void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs)
 {
-    int  *tmp2, i, k;
     long cpu_order = 0; 
-
     cpu_time_sorting = 0;
     cpu_time_scc = 0;
 
     int nb = dbe->size();
     
-    // Pas de réord : on garde l'ordre de eqs et donc tout est interdep
+    // No reordering : we keep the order of eqs and so everything is interdep
     if(sorting_algo == SORT_NONE) 
     {
         nb_pre = nb_post = 0;
         nb_inter = nb;
-        v_order = (int *) SW_nalloc(sizeof(int) * nb);
+        v_order.clear();
+        v_order.resize(nb, -1);
         if(eqs.size() == 0)
-            for(i = 0; i < nb_inter; i++) 
+            for(int i = 0; i < nb_inter; i++) 
                 v_order[i] = i;
         else
-            for(i = 0; i < nb_inter; i++) 
+            for(int i = 0; i < nb_inter; i++) 
                 v_order[i] = dbe->index_of(eqs[i]);
         return;
     }
@@ -318,7 +320,8 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     nb_post = build_pre_post_list(dbe, successors, nb_pre);
 
     /* REVERSE FOR EXECUTION PURPOSE */
-    for(i = 0; i < nb_post / 2; i++) 
+    int k;
+    for(int i = 0; i < nb_post / 2; i++) 
     {
         k = v_order[nb_pre + i];
         v_order[nb_pre + i] = v_order[nb_pre + (nb_post - 1) - i];
@@ -334,12 +337,11 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
             nb_inter, 
             nb_post);
 
-    /* A AMELIORER !! */
-    tmp2 = (int *) SW_nalloc(sizeof(int) * (nb_inter + nb_post));
-    memcpy(tmp2, v_order + nb_pre, (nb_inter + nb_post) * sizeof(int));
-    memcpy(v_order + nb_pre, tmp2 + nb_post, nb_inter * sizeof(int));
-    memcpy(v_order + nb_pre + nb_inter, tmp2, nb_post * sizeof(int));
-    SW_nfree(tmp2);
+    // NOTE: currently, v_order contains lists in the order *pre*, *post*, *inter*.
+    // Rotate the [post, inter] subrange left by nb_post to obtain *pre*, *inter*, *post*.
+    std::rotate(v_order.begin() + nb_pre,
+                v_order.begin() + nb_pre + nb_post,
+                v_order.begin() + nb_pre + nb_post + nb_inter);
 
     if(sorting_algo == SORT_BOTH) 
     {
@@ -381,17 +383,13 @@ int CSimulation::get_eq_position(int posendo)
 /**
  *  Initialise the pseudo-triangulation variables.
  *  
- *  @param [in]     KDB*    dbe         model   
- *  @global [out]   int*    v_permut   vector of equations permutations. Filled with -1 at start.
- *  
+ *  @param [in]     KDB*    dbe         model    
  */
 int CSimulation::compute_tri_begin(KDBEquationsPtr dbe)
 {
     int nb = dbe->size();
-    v_permut = (int *) SW_nalloc(sizeof(int) * nb);
-    
-    for(int i = 0 ; i < nb ; i++) 
-        v_permut[i] = -1;
+    v_permut.clear();
+    v_permut.resize(nb, -1);
     
     for(int i = 0 ; i < nb_inter ; i++)
         v_permut[v_order[nb_pre + i]] = i;
@@ -403,9 +401,7 @@ int CSimulation::compute_tri_begin(KDBEquationsPtr dbe)
 /**
  *  Saves int v_order the changes computed by the triangulation algorithm.
  *  
- *  @param [in]     KDB*    dbe         model   
- *  @global [out]   int*    v_permut   vector of equations permutations.
- *  
+ *  @param [in]     KDB*    dbe         model    
  */
 int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
 {
@@ -413,8 +409,7 @@ int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
         if(v_permut[i] >= 0)
             v_order[nb_pre + v_permut[i]] = i;
 
-    SW_nfree(v_permut);
-    v_permut = NULL;
+    v_permut.clear();
     return 0;
 }
 
@@ -430,9 +425,6 @@ int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
  *  @param [in]         KDB*    dbe     model   
  *  @param [in]         int     i       equation position in the dbe
  *  @param [in]         int*    vars    list of explanatory variables in equation i
- *
- *  @global [in, out]   int*    v_permut   vector of equations permutations. 
- *  
  */
 void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& vars)
 {
@@ -475,9 +467,6 @@ void CSimulation::compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>
  *  @param [in]         KDB*    dbe             model
  *  @param [in]         int**   predecessors    table of vectors, 1 vector per equation with the list explanatory variables  
  *  @param [in]         int     passes          how many times the heuristic algorithm must be run 
- *      
- *  @global [in, out]   int*    v_permut vector of equation positions after pseudo-triangulation
- *  
  */
 void CSimulation::compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)
 {   

@@ -1230,7 +1230,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     global_ws_var->set_var("UY", "2002Y1", 680.0);
 
     // Simulate with exchange UY - XNATY
-    global_simu->v_endo_exo = (char**) SCR_vtoms((unsigned char*)"UY-XNATY", (unsigned char*)",; ");
+    global_simu->exchange("UY-XNATY");
     success = global_simu->simulate(kdbe, kdb_var, kdbs, smpl);
 
     // Check result

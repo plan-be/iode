@@ -61,8 +61,10 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* 
 
     // v_pos_endo_in_dbv[i] = num dans dbv de la var endogène de l'équation i
     // v_pos_endo_in_dbe[i] = pos in sim_dbe of the eq whose endo is var[i] 
-    v_pos_endo_in_dbv = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
-    v_pos_endo_in_dbe = (int *) SW_nalloc((int)(sizeof(int) * dbe->size()));
+    v_pos_endo_in_dbv.clear();
+    v_pos_endo_in_dbe.clear();
+    v_pos_endo_in_dbv.resize(dbe->size(), -1);
+    v_pos_endo_in_dbe.resize(dbe->size(), -1);
     for(int i = 0 ; i < dbe->size(); i++) 
         v_pos_endo_in_dbe[i] = -1;  
     
@@ -101,12 +103,9 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, char* pre, char* 
     order(dbe);
     build_lists_order(pre, inter, post);
 
-    SW_nfree(v_pos_endo_in_dbv);
-    v_pos_endo_in_dbv = NULL;
-    SW_nfree(v_pos_endo_in_dbe);
-    v_pos_endo_in_dbe = NULL;
-    SW_nfree(v_order);
-    v_order = NULL;
+    v_pos_endo_in_dbv.clear();
+    v_pos_endo_in_dbe.clear();
+    v_order.clear();
 
     nb_passes = opasses;
     sorting_algo = osort;
@@ -149,17 +148,18 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
     }
 
     // v_pos_endo_in_dbv[i] = num dans dbv de la var endogène de l'équation i
-    v_pos_endo_in_dbv = (int *) SW_nalloc(sizeof(int) * dbe->size());
+    v_pos_endo_in_dbv.clear();
+    v_pos_endo_in_dbv.resize(dbe->size(), -1);
 
     // Initialise les nouvelles vars pour conserver les résultats de sim
     // WARNING: DO NOT FREE v_norm and v_nb_iterations later because they are used 
     //          for reporting afterwards!
-    SCR_free(v_norm);
-    SCR_free(v_nb_iterations);
-    SCR_free(v_cpu_time);
-    v_norm = (double *) SCR_malloc(sizeof(double) * dbv->get_sample()->nb_periods);
-    v_nb_iterations = (int *) SCR_malloc(sizeof(int) * dbv->get_sample()->nb_periods);
-    v_cpu_time = (long *) SCR_malloc(sizeof(long) * dbv->get_sample()->nb_periods);
+    v_norm.clear();
+    v_nb_iterations.clear();
+    v_cpu_time.clear();
+    v_norm.resize(dbv->get_sample()->nb_periods, 0.0);
+    v_nb_iterations.resize(dbv->get_sample()->nb_periods, 0);
+    v_cpu_time.resize(dbv->get_sample()->nb_periods, 0);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     int rc = 0;
@@ -192,13 +192,14 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
         }
     }
 
-    v_endo_values = (double *) SW_nalloc(sizeof(double) * nb_inter);
-    v_endo_values_1 = (double *) SW_nalloc(sizeof(double) * nb_inter);
+    v_endo_values.clear();
+    v_endo_values_1.clear();
+    v_endo_values.resize(nb_inter, 0.0);
+    v_endo_values_1.resize(nb_inter, 0.0);
     return true;
 
 fin:
-    SW_nfree(v_pos_endo_in_dbv);
-    v_pos_endo_in_dbv = NULL;
+    v_pos_endo_in_dbv.clear();
     return success;
 }
 
@@ -228,7 +229,8 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
 
     // Fixe l'ordre d'exécution dans v_order
     int j = 0;
-    v_order = (int *)  SW_nalloc(sizeof(int) * (nb_pre + nb_inter + nb_post));
+    v_order.clear();
+    v_order.resize(nb_pre + nb_inter + nb_post, -1);
     for(int i = 0; i < nb_pre; i++)   
         v_order[j++] = dbe->index_of(std::string(pre[i]));
     for(int i = 0; i < nb_inter; i++) 
