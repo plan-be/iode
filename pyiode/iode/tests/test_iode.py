@@ -1345,7 +1345,8 @@ def test_simulation(capsys):
         simulation.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     
     simulation.model_calculate_SCC(100, "_PRE", "_INTER", "_POST")
-    with pytest.warns(RuntimeWarning, match=r"PMAB : becomes unavailable at 1960Y1"):
+    with pytest.warns(RuntimeWarning, match=r"Cannot simulate SCC:\n"
+                                            r"\tSSH3P : becomes unavailable at 1960Y1"):
         simulation.model_simulate_SCC("1960Y1", "2015Y1", "_PRE", "_INTER", "_POST")
     
     # Test simulation: divergence (max nb iterations = 2)

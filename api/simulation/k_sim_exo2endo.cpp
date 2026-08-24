@@ -4,12 +4,6 @@
  *  Functions to invert equations in order to solve the equation system with respect to an 
  *  alternative set of variables.
  *  
- *  List of functions 
- *  -----------------
- *  
- *      int exo_to_endo(int posendo, int posexo)  Modify the model to solve it with respect to another set of variables
- *
- *
  *  Exchanges Endo-Exo
  *  ------------------
  *
@@ -71,101 +65,89 @@
  *  
  *  See more explanation at the top of this module.
  *  
- *  @param [in] int     posendo     position of the endogenous variable in sim_dbv
- *  @param [in] int     posexo      position of the exogenous variable in sim_dbv
+ *  @param [in] int     posendo     position of the endogenous variable in sim_dbe
+ *  @param [in] int     posexo      position of the exogenous variable in sim_dbe
  *  @param [in] int*    depth       current level of recursivity (starts at 0 and increase each time KE)
- *  @return     int                 0 on success, -1 on error
- *  
- *  TODO: check that eclec is freed
  *  
  */
-int CSimulation::find_path(int posendo, int posexo, int* depth)
+bool CSimulation::find_path(int posendo, int posexo, int& depth)
 {
-    int poseq, posseq, posvar, rc = -1;
-
-    if(posexo < 0 || *depth > max_depth) 
-        return -1;
+    if(posexo < 0 || depth > max_depth) 
+        return false;
 
     std::shared_ptr<Equation> eq_ptr;
+    std::string endo = sim_dbv->get_name(posendo);
+    std::string exo = sim_dbv->get_name(posexo);
 
     // Endo and exo are in same equation 
-    // => replace the endo var position in v_pos_endo_in_dbv by the exo var position 
-    std::string coef_name, eq_name;
-    poseq = get_eq_position(posendo);
-    eq_name = sim_dbv->get_name(posendo);
-    eq_ptr = sim_dbe->get_obj_ptr(eq_name);
+    // => add entry in map_exchange and map_exchange_rev and return 
+    eq_ptr = sim_dbe->get_obj_ptr(endo);
     std::shared_ptr<CLEC> clec = eq_ptr->clec;
     for(auto& [name, pos]: clec->map_objs) 
     {
         if(is_coefficient(name)) 
             continue;
         
-        if(pos == posexo) 
+        if(name == exo) 
         {
-            v_pos_endo_in_dbv[poseq] = posexo;
-            v_pos_endo_in_dbe[posexo] = poseq;
-            return 0;
+            map_exchange[endo] = exo;
+            map_exchange_rev[exo] = endo;
+            return true;
         }
     }
 
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
-    std::shared_ptr<CLEC> eclec;
+    int poseq = -1;
+    bool success = false;
     for(auto& [name, pos]: clec->map_objs) 
-    {
-        eq_name = sim_dbe->get_name(poseq);
-        eq_ptr = sim_dbe->get_obj_ptr(eq_name);
-        eclec = eq_ptr->clec;            
-        CLEC clec(*eclec);
-        
+    {   
         if(is_coefficient(name)) 
             continue;
-        
-        posseq = get_eq_position(pos);
 
-        /* if same endo, variable exo or endo already exchanged continue */
-        if(poseq == posseq || posseq < 0) 
+        if(name == endo)
             continue;
 
-        /* if path already examined continue */
-        if(v_path[posseq]) 
+        poseq = get_eq_position(name);
+
+        // current variable is not an endogenous of any equation
+        if(poseq < 0) 
+            continue;
+
+        // if path already examined --> continue
+        if(path_examined.contains(poseq)) 
             continue;
         else 
-            v_path[posseq] = true;
+            path_examined.insert(poseq);
 
-        (*depth) ++;
-        rc = find_path(pos, posexo, depth);
+        depth++;
+        success = find_path(pos, posexo, depth);
         // If not found, try the next variable in clec
-        if(rc < 0) 
+        if(!success) 
         {
-            (*depth) --;
+            depth--;
             continue;
         }
 
         // Path found
-        // Replace the endo of the v_pos_endo_in_dbv[poseq] by the j'd varname in current clec
-        posvar = pos;
-        v_pos_endo_in_dbv[poseq] = posvar;
-        v_pos_endo_in_dbe[posvar] = poseq;
+        map_exchange[endo] = name;
+        map_exchange_rev[name] = endo;
         
         // decrease the depth by 1
-        (*depth) --;
+        depth--;
         
-        return rc;
+        return success;
     }
 
-    return -1;
+    return false;
 }
 
 /**
  *  Modify the model to solve it with respect to another set of variables, 
  *  the variable posendo becoming exogenous and the variable posexo becoming endogenous.
  *  
- *  If the function succeeds, the vector v_pos_endo_in_dbv is modified to reflect the new endogenous for each equation.
- *   
- *  Note that v_pos_endo_in_dbv[i] contains for each eq of the model (defined by sim_dbe) 
- *  the position in sim_dbv of the endo variable of equation sim_dbe[i].
- *  
+ *  If the function succeeds, the vector v_endo is modified to reflect the new endogenous 
+ *  for each equation.
  *  
  *  @param [in] int     posendo     position of the endogenous variable in sim_dbv
  *  @param [in] int     posexo      position of the exogenous variable in sim_dbv
@@ -175,44 +157,61 @@ int CSimulation::find_path(int posendo, int posexo, int* depth)
  *                                      path between endo and exo inexistent 
  *  
  */
-int CSimulation::exo_to_endo(int posendo, int posexo)
+bool CSimulation::exo_to_endo(int posendo, int posexo)
 {
-    int endo, exo;
     int depth = 0;
+    std::string endo, exo;
 
-    endo = get_eq_position(posendo);
-    if(endo < 0) 
+    try
     {
-        std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(sim_dbv->get_name(posendo));
-        error_msg += " : no such equation in the Equations workspace";
+        endo = sim_dbv->get_name(posendo);
+    }
+    catch(const std::exception& e) 
+    {
+        std::string error_msg = "Goal Seeking: cannot find endogenous variable.\n";
+        error_msg += std::string(e.what());
         error_manager.append_error(error_msg);
-        return -1;
+        return false;
     }
 
-    exo = get_eq_position(posexo);
-    if(exo >= 0) 
+    if(map_exchange.contains(endo))
     {
-        std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(sim_dbv->get_name(posexo));
-        error_msg += " already endogeneous";
+        std::string error_msg = "Goal Seeking: an exchange for the endogenous variable ";
+        error_msg += "'" + endo + "' already exists";
         error_manager.append_error(error_msg);
-        return -1;
+        return false;
     }
 
-    /* check if exo in equation */
-    v_path.clear();
-    v_path.resize(max_depth, false);
-    exo = find_path(posendo, posexo, &depth);
-    if(exo < 0) 
+    try
     {
-        std::string error_msg = "Goal Seeking: ";
-        error_msg += std::string(sim_dbv->get_name(posendo)) + "-"; 
-        error_msg += std::string(sim_dbv->get_name(posexo));
-        error_msg += " no exchange possible";
+        exo = sim_dbv->get_name(posexo);
+    }
+    catch(const std::exception& e) 
+    {
+        std::string error_msg = "Goal Seeking: cannot find exogenous variable.\n";
+        error_msg += std::string(e.what());
         error_manager.append_error(error_msg);
-        return -1;
+        return false;
     }
 
-    return 0;
+    if(map_exchange_rev.contains(exo))
+    {
+        std::string error_msg = "Goal Seeking: an exchange for the exogenous variable ";
+        error_msg += "'" + exo + "' already exists";
+        error_manager.append_error(error_msg);
+        return false;
+    }
+
+    // search for a path and add an entry to map_exchange and map_exchange_rev
+    path_examined.clear();
+    bool success = find_path(posendo, posexo, depth);
+    if(!success) 
+    {
+        std::string error_msg = "Goal Seeking: no exchange ";
+        error_msg += "'" + endo + " <-> " + exo + "' possible";
+        error_manager.append_error(error_msg);
+        return false;
+    }
+
+    return true;
 }

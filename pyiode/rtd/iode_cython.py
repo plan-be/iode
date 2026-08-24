@@ -21,7 +21,6 @@ IODE_DEFAULT_DATABASE_FILENAME: str = None
 NA: float = None
 NAN_REP: str = None
 allowed_keys: set = None
-la: None = None
 
 class AdjustmentMethod(enum.IntEnum):
     ERROR_CORRECTION = enum.auto()

@@ -51,8 +51,8 @@ public:
 	int     nb_passes;       	    // number of passes for the heuristic triangulation algorithm
 	int     sorting_algo;           // reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
 	int     init_algo;              // endogenous initial values
-		
-    std::vector<bool> v_path;
+	
+    std::set<int> path_examined;
 	std::vector<std::string> v_endo_exo;    // Allow exchange exogenous <-> endogenous roles in equations
     std::vector<double> v_norm;             // Convergence threshold reached at the end of each simulation period
     std::vector<int> v_nb_iterations;       // Numbers of iterations needed for each simulation period
@@ -72,13 +72,14 @@ protected:
 	double  norm = 0.0;                     // Error measure: maximum difference between 2 iterations 
 
 	// EQUATION ORDERING
-	int  	nb_pre = 0;                     // number of equations in the "prolog" block
-	int  	nb_inter = 0;                   // number of equations in the "interdep" block
-	int  	nb_post = 0;                    // number of equations in the "epilog"
-	int  	max_depth = 0;                  // Number of equations in the model
-    std::vector<int> v_order;               // position in dbe of the equations (to simulate) in the execution order.
-    std::vector<int> v_pos_endo_in_dbv;     // Position in sim_dbv of the endo variable of equation "sim_dbe[i]"
-    std::vector<int> v_pos_endo_in_dbe;     // Position in sim_dbe of the equation whose endo is "sim_dbv[i]" (reverse of v_pos_endo_in_dbv)
+	int nb_pre = 0;             // number of equations in the "prolog" block
+	int nb_inter = 0;           // number of equations in the "interdep" block
+	int nb_post = 0;            // number of equations in the "epilog"
+	int max_depth = 0;          // Number of equations in the model
+    std::vector<int> v_order;   // position in dbe of the equations (to simulate) in the execution order.
+    
+    std::map<std::string, std::string> map_exchange;        // pairs <endo, exo> for which the exchanges are defined
+    std::map<std::string, std::string> map_exchange_rev;    // reverse of map_exchange
 
     std::vector<double> v_endo_values;      // Values of the endogenous variables (in the interdep block) at the end of the previous iteration
     std::vector<double> v_endo_values_1;    // Values of the endogenous variables (in the interdep block) during the current iteration
@@ -98,12 +99,12 @@ private:
         cpu_time_scc = 0;    
         cpu_time_sorting = 0;
 
-        v_path.clear();
+        path_examined.clear();
         v_endo_exo.clear();
         v_endo_values.clear();
         v_endo_values_1.clear();
-        v_pos_endo_in_dbv.clear();
-        v_pos_endo_in_dbe.clear();
+        map_exchange.clear();
+        map_exchange_rev.clear();
         v_order.clear();
         v_permut.clear();
         v_ordered.clear();
@@ -241,32 +242,12 @@ protected:
 	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */
-	int get_eq_position(int posendo);
+	int get_eq_position(const std::string& var);
 	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
-	int exo_to_endo(int posendo, int posexo);
-
-	///< Name of the endogenous of equation i (possibly after endo-exo)
-	std::string get_endo_name(const int i) const
-	{
-		return sim_dbv->get_name(v_pos_endo_in_dbv[i]);
-	}
-
-	///< get value of endo[i] in period nb t
-	double get_value(const int i, const int t) const
-	{
-		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
-		return sim_dbv->get_value(name, t);
-	}
-
-	///< set value of endo[i] in period nb t
-	void set_value(const int i, const int t, const double value)
-	{
-		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
-		sim_dbv->set_var(name, t, value);
-	}
+	bool exo_to_endo(int posendo, int posexo);
 
     std::vector<std::string> eqs_to_vector(const std::string& list_eqs)
     {
@@ -298,9 +279,19 @@ protected:
     }
 
 private:
+    std::string get_var(const int i)
+    {
+        int eq_pos = v_order[i];
+        std::string eq_name = sim_dbe->get_name(eq_pos);
+        if(map_exchange.contains(eq_name))
+            return map_exchange[eq_name];
+        else
+            return eq_name;
+    }
+
 	/* k_sim_main.c */
 	void init_values(int t);
-	void restore_XK(int t);
+	void restore_values(int t);
 	int prolog(int t);
 	int interdep(int t);
 	int sub_interdep_1(int t);
@@ -321,7 +312,7 @@ private:
 	int compute_tri_end(KDBEquationsPtr dbe);
 
 	/* k_sim_exo2endo.c */
-	int find_path(int posendo, int posexo, int* depth);
+	bool find_path(int posendo, int posexo, int& depth);
 
 	/* k_sim_scc.c */
 	bool simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl);

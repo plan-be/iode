@@ -49,7 +49,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     max_depth = dbe->size();
     nb_passes = tris;
 
-    // to build the PRE, INTER and POST lists in build_lists_order() via get_endo_name
+    // to build the PRE, INTER and POST lists in build_lists_order()
     std::shared_ptr<Variable> var_ptr;
     sim_dbv = KDBVariables::Create(false);
     for(const std::string& var_name : dbe->get_names())
@@ -60,14 +60,8 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     else         
         sorting_algo = SORT_CONNEX;
 
-    // v_pos_endo_in_dbv[i] = num dans dbv de la var endogène de l'équation i
-    // v_pos_endo_in_dbe[i] = pos in sim_dbe of the eq whose endo is var[i] 
-    v_pos_endo_in_dbv.clear();
-    v_pos_endo_in_dbe.clear();
-    v_pos_endo_in_dbv.resize(dbe->size(), -1);
-    v_pos_endo_in_dbe.resize(dbe->size(), -1);
-    for(int i = 0 ; i < dbe->size(); i++) 
-        v_pos_endo_in_dbe[i] = -1;  
+    map_exchange.clear();
+    map_exchange_rev.clear();
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
     std::string eq_name;
@@ -75,8 +69,6 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     kmsg("Pseudo-linking equations ....");
     for(int i = 0 ; i < dbe->size(); i++) 
     {
-        v_pos_endo_in_dbv[i] = i;
-        v_pos_endo_in_dbe[i] = i;
         eq_name = dbe->get_name(i);
         eq_ptr = dbe->get_obj_ptr(eq_name);
         if(!eq_ptr)
@@ -104,9 +96,9 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     order(dbe);
     build_lists_order(pre, inter, post);
 
-    v_pos_endo_in_dbv.clear();
-    v_pos_endo_in_dbe.clear();
     v_order.clear();
+    map_exchange.clear();
+    map_exchange_rev.clear();
 
     nb_passes = opasses;
     sorting_algo = osort;
@@ -148,9 +140,8 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
         return false;
     }
 
-    // v_pos_endo_in_dbv[i] = num dans dbv de la var endogène de l'équation i
-    v_pos_endo_in_dbv.clear();
-    v_pos_endo_in_dbv.resize(dbe->size(), -1);
+    map_exchange.clear();
+    map_exchange_rev.clear();
 
     // Initialise les nouvelles vars pour conserver les résultats de sim
     // WARNING: DO NOT FREE v_norm and v_nb_iterations later because they are used 
@@ -171,14 +162,11 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
     for(int i = 0 ; i < dbe->size(); i++) 
     {
         eq_name = dbe->get_name(i);
-
-        v_pos_endo_in_dbv[i] = dbv->index_of(eq_name);
-        if(v_pos_endo_in_dbv[i] < 0) 
+        if(!dbv->contains(eq_name)) 
         {
             std::string error_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(error_msg);
-            success = false;
-            goto fin;
+            return false;
         }
         
         eq_ptr = dbe->get_obj_ptr(eq_name);
@@ -188,8 +176,7 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
             error_manager.append_error(error_msg);
-            success = false;
-            goto fin;
+            return false;
         }
     }
 
@@ -198,10 +185,6 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
     v_endo_values.resize(nb_inter, 0.0);
     v_endo_values_1.resize(nb_inter, 0.0);
     return true;
-
-fin:
-    v_pos_endo_in_dbv.clear();
-    return success;
 }
 
 

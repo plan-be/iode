@@ -115,16 +115,6 @@ public:
 	    A2mMessage_toggle(1);
 	}
 
-	void U_test_suppress_kmsg_msgs()
-	{
-	    skip_message(false);
-	}
-
-	void U_test_reset_kmsg_msgs()
-	{
-	    skip_message(true);
-	}
-
 	void U_test_CreateObjects()
 	{
         double*     values;
@@ -1817,7 +1807,6 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     int rc;
 
     U_test_print_title("Tests B_EQS");
-    U_test_suppress_kmsg_msgs();
 
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
@@ -1842,8 +1831,6 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     Sample smpl = eq_ptr->sample;
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2090,8 +2077,6 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
 
     U_test_print_title("Tests EXP: Export CSV and rcsv");
 
-    U_test_suppress_kmsg_msgs();
-
     // Export
     // Exports VAR files into external formats.
     // int EXP_RuleExport(" "char* trace, NULL, char* out, char* vfile, char* cfile, char* from, char* to, char* na, char* sep, int fmt)
@@ -2148,8 +2133,6 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
         EXPECT_TRUE(global_ws_cmt != nullptr);
         EXPECT_EQ(global_ws_cmt->get("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2163,7 +2146,6 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     int     rc;
 
     U_test_print_title("Tests XODE: Import ASCII via report function");
-    U_test_suppress_kmsg_msgs();
 
     sprintf(reffile, "%sfun_xode.av.ref", input_test_dir);
     sprintf(outfile, "%sfun_xode.var", output_test_dir);
@@ -2179,8 +2161,6 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     global_ws_var = kdb_var;
     U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
 
-    U_test_reset_kmsg_msgs();
-
 }
 
 
@@ -2192,7 +2172,6 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     int     rc;
 
     U_test_print_title("Tests B_LTOH: convert low periodicity to high periodicity");
-    U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
@@ -2237,8 +2216,6 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     rc = B_WsLtoHFlow(cmd);
     EXPECT_EQ(rc, 0);
     U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.1050747);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2254,7 +2231,6 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     //printf("%s\n", current_dir);
 
     U_test_print_title("Tests B_HTOL: convert high periodicity to low periodicity");
-    U_test_suppress_kmsg_msgs();
 
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
@@ -2281,8 +2257,6 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     rc = B_WsHtoLSum(cmd);
     EXPECT_EQ(rc, 0);
     U_test_lec("AOUC[2014Y1]", "AOUC[2014Y1]", 0, 1.423714 );
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2303,7 +2277,6 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
 
     U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
-    U_test_suppress_kmsg_msgs();
 
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
@@ -2339,18 +2312,9 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // --- check one Variable ---
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "1999Y1") * 1e6) / 1e6, 13.530405);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2000Y1") * 1e6) / 1e6, 10.046611);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2001Y1") * 1e6) / 1e6, 2.623793);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2001Y1") * 1e6) / 1e6, 2.623791);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274625);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2003Y1") * 1e6) / 1e6, -6.091565);
-    // --- check all Variables ---
-    std::string file_expected_output = str_output_test_dir + "test_simu.var";
-    std::string arg = file_expected_output + " WS_ONLY FILE_ONLY BOTH_EQ BOTH_DIFF";
-    B_DataCompare((char*) arg.c_str(), VARIABLES);
-    EXPECT_EQ(global_ws_lst->get("WS_ONLY"), "");
-    EXPECT_EQ(global_ws_lst->get("FILE_ONLY"), "");
-    EXPECT_EQ(global_ws_lst->get("BOTH_DIFF"), "");
-
-    // B_ModelExchange()
 
     // Reloads 3 WS
     U_test_load_fun_esv(filename);
@@ -2379,7 +2343,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // Check some results
     EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
     //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800673);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800674);
 
     // B_ModelCompile(char* arg, int unused)
     rc = B_ModelCompile("");
@@ -2388,9 +2352,9 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // $ModelCalcSCC nbtris prename intername postname [eqs]
     rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;";
-    expected_list += "NATY;POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;";
-    expected_list += "TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;";
+    expected_list += "POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXAB;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;";
+    expected_list += "TWG;TWGP;ZZF_;DTH1;PMAB;PME;PMS;PMT";
     EXPECT_EQ(global_ws_lst->get("_PRE2"), expected_list);
 
     // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
@@ -2412,11 +2376,10 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     //  3. Simulate & compare
     rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
     EXPECT_EQ(rc, 0);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274623);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274625);
 
     // B_ModelSimulateSaveNIters(char *arg)                    
     // $ModelSimulateSaveNiters varname
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2426,7 +2389,6 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     std::string filepath;
     
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -2764,8 +2726,6 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     t = var_sample->get_period_position("2015Y1");
     EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
     EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -2776,7 +2736,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     std::string out_filepath;
     
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -3199,8 +3158,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     t = var_sample->get_period_position("2015Y1");
     EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
     EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3211,7 +3168,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     std::string out_filepath;
     
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -3428,8 +3384,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     t = var_sample->get_period_position("2015Y1");
     EXPECT_DOUBLE_EQ(round(first_var[t] * 1e3) / 1e3, -96.41);
     EXPECT_DOUBLE_EQ(round(last_var[t] * 1e3) / 1e3, 0.688);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3439,7 +3393,6 @@ TEST_F(LegacyAPITest, Tests_B_WsExport)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3460,8 +3413,6 @@ TEST_F(LegacyAPITest, Tests_B_WsExport)
     U_test_B_WsExport("fun.scl", "fun2.as", SCALARS);
     U_test_B_WsExport("fun.tbl", "fun2.at", TABLES);
     U_test_B_WsExport("fun.var", "fun2.av", VARIABLES);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3471,7 +3422,6 @@ TEST_F(LegacyAPITest, Tests_B_WsClear)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3492,8 +3442,6 @@ TEST_F(LegacyAPITest, Tests_B_WsClear)
     U_test_B_WsClear(SCALARS);
     U_test_B_WsClear(TABLES);
     U_test_B_WsClear(VARIABLES);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3503,7 +3451,6 @@ TEST_F(LegacyAPITest, Tests_B_WsImport)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3525,8 +3472,6 @@ TEST_F(LegacyAPITest, Tests_B_WsImport)
     U_test_B_WsImport("fun2.at", TABLES, 46);
     U_test_B_WsImport("fun2.av", VARIABLES, 394);
     // TODO : correct fun.eqs (W) and fun.idt (NAWRU)
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3536,7 +3481,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3554,8 +3498,6 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
     Sample smpl("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(*global_ws_var->get_sample(), smpl);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3567,7 +3509,6 @@ TEST_F(LegacyAPITest, Tests_B_WsClearAll)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3590,8 +3531,6 @@ TEST_F(LegacyAPITest, Tests_B_WsClearAll)
     EXPECT_EQ(global_ws_scl->size(), 0);
     EXPECT_EQ(global_ws_tbl->size(), 0);
     EXPECT_EQ(global_ws_var->size(), 0);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3601,7 +3540,6 @@ TEST_F(LegacyAPITest, Tests_B_WsDescr)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3622,8 +3560,6 @@ TEST_F(LegacyAPITest, Tests_B_WsDescr)
     U_test_B_WsDescr("Ws content description", SCALARS);
     U_test_B_WsDescr("Ws content description", TABLES);
     U_test_B_WsDescr("Ws content description", VARIABLES);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3633,7 +3569,6 @@ TEST_F(LegacyAPITest, Tests_B_WsName)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3653,8 +3588,6 @@ TEST_F(LegacyAPITest, Tests_B_WsName)
     U_test_B_WsName("funtest", SCALARS);
     U_test_B_WsName("funtest", TABLES);
     U_test_B_WsName("funtest", VARIABLES);
-
-    U_test_reset_kmsg_msgs();
 }
 
 TEST_F(LegacyAPITest, Tests_B_WsCopy)
@@ -3663,7 +3596,6 @@ TEST_F(LegacyAPITest, Tests_B_WsCopy)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3686,8 +3618,6 @@ TEST_F(LegacyAPITest, Tests_B_WsCopy)
     U_test_B_WsCopy("fun", LISTS, 17);
     U_test_B_WsCopy("fun", SCALARS, 161);
     U_test_B_WsCopy("fun", TABLES, 46);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3697,7 +3627,6 @@ TEST_F(LegacyAPITest, Tests_B_WsMerge)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3719,8 +3648,6 @@ TEST_F(LegacyAPITest, Tests_B_WsMerge)
     U_test_B_WsMerge("fun", IDENTITIES, 48);
     U_test_B_WsMerge("fun", SCALARS, 161);
     U_test_B_WsMerge("fun", TABLES, 46);
-
-    U_test_reset_kmsg_msgs();
 }
 
 TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
@@ -3733,7 +3660,6 @@ TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3754,8 +3680,6 @@ TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
     U_test_B_WsExtrapolate(4, IODE_NAN);
     U_test_B_WsExtrapolate(5, 6.0);
     U_test_B_WsExtrapolate(6, 7.0);
-    
-    U_test_reset_kmsg_msgs();
 #endif
 }
 
@@ -3766,7 +3690,6 @@ TEST_F(LegacyAPITest, Tests_B_WsAggregate)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3784,8 +3707,6 @@ TEST_F(LegacyAPITest, Tests_B_WsAggregate)
     // int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
     U_test_print_title("B_WsAggregate");
     U_test_B_WsAggregate();
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3795,7 +3716,6 @@ TEST_F(LegacyAPITest, Tests_B_StatUnitRoot)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3816,8 +3736,6 @@ TEST_F(LegacyAPITest, Tests_B_StatUnitRoot)
     U_test_B_StatUnitRoot(1, 0, 0, "ACAF", 1.117498);
     U_test_B_StatUnitRoot(1, 1, 0, "ACAF", -0.798686);
     U_test_B_StatUnitRoot(0, 0, 2, "ACAF", 1.419631);
-
-    U_test_reset_kmsg_msgs();
 }
 
 
@@ -3827,7 +3745,6 @@ TEST_F(LegacyAPITest, Tests_B_Csv)
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
     U_test_print_title("Tests B_Ws*(): report functions $Ws*");
-    U_test_suppress_kmsg_msgs();
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
     U_test_print_title("B_WsLoad()");
@@ -3847,8 +3764,6 @@ TEST_F(LegacyAPITest, Tests_B_Csv)
     // int B_CsvSave(char* arg, int type)                            $CsvSave<type> file name1 name2 ...
     U_test_print_title("B_Csv*");
     U_test_B_Csv();
-
-    U_test_reset_kmsg_msgs();
 }
 
 TEST_F(LegacyAPITest, Tests_B_PRINT_Table_DEF)

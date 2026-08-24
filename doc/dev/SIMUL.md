@@ -293,7 +293,7 @@ Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
 |Syntax|Description|
 |:---|:---|
 |`int order(KDBEquationsPtr dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
-|`int get_eq_position(int posendo)`|Searches the equation whose endogenous is the variable posendo.|
+|`int get_eq_position(const std::string& endo)`|Searches the equation whose endogenous is the variable posendo.|
 |`void compute_tri(KDBEquationsPtr dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
 #### k\_sim\_scc.c {#T13}
