@@ -49,7 +49,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     max_depth = dbe->size();
     nb_passes = tris;
 
-    // to build the PRE, INTER and POST lists in build_lists_order() via KSIM_NAME
+    // to build the PRE, INTER and POST lists in build_lists_order() via get_endo_name
     std::shared_ptr<Variable> var_ptr;
     sim_dbv = KDBVariables::Create(false);
     for(const std::string& var_name : dbe->get_names())

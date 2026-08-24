@@ -249,23 +249,23 @@ protected:
 	int exo_to_endo(int posendo, int posexo);
 
 	///< Name of the endogenous of equation i (possibly after endo-exo)
-	std::string KSIM_NAME(const int i) const
+	std::string get_endo_name(const int i) const
 	{
 		return sim_dbv->get_name(v_pos_endo_in_dbv[i]);
 	}
 
 	///< get value of endo[i] in period nb t
-	double KSIM_VAL(const int i, const int t) const
+	double get_value(const int i, const int t) const
 	{
 		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
 		return sim_dbv->get_value(name, t);
 	}
 
 	///< set value of endo[i] in period nb t
-	void KSIM_SET_VAL(const int i, const int t, const double value)
+	void set_value(const int i, const int t, const double value)
 	{
 		std::string name = sim_dbv->get_name(v_pos_endo_in_dbv[i]);
-		*sim_dbv->get_var_ptr(name, t) = value;
+		sim_dbv->set_var(name, t, value);
 	}
 
     std::vector<std::string> eqs_to_vector(const std::string& list_eqs)

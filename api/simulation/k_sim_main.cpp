@@ -131,7 +131,7 @@ void CSimulation::restore_XK(int t)
 {
     int i, j;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)
-        KSIM_SET_VAL(v_order[i], t, v_endo_values[j]);
+        set_value(v_order[i], t, v_endo_values[j]);
 }
 
 /**
@@ -152,7 +152,7 @@ int CSimulation::prolog(int t)
         eq_name = sim_dbe->get_name(v_order[i]);
         var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
         x = calculate_CLEC(eq_name, var_name, t, 0);
-        KSIM_SET_VAL(v_order[i], t, x);
+        set_value(v_order[i], t, x);
     }
 
     return 0;
@@ -164,7 +164,7 @@ int CSimulation::prolog(int t)
  *  
  *  For eq nb i:
  *    - saves the previous iteration value of the endogenous variable in v_endo_values[i]
- *    - computes the new value of the endo var and saves it into sim_dbv (via KSIM_SET_VAL) 
+ *    - computes the new value of the endo var and saves it into sim_dbv (via set_value) 
  *    - if required, modifies the resulting value by "relaxing" it (multiply by relax)
  *    - computes the ||f(x)|| = diff between the new endo value and the value of the previous iteration 
  *      and saves that value in norm. 
@@ -188,7 +188,7 @@ int CSimulation::sub_interdep_1(int t)
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK first */
-        v_endo_values[j] = KSIM_VAL(v_order[i], t);
+        v_endo_values[j] = get_value(v_order[i], t);
 
         /* execute lec */
         eq_name = sim_dbe->get_name(v_order[i]);
@@ -210,13 +210,13 @@ int CSimulation::sub_interdep_1(int t)
             if(pd > norm) norm = pd;
 
             // Stores the new endo value and "relaxes" it 
-            KSIM_SET_VAL(v_order[i], t, relax * (x - v_endo_values[j]) + v_endo_values[j]);
+            set_value(v_order[i], t, relax * (x - v_endo_values[j]) + v_endo_values[j]);
         }
         else 
         {
             // if NaN, set norm to a huge value 
             norm = 10;
-            KSIM_SET_VAL(v_order[i], t, x);
+            set_value(v_order[i], t, x);
         }
     }
 
@@ -248,7 +248,7 @@ int CSimulation::sub_interdep_2(int t)
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK for further use */
-        v_endo_values[j] = KSIM_VAL(v_order[i], t);
+        v_endo_values[j] = get_value(v_order[i], t);
 
         /* execute lec and save in v_endo_values_1 */
         eq_name = sim_dbe->get_name(v_order[i]);
@@ -281,13 +281,13 @@ int CSimulation::sub_interdep_2(int t)
                 norm = pd;
 
             /* Store new value and relax it */
-            KSIM_SET_VAL(v_order[i], t, relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j]);
+            set_value(v_order[i], t, relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j]);
         }
         // If previous iteation value is L-NAN, set norm to 10 and assing new calc value to endo
         else 
         {
             norm = 10;
-            KSIM_SET_VAL(v_order[i], t, v_endo_values_1[j]);
+            set_value(v_order[i], t, v_endo_values_1[j]);
         }
     }
 
@@ -342,7 +342,7 @@ int CSimulation::epilog(int t)
         eq_name = sim_dbe->get_name(v_order[i]);
         var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
         x = calculate_CLEC(eq_name, var_name, t, 0);
-        KSIM_SET_VAL(v_order[i], t, x);  
+        set_value(v_order[i], t, x);  
     }
 
     return 0;
@@ -380,7 +380,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK first */
-        v_endo_values[j] = KSIM_VAL(v_order[i], t);
+        v_endo_values[j] = get_value(v_order[i], t);
 
         /* execute lec */
         eq_name = sim_dbe->get_name(v_order[i]);
@@ -404,7 +404,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
             {
                 if(diverg) 
                     diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
-                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) KSIM_NAME(v_order[i]).c_str());
+                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) get_endo_name(v_order[i]).c_str());
             }
         }
     }
@@ -763,8 +763,8 @@ double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string
  *  Sub-function  of build_lists_order().
  *  
  *  @param [in] char*   lstname     name of the list to be created / updated    
- *  @param [in] int     eq1         first equation position in v_order (name = KSIM_NAME[v_order[eq1]])
- *  @param [in] int     eqn         last equation pos in v_order (name = KSIM_NAME[v_order[eqn]])
+ *  @param [in] int     eq1         first equation position in v_order (name = get_endo_name[v_order[eq1]])
+ *  @param [in] int     eqn         last equation pos in v_order (name = get_endo_name[v_order[eqn]])
  *  
  */
 void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int eqn)
@@ -792,7 +792,7 @@ void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int
     
     // Creates a table of strings containing all the name to set in the list
     for(i = 0; i < nb; i++)
-        SCR_add_ptr(&lst, &nlst, (unsigned char*) KSIM_NAME(v_order[i + eq1]).c_str());
+        SCR_add_ptr(&lst, &nlst, (unsigned char*) get_endo_name(v_order[i + eq1]).c_str());
 
     SCR_add_ptr(&lst, &nlst, 0); 
 
