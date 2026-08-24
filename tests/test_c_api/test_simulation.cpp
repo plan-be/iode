@@ -90,22 +90,21 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_TRUE(success);
 
     std::string list_pre = global_ws_lst->get("_PRE");
-    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;";
-    expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;";
+    expected_lst_pre += "PWXS;PXAB;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PMAB;PME;PMS;PMT";
     EXPECT_EQ(list_pre, expected_lst_pre);
 
     std::string list_inter = global_ws_lst->get("_INTER");
-    std::string expected_lst_inter = "PMAB;PXAB;ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;";
-    expected_lst_inter += "YN;UY;WBF;WIND;WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;";
-    expected_lst_inter += "VAF;YDH;EXCC;EXC;ITF;PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;";
-    expected_lst_inter += "WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;";
-    expected_lst_inter += "SSH;RDEBT;YIDG;QAG;KNFF;KNI;KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;";
-    expected_lst_inter += "VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;";
-    expected_lst_inter += "QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;";
-    expected_lst_inter += "PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;";
-    expected_lst_inter += "QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;";
-    expected_lst_inter += "QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;";
-    expected_lst_inter += "WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
+    std::string expected_lst_inter = "ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;YN;UY;WBF;WIND;";
+    expected_lst_inter += "WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;VAF;YDH;EXCC;EXC;ITF;";
+    expected_lst_inter += "PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;WLCP;WBGP;YSEFT2;YSEFT1;";
+    expected_lst_inter += "YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;SSH;RDEBT;YIDG;QAG;KNFF;KNI;";
+    expected_lst_inter += "KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;";
+    expected_lst_inter += "IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;";
+    expected_lst_inter += "SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;";
+    expected_lst_inter += "PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;";
+    expected_lst_inter += "SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;";
+    expected_lst_inter += "QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
     EXPECT_EQ(list_inter, expected_lst_inter);
 
     std::string list_post = global_ws_lst->get("_POST");
@@ -142,23 +141,22 @@ TEST_F(SimulationTest, Simulation)
 
     // exchange UY - XNATY -> NATY removed from block _PRE
     list_pre = global_ws_lst->get("_PRE");
-    expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;POIL;PW3;PWMAB;PWMS;";
-    expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;POIL;PW3;PWMAB;PWMS;PWXAB;";
+    expected_lst_pre += "PWXS;PXAB;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PMAB;PME;PMS;PMT";
     EXPECT_EQ(list_pre, expected_lst_pre);
 
     // exchange UY - XNATY -> replace UY by NATY in block _INTER
     list_inter = global_ws_lst->get("_INTER");
-    expected_lst_inter = "PMAB;PXAB;ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;";
-    expected_lst_inter += "YN;NATY;WBF;WIND;WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;";
-    expected_lst_inter += "VAF;YDH;EXCC;EXC;ITF;PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;";
-    expected_lst_inter += "WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;";
-    expected_lst_inter += "SSH;RDEBT;YIDG;QAG;KNFF;KNI;KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;";
-    expected_lst_inter += "VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;";
-    expected_lst_inter += "QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;";
-    expected_lst_inter += "PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;";
-    expected_lst_inter += "QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;";
-    expected_lst_inter += "QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;";
-    expected_lst_inter += "WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
+    expected_lst_inter = "ITFGO;ITFGI;CGU;SSH3O;ULCP;SSFFX;SBF;SBF3L;SSH3P;WBG;SSF3;NFY;VXN;VMN;YN;NATY;WBF;WIND;";
+    expected_lst_inter += "WIND_;VAMARE;SSFFIC;SSF3P;SSF3L;SSH3ZA;SSH3WA;KNF;QIF;KNFY;DEBT;IDG;DTF;VS;VAF;YDH;EXCC;EXC;ITF;";
+    expected_lst_inter += "PAF_;QAI;QAF;ITEP;QAFF_;QAF_;QXS;QAFF;VAI;QAI_;IT;DTH;YDTG;YSFIC;WMIN;WLCP;WBGP;YSEFT2;YSEFT1;";
+    expected_lst_inter += "YSEFP;SBG;SBH;PWBG;WBGO;WBU_;SSFDOM;SSH3W;SSFF;WCF;GOSF;BVY;SH;ITFC;SSH;RDEBT;YIDG;QAG;KNFF;KNI;";
+    expected_lst_inter += "KNIY;Q_I;NFYH;WCRH;PROD;W;WBF_;YSSF;WCF_;KLFHP;Q_F;QL;VAFF_;VAF_;VS_;VAFF;COEFON;QI;KN5;ITF5;ITD;";
+    expected_lst_inter += "IDH;QC;ITFQ;QS;ITONQ;ITMQ;ITNQ;QAT_;QAT;PM;VAI_;ITM;ITON;AOUC;QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;";
+    expected_lst_inter += "SSH3ZW;SSH3GP;SSH3WW;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;VXS;PQOG;QGO;PIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;";
+    expected_lst_inter += "PFI;PDPUG;PC_;QC_;VC_;PFI_;QBBP_B;QBBP;QS_;QBBP_P;QMAB;VMAB;QM;VM;QX;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;";
+    expected_lst_inter += "SUBCEE;SUB;VAT_;VAT;RIDG;QOUG;OCUH;OCUG;IUG;VI;QIG;ITPS;ITPR;ITPL;ITT;GOSH_;GOSG;DPUG;VAG;DPUGO;QG;";
+    expected_lst_inter += "QQMAB_;QMS;VMS;QME;VME;QXE;VXE;COTRES;SSFG;WG;SSF;YSSG;YDH_;SG;ACAG;FLG;VBNP;VBNP_P;VBBP_P";
     EXPECT_EQ(list_inter, expected_lst_inter);
 
     // exchange UY - XNATY -> XNATY added to block _POST
@@ -193,22 +191,21 @@ TEST_F(SimulationTest, CalculateSCC)
     EXPECT_TRUE(success);
 
     std::string list_pre = global_ws_lst->get("_PRE");
-    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;";
-    expected_lst_pre += "PWXAB;PWXS;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PME;PMS;PMT";
+    std::string expected_lst_pre = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;POIL;PW3;PWMAB;PWMS;PWXAB;";
+    expected_lst_pre += "PWXS;PXAB;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;TWG;TWGP;ZZF_;DTH1;PMAB;PME;PMS;PMT";
     EXPECT_EQ(list_pre, expected_lst_pre);
 
     std::string list_inter = global_ws_lst->get("_INTER");
-    std::string expected_lst_inter = "PMAB;PXAB;ULCP;SSH3P;WBG;ITF;EXCC;ITFQ;QS;ITFGO;ITFGI;CGU;SSH3O;DEBT;IDG;SSFFX;";
-    expected_lst_inter += "SBF;SSF3;SBF3L;YDH;SUBCEE;SUB;RIDG;QOUG;OCUH;OCUG;IUG;ITPS;ITPR;ITPL;GOSH_;GOSG;DPUG;VAG;COTRES;";
-    expected_lst_inter += "SSFG;WG;ACAG;FLG;IT;VAT;VAT_;ITMQ;PM;ITM;ITON;ITNQ;QAT_;QAFF_;KNF;QIF;KNFY;VAI;VAF;DTF;DTH;YDTG;";
-    expected_lst_inter += "YSFIC;WMIN;WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;SSFDOM;GOSF;BVY;VBBP_P;SH;ITFC;SSH;";
-    expected_lst_inter += "RDEBT;YIDG;QAG;VAFF_;VAF_;VAFF;COEFON;ITONQ;QI;KN5;VI;ITF5;ITD;IDH;DPUGO;QG;QC;PAF_;VS_;VS;QAI_;";
-    expected_lst_inter += "QAF_;QAI;NFY;VXN;VMN;YN;UY;NFYH;KLFHP;Q_F;QL;AOUC;QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;";
-    expected_lst_inter += "SSH3GP;RSBE;RLBE;QXT;QMT;VMT;PXT;VXT;PXS;PQOG;QGO;PIG;QIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;";
-    expected_lst_inter += "PDPUG;PC_;QC_;VC_;PFI_;WBF;WIND;WIND_;VAMARE;VAI_;SSH3W;SSH3WW;SSFFIC;SSF3P;SSF3L;SSFF;WCF;WCRH;";
-    expected_lst_inter += "SSH3ZA;SSH3WA;SSF;SG;WBU_;YDH_;KNFF;KNI;KNIY;Q_I;QXS;QBBP_B;QBBP;QS_;QBBP_P;QMAB;VMAB;QM;VM;QX;";
-    expected_lst_inter += "QQMAB_;QMS;VMS;QME;VME;QXE;VXE;VXS;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;VBNP;VBNP_P;QAT;QAFF;QAF;PROD;W;";
-    expected_lst_inter += "WBF_;YSSF;YSSG;WCF_;ITEP;EXC;ITT";
+    std::string expected_lst_inter = "ULCP;SSH3P;WBG;ITF;EXCC;ITFQ;QS;ITFGO;ITFGI;CGU;SSH3O;DEBT;IDG;SSFFX;SBF;SSF3;SBF3L;";
+    expected_lst_inter += "YDH;SUBCEE;SUB;RIDG;QOUG;OCUH;OCUG;IUG;ITPS;ITPR;ITPL;GOSH_;GOSG;DPUG;VAG;COTRES;SSFG;WG;ACAG;";
+    expected_lst_inter += "FLG;IT;VAT;VAT_;ITMQ;PM;ITM;ITON;ITNQ;QAT_;QAFF_;KNF;QIF;KNFY;VAI;VAF;DTF;DTH;YDTG;YSFIC;WMIN;";
+    expected_lst_inter += "WLCP;WBGP;YSEFT2;YSEFT1;YSEFP;SBG;SBH;PWBG;WBGO;SSFDOM;GOSF;BVY;VBBP_P;SH;ITFC;SSH;RDEBT;YIDG;";
+    expected_lst_inter += "QAG;VAFF_;VAF_;VAFF;COEFON;ITONQ;QI;KN5;VI;ITF5;ITD;IDH;DPUGO;QG;QC;PAF_;VS_;VS;QAI_;QAF_;QAI;NFY";
+    expected_lst_inter += ";VXN;VMN;YN;UY;NFYH;KLFHP;Q_F;QL;AOUC;QXAB;VXAB;PC;ZJ;WDOM;VXK;VMK;YK;VC;SSH3ZW;SSH3GP;RSBE;RLBE;";
+    expected_lst_inter += "QXT;QMT;VMT;PXT;VXT;PXS;PQOG;QGO;PIG;QIG;PIF;VIF;PKF;PI5;VAH;QI5;VI5;PFI;PDPUG;PC_;QC_;VC_;PFI_;";
+    expected_lst_inter += "WBF;WIND;WIND_;VAMARE;VAI_;SSH3W;SSH3WW;SSFFIC;SSF3P;SSF3L;SSFF;WCF;WCRH;SSH3ZA;SSH3WA;SSF;SG;WBU_;";
+    expected_lst_inter += "YDH_;KNFF;KNI;KNIY;Q_I;QXS;QBBP_B;QBBP;QS_;QBBP_P;QMAB;VMAB;QM;VM;QX;QQMAB_;QMS;VMS;QME;VME;QXE;VXE;";
+    expected_lst_inter += "VXS;VX;VBBP_B;VBNP_B;VBNP_I;VBBP;VBNP;VBNP_P;QAT;QAFF;QAF;PROD;W;WBF_;YSSF;YSSG;WCF_;ITEP;EXC;ITT";
     EXPECT_EQ(list_inter, expected_lst_inter);
 
     std::string list_post = global_ws_lst->get("_POST");
@@ -242,9 +239,9 @@ TEST_F(SimulationTest, SimulateSCC)
 
     // Check result
     // exo
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.173844);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.052155);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.610756);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.171926);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.049475);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.608054);
     // endo
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
@@ -272,9 +269,9 @@ TEST_F(SimulationTest, SimulateSCC)
     EXPECT_TRUE(success);
 
     // Check result
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.183956);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.047353);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.58507);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.18396);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.047397);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.585134);
 
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);

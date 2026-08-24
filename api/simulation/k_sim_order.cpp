@@ -9,12 +9,6 @@
  *          - epilog (nb_post)
  *      2. "pseudo-triangulates" the interdep block, i.e. inverts the equation order 
  *         to optimize the incidence matrix (i.e.: minimizing the nb of 1 above the diagonal).
- *  
- * List of functions 
- * -----------------
- *      int order(KDBEquationsPtr dbe, char** eqs)              Reorders a model before the simulation to optimise the execution order of the set of equations.
- *      int get_eq_position(int posendo)                       Searches the equation whose endogenous is the variable posendo. 
- *      void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes)    Sort the equations by making successive 'pseudo-triangulation' passes.
  */
 #include "api/pch.h"
 #include "api/k_super.h"
@@ -210,42 +204,46 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
     v_ordered.clear();
     v_ordered.resize(nb, false);
     
-    int posj, eq_pos;
+    int eq_pos;
     int i = 0, j = 0;
+    bool exchange = false;
     std::shared_ptr<CLEC> clec;
-    for(const auto& [_, eq] : dbe->k_objs) 
+    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
     {
-        clec = eq->clec;
+        clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.resize(clec->map_objs.size() + 1, 0);
+        eq_predecessors.reserve(clec->map_objs.size() + 1);
 
         /* LOG NB AND POS OF ENDO VARS */
         // eq_predecessors[0] = (maximum) nb of (possible) predecessors of the ith equation
-        eq_predecessors[0] = (int) clec->map_objs.size();
+        eq_predecessors.push_back(0);
 
         j = 1;
         eq_pos = -1;
+        exchange = map_exchange.contains(eq_name);
         for(const auto& [name, pos]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
                 continue;
             
-            // Recherche l'eq dont la variable j est endo
-            posj = pos;
-            
-            if(v_pos_endo_in_dbv[i] == posj)  // améliore les performances JMP 11/3/2012 -- CHECK!
-                eq_pos = -1; // Endo de l'eq courante
+            // 'name' is the endogenous variable of the current equation
+            if(!exchange && name == eq_name)
+                eq_pos = -1;
             else 
             {
-                eq_pos = get_eq_position(posj);
-                // si var pos est l'endogène => -1
+                eq_pos = get_eq_position(name);
+                // 'name' is the endogenous variable of the equation 'eq_pos'
+                // (take care of possible exchanges)
                 if(eq_pos >= 0 && eq_pos == i) 
                     eq_pos = -1;
             }
-            eq_predecessors[j++] = eq_pos;
+
+            eq_predecessors[0]++;
+            eq_predecessors.push_back(eq_pos);
             if(eq_pos >= 0) 
                 add_post(successors, i, eq_pos);
         }
+        
         i++;
     }
 
@@ -355,28 +353,23 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
 
 
 /**
- *  Tries to find the equation whose endogenous is the variable posendo. 
- *  Browses therefore the vector v_pos_endo_in_dbv which contains the (possibly modified) endogenous var positions 
- *  after the first endo-exo exchanges.
+ *  Tries to find the equation whose endogenous is the variable 'var'. 
+ *  Browses therefore map_exchange which contains the (possibly modified) 
+ *  endogenous variable 'var' after the first endo-exo exchanges.
  *  
- *  @param  [in]    int     posendo   initial position of the endogenous variable
- *  @return         int               new position of that endo after the first endo-exo exchanges
- *                                    -1 if posendo is not found in v_pos_endo_in_dbv
- *  
- *  @global [in]    int     max_depth   nb of eqs dans the model (sim_dbe)
- *  @global [in]    int*    v_pos_endo_in_dbv      v_pos_endo_in_dbv[i] = position in sim_dbv of the endo variable of equation "sim_dbe[i]"
- *  
+ *  @param  [in]    string   var       variable to search for
+ *  @return         int                new position in sim_dbe of that 'var' after the first endo-exo exchanges
  */
-int CSimulation::get_eq_position(int posendo)
-{
-    if(posendo < 0) 
-        return -1;
-    
-    if(posendo < max_depth && v_pos_endo_in_dbv[posendo] == posendo) 
-        return posendo;
-
-    // Recherche l'eq avec pour endogène posendo ie i tq posendo = v_pos_endo_in_dbv[i]
-    return v_pos_endo_in_dbe[posendo]; 
+int CSimulation::get_eq_position(const std::string& var)
+{   
+    // Search equation for which variable 'endo' is the endogenous variable
+    if(map_exchange_rev.contains(var))
+    {
+        std::string endo = map_exchange_rev[var];
+        return sim_dbe->index_of(endo);
+    }
+    else
+        return sim_dbe->index_of(var);
 }
 
 

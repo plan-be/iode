@@ -108,13 +108,13 @@ void CSimulation::init_values(int t)
     if(init_algo == VAR_INIT_ASIS) 
         return;
 
-    double* val;
-    std::string name;
+    double* values;
+    std::string var_name;
     for(int i = 0 ; i < nb_pre + nb_inter + nb_post; i++) 
     {
-        name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
-        val = sim_dbv->get_var_ptr(name);
-        KV_init_values_1(val, t, init_algo);
+        var_name = get_var(i);
+        values = sim_dbv->get_var_ptr(var_name);
+        KV_init_values_1(values, t, init_algo);
     }
 }
 
@@ -127,11 +127,11 @@ void CSimulation::init_values(int t)
  *  @param  [in]  int  t   index of the period where the data must be copied
  *  
  */
-void CSimulation::restore_XK(int t)
+void CSimulation::restore_values(int t)
 {
     int i, j;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)
-        set_value(v_order[i], t, v_endo_values[j]);
+        sim_dbv->set_var(get_var(i), t, v_endo_values[j]);
 }
 
 /**
@@ -150,9 +150,9 @@ int CSimulation::prolog(int t)
     for(int i = 0; i < nb_pre; i++)  
     {
         eq_name = sim_dbe->get_name(v_order[i]);
-        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 0);
-        set_value(v_order[i], t, x);
+        sim_dbv->set_var(var_name, t, x);
     }
 
     return 0;
@@ -164,7 +164,7 @@ int CSimulation::prolog(int t)
  *  
  *  For eq nb i:
  *    - saves the previous iteration value of the endogenous variable in v_endo_values[i]
- *    - computes the new value of the endo var and saves it into sim_dbv (via set_value) 
+ *    - computes the new value of the endo var and saves it into sim_dbv 
  *    - if required, modifies the resulting value by "relaxing" it (multiply by relax)
  *    - computes the ||f(x)|| = diff between the new endo value and the value of the previous iteration 
  *      and saves that value in norm. 
@@ -181,18 +181,18 @@ int CSimulation::sub_interdep_1(int t)
     double  x;
     double  d, pd;
 
-
     norm = 0.0;
     std::string eq_name;
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = get_var(i);
+
         /* save XK first */
-        v_endo_values[j] = get_value(v_order[i], t);
+        v_endo_values[j] = sim_dbv->get_value(var_name, t);
 
         /* execute lec */
-        eq_name = sim_dbe->get_name(v_order[i]);
-        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
         x = calculate_CLEC(eq_name, var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
@@ -210,13 +210,13 @@ int CSimulation::sub_interdep_1(int t)
             if(pd > norm) norm = pd;
 
             // Stores the new endo value and "relaxes" it 
-            set_value(v_order[i], t, relax * (x - v_endo_values[j]) + v_endo_values[j]);
+            sim_dbv->set_var(var_name, t, relax * (x - v_endo_values[j]) + v_endo_values[j]);
         }
         else 
         {
             // if NaN, set norm to a huge value 
             norm = 10;
-            set_value(v_order[i], t, x);
+            sim_dbv->set_var(var_name, t, x);
         }
     }
 
@@ -247,12 +247,13 @@ int CSimulation::sub_interdep_2(int t)
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
+        eq_name = sim_dbe->get_name(v_order[i]);
+        var_name = get_var(i);
+
         /* save XK for further use */
-        v_endo_values[j] = get_value(v_order[i], t);
+        v_endo_values[j] = sim_dbv->get_value(var_name, t);
 
         /* execute lec and save in v_endo_values_1 */
-        eq_name = sim_dbe->get_name(v_order[i]);
-        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
         v_endo_values_1[j] = calculate_CLEC(eq_name, var_name, t, 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(v_endo_values_1[j])) 
@@ -263,6 +264,8 @@ int CSimulation::sub_interdep_2(int t)
     norm = 0.0;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
+        var_name = get_var(i);
+
         // Valeur précédente définie
         if(IODE_IS_A_NUMBER(v_endo_values[j])) 
         {
@@ -281,13 +284,13 @@ int CSimulation::sub_interdep_2(int t)
                 norm = pd;
 
             /* Store new value and relax it */
-            set_value(v_order[i], t, relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j]);
+            sim_dbv->set_var(var_name, t, relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j]);
         }
         // If previous iteation value is L-NAN, set norm to 10 and assing new calc value to endo
         else 
         {
             norm = 10;
-            set_value(v_order[i], t, v_endo_values_1[j]);
+            sim_dbv->set_var(var_name, t, v_endo_values_1[j]);
         }
     }
 
@@ -340,9 +343,9 @@ int CSimulation::epilog(int t)
     for(i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
         eq_name = sim_dbe->get_name(v_order[i]);
-        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 0);
-        set_value(v_order[i], t, x);  
+        sim_dbv->set_var(var_name, t, x);  
     }
 
     return 0;
@@ -380,11 +383,11 @@ int CSimulation::diverge(int t, char* c_name, double eps)
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
         /* save XK first */
-        v_endo_values[j] = get_value(v_order[i], t);
+        v_endo_values[j] = sim_dbv->get_value(get_var(i), t);
 
         /* execute lec */
         eq_name = sim_dbe->get_name(v_order[i]);
-        var_name = sim_dbv->get_name(v_pos_endo_in_dbv[v_order[i]]);
+        var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
@@ -404,7 +407,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
             {
                 if(diverg) 
                     diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
-                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) get_endo_name(v_order[i]).c_str());
+                diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) var_name.c_str());
             }
         }
     }
@@ -471,7 +474,7 @@ int CSimulation::sub_simulate(int t)
             kgetkey();      // Reads the keyboard buffer
             if(!kconfirm("Stop Simulation")) 
             {  
-                restore_XK(t);
+                restore_values(t);
                 ktermvkey(ovtime); 
                 return -1;
             }
@@ -481,7 +484,7 @@ int CSimulation::sub_simulate(int t)
 
     if(conv) 
     {
-        restore_XK(t);
+        restore_values(t);
         if(epilog(t)) 
             return -1;
         return 0;
@@ -492,7 +495,7 @@ int CSimulation::sub_simulate(int t)
         err_msg += std::to_string(max_iter);
         err_msg += " iterations";
         error_manager.append_error(err_msg);
-        restore_XK(t);
+        restore_values(t);
         diverge(t, "_DIVER", epsilon); // Saves the list of non convergent eqs in the list _DIVER
     }
 
@@ -533,13 +536,6 @@ int CSimulation::sub_simulate(int t)
 bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
     const std::vector<std::string>& eqs)
 {
-    bool success = true;
-    int     i, t, bt, at, j, k, res, endo_exonb,
-            posendo, posexo, posvar, cpu_iter;
-    double  *x;
-    std::string var_name, var_exo;
-    std::vector<std::string> pair_endo_exo;
-
     if(dbe->size() == 0) 
     {
         std::string err_msg = "Empty set of equations";
@@ -555,24 +551,18 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
 
     // Find in the sim_dbv sample the position t of the first period to simulate
     // and check that the simulation sample is included in sim_dbv sample
-    at = smpl->start_period.difference(dbv->get_sample()->start_period);
-    bt = dbv->get_sample()->end_period.difference(smpl->end_period);
+    int at = smpl->start_period.difference(dbv->get_sample()->start_period);
+    int bt = dbv->get_sample()->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
         return false;
     }
-    t = at; // t = index of the first period to simulate
+    int t = at; // t = index of the first period to simulate
 
-    // v_pos_endo_in_dbv[i] = pos in sim_dbv of the endo of equation i (endo var = eq name)
-    // v_pos_endo_in_dbe[i] = pos in sim_dbe of the eq whose endo is var[i] 
-    v_pos_endo_in_dbv.clear();
-    v_pos_endo_in_dbe.clear();
-    v_pos_endo_in_dbv.resize(dbe->size(), -1);
-    v_pos_endo_in_dbe.resize(dbv->size(), -1);
-    for(i = 0 ; i < dbv->size(); i++) 
-        v_pos_endo_in_dbe[i] = -1;
+    map_exchange.clear();
+    map_exchange_rev.clear();
 
     // Initialize v_norm and v_nb_iterations (see definitions above) 
     v_norm.clear();
@@ -585,32 +575,31 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
     kmsg("Linking equations ....");
     
-    int rc = 0;
+    int rc = -1;
+    int posvar = -1;
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
-    for(i = 0 ; i < dbe->size(); i++) 
+    for(int i = 0 ; i < dbe->size(); i++) 
     {
         eq_name = dbe->get_name(i);   
         posvar = dbv->index_of(eq_name);
-        v_pos_endo_in_dbv[i] = posvar;
         if(posvar < 0) 
         {
-            std::string err_msg = std::string("'") + eq_name + "': cannot find variable";
+            std::string err_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(err_msg);
-            success = false;
-            goto fin;
+            clear();
+            return false;
         }
-        v_pos_endo_in_dbe[posvar] = i; // Position of equation with endo nb posvar = i
         
         eq_ptr = dbe->get_obj_ptr(eq_name);
         eq_ptr->compile();
         rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
         {
-            std::string err_msg = std::string("'") + eq_name + "': cannot link equation";
+            std::string err_msg = "'" + eq_name + "': cannot link equation";
             error_manager.append_error(err_msg);
-            success = false;
-            goto fin;
+            clear();
+            return false;
         }
     }
 
@@ -618,47 +607,48 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     // Each couple endo-exo
     if(!v_endo_exo.empty()) 
     {
-        v_path.clear();
-        v_path.resize(max_depth, false);
-        endo_exonb = (int) v_endo_exo.size();
-        for(i = 0; i < endo_exonb; i ++) 
+        bool success = false;
+        int posendo, posexo;
+        std::string endo, exo;
+        path_examined.clear();
+        for(const std::string& endo_exo : v_endo_exo) 
         {
-            pair_endo_exo = split(v_endo_exo[i], '-');
+            std::vector<std::string> pair_endo_exo = split(endo_exo, '-');
             if(pair_endo_exo.size() != 2) 
             {
-                std::string err_msg = v_endo_exo[i] + ": syntax error in goal seeking parameter";
+                std::string err_msg = "'" + endo_exo + "': syntax error in goal ";
+                err_msg += "seeking parameter";
                 error_manager.append_error(err_msg);
-                success = false;
-                goto fin;
+                clear();
+                return false;
             }
 
-            var_name = pair_endo_exo[0];
-            posendo = sim_dbv->index_of(var_name);   // Position of the endogenous var in dbv
+            endo = pair_endo_exo[0];
+            posendo = sim_dbv->index_of(endo);   // Position of the endogenous var in dbv
             if(posendo < 0) 
             {
-                std::string err_msg = "Goal Seeking: '";
-                err_msg += var_name;
-                err_msg += "': no such equation in the Equations workspace";
+                std::string err_msg = "Goal Seeking: '" + endo + "': ";
+                err_msg += "no such equation in the Equations workspace";
                 error_manager.append_error(err_msg);
-                success = false;
-                goto fin;
+                clear();
+                return false;
             }
 
-            var_name = pair_endo_exo[1];
-            posexo = sim_dbv->index_of(var_name);  // Position of the exogenous var in dbv
+            exo = pair_endo_exo[1];
+            posexo = sim_dbv->index_of(exo);
             if(posexo < 0) 
             {
-                std::string err_msg = std::string("'") + var_name + "': cannot find variable";
+                std::string err_msg = "'" + exo + "': cannot find variable";
                 error_manager.append_error(err_msg);
-                success = false;
-                goto fin;
+                clear();
+                return false;
             }
             
-            res = exo_to_endo(posendo, posexo);
-            if(res < 0) 
+            success = exo_to_endo(posendo, posexo);
+            if(!success) 
             {
-                success = false;
-                goto fin;
+                clear();
+                return false;
             }
         }
     }
@@ -674,36 +664,39 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     v_endo_values.resize(nb_inter, 0.0);
     v_endo_values_1.resize(nb_inter, 0.0);
 
-    for(i = 0; i < smpl->nb_periods; i++, t++) 
+    int cpu_iter;
+    bool success = false;
+    for(int i = 0; i < smpl->nb_periods; i++, t++) 
     {
         cpu_iter = WscrGetMS();
 
         rc = sub_simulate(t);
         success = (rc == 0) ? true : false;
-        if(!success) 
-            goto fin;
+        if(!success)
+        {
+            clear();
+            return false;
+        } 
         
         v_cpu_time[t] = WscrGetMS() - cpu_iter;
+
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
         if(!v_endo_exo.empty()) 
         {
-            for(k = 0; k < endo_exonb; k ++) 
+            double* x;
+            std::string exo;
+            for(const std::string& endo_exo : v_endo_exo) 
             {
-                pair_endo_exo = split(v_endo_exo[k], '-');
-                var_name = pair_endo_exo[1];
-                posexo = sim_dbv->index_of(var_name);  // Position of the exogenous var in dbv
-
-                var_exo = sim_dbv->get_name(posexo);
-                x = sim_dbv->get_var_ptr(var_exo);
-                for(j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
+                std::vector<std::string> pair_endo_exo = split(endo_exo, '-');
+                exo = pair_endo_exo[1];
+                x = sim_dbv->get_var_ptr(exo);
+                for(int j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
                     x[j] = x[t];
             }
         }
     }
 
-fin:
-    clear();
-    return success;
+    return true;
 }
 
  
@@ -763,8 +756,8 @@ double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string
  *  Sub-function  of build_lists_order().
  *  
  *  @param [in] char*   lstname     name of the list to be created / updated    
- *  @param [in] int     eq1         first equation position in v_order (name = get_endo_name[v_order[eq1]])
- *  @param [in] int     eqn         last equation pos in v_order (name = get_endo_name[v_order[eqn]])
+ *  @param [in] int     eq1         first equation position in v_order
+ *  @param [in] int     eqn         last equation pos in v_order
  *  
  */
 void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int eqn)
@@ -791,8 +784,12 @@ void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int
     SCR_free_tbl(tbl_todel);
     
     // Creates a table of strings containing all the name to set in the list
+    std::string var_name;
     for(i = 0; i < nb; i++)
-        SCR_add_ptr(&lst, &nlst, (unsigned char*) get_endo_name(v_order[i + eq1]).c_str());
+    {
+        var_name = get_var(i + eq1);
+        SCR_add_ptr(&lst, &nlst, (unsigned char*) var_name.c_str());
+    }
 
     SCR_add_ptr(&lst, &nlst, 0); 
 

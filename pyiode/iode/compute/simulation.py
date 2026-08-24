@@ -783,7 +783,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
@@ -795,14 +795,14 @@ class Simulation:
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
         
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PMAB', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
-        31
+        33
 
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        ['PMAB', 'PXAB', 'ITFGO', 'ITFGI', ..., 'FLG', 'VBNP', 'VBNP_P', 'VBBP_P']
+        ['ITFGO', 'ITFGI', 'CGU', 'SSH3O', ..., 'FLG', 'VBNP', 'VBNP_P', 'VBBP_P']
         >>> len(lists["_INTER"])
-        204
+        202
 
         >>> lists["_POST"]          # doctest: +ELLIPSIS
         ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'GAP', 'FLGR', 'FLF', 'DPUU', 'BENEF']
@@ -908,7 +908,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
@@ -969,7 +969,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
@@ -1035,7 +1035,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
@@ -1094,7 +1094,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
@@ -1199,7 +1199,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =    1.342 - cpu=...ms
@@ -1248,7 +1248,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 30 - #INTER 204 - #POST 40
+        Calculating SCC... -> #PRE 32 - #INTER 202 - #POST 40
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =  0.09305 - cpu=...ms
@@ -1428,7 +1428,7 @@ class Simulation:
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         2000Y1: 1 iters - error =    1.342 - cpu=...ms
@@ -1542,24 +1542,24 @@ class Simulation:
         >>> success = simulation.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         >>> success
         True
 
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PME', 'PMS', 'PMT']
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PMAB', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
-        31
+        33
 
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        ['PMAB', 'PXAB', 'ULCP', 'SSH3P', ..., 'WCF_', 'ITEP', 'EXC', 'ITT']
+        ['ULCP', 'SSH3P', 'WBG', 'ITF', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
         >>> len(lists["_INTER"])
-        204
+        202
 
         >>> lists["_POST"]          # doctest: +ELLIPSIS
-        ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'FLGR', 'FLF', 'DPUU', 'BENEF']
+        ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'GAP', 'FLGR', 'FLF', 'DPUU', 'BENEF']
         >>> len(lists["_POST"])
         39
         """
@@ -1659,20 +1659,20 @@ class Simulation:
         >>> success = simulation.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
-        Calculating SCC... -> #PRE 31 - #INTER 204 - #POST 39
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
         Reordering interdependent block...
         Reordering interdependent block...
         >>> success
         True
 
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
-        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'ZZF_', 'DTH1', 'PME', 'PMS', 'PMT']
+        ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PMAB', 'PME', 'PMS', 'PMT']
         >>> len(lists["_PRE"])
-        31
+        33
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        ['PMAB', 'PXAB', 'ULCP', 'SSH3P', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
+        ['ULCP', 'SSH3P', 'WBG', 'ITF', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
         >>> len(lists["_INTER"])
-        204
+        202
         >>> lists["_POST"]          # doctest: +ELLIPSIS
         ['IFU', 'SSHFF', 'PBBP', 'OCUF', ..., 'GAP', 'FLGR', 'FLF', 'DPUU', 'BENEF']
         >>> len(lists["_POST"])
