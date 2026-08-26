@@ -604,11 +604,10 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     }
 
     // Optional goal seeking = exchange exo and endo roles in equations
-    // Each couple endo-exo
+    std::vector<std::string> v_exo;
     if(!v_endo_exo.empty()) 
     {
         bool success = false;
-        int posendo, posexo;
         std::string endo, exo;
         path_examined.clear();
         for(const std::string& endo_exo : v_endo_exo) 
@@ -624,10 +623,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             }
 
             endo = pair_endo_exo[0];
-            posendo = sim_dbv->index_of(endo);   // Position of the endogenous var in dbv
-            if(posendo < 0) 
+            if(!sim_dbe->contains(endo)) 
             {
-                std::string err_msg = "Goal Seeking: '" + endo + "': ";
+                std::string err_msg = "Goal Seeking - '" + endo + "': ";
                 err_msg += "no such equation in the Equations workspace";
                 error_manager.append_error(err_msg);
                 clear();
@@ -635,21 +633,23 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             }
 
             exo = pair_endo_exo[1];
-            posexo = sim_dbv->index_of(exo);
-            if(posexo < 0) 
+            if(!sim_dbv->contains(exo)) 
             {
-                std::string err_msg = "'" + exo + "': cannot find variable";
+                std::string err_msg = "Goal Seeking - '" + exo + "': ";
+                err_msg += "cannot find the variable";
                 error_manager.append_error(err_msg);
                 clear();
                 return false;
             }
             
-            success = exo_to_endo(posendo, posexo);
+            success = exo_to_endo(endo, exo);
             if(!success) 
             {
                 clear();
                 return false;
             }
+
+            v_exo.push_back(exo);
         }
     }
 
@@ -681,14 +681,11 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         v_cpu_time[t] = WscrGetMS() - cpu_iter;
 
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
-        if(!v_endo_exo.empty()) 
+        if(!v_exo.empty()) 
         {
             double* x;
-            std::string exo;
-            for(const std::string& endo_exo : v_endo_exo) 
+            for(const std::string& exo : v_exo) 
             {
-                std::vector<std::string> pair_endo_exo = split(endo_exo, '-');
-                exo = pair_endo_exo[1];
                 x = sim_dbv->get_var_ptr(exo);
                 for(int j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
                     x[j] = x[t];
