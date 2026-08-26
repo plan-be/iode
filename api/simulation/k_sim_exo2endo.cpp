@@ -70,19 +70,13 @@
  *  @param [in] int*    depth       current level of recursivity (starts at 0 and increase each time KE)
  *  
  */
-bool CSimulation::find_path(int posendo, int posexo, int& depth)
+bool CSimulation::find_path(const std::string& endo, const std::string& exo, int& depth)
 {
-    if(posexo < 0 || depth > max_depth) 
-        return false;
-
-    std::shared_ptr<Equation> eq_ptr;
-    std::string endo = sim_dbv->get_name(posendo);
-    std::string exo = sim_dbv->get_name(posexo);
+    std::shared_ptr<Equation> eq_ptr = sim_dbe->get_obj_ptr(endo);
+    std::shared_ptr<CLEC> clec = eq_ptr->clec;
 
     // Endo and exo are in same equation 
     // => add entry in map_exchange and map_exchange_rev and return 
-    eq_ptr = sim_dbe->get_obj_ptr(endo);
-    std::shared_ptr<CLEC> clec = eq_ptr->clec;
     for(auto& [name, _]: clec->map_objs) 
     {
         if(is_coefficient(name)) 
@@ -101,7 +95,7 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
     int poseq = -1;
     bool success = false;
     std::string eq_name_resolved;
-    for(auto& [name, pos]: clec->map_objs) 
+    for(auto& [name, _]: clec->map_objs) 
     {   
         if(is_coefficient(name)) 
             continue;
@@ -122,7 +116,7 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
         path_examined.insert(eq_name_resolved);
 
         depth++;
-        success = find_path(pos, posexo, depth);
+        success = find_path(name, exo, depth);
         // If not found, try the next variable in clec
         if(!success) 
         {
@@ -158,39 +152,12 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
  *                                      path between endo and exo inexistent 
  *  
  */
-bool CSimulation::exo_to_endo(int posendo, int posexo)
+bool CSimulation::exo_to_endo(const std::string& endo, const std::string& exo)
 {
-    int depth = 0;
-    std::string endo, exo;
-
-    try
-    {
-        endo = sim_dbv->get_name(posendo);
-    }
-    catch(const std::exception& e) 
-    {
-        std::string error_msg = "Goal Seeking: cannot find endogenous variable.\n";
-        error_msg += std::string(e.what());
-        error_manager.append_error(error_msg);
-        return false;
-    }
-
     if(map_exchange.contains(endo))
     {
         std::string error_msg = "Goal Seeking: an exchange for the endogenous variable ";
         error_msg += "'" + endo + "' already exists";
-        error_manager.append_error(error_msg);
-        return false;
-    }
-
-    try
-    {
-        exo = sim_dbv->get_name(posexo);
-    }
-    catch(const std::exception& e) 
-    {
-        std::string error_msg = "Goal Seeking: cannot find exogenous variable.\n";
-        error_msg += std::string(e.what());
         error_manager.append_error(error_msg);
         return false;
     }
@@ -204,8 +171,9 @@ bool CSimulation::exo_to_endo(int posendo, int posexo)
     }
 
     // search for a path and add an entry to map_exchange and map_exchange_rev
+    int depth = 0;
     path_examined.clear();
-    bool success = find_path(posendo, posexo, depth);
+    bool success = find_path(endo, exo, depth);
     if(!success) 
     {
         std::string error_msg = "Goal Seeking: no exchange ";

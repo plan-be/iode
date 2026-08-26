@@ -247,7 +247,7 @@ protected:
 	void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
-	bool exo_to_endo(int posendo, int posexo);
+	bool exo_to_endo(const std::string& endo, const std::string& exo);
 
     std::vector<std::string> eqs_to_vector(const std::string& list_eqs)
     {
@@ -312,7 +312,7 @@ private:
 	int compute_tri_end(KDBEquationsPtr dbe);
 
 	/* k_sim_exo2endo.c */
-	bool find_path(int posendo, int posexo, int& depth);
+	bool find_path(const std::string& endo, const std::string& exo, int& depth);
 
 	/* k_sim_scc.c */
 	bool simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl);
