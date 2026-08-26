@@ -61,7 +61,7 @@ int CSimulation::add_post(std::vector<std::vector<int>>& successors, int i, int 
  *               skip the equation
  *			else 
  *				v_ordered[varj] = true
- *				v_order[from + nb] = i
+ *				v_ordered_eqs[from + nb] = i
  *	
  *       If no new equation had been set in v_order during the loop, end of the process (the block is completed)
  *       Else restart the loop on the equations
@@ -117,7 +117,7 @@ int CSimulation::build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vecto
             {
                 new_eq_added = true;
                 v_ordered[i] = true;
-                v_order[from + nb] = i;
+                v_ordered_eqs[from + nb] = i;
                 nb++;
             }
         }
@@ -149,7 +149,7 @@ int CSimulation::build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<i
     {
         if(v_ordered[i]) 
             continue;
-        v_order[nb_pre + nb_post + nb] = i;
+        v_ordered_eqs[nb_pre + nb_post + nb] = i;
         nb++;
     }
     return nb;
@@ -198,8 +198,8 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
 {
     int nb = dbe->size();
     
-    v_order.clear();
-    v_order.resize(nb, -1);
+    v_ordered_eqs.clear();
+    v_ordered_eqs.resize(nb, -1);
 
     v_ordered.clear();
     v_ordered.resize(nb, false);
@@ -294,14 +294,15 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     {
         nb_pre = nb_post = 0;
         nb_inter = nb;
-        v_order.clear();
-        v_order.resize(nb, -1);
+
+        v_ordered_eqs.clear();
+        v_ordered_eqs.resize(nb, -1);
         if(eqs.size() == 0)
             for(int i = 0; i < nb_inter; i++) 
-                v_order[i] = i;
+                v_ordered_eqs[i] = i;
         else
             for(int i = 0; i < nb_inter; i++) 
-                v_order[i] = dbe->index_of(eqs[i]);
+                v_ordered_eqs[i] = dbe->index_of(eqs[i]);
         return;
     }
 
@@ -321,9 +322,9 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
     int k;
     for(int i = 0; i < nb_post / 2; i++) 
     {
-        k = v_order[nb_pre + i];
-        v_order[nb_pre + i] = v_order[nb_pre + (nb_post - 1) - i];
-        v_order[nb_pre + (nb_post - 1) - i] = k;
+        k = v_ordered_eqs[nb_pre + i];
+        v_ordered_eqs[nb_pre + i] = v_ordered_eqs[nb_pre + (nb_post - 1) - i];
+        v_ordered_eqs[nb_pre + (nb_post - 1) - i] = k;
     }
 
     nb_inter = build_inter_list(dbe, predecessors);
@@ -335,11 +336,11 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
             nb_inter, 
             nb_post);
 
-    // NOTE: currently, v_order contains lists in the order *pre*, *post*, *inter*.
+    // NOTE: currently, v_ordered_eqs contains lists in the order *pre*, *post*, *inter*.
     // Rotate the [post, inter] subrange left by nb_post to obtain *pre*, *inter*, *post*.
-    std::rotate(v_order.begin() + nb_pre,
-                v_order.begin() + nb_pre + nb_post,
-                v_order.begin() + nb_pre + nb_post + nb_inter);
+    std::rotate(v_ordered_eqs.begin() + nb_pre,
+                v_ordered_eqs.begin() + nb_pre + nb_post,
+                v_ordered_eqs.begin() + nb_pre + nb_post + nb_inter);
 
     if(sorting_algo == SORT_BOTH) 
     {
@@ -388,7 +389,7 @@ int CSimulation::compute_tri_begin(KDBEquationsPtr dbe)
     v_permut.resize(nb, -1);
     
     for(int i = 0 ; i < nb_inter ; i++)
-        v_permut[v_order[nb_pre + i]] = i;
+        v_permut[v_ordered_eqs[nb_pre + i]] = i;
 
     return 0;
 }
@@ -403,7 +404,7 @@ int CSimulation::compute_tri_end(KDBEquationsPtr dbe)
 {
     for(int i = 0 ; i < dbe->size() ; i++)
         if(v_permut[i] >= 0)
-            v_order[nb_pre + v_permut[i]] = i;
+            v_ordered_eqs[nb_pre + v_permut[i]] = i;
 
     v_permut.clear();
     return 0;
@@ -475,7 +476,7 @@ void CSimulation::compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>
     {
         for(int i = 0 ; i < nb_inter ; i++) 
         {
-            var = v_order[nb_pre + i];
+            var = v_ordered_eqs[nb_pre + i];
             compute_tri_perm1(dbe, var, predecessors[var]);
         }
     }

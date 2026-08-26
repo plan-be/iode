@@ -56,9 +56,10 @@ public:
 	std::vector<std::string> v_endo_exo;    // Allow exchange exogenous <-> endogenous roles in equations
     std::vector<double> v_norm;             // Convergence threshold reached at the end of each simulation period
     std::vector<int> v_nb_iterations;       // Numbers of iterations needed for each simulation period
+    
+	int cpu_time_scc;                       // Elapsed time to compute SCC
+	int cpu_time_sorting;                   // Elapsed time to sort interdep block
     std::vector<long> v_cpu_time;           // Elapsed time for each simulation period
-	int     cpu_time_scc;                   // Elapsed time to compute SCC
-	int     cpu_time_sorting;               // Elapsed time to sort interdep block
 
     double  newton_epsilon;                 // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
     double  newton_step;                    // Newton-Raphson: save a trace of the sub-iterations
@@ -72,11 +73,10 @@ protected:
 	double  norm = 0.0;                     // Error measure: maximum difference between 2 iterations 
 
 	// EQUATION ORDERING
-	int nb_pre = 0;             // number of equations in the "prolog" block
-	int nb_inter = 0;           // number of equations in the "interdep" block
-	int nb_post = 0;            // number of equations in the "epilog"
-	int max_depth = 0;          // Number of equations in the model
-    std::vector<int> v_order;   // position in dbe of the equations (to simulate) in the execution order.
+	int nb_pre = 0;                         // number of equations in the "prolog" block
+	int nb_inter = 0;                       // number of equations in the "interdep" block
+	int nb_post = 0;                        // number of equations in the "epilog"
+    std::vector<int> v_ordered_eqs;         // positions of the equations (to simulate) in the execution order.
     
     std::map<std::string, std::string> map_exchange;        // pairs <endo, exo> for which the exchanges are defined
     std::map<std::string, std::string> map_exchange_rev;    // reverse of map_exchange
@@ -94,8 +94,7 @@ private:
         norm = 0.0;
         nb_pre = 0;     
         nb_inter = 0;   
-        nb_post = 0;        
-        max_depth = 0;  
+        nb_post = 0;          
         cpu_time_scc = 0;    
         cpu_time_sorting = 0;
 
@@ -105,7 +104,7 @@ private:
         v_endo_values_1.clear();
         map_exchange.clear();
         map_exchange_rev.clear();
-        v_order.clear();
+        v_ordered_eqs.clear();
         v_permut.clear();
         v_ordered.clear();
     }
@@ -281,7 +280,7 @@ protected:
 private:
     std::string get_var(const int i)
     {
-        int eq_pos = v_order[i];
+        int eq_pos = v_ordered_eqs[i];
         std::string eq_name = sim_dbe->get_name(eq_pos);
         if(map_exchange.contains(eq_name))
             return map_exchange[eq_name];
