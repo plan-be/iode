@@ -208,6 +208,7 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
     int i = 0, j = 0;
     bool exchange = false;
     std::shared_ptr<CLEC> clec;
+    std::string eq_name_resolved;
     for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
     {
         clec = eq_ptr->clec;
@@ -221,29 +222,28 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
         j = 1;
         eq_pos = -1;
         exchange = map_exchange.contains(eq_name);
-        for(const auto& [name, pos]: clec->map_objs) 
+        for(const auto& [name, _]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
                 continue;
+
+            eq_name_resolved = find_eq_name(name);
             
+            // 'name' is not an endogenous variable of any equation
+            if(eq_name_resolved.empty())
+                eq_pos = -1;
             // 'name' is the endogenous variable of the current equation
-            if(!exchange && name == eq_name)
+            else if(eq_name_resolved == eq_name)
                 eq_pos = -1;
             else 
-            {
-                eq_pos = get_eq_position(name);
-                // 'name' is the endogenous variable of the equation 'eq_pos'
-                // (take care of possible exchanges)
-                if(eq_pos >= 0 && eq_pos == i) 
-                    eq_pos = -1;
-            }
+                eq_pos = sim_dbe->index_of(eq_name_resolved);
 
             eq_predecessors[0]++;
             eq_predecessors.push_back(eq_pos);
             if(eq_pos >= 0) 
                 add_post(successors, i, eq_pos);
         }
-        
+
         i++;
     }
 
@@ -357,19 +357,22 @@ void CSimulation::order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs
  *  Browses therefore map_exchange which contains the (possibly modified) 
  *  endogenous variable 'var' after the first endo-exo exchanges.
  *  
- *  @param  [in]    string   var       variable to search for
- *  @return         int                new position in sim_dbe of that 'var' after the first endo-exo exchanges
+ *  @param  [in]    string   var    variable to search for
+ *  @return         string          name of the equation whose endogenous is 'var'
  */
-int CSimulation::get_eq_position(const std::string& var)
+std::string CSimulation::find_eq_name(const std::string& var)
 {   
-    // Search equation for which variable 'endo' is the endogenous variable
+    // exchange for this variable -> the endogenous of the equation 
+    // is the exchanged variable
     if(map_exchange_rev.contains(var))
-    {
-        std::string endo = map_exchange_rev[var];
-        return sim_dbe->index_of(endo);
-    }
+        return map_exchange_rev[var];
+    
+    // no exchange for this variable -> endogenous of the equation 
+    // is the variable itself 
+    if(sim_dbe->contains(var))
+        return var;
     else
-        return sim_dbe->index_of(var);
+        return "";
 }
 
 

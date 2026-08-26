@@ -83,7 +83,7 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
     // => add entry in map_exchange and map_exchange_rev and return 
     eq_ptr = sim_dbe->get_obj_ptr(endo);
     std::shared_ptr<CLEC> clec = eq_ptr->clec;
-    for(auto& [name, pos]: clec->map_objs) 
+    for(auto& [name, _]: clec->map_objs) 
     {
         if(is_coefficient(name)) 
             continue;
@@ -100,6 +100,7 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
     // => try to find a path between endo and exo and change endo / exo at each step
     int poseq = -1;
     bool success = false;
+    std::string eq_name_resolved;
     for(auto& [name, pos]: clec->map_objs) 
     {   
         if(is_coefficient(name)) 
@@ -108,17 +109,17 @@ bool CSimulation::find_path(int posendo, int posexo, int& depth)
         if(name == endo)
             continue;
 
-        poseq = get_eq_position(name);
+        eq_name_resolved = find_eq_name(name);
 
         // current variable is not an endogenous of any equation
-        if(poseq < 0) 
+        if(eq_name_resolved.empty()) 
             continue;
 
         // if path already examined --> continue
-        if(path_examined.contains(poseq)) 
+        if(path_examined.contains(eq_name_resolved)) 
             continue;
-        else 
-            path_examined.insert(poseq);
+        
+        path_examined.insert(eq_name_resolved);
 
         depth++;
         success = find_path(pos, posexo, depth);
