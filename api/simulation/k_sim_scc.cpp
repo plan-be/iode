@@ -46,7 +46,6 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     }
 
     sim_dbe = dbe;
-    max_depth = dbe->size();
     nb_passes = tris;
 
     // to build the PRE, INTER and POST lists in build_lists_order()
@@ -96,7 +95,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     order(dbe);
     build_lists_order(pre, inter, post);
 
-    v_order.clear();
+    v_ordered_eqs.clear();
     map_exchange.clear();
     map_exchange_rev.clear();
 
@@ -127,7 +126,6 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
 
     sim_dbv = dbv;
     sim_dbe = dbe;
-    max_depth = dbe->size();
     sim_dbs = dbs;
 
     // Check Sample dans les bornes du WS
@@ -214,14 +212,14 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
 
     // Fixe l'ordre d'exécution dans v_order
     int j = 0;
-    v_order.clear();
-    v_order.resize(nb_pre + nb_inter + nb_post, -1);
+    v_ordered_eqs.clear();
+    v_ordered_eqs.resize(nb_pre + nb_inter + nb_post, -1);
     for(int i = 0; i < nb_pre; i++)   
-        v_order[j++] = dbe->index_of(pre[i]);
+        v_ordered_eqs[j++] = dbe->index_of(pre[i]);
     for(int i = 0; i < nb_inter; i++) 
-        v_order[j++] = dbe->index_of(inter[i]);
+        v_ordered_eqs[j++] = dbe->index_of(inter[i]);
     for(int i = 0; i < nb_post; i++)  
-        v_order[j++] = dbe->index_of(post[i]);
+        v_ordered_eqs[j++] = dbe->index_of(post[i]);
 
     // Simulation
     int t = smpl->start_period.difference(dbv->get_sample()->start_period);

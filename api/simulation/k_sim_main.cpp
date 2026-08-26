@@ -149,7 +149,7 @@ int CSimulation::prolog(int t)
     std::string var_name;
     for(int i = 0; i < nb_pre; i++)  
     {
-        eq_name = sim_dbe->get_name(v_order[i]);
+        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 0);
         sim_dbv->set_var(var_name, t, x);
@@ -186,7 +186,7 @@ int CSimulation::sub_interdep_1(int t)
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_order[i]);
+        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
 
         /* save XK first */
@@ -247,7 +247,7 @@ int CSimulation::sub_interdep_2(int t)
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_order[i]);
+        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
 
         /* save XK for further use */
@@ -342,7 +342,7 @@ int CSimulation::epilog(int t)
     std::string var_name;
     for(i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_order[i]);
+        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 0);
         sim_dbv->set_var(var_name, t, x);  
@@ -386,7 +386,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
         v_endo_values[j] = sim_dbv->get_value(get_var(i), t);
 
         /* execute lec */
-        eq_name = sim_dbe->get_name(v_order[i]);
+        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
         x = calculate_CLEC(eq_name, var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
@@ -546,7 +546,6 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     // Assign static global variables to avoid passing to many parameters to sub functions
     sim_dbv = dbv;
     sim_dbe = dbe;
-    max_depth = dbe->size();
     sim_dbs = dbs;
 
     // Find in the sim_dbv sample the position t of the first period to simulate
@@ -748,7 +747,7 @@ double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string
 
 
 /**
- *  Creates or updates a list of equations from equation v_order[eq1] to equation v_order[eqn].
+ *  Creates or updates a list of equations from equation v_ordered_eqs[eq1] to equation v_ordered_eqs[eqn].
  *  
  *  Sub-function  of build_lists_order().
  *  
