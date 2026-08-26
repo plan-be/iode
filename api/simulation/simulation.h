@@ -52,7 +52,7 @@ public:
 	int     sorting_algo;           // reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
 	int     init_algo;              // endogenous initial values
 	
-    std::set<int> path_examined;
+    std::set<std::string> path_examined;
 	std::vector<std::string> v_endo_exo;    // Allow exchange exogenous <-> endogenous roles in equations
     std::vector<double> v_norm;             // Convergence threshold reached at the end of each simulation period
     std::vector<int> v_nb_iterations;       // Numbers of iterations needed for each simulation period
@@ -242,7 +242,7 @@ protected:
 	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */
-	int get_eq_position(const std::string& var);
+	std::string find_eq_name(const std::string& var);
 	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
 	void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes);
 
