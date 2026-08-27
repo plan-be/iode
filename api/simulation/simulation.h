@@ -65,28 +65,30 @@ public:
     double  newton_step;                    // Newton-Raphson: save a trace of the sub-iterations
     int     newton_max_iter;                // Newton-Raphson convergence threshold
 
-protected:
+private:
 	KDBVariablesPtr  sim_dbv;               // KDB of variables used for the simulation. Normally global_ws_var
 	KDBScalarsPtr    sim_dbs;               // KDB of scalars used for the simulation. Normally global_ws_scl
 	KDBEquationsPtr  sim_dbe; 	            // KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
 
 	double  norm = 0.0;                     // Error measure: maximum difference between 2 iterations 
 
+    std::unordered_map<std::string, int> map_eq_name_index;   // Cache of equation name to index mapping for fast lookups
+
 	// EQUATION ORDERING
 	int nb_pre = 0;                         // number of equations in the "prolog" block
 	int nb_inter = 0;                       // number of equations in the "interdep" block
 	int nb_post = 0;                        // number of equations in the "epilog"
-    std::vector<int> v_ordered_eqs;         // positions of the equations (to simulate) in the execution order.
+    std::vector<std::string> v_ordered_eqs; // names of the equations (to simulate) in the execution order.
     
-    std::map<std::string, std::string> map_exchange;        // pairs <endo, exo> for which the exchanges are defined
-    std::map<std::string, std::string> map_exchange_rev;    // reverse of map_exchange
+    std::unordered_map<std::string, std::string> map_exchange;          // pairs <endo, exo> for which the exchanges are defined
+    std::unordered_map<std::string, std::string> map_exchange_rev;      // reverse of map_exchange
 
     std::vector<double> v_endo_values;      // Values of the endogenous variables (in the interdep block) at the end of the previous iteration
     std::vector<double> v_endo_values_1;    // Values of the endogenous variables (in the interdep block) during the current iteration
 
-private:
-    std::vector<int> v_permut;              // vector of permutation
+    std::vector<int> v_permut;              // vector of permutation   
     std::vector<bool> v_ordered;            // indicates if equation i is already in a block
+    std::vector<int> v_ordered_eqs_pos;     // positions of the equations (to simulate) in the execution order.
 
 private:
     void clear()
@@ -105,6 +107,7 @@ private:
         map_exchange.clear();
         map_exchange_rev.clear();
         v_ordered_eqs.clear();
+        v_ordered_eqs_pos.clear();
         v_permut.clear();
         v_ordered.clear();
     }
@@ -280,8 +283,7 @@ protected:
 private:
     std::string get_var(const int i)
     {
-        int eq_pos = v_ordered_eqs[i];
-        std::string eq_name = sim_dbe->get_name(eq_pos);
+        std::string eq_name = v_ordered_eqs[i];
         if(map_exchange.contains(eq_name))
             return map_exchange[eq_name];
         else
@@ -302,11 +304,9 @@ private:
 
 	/* k_sim_order.c */
 	int pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
-	int add_post(std::vector<std::vector<int>>& successors, int i, int pos);
-	int post_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
-	int build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int from);
+	int build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& v_eq_vars, int from);
 	int build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors);
-	void compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& vars);
+	void compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& v_vars);
 	int compute_tri_begin(KDBEquationsPtr dbe);
 	int compute_tri_end(KDBEquationsPtr dbe);
 
