@@ -49,10 +49,9 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     nb_passes = tris;
 
     // to build the PRE, INTER and POST lists in build_lists_order()
-    std::shared_ptr<Variable> var_ptr;
     sim_dbv = KDBVariables::Create(false);
     for(const std::string& var_name : dbe->get_names())
-        sim_dbv->k_objs[var_name] = var_ptr;
+        sim_dbv->k_objs[var_name] = std::shared_ptr<Variable>();
 
     if(tris > 0) 
         sorting_algo = SORT_BOTH;
@@ -66,10 +65,8 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
     kmsg("Pseudo-linking equations ....");
-    for(int i = 0 ; i < dbe->size(); i++) 
+    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
     {
-        eq_name = dbe->get_name(i);
-        eq_ptr = dbe->get_obj_ptr(eq_name);
         if(!eq_ptr)
         {
             std::string error_msg = "'" + eq_name + "': cannot find equation";
@@ -157,9 +154,8 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr = nullptr;
     kmsg("Linking equations ....");
-    for(int i = 0 ; i < dbe->size(); i++) 
+    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
     {
-        eq_name = dbe->get_name(i);
         if(!dbv->contains(eq_name)) 
         {
             std::string error_msg = "'" + eq_name + "': cannot find variable";
@@ -167,7 +163,6 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
             return false;
         }
         
-        eq_ptr = dbe->get_obj_ptr(eq_name);
         eq_ptr->compile();
         rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
@@ -211,15 +206,14 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
         return false;
 
     // Fixe l'ordre d'exécution dans v_order
-    int j = 0;
     v_ordered_eqs.clear();
-    v_ordered_eqs.resize(nb_pre + nb_inter + nb_post, -1);
+    v_ordered_eqs.reserve(nb_pre + nb_inter + nb_post);
     for(int i = 0; i < nb_pre; i++)   
-        v_ordered_eqs[j++] = dbe->index_of(pre[i]);
+        v_ordered_eqs.push_back(pre[i]);
     for(int i = 0; i < nb_inter; i++) 
-        v_ordered_eqs[j++] = dbe->index_of(inter[i]);
+        v_ordered_eqs.push_back(inter[i]);
     for(int i = 0; i < nb_post; i++)  
-        v_ordered_eqs[j++] = dbe->index_of(post[i]);
+        v_ordered_eqs.push_back(post[i]);
 
     // Simulation
     int t = smpl->start_period.difference(dbv->get_sample()->start_period);

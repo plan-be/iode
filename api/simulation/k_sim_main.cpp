@@ -145,13 +145,11 @@ void CSimulation::restore_values(int t)
 int CSimulation::prolog(int t)
 {
     double x;
-    std::string eq_name;
     std::string var_name;
     for(int i = 0; i < nb_pre; i++)  
     {
-        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
-        x = calculate_CLEC(eq_name, var_name, t, 0);
+        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 0);
         sim_dbv->set_var(var_name, t, x);
     }
 
@@ -182,18 +180,16 @@ int CSimulation::sub_interdep_1(int t)
     double  d, pd;
 
     norm = 0.0;
-    std::string eq_name;
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
 
         /* save XK first */
         v_endo_values[j] = sim_dbv->get_value(var_name, t);
 
         /* execute lec */
-        x = calculate_CLEC(eq_name, var_name, t, 1);
+        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
 
@@ -243,18 +239,16 @@ int CSimulation::sub_interdep_2(int t)
     double  d, pd;
 
     // Stage 1
-    std::string eq_name;
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
 
         /* save XK for further use */
         v_endo_values[j] = sim_dbv->get_value(var_name, t);
 
         /* execute lec and save in v_endo_values_1 */
-        v_endo_values_1[j] = calculate_CLEC(eq_name, var_name, t, 1);
+        v_endo_values_1[j] = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(v_endo_values_1[j])) 
             return -1;
@@ -335,16 +329,13 @@ int CSimulation::interdep(int t)
  */
 int CSimulation::epilog(int t)
 {
-    int     i, j;
-    double  x;
-
-    std::string eq_name;
+    int i, j;
+    double x;
     std::string var_name;
     for(i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
-        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
         var_name = get_var(i);
-        x = calculate_CLEC(eq_name, var_name, t, 0);
+        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 0);
         sim_dbv->set_var(var_name, t, x);  
     }
 
@@ -378,21 +369,21 @@ int CSimulation::diverge(int t, char* c_name, double eps)
     if(global_ws_lst->contains(name))
         global_ws_lst->remove(name);
     
-    std::string eq_name;
     std::string var_name;
     for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
+        var_name = get_var(i);
+
         /* save XK first */
-        v_endo_values[j] = sim_dbv->get_value(get_var(i), t);
+        v_endo_values[j] = sim_dbv->get_value(var_name, t);
 
         /* execute lec */
-        eq_name = sim_dbe->get_name(v_ordered_eqs[i]);
-        var_name = get_var(i);
-        x = calculate_CLEC(eq_name, var_name, t, 1);
+        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
-        if(IODE_IS_A_NUMBER(v_endo_values[j])) {
+        if(IODE_IS_A_NUMBER(v_endo_values[j])) 
+        {
             /* ?????????????
             d = (v_endo_values[j] - x) * relax;
             */
@@ -575,14 +566,11 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     kmsg("Linking equations ....");
     
     int rc = -1;
-    int posvar = -1;
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
-    for(int i = 0 ; i < dbe->size(); i++) 
-    {
-        eq_name = dbe->get_name(i);   
-        posvar = dbv->index_of(eq_name);
-        if(posvar < 0) 
+    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
+    { 
+        if(!dbv->contains(eq_name)) 
         {
             std::string err_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(err_msg);
@@ -590,7 +578,6 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             return false;
         }
         
-        eq_ptr = dbe->get_obj_ptr(eq_name);
         eq_ptr->compile();
         rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
@@ -757,41 +744,34 @@ double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string
  *  
  */
 void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int eqn)
-{
-    U_ch** lst = NULL;                     
-    U_ch** tbl_todel = NULL;
-    U_ch* lst_todel = NULL;
-    U_ch buf[256];
-    int i = 0; 
-    int nlst = 0; 
-    int nb = eqn - eq1 + 1;  
-    int maxl = 1000;
-
+{    
     // delete the list 'lstname' and all sub-lists
+    U_ch buf[256];
     sprintf((char*) buf, "%s*", (char*) lstname.c_str());
-    lst_todel = (unsigned char*) K_expand(LISTS, NULL, (char*) buf, '*');
-    if(lst_todel) 
+    const char* expanded = K_expand(LISTS, NULL, (char*) buf, '*');
+    std::string lst_todel = expanded ? std::string(expanded) : std::string();
+    if(!lst_todel.empty()) 
     {
-        tbl_todel = SCR_vtom(lst_todel, ';');
-        for(i = 0; tbl_todel[i] ; i++)
-            global_ws_lst->remove(std::string((char*) tbl_todel[i]));
+        std::vector<std::string> tbl_todel = split(lst_todel, ';');
+        for(const std::string& name : tbl_todel)
+            global_ws_lst->remove(name);
     }
-    SCR_free(lst_todel);
-    SCR_free_tbl(tbl_todel);
     
     // Creates a table of strings containing all the name to set in the list
     std::string var_name;
-    for(i = 0; i < nb; i++)
+    int nb = eqn - eq1 + 1;
+    std::vector<std::string> v_vars;
+    for(int i = 0; i < nb; i++)
     {
         var_name = get_var(i + eq1);
-        SCR_add_ptr(&lst, &nlst, (unsigned char*) var_name.c_str());
+        v_vars.push_back(var_name);
     }
 
-    SCR_add_ptr(&lst, &nlst, 0); 
-
     // Creates the list lstname (and possibly sub-lists lstname1,...) 
-    KL_lst((char*) lstname.c_str(), (char**) lst, maxl);
-    SCR_free_tbl(lst);
+    int maxl = 1000;
+    char** c_lst = vector_to_double_char(v_vars);
+    KL_lst((char*) lstname.c_str(), c_lst, maxl);
+    SCR_free_tbl((unsigned char**) c_lst);
 }
 
 
