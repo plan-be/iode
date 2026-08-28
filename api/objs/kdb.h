@@ -368,7 +368,7 @@ public:
         const bool names, const bool forms, const bool texts, const char all) const;
     std::string expand(const std::string& pattern, const char all='*') const;
     virtual bool print_obj_def(const std::string& name) = 0;
-    char* dde_create_obj(int objnb, int* nc, int* nl);
+    char* dde_create_obj(const std::string& name, int* nc, int* nl);
 
     virtual bool copy_from_file(const std::string& file, const std::string& objs_names, 
         std::set<std::string>& v_found) = 0;
