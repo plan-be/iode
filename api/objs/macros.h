@@ -45,6 +45,8 @@ public:
 
     void merge_from(const std::string& input_file) override {}
 
+    bool scan(const std::string& list_var, const std::string& list_scal) override;
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override
     {

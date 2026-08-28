@@ -1,17 +1,3 @@
-/**
- * @header4iode
- *
- *  Basic functions to manipulate lists and to extract lists of VARs and Scalars from IODE objects.
- *  
- *  List of functions 
- *  -----------------
- *    int K_scan(KDB* kdb, char* l_var, char* l_scal)       Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).
- *    void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
- *    void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
- *    void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)    Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.
- *    int KL_lst(char* name, char** lst, int chunck)        Creates a list from a table of strings. The elements in the new list are separated by semi-colons.
- *    unsigned char **KL_expand(char *str)                  Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.
- */ 
 #include "api/b_errors.h"
 #include "api/lec/lec.h"
 #include "api/objs/kdb.h"
@@ -23,178 +9,6 @@
 #include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/tables.h"
-
-
-/**
- *  Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).
- *  
- *  @param [in] KDB*  kdb    KDB to be analysed. Only possible for IDT, EQ or Table KDB.
- *  @param [in] char* l_var  name of the list that will contain the resulting list of VAR
- *  @param [in] char* l_scal name of the list that will contain the resulting list of Scalar
- *  @return     int        
- *  
- */
-int K_scan(const KDB& kdb, char* l_var, char* l_scal)
-{
-    if(kdb.size() == 0) 
-    {
-        std::string error_msg = "scan : '";
-        error_msg += v_iode_types[kdb.k_type];
-        error_msg += "' database is empty";
-        error_manager.append_error(error_msg);
-        return -1;
-    }
-
-    auto exo_ptr = KDBVariables::KDBVariables::Create(false);
-    auto scal_ptr = KDBScalars::KDBScalars::Create(false);
-
-    for(int i = 0; i < kdb.size(); i++) 
-    {
-        switch(kdb.k_type) 
-        {
-            case IDENTITIES :
-                KI_scan(kdb, i, *exo_ptr, *scal_ptr);
-                break;
-            case EQUATIONS :
-                KE_scan(kdb, i, *exo_ptr, *scal_ptr);
-                break;
-            case TABLES :
-                KT_scan(kdb, i, *exo_ptr, *scal_ptr);
-                break;
-        }
-    }
-
-    int rc = -1;
-    char** c_lst;
-    std::vector<std::string> lst;
-
-    lst = scal_ptr->grep("*", true, true, false, false, '*');
-    c_lst = vector_to_double_char(lst);
-    rc =  KL_lst(l_scal, c_lst, 200);
-    SCR_free_tbl((unsigned char**) c_lst);
-
-    lst = exo_ptr->grep("*", true, true, false, false, '*');
-    c_lst = vector_to_double_char(lst);
-    rc = KL_lst(l_var, c_lst, 200);
-    SCR_free_tbl((unsigned char**) c_lst);
-
-    return 0;
-}
-
-
-/**
- *  Extracts exogenous variables and scalars from a CLEC expression. 
- *  Adds the result to 2 KDBs: exo for the exogenous and scal for the scalars.
- *  
- *  The KDB of EQs is needed to determine if a VAR is an endogenous (found in dbe) or an exogenous (not present in dbe). 
- *  Only the exogenous variables are saved in exo.
- *  
- *  @param [in]      KDB*  kdb      KDB of identities or equations used to check if a VAR is exo or endo
- *  @param [in]      CLEC* cl       compiled LEC expression or equation
- *  @param [in, out] KDB*  exo      KDB of exogenous (only the names, not the values)
- *  @param [in, out] KDB*  scal     KDB of scalars (only the names, not the values)
- *  @return          void 
- *  
- *  @details 
- */
-static void K_clecscan(const KDB& kdb, const std::shared_ptr<CLEC> cl, KDBVariables& exo, KDBScalars& scal)
-{
-    if(!cl) 
-        return;
-
-    for(auto& [name, _] : cl->map_objs) 
-    {
-        if(is_coefficient(name))
-            // add dummy value for the scalar. The value is not relevant 
-            // as only the name will be used in the list of scalars.
-            scal.set(name, Scalar());
-        else 
-        {
-            if(kdb.contains(name)) 
-                continue;
-            // add dummy value for the variable. The value is not relevant 
-            // as only the name will be used in the list of variables.
-            exo.set(name, Variable());
-        }
-    }
-}
-
-
-/**
- *  Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.
- *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
- *  
- *  @param [in]      KDB* dbe    KDB of equations
- *  @param [in]      int  i      position of the equation in the dbe
- *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbe[i]
- *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbe[i]
- *  @return          void
- *  
- */
-void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal)
-{
-    std::string name = dbe.get_name(i);
-    std::shared_ptr<Equation> eq = reinterpret_cast<const KDBEquations&>(dbe).get_obj_ptr(name);
-    std::shared_ptr<CLEC> clec = eq->clec;
-    K_clecscan(dbe, clec, exo, scal);
-}
-
-
-/**
- *  Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.
- *  
- *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
- *  
- *  @param [in]      KDB* dbi    KDB of identities
- *  @param [in]      int  i      position of the identity in the dbi
- *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbi[i]
- *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbi[i]
- *  @return          void
- *  
- */
-void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal)
-{
-    std::string name = dbi.get_name(i);
-    std::shared_ptr<Identity> idt = reinterpret_cast<const KDBIdentities&>(dbi).get_obj_ptr(name);
-    std::shared_ptr<CLEC> clec = idt->get_compiled_lec();
-    K_clecscan(dbi, clec, exo, scal);
-}
-
-
-/**
- *  Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.
- *  
- *  The result is added to 2 KDB of type OBJECTS (i.e.: no type), no type meaning that only the object names are relevant.
- *  
- *  @param [in]      KDB* dbt    KDB of tables
- *  @param [in]      int  i      position of the table in the dbt
- *  @param [in, out] KDB* exo    KDB (of type OBJECTS == no type) containing all VAR names found in dbt[i]
- *  @param [in, out] KDB* scal   KDB (of type OBJECTS == no type) containing all Scalar names found in dbt[i]
- *  @return          void
- *  
- */
-void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal)
-{
-    std::string name = dbt.get_name(i);
-    std::shared_ptr<Table> tbl = reinterpret_cast<const KDBTables&>(dbt).get_obj_ptr(name);
-
-    std::shared_ptr<CLEC> clec = nullptr;
-    auto kdb_empty_ptr = KDBTables::KDBTables::Create(false);
-    for(int k = 0; k < tbl->lines.size(); k++)   
-    {
-        if(tbl->lines[k].get_type() != TABLE_LINE_CELL) 
-            continue;
-        
-        for(TableCell& cell: tbl->lines[k].cells) 
-        {
-            if(cell.get_type() != TABLE_CELL_LEC) 
-                continue;
-
-            clec = cell.get_compiled_lec();
-            K_clecscan(*kdb_empty_ptr, clec, exo, scal);
-        }
-    }
-}
 
 
 /**
@@ -431,4 +245,11 @@ bool KDBLists::print_obj_def(const std::string& name)
 void KDBLists::update_reference_db()
 {
     global_ref_lst[0] = this->get_subset("*", false);
+}
+
+bool KDBLists::scan(const std::string& list_var, const std::string& list_scal) 
+{
+    std::string msg = "scan() is not implemented for database of type Lists";
+    kwarning(msg.c_str());
+    return false;
 }

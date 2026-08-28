@@ -66,3 +66,10 @@ void KDBComments::update_reference_db()
 {
     global_ref_cmt[0] = this->get_subset("*", false);
 }
+
+bool KDBComments::scan(const std::string& list_var, const std::string& list_scal) 
+{
+    std::string msg = "scan() is not implemented for database of type Comments";
+    kwarning(msg.c_str());
+    return false;
+}

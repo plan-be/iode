@@ -361,7 +361,6 @@ Basic functions to manipulate lists and to extract lists of VARs and Scalars fro
 
 |`Syntax`|Description|
 |:---|:---|
-|`int K_scan(KDB* kdb, char* l_var, char* l_scal)`|Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).|
 |`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.|
 |`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.|
 |`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.|

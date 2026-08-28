@@ -1,5 +1,6 @@
 #include "api/objs/equations.h"
 #include "api/objs/identities.h"
+#include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/report/commands/commands.h"
 
@@ -229,4 +230,35 @@ bool KDBIdentities::print_obj_def(const std::string& name)
 void KDBIdentities::update_reference_db()
 {
     global_ref_idt[0] = this->get_subset("*", false);
+}
+
+bool KDBIdentities::scan(const std::string& list_var, const std::string& list_scal)
+{
+    if(this->size() == 0) 
+        return true;
+
+    KDBVariablesPtr exo_ptr = KDBVariables::Create(false);
+    KDBScalarsPtr scal_ptr = KDBScalars::Create(false);
+
+    for(const auto& [_, idt_ptr] : this->k_objs)
+    {
+        std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
+        clec_scan(*this, clec, exo_ptr, scal_ptr);
+    }
+
+    int rc = -1;
+    char** c_lst;
+    std::vector<std::string> lst;
+
+    lst = scal_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_scal.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    lst = exo_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_var.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    return rc < 0 ? false : true;
 }

@@ -54,6 +54,8 @@ public:
 
     bool print_obj_def(const std::string& name) override;
 
+    bool scan(const std::string& list_var, const std::string& list_scal) override;
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
@@ -92,12 +94,6 @@ inline std::size_t hash_value(KDBLists const& cpp_kdb)
     return seed;
 }
 
-// TODO : make functions below methods of KDBEquations, KDBIdentities and KDBTables
-
 /* k_lst.c */
-int K_scan(const KDB& kdb, char* l_var, char* l_scal);
-void KE_scan(const KDB& dbe, int i, KDBVariables& exo, KDBScalars& scal);
-void KI_scan(const KDB& dbi, int i, KDBVariables& exo, KDBScalars& scal);
-void KT_scan(const KDB& dbt, int i, KDBVariables& exo, KDBScalars& scal);
 int KL_lst(char* name, char** lst, int chunck);
 unsigned char **KL_expand(char* str);

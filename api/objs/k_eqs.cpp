@@ -459,3 +459,34 @@ void KDBEquations::update_reference_db()
 {
     global_ref_eqs[0] = this->get_subset("*", false);
 }
+
+bool KDBEquations::scan(const std::string& list_var, const std::string& list_scal)
+{
+    if(this->size() == 0) 
+        return true;
+
+    KDBVariablesPtr exo_ptr = KDBVariables::Create(false);
+    KDBScalarsPtr scal_ptr = KDBScalars::Create(false);
+
+    for(const auto& [_, eq_ptr] : this->k_objs)
+    {
+        std::shared_ptr<CLEC> clec = eq_ptr->clec;
+        clec_scan(*this, clec, exo_ptr, scal_ptr);
+    }
+
+    int rc = -1;
+    char** c_lst;
+    std::vector<std::string> lst;
+
+    lst = scal_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_scal.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    lst = exo_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_var.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    return rc < 0 ? false : true;
+}

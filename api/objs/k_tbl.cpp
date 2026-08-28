@@ -1282,3 +1282,48 @@ void KDBTables::update_reference_db()
 {
     global_ref_tbl[0] = this->get_subset("*", false);
 }
+
+bool KDBTables::scan(const std::string& list_var, const std::string& list_scal)
+{
+    if(this->size() == 0) 
+        return true;
+
+    KDBVariablesPtr exo_ptr = KDBVariables::Create(false);
+    KDBScalarsPtr scal_ptr = KDBScalars::Create(false);
+
+    for(const auto& [_, tbl_ptr] : this->k_objs)
+    {
+        std::shared_ptr<CLEC> clec = nullptr;
+        KDBTablesPtr kdb_empty_ptr = KDBTables::Create(false);
+        for(int k = 0; k < tbl_ptr->lines.size(); k++)   
+        {
+            if(tbl_ptr->lines[k].get_type() != TABLE_LINE_CELL) 
+                continue;
+            
+            for(TableCell& cell: tbl_ptr->lines[k].cells) 
+            {
+                if(cell.get_type() != TABLE_CELL_LEC) 
+                    continue;
+    
+                clec = cell.get_compiled_lec();
+                clec_scan(*kdb_empty_ptr, clec, exo_ptr, scal_ptr);
+            }
+        }
+    }
+
+    int rc = -1;
+    char** c_lst;
+    std::vector<std::string> lst;
+
+    lst = scal_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_scal.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    lst = exo_ptr->grep("*", true, true, false, false, '*');
+    c_lst = vector_to_double_char(lst);
+    rc = KL_lst((char*) list_var.c_str(), c_lst, 200);
+    SCR_free_tbl((unsigned char**) c_lst);
+
+    return rc < 0 ? false : true;
+}
