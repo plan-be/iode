@@ -603,30 +603,31 @@ done:
  */
 int B_WsAggr(int method, char* arg)
 {
-    int     rc = -1;
-    char    *pattern = NULL;
-    KDBVariablesPtr kdb = global_ws_var;
-    KDBVariablesPtr nkdb = NULL;
-
     char** args = B_ainit_chk(arg, NULL, 0);
     int nb_args = SCR_tbl_size((unsigned char**) args);
     if(nb_args < 1) 
     {
         error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
-        goto done;
+        SCR_free_tbl((unsigned char**) args);
+        return -1;
     }
-    pattern = (char*) SCR_stracpy((unsigned char*) args[0]);
-    nkdb = KV_aggregate(kdb, method, pattern, args[1]);
-    if(nkdb) 
+
+    std::string pattern = std::string(copy_char_array(args[0]));
+    std::string filename; 
+    if(nb_args > 1 && args[1] != NULL)
+        filename = std::string(copy_char_array(args[1]));
+
+    KDBVariablesPtr kdb = global_ws_var;
+    KDBVariablesPtr nkdb = KV_aggregate(kdb, method, pattern, filename);
+    if(!nkdb)
     {
-        KV_merge_del(kdb, nkdb, 1);
-        rc = 0;
-    }    
-    
-done:
-    SCR_free(pattern);
-    SCR_free_tbl((unsigned char**) args);
-    return rc;
+        error_manager.append_error("WsAggr* : aggregation failed");
+        SCR_free_tbl((unsigned char**) args);
+        return -1;
+    }
+
+    KV_merge_del(kdb, nkdb, 1);
+    return 0;    
 }
 
 
