@@ -181,6 +181,44 @@ std::vector<std::string> KDB::search(const std::string& pattern, const bool word
 }
 
 /**
+ *  Extracts exogenous variables and scalars from a CLEC expression. 
+ *  Adds the result to 2 KDBs: exo for the exogenous and scal for the scalars.
+ *  
+ *  The KDB of EQs is needed to determine if a VAR is an endogenous (found in dbe) or an exogenous (not present in dbe). 
+ *  Only the exogenous variables are saved in exo.
+ *  
+ *  @param [in]      KDB*  kdb      KDB of identities or equations used to check if a VAR is exo or endo
+ *  @param [in]      CLEC* cl       compiled LEC expression or equation
+ *  @param [in, out] KDB*  exo      KDB of exogenous (only the names, not the values)
+ *  @param [in, out] KDB*  scal     KDB of scalars (only the names, not the values)
+ *  @return          void 
+ *  
+ *  @details 
+ */
+void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr exo_ptr, KDBScalarsPtr scal_ptr)
+{
+    if(!clec) 
+        return;
+
+    for(auto& [name, _] : clec->map_objs) 
+    {
+        if(is_coefficient(name))
+            // add dummy value for the scalar. The value is not relevant 
+            // as only the name will be used in the list of scalars.
+            scal_ptr->set(name, Scalar());
+        else 
+        {
+            // if endogenous -> skip
+            if(kdb.contains(name)) 
+                continue;
+            // add dummy value for the variable. The value is not relevant 
+            // as only the name will be used in the list of variables.
+            exo_ptr->set(name, Variable());
+        }
+    }
+}
+
+/**
  *  Print a header and a modified text: spaces are added before and after specific characters in the text.
  *  If the text is NULL, print only a \n.
  *  

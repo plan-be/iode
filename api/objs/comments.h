@@ -46,6 +46,8 @@ public:
 
     bool print_obj_def(const std::string& name) override;
 
+    bool scan(const std::string& list_var, const std::string& list_scal) override;
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;

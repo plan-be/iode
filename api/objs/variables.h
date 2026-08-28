@@ -342,6 +342,8 @@ public:
     bool copy_from(const std::string& input_files, const std::string& from, 
         const std::string& to, const std::string& objects_names);
 
+    bool scan(const std::string& list_var, const std::string& list_scal) override;
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;

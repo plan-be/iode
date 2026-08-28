@@ -64,3 +64,10 @@ bool KDBMacros::save_asc(const std::string& filename)
     // not implemented for macros
     return false;    
 }
+
+bool KDBMacros::scan(const std::string& list_var, const std::string& list_scal) 
+{
+    std::string msg = "scan() is not implemented for database of type Macros";
+    kwarning(msg.c_str());
+    return false;
+}

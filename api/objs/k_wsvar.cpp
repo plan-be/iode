@@ -1341,3 +1341,10 @@ void KDBVariables::update_reference_db()
 {
     global_ref_var[0] = this->get_subset("*", false);
 }
+
+bool KDBVariables::scan(const std::string& list_var, const std::string& list_scal) 
+{
+    std::string msg = "scan() is not implemented for database of type Variables";
+    kwarning(msg.c_str());
+    return false;
+}

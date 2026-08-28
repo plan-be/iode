@@ -383,6 +383,16 @@ public:
         const bool case_sensitive=true, const bool in_name=true, const bool in_formula=true, 
         const bool in_text=true, const std::string& list_result="_RES");
 
+    /**
+     *  Analyses a KDB content and creates 2 lists with all VAR and all Scalar found in the kdb objects (limited to IDT, EQ or Table).
+     *  
+     *  @param [in] char* list_var      name of the list that will contain the resulting list of VAR
+     *  @param [in] char* list_scal     name of the list that will contain the resulting list of Scalar
+     *  @return     int        
+     *  
+     */
+    virtual bool scan(const std::string& list_var, const std::string& list_scal) = 0;
+
     // load
 
     virtual bool load_asc(const std::string& filename) = 0;

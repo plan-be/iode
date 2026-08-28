@@ -86,3 +86,10 @@ void KDBScalars::update_reference_db()
 {
     global_ref_scl[0] = this->get_subset("*", false);
 }
+
+bool KDBScalars::scan(const std::string& list_var, const std::string& list_scal) 
+{
+    std::string msg = "scan() is not implemented for database of type Scalars";
+    kwarning(msg.c_str());
+    return false;
+}

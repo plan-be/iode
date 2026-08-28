@@ -640,6 +640,8 @@ public:
 
     bool print_obj_def(const std::string& name) override;
 
+    bool scan(const std::string& list_var, const std::string& list_scal) override;
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
@@ -683,6 +685,7 @@ int KE_compile(KDBEquations& dbe);
 int E_split_eq(char* lec, char** lhs, char** rhs);
 int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec);
 int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
+void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr exo_ptr, KDBScalarsPtr scal_ptr);
 
 // lec/l_link.c
 // NOTE: declare here to avoid circular dependency between equations.h and lec.h
