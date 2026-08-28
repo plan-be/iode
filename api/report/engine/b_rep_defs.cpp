@@ -37,16 +37,16 @@
  *                              -1 if add() fails
  *                              0 on success
  */
-int RP_define_1(char* name, char* c_macro)
+int RP_define_1(char* c_name, char* c_macro)
 {
     if(c_macro == 0) 
         c_macro = "";
     
     std::string macro(c_macro);
-    bool success = RP_MACRO->set_macro(name, macro);
+    bool success = RP_MACRO->set_macro(c_name, macro);
     if(!success) 
     {
-        std::string error_msg = "Report: Define of " + std::string(name);
+        std::string error_msg = "Report: Define of " + std::string(c_name);
         error_msg += " (" + macro + ") not possible";
         error_manager.append_error(error_msg);
         return -1;
@@ -166,27 +166,29 @@ int RP_undef(char *arg, int unused)
  *  @param [in] char*   name    macro name (without #<n>)
  *  @return     int             max <n> in macros name#<n>
  */
-int RP_define_calcdepth(char *name)
-{
-    int     i, lg, maxdepth = -1, depth, objpos = -1;
-    char    buf[1024];
+int RP_define_calcdepth(char* c_name)
+{    
+    // add the secret separator to the name to find all macros with this prefix
+    std::string prefix = std::string(c_name) + K_SECRETSEP;
+    int lg = (int) prefix.length();
 
-    // Try to find object name#*
-    sprintf(buf, "%s%c", name, K_SECRETSEP);
-    lg = (int)strlen(buf);
-
-    for(i = 0; i < RP_MACRO->size(); i++) 
+    int maxdepth = -1, depth;
+    std::string name_without_depth;
+    for(const auto& [macro_name, _] : RP_MACRO->k_objs) 
     {
-        if(strncmp(buf, RP_MACRO->get_name(i).c_str(), lg) == 0) 
-        {
-            objpos = i;
-            depth = atoi(RP_MACRO->get_name(i).c_str() + lg);
-            if(depth > maxdepth) 
-                maxdepth = depth; // cas avec depth > 9
-        }
+        if(macro_name.length() <= lg) 
+            continue;
+
+        if(macro_name.substr(0, lg) != prefix) 
+            continue;
+        
+        // convert the rest of the macro name to an integer
+        depth = std::stoi(macro_name.substr(lg));
+        if(depth > maxdepth) 
+            maxdepth = depth;
     }
 
-    return(maxdepth);
+    return maxdepth;
 }
 
 
@@ -198,23 +200,21 @@ int RP_define_calcdepth(char *name)
  *                              -1 if RP_define_1() fails
  *                              0 on success
  */
-int RP_define_save(char *name)
+int RP_define_save(char* c_name)
 {
-    int     rc, maxdepth;
-    char    buf[1024];
+    std::string name(c_name);
 
     // if the macro "name" does not yet exist, no need to push its definition
     if(!RP_MACRO->contains(name)) 
         return 0;
 
     // Try to find object name#*
-    maxdepth = RP_define_calcdepth(name);
+    int maxdepth = RP_define_calcdepth(c_name);
 
     // Create a copy of existing name in name#(maxdepth+1)
-    sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth + 1);
     std::string macro = RP_MACRO->get_macro(name);
-    rc = RP_define_1(buf, (char*) macro.c_str());
-
+    std::string fullname = name + K_SECRETSEP + std::to_string(maxdepth + 1);
+    int rc = RP_define_1((char*) fullname.c_str(), (char*) macro.c_str());
     return rc;
 }
 
@@ -229,24 +229,23 @@ int RP_define_save(char *name)
  *                              -1 if RP_define_1() fails
  *                              0 on success
  */
-int RP_define_restore(char *name)
+int RP_define_restore(char* c_name)
 {
     // Undefine the current
-    RP_undef_1(name);
+    RP_undef_1(c_name);
 
     // Try to find object name#* - Nothing to do if not found
-    int maxdepth = RP_define_calcdepth(name);
+    int maxdepth = RP_define_calcdepth(c_name);
     if(maxdepth < 0) 
         return 0;
 
-    // Restore the copy of existing name in name#(maxdepth+1)
-    char buf[1024];
-    sprintf(buf, "%s%c%d", name, K_SECRETSEP, maxdepth);
-    std::string macro = RP_MACRO->get_macro(buf);
-    int rc = RP_define_1(name, (char*) macro.c_str());
+    // Restore 'name' from the copy of 'name#maxdepth' 
+    std::string fullname = std::string(c_name) + K_SECRETSEP + std::to_string(maxdepth);
+    std::string macro = RP_MACRO->get_macro(fullname);
+    int rc = RP_define_1(c_name, (char*) macro.c_str());
 
-    // Delete the copy
-    RP_undef_1(buf);
+    // Delete the copy 'name#maxdepth' 
+    RP_undef_1((char*) fullname.c_str());
 
     return rc;
 }
