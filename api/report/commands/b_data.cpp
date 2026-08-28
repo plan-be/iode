@@ -1511,9 +1511,8 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         //      3 -> if name in both global_db and file, IODE object in global_db == IODE object in file
         //      4 -> if name in both global_db and file, IODE object in global_db != IODE object in file
         std::string name;
-        for(int i = 0; i < kdb1.size(); i++) 
+        for(const std::string& name : kdb1.get_names()) 
         {
-            name = kdb1.get_name(i);
             c_name = (char*) name.c_str();
             rc = K_compare(c_name, kdb1, *kdb2_ptr);
             switch(rc)
@@ -1549,9 +1548,9 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         return -1;
     }
 
-    for(int i = 0; i < kdb2_ptr->size(); i++)
+    for(const auto& [name, _] : kdb2_ptr->k_objs) 
     {
-        c_name = (char*) kdb2_ptr->get_name(i).c_str();
+        c_name = (char*) name.c_str();
         SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
     }
 
