@@ -402,7 +402,7 @@ inline bool var_to_binary(char** pack, const Variable& var)
 /* k_wsvar.c */
 int KV_merge(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
 void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace);
-int KV_add(KDBVariablesPtr kdb, char* varname);
+bool KV_add(KDBVariablesPtr kdb, const std::string& varname);
 double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mode);
 void KV_set(KDBVariablesPtr kdb, const std::string& name, int t, int mode, double value);
 int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample* smpl, char* pattern);

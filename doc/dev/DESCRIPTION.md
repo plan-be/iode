@@ -303,7 +303,7 @@ Functions acting on workspaces of variables.
 |:---|:---|
 |`int KV_merge(KDB* kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
 |`void KV_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
-|`int KV_add(KDBVariablesPtr kdb, char* varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
+|`bool KV_add(KDBVariablesPtr kdb, std::string& varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
 |`double KV_get(KDB* kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
 |`void KV_set(KDB* kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
 |`int KV_extrapolate(KDB* dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|

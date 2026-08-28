@@ -369,7 +369,7 @@ cdef class Variables(CythonIodeDatabase):
         return self
 
     def from_numpy(self, data: np.ndarray, vars_names: List[str], new_vars: Set[str], t_first_period: int, t_last_period: int):
-        cdef int var_pos
+        cdef bint success
         cdef bytes b_name
         cdef char* c_name
         cdef double value
@@ -394,8 +394,8 @@ cdef class Variables(CythonIodeDatabase):
             b_name = name.encode()
             c_name = b_name
             # add a new variable with all values set to IODE_NAN
-            var_pos = KV_add(self.database_ptr, c_name)
-            if var_pos < 0:
+            success = KV_add(self.database_ptr, c_name)
+            if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
 
         # declaring a C-contiguous array of 2D double
