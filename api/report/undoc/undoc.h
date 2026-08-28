@@ -28,7 +28,7 @@ int IodeDdeLocale(char *buf);
 int IodeDdeUnLocale(char *buf);
 int IodeDdeType(char *szTopic);
 char *IodeDdeGetWS(char *szItem);
-char *IodeDdeCreateSeries(int objnb, int bt);
+char *IodeDdeCreateSeries(const std::string& var_name, int bt);
 char *IodeDdeCreatePer(int bt);
 char *ToBase26(int num);
 char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg);

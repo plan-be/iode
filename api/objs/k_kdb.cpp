@@ -78,13 +78,8 @@ KDB& get_global_db(const int iode_type)
     return *kdb;
 }
 
-char* KDB::dde_create_obj(int objnb, int *nc, int *nl)
-{
-    if(objnb < 0 || objnb >= this->size())
-        return NULL;
-
-    std::string name = this->get_name(objnb);
-    
+char* KDB::dde_create_obj(const std::string& name, int *nc, int *nl)
+{   
     char *res;
     if(this->k_type != TABLES) 
     {
