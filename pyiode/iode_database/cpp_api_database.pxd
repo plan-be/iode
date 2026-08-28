@@ -108,7 +108,7 @@ cdef extern from "api/all.h":
     char* K_expand(int iode_type, char* filepath, char* pattern, int _all)
 
     # see k_wsvar.c
-    int KV_add(shared_ptr[KDBVariables] kdb, char* varname)
+    bool KV_add(shared_ptr[KDBVariables] kdb, string& varname)
     double KV_get(shared_ptr[KDBVariables] kdb, const string& name, int t, int mode)
     void KV_set(shared_ptr[KDBVariables] kdb, const string& name, int t, int mode, double value)
 

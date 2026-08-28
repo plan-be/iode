@@ -146,17 +146,16 @@ void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
  *  
  *  @param [in] kdb     KDB*        KDB of variables
  *  @param [in] char*   varname     name of the new variable
- *  @return     int                 position of varname in the kdb
  */
-int KV_add(KDBVariablesPtr kdb, char* varname)
+bool KV_add(KDBVariablesPtr kdb, const std::string& varname)
 {
     if(!kdb)
-        return -1;
+        return false;
 
     if(kdb->k_type != VARIABLES)
     {
         kwarning("KV_add is only implemented for databases of type VARIABLES");
-        return -1;
+        return false;
     } 
     
     // Create varname with NaN 
@@ -172,14 +171,13 @@ int KV_add(KDBVariablesPtr kdb, char* varname)
         // Replaces all values by IODE_NAN 
         double* vptr = kdb->get_var_ptr(varname);
         if(!vptr) 
-            return -1;
+            return false;
         
         for(int t = 0; t < kdb->get_sample()->nb_periods; t++)
             vptr[t] = IODE_NAN;
     }
     
-    int pos = kdb->index_of(varname);
-    return pos;
+    return true;
 }
 
 /**

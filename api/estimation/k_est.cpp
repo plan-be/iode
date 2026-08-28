@@ -113,12 +113,12 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
     sprintf(varname, "%s%d", name, eqnb);
     
     // create varname with NaN 
-    KV_add(global_ws_var, varname);
-    double* var = global_ws_var->get_var_ptr(varname);
-    if(var == NULL) 
+    bool success = KV_add(global_ws_var, varname);
+    if(!success) 
         return;
     
     // copy mat to name from E_FROM to E_FROM + E_T
+    double* var = global_ws_var->get_var_ptr(varname);
     for(int t = E_FROM; t < E_FROM + E_T; t++)
         var[t] =  MATE(mat, eqnb, t - E_FROM);
 }
