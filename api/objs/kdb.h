@@ -10,10 +10,10 @@
     #include "gtest/gtest.h"
 #endif
 
-inline int K_SECRETSEP = '#';   // pour les macros pushed A#n in reports
-inline int B_TABLE_TITLE = 0;   // Specify how to print a TABLE 
-                                //      0 : print table full definitions
-                                //      1 : print only table titles
+constexpr char K_SECRETSEP = '#';   // pour les macros pushed A#n in reports
+inline int B_TABLE_TITLE = 0;       // Specify how to print a TABLE 
+                                    //      0 : print table full definitions
+                                    //      1 : print only table titles
 
 enum IodeDatabaseType
 {

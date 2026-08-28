@@ -135,7 +135,7 @@ int IodeDdeType(char *szTopic)
 char *IodeDdeGetWS(char *szItem)
 {
     char    *res;
-    int     i, type;
+    int     type;
 
     SCR_upper((unsigned char*) szItem);
     type = IodeDdeType(szItem);
@@ -335,7 +335,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
     U_ch    **tbl, **lst;
     char    *res = 0, *sheet, *item,
              *plst =  NULL;
-    int     objnb, i, l, h;
+    int     i, l, h;
     HCONV   hConv;
     std::string name;
 
