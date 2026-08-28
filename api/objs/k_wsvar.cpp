@@ -481,73 +481,61 @@ int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample* smpl, char* pattern)
  *                                           NULL on error (filename given but inexistent, not enough memory...)
  */
 
-KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, char *filename)
+KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, const int method, const std::string& pattern, const std::string& filename)
 {
     if(!dbv)
         return nullptr;
 
-    int     nb_per, res, npos, added, *times, nbtimes = 500;
-    char    c_nname[K_MAX_NAME + 1];
-    std::string nname;
-    KDBVariablesPtr ndbv = nullptr;
     KDBVariablesPtr edbv = nullptr;
-    std::shared_ptr<Sample> smpl;
-
-    if(filename == NULL || filename[0] == 0) 
+    if(filename.empty() || filename[0] == 0) 
         edbv = dbv;
     else
     {
         edbv = KDBVariables::Create(false);
         bool success = edbv->load(std::string(filename));
         if(!success)
-            goto done;
+            return nullptr;
     }
     
     if(!edbv) 
-        goto done;
+        return nullptr;
 
-    smpl = edbv->get_sample();
+    std::shared_ptr<Sample> smpl = edbv->get_sample();
     if(!smpl || smpl->nb_periods == 0)
-        goto done;
+        return nullptr;
+    
+    int nb_per = smpl->nb_periods;
 
-    nb_per = smpl->nb_periods;
-    times = (int *) SCR_malloc(nbtimes * sizeof(int));
-
-    ndbv = KDBVariables::Create(false);
+    KDBVariablesPtr ndbv = KDBVariables::Create(false);
     if(!ndbv) 
-        goto done;
+        return nullptr;
     
     ndbv->set_sample(*edbv->get_sample());
 
-    for(const auto& [ename, var_ptr] : edbv->k_objs) 
+    int res = -1;
+    std::string nname;
+    bool added = false;
+    char c_nname[K_MAX_NAME + 1];
+
+    std::unordered_map<std::string, int> map_times;
+    for(const auto& [var_name, var_ptr] : edbv->k_objs) 
     {
-        res = K_aggr(pattern, (char*) ename.c_str(), c_nname);
+        res = K_aggr((char*) pattern.c_str(), (char*) var_name.c_str(), c_nname);
         if(res < 0) 
             continue;
     
-        added = 1;
         nname = std::string(c_nname);
-        npos = ndbv->index_of(nname);
-        if(npos < 0) 
+        if(!ndbv->contains(nname)) 
         {
-            ndbv->set(c_nname, Variable(nb_per, IODE_NAN));
-            npos = ndbv->index_of(nname);
-            if(npos > nbtimes - 1) 
-            {
-                times = (int *) SCR_realloc((char *) times, sizeof(int), nbtimes, nbtimes + 500);
-                nbtimes += 500;
-            }
-            times[npos] = 1;
-
+            added = true;
+            ndbv->set(nname, Variable(nb_per, IODE_NAN));
+            map_times[nname] = 1;
         }
         else 
         {
-            added = 0;
-            times[npos] += 1;
+            added = false;
+            map_times[nname] += 1;
         }
-
-        if(npos < 0) 
-            goto done;
 
         Variable eval = *var_ptr;
         double* nval = ndbv->get_var_ptr(nname);
@@ -580,18 +568,18 @@ KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char *pattern, cha
 
     if(method == 2) 
     {
+        int nb_times;
         double* values;
         for(auto& [name, var_ptr] : ndbv->k_objs) 
         {
             values = var_ptr->data();
+            nb_times = map_times[name];
             for(int t = 0; t < smpl->nb_periods; t++)
                 if(IODE_IS_A_NUMBER(values[t])) 
-                values[t] /= times[npos];
+                    values[t] /= nb_times;
         }
     }
 
-done:
-    SCR_free(times);
     return ndbv;
 }
 

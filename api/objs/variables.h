@@ -406,5 +406,5 @@ bool KV_add(KDBVariablesPtr kdb, const std::string& varname);
 double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mode);
 void KV_set(KDBVariablesPtr kdb, const std::string& name, int t, int mode, double value);
 int KV_extrapolate(KDBVariablesPtr dbv, int method, Sample* smpl, char* pattern);
-KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, int method, char* pattern, char* filename);
+KDBVariablesPtr KV_aggregate(KDBVariablesPtr dbv, const int method, const std::string& pattern, const std::string& filename);
 void KV_init_values_1(double* val, int t, int method);
