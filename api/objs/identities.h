@@ -108,12 +108,22 @@ public:
 struct KDBIdentities : public KDBTemplate<KDBIdentities, Identity>
 {
 private:
+    std::set<std::string> idt_exec_loaded_vars;
+    std::vector<std::string> v_var_files;
+    std::vector<std::string> v_scl_files;
+
+private:
     // Constructors are private - use Create() factory method instead
     // global or standalone database
     KDBIdentities(const bool is_global) : KDBTemplate(IDENTITIES, is_global) {}
 
     // copy constructor
-    KDBIdentities(const KDBIdentities& other): KDBTemplate(other) {}
+    KDBIdentities(const KDBIdentities& other) : KDBTemplate(other) 
+    {
+        // copying v_scl_files and v_var_files to the new instance
+        this->v_scl_files = other.v_scl_files;
+        this->v_var_files = other.v_var_files;
+    }
 
 public:
     /**
@@ -132,6 +142,20 @@ public:
     static std::shared_ptr<KDBIdentities> Create(const bool is_global)
     {
         return std::shared_ptr<KDBIdentities>(new KDBIdentities(is_global));
+    }
+
+    // destructor
+    ~KDBIdentities() {}
+
+    std::shared_ptr<KDBIdentities> initialize_subset(const std::shared_ptr<KDBIdentities> true_parent, const bool copy) override
+    {
+        std::shared_ptr<KDBIdentities> subset_ptr = KDBTemplate::initialize_subset(true_parent, copy);
+        
+        // copying v_scl_files and v_var_files to the subset
+        subset_ptr->v_scl_files = this->v_scl_files;
+        subset_ptr->v_var_files = this->v_var_files;
+        
+        return subset_ptr;
     }
 
     bool add(const std::string& name, const Identity& idt) override 
@@ -164,6 +188,12 @@ public:
 
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
+    void set_scl_files(char* arg);
+    void set_var_files(char* arg);
+    void clear_files();
+
+    KDBVariablesPtr exec(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, Sample* in_smpl);
+
 private:
     bool binary_to_obj(const std::string& name, char* pack) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
@@ -174,6 +204,26 @@ private:
         const bool ecase, const bool forms, const bool texts, const char all) const override;
     
     void update_reference_db() override;
+
+    // Helper methods for identity execution (moved from k_exec_idt.cpp)
+    int strcmp_helper(const char *pa, const char *pb);
+    int wrapper_strcmp(const void *pa, const void *pb);
+    
+    KDBVariablesPtr series_list() const;
+    KDBScalarsPtr scalar_list() const;
+    int quick_extract(KDBVariablesPtr dbv_ptr) const;
+    std::vector<std::string> reorder() const;
+    
+    int read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, const std::string& source_name);
+    int read_vars_file(KDBVariablesPtr dbv_ptr, const std::string& file);
+    int read_vars(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_ws);
+    
+    int read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, const std::string& source_name);
+    int read_scls_file(KDBScalarsPtr dbs_ptr, const std::string& file);
+    int read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws);
+    
+    int execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, 
+        std::vector<std::string> v_order, const std::shared_ptr<Sample> smpl) const;
 };
 
 /*----------------------- GLOBALS ----------------------------*/

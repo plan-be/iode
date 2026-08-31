@@ -15,13 +15,7 @@
 #include "api/objs/identities.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
-#include "api/objs/k_exec_idt.h"
-
 #include "api/report/commands/commands.h"
-
-
-static char**  KEXEC_VFILES = NULL;
-static char**  KEXEC_SFILES = NULL;
 
 /**
  *  Report function to execute identities. Used in conjunction with report functions
@@ -80,10 +74,10 @@ int B_IdtExecute(char* arg, int unused)
 /**
  *  Executes a group of identities on a defined sample. 
  *  
- *  The input VAR and Scalar files are found in the globals KEXEC_VFILES and KEXEC_SFILES that
- *  are specified via the functions B_IdtExecuteVarFiles() and B_IdtExecuteSclFiles().
+ *  The input VAR and Scalar files are found in the instance members v_var_files and v_scl_files 
+ *  of global_ws_idt that are specified via the functions B_IdtExecuteVarFiles() and B_IdtExecuteSclFiles().
  *  
- *  At the end of the functions, KEXEC_VFILES and KEXEC_SFILES are reset to NULL.
+ *  At the end of the functions, v_var_files and v_scl_files are reset to NULL.
  *  The resulting variables are copied into global_ws_var.
  *  
  *
@@ -101,12 +95,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
     KDBVariablesPtr kdb_var = nullptr;
     if(c_idts == NULL || nb_idts == 0)
-    {
-        kdb_var = KI_exec(global_ws_idt,
-                          global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
-                          smpl);
-    }
+        kdb_var = global_ws_idt->exec(global_ws_var, global_ws_scl, smpl);
     else 
     {
         std::string idts;
@@ -114,16 +103,10 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
             idts += std::string(c_idts[i]) + ";";
 
         KDBIdentitiesPtr kdb_idt = global_ws_idt->get_subset(idts, false);
-        kdb_var = KI_exec(kdb_idt,
-                          global_ws_var, SCR_tbl_size((unsigned char**) KEXEC_VFILES), KEXEC_VFILES,
-                          global_ws_scl, SCR_tbl_size((unsigned char**) KEXEC_SFILES), KEXEC_SFILES,
-                          smpl);
+        kdb_var = kdb_idt->exec(global_ws_var, global_ws_scl, smpl);
     }
 
-    SCR_free_tbl((unsigned char**) KEXEC_VFILES);
-    KEXEC_VFILES = NULL;
-    SCR_free_tbl((unsigned char**) KEXEC_SFILES);
-    KEXEC_SFILES = NULL;
+    global_ws_idt->clear_files();
 
     if(error_manager.has_errors())
     {
@@ -164,8 +147,7 @@ int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
 
 int B_IdtExecuteVarFiles(char* arg, int unused)
 {
-    SCR_free_tbl((unsigned char**) KEXEC_VFILES);
-    KEXEC_VFILES = B_ainit_chk(arg, NULL, 0);
+    global_ws_idt->set_var_files(arg);
     return 0;
 }
 
@@ -185,8 +167,7 @@ int B_IdtExecuteVarFiles(char* arg, int unused)
 
 int B_IdtExecuteSclFiles(char* arg, int unused)
 {
-    SCR_free_tbl((unsigned char**) KEXEC_SFILES);
-    KEXEC_SFILES = B_ainit_chk(arg, NULL, 0);
+    global_ws_idt->set_scl_files(arg);
     return 0;
 }
 
