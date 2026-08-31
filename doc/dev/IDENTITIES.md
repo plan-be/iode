@@ -84,10 +84,3 @@ On the other hand, one can execute identities on a sub\-sample. In this case, th
 
 - if a calculated VAR already exists in the current WS, its values are left unchanged outside the calculation sample
 - if the VAR is created, the values outside the calculation sample are set to L\_NAN.
-
-### List of functions {#T7}
-
-|Syntax|Description|
-|:---|:---|
-|`KDB *KI_exec(KDB* dbi, KDB* dbv, int nv, char* vfiles[], KDB* dbs, int ns, char* sfiles[], Sample* smpl)`|Executes all identities in dbi using the input series of dbv and scalars of dbs. Missing vars and scalars are collected from vfiles and sfiles.|
-

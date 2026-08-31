@@ -74,13 +74,44 @@
 #include "api/objs/identities.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
-#include "api/objs/k_exec_idt.h"
 
 #include <unordered_set>
 
 
+void KDBIdentities::set_scl_files(char* arg)
+{
+    v_scl_files.clear();
+    char** tbl_scl_files = B_ainit_chk(arg, NULL, 0);
+    int nb_scl_files = SCR_tbl_size((unsigned char**) tbl_scl_files);
+    if(nb_scl_files > 0)
+    {
+        for(int i=0; i < nb_scl_files; i++)
+            v_scl_files.push_back(tbl_scl_files[i]);
+    }
+    SCR_free_tbl((unsigned char**) tbl_scl_files);
+}
+
+void KDBIdentities::set_var_files(char* arg)
+{
+    v_var_files.clear();
+    char** tbl_var_files = B_ainit_chk(arg, NULL, 0);
+    int nb_var_files = SCR_tbl_size((unsigned char**) tbl_var_files);
+    if(nb_var_files > 0)
+    {
+        for(int i=0; i < nb_var_files; i++)
+            v_var_files.push_back(tbl_var_files[i]);
+    }
+    SCR_free_tbl((unsigned char**) tbl_var_files);
+}
+
+void KDBIdentities::clear_files()
+{
+    v_scl_files.clear();
+    v_var_files.clear();
+}
+
 /**
- *  Helper function used to compare 2 strings in KI_series_list().
+ *  Helper function used to compare 2 strings in series_list().
  *  
  *  @param [in] const char* pa  first string
  *  @param [in] const char* pb  second string
@@ -88,7 +119,7 @@
  *                              -1 if a is NULL
  *                              1 if b is NULL and a is not null  
  */
-static int KI_strcmp(const char *pa, const char *pb)
+int KDBIdentities::strcmp_helper(const char *pa, const char *pb)
 {
     char *a = *(char **)pa, *b = *(char **)pb;
 
@@ -97,24 +128,23 @@ static int KI_strcmp(const char *pa, const char *pb)
     else return(strcmp(a, b));
 }
 
-static int wrapper_KI_strcmp(const void *pa, const void *pb)
+int KDBIdentities::wrapper_strcmp(const void *pa, const void *pb)
 {
-    return KI_strcmp((char*) pa, (char*) pb);
+    return strcmp_helper((char*) pa, (char*) pb);
 }
 
 /**
- *  Creates a KDB containing all variables found in the IDT KDB dbi.
+ *  Creates a KDB containing all variables found in this IDT KDB.
  *  
- *  @param [in] KDB*    dbi     KDB of identities
- *  @return     KDB*            KDB of all vars found in dbi. All vars are initialised to L_NaN
+ *  @return     KDB*            KDB of all vars found. All vars are initialised to L_NaN
  */
-static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
+KDBVariablesPtr KDBIdentities::series_list() const
 {
     // Creates a list with all variable names encountered
     // (without checking for duplicates)
     std::shared_ptr<CLEC> clec;
     std::set<std::string> vars_to_compute;
-    for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
+    for(const auto& [idt_name, idt] : this->k_objs) 
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
@@ -137,17 +167,16 @@ static KDBVariablesPtr KI_series_list(const KDBIdentitiesPtr dbi_ptr)
 
 
 /**
- *  Creates a KDB containing all scalars found in the IDT KDB dbi.
+ *  Creates a KDB containing all scalars found in this IDT KDB.
  *  
- *  @param [in] KDB*    dbi     KDB of identities
- *  @return     KDB*            KDB of all scalars found in dbi.
+ *  @return     KDB*            KDB of all scalars found.
  */
-static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
+KDBScalarsPtr KDBIdentities::scalar_list() const
 {
     Scalar new_scl;
     std::shared_ptr<CLEC> clec;
     KDBScalarsPtr dbs = KDBScalars::Create(false);
-    for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
+    for(const auto& [idt_name, idt] : this->k_objs) 
     {
         clec = idt->get_compiled_lec();
         CLEC clec_copy(*clec);
@@ -164,15 +193,14 @@ static KDBScalarsPtr KI_scalar_list(const KDBIdentitiesPtr dbi_ptr)
 
 
 /**
- *  Reconstructs dbv with the variables whose names are found in dbi. The result is 
- *  a KDB (dbv modified) containing the vars computed from the identities in dbi
+ *  Reconstructs dbv with the variables whose names are found in this database. The result is 
+ *  a KDB (dbv modified) containing the vars computed from the identities
  *  (identities have the name of the output var).
  *  
  *  @param [in, out] KDB*   dbv     
- *  @param [in]      KDB*   dbi     
  *  @return          int    0 always
  */
-static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_ptr) 
+int KDBIdentities::quick_extract(KDBVariablesPtr dbv_ptr) const
 {
     // get list of VARs names
     std::vector<std::string> names;
@@ -180,10 +208,10 @@ static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_
     for(const auto& [name, _] : dbv_ptr->k_objs)
         names.push_back(name);
 
-    // keep only VARs that have the same name as an IDT in dbi
+    // keep only VARs that have the same name as an IDT
     for(const std::string& name : names)
     {
-        if(!dbi_ptr->contains(name))
+        if(!this->contains(name))
             dbv_ptr->remove(name);
     }
 
@@ -192,8 +220,8 @@ static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_
 
 
 /**
- *  Computes the execution order of a KDB of identities by placing child identities after their "parents".
- *  If reordering is impossible, returns NULL.
+ *  Computes the execution order of this KDB of identities by placing child identities after their "parents".
+ *  If reordering is impossible, returns an empty vector.
  *  
  *  Example
  *  -------
@@ -205,13 +233,11 @@ static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_
  *  
  *  Order => [1, 0, 2] i.e. B is computed before A because A is a successor of B. E remains in 3d position.
  *    
- *  @param [in] KDB*    dbi     KDB of identities to reorder
- *  @return     int*            execution order or NULL if reordering is impossible             
+ *  @return     std::vector<std::string>    execution order or empty vector if reordering is impossible             
  */
-
-static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
+std::vector<std::string> KDBIdentities::reorder() const
 {
-    int nb_identities = dbi_ptr->size();
+    int nb_identities = this->size();
     std::vector<std::string> v_order(nb_identities, "");
     std::unordered_set<std::string> ordered;
 
@@ -221,7 +247,7 @@ static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
     while(nb_ordered < nb_identities) 
     {
         bool success = false;
-        for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
+        for(const auto& [idt_name, idt] : this->k_objs) 
         {
             if(ordered.contains(idt_name)) 
                 continue;
@@ -237,13 +263,13 @@ static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
                 // identity name == variable name -> continue looping
                 if(idt_name == name) 
                     continue;
-                // variable name not found in dbi -> continue looping
-                if(!dbi_ptr->contains(name)) 
+                // variable name not found -> continue looping
+                if(!this->contains(name)) 
                     continue;
                 // identity already marked for execution -> continue looping
                 if(ordered.contains(name)) 
                     continue;
-                // variable name found in dbi and not marked for execution 
+                // variable name found and not marked for execution 
                 // -> exit looping
                 break_reached = true;
                 break;
@@ -264,7 +290,7 @@ static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
             /* IDENTITIES LOOP */
             if(KEXEC_TRACE) 
             {
-                for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
+                for(const auto& [idt_name, idt] : this->k_objs) 
                 {
                     if(ordered.contains(idt_name))
                         W_printfDbl(".par1 enum_1\nIdt %s Ok\n", idt_name);
@@ -293,7 +319,7 @@ static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
  *                                  -3 if there is no common sample between dbv_tmp and dbv
  *  
  */
-static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, char* source_name)
+int KDBIdentities::read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, const std::string& source_name)
 {
     int start, start_tmp;
 
@@ -317,11 +343,11 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
     auto tsmpl = dbv_tmp->get_sample();
     if(!tsmpl)
     {
-        std::string msg = "Function KI_read_vars_db: the sample of the ";
-        if(std::string(source_name) == "WS")
+        std::string msg = "Function read_vars_db: the sample of the ";
+        if(source_name == "WS")
             msg += "current Variables workspace";
         else
-            msg += "database read from the file '" + std::string(source_name) + "'";
+            msg += "database read from the file '" + source_name + "'";
         msg += " is empty";
         error_manager.append_error(msg);
         return -3;
@@ -344,7 +370,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
         return -3;
 
     if(KEXEC_TRACE) 
-        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name);
+        W_printfDbl(".par1 enum_1\nFrom %s : ", (char*) source_name.c_str());
 
     int nb_found = 0;
     for(const std::string& name : vars_to_copy)
@@ -368,10 +394,10 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
         if(!var_ptr)
         {
             std::string msg = "Execution of identities: the variable '" + name + "' has not been found in the ";
-            if(std::string(source_name) == "WS")
+            if(source_name == "WS")
                 msg += "current Variables workspace";
             else
-                msg += "Variables workspace read from the file '" + std::string(source_name) + "'";
+                msg += "Variables workspace read from the file '" + source_name + "'";
             error_manager.append_error(msg);
             continue;
         }
@@ -411,7 +437,7 @@ static int KI_read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp, cha
  *                              -3 if there is no common sample between dbv and file
  *  
  */
-static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
+int KDBIdentities::read_vars_file(KDBVariablesPtr dbv_ptr, const std::string& file)
 {
     char    **vars = NULL;
     int     nbv = 0, nb_found;
@@ -430,29 +456,29 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
     if(vars_to_read.size() == 0)
         return 0;
 
-    if(vars_to_read.size() > 0 && std::string(file).empty())
+    if(vars_to_read.size() > 0 && file.empty())
     {
         error_manager.append_error("The path of file to read the Variables is empty");
         return -1;
     }
     
     auto dbv_tmp_ptr = KDBVariables::KDBVariables::Create(false);
-    bool success = dbv_tmp_ptr->load(std::string(file));
+    bool success = dbv_tmp_ptr->load(file);
     if(!success) 
     {
-        std::string msg = "Variables file '" + std::string(file) + "' not found";
+        std::string msg = "Variables file '" + file + "' not found";
         error_manager.append_error(msg);
         return -1;
     }
 
     if(dbv_tmp_ptr->size() == 0) 
     {
-        std::string msg = "Variables file '" + std::string(file) + "' contains no variable";
+        std::string msg = "Variables file '" + file + "' contains no variable";
         error_manager.append_error(msg);
         return -1;
     }
 
-    nb_found = KI_read_vars_db(dbv_ptr, dbv_tmp_ptr, file);
+    nb_found = this->read_vars_db(dbv_ptr, dbv_tmp_ptr, file);
     return nb_found;
 }
 
@@ -461,43 +487,39 @@ static int KI_read_vars_file(KDBVariablesPtr dbv_ptr, char* file)
  *  Reads from a list of files, the VARs needed to compute identities. 
  *  For the variables to be read in the current KDB of VARs, specify "WS" as filename (required unless nb ==0).
  *  
- *  @param [in] KDB*    dbi         identities to be calculated
- *  @param [in] KDB*    dbv         list of series needed to calculate the identities in dbi
+ *  @param [in] KDB*    dbv         list of series needed to calculate the identities
  *  @param [in] KDB*    dbv_ws      current VAR KDB (global_ws_var)
- *  @param [in] int     nb          Number of VAR input files
- *  @param [in] char*   files[]     list of input VAR files, including "WS" for the current KDB of VARs 
- *                                  if nb == 0, the needed VARs are read from dbv_ws
  *  @return     int                 0 on success (all vars have been found)
  *                                  -1 if one of the files is not found
  *                                  -2 if some vars are not found in the files
  */
-static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_ws, 
-    int nb_files, char* files[])
+int KDBIdentities::read_vars(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_ws)
 {
     idt_exec_loaded_vars.clear();
 
-    int nb = 0;
     int nb_found = 0;
     int nb_found_total = 0;
-    if(nb_files == 0) 
+    if(v_var_files.empty()) 
     {
         // No filename given => read in dbv_ws (normally global_ws_var)
-        nb_found = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
+        nb_found = this->read_vars_db(dbv_ptr, dbv_ws, "WS");
         if(nb_found < 0)
             return -1;
         nb_found_total += nb_found;
     }
     else 
     {
-        // Files given, search in files in the same order as they are listed
-        for(int i = 0;  i < nb_files && nb_found_total < dbv_ptr->size(); i++) 
+        for(const std::string& file : v_var_files) 
         {
-            if(strcmp(files[i], "WS") == 0)
+            if(nb_found_total >= dbv_ptr->size())
+                break;
+
+            if(file == "WS")
                 // Special name "WS" => read in dbv_ws 
-                nb_found = KI_read_vars_db(dbv_ptr, dbv_ws, "WS");
+                nb_found = this->read_vars_db(dbv_ptr, dbv_ws, "WS");
             else
                 // Regular VAR file
-                nb_found = KI_read_vars_file(dbv_ptr, files[i]);
+                nb_found = this->read_vars_file(dbv_ptr, file);
             
             if(nb_found < 0)
                 return -1;
@@ -529,7 +551,7 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
                 continue;
 
             // series = identity ("endogenous") => creates an IODE_NAN Variable
-            if(dbi_ptr->contains(name)) 
+            if(this->contains(name)) 
             {
                 it->second.reset();
                 new_var_ptr = std::make_shared<Variable>(dim, IODE_NAN);
@@ -568,10 +590,10 @@ static int KI_read_vars(const KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr,
  *  @return     int                 nb of Scalars copied
  *                                  -3 if there is no common sample between dbv_tmp and dbv
  */
-static int KI_read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, char* source_name)
+int KDBIdentities::read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, const std::string& source_name)
 {
     if(KEXEC_TRACE) 
-        W_printfDbl(".par1 enum_1\nFrom %s : ", source_name); /* JMP 19-10-99 */
+        W_printfDbl(".par1 enum_1\nFrom %s : ", (char*) source_name.c_str());
     
     int nb_found = 0;
     for(const std::string& name : dbs_ptr->get_names()) 
@@ -609,7 +631,7 @@ static int KI_read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_tmp, 
  *                              -1 if the file cannot be opened
  *  
  */
-static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
+int KDBIdentities::read_scls_file(KDBScalarsPtr dbs_ptr, const std::string& file)
 {
     char    **scls = NULL;
     int     nbs = 0, nb_found;
@@ -629,15 +651,15 @@ static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
         return 0;
 
     auto kdb_tmp_ptr = KDBScalars::KDBScalars::Create(false);
-    bool success = kdb_tmp_ptr->load(std::string(file));
+    bool success = kdb_tmp_ptr->load(file);
     if(!success) 
     {
-        std::string msg = "Scalar file '" + std::string(file) + "' not found";
+        std::string msg = "Scalar file '" + file + "' not found";
         error_manager.append_error(msg);
         return -1;
     }
 
-    nb_found = KI_read_scls_db(dbs_ptr, kdb_tmp_ptr, file);
+    nb_found = this->read_scls_db(dbs_ptr, kdb_tmp_ptr, file);
     return nb_found;
 }
 
@@ -648,33 +670,33 @@ static int KI_read_scls_file(KDBScalarsPtr dbs_ptr, char* file)
  *  
  *  @param [out] KDB*   dbs         Scalars to be read
  *  @param [in] KDB*    dbs_ws      current Scalar KDB (global_ws_scl)
- *  @param [in] int     nb          Number of Scalar input files
- *  @param [in] char*   files[]     list of input Scalar files, including "WS" for the current KDB of Scalars 
- *                                  if nb == 0, the needed Scalars are read from dbs_ws
  *  @return     int                 0 on success (all Scalars have been found)
  *                                  -1 if one of the files is not found
  *                                  -2 if some Scalars were not found in the files
  */
 
-static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int nb, char* files[])
+int KDBIdentities::read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws)
 {
     int nb_found;
     int nb_found_total = 0;
-    if(nb == 0) 
+    if(v_scl_files.empty()) 
     {
-        nb_found = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
+        nb_found = this->read_scls_db(dbs_ptr, dbs_ws, "WS");
         if(nb_found < 0) 
             return -1;
         nb_found_total += nb_found;
     }
     else 
     {
-        for(int i = 0;  i < nb && nb_found_total < dbs_ptr->size(); i++) 
+        for(const std::string& file : v_scl_files) 
         {
-            if(strcmp(files[i], "WS") == 0)
-                nb_found = KI_read_scls_db(dbs_ptr, dbs_ws, "WS");
+            if(nb_found_total >= dbs_ptr->size())
+                break;
+
+            if(file == "WS")
+                nb_found = this->read_scls_db(dbs_ptr, dbs_ws, "WS");
             else
-                nb_found = KI_read_scls_file(dbs_ptr, files[i]);
+                nb_found = this->read_scls_file(dbs_ptr, file);
 
             if(nb_found < 0) 
                 return -1;
@@ -710,21 +732,20 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
 
 
 /**
- *  Sub function of KI_exec() that links and computes all identities in dbi after 
+ *  Sub function of exec() that links and computes all identities after 
  *  all needed VARs and Scalars have been read and saved in dbv and dbs.
  *  
  *  
  *  @param [in] KDB*    dbv   Input VAR KDB
  *  @param [in] KDB*    dbs   Input Scalar KDB
- *  @param [in] KDB*    dbi   KDB of identities to compute
  *  @param [in] int*    order order of execution of the identities
  *  @param [in] Sample* smpl  execution Sample
  *  @return     int           0 on success
  *                            -1 on LEC execution error (DIV/0...)
  *  
  */
-static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
-    std::vector<std::string> v_order, const std::shared_ptr<Sample> smpl)
+int KDBIdentities::execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, 
+    std::vector<std::string> v_order, const std::shared_ptr<Sample> smpl) const
 {
     if(!smpl) 
     {
@@ -742,7 +763,7 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
     std::shared_ptr<CLEC> clec_copy = nullptr;
     for(const std::string& idt_name : v_order) 
     {
-        idt_ptr = dbi_ptr->get_obj_ptr(idt_name);
+        idt_ptr = this->get_obj_ptr(idt_name);
         idt_clec = idt_ptr->get_compiled_lec();
         if(!idt_clec) 
             return -1;
@@ -763,23 +784,17 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
 
 
 /**
- *  Executes all identities in dbi using the input series of dbv and scalars of dbs.
+ *  Executes all identities using the input series of dbv and scalars of dbs.
  *  Missing vars and scalars are collected from vfiles and sfiles.
  *
- *  @param [in] KDB*    dbi         KDB of identities to be calculated
  *  @param [in] KDB*    dbv         Input VAR KDB
- *  @param [in] int     nv          Number of input VAR files
- *  @param [in] char*   vfiles[]    Input VAR files
  *  @param [in] KDB*    dbs         Input Scalar KDB
- *  @param [in] int     ns          number of input Scalar files
- *  @param [in] char*   sfiles[]    Input Scalar files
  *  @param [in] Sample* in_smpl     execution Sample or NULL to select the current VAR KDB sample
  *  @return     KDB*                Variables KDB containing the variables calculated using the identities
  *                                  NULL on error (illegal Sample, empty dbi, vars or scls not found...).
  *                                  The specific message is added via IodeErrorManager::append_error().
  */
-KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int nv, char* vfiles[], 
-    KDBScalarsPtr dbs_ptr, int ns, char* sfiles[], Sample* in_smpl)
+KDBVariablesPtr KDBIdentities::exec(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, Sample* in_smpl)
 {
     std::shared_ptr<Sample> var_sample = global_ws_var->get_sample();
     std::shared_ptr<Sample> exec_sample = nullptr; 
@@ -815,20 +830,20 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         }
     }
     
-    if(dbi_ptr->size() == 0) 
+    if(this->size() == 0) 
     {
         error_manager.append_error("Empty set of identities");
         return nullptr;
     }
 
-    std::vector<std::string> v_order = KI_reorder(dbi_ptr);
+    std::vector<std::string> v_order = this->reorder();
     if(v_order.empty()) 
     {
         error_manager.append_error("Circular identity definition");
         return nullptr;
     }
 
-    KDBVariablesPtr dbv_i_ptr = KI_series_list(dbi_ptr);
+    KDBVariablesPtr dbv_i_ptr = this->series_list();
     if(var_sample) 
         dbv_i_ptr->set_sample(*var_sample);
     else  
@@ -843,23 +858,23 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         W_printf((char*) ".par1 tit_1\nVariables loaded\n");
     }
     
-    int res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
+    int res = this->read_vars(dbv_i_ptr, dbv_ptr);
     idt_exec_loaded_vars.clear();
     if(res != 0) 
         return nullptr;
 
-    KDBScalarsPtr dbs_i = KI_scalar_list(dbi_ptr);
+    KDBScalarsPtr dbs_i = this->scalar_list();
     if(KEXEC_TRACE) 
         W_printf((char*) ".par1 tit_1\nScalars loaded\n");
     
-    res = KI_read_scls(dbs_i, dbs_ptr, ns, sfiles);
+    res = this->read_scls(dbs_i, dbs_ptr);
     if(res != 0) 
         return nullptr;
 
     if(KEXEC_TRACE) 
         W_flush();
 
-    KI_execute(dbv_i_ptr, dbs_i, dbi_ptr, v_order, exec_sample);
-    KI_quick_extract(dbv_i_ptr, dbi_ptr);
+    this->execute(dbv_i_ptr, dbs_i, v_order, exec_sample);
+    this->quick_extract(dbv_i_ptr);
     return dbv_i_ptr;
 }
