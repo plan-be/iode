@@ -302,7 +302,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         SW_nfree(str);
         dif_skip_to(SYY, DIF_BOT);
     }
-    as1 --;
+    as1--;
 
     char* name1 = (char*) kdb_cmt->get_name(as1).c_str();
     niv = get_niv(name1);
@@ -319,9 +319,9 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
             str = (char*) cmt_ptr->c_str();
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
-            niv --;
+            niv--;
         }
-        as1 --;
+        as1--;
     }
 
     if(as2 > 0) 
@@ -336,9 +336,9 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
                 std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_obj_ptr(name2);
                 str = (char*) cmt_ptr->c_str();
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
-                niv --;
+                niv--;
             }
-            as2 --;
+            as2--;
         }
     }
 

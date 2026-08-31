@@ -129,26 +129,23 @@ char* ExportObjsCSV::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, c
  *  @param [in, out] char** vec     (re-)allocated vector of the VAR values in CSV format
  *  @return          char*          *vec
  */
-char* ExportObjsCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
+char* ExportObjsCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)
 {
-    int     lg, olg;
-    char    tmp[81], *buf = NULL;
-
-    std::string name = dbv_ptr->get_name(nb);
     double value = dbv_ptr->get_var(name, t);
+    
+    char tmp[81], *buf = NULL;
     write_value(tmp, value);
     write_separator(tmp, &buf);
-    lg = (int) strlen(buf) + 1;
+    int lg = (int) strlen(buf) + 1;
 
-    if(*vec == NULL) 
-        olg = 0;
-    else 
+    int olg = 0;
+    if(*vec != NULL) 
         olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
-    return(*vec);
+    return *vec;
 }
 
 /**
@@ -188,15 +185,15 @@ char* ExportObjsRevertCSV::write_object_name(char* name, char** code)
     return(write_separator(name, code));
 }
 
-char* ExportObjsRevertCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
-{
+char* ExportObjsRevertCSV::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)
+{    
+    double value = dbv_ptr->get_var(name, t);
+
     char  tmp[81]; 
     char* buf = NULL;
-
-    std::string name = dbv_ptr->get_name(nb);
-    double value = dbv_ptr->get_var(name, t);
     write_value(tmp, value);
     write_separator(tmp, &buf);
+
     if(vec) 
         *vec = buf;
     return buf;

@@ -104,26 +104,23 @@ char* ExportObjsTSP::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, c
     return(*cmt);
 }
 
-char* ExportObjsTSP::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
+char* ExportObjsTSP::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)
 {
-    int     lg, olg;
-    char    tmp[81], *buf = NULL;
-
-    std::string name = dbv_ptr->get_name(nb);
     double value = dbv_ptr->get_var(name, t);
+
+    char tmp[81], *buf = NULL;
     write_value(tmp, value);
     write_pre_post("", " ", tmp, &buf);
-    lg = (int) strlen(buf) + 1;
+    int lg = (int) strlen(buf) + 1;
 
-    if(*vec == NULL) 
-        olg = 0;
-    else 
+    int olg = 0;
+    if(*vec != NULL) 
         olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
-    return(*vec);
+    return *vec;
 }
 
 int ExportObjsTSP::write_variable_and_comment(char* code, char* cmt, char* vec)

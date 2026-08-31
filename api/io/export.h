@@ -43,7 +43,7 @@ struct ExportToFile
         return *code;
     }
     virtual char* extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt) { return 0; }                                // method to create the output object comment (if it exists in global_ws_cmt) + the separator for the output file
-    virtual char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) { return 0; }                           // method constructing an allocated string of one value + sep
+    virtual char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) { return 0; }                           // method constructing an allocated string of one value + sep
     virtual int   write_variable_and_comment(char* code, char* cmt, char* vec) { return 0; }      // method saving the VAR and CMT in the output file
     virtual int   close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) { return 0; }                             // method that closes the output file after having written its footer
 };
@@ -54,7 +54,7 @@ struct ExportObjsCSV : public ExportToFile
     int write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
     char* extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt) override;
-    char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
     int close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
 };
@@ -65,7 +65,7 @@ struct ExportObjsDIF : public ExportToFile
     int write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
     char* extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt) override;
-    char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
     int close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
 };
@@ -80,7 +80,7 @@ public:
     int write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
     char* extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt) override;
-    char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
     int close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
 };
@@ -91,7 +91,7 @@ struct ExportObjsTSP : public ExportToFile
     int write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
     char* extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt) override;
-    char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
     int close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
 };
@@ -101,7 +101,7 @@ struct ExportObjsRevertCSV : public ExportToFile
 {
     int write_header(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
     char* write_object_name(char* name, char** code) override;
-    char* get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec) override;
+    char* get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec) override;
     int write_variable_and_comment(char* code, char* cmt, char* vec) override;
     int close(const KDBVariablesPtr dbv_ptr, const KDBCommentsPtr dbc_ptr, char* outfile) override;
 };
