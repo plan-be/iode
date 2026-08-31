@@ -1,13 +1,3 @@
-/**
- *  @header4iode
- * 
- *  Functions to print the results of an estimation. The generated format is A2M.
- *  
- *  List of functions 
- *  -----------------
- *      int E_graph(char** titles, Sample* smpl, MAT* mlhs, MAT* mrhs, int view, int res)   Displays or prints the graphs of residuals or observed / fitted values 
- *      int E_print_results(int corr, int corru, int obs, int grobs, int grres)             Prints the estimation input and output of a block of equations. 
- */
 #include "api/pch.h"
 #include "api/k_lang.h"
 #include "api/objs/objs.h"
@@ -18,7 +8,7 @@
 
 
 // Declarations
-static int E_graph_calc_lhs(char* name, char* res, char* rhs);
+static int E_graph_calc_lhs(const std::string& name, char* res, char* rhs);
 
 /**
  *  Prints the estimation parameters of the current estimation.
@@ -47,13 +37,12 @@ void Estimation::E_print_parms()
  */
 void Estimation::E_print_eqs()
 {
-    int     i;
-
     W_print_tit(2);
     W_printf((char*) "Equations\n");
-    for(i = 0 ; i < E_NEQ ; i++) {
+    for(int i = 0 ; i < E_NEQ ; i++) 
+    {
         W_print_enum(2);
-        W_printf((char*) "%s\n", E_LECS[i]);
+        W_printf((char*) "%s\n", v_block_lecs[i].c_str());
     }
 }
 
@@ -63,14 +52,15 @@ void Estimation::E_print_eqs()
  */
 void Estimation::E_print_instrs()
 {
-    int     i;
+    if(E_NINSTR == 0 || E_MET == 0 || E_MET == 1) 
+        return;
 
-    if(E_NINSTR == 0 || E_MET == 0 || E_MET == 1) return;
     W_print_tit(2);
     W_printf((char*) "Instruments\n");
-    for(i = 0 ; i < E_NINSTR ; i++) {
+    for(int i = 0 ; i < E_NINSTR ; i++) 
+    {
         W_print_enum(2);
-        W_printf((char*) "%s\n", E_INSTRS[i]);
+        W_printf((char*) "%s\n", v_block_instrs[i].c_str());
     }
 }
 
@@ -112,18 +102,21 @@ void Estimation::E_print_mcorr()
     int     i, j, ic, jc;
 
     W_print_tb("Correlation matrix of coefficients", E_NCE + 1);
-    // E_printf(".twidth 2 2\n"); // JMP 06/07/2022 => to keep .twidth empty as long as possible :-)
 
     W_printfRepl((char*) "&1C ");
     for(i = 0 ; i < E_NC ; i++)
         if(MATE(E_SMO, i, 0)) W_printfRepl((char*) "&1C%s", E_DBS->get_name(E_C_NBS[i]));
 
     W_printf((char*) "\n.tl\n");
-    for(i = 0, ic = 0 ; i < E_NC ; i++) {
-        if(MATE(E_SMO, i, 0) == 0) continue;
+    for(i = 0, ic = 0 ; i < E_NC ; i++) 
+    {
+        if(MATE(E_SMO, i, 0) == 0) 
+            continue;
         W_printfRepl((char*) "&1L%s", E_DBS->get_name(E_C_NBS[i]));
-        for(j = 0, jc = 0 ; j < E_NC ; j++) {
-            if(MATE(E_SMO, j, 0) == 0) continue;
+        for(j = 0, jc = 0 ; j < E_NC ; j++) 
+        {
+            if(MATE(E_SMO, j, 0) == 0) 
+                continue;
             W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORR, ic, jc));
             jc++;
         }
@@ -139,20 +132,22 @@ void Estimation::E_print_mcorr()
  */
 void Estimation::E_print_mcorru()
 {
-    int     i, j;
-
     W_print_tb("Correlation of residuals", E_NEQ + 1);
 
     W_printfRepl((char*) "&1C ");
-    for(i = 0 ; i < E_NEQ ; i++) W_printfRepl((char*) "&1C%s", E_ENDOS[i]);
+    for(int i = 0 ; i < E_NEQ ; i++) 
+        W_printfRepl((char*) "&1C%s", v_block_endos[i].c_str());
+    
     W_printfRepl((char*) "\n.tl\n");
-    for(i = 0 ; i < E_NEQ ; i++) {
-        W_printfRepl((char*) "&1L%s", E_ENDOS[i]);
-        for(j = 0 ; j < E_NEQ ; j++) W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORRU, i, j));
+    for(int i = 0 ; i < E_NEQ ; i++) 
+    {
+        W_printfRepl((char*) "&1L%s", v_block_endos[i].c_str());
+        for(int j = 0 ; j < E_NEQ ; j++) 
+            W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORRU, i, j));
         W_printfRepl((char*) "\n");
     }
+    
     W_printfRepl((char*) ".te\n");
-    /* JMP 13-07-96 */
 }
 
 
@@ -185,7 +180,6 @@ void Estimation::E_print_eqres_1(int eq_nb)
     W_printfRepl((char*) "&1LLog likelihood              &1D%lf\n", (double) MATE(E_LOGLIK, 0, eq_nb));
     W_printfRepl((char*) ".tl\n");
     W_printfRepl((char*) ".te\n");
-    /* JMP 13-07-96 */
 }
 
 
@@ -197,13 +191,13 @@ void Estimation::E_print_eqres_1(int eq_nb)
  */
 void Estimation::E_print_eqres_2(int eq_nb)
 {
-    int     i;
-    double  respct;
+    double respct;
 
     W_print_tb("Actual and fitted values", 5);
     W_printfRepl((char*) "&1CPeriod&1CObservations&1CFitted Values&1CResiduals&1CResiduals (%%)\n");
     W_printfRepl((char*) ".tl\n");
-    for(i = 0 ; i < E_T ; i++) {
+    for(int i = 0 ; i < E_T ; i++) 
+    {
         Period per = E_SMPL->start_period.shift(i);
         std::string str_period = per.to_string();
         respct = 100 * E_div_0(MATE(E_U, eq_nb, i), MATE(E_LHS, eq_nb, i));
@@ -216,7 +210,6 @@ void Estimation::E_print_eqres_2(int eq_nb)
     }
 
     W_printfRepl((char*) ".te\n");
-    /* JMP 13-07-96 */
 }
 
 
@@ -227,18 +220,17 @@ void Estimation::E_print_eqres_2(int eq_nb)
  */
 void Estimation::E_print_eqres(int obs)
 {
-    int     i;
-
     W_print_tit(2);
     W_printf((char*) "Results by equation\n");
-    for(i = 0 ; i < E_NEQ ; i++) {
+    for(int i = 0 ; i < E_NEQ ; i++) 
+    {
         W_print_tit(3);
-        W_printf((char*) "Equation : %s\n", E_ENDOS[i]);
+        W_printf((char*) "Equation : %s\n", v_block_endos[i].c_str());
         W_print_par(3);
-        W_printf((char*) "%s\n", E_LECS[i]);
+        W_printf((char*) "%s\n", v_block_lecs[i].c_str());
         E_print_eqres_1(i);
-        if(obs) E_print_eqres_2(i);
-        /*        E_print_eqres_3(i); */
+        if(obs) 
+            E_print_eqres_2(i);
     }
 }
 
@@ -251,12 +243,11 @@ void Estimation::E_print_eqres(int obs)
  *  @param [out]    char*   rhs     right member (max 70 chars)
  *  @return         int             -1 if no ":=" found in equation, 0 otherwise
  */
-static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
+static int E_graph_calc_lhs(const std::string& name, char* res, char* rhs)
 {
     memset(res, 0, 71);
     memset(rhs, 0, 71);
 
-    std::string name = std::string(c_name);
     if(!global_ws_eqs->contains(name)) 
         return -1;
     
@@ -286,8 +277,8 @@ static int E_graph_calc_lhs(char* c_name, char* res, char* rhs)
  *  @param [in] int         res     print residuals 
  *  @return     int                 0 always
  */
-int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, 
-    int view, int res)
+int Estimation::E_graph(const std::vector<std::string>& titles, const std::shared_ptr<Sample> smpl, 
+    MAT* mlhs, MAT* mrhs, int view, int res)
 {
     char buf[256], lhs[80], rhs[80];
 
@@ -302,8 +293,8 @@ int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* 
             W_InitDisplay();
 
         T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH); /* JMP 19-02-98 */
-        sprintf(buf, "Equation %s : observed and fitted values", titles[i]);    /* JMP 26-02-98 */
-        T_GraphTitle(buf);                             /* JMP 26-02-98 */
+        sprintf(buf, "Equation %s : observed and fitted values", titles[i].c_str());
+        T_GraphTitle(buf);
 
         for(int t = 0; t < nt; t ++) 
             y[t] = MATE(mlhs, i, t);
@@ -322,7 +313,7 @@ int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* 
 
         T_GraphEnd();
 
-        sprintf(buf, "Equation %s : observed and fitted values", titles[i]);    /* JMP 26-02-98 */
+        sprintf(buf, "Equation %s : observed and fitted values", titles[i].c_str());
         if(view) 
             W_EndDisplay(buf, -ng, -i, -1, -1);
     }
@@ -333,8 +324,8 @@ int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* 
             W_InitDisplay();
 
         T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, 0, 0, IODE_NAN, IODE_NAN, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
-        sprintf(buf, "Equation %s : residuals", titles[i]);    /* JMP 26-02-98 */
-        T_GraphTitle(buf);                                     /* JMP 26-02-98 */
+        sprintf(buf, "Equation %s : residuals", titles[i].c_str());
+        T_GraphTitle(buf);
 
         for(int t = 0; t < nt; t ++) 
             y[t] = MATE(mlhs, i, t) - MATE(mrhs, i, t);
@@ -345,11 +336,10 @@ int Estimation::E_graph(char** titles, const std::shared_ptr<Sample> smpl, MAT* 
 
         T_GraphEnd();
 
-        sprintf(buf, "Equation %s : residuals", titles[i]);    /* JMP 26-02-98 */
+        sprintf(buf, "Equation %s : residuals", titles[i].c_str());
         if(view) 
             W_EndDisplay(buf, -ng, -i, -1, -1);
     }
-
 
     SW_nfree(y);
     return 0;
@@ -389,9 +379,9 @@ int Estimation::E_print_results(int corr, int corru, int obs, int grobs, int grr
         E_print_mcorru();
     E_print_eqres(obs);
     if(grobs) 
-        E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 0);
+        E_graph(v_block_endos, E_SMPL, E_LHS, E_RHS, 0, 0);
     if(grres) 
-        E_graph(E_ENDOS, E_SMPL, E_LHS, E_RHS, 0, 1);
+        E_graph(v_block_endos, E_SMPL, E_LHS, E_RHS, 0, 1);
 
     W_flush();
     return 0;

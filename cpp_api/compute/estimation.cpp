@@ -283,10 +283,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
     // frees all allocated variables for the last estimation
     if(estimation_done)
         delete estimation;
-    estimation_done = false;
-
-    // endos
-    char** c_endos = set_to_double_char(v_equations);   
+    estimation_done = false;  
     
     // list of LEC expressions for each equation of the vector v_equations
     // NOTE: equations are stored in the local database kdb_eqs 
@@ -321,11 +318,12 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
         }
     }
 
-    // NOTE: do NOT free c_endos, c_lecs and c_instrs -> they're will be freed in 
+    // NOTE: do NOT free c_lecs and c_instrs -> they're will be freed in 
     // the Estimation destructor
     int i_method = (int) method;
     KDBVariablesPtr kdb_var = global_ws_var;
-    estimation = new Estimation(c_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
+    std::vector<std::string> v_endos(v_equations.begin(), v_equations.end()); 
+    estimation = new Estimation(v_endos, kdb_eqs, kdb_var, kdb_scl, sample, 
                                 i_method, maxit, eps);
     int res = estimation->estimate();
 

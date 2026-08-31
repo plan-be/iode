@@ -7,16 +7,7 @@
  *      - verify a given condition and
  *      - give the best statistical test (fstat or r2) 
  *  
- *  The selection is done by blocking all possible combinaisons of coefficients.
- *  
- *  TODO: rewrite and standardize these very obscure functions.
- *  
- *  List of functions 
- *  -----------------
- *      double C_evallec(char* lec, int t)                                    Evaluates a LEC expression at a specific period of time.
- *      double estimate_step_wise(Sample* smpl, char* eqname, char* cond, char* test) For a given equation, tries all combinations of coefficients and saves the 
- *                                                                                  coefficient configuration that gives 
- *                                                                                  the best statistical result (for a chosen test).
+ *  The selection is done by blocking all possible combinaisons of coefficients.                                                                                 the best statistical result (for a chosen test).
  */
 #include "api/b_args.h"
 #include "api/k_super.h"
@@ -32,7 +23,7 @@
 static std::vector<std::string> E_GetScls(CLEC* clec);
 static void E_SetScl(const bool relax, const std::string& name);
 static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, 
-    const std::shared_ptr<Sample> smpl, char** eqs, char* test);
+    const std::shared_ptr<Sample> smpl, const std::vector<std::string>& v_eqs, char* test);
 
 /**
  *  Retrieves (in a list of char*) the names of all scalars in a CLEC structure.
@@ -132,7 +123,7 @@ double C_evallec(char* lec, int t)
  *  @return     double                      value of test after estimation or 0 if no coefficient is found in eqs[0] (?)
  */
 static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scalar_names, 
-    const std::shared_ptr<Sample> smpl, char** eqs, char* test)   
+    const std::shared_ptr<Sample> smpl, const std::vector<std::string>& v_eqs, char* test)   
 {
     char buf[512];
     memset(buf, 0, 512);
@@ -164,7 +155,7 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
     std::shared_ptr<Scalar> scl_ptr;
     if(nscl > 1) 
     {                   
-        Estimation* est = new Estimation(eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
+        Estimation* est = new Estimation(v_eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
         est->estimate();
         delete est;
 
@@ -177,8 +168,8 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
             return 0.0;
         }
         res = scl_ptr->value;
-        kmsg("%s: scalars : %s, %s=%lf", eqs[0], buf, test, res);
-        L_debug("%s: scalars : %s, %s=%lf\n", eqs[0], buf, test, res);
+        kmsg("%s: scalars : %s, %s=%lf", v_eqs[0].c_str(), buf, test, res);
+        L_debug("%s: scalars : %s, %s=%lf\n", v_eqs[0].c_str(), buf, test, res);
     }
     
     return res;
@@ -256,8 +247,11 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
     }
     
     std::string name = std::string(eqs[0]);
+    SCR_free_tbl((unsigned char**) eqs);
     if(!global_ws_eqs->contains(name)) 
         return 0.0;
+
+    std::vector<std::string> v_eqs = { name };
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);               
@@ -271,7 +265,7 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
     double numtest = 0.0;
     for(int i = 1; i < nb_combinations; i++) 
     {                                           
-        numtest = estimate_step_wise_1(i, v_scalar_names, smpl, eqs, test);
+        numtest = estimate_step_wise_1(i, v_scalar_names, smpl, v_eqs, test);
         // print_result(numtest,numtest,C_evallec(cond,0),scl,nbscl,i,cond);  Aide pour la programmation
         // Sauve la combi qui a le meilleur fstat
         if(last_numtest < numtest && C_evallec(cond, 0) != 0 && numtest != 0) 
@@ -282,8 +276,7 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
     }
 
     // Refait l'estimation pour la meilleure combi
-    numtest = estimate_step_wise_1(last_i, v_scalar_names, smpl, eqs, test); 
+    numtest = estimate_step_wise_1(last_i, v_scalar_names, smpl, v_eqs, test); 
     
-    SCR_free_tbl((unsigned char**) eqs);
     return numtest;
 }

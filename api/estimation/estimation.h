@@ -52,9 +52,9 @@ class Estimation
     FRIEND_TEST(EstimationTest, Estimate);
 #endif
 
-    char**    est_endos;                // list of equation names (endos = eqs names)
-    int       est_method;               // estimation method
-    std::shared_ptr<Sample> est_smpl;   // sample used for the estimation
+    int est_method;                         // estimation method
+    std::shared_ptr<Sample> est_smpl;       // sample used for the estimation
+    std::vector<std::string> v_endos;       // list of equation names (endos = eqs names)
 
 protected:
     int       E_IT;           // Number of iterations of the last estimation
@@ -74,10 +74,10 @@ protected:
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
     double    E_EPS;          // Convergence criterion (threshold) for the estimation
-    CLEC      **E_CRHS;       // List of CLEC corresponding to the right members of the equations
-    char      **E_LECS;       // List (block) of simultaneous equations of the current estimation
-    char      **E_INSTRS;     // List of instruments (LEC formulas) of the current estimation    
-    char      **E_ENDOS;      // List of endogenous vars of the current estimation
+    CLEC      **E_CRHS;       // List (block) of CLEC corresponding to the right members of the equations
+    std::vector<std::string> v_block_endos;     // List (block) of equations' names of the current estimation
+    std::vector<std::string> v_block_lecs;      // List (block) of LEC expressions of the current estimation
+    std::vector<std::string> v_block_instrs;    // List (block) of instruments (LEC formulas) of the current estimation    
     
     MAT* E_U;                 // Residuals (neq x t)
     MAT* E_VCU;               // Variance / covariance of the residuals (neq x neq)    
@@ -127,9 +127,9 @@ public:
      *  associated tests are directly saved in dbs. 
      *  
      *  The special scalars containing the tests by equations related to the error terms
-     *  are NOT saved here: this is done by KE_est_s(). Idem for the variables 
+     *  are NOT saved here: this is done by estimate_sample(). Idem for the variables 
      *  _YCALC, _YOBS and _YRES. The equations with their tests and new
-     *  sample, instruments and/or block are also saved by KE_est_s().
+     *  sample, instruments and/or block are also saved by estimate_sample().
      *  
      *  The LEC expressions of each equations must be given in the parameter "lecs". 
      *  They can differ from their current value in the equation workspace.
@@ -151,15 +151,10 @@ public:
      *  @param [in] int     maxit           max number of iterations
      *  @param [in] double  eps             convergence threshold
      */
-    Estimation(char* endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
+    Estimation(const std::string& list_endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
                KDBScalarsPtr dbs = nullptr, char* from_period = NULL, char* to_period = NULL, 
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
-    {
-        est_endos = NULL;
-
-        // TODO: replace hard-coded separators by a (new?) variable 
-        char** tmp_endos = (char**) SCR_vtoms((unsigned char*) endos, (unsigned char*) ",; ");
-        
+    {   
         std::shared_ptr<Sample> smpl = nullptr;
         if(from_period != NULL && to_period != NULL)
         {
@@ -173,15 +168,15 @@ public:
             }
         }
 
-        initialize(tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
+        std::vector<std::string> v_tmp_endos = split_multi(list_endos, ",; ");
+        initialize(v_tmp_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
     }
 
-    Estimation(char** endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
+    Estimation(const std::vector<std::string>& v_endos, KDBEquationsPtr dbe = nullptr, KDBVariablesPtr dbv = nullptr, 
                KDBScalarsPtr dbs = nullptr, const std::shared_ptr<Sample> smpl = nullptr, 
                int method = -1, int maxit = DEFAULT_MAXIT, double eps = DEFAULT_EPS)
     {
-        est_endos = NULL;
-        initialize(endos, dbe, dbv, dbs, smpl, method, maxit, eps);
+        initialize(v_endos, dbe, dbv, dbs, smpl, method, maxit, eps);
     }
 
     ~Estimation()
@@ -219,7 +214,7 @@ public:
         else
             smpl = est_smpl;                // Use the sample provided at initialization
 
-        int rc = KE_est_s(smpl);            // Perform the estimation
+        int rc = estimate_sample(smpl);            // Perform the estimation
 
         if(rc != 0)
         {
@@ -263,12 +258,12 @@ public:
     }
 
 private:
-    void initialize(char** endos, KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
+    void initialize(const std::vector<std::string>& v_endos, KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         const std::shared_ptr<Sample> smpl, int method, int maxit, double eps)
     {
-        if(endos == NULL || endos[0] == NULL)
+        if(v_endos.empty())
             throw std::invalid_argument("List of equations names must be provided");
-        est_endos = endos;
+        this->v_endos = v_endos;
 
         if(method >= IODE_NB_EQ_METHODS)
             throw std::invalid_argument(std::string("Invalid estimation method: Must be between -1 ") + 
@@ -317,7 +312,8 @@ private:
     int E_c_ivcc();
     int E_c_vcc();
     int E_gls();
-    int E_est(char** endos, char** lecs, char** instrs);
+    int E_est(const std::vector<std::string>& v_block_endos, const std::vector<std::string>& v_block_lecs, 
+        const std::vector<std::string>& v_block_instrs);
 
     /* e_tests.c */
     double M_c_line(MAT* m1, int line, int oper);
@@ -332,10 +328,10 @@ private:
     int E_output(void);
 
     /* e_prep.c */
-    int E_prep(char** lecs, char** instrs);
+    int E_prep();
     int E_prep_alloc();
-    int E_prep_lecs(char** lecs);
-    int E_prep_instrs(char** instrs);
+    int E_prep_lecs();
+    int E_prep_instrs();
     int E_prep_coefs();
     int E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs);
     void E_prep_reset();
@@ -354,15 +350,15 @@ private:
     void E_print_eqres_1(int eq_nb);
     void E_print_eqres_2(int eq_nb);
     void E_print_eqres(int obs);
-    int E_graph(char** titles, std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, int view, int res);
+    int E_graph(const std::vector<std::string>& titles, std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, int view, int res);
     int E_print_results(int corr, int corru, int obs, int grobs, int grres);
 
     /* k_est.c */
     void E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k);
     void E_savescl(double val, int eqnb, char* txt);
     void E_savevar(char* name, int eqnb, MAT* mat);
-    int KE_est_s(const std::shared_ptr<Sample> smpl);
-    int KE_update(char* name, char* lec, int method, const std::shared_ptr<Sample> smpl, float* tests);
+    int estimate_sample(const std::shared_ptr<Sample> smpl);
+    int update_eq(const std::string& name, const std::string& lec, int method, const std::shared_ptr<Sample> smpl, float* tests);
 };
 
 /* ---------------------- FUNCS ---------------------- */

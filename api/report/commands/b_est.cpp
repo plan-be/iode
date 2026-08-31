@@ -72,7 +72,7 @@ static std::vector<std::string> B_EqsSplitSmplName(const std::string& arg, Sampl
  *  @param [in] Sample* smpl    estimation sample
  *  @param [in] char**  eqs     block of equations to be simultaneously estimated 
  *  @return     int             -1 if some eqs are not found
- *                              rc of KE_est_s() otherwise 
+ *                              rc of estimate_sample() otherwise 
  */
 int B_EqsEstimateEqs(Sample* smpl, char* pattern)
 {
