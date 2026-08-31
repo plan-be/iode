@@ -106,24 +106,23 @@ char* ExportObjsDIF::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, c
         return write_pre_post("1,0\n\"", "\"\n", "", cmt);
 }
 
-char* ExportObjsDIF::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
-{
-    int     lg, olg;
-    char    tmp[81], *buf = NULL;
-
-    std::string name = dbv_ptr->get_name(nb);
+char* ExportObjsDIF::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)
+{   
     double value = dbv_ptr->get_var(name, t);
+    
+    char tmp[81], *buf = NULL;
     write_value(tmp, value);
     write_pre_post("0,", "\nV\n", tmp, &buf);
-    lg = (int) strlen(buf) + 1;
+    int lg = (int) strlen(buf) + 1;
 
-    if(*vec == NULL) olg = 0;
-    else olg = (int) strlen(*vec);
+    int olg = 0;
+    if(*vec != NULL)
+        olg = (int) strlen(*vec);
     *vec = (char*) SW_nrealloc(*vec, olg, olg + lg);
 
     strcat(*vec, buf);
     SW_nfree(buf);
-    return(*vec);
+    return *vec;
 }
 
 int ExportObjsDIF::write_variable_and_comment(char* code, char* cmt, char* vec)

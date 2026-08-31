@@ -78,16 +78,15 @@ char* ExportObjsWKS::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, c
     return *cmt;
 }
 
-char* ExportObjsWKS::get_variable_value(const KDBVariablesPtr dbv_ptr, int nb, int t, char** vec)
+char* ExportObjsWKS::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)
 {
     char* buf = NULL;
-
-    std::string name = dbv_ptr->get_name(nb);
     double value = dbv_ptr->get_var(name, t);
     wks_value(value, WKS_COL, WKS_ROW);
     WKS_COL++;
 
-    return(*vec = NULL);
+    *vec = NULL;
+    return *vec;
 }
 
 int ExportObjsWKS::write_variable_and_comment(char* code, char* cmt, char* vec)
