@@ -6,16 +6,6 @@
  *  Estimation functions making the link between the estimation package (E_estim()) 
  *  and the workspaces of equations and scalars where the estimation results 
  *  are stored. 
- *  
- *  List of functions
- *  -----------------
- *      int KE_est_s()                          Estimates an equation or a block of equations
- *      int KE_estim(char* afrom, char* ato)    Estimates an equation or a block of equations on the specified sample. Simplified version of KE_est_s()
- *  
- *  Utility function
- *  ----------------
- *      void E_tests2scl(const std::shared_ptr<Equation>& eq, const int j, const int n, const int k)   Creates the scalars containing the results of an estimated equation
- *  
  */
 #include "scr4/s_prodt.h"
 
@@ -132,13 +122,12 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
  *  @param [in] int     method  estimation method
  *  @param [in] Sample* smpl    estimation sample or NULL. If NULL, the estimation 
  *                              sample is read from the equation itself
- *  @param [in] float*  tests   list of tests (see KE_est_s() for the complete list)
+ *  @param [in] float*  tests   list of tests (see estimate_sample() for the complete list)
  *  @return     int             0 on success, -1 on error
  */
-int Estimation::KE_update(char* name, char* c_lec, int i_method, const std::shared_ptr<Sample> smpl, float* tests)
+int Estimation::update_eq(const std::string& name, const std::string& lec, int i_method, 
+    const std::shared_ptr<Sample> smpl, float* tests)
 {
-    std::string endo(name);
-    std::string lec(c_lec);
     IodeEquationMethod method = EQ_LSQ;
     if (i_method >= 0 && i_method < IODE_NB_EQ_METHODS)
         method = (IodeEquationMethod) i_method;
@@ -149,10 +138,10 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, const std::shar
         {
             std::string comment = "";
             std::string instruments = "";
-            std::string block = endo;
+            std::string block = name;
             Period from_period = (smpl.get() != nullptr) ? smpl->start_period : Period();
             Period to_period = (smpl.get() != nullptr) ? smpl->end_period : Period();
-            Equation eq(endo, lec, method, from_period.to_string(), to_period.to_string(), 
+            Equation eq(name, lec, method, from_period.to_string(), to_period.to_string(), 
                         comment, instruments, block, true);
             eq.update_date();
             memcpy(eq.tests.data(), tests, EQS_NBTESTS * sizeof(float));
@@ -172,7 +161,7 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, const std::shar
     catch(const std::exception& e)
     {
         std::string error_msg = "Error while saving estimation results for equation ";
-        error_msg += "'" + endo + "':\n" + std::string(e.what());
+        error_msg += "'" + name + "':\n" + std::string(e.what());
         error_manager.append_error(error_msg);
         return -1;
     }
@@ -193,26 +182,25 @@ int Estimation::KE_update(char* name, char* c_lec, int i_method, const std::shar
  *  
  *  @return     int                  0 on success, -1 on error
  */
-int Estimation::KE_est_s(const std::shared_ptr<Sample> smpl)
+int Estimation::estimate_sample(const std::shared_ptr<Sample> smpl)
 {
+    int error = 0;
     static char met[6] = {"LZIGM"};
-    int        nb, error = 0, nbl = 0, nbe = 0, nblk;
-    U_ch**     endos = 0;
-    U_ch**     blk = 0;
-    U_ch**     lecs = 0;
-    U_ch**     instrs = 0;
-    float      tests[EQS_NBTESTS];
+    float tests[EQS_NBTESTS];
     std::shared_ptr<Sample> eq_smpl;
     std::shared_ptr<Equation> eq_ptr;
     
-    nb = SCR_tbl_size((unsigned char**) est_endos);
-    
-    std::string endo;
     std::set<std::string> estimated_eqs;
-    for(int i = 0; i < nb; i++) 
-    {    
+    std::vector<std::string> _v_block_lecs_;
+    std::vector<std::string> _v_block_endos_;
+    std::vector<std::string> _v_block_instrs_;
+    for(const std::string& endo: v_endos) 
+    {   
+        _v_block_lecs_.clear();
+        _v_block_endos_.clear();
+        _v_block_instrs_.clear();
+        
         // check if the equation has already been estimated (through a block)
-        endo = std::string(est_endos[i]);
         if(estimated_eqs.contains(endo))
             continue;
 
@@ -220,7 +208,7 @@ int Estimation::KE_est_s(const std::shared_ptr<Sample> smpl)
         {
             std::string error_msg  = "Equation '" + endo + "' not found";
             error_manager.append_error(error_msg);
-            goto err;
+            return -1;
         }
 
         eq_ptr = E_DBE->get_obj_ptr(endo);
@@ -242,77 +230,70 @@ int Estimation::KE_est_s(const std::shared_ptr<Sample> smpl)
         {
             std::string error_msg = "Equation '" + endo + "': estimation sample undefined";
             error_manager.append_error(error_msg);
-            goto err;
+            return -1;
         }
         E_T = E_SMPL->nb_periods;
 
-        std::string _instruments = eq_ptr->instruments;
-        if(_instruments.empty()) 
-            instrs = NULL;
-        else 
-            instrs = SCR_vtoms((unsigned char*) _instruments.c_str(), (unsigned char*) ",;");
+        std::string _instruments_ = eq_ptr->instruments;
+        if(!_instruments_.empty()) 
+            _v_block_instrs_ = split_multi(_instruments_, ",;");
 
-        std::string _block = eq_ptr->block;
-        blk =  SCR_vtoms((unsigned char*) _block.c_str(), (unsigned char*) " ,;");
-        nblk = SCR_tbl_size(blk);
+        std::string _block_ = eq_ptr->block;
+        std::vector<std::string> v_bloc;
+        if(!_block_.empty())
+            v_bloc =  split_multi(_block_, " ,;");
 
         std::string eq_name;
-        if(nblk == 0)  
+        if(v_bloc.empty())  
         {
-            SCR_add_ptr(&lecs, &nbl, (unsigned char*) eq_ptr->lec.c_str());
-            SCR_add_ptr(&endos, &nbe, (unsigned char*) endo.c_str());
+            _v_block_lecs_.push_back(eq_ptr->lec);
+            _v_block_endos_.push_back(endo);
         }
         else 
         {
             /* add elements of block */
-            std::string _lec;
-            for(int j = 0; j < nblk; j++) 
+            std::string _lec_;
+            for(const std::string& _eq_name_: v_bloc) 
             {
-                SCR_sqz(blk[j]);
-                eq_name = std::string((char*) blk[j]);
+                eq_name = trim(_eq_name_);
                 if(!global_ws_eqs->contains(eq_name)) 
                 {
                     std::string error_msg = "Equation '" + eq_name + "' "; 
                     error_msg += "not found in block of equation";
                     error_manager.append_error(error_msg);
-                    SCR_free_tbl(lecs);
-                    SCR_free_tbl(endos);
-                    SCR_free_tbl(instrs);
-                    SCR_free_tbl(blk);
-                    goto err;
+                    return -1;
                 }
 
-                _lec = global_ws_eqs->get_obj_ptr(eq_name)->lec;
-                SCR_add_ptr(&lecs, &nbl, (unsigned char*) _lec.c_str());
-                SCR_add_ptr(&endos, &nbe, (unsigned char*) eq_name.c_str());
+                _v_block_endos_.push_back(eq_name);
+                _lec_ = global_ws_eqs->get_obj_ptr(eq_name)->lec;
+                _v_block_lecs_.push_back(_lec_);
             }
         }
 
-        SCR_add_ptr(&lecs, &nbl, 0L);
-        SCR_add_ptr(&endos, &nbe, 0L);
-
-        error = E_est((char**) endos, (char**) lecs, (char**) instrs);
+        error = E_est(_v_block_endos_, _v_block_lecs_, _v_block_instrs_);
 
         if(error == 0) 
         {
             E_print_results(1, 1, 1, 1, 1);
 
-            for(int j = 0; j < nbe - 1; j++) 
+            std::string lec;
+            for(int j = 0; j < _v_block_endos_.size(); j++) 
             {
-                tests[EQ_CORR]    = (float)MATE(E_MCORRU,      0, j);
-                tests[EQ_STDEV]   = (float)MATE(E_STDEV,       0, j);
-                tests[EQ_MEANY]   = (float)MATE(E_MEAN_Y,      0, j);
-                tests[EQ_SSRES]   = (float)MATE(E_SSRES,       0, j);
-                tests[EQ_STDERR]  = (float)MATE(E_STDERR,      0, j);
-                tests[EQ_STDERRP] = (float)MATE(E_STD_PCT,     0, j);
-                tests[EQ_FSTAT]   = (float)MATE(E_FSTAT,       0, j);
-                tests[EQ_R2]      = (float)MATE(E_RSQUARE,     0, j);
-                tests[EQ_R2ADJ]   = (float)MATE(E_RSQUARE_ADJ, 0, j);
-                tests[EQ_DW]      = (float)MATE(E_DW,          0, j);
-                tests[EQ_LOGLIK]  = (float)MATE(E_LOGLIK,      0, j);
+                tests[EQ_CORR]    = (float) MATE(E_MCORRU,      0, j);
+                tests[EQ_STDEV]   = (float) MATE(E_STDEV,       0, j);
+                tests[EQ_MEANY]   = (float) MATE(E_MEAN_Y,      0, j);
+                tests[EQ_SSRES]   = (float) MATE(E_SSRES,       0, j);
+                tests[EQ_STDERR]  = (float) MATE(E_STDERR,      0, j);
+                tests[EQ_STDERRP] = (float) MATE(E_STD_PCT,     0, j);
+                tests[EQ_FSTAT]   = (float) MATE(E_FSTAT,       0, j);
+                tests[EQ_R2]      = (float) MATE(E_RSQUARE,     0, j);
+                tests[EQ_R2ADJ]   = (float) MATE(E_RSQUARE_ADJ, 0, j);
+                tests[EQ_DW]      = (float) MATE(E_DW,          0, j);
+                tests[EQ_LOGLIK]  = (float) MATE(E_LOGLIK,      0, j);
 
-                eq_name = std::string((char*) endos[j]);
-                KE_update((char*) eq_name.c_str(), (char*) lecs[j], E_MET, E_SMPL, tests);
+                eq_name = _v_block_endos_[j];
+                lec = _v_block_lecs_[j];
+                update_eq(eq_name, lec, E_MET, E_SMPL, tests);
                 // create the Scalars containing the results of an estimated equation
                 eq_ptr = E_DBE->get_obj_ptr(eq_name);
                 E_tests2scl(eq_ptr, j, E_T, E_NCE);
@@ -325,20 +306,9 @@ int Estimation::KE_est_s(const std::shared_ptr<Sample> smpl)
             }
         }
 
-        // endos, lecs and instruments freed in E_est
-        SCR_free_tbl(blk);
-        lecs = endos = instrs = blk = NULL;
-        nbl = nbe = 0;
-
         if(error != 0) 
             return -1;
     }
 
     return 0;
-
-err :
-    SCR_free_tbl(blk);
-    lecs = endos = instrs = blk = NULL;
-    nbl = nbe = 0;
-    return -1;
 }

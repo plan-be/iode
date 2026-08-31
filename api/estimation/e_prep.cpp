@@ -1,16 +1,3 @@
-/**
- *  @header4iode
- * 
- *  Functions to create and to free the global variables used by the estimation functions.
- *  
- *  List of functions 
- *  -----------------
- *      int E_prep(char** lecs, char** instrs)  Prepares the estimation of a group a equations.
- *      void E_get_C()                          Saves in E_C the values of the estimated coefficients. 
- *      void E_put_C()                          Stores in E_DBS the values of the coefficients in E_C.
- *      void E_get_SMO()                        Saves in E_SMO the relaxation parameters of each coefficient of the equation block. 
- *      void E_free_work()                      Frees all allocated variables for the last estimation.
- */
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
 #include "api/objs/scalars.h"
@@ -85,13 +72,9 @@ int Estimation::E_prep_alloc()
  *  @return     int             0 or -1           
  *  
  */
-int Estimation::E_prep_lecs(char** lecs)
+int Estimation::E_prep_lecs()
 {
-    int     i, pos, t;
-    double  x;
-    std::shared_ptr<CLEC> clec = nullptr;
-
-    E_NEQ = SCR_tbl_size((unsigned char**) lecs);
+    E_NEQ = (int) v_block_lecs.size();
     if(E_NEQ < 1)
     {
         error_manager.append_error("Estimation: No equation");
@@ -112,19 +95,27 @@ int Estimation::E_prep_lecs(char** lecs)
         return -1;
     }
 
-    for(i = 0 ; i < E_NEQ ; i++) 
+    double x;
+    int i = 0;
+    size_t pos = 0;
+    std::shared_ptr<CLEC> clec = nullptr;
+    std::string left_hand_side, right_hand_side;
+    for(const std::string& lec : v_block_lecs) 
     {
-        pos = split_eq(lecs[i]);
-        if(pos < 0)
+        // split equation into left and right hand side
+        pos = lec.find(":=");
+
+        // test if := not found -> return
+        if(pos == std::string::npos) 
         {
             error_manager.append_error("Estimation: Syntax Error");
             return -1;
         } 
 
-        lecs[i][pos] = 0;
+        left_hand_side = lec.substr(0, pos);
         try
         {
-            clec = std::make_shared<CLEC>(lecs[i]);
+            clec = std::make_shared<CLEC>(left_hand_side);
         }
         catch(const std::exception&)
         {
@@ -144,7 +135,7 @@ int Estimation::E_prep_lecs(char** lecs)
             return -1;
         }
 
-        for(t = 0 ; t < E_T ; t++) 
+        for(int t = 0 ; t < E_T ; t++) 
         {
             x = clec->execute(E_DBV, E_DBS, t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
@@ -155,12 +146,10 @@ int Estimation::E_prep_lecs(char** lecs)
             MATE(E_LHS, i, t) = x;
         }
         
-        lecs[i][pos] = ':';
-
+        right_hand_side = lec.substr(pos+2); 
         try
         {
-
-            clec = std::make_shared<CLEC>(lecs[i] + pos + 2);
+            clec = std::make_shared<CLEC>(right_hand_side);
         }
         catch(const std::exception&)
         {
@@ -171,7 +160,7 @@ int Estimation::E_prep_lecs(char** lecs)
         if(E_add_scls(clec, *E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
-            return -1; // JMP 13/11/2012
+            return -1;
         } 
 
         if(clec->link(E_DBV, E_DBS) != 0)
@@ -181,6 +170,7 @@ int Estimation::E_prep_lecs(char** lecs)
         }
 
         E_CRHS[i] = new CLEC(*clec);
+        i++;
     }
 
     return 0;
@@ -218,17 +208,15 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
  *  @return     int     0 or -1        
  *  @global     MAT*    E_D (E_T, E_T)
  */
-int Estimation::E_prep_instrs(char** instrs)
+int Estimation::E_prep_instrs()
 {
-    int     i, t;
-    double  x;
     std::shared_ptr<CLEC> clec = nullptr;
 
     // Check if there are instruments. If not, return 0
     if(E_MET != 2 && E_MET != 3) 
         return 0;
 
-    E_NINSTR = SCR_tbl_size((unsigned char**) instrs);
+    E_NINSTR = (int) v_block_instrs.size();
     if(E_NINSTR < 1) 
         return 0;
 
@@ -247,14 +235,15 @@ int Estimation::E_prep_instrs(char** instrs)
         goto fin;
     }
 
-    for(i = 0 ; i < E_T ; i++) 
+    for(int i = 0 ; i < E_T ; i++) 
         MATE(minstr, i, 0) = 1.0;
    
-    for(i = 0 ; i < E_NINSTR ; i++) 
+    double x;
+    for(const std::string& instr : v_block_instrs) 
     {
         try
         {
-            clec = std::make_shared<CLEC>(instrs[i]);
+            clec = std::make_shared<CLEC>(instr);
         }
         catch(const std::exception&) 
         {
@@ -268,7 +257,7 @@ int Estimation::E_prep_instrs(char** instrs)
             goto fin;
         }
 
-        for(t = 0 ; t < E_T ; t++) 
+        for(int t = 0 ; t < E_T ; t++) 
         {
             x = clec->execute(E_DBV, E_DBS, t + E_FROM);
         }
@@ -545,13 +534,6 @@ void Estimation::E_free_work()
     M_free(E_UVCCTMP);
     M_free(E_GMUTMP);
 
-    SCR_free_tbl((unsigned char**) E_ENDOS);
-    SCR_free_tbl((unsigned char**) E_LECS);
-    SCR_free_tbl((unsigned char**) E_INSTRS);
-    E_ENDOS = 0;
-    E_LECS = 0;
-    E_INSTRS = 0;
-
     E_prep_reset();
 }
 
@@ -569,12 +551,12 @@ void Estimation::E_free_work()
  *  @return     int             0 on success, -1 on error
  *  
  */
-int Estimation::E_prep(char** lecs, char** instrs)
+int Estimation::E_prep()
 {
     E_prep_reset();
-    if(E_prep_lecs(lecs)) 
+    if(E_prep_lecs()) 
         return -1;
-    if(E_prep_instrs(instrs)) 
+    if(E_prep_instrs()) 
         return -1;
     if(E_prep_coefs()) 
         return -1;

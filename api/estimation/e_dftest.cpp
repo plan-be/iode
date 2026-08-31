@@ -111,20 +111,14 @@ int E_GetLecName(char* lec, char* name)
  */
 static int E_UnitRoot_1(const std::shared_ptr<Sample> smpl, char* buf)
 {
-    int  neqs = 0;
-    char** eqs = NULL;
-
-    SCR_add_ptr((unsigned char***) &eqs, &neqs, (unsigned char*) "_DF");
-    SCR_add_ptr((unsigned char***) &eqs, &neqs, NULL);
-
     Equation eq("_DF", std::string(buf), EQ_LSQ, "", "", "", "", "", false);
     global_ws_eqs->set("_DF", eq);
     
-    Estimation est(eqs, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
+    std::vector<std::string> v_endos = { "_DF" };
+    Estimation est(v_endos, global_ws_eqs, global_ws_var, global_ws_scl, smpl);
     int rc = est.estimate();
 
     global_ws_eqs->remove("_DF");
-    SCR_free_tbl((unsigned char**) eqs);
     return rc;
 }
 

@@ -3,18 +3,12 @@
  * 
  *  Estimation functions. 
  *  These functions do not save the results in the equations 
- *  themselves: it is the role of the upper level function KE_est_s() that 
+ *  themselves: it is the role of the upper level function estimate_sample() that 
  *  calls E_est() and saves the results in global_ws_eqs and global_ws_scl.
  *  
  *  See "Specification, Estimation and Analysis of Macroeconomic Models" [Fair, 1984]
  *  for details on the methods implemented in IODE.
- *  
- *  List of functions 
- *  -----------------
- *      int E_est(char** endos, char** lecs, char** instrs)     Estimates a block of equations
- *      int E_scl_in_eq(int coef_nb, int eq_nb)                 Checks if the coefficient coef_nb is in the equation eq_nb.
  */
-
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
 #include "api/estimation/estimation.h"
@@ -568,9 +562,9 @@ err :
  *  associated tests are directly saved in dbs. 
  *  
  *  The special scalars containing the tests by equations related to the error terms
- *  are NOT saved here: this is done by KE_est_s(). Idem for the variables 
+ *  are NOT saved here: this is done by estimate_sample(). Idem for the variables 
  *  _YCALC, _YOBS and _YRES. The equations with their tests and new
- *  sample, instruments and/or block are also saved by KE_est_s().
+ *  sample, instruments and/or block are also saved by estimate_sample().
  *  
  *  The LEC expressions of each equations must be given in the parameter "lecs". 
  *  They can differ from their current value in the equation workspace.
@@ -587,14 +581,15 @@ err :
  *  @param [in] char**  instrs  list of LEC formulas (instruments)
  *  @return     int             0 if a solution is found, -1 otherwise
  */
-int Estimation::E_est(char** endos, char** lecs, char** instrs)
+int Estimation::E_est(const std::vector<std::string>& v_block_endos, const std::vector<std::string>& v_block_lecs, 
+    const std::vector<std::string>& v_block_instrs)
 {
     int  rc = -1, rc_prep = -1, rc_est = -1;
 
     M_errno = 0;
-    E_ENDOS = endos;
-    E_LECS = lecs;
-    E_INSTRS = instrs;
+    this->v_block_endos = v_block_endos;
+    this->v_block_lecs = v_block_lecs;
+    this->v_block_instrs = v_block_instrs;
 
     if(!E_DBV->get_sample() || E_DBV->get_sample()->nb_periods == 0)
         throw std::runtime_error("Variables database has no sample defined");
@@ -603,7 +598,7 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     E_FROM = E_SMPL->start_period.difference(E_DBV->get_sample()->start_period);
     E_T    = E_SMPL->nb_periods;
 
-    rc_prep = E_prep(lecs, instrs);
+    rc_prep = E_prep();
     if(rc_prep != 0)
     {
         std::string error_msg = "Could not prepare estimation:";
@@ -615,6 +610,6 @@ int Estimation::E_est(char** endos, char** lecs, char** instrs)
     rc_est = E_gls();
     if(rc_prep == 0 && rc_est == 0) 
         rc = E_output();
-    
+
     return rc;
 }

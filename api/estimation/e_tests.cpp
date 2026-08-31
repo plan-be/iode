@@ -6,16 +6,6 @@
  *  Therefore, an estimation MUST precede the call to these functions. 
  *  
  *  The computed tests are stored in various MAT object described in function E_output().
- *  
- *  List of functions 
- *  -----------------
- *      int E_output()                                  Computes the statistical tests after an estimation and saves the tests in MAT objects.
- *      
- *  Utility functions
- *  -----------------
- *      double M_c_line(MAT* m1, int line, int oper)    Adds, substracts or multiplies all elements of a matrix line.
- *      double E_div_0(double a, double b)              Divides a by b if b is not null. If b is null, returns 0.0.
- *      double E_sqrt(double val)                       Returns the square root of val if val >= 0. If not, returns 0.0.
  */
 #include "api/objs/scalars.h"
 #include "api/estimation/estimation.h"
