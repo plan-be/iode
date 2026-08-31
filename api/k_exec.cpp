@@ -76,6 +76,7 @@
 #include "api/utils/utils.h"
 #include "api/k_exec.h"
 
+#include <unordered_set>
 
 
 /**
@@ -208,23 +209,21 @@ static int KI_quick_extract(KDBVariablesPtr dbv_ptr, const KDBIdentitiesPtr dbi_
  *  @return     int*            execution order or NULL if reordering is impossible             
  */
 
-static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
+static std::vector<std::string> KI_reorder(const KDBIdentitiesPtr dbi_ptr)
 {
-    int nb_ordered = 0;
     int nb_identities = dbi_ptr->size();
-    int* order = (int*) malloc(sizeof(int) * nb_identities);
-    std::vector<bool> mark(nb_identities, false);
+    std::vector<std::string> v_order(nb_identities, "");
+    std::unordered_set<std::string> ordered;
 
-    int i, pos;
     std::string name;
+    int nb_ordered = 0;
     std::shared_ptr<CLEC> clec = nullptr;
     while(nb_ordered < nb_identities) 
     {
-        i = 0;
         bool success = false;
         for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
         {
-            if(mark[i]) 
+            if(ordered.contains(idt_name)) 
                 continue;
             
             clec = idt->get_compiled_lec();
@@ -239,13 +238,13 @@ static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
                 if(idt_name == name) 
                     continue;
                 // variable name not found in dbi -> continue looping
-                pos = dbi_ptr->index_of(name);
-                if(pos < 0) 
+                if(!dbi_ptr->contains(name)) 
                     continue;
                 // identity already marked for execution -> continue looping
-                if(mark[pos]) 
+                if(ordered.contains(name)) 
                     continue;
-                // variable name found in dbi and not marked for execution -> break
+                // variable name found in dbi and not marked for execution 
+                // -> exit looping
                 break_reached = true;
                 break;
             }
@@ -254,12 +253,10 @@ static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
             if(!break_reached) 
             {
                 success = true;
-                mark[i] = true;
-                order[nb_ordered] = i;
+                ordered.insert(idt_name);
+                v_order[nb_ordered] = idt_name;
                 nb_ordered++;
             }
-
-            i++;
         }
 
         if(!success) 
@@ -267,20 +264,21 @@ static int *KI_reorder(const KDBIdentitiesPtr dbi_ptr)
             /* IDENTITIES LOOP */
             if(KEXEC_TRACE) 
             {
-                for(int j = 0; j < nb_identities; j++) 
+                for(const auto& [idt_name, idt] : dbi_ptr->k_objs) 
                 {
-                    if(mark[j])
-                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", dbi_ptr->get_name(j));
+                    if(ordered.contains(idt_name))
+                        W_printfDbl(".par1 enum_1\nIdt %s Ok\n", idt_name);
                     else
-                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", dbi_ptr->get_name(j));
+                        W_printfDbl(".par1 enum_1\nIdt %s Circular\n", idt_name);
                 }
             }
-            free(order);
-            return (int*) 0;
+            
+            v_order.clear();
+            return v_order;
         }
     }
 
-    return order;
+    return v_order;
 }
 
 
@@ -726,7 +724,7 @@ static int KI_read_scls(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_ws, int 
  *  
  */
 static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentitiesPtr dbi_ptr, 
-    int* order, const std::shared_ptr<Sample> smpl)
+    std::vector<std::string> v_order, const std::shared_ptr<Sample> smpl)
 {
     if(!smpl) 
     {
@@ -739,15 +737,16 @@ static int KI_execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, KDBIdentit
         start = 0;
 
     double d;
-    std::string idt_name;
+    std::shared_ptr<Identity> idt_ptr = nullptr;
     std::shared_ptr<CLEC> idt_clec = nullptr;
     std::shared_ptr<CLEC> clec_copy = nullptr;
-    for(int i = 0; i < dbi_ptr->size(); i++) 
+    for(const std::string& idt_name : v_order) 
     {
-        idt_name = dbi_ptr->get_name(order[i]);
-        idt_clec = dbi_ptr->get_obj_ptr(idt_name)->get_compiled_lec();
+        idt_ptr = dbi_ptr->get_obj_ptr(idt_name);
+        idt_clec = idt_ptr->get_compiled_lec();
         if(!idt_clec) 
             return -1;
+        
         clec_copy = std::make_shared<CLEC>(*idt_clec);
         if(clec_copy->link(dbv_ptr, dbs_ptr)) 
             return -1;
@@ -822,8 +821,8 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
         return nullptr;
     }
 
-    int* order = KI_reorder(dbi_ptr);
-    if(!order) 
+    std::vector<std::string> v_order = KI_reorder(dbi_ptr);
+    if(v_order.empty()) 
     {
         error_manager.append_error("Circular identity definition");
         return nullptr;
@@ -847,10 +846,7 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     int res = KI_read_vars(dbi_ptr, dbv_i_ptr, dbv_ptr, nv, vfiles);
     idt_exec_loaded_vars.clear();
     if(res != 0) 
-    {
-        free(order);
         return nullptr;
-    }
 
     KDBScalarsPtr dbs_i = KI_scalar_list(dbi_ptr);
     if(KEXEC_TRACE) 
@@ -858,16 +854,12 @@ KDBVariablesPtr KI_exec(KDBIdentitiesPtr dbi_ptr, KDBVariablesPtr dbv_ptr, int n
     
     res = KI_read_scls(dbs_i, dbs_ptr, ns, sfiles);
     if(res != 0) 
-    {
-        free(order);
         return nullptr;
-    }
 
     if(KEXEC_TRACE) 
         W_flush();
 
-    KI_execute(dbv_i_ptr, dbs_i, dbi_ptr, order, exec_sample);
+    KI_execute(dbv_i_ptr, dbs_i, dbi_ptr, v_order, exec_sample);
     KI_quick_extract(dbv_i_ptr, dbi_ptr);
-    free(order);
     return dbv_i_ptr;
 }
