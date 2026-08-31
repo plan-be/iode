@@ -8,7 +8,6 @@
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/b_iodeini.h"
-#include "api/k_exec.h"
 #include "api/k_lang.h"
 #include "api/k_super.h"
 #include "api/version.h"

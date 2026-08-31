@@ -25,7 +25,6 @@ add_subdirectory(io)
 add_subdirectory(report)
 
 target_sources(iode_c_api PRIVATE b_args.cpp)		# MISC
-target_sources(iode_c_api PRIVATE k_exec.cpp) 		# IDT
 target_sources(iode_c_api PRIVATE k_super.cpp) 		# KSUPER
 target_sources(iode_c_api PRIVATE b_iodeini.cpp) 	# INI
 target_sources(iode_c_api PRIVATE b_a2mini.cpp) 	# A2M
