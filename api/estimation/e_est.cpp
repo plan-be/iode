@@ -83,9 +83,10 @@ int Estimation::E_c_gmg()
  */
 double Estimation::E_rhs_ij(int i, int t)
 {
-    std::shared_ptr<CLEC> clec(E_CRHS[i], [](CLEC*) {});
-    double rhs_i_t = clec->execute(E_DBV, E_DBS, t + E_FROM);
-    return rhs_i_t;
+    if(!v_block_rhs[i])
+        return IODE_NAN;
+    else
+        return v_block_rhs[i]->execute(E_DBV, E_DBS, t + E_FROM);
 }
 
 
@@ -261,7 +262,9 @@ int Estimation::E_jacobian()
  */
 int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 {
-    CLEC* clec = E_CRHS[eq_nb];
+    std::shared_ptr<CLEC> clec = v_block_rhs[eq_nb];
+    if(!clec)
+        return 0;
 
     for(auto& [name, pos]: clec->map_objs)
     {

@@ -74,7 +74,7 @@ protected:
     char      E_MET;          // Current estimation method
     double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
     double    E_EPS;          // Convergence criterion (threshold) for the estimation
-    CLEC      **E_CRHS;       // List (block) of CLEC corresponding to the right members of the equations
+    std::vector<std::shared_ptr<CLEC>> v_block_rhs;     // List (block) of CLEC corresponding to the right members of the equations
     std::vector<std::string> v_block_endos;     // List (block) of equations' names of the current estimation
     std::vector<std::string> v_block_lecs;      // List (block) of LEC expressions of the current estimation
     std::vector<std::string> v_block_instrs;    // List (block) of instruments (LEC formulas) of the current estimation    
