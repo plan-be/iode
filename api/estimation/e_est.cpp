@@ -229,7 +229,7 @@ int Estimation::E_jacobian()
     std::shared_ptr<Scalar> scl_ptr;
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
-        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl_name = E_DBS->get_name(v_coef_pos[i]);
         scl_ptr = E_DBS->get_obj_ptr(scl_name);
         // Uniquement pour les coef estimés (relax <> 0)
         if(scl_ptr->relax != 0) 
@@ -256,7 +256,7 @@ int Estimation::E_jacobian()
 /**
  *  Checks if the coefficient coef_nb is in the equation eq_nb.
  *  
- *  @param [in] int coef_nb     position of the coefficient to search in E_C_NBS.
+ *  @param [in] int coef_nb     position of the coefficient to search in v_coef_pos.
  *  @param [in] int eq_nb       equation position in the estimated block
  *  @return     int             1 if coef_nb is in eq_nb, 0 otherwise
  */
@@ -268,7 +268,7 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 
     for(auto& [name, pos]: clec->map_objs)
     {
-        if(is_coefficient(name) && E_C_NBS[coef_nb] == pos) 
+        if(is_coefficient(name) && v_coef_pos[coef_nb] == pos) 
             return 1;
     }
 

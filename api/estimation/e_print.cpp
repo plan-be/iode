@@ -79,7 +79,7 @@ void Estimation::E_print_coefs()
     std::shared_ptr<Scalar> scl_ptr;
     for(int i = 0 ; i < E_NC ; i++) 
     {
-        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl_name = E_DBS->get_name(v_coef_pos[i]);
         scl_ptr = E_DBS->get_obj_ptr(scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
@@ -105,14 +105,14 @@ void Estimation::E_print_mcorr()
 
     W_printfRepl((char*) "&1C ");
     for(i = 0 ; i < E_NC ; i++)
-        if(MATE(E_SMO, i, 0)) W_printfRepl((char*) "&1C%s", E_DBS->get_name(E_C_NBS[i]));
+        if(MATE(E_SMO, i, 0)) W_printfRepl((char*) "&1C%s", E_DBS->get_name(v_coef_pos[i]));
 
     W_printf((char*) "\n.tl\n");
     for(i = 0, ic = 0 ; i < E_NC ; i++) 
     {
         if(MATE(E_SMO, i, 0) == 0) 
             continue;
-        W_printfRepl((char*) "&1L%s", E_DBS->get_name(E_C_NBS[i]));
+        W_printfRepl((char*) "&1L%s", E_DBS->get_name(v_coef_pos[i]));
         for(j = 0, jc = 0 ; j < E_NC ; j++) 
         {
             if(MATE(E_SMO, j, 0) == 0) 

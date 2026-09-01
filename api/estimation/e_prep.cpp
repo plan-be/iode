@@ -292,7 +292,7 @@ fin:
  *  @global     int  E_NC       Nb of coefficients (total)
  *  @global     int  E_NCE      Nb of estimated coefficients (total)
  *  @global     MAT* E_NBCE     Nb of estimated coefficients per equation (MAT(1,E_NEQ))
- *  @global     int* E_C_NBS    position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_pos    position in E_DBS of the estimated coefs
  *  @global     int  E_DBS      global KDB of scalars
  *  @global     MAT* E_C        MAT 1 col of estimated coefficients
  *  @global     MAT* E_SMO      MAT 1 col of relaxation params
@@ -307,13 +307,8 @@ int Estimation::E_prep_coefs()
     for(const std::shared_ptr<CLEC>& clec : v_block_rhs) 
         E_NC += (int) clec->map_objs.size();
     
-    // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
-    E_C_NBS = (int *) SW_nalloc(E_NC * sizeof(int));
-    if(E_C_NBS == 0) 
-    {
-        error_manager.append_error("Estimation : Memory Error");
-        return -1;
-    }
+    // Creates the vector v_coef_pos of positions of the coefficients in E_DBS
+    v_coef_pos.resize(E_NC, 0);
     
     // Loop on equations and names in each equations (linked before with E_BDS)
     E_NC = 0;
@@ -330,14 +325,14 @@ int Estimation::E_prep_coefs()
                 int k = 0;
 
                 for(k = 0 ; k < E_NC ; k++)
-                    if(E_C_NBS[k] == pos) 
-                        break;                              // Coef already found in E_C_NBS
+                    if(v_coef_pos[k] == pos) 
+                        break;                              // Coef already found in v_coef_pos
                 
                 scl_name = E_DBS->get_name(pos);
                 
                 if(k == E_NC) 
                 {
-                    E_C_NBS[E_NC++] = pos;                  // Add a coefficient in E_C_NBS
+                    v_coef_pos[E_NC++] = pos;                  // Add a coefficient in v_coef_pos
                     if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
                         E_NCE++;
                 }
@@ -372,7 +367,7 @@ int Estimation::E_prep_coefs()
  *  it is replaced by 0.1 in E_DBS to avoid precision and convergence problems.
  *    
  *  @global     MAT*    E_C (E_NC x 1)   Array of estimated coefficient values
- *  @global     int*    E_C_NBS             position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_pos    position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS               KDB of scalars for the estimation
  */
 void Estimation::E_get_C()
@@ -381,7 +376,7 @@ void Estimation::E_get_C()
     std::string scl_name;
     for(int i = 0 ; i < E_NC ; i++) 
     {
-        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl_name = E_DBS->get_name(v_coef_pos[i]);
         c = E_DBS->get_obj_ptr(scl_name)->value;
         if(E_DBS->get_obj_ptr(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
         {
@@ -397,7 +392,7 @@ void Estimation::E_get_C()
  *  Copies the values in E_C to the KDB E_DBS.
  *  
  *  @global     MAT*    E_C       Array of estimated coefficient values: MAT(E_NC, 1)
- *  @global     int*    E_C_NBS   position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_pos   position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS     KDB of scalars for the estimation
  */
 void Estimation::E_put_C()
@@ -405,7 +400,7 @@ void Estimation::E_put_C()
     std::string name;
     for(int i = 0 ; i < E_NC ; i++)
     {
-        name = E_DBS->get_name(E_C_NBS[i]);
+        name = E_DBS->get_name(v_coef_pos[i]);
         E_DBS->get_obj_ptr(name)->value = MATE(E_C, i, 0);
     }
 }
@@ -416,7 +411,7 @@ void Estimation::E_put_C()
  *  These values are searched in E_DBS.
  *  
  *  @global     MAT*    E_SMO          Array of relaxation parameters (E_NC x 1)
- *  @global     int*    E_C_NBS        position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_pos        position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS          KDB of scalars for the estimation
  */
 void Estimation::E_get_SMO()
@@ -424,7 +419,7 @@ void Estimation::E_get_SMO()
     std::string scl_name;
     for(int i = 0 ; i < E_NC ; i++)
     {
-        scl_name = E_DBS->get_name(E_C_NBS[i]);
+        scl_name = E_DBS->get_name(v_coef_pos[i]);
         MATE(E_SMO, i, 0) = E_DBS->get_obj_ptr(scl_name)->relax;
     }
 }
@@ -436,8 +431,8 @@ void Estimation::E_get_SMO()
 void Estimation::E_prep_reset()
 {
     v_block_rhs.clear();
+    v_coef_pos.clear();
 
-    E_C_NBS = 0;
     E_NINSTR = 0;
     E_RHS = 0;
     E_LHS = 0;
@@ -483,9 +478,6 @@ void Estimation::E_prep_reset()
  */
 void Estimation::E_free_work()
 {
-    v_block_rhs.clear();
-    SW_nfree(E_C_NBS);
-
     M_free(E_RHS);
     M_free(E_LHS);
     M_free(E_U);
