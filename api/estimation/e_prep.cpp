@@ -58,13 +58,13 @@ int Estimation::E_prep_alloc()
  *  Analyses the LEC equations and set various variables for the estimation process:  
  *      - E_NEQ
  *      - E_LHS 
- *      - E_CRHS
+ *      - v_block_rhs
  *      - ...
  *   
  *  Compiles the left members of each equations and link them with E_DBV and E_DBS.
  *  Computes the left members on [E_FROM, E_FROM+E_T] and saves the result in the array E_LHS.
  *  
- *  Compiles the right members of each eq and saves the resulting CLEC* in E_CRHS.
+ *  Compiles the right members of each eq and saves the resulting CLEC* in v_block_rhs.
  *  Adds all coefficients in E_DBS if needed.
  *  Compiles and links the right members with E_DBV and E_DBS.
  *  
@@ -88,12 +88,8 @@ int Estimation::E_prep_lecs()
         return -1;
     }
 
-    E_CRHS = (CLEC **) SW_nalloc(E_NEQ * sizeof(CLEC *));
-    if(!E_CRHS)
-    {
-        error_manager.append_error("Estimation: Memory Error");
-        return -1;
-    }
+    v_block_rhs.clear();
+    v_block_rhs.resize(E_NEQ, nullptr);
 
     double x;
     int i = 0;
@@ -169,7 +165,7 @@ int Estimation::E_prep_lecs()
             return -1;
         }
 
-        E_CRHS[i] = new CLEC(*clec);
+        v_block_rhs[i] = clec;
         i++;
     }
 
@@ -291,7 +287,7 @@ fin:
  *  the global variables described below.
  *  
  *  The block of equations must have been compiled/linked before and their CLEC 
- *  forms were normally saved in E_CRHS.
+ *  forms were normally saved in v_block_rhs.
  *  
  *  @global     int  E_NC       Nb of coefficients (total)
  *  @global     int  E_NCE      Nb of estimated coefficients (total)
@@ -308,8 +304,8 @@ int Estimation::E_prep_coefs()
     E_NC = E_NCE = 0;
     
     // Compute the nb of coefficients E_NC
-    for(int i = 0 ; i < E_NEQ ; i++) 
-        E_NC += (int) E_CRHS[i]->map_objs.size();
+    for(const std::shared_ptr<CLEC>& clec : v_block_rhs) 
+        E_NC += (int) clec->map_objs.size();
     
     // Creates the vector E_C_NBS of positions of the coefficients in E_DBS
     E_C_NBS = (int *) SW_nalloc(E_NC * sizeof(int));
@@ -323,10 +319,10 @@ int Estimation::E_prep_coefs()
     E_NC = 0;
     E_NBCE = M_alloc(1, E_NEQ);
     std::string scl_name;
-    CLEC* clec = nullptr;
+    std::shared_ptr<CLEC> clec = nullptr;
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
-        clec = E_CRHS[i];                                   // linked before
+        clec = v_block_rhs[i];
         for(auto& [name, pos]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
@@ -439,11 +435,10 @@ void Estimation::E_get_SMO()
  */
 void Estimation::E_prep_reset()
 {
-    E_CRHS = 0;
+    v_block_rhs.clear();
+
     E_C_NBS = 0;
-
     E_NINSTR = 0;
-
     E_RHS = 0;
     E_LHS = 0;
     E_U = 0;
@@ -488,12 +483,7 @@ void Estimation::E_prep_reset()
  */
 void Estimation::E_free_work()
 {
-    int     i;
-
-    if(E_CRHS) {
-        for(i = 0 ; i < E_NEQ ; i++) SW_nfree(E_CRHS[i]);
-        SW_nfree(E_CRHS);
-    }
+    v_block_rhs.clear();
     SW_nfree(E_C_NBS);
 
     M_free(E_RHS);
