@@ -85,7 +85,7 @@ void Estimation::E_deg_freed()
     std::string coef_name;
     for(cf = 0, j = 0; cf < E_NC; cf++) 
     {
-        coef_name = E_DBS->get_name(E_C_NBS[cf]);
+        coef_name = E_DBS->get_name(v_coef_pos[cf]);
         if(E_DBS->get_obj_ptr(coef_name)->relax == 0) 
             continue;
         nbr = 0;
@@ -226,7 +226,7 @@ int Estimation::E_c_ttests()
     std::string coef_name;
     for(i = 0, j = 0 ; i < E_NC ; i++) 
     {
-        coef_name = E_DBS->get_name(E_C_NBS[i]);
+        coef_name = E_DBS->get_name(v_coef_pos[i]);
         scl_ptr = E_DBS->get_obj_ptr(coef_name);
         scl_ptr->std = 0.0;
         if(scl_ptr->relax == 0) 

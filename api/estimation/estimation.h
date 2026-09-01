@@ -57,23 +57,23 @@ class Estimation
     std::vector<std::string> v_endos;       // list of equation names (endos = eqs names)
 
 protected:
-    int       E_IT;           // Number of iterations of the last estimation
-    int       E_CONV;         // Boolean. Indicates if the estimation iteration has converged
-    int       E_NEQ;          // Number of equations in the current block of equations
-    int       E_NCE;          // Number of estimated coefficients in the current block of equations
-    int       E_NC;           // Number of coefficients (est and non est) in the current block of equations
-    int       E_NINSTR;       // Number of instruments in the estimation
-    int       E_T;            // Number of periods in the estimation sample
-    int       E_FROM;         // Position in E_DBV of the first period in the estimation sample
-    int       E_MAXIT;        // Max number of iterations for the estimation
-    int       *E_C_NBS;       // Positions in E_DBS of the estimated coefs
+    int E_IT;           // Number of iterations of the last estimation
+    int E_CONV;         // Boolean. Indicates if the estimation iteration has converged
+    int E_NEQ;          // Number of equations in the current block of equations
+    int E_NCE;          // Number of estimated coefficients in the current block of equations
+    int E_NC;           // Number of coefficients (est and non est) in the current block of equations
+    int E_NINSTR;       // Number of instruments in the estimation
+    int E_T;            // Number of periods in the estimation sample
+    int E_FROM;         // Position in E_DBV of the first period in the estimation sample
+    int E_MAXIT;        // Max number of iterations for the estimation
+    std::vector<int> v_coef_pos;        // Positions in E_DBS of the estimated coefs
     KDBEquationsPtr  E_DBE;             // KDB of equations used for the estimation
     KDBScalarsPtr    E_DBS;             // KDB of scalars used for the estimation
     KDBVariablesPtr  E_DBV;             // KDB of variables used for the estimation 
     std::shared_ptr<Sample> E_SMPL;     // Current estimation sample
-    char      E_MET;          // Current estimation method
-    double    E_CONV_TEST;    // Sum of the squares of the relative differences between 2 iterations
-    double    E_EPS;          // Convergence criterion (threshold) for the estimation
+    char   E_MET;                       // Current estimation method
+    double E_CONV_TEST;                 // Sum of the squares of the relative differences between 2 iterations
+    double E_EPS;                       // Convergence criterion (threshold) for the estimation
     std::vector<std::shared_ptr<CLEC>> v_block_rhs;     // List (block) of CLEC corresponding to the right members of the equations
     std::vector<std::string> v_block_endos;     // List (block) of equations' names of the current estimation
     std::vector<std::string> v_block_lecs;      // List (block) of LEC expressions of the current estimation
