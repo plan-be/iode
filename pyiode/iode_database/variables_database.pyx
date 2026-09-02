@@ -253,7 +253,7 @@ cdef class Variables(CythonIodeDatabase):
         _c_copy_var_content(c_dest_name, self.database, t_first, t_last, 
                             c_source_name, value.database, value_t_first, value_t_last)
 
-    def _update_variable(self, name: str, pos: int, values, key_periods: Union[Period, tuple, list]):
+    def _update_variable(self, name: str, values, key_periods: Union[Period, tuple, list]):
         cdef int t
         cdef int t_first
         cdef int t_last
