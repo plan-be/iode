@@ -1094,8 +1094,7 @@ class Variables(IodeDatabase):
         
         # update a Variable
         else:
-            pos = self.index(key_name) if isinstance(key_name, str) else key_name
-            name = self.get_name(pos) if isinstance(key_name, int) else key_name
+            name = self.get_name(key_name) if isinstance(key_name, int) else key_name
             # update values for the whole (subset) sample
             if key_periods is None:
                 sample = self.sample
@@ -1156,7 +1155,7 @@ class Variables(IodeDatabase):
                                 f"Expected periods to be of type str, Period, list or tuple.\n"
                                 f"Got periods of type {type(key_periods).__name__} instead")
             
-            self._cy_database._update_variable(name, pos, values, key_periods)
+            self._cy_database._update_variable(name, values, key_periods)
 
     def _check_pandas_series(self, value: pd.Series, key_names: List[str], key_periods: List[str]) -> pd.Series:
         if isinstance(value.index, pd.MultiIndex):
