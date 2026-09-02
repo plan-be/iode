@@ -195,7 +195,7 @@ void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr
     if(!clec) 
         return;
 
-    for(auto& [name, _] : clec->map_objs) 
+    for(const std::string& name : clec->v_obj_names) 
     {
         if(is_coefficient(name))
             // add dummy value for the scalar. The value is not relevant 

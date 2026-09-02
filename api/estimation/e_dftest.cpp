@@ -84,7 +84,7 @@ int E_GetLecName(char* lec, char* name)
         return -1;
     }
 
-    for(auto& [obj_name, _]: clec->map_objs) 
+    for(const std::string& obj_name: clec->v_obj_names) 
     {   
         // skip "_DF" 
         if(obj_name == "_DF")

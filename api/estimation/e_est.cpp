@@ -261,7 +261,7 @@ int Estimation::E_scl_in_eq(const std::string& coef_name, int eq_nb)
     if(!clec)
         return 0;
 
-    for(auto& [name, pos]: clec->map_objs)
+    for(const std::string& name: clec->v_obj_names)
     {
         if(is_coefficient(name) && name == coef_name) 
             return 1;

@@ -118,7 +118,7 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> #     df1 * d(ACAF[-1]) + df2*d(ACAF[-2]) + df3*d(ACAF[-3])  (ORDER)
     >>> df_scalars = dickey_fuller_test("ACAF", True, True, 3)
     Estimating : iteration 1 (||eps|| = 2.20454)
-    Estimating : iteration 2 (||eps|| = 1.73868e-10)
+    Estimating : iteration 2 (||eps|| = 2.39047e-10)
     Solution reached after 2 iteration(s). Creating results file ...
     >>> df_scalars.get_names("df*")
     ['df1', 'df2', 'df3', 'df_', 'df_d', 'df_t']

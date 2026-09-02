@@ -84,8 +84,6 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
             error_manager.append_error(error_msg);
             return false;
         }
-
-        L_link_endos(dbe, eq_ptr->clec);
     }
 
     /* ORDERING EQUATIONS */

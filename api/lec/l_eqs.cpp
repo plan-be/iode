@@ -545,25 +545,18 @@ void SLEC::merge_names(CLEC& clec)
     if(!left_clec || !right_clec)
         return;
 
-    clec.v_objs.clear();
-    clec.map_objs.clear();
+    clec.v_obj_names.clear();
 
-    
     // Copy from left_clec
-    clec.v_objs = left_clec->v_objs;
-    for(const auto& [name, pos] : left_clec->map_objs)
-        clec.map_objs[name] = pos;
+    clec.v_obj_names = left_clec->v_obj_names;
     
     // Copy from right_clec (skip duplicates)
-    std::set<std::string> s_objs(clec.v_objs.begin(), clec.v_objs.end());
-    for(const std::string& name : right_clec->v_objs)
+    std::set<std::string> s_objs(clec.v_obj_names.begin(), clec.v_obj_names.end());
+    for(const std::string& name : right_clec->v_obj_names)
     {
         if(!s_objs.contains(name))
-            clec.v_objs.push_back(name);
+            clec.v_obj_names.push_back(name);
     }
-
-    for(const auto& [name, pos] : right_clec->map_objs)
-        clec.map_objs[name] = pos;
 }
 
 

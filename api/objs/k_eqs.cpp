@@ -224,7 +224,7 @@ bool Equation::print_definition() const
         W_printf((char*) ".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
         
         CLEC* copy_clec = new CLEC(*clec);
-        for(auto& [sname, _]: copy_clec->map_objs) 
+        for(const std::string& sname : copy_clec->v_obj_names) 
         {
             if(is_coefficient(sname)) 
             {
