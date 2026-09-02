@@ -75,11 +75,9 @@ void Estimation::E_print_coefs()
     W_printfRepl((char*) "&1CName&1CValue&1CStandard Error&1CT-Statistic&1CRelax\n");
     W_printf((char*) ".tl\n");
 
-    std::string scl_name;
     std::shared_ptr<Scalar> scl_ptr;
-    for(int i = 0 ; i < E_NC ; i++) 
+    for(const std::string& scl_name : v_coef_names) 
     {
-        scl_name = E_DBS->get_name(v_coef_pos[i]);
         scl_ptr = E_DBS->get_obj_ptr(scl_name);
         //   if(scl->relax == 0) continue; /* JMP 12-03-98 */
         W_printfRepl((char*) "&1L%s&1D%lf&1D%lf&1D%lf&1D%lf\n",
@@ -99,24 +97,27 @@ void Estimation::E_print_coefs()
  */
 void Estimation::E_print_mcorr()
 {
-    int     i, j, ic, jc;
-
     W_print_tb("Correlation matrix of coefficients", E_NCE + 1);
 
     W_printfRepl((char*) "&1C ");
-    for(i = 0 ; i < E_NC ; i++)
-        if(MATE(E_SMO, i, 0)) W_printfRepl((char*) "&1C%s", E_DBS->get_name(v_coef_pos[i]));
+    for(int i = 0; i < v_coef_names.size(); i++)
+        if(MATE(E_SMO, i, 0)) 
+            W_printfRepl((char*) "&1C%s", v_coef_names[i]);
 
+    int ic = 0;
     W_printf((char*) "\n.tl\n");
-    for(i = 0, ic = 0 ; i < E_NC ; i++) 
+    for(int i = 0; i < v_coef_names.size(); i++) 
     {
         if(MATE(E_SMO, i, 0) == 0) 
             continue;
-        W_printfRepl((char*) "&1L%s", E_DBS->get_name(v_coef_pos[i]));
-        for(j = 0, jc = 0 ; j < E_NC ; j++) 
+
+        int jc = 0;
+        W_printfRepl((char*) "&1L%s", v_coef_names[i]);
+        for(int j = 0; j < v_coef_names.size(); j++) 
         {
             if(MATE(E_SMO, j, 0) == 0) 
                 continue;
+            
             W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORR, ic, jc));
             jc++;
         }

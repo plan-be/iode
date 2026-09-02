@@ -172,25 +172,23 @@ int Estimation::E_deltac()
  *  @param [in] double  h           step used to compute the numerical derivative
  *  @return     int                 0 on success, -1 on error
  */
-int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
+int Estimation::E_mod_residuals(const std::string& coef_name, int est_coef_nb, double h)
 {
-    int     i, j;
-    double  x;
-
     // Pour toute équation
-    for(i = 0 ; i < E_NEQ ; i++) 
+    double x;
+    for(int i = 0 ; i < E_NEQ ; i++) 
     {
-        if(E_scl_in_eq(coef_nb, i)) 
+        if(E_scl_in_eq(coef_name, i)) 
         {
             // Si le scalaire i est dans l'éq : calculer le RHS (pour chaque année)
             // et sauver la dérivée dans la matrice E_G  : (f(x + h) - f(x)) / h
-            for(j = 0 ; j < E_T ; j++) 
+            for(int t = 0; t < E_T; t++) 
             {
-                x = E_rhs_ij(i, j);
+                x = E_rhs_ij(i, t);
                 if(x >= MAXFLOAT) 
                     x = IODE_NAN;
                 if(IODE_IS_A_NUMBER(x))
-                    MATE(E_G, est_coef_nb, i * E_T + j) = (x - MATE(E_RHS, i, j)) / h;
+                    MATE(E_G, est_coef_nb, i * E_T + t) = (x - MATE(E_RHS, i, t)) / h;
                 else  
                 {
                     error_manager.append_error("Estimation: NaN Generated");
@@ -200,8 +198,8 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
         }
         else
             // Sinon, placer des 0 dans la matrice E_G pour le coef en question
-            for(j = 0 ; j < E_T ; j++)
-                MATE(E_G, est_coef_nb, i * E_T + j) = 0;
+            for(int t = 0; t < E_T; t++)
+                MATE(E_G, est_coef_nb, i * E_T + t) = 0;
     }
 
     return 0;
@@ -222,14 +220,11 @@ int Estimation::E_mod_residuals(int coef_nb, int est_coef_nb, double h)
  */
 int Estimation::E_jacobian()
 {
-    int i, j;
+    int j = 0;
     double h = 1e-4, oldc;
-
-    std::string scl_name;
     std::shared_ptr<Scalar> scl_ptr;
-    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    for(const std::string& scl_name : v_coef_names) 
     {
-        scl_name = E_DBS->get_name(v_coef_pos[i]);
         scl_ptr = E_DBS->get_obj_ptr(scl_name);
         // Uniquement pour les coef estimés (relax <> 0)
         if(scl_ptr->relax != 0) 
@@ -238,7 +233,7 @@ int Estimation::E_jacobian()
             if(fabs(oldc) < 1e-15)                      // ou 0.1 si coef proche de nul
                 oldc = 0.1;                      
             scl_ptr->value = oldc * (1.0 + h);              // coef augmenté de h pourcents
-            if(0 != E_mod_residuals(i, j, oldc * h)) 
+            if(0 != E_mod_residuals(scl_name, j, oldc * h)) 
             {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
                 scl_ptr->value = oldc;                      /* reset coef */
@@ -256,11 +251,11 @@ int Estimation::E_jacobian()
 /**
  *  Checks if the coefficient coef_nb is in the equation eq_nb.
  *  
- *  @param [in] int coef_nb     position of the coefficient to search in v_coef_pos.
+ *  @param [in] int coef_nb     position of the coefficient to search in v_coef_names.
  *  @param [in] int eq_nb       equation position in the estimated block
  *  @return     int             1 if coef_nb is in eq_nb, 0 otherwise
  */
-int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
+int Estimation::E_scl_in_eq(const std::string& coef_name, int eq_nb)
 {
     std::shared_ptr<CLEC> clec = v_block_rhs[eq_nb];
     if(!clec)
@@ -268,7 +263,7 @@ int Estimation::E_scl_in_eq(int coef_nb, int eq_nb)
 
     for(auto& [name, pos]: clec->map_objs)
     {
-        if(is_coefficient(name) && v_coef_pos[coef_nb] == pos) 
+        if(is_coefficient(name) && name == coef_name) 
             return 1;
     }
 
@@ -329,7 +324,7 @@ int Estimation::E_testcv()
 
     E_CONV = 0;
     E_get_C();
-    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    for(i = 0, j = 0; i < v_coef_names.size(); i++) 
     {
         if(MATE(E_SMO, i, 0) == 0) 
             continue; /* relax == 0 */
@@ -362,8 +357,8 @@ int Estimation::E_testcv()
  */
 int Estimation::E_adaptcoef()
 {
-    int i = 0, j = 0;
-    for(i = 0, j = 0; i < E_NC; i++) 
+    int i, j;
+    for(i = 0, j = 0; i < v_coef_names.size(); i++) 
     {
         if(MATE(E_SMO, i, 0) == 0) 
             continue;

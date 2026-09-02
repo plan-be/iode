@@ -60,20 +60,19 @@ protected:
     int E_IT;           // Number of iterations of the last estimation
     int E_CONV;         // Boolean. Indicates if the estimation iteration has converged
     int E_NEQ;          // Number of equations in the current block of equations
-    int E_NCE;          // Number of estimated coefficients in the current block of equations
-    int E_NC;           // Number of coefficients (est and non est) in the current block of equations
+    int E_NCE;          // Number of coefficients to be estimated in the current block of equations
     int E_NINSTR;       // Number of instruments in the estimation
     int E_T;            // Number of periods in the estimation sample
     int E_FROM;         // Position in E_DBV of the first period in the estimation sample
     int E_MAXIT;        // Max number of iterations for the estimation
-    std::vector<int> v_coef_pos;        // Positions in E_DBS of the estimated coefs
-    KDBEquationsPtr  E_DBE;             // KDB of equations used for the estimation
-    KDBScalarsPtr    E_DBS;             // KDB of scalars used for the estimation
-    KDBVariablesPtr  E_DBV;             // KDB of variables used for the estimation 
-    std::shared_ptr<Sample> E_SMPL;     // Current estimation sample
-    char   E_MET;                       // Current estimation method
-    double E_CONV_TEST;                 // Sum of the squares of the relative differences between 2 iterations
-    double E_EPS;                       // Convergence criterion (threshold) for the estimation
+    std::vector<std::string> v_coef_names;  // Names of coefficients
+    KDBEquationsPtr  E_DBE;                 // KDB of equations used for the estimation
+    KDBScalarsPtr    E_DBS;                 // KDB of scalars used for the estimation
+    KDBVariablesPtr  E_DBV;                 // KDB of variables used for the estimation 
+    std::shared_ptr<Sample> E_SMPL;         // Current estimation sample
+    char   E_MET;                           // Current estimation method
+    double E_CONV_TEST;                     // Sum of the squares of the relative differences between 2 iterations
+    double E_EPS;                           // Convergence criterion (threshold) for the estimation
     std::vector<std::shared_ptr<CLEC>> v_block_rhs;     // List (block) of CLEC corresponding to the right members of the equations
     std::vector<std::string> v_block_endos;     // List (block) of equations' names of the current estimation
     std::vector<std::string> v_block_lecs;      // List (block) of LEC expressions of the current estimation
@@ -300,9 +299,9 @@ private:
     int E_c_rhs();
     int E_residuals();
     int E_deltac();
-    int E_mod_residuals(int coef_nb, int est_coef_nb, double h);
+    int E_mod_residuals(const std::string& coef_name, int est_coef_nb, double h);
     int E_jacobian();
-    int E_scl_in_eq(int coef_nb, int eq_nb);
+    int E_scl_in_eq(const std::string& coef_name, int eq_nb);
     int E_c_gmu();
     int E_testcv();
     int E_adaptcoef();
