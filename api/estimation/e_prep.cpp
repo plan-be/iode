@@ -3,6 +3,8 @@
 #include "api/objs/scalars.h"
 #include "api/estimation/estimation.h"
 
+#include <unordered_set>
+
 
 /**
  *  Creates MAT struct's needed for the estimation of a block of equations.
@@ -292,7 +294,7 @@ fin:
  *  @global     int  E_NC       Nb of coefficients (total)
  *  @global     int  E_NCE      Nb of estimated coefficients (total)
  *  @global     MAT* E_NBCE     Nb of estimated coefficients per equation (MAT(1,E_NEQ))
- *  @global     std::vector<int> v_coef_pos    position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_names    position in E_DBS of the estimated coefs
  *  @global     int  E_DBS      global KDB of scalars
  *  @global     MAT* E_C        MAT 1 col of estimated coefficients
  *  @global     MAT* E_SMO      MAT 1 col of relaxation params
@@ -301,44 +303,38 @@ fin:
  */
 int Estimation::E_prep_coefs()
 {
-    E_NC = E_NCE = 0;
-    
-    // Compute the nb of coefficients E_NC
-    for(const std::shared_ptr<CLEC>& clec : v_block_rhs) 
-        E_NC += (int) clec->map_objs.size();
-    
-    // Creates the vector v_coef_pos of positions of the coefficients in E_DBS
-    v_coef_pos.resize(E_NC, 0);
+    v_coef_names.clear();
+    std::unordered_set<std::string> coef_set;
     
     // Loop on equations and names in each equations (linked before with E_BDS)
-    E_NC = 0;
+    E_NCE = 0;
     E_NBCE = M_alloc(1, E_NEQ);
-    std::string scl_name;
-    std::shared_ptr<CLEC> clec = nullptr;
+
+    std::shared_ptr<CLEC> clec = nullptr; 
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = v_block_rhs[i];
-        for(auto& [name, pos]: clec->map_objs) 
+        for(auto& [name, _]: clec->map_objs) 
         {
             if(is_coefficient(name)) 
             {
-                int k = 0;
-
-                for(k = 0 ; k < E_NC ; k++)
-                    if(v_coef_pos[k] == pos) 
-                        break;                              // Coef already found in v_coef_pos
+                if(!E_DBS->contains(name))
+                    continue;
                 
-                scl_name = E_DBS->get_name(pos);
+                // Coef already found in v_coef_names
+                if(coef_set.contains(name))
+                    continue;
                 
-                if(k == E_NC) 
+                // Add a coefficient in v_coef_names
+                v_coef_names.push_back(name);
+                coef_set.insert(name);
+                
+                // relax > 0 => estimation coef
+                if(E_DBS->get_obj_ptr(name)->relax > 0)
                 {
-                    v_coef_pos[E_NC++] = pos;                  // Add a coefficient in v_coef_pos
-                    if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
-                        E_NCE++;
-                }
-                
-                if(E_DBS->get_obj_ptr(scl_name)->relax > 0) 
-                    MATE(E_NBCE, 0, i)++;                   // relax > 0 => estimation coef
+                    E_NCE++;
+                    MATE(E_NBCE, 0, i)++;
+                } 
             }
         }
     }
@@ -351,8 +347,9 @@ int Estimation::E_prep_coefs()
         return -1;
     }
 
-    E_C   = M_alloc(E_NC, 1);
-    E_SMO = M_alloc(E_NC, 1);
+    int nb_coefs = (int) v_coef_names.size();
+    E_C = M_alloc(nb_coefs, 1);
+    E_SMO = M_alloc(nb_coefs, 1);
     E_get_SMO();
     E_get_C();
     return 0;
@@ -367,23 +364,23 @@ int Estimation::E_prep_coefs()
  *  it is replaced by 0.1 in E_DBS to avoid precision and convergence problems.
  *    
  *  @global     MAT*    E_C (E_NC x 1)   Array of estimated coefficient values
- *  @global     std::vector<int> v_coef_pos    position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_names    position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS               KDB of scalars for the estimation
  */
 void Estimation::E_get_C()
 {
     double c;
-    std::string scl_name;
-    for(int i = 0 ; i < E_NC ; i++) 
+    int i = 0;
+    for(const std::string& scl_name : v_coef_names) 
     {
-        scl_name = E_DBS->get_name(v_coef_pos[i]);
         c = E_DBS->get_obj_ptr(scl_name)->value;
         if(E_DBS->get_obj_ptr(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
         {
             c = 0.1;
-            E_DBS->get_obj_ptr(scl_name)->value = c; // GB 24/01/2013
+            E_DBS->get_obj_ptr(scl_name)->value = c;
         }
         MATE(E_C, i, 0) = c;
+        i++;
     }
 }
 
@@ -392,16 +389,16 @@ void Estimation::E_get_C()
  *  Copies the values in E_C to the KDB E_DBS.
  *  
  *  @global     MAT*    E_C       Array of estimated coefficient values: MAT(E_NC, 1)
- *  @global     std::vector<int> v_coef_pos   position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_names   position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS     KDB of scalars for the estimation
  */
 void Estimation::E_put_C()
 {
-    std::string name;
-    for(int i = 0 ; i < E_NC ; i++)
+    int i = 0;
+    for(const std::string& scl_name : v_coef_names) 
     {
-        name = E_DBS->get_name(v_coef_pos[i]);
-        E_DBS->get_obj_ptr(name)->value = MATE(E_C, i, 0);
+        E_DBS->get_obj_ptr(scl_name)->value = MATE(E_C, i, 0);
+        i++;
     }
 }
 
@@ -411,16 +408,16 @@ void Estimation::E_put_C()
  *  These values are searched in E_DBS.
  *  
  *  @global     MAT*    E_SMO          Array of relaxation parameters (E_NC x 1)
- *  @global     std::vector<int> v_coef_pos        position in E_DBS of the estimated coefs
+ *  @global     std::vector<int> v_coef_names        position in E_DBS of the estimated coefs
  *  @global     KDB*    E_DBS          KDB of scalars for the estimation
  */
 void Estimation::E_get_SMO()
 {
-    std::string scl_name;
-    for(int i = 0 ; i < E_NC ; i++)
+    int i = 0;
+    for(const std::string& scl_name : v_coef_names) 
     {
-        scl_name = E_DBS->get_name(v_coef_pos[i]);
         MATE(E_SMO, i, 0) = E_DBS->get_obj_ptr(scl_name)->relax;
+        i++;
     }
 }
 
@@ -431,7 +428,7 @@ void Estimation::E_get_SMO()
 void Estimation::E_prep_reset()
 {
     v_block_rhs.clear();
-    v_coef_pos.clear();
+    v_coef_names.clear();
 
     E_NINSTR = 0;
     E_RHS = 0;

@@ -80,22 +80,21 @@ double Estimation::E_sqrt(double val)
  */
 void Estimation::E_deg_freed()
 {
-    int j, eq, cf, nbr, nbce;
-
-    std::string coef_name;
-    for(cf = 0, j = 0; cf < E_NC; cf++) 
+    int j = 0;
+    for(const std::string& scl_name : v_coef_names) 
     {
-        coef_name = E_DBS->get_name(v_coef_pos[cf]);
-        if(E_DBS->get_obj_ptr(coef_name)->relax == 0) 
+        if(E_DBS->get_obj_ptr(scl_name)->relax == 0) 
             continue;
-        nbr = 0;
-        for(eq = 0; eq < E_NEQ; eq++) 
+        
+        int nbr = 0, nbce = 0;
+        for(int eq = 0; eq < E_NEQ; eq++) 
         {
-            if(E_scl_in_eq(cf, eq)) 
+            if(E_scl_in_eq(scl_name, eq)) 
             {
                 nbr ++;
                 nbce = (int) MATE(E_NBCE, 0, eq);
             }
+
             if(nbr > 1) 
                 MATE(E_DF, 0, j) = E_T;
             else 
@@ -220,21 +219,20 @@ int Estimation::E_c_mcorru()
  */
 int Estimation::E_c_ttests()
 {
-    int     i, j;
+    int j = 0;
     std::shared_ptr<Scalar> scl_ptr;
-
-    std::string coef_name;
-    for(i = 0, j = 0 ; i < E_NC ; i++) 
+    for(const std::string& scl_name : v_coef_names) 
     {
-        coef_name = E_DBS->get_name(v_coef_pos[i]);
-        scl_ptr = E_DBS->get_obj_ptr(coef_name);
+        scl_ptr = E_DBS->get_obj_ptr(scl_name);
         scl_ptr->std = 0.0;
         if(scl_ptr->relax == 0) 
             continue;
+        
         if(E_MET == IodeEquationMethod::EQ_MAX_LIKELIHOOD)
             scl_ptr->std = E_sqrt(MATE(E_VCC, j, j));
         else
             scl_ptr->std = E_sqrt(E_div_0(MATE(E_VCC, j, j) * E_T, MATE(E_DF, 0, j)));
+        
         j++;
     }
 
