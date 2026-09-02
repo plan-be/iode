@@ -77,7 +77,7 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
 
     // Endo and exo are in same equation 
     // => add entry in map_exchange and map_exchange_rev and return 
-    for(auto& [name, _]: clec->map_objs) 
+    for(const std::string& name: clec->v_obj_names) 
     {
         if(is_coefficient(name)) 
             continue;
@@ -95,7 +95,7 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
     int poseq = -1;
     bool success = false;
     std::string eq_name_resolved;
-    for(auto& [name, _]: clec->map_objs) 
+    for(const std::string& name: clec->v_obj_names) 
     {   
         if(is_coefficient(name)) 
             continue;

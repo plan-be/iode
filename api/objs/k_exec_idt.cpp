@@ -148,7 +148,7 @@ KDBVariablesPtr KDBIdentities::series_list() const
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
-        for(auto [name, _]: clec->map_objs) 
+        for(const std::string& name : clec->v_obj_names) 
         {
             if(is_coefficient(name)) 
                 continue;
@@ -180,7 +180,7 @@ KDBScalarsPtr KDBIdentities::scalar_list() const
     {
         clec = idt->get_compiled_lec();
         CLEC clec_copy(*clec);
-        for(auto& [name, _]: clec_copy.map_objs) 
+        for(const std::string& name : clec_copy.v_obj_names) 
         {
             if(!is_coefficient(name)) 
                 continue;
@@ -255,7 +255,7 @@ std::vector<std::string> KDBIdentities::reorder() const
             clec = idt->get_compiled_lec();
 
             bool break_reached = false;
-            for(auto& [name, _]: clec->map_objs) 
+            for(const std::string& name : clec->v_obj_names) 
             {
                 // name represents a coefficient -> continue looping
                 if(is_coefficient(name)) 

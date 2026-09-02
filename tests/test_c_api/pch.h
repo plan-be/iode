@@ -20,7 +20,7 @@
 inline bool lec_contains(const std::shared_ptr<CLEC> clec, const std::string& name)
 {
     bool found = false;
-    for(const auto& [obj_name, _]: clec->map_objs)
+    for(const std::string& obj_name : clec->v_obj_names)
     {
         if(obj_name == name)
         {

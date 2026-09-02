@@ -1212,7 +1212,7 @@ int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const i
 {
     int k = 0;
     std::string tbl_name;
-    for(const std::string& name: clec->v_objs) 
+    for(const std::string& name: clec->v_obj_names) 
     {
         if(is_coefficient(name) && type != 'S') 
             continue;

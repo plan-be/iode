@@ -171,8 +171,8 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(clec)
     {
         std::cout << "lec: " << clec->lec << std::endl;
-        std::cout << " , nb_names: " << clec->map_objs.size() << ", v_names: ";
-        for(auto& [name, _]: clec->map_objs)
+        std::cout << " , nb_names: " << clec->v_obj_names.size() << ", v_names: ";
+        for(const std::string& name: clec->v_obj_names)
             std::cout << name << ", ";
         std::cout << ", duplicated_endo: " << clec->duplicated_endo << std::endl;
     }
@@ -183,8 +183,8 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(dclec)
     {
         std::cout << "lec: " << dclec->lec << std::endl;
-        std::cout << " , nb_names: " << dclec->map_objs.size() << ", v_names: ";
-        for(auto& [name, _]: dclec->map_objs)
+        std::cout << " , nb_names: " << dclec->v_obj_names.size() << ", v_names: ";
+        for(const std::string& name : dclec->v_obj_names)
             std::cout << name << ", ";
         std::cout << ", duplicated_endo: " << dclec->duplicated_endo << std::endl;
     }

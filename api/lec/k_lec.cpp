@@ -58,7 +58,7 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     std::string sname;
     std::shared_ptr<Scalar> scl = nullptr;
     char tcoef[128], ttest[128];
-    for(const auto& [sname, _] : clec->map_objs) 
+    for(const std::string& sname : clec->v_obj_names) 
     {
         buf[0] = 0;
         if(coefs && is_coefficient(sname)) 

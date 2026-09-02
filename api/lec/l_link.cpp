@@ -18,14 +18,15 @@
 */
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    for(auto& [name, pos] : this->map_objs) 
+    bool found = false;
+    for(const std::string& name : this->v_obj_names) 
     {
         if(is_coefficient(name))
-            pos = dbs->index_of(name);
+            found = dbs->contains(name);
         else
-            pos = dbv->index_of(name);
+            found = dbv->contains(name);
         
-        if(pos < 0) 
+        if(!found) 
         {
             std::string msg = "linking LEC failed: '" + name + "' not found";
             error_manager.append_error(msg);
@@ -136,31 +137,4 @@ int CLEC::link(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     
     this->link_sample(dbv, 0, (int) this->v_expression.size());
     return 0;
-}
-
-
-/*---- PSEUDO LINKING FOR THE CONSTRUCTION OF THE MODEL SCC ----*/
-
-/**
- * Pseudo linking used to calculate the strong connex components of a model (SCC).
- * 
- * The endogenous variables are assigned the position of their equation in dbe. 
- * This process constructs a sort of incidence matrix of the model by assigning to the position of the endogenous variables 
- * in the CLEC l_names of each equation (therefore, the KDB of vars and scalars are not needed here).
- * 
- * @param [in]      dbe     KDB*    KDB of equations
- * @param [in, out] clec    CLEC*   pointer to the CLEC to be linked
- */
-void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& clec)
-{   
-    for(auto& [name, pos] : clec->map_objs) 
-    {
-        if(is_coefficient(name))
-            pos = 0;  // For the SCC construction, we do not need the coefficients (scalars)
-        else
-            pos = dbe->index_of(name);
-
-        if(pos < 0)  // Not found => exogenous var
-            pos = -1; // For the SCC construction, we do not need the exogenous vars positions 
-    }
 }

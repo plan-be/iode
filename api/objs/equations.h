@@ -686,7 +686,3 @@ int E_split_eq(char* lec, char** lhs, char** rhs);
 int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec);
 int E_DynamicAdjustment(int method, char** eqs, char* c1, char* c2);
 void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr exo_ptr, KDBScalarsPtr scal_ptr);
-
-// lec/l_link.c
-// NOTE: declare here to avoid circular dependency between equations.h and lec.h
-void L_link_endos(const KDBEquationsPtr dbe, std::shared_ptr<CLEC>& clec);

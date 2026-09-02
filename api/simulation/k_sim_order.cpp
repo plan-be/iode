@@ -165,10 +165,10 @@ int CSimulation::pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& p
     {
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.reserve(clec->map_objs.size());
+        eq_predecessors.reserve(clec->v_obj_names.size());
 
         eq_pos = -1;
-        for(const auto& [name, _]: clec->map_objs) 
+        for(const std::string& name : clec->v_obj_names) 
         {
             if(is_coefficient(name)) 
                 continue;
