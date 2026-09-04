@@ -187,7 +187,8 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
     //       in comments written as /* ... */)
     std::string list_oem(value);
     std::string list_utf8 = oem_to_utf8(list_oem);
-    this->k_objs[name] = std::make_shared<List>(list_utf8);
+    std::shared_ptr<List> lst_ptr = std::make_shared<List>(list_utf8);
+    this->add_obj_ptr(name, lst_ptr);
     return true;
 }
 

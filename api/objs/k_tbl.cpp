@@ -910,7 +910,8 @@ bool KDBTables::binary_to_obj(const std::string& name, char* pack)
     if(!tbl)
         return false;
 
-    this->k_objs[name] = std::make_shared<Table>(*tbl);
+    std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(*tbl);
+    this->add_obj_ptr(name, tbl_ptr);
     return true;
 }
 

@@ -9,7 +9,8 @@ bool KDBComments::binary_to_obj(const std::string& name, char* pack)
     strncpy(value, (char*) P_get_ptr(pack, 0), len);
     std::string cmt_oem(value);
     std::string cmt_utf8 = oem_to_utf8(cmt_oem);
-    this->k_objs[name] = std::make_shared<Comment>(cmt_utf8);
+    std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>(cmt_utf8);
+    this->add_obj_ptr(name, cmt_ptr);
     return true;
 }
 

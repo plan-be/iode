@@ -1510,7 +1510,6 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         //      2 -> if name not in global_db but in file
         //      3 -> if name in both global_db and file, IODE object in global_db == IODE object in file
         //      4 -> if name in both global_db and file, IODE object in global_db != IODE object in file
-        std::string name;
         for(const std::string& name : kdb1.get_names()) 
         {
             c_name = (char*) name.c_str();

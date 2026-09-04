@@ -405,7 +405,8 @@ bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
     if(!eq) 
         return false;
     
-    this->k_objs[name] = std::make_shared<Equation>(*eq);
+    std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(*eq);
+    this->add_obj_ptr(name, eq_ptr);
     return true;
 }
 
