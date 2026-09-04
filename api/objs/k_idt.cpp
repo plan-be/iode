@@ -163,7 +163,8 @@ bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
     //       comments written as /* ... */)
     std::string lec_oem(c_lec);
     std::string lec_utf8 = oem_to_utf8(lec_oem);
-    this->k_objs[name] = std::make_shared<Identity>(lec_utf8);
+    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec_utf8);
+    this->add_obj_ptr(name, idt_ptr);
     return true;
 }
 

@@ -160,7 +160,6 @@ std::pair<int, char[64]> KDBInfo::_preload_(FILE *fd, const std::string& filepat
                     throw std::runtime_error(error_msg.c_str());
                 }
                 nb_objs = kdb32.k_nb;
-                this->k_mode = kdb32.k_mode;
                 this->k_compressed = kdb32.k_compressed;
                 this->k_arch = std::string(kdb32.k_arch);
                 this->description = std::string(kdb32.k_desc);
@@ -211,7 +210,6 @@ std::pair<int, char[64]> KDBInfo::_preload_(FILE *fd, const std::string& filepat
             throw std::runtime_error(error_msg.c_str());
         }
         nb_objs = okdb643->k_nb;
-        this->k_mode = okdb643->k_mode;
         this->k_arch = std::string(okdb643->k_arch);
         this->description = std::string(okdb643->k_desc);
         if(okdb643->k_data != NULL && okdb643->k_data[0] != 0)

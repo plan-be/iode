@@ -57,15 +57,14 @@ cdef extern from "api/all.h":
     int B_DataPattern(char* arg, int iode_type)
 
     cdef cppclass KDB:
-        map[string, SWHDL]  k_objs
-        short               k_type
-        short               k_mode
-        string              k_arch
-        string              description
-        char                k_compressed
-        char                k_db_type
-        string              filepath
-        string              type_name
+        short  k_type
+        short  k_mode
+        string k_arch
+        string description
+        char   k_compressed
+        char   k_db_type
+        string filepath
+        string type_name
 
         # ==== methods ====
 

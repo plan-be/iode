@@ -130,7 +130,9 @@ void KV_merge_del(KDBVariablesPtr kdb1, KDBVariablesPtr kdb2, int replace)
             else if(kdb2->get_sample())
                 kdb1->set_sample(*kdb2->get_sample());
         }
-        kdb1->k_objs = kdb2->k_objs;
+
+        for(const auto& [var_name, var_ptr] : kdb2->k_objs)
+            kdb1->add_obj_ptr(var_name, var_ptr);
         kdb2->clear();
         return;
     }
@@ -1281,7 +1283,8 @@ bool KDBVariables::binary_to_obj(const std::string& name, char* pack)
 
     int nb_periods = this->get_nb_periods();
     Variable var(values, values + nb_periods);
-    this->k_objs[name] = std::make_shared<Variable>(var);
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(var);
+    this->add_obj_ptr(name, var_ptr);
     return true;
 }
 

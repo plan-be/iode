@@ -379,7 +379,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                 if(SCR_tbl_size(lst) == 0) 
                 {
                     i = 0;
-                    for(const std::string& var_name: global_ws_var->get_names()) 
+                    for(const auto& [var_name, _] : global_ws_var->k_objs) 
                     {
                         res = IodeDdeCreateSeries(var_name, 0);
                         WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i + 1, 0, 1 + nb_periods, 1), 

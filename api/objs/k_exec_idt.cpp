@@ -596,7 +596,7 @@ int KDBIdentities::read_scls_db(KDBScalarsPtr& dbs_ptr, const KDBScalarsPtr dbs_
         W_printfDbl(".par1 enum_1\nFrom %s : ", (char*) source_name.c_str());
     
     int nb_found = 0;
-    for(const std::string& name : dbs_ptr->get_names()) 
+    for(const auto& [name, _] : dbs_ptr->k_objs) 
     {
         // scalar already loaded in dbs
         if(dbs_ptr->contains(name)) 

@@ -191,7 +191,7 @@ void EditAndEstimateEquations::update_scalars()
 
     // for each equation in the local Equations workspace, get the list if corresponding scalars
     std::vector<std::string> tmp_coefs_list;
-    for (const std::string& name : kdb_eqs->get_names())
+    for (const auto& [name, _] : kdb_eqs->k_objs)
     {
         if(!kdb_eqs->contains(name))
             throw std::runtime_error("Estimation: Cannot get equation at position " + 

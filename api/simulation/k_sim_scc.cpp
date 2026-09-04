@@ -50,8 +50,8 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
 
     // to build the PRE, INTER and POST lists in build_lists_order()
     sim_dbv = KDBVariables::Create(false);
-    for(const std::string& var_name : dbe->get_names())
-        sim_dbv->k_objs[var_name] = std::shared_ptr<Variable>();
+    for(const auto& [var_name, _] : dbe->k_objs)
+        sim_dbv->add_obj_ptr(var_name, std::shared_ptr<Variable>());
 
     if(tris > 0) 
         sorting_algo = SORT_BOTH;

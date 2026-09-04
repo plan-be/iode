@@ -34,7 +34,8 @@ bool KDBScalars::binary_to_obj(const std::string& name, char* pack)
     if(!scl) 
         return false;
 
-    this->k_objs[name] = std::make_shared<Scalar>(*scl);
+    std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>(*scl);
+    this->add_obj_ptr(name, scl_ptr);
     return true;
 }
 

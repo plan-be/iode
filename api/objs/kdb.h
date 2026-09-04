@@ -5,6 +5,7 @@
 #include "api/time/sample.h"    // Period, Sample
 #include "api/objs/xdr.h"
 
+#include <unordered_set>
 
 #ifndef SKBUILD
     #include "gtest/gtest.h"
@@ -42,7 +43,7 @@ protected:
         switch(type) 
         {
             case COMMENTS :
-                this->k_mode = (short) ASIS_CASE;
+                this->k_mode = (short) UPPER_CASE;
                 break;
             case EQUATIONS :
                 this->k_mode = (short) UPPER_CASE;
@@ -64,6 +65,9 @@ protected:
                 break;
             case OBJECTS :
                 this->k_mode = (short) ASIS_CASE;
+                break;
+            default:
+                throw std::runtime_error("Unknown object type");
                 break;
         }
     }
@@ -291,7 +295,6 @@ public:
     }
 
     virtual bool contains(const std::string& name) const = 0;
-    virtual std::string get_key(const std::string& name) const = 0;
     virtual int index_of(const std::string& name) const = 0;
     virtual const std::string& get_name(const int index) const = 0;
     virtual std::set<std::string> get_names() const = 0;
@@ -335,17 +338,14 @@ public:
             if(name.empty())
                 continue;
             
+            key = to_key(name);
             if(must_exist)
             {
-                key = get_key(name);
-                if(!key.empty())
+                if(this->contains(key))
                     names.insert(key);
             }
             else
-            {
-                key = to_key(name);
                 names.insert(key);
-            }
         }
         SCR_free_tbl((unsigned char **) c_names);
 
@@ -427,6 +427,8 @@ public:
     // NOTE: if an IODE object is added/removed/updated from the current database,
     //       it must also done in all subset instances ('shallow copies')
     std::map<std::string, std::shared_ptr<T>> k_objs;
+    // cache of k_objs keys kept in sync with k_objs (below) for fast lookups
+    std::unordered_set<std::string> obj_names;
 
 private:
     // only used by subsets ('shallow copies')
@@ -435,6 +437,28 @@ private:
     std::set<std::shared_ptr<D>> children_db;
 
 private:
+    void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
+    {
+        std::shared_ptr<D> top_db = get_top_level_db();
+
+        // Both the passed obj_ptr and k_objs[key] will point to the same object
+        this->add_obj_ptr(key, obj_ptr);
+
+        // if this is a subset database, we also need to set the object in the 
+        // top-level database
+        if(this->k_db_type == DB_SUBSET)
+            top_db->add_obj_ptr(key, obj_ptr);
+
+        // if this is a top-level database, we also need to set the object in all 
+        // subset instances
+        for(std::shared_ptr<D> subset : get_children_db())
+        {
+            if(!subset->contains(key))
+                continue;
+            subset->add_obj_ptr(key, obj_ptr);
+        }
+    }
+
     bool shallow_copy(const std::shared_ptr<D> other_ptr, const std::set<std::string>& subset_keys)
     {
         std::shared_ptr<T> obj_ptr;
@@ -451,7 +475,7 @@ private:
             }
 
             obj_ptr = other_ptr->get_obj_ptr(name);
-            this->k_objs[name] = obj_ptr;
+            this->add_obj_ptr(name, obj_ptr);
         }
 
         if(!success)
@@ -481,28 +505,6 @@ private:
             this->clear();
 
         return success;
-    }
-
-    virtual void set_obj_ptr_no_check(const std::string& key, std::shared_ptr<T> obj_ptr)
-    {
-        std::shared_ptr<D> top_db = get_top_level_db();
-
-        // Both the passed obj_ptr and k_objs[key] will point to the same object
-        this->k_objs[key] = obj_ptr;
-
-        // if this is a subset database, we also need to set the object in the 
-        // top-level database
-        if(this->k_db_type == DB_SUBSET)
-            top_db->k_objs[key] = obj_ptr;
-
-        // if this is a top-level database, we also need to set the object in all 
-        // subset instances
-        for(std::shared_ptr<D> subset : get_children_db())
-        {
-            if(!subset->contains(key))
-                continue;
-            subset->k_objs[key] = obj_ptr;
-        }
     }
 
 protected:
@@ -659,7 +661,7 @@ public:
         }
 
         this->k_objs.clear();
-
+        this->obj_names.clear();
         KDBInfo::clear();
     }
 
@@ -713,6 +715,18 @@ public:
         return subset_ptr;
     }
 
+    void add_obj_ptr(const std::string& key, std::shared_ptr<T> obj_ptr)
+    {
+        this->k_objs[key] = obj_ptr;
+        obj_names.insert(key);
+    }
+
+    void remove_obj_ptr(const std::string& key)
+    {
+        k_objs.erase(key);
+        obj_names.erase(key);
+    }
+
     int size() const override
     { 
         return (int) k_objs.size();
@@ -720,60 +734,14 @@ public:
 
     /**
      * @brief Checks if a name exists in the database
-     * @details Performs case-sensitive lookup based on the database mode.
-     *          for COMMENTS, searches for a matching key with case-insensitive comparison.
      * @param name The name to search for
      * @return true if the name exists in the database, false otherwise
      */
     bool contains(const std::string& name) const override
     {
-        if(this->k_type == COMMENTS)
-        {
-            std::string lowercase_name = to_lower(trim(name));
-            for(const auto& [k, _] : k_objs)
-            {
-                if(to_lower(k) == lowercase_name)
-                    return true;
-            }
-            return false;
-        }
-        else
-        {
-            std::string key = to_key(name);
-            return k_objs.contains(key);
-        }
-    }
-
-    /**
-     * @brief Retrieves the actual key for a given name
-     * @details Performs case-sensitive lookup based on the database mode.
-     *          for COMMENTS, searches for a matching key with case-insensitive comparison.
-     * @param name The name to search for
-     * @return The actual key if found, empty string otherwise
-     */
-    std::string get_key(const std::string& name) const override
-    {
-        std::string key = "";
-        if(this->k_type == COMMENTS)
-        {
-            bool found = false;
-            std::string lowercase_name = to_lower(trim(name));
-            for(const auto& [k, _] : k_objs)
-            {
-                if(to_lower(k) == lowercase_name)
-                {
-                    key = k;
-                    found = true;
-                }
-            }
-        }
-        else
-        {
-            key = to_key(name);
-            if(!contains(key))
-                key = "";
-        }
-        return key;
+        // unordered_set (obj_names) -> fast O(1) lookup
+        // map<key, value> (k_objs) -> O(log n) lookup
+        return obj_names.contains(to_key(name));
     }
 
     bool parent_contains(const std::string& name) const
@@ -820,10 +788,7 @@ public:
 
     std::set<std::string> get_names() const override
     {
-        std::set<std::string> names;
-        for(const auto& [name, _] : k_objs) 
-            names.insert(name);
-        return names;
+        return std::set<std::string>(obj_names.begin(), obj_names.end());
     }
 
     std::string get_names_as_string() const override
@@ -873,16 +838,16 @@ public:
         }
 
         std::shared_ptr<T> obj_ptr = top_db->get_obj_ptr(old_key);
-        top_db->k_objs.erase(old_key);
-        top_db->k_objs[new_key] = obj_ptr;
+        top_db->remove_obj_ptr(old_key);
+        top_db->add_obj_ptr(new_key, obj_ptr);
 
         // rename in all subset instances (including 'this' if 'this' is a subset)
         for(std::shared_ptr<D> subset : get_children_db())
         {
             if(!subset->contains(old_key))
                 continue;
-            subset->k_objs.erase(old_key);
-            subset->k_objs[new_key] = obj_ptr;
+            subset->remove_obj_ptr(old_key);
+            subset->add_obj_ptr(new_key, obj_ptr);
         }
 
         return true;
@@ -902,11 +867,11 @@ public:
 
         // remove from top-level database
         // No need to manually delete - shared_ptr handles memory management automatically
-        top_db->k_objs.erase(key);
+        top_db->remove_obj_ptr(key);
 
         // remove from all subset instances (including 'this' if 'this' is a subset)
         for(std::shared_ptr<D> subset : get_children_db())
-            subset->k_objs.erase(key);
+            subset->remove_obj_ptr(key);
 
         return true;
     }
@@ -1041,10 +1006,10 @@ public:
     void merge(std::shared_ptr<D> other_ptr, const bool overwrite, const bool clear_source)
     {
         if(other_ptr->size() == 0) 
-            return;
-    
+            return;    
+        
         bool found = false;
-        for(const std::string& name : other_ptr->get_names()) 
+        for(const auto& [name, _] : other_ptr->k_objs) 
         {
             if(!other_ptr->contains(name)) 
                 continue;
@@ -1059,10 +1024,10 @@ public:
                 // delete elements from this
                 this->remove(name);
             }
-            
+
             this->copy_obj_from(other_ptr, name, name);
         }
-    
+
         if(clear_source)
             other_ptr->clear();
     }
@@ -1098,8 +1063,8 @@ public:
     //       T& operator[](const std::string& name)
     std::shared_ptr<T> get_obj_ptr(const std::string& name) const
     {
-        std::string key = get_key(name);
-        if(key.empty())
+        std::string key = to_key(name);
+        if(!this->contains(key))
         {
             std::string error_msg = "Cannot get a(n) " + type_name + " with an empty name";
             throw std::invalid_argument(error_msg);
@@ -1141,14 +1106,12 @@ public:
         {
             // if the object already exists in the top-level database
             // -> check if it's the same shared_ptr
-            // NOTE: use get_key() to handle the case k_mode == ASIS_CASE
-            std::string existing_key = top_db->get_key(key);
-            if(!existing_key.empty())
+            if(top_db->contains(key))
             {
                 // NOTE: if the object already exists in the top-level database
                 //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
-                if(top_db->k_objs[existing_key] == obj_ptr)
+                if(top_db->k_objs[key] == obj_ptr)
                     return obj_ptr;
                 // No need to delete - shared_ptr handles memory management automatically
             }     
@@ -1156,14 +1119,12 @@ public:
         else
         {
             // if the object already exists in this database -> check if it's the same shared_ptr
-            // NOTE: use get_key() to handle the case k_mode == ASIS_CASE
-            std::string existing_key = this->get_key(key);
-            if(!existing_key.empty())
+            if(this->contains(key))
             {
                 // NOTE: if the object already exists in the database
                 //       and is the same shared_ptr as the one we want to set,
                 //       exit without doing anything
-                if(this->k_objs[existing_key] == obj_ptr)
+                if(this->k_objs[key] == obj_ptr)
                     return obj_ptr;
                 // No need to delete - shared_ptr handles memory management automatically
             }
