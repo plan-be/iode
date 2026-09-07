@@ -330,9 +330,11 @@ __pycache__/
 *.pyd
 /dist
 pyproject.toml
-**/*.whl
 archives/pyiode_nanobind/iode/tests/data
 archives/pyiode_nanobind/iode/_version.py
+
+**/*.whl
+!development/*.whl
 
 # Cake - Uncomment if you are using it
 # tools/**
