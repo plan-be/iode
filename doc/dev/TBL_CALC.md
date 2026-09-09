@@ -118,13 +118,6 @@ Functions to generate IODE tables in A2M format based on Table structures and GS
 |`std::string (Table* tbl)`|Retrieves a Table title, i.e. the contents of the first line of type KT\_TITLE|
 |`int T_print_tbl(Table* tbl, char* smpl)`|Computes a table on a GSample and saves the result in A2M format|
 
-Global variables
-
-|Variable|Default value|Description|
-|:---|:---|:---|
-|`char KT_sep`|` '&'`|Table cell separator|
-|`int K_NBDEC`|` -1`|Default nb of decimals|
-
 ### k\_graph.c {#T7}
 
 Functions to generate IODE graphs in A2M format based on a Table structure and a GSample definition. Contains also V\_graph(), a function to print or display variables or combinations of variables on a (simple) Sample.

@@ -7,9 +7,7 @@
 #include "api/objs/tables.h"
 
 
-//inline char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
 inline int      K_NBDEC = -1;          // Default nb of decimals
-
 inline char     **KT_names = NULL;     // Names of the files used in a GSample
 inline int      KT_nbnames = 0;        // Number of names in KT_names
 inline int      KT_mode[MAX_MODE];     // Modes used in a GSample
