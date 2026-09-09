@@ -22,7 +22,6 @@
  *  
  *  Global variables
  *  ----------------
- *      char     KT_sep = '&';                                      Table cell separator => replaced by A2M_SEPCH
  *      int      K_NBDEC = -1;                                      Default nb of decimals
  *  
  */
