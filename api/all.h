@@ -22,6 +22,7 @@
 #include "api/gsample/gsample.h"
 
 #include "api/lec/lec.h"
+#include "api/lec/execute_lec.h"
 
 #include "api/objs/grep.h"
 #include "api/objs/objs.h"
