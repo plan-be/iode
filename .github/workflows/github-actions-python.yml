@@ -80,24 +80,20 @@ jobs:
           - name: Build SCR4
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_scr4 
-          - name: Build C IODE API
+          - name: Build C API
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_c_api 
-          - name: Build C++ IODE API
+          - name: Build C++ API
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cpp_api 
-          - name: Build C/C++ Tests
+          - name: Build C++ API Tests
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target test_all 
-          - name: Run C API Tests
-            if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
-            shell: bash
-            run: ctest --preset c-api-${{ env.os }}-${{ inputs.build-config }}
           - name: Run C++ API Tests
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell: bash
-            run: ctest --preset cpp-api-${{ env.os }}-${{ inputs.build-config }}
+            run: ctest --preset c-api-${{ env.os }}-${{ inputs.build-config }}
           - name: Configure Conda
             uses: conda-incubator/setup-miniconda@v3
             with:
@@ -165,7 +161,7 @@ jobs:
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell:  bash -el {0}
             run: python tests/test_big_files/generate_big_vars_ws.py
-          - name: Build C/C++ Tests for big databases
+          - name: Build C++ API Tests for big databases
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target test_${{ inputs.build-config }}_big_files 

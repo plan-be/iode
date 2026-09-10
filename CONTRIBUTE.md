@@ -112,7 +112,6 @@ where `<target>` is one the item in the list below:
 - `iode_cpp_api`       -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_cython`        -> Cython wrapper for the C/C++ API.
 - `test_c_api`         -> Builds the tests for the C API (based on Google Test).
-- `test_cpp_api`       -> Builds the tests for the C++ classes (based on Google Test).
 - `iode_doc`           -> Builds the user documentation (using Python Sphinx)
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
@@ -141,7 +140,6 @@ To test the C and C++ API, you first have to build them as explain above:
 The second step is to build the tests:
 ```bash
 > cmake --build --preset <preset_config> --target test_c_api
-> cmake --build --preset <preset_config> --target test_cpp_api
 ```
 
 The final and third step is to ask CMake to run the tests:
