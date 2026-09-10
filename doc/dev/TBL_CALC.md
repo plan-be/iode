@@ -107,7 +107,7 @@ Functions to generate IODE tables in A2M format based on Table structures and GS
 
 |Syntax|Description|
 |:---|:---|
-|`int T_prep_cls(Table* tbl, char* smpl, COLS** cls)`|Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table|
+|`int initialize_columns(Table* tbl, char* smpl, COLS** cls)`|Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table|
 |`void T_fmt_val(char* buf, double val, int lg, int nd)`|Formats a double value|
 |`void T_print_val(double val)`|Prints a IODE\_REAL value using W\_printf()|
 |`void T_open_cell(int attr, int straddle, int type)`|Prints the header of an a2m table cell|
@@ -121,24 +121,6 @@ Functions to generate IODE tables in A2M format based on Table structures and GS
 ### k\_graph.c {#T7}
 
 Functions to generate IODE graphs in A2M format based on a Table structure and a GSample definition. Contains also V\_graph(), a function to print or display variables or combinations of variables on a (simple) Sample.
-
-Includes some A2M helper functions.
-
-|Syntax|Description|
-|:---|:---|
-|`int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)`|Initialises a graph by sending a2m commands to W\_printf().|
-|`int T_GraphTest(Table *tbl)`|Displays the table tbl as a graph (in level) on the full sample of the current WS.|
-|`int T_GraphEnd()`|Ends a A2M graph definition by sending the a2m command ".ge" to W\_printf().|
-|`int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)`|Generates one graph in A2M format from a Table struct and a GSample.|
-|`int T_GraphTitle(char *txt)`|Defines the graph title by sending a2m command ".gtitle" to W\_printf().|
-|`int T_GraphLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*time\* axis (.gty or .gtz, see a2m language) with its position, type and title.|
-|`int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)`|Adds (in A2M) graph \*xy\* axis with its position, type and title.|
-|`int T_GraphTimeData(Sample *smpl, double *y)`|Adds numerical data on a \*time\* graph line or bar.|
-|`int T_GraphXYData(int nb, double *x, double *y)`|Adds numerical data on a \*xy\* graph line or bar.|
-|`int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)`|Adds graph curves from a table line definition and a calculated GSample.|
-|`int T_find_opf(COLS *fcls, COL *cl)`|Tries to find the position in \*fcls of the opf (operation on files) in cl.|
-|`int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)`|Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.|
-|`int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)`|Prints or displays graph(s) from variable list(s) or combination(s) or variables.|
 
 ### Translations {#T8}
 

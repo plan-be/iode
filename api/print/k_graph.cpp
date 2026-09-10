@@ -5,24 +5,6 @@
  *  The graphs are based on 
  *      - Table structures and a GSample definition, or
  *      - VAR list(s) or combination(s) or VARS. 
- *  
- *  Includes some A2M helper functions. 
- *  
- *  List of functions 
- *  -----------------
- *      int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)    Initialises a graph by sending a2m commands to W_printf().
- *      int T_GraphTest(Table *tbl)                                               Displays the table tbl as a graph (in level) on the full sample of the current WS.
- *      int T_GraphEnd()                                                        Ends a A2M graph definition by sending the a2m command ".ge" to W_printf().
- *      int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a Table struct and a GSample.
- *      int T_GraphTitle(char *txt)                                             Defines the graph title by sending a2m command ".gtitle" to W_printf().
- *      int T_GraphLegend(int axis, int type, char *txt, char *fileop)          Adds (in A2M) graph *time* axis (.gty or .gtz, see a2m language) with its position, type and title.
- *      int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)        Adds (in A2M) graph *xy* axis with its position, type and title.
- *      int T_GraphTimeData(Sample *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
- *      int T_GraphXYData(int nb, double *x, double *y)                   Adds numerical data on a *xy* graph line or bar.
- *      int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSample. 
- *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
- *      int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)                   Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.
- *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
 #include "api/pch.h"
 #include "api/b_errors.h"
@@ -41,9 +23,13 @@
  *  @param [in] Table*    tbl table to print
  *  @return     int         0 on success, -1 on error 
  */
-int T_GraphTest(Table *tbl)
+int T_GraphTest(const std::shared_ptr<Table> tbl_ptr)
 {
-    char    gsmpl[20];
+    char gsmpl[20];
+
+    if(!tbl_ptr)
+        return -1;
+
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
     if(!smpl) 
         return -1;
@@ -52,14 +38,14 @@ int T_GraphTest(Table *tbl)
     std::string str_period = smpl->start_period.to_string();
     sprintf(gsmpl, "%s:%d", (char*) str_period.c_str(), smpl->nb_periods); /* JMP 28-11-93 */
     //KT_nb = 1; // JMP 11/05/2022
-    if(T_graph_tbl_1(tbl, gsmpl, 1)) 
+    if(T_graph_tbl_1(tbl_ptr, gsmpl, 1)) 
     { // JMP 11-05-2022 : mode = 1 => display 
         std::string err_msg = "Testing failed ...";
         error_manager.append_error(err_msg);
         return -1;
     }
 
-    W_EndDisplay((char*) T_get_title(tbl).c_str(), -1, -1, -1, -1);
+    W_EndDisplay((char*) T_get_title(tbl_ptr.get()).c_str(), -1, -1, -1, -1);
     return 0;
 }
 
@@ -125,10 +111,10 @@ int T_GraphEnd()
  *  @return     int             0 on success, -1 on error (more than 2 cols in tbl 
  *                              or one of the ref files is not in global_ref_xxx)
  */
-int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
+int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl, int mode)
 {
     // KT_attr = 4;
-    if(tbl->nb_columns != 2) 
+    if(tbl_ptr->nb_columns != 2) 
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
@@ -136,7 +122,7 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
     }
 
     COLS* cls = nullptr;
-    int dim = T_prep_cls(tbl, gsmpl, &cls);
+    int dim = initialize_columns(tbl_ptr, gsmpl, &cls);
     if(dim < 0) 
         return -1;
 
@@ -159,7 +145,7 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
 
     if(mode != 0)
     {
-        std::string title = T_get_title(tbl);
+        std::string title = T_get_title(tbl_ptr.get());
         // NOTE: W_Print(...) functions expect OEM encoding, so convert title 
         //       from UTF-8 to OEM before printing 
         title = utf8_to_oem(title);
@@ -167,18 +153,19 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
     } 
     
     int w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
-                    (int) tbl->get_gridx(), (int) tbl->get_gridy(),
-                    (double)tbl->y_min, (double)tbl->y_max,
-                    (double)tbl->z_min, (double)tbl->z_max,
-                    (int) tbl->get_text_alignment(), tbl->chart_box, 50 * tbl->chart_shadow);
+                    (int) tbl_ptr->get_gridx(), (int) tbl_ptr->get_gridy(),
+                    (double)tbl_ptr->y_min, (double)tbl_ptr->y_max,
+                    (double)tbl_ptr->z_min, (double)tbl_ptr->z_max,
+                    (int) tbl_ptr->get_text_alignment(), tbl_ptr->chart_box, 
+                    50 * tbl_ptr->chart_shadow);
 
     int begin = 1;
     std::string content;
     TableLine* line = nullptr;
     TableCell* cells = nullptr; 
-    for(int i = 0; i < tbl->lines.size() && w >= 0; i++) 
+    for(int i = 0; i < tbl_ptr->lines.size() && w >= 0; i++) 
     {
-        line = &tbl->lines[i];
+        line = &tbl_ptr->lines[i];
         cells = line->cells.data();
 
         switch(line->get_type()) 
@@ -187,7 +174,7 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, smpl, x, y, fcls)) 
+                if(T_GraphLine(tbl_ptr, i, cls, smpl, x, y, fcls)) 
                     w = -1;
                 break;
 
@@ -365,13 +352,14 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  @return 
  *  
  */
-int T_GraphLine(Table* tbl, int i, COLS* cls, const std::shared_ptr<Sample> smpl, double* x, double* y, COLS* fcls)
+int T_GraphLine(const std::shared_ptr<Table> tbl_ptr, int i, COLS* cls, const std::shared_ptr<Sample> smpl, 
+    double* x, double* y, COLS* fcls)
 {
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) 
+    if(COL_exec(tbl_ptr.get(), i, cls) < 0) 
         return -1;
 
-    TableLine* line = &tbl->lines[i];
+    TableLine* line = &tbl_ptr->lines[i];
     for(int k = 0 ; k < fcls->cl_nb ; k++) 
     {
         T_GraphLineTitle(line, fcls, k);
@@ -932,7 +920,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     }
     
     COLS* cls = nullptr;
-    int dim = T_prep_cls(tbl, gsmpl, &cls);
+    std::shared_ptr<Table> tbl_ptr(tbl, [](Table*) {});
+    int dim = initialize_columns(tbl_ptr, gsmpl, &cls);
     if(dim < 0) 
         return -1;
     
