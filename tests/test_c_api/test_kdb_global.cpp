@@ -1,13 +1,13 @@
 #include "pch.h"
 
 
-class KDBGlobalTest : public KDBTest, public ::testing::Test
+class KDBGlobalTest : public TestAbstract, public ::testing::Test 
 {
 protected:
     void SetUp() override
     {
-        global_ws_eqs->load(input_test_dir + "fun.ae");
-        global_ws_lst->load(input_test_dir + "fun.al");
+        global_ws_eqs->load(str_input_test_dir + "fun.ae");
+        global_ws_lst->load(str_input_test_dir + "fun.al");
     }
 
     // void TearDown() override {}
@@ -77,7 +77,7 @@ TEST_F(KDBGlobalTest, Filter)
 
 TEST_F(KDBGlobalTest, LowToHigh)
 {
-    std::string varfile = input_test_dir + "fun.av";
+    std::string varfile = str_input_test_dir + "fun.av";
 
     // Set the sample for the variable WS
     global_ws_var->set_sample("2010Q1", "2020Q4");
@@ -111,7 +111,7 @@ TEST_F(KDBGlobalTest, LowToHigh)
 
 TEST_F(KDBGlobalTest, HighToLow)
 {
-    std::string varfile = input_test_dir + "fun_q.var";
+    std::string varfile = str_input_test_dir + "fun_q.var";
 
     // Set the sample for the variable WS
     global_ws_var->set_sample("2000Y1", "2020Y1");
