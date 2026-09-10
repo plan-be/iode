@@ -426,7 +426,8 @@ void ComputedTable::print_to_file()
         return;
     }
 
-    std::string title_utf8 = T_get_title(ref_table);
+    std::shared_ptr<Table> ref_table_ptr(ref_table, [](Table*) {});
+    std::string title_utf8 = T_get_title(ref_table_ptr);
     // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
     std::string title_oem = utf8_to_oem(title_utf8);
     W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title_oem.c_str());
@@ -468,7 +469,7 @@ void ComputedTable::print_to_file()
                 T_print_files(columns, dim);
                 break;
             case TABLE_LINE_CELL  :
-                res = T_print_line(ref_table, i, columns);
+                res = T_print_line(ref_table_ptr, i, columns);
                 if(res != 0)
                     throw std::runtime_error("Couldn't print table. Couldn't print line " + std::to_string(i));
         }

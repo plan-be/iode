@@ -117,8 +117,8 @@ int B_ViewPrintVar(char* arg, int mode)
         }
         else 
         {
-            Table tbl(2, "", chunks, true, true, true, search_comment);
-            rc = T_print_tbl(&tbl, (char*) sample.c_str());
+            std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(2, "", chunks, true, true, true, search_comment);
+            rc = T_print_tbl(tbl_ptr, sample);
         }
 
         // something went wrong -> exit loop
@@ -190,7 +190,7 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl_ptr.get(), smpl, (char*) name.c_str());
     else
-        rc = T_print_tbl(tbl_ptr.get(), smpl);
+        rc = T_print_tbl(tbl_ptr, smpl);
 
     if(rc < 0) 
         error_manager.append_error("Table '" + name + "' not printed");
@@ -239,7 +239,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         hg = T_graph_tbl_1(tbl_ptr, gsmpl, B_viewmode);
 
         if(view) 
-            W_EndDisplay((char*) T_get_title(tbl_ptr.get()).c_str(), -ng, -i, -1, -1);
+            W_EndDisplay((char*) T_get_title(tbl_ptr).c_str(), -ng, -i, -1, -1);
 
         if(hg < 0) 
         {

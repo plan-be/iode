@@ -184,11 +184,11 @@ int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl);
 int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, 
     const std::shared_ptr<Sample> smpl, char **names);
 
-/* int.c */
+/* k_print.c */
 int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, COLS** cls);
-int T_print_tbl(Table* tbl, char* smpl);
+int T_print_tbl(std::shared_ptr<Table> tbl_ptr, const std::string& sample);
 void T_print_title(TableCell* cell, int straddle);
-int T_print_line(Table* tbl, int i, COLS* cls);
+int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls);
 void T_print_cell(TableCell* cell, COL* cl, int straddle);
 void T_fmt_val(char* buf, double val, int lg, int nd);
 void T_print_val(double val);
@@ -202,4 +202,4 @@ void T_print_mode(COLS* cls, int dim);
 void T_print_date(int dim);
 int T_begin_tbl(int dim, COLS* cls);
 void T_end_tbl(void);
-std::string T_get_title(Table* tbl);
+std::string T_get_title(const std::shared_ptr<Table> tbl_ptr);
