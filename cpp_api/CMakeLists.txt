@@ -3,7 +3,6 @@ message(STATUS "\n---- C++ API ----\n")
 
 add_library(iode_cpp_api STATIC 
             iode_cpp_api.h      iode_cpp_api.cpp 
-            common.h
             legacy/s_iode.c
             )
 
