@@ -1,5 +1,9 @@
 #include "kdb_reference.h"
 
+#include "api/objs/variables.h"
+#include "api/objs/ws.h"
+#include "api/utils/utils.h"
+
 
 void load_reference_kdb(const int ref, std::string& filepath)
 {

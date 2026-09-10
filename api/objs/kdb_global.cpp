@@ -1,5 +1,6 @@
 #pragma once
 #include "kdb_global.h"
+#include "api/all.h"
 
 
 bool is_global_database_loaded(const IodeType iodeType) 

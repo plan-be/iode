@@ -180,7 +180,7 @@ cdef extern from "api/all.h":
         HTOL_MEAN,
         HTOL_SUM 
 
-cdef extern from "cpp_api/KDB/kdb_global.h":
+cdef extern from "api/objs/kdb_global.h":
     cdef map[char, string] mLowToHigh
 
 cdef extern from "api/all.h":
