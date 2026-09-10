@@ -1,12 +1,12 @@
 #include "pch.h"
 
 
-class LecTest : public KDBTest, public ::testing::Test
+class LecTest : public TestAbstract, public ::testing::Test 
 {
 protected:
     void SetUp() override
     {
-        global_ws_var->load(input_test_dir + "a.var");
+        global_ws_var->load(str_input_test_dir + "a.var");
     }
 
     // void TearDown() override {}
