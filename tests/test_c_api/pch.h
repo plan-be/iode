@@ -53,7 +53,7 @@ public:
 		skip_message(true);
 		
 		// NOTE: we assume that: 
-		//       - current path is binaryDir/tests/test_cpp_api
+		//       - current path is binaryDir/tests/test_c_api
 		//       - data directory has been copied in binaryDir/tests (see CMakeLists.txt in root directory)
 		std::string current_file = __FILE__;
 		std::filesystem::path cwd(current_file);
