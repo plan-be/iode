@@ -11,7 +11,7 @@ set(CPP_REPORT
 )
 
 set(CPP_COMPUTE
-    compute/estimation.h    compute/estimation.cpp
+    compute/edit_estimate_eqs.h    compute/edit_estimate_eqs.cpp
     )
 
 set(CPP_LEC 
