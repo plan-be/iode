@@ -1,4 +1,8 @@
-#include "report.h"
+#include "api/report/reports.h"
+#include "api/b_errors.h"
+#include "api/report/engine/engine.h"
+#include "api/utils/utils.h"
+#include "api/write/write.h"
 
 
 void execute_report(const std::string& filepath, const std::string& parameters)

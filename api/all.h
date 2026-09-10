@@ -55,6 +55,7 @@
 #include "api/print/print.h"
 #include "api/write/write.h"
 
+#include "api/report/rep_list.h"
 #include "api/report/reports.h"
 #include "api/report/commands/commands.h"
 #include "api/report/engine/engine.h"

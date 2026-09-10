@@ -62,3 +62,28 @@ inline int      RP_NOPARSING_CHAR = '`';    // If set, strings between RP_NOPARS
 inline int      RP_PRINT = 2;               // 2 = print and display messages, 1 = print only, 0 = ignore
 inline int      RP_T = 0;                   // current value of t for LEC evaluations in reports
 inline Period   RP_PER;                     // current Period for LEC evaluations in reports
+
+/*------------------------ FUNCTIONS ----------------------- */
+
+/**
+ * @brief
+ *
+ * @param filepath
+ * @param parameters
+ *
+ * @note same as function IodeExecArgs() from b_api.c (from iode_dos repository).
+ *       See https://iode.plan.be/doku.php?id=reportexec
+ */
+void execute_report(const std::string& filepath, const std::string& parameters = "");
+
+void execute_report(const std::string& filepath,
+    const std::vector<std::string>& parameters = std::vector<std::string>());
+
+/**
+ * @brief
+ *
+ * @param commands Sets of report command(s) separated by '\n'
+ */
+void execute_report_line(const std::string& commands);
+
+void execute_report_line(const std::vector<std::string>& commands);
