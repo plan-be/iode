@@ -5,18 +5,12 @@ set(CPP_UTILS
     utils/super.h     utils/super.cpp
     )
 
-set(CPP_REPORT
-    report/report.h     report/report.cpp
-    report/rep_list.h   report/rep_list.cpp
-)
-
 set(CPP_LEGACY  legacy/s_iode.c)
 
 add_library(iode_cpp_api STATIC 
             iode_cpp_api.h      iode_cpp_api.cpp 
             common.h
             ${CPP_UTILS}
-            ${CPP_REPORT}
             ${CPP_LEGACY}
             )
 

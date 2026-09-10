@@ -1,5 +1,7 @@
 #pragma once 
-#include "cpp_api/common.h"
+#include "api/lec/l_token.h"
+#include "api/report/reports.h"
+#include "api/utils/utils.h"
 
 #include <string>
 #include <cctype>
