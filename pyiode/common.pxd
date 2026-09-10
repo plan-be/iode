@@ -207,7 +207,7 @@ cdef extern from "api/all.h":
 cdef extern from "api/simulation/simulation.h":
     cdef vector[string] v_simulation_sort_algorithm
 
-cdef extern from "cpp_api/compute/estimation.h":
+cdef extern from "cpp_api/compute/edit_estimate_eqs.h":
     cdef vector[string] v_adjustment_method
     cdef int    ESTIMATION_MAXIT
     cdef double ESTIMATION_EPS

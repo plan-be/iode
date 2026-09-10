@@ -7,6 +7,6 @@
 #include "cpp_api/report/report.h"
 #include "cpp_api/report/rep_list.h"
 #include "cpp_api/lec/lec.h"
-#include "cpp_api/compute/estimation.h"
+#include "cpp_api/compute/edit_estimate_eqs.h"
 
 void cpp_iode_init();
