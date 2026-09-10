@@ -9,13 +9,6 @@ extern "C" long SCR_TOTAL_ALLOC;        // Total remaining memory allocation in 
 extern "C" int SCR_ALLOC_DOC;           // Log the remaining allocations    
 extern "C" char *SCR_ALLOC_DOC_LOGFILE; // Log file for remaining allocations    
 
-
-// Function used by A2M HTML generator (does not work in 64bits)
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) 
-{
-    return 0;
-}
-
 int free_tbl(char** tbl)
 {
     return SCR_free_tbl((unsigned char**) tbl);

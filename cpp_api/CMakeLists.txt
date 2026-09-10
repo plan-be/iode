@@ -1,10 +1,7 @@
 ﻿
 message(STATUS "\n---- C++ API ----\n")
 
-add_library(iode_cpp_api STATIC 
-            iode_cpp_api.h      iode_cpp_api.cpp 
-            legacy/s_iode.c
-            )
+add_library(iode_cpp_api STATIC iode_cpp_api.cpp)
 
 target_include_directories(iode_cpp_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(iode_cpp_api PUBLIC iode_c_api)

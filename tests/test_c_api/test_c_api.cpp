@@ -15,8 +15,6 @@
 #include <filesystem>
 #include <iostream>
 
-int A2mGIF_HTML(A2MGRF *go, U_ch* filename) {return 0;}
-
 
 class LegacyAPITest : public TestAbstract, public ::testing::Test
 {

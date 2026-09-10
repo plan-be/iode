@@ -286,11 +286,8 @@ int RP_message(char* arg, int unused)
 
     if(arg == NULL || arg[0] == 0) return 0;
 
-    //kmsg("%.80s", arg);
-
-    sprintf(fmt, "%%.%ds", SCR_PAGE_SIZE[1]-20);   /* JMP 17-03-11 */
-    kmsg(fmt, arg); // JMP 4/02/09                 /* JMP 17-03-11 */
-    /*    SCR_beep();    /* JMP 17-12-93 */
+    sprintf(fmt, "%%.%ds", SCR_PAGE_SIZE[1]-20);
+    kmsg(fmt, arg);
     return 0;
 }
 
@@ -339,7 +336,6 @@ int RP_ask(char* arg, int unused)
     U_ch    name[31];
 
     lg = B_get_arg0((char*) name, arg, 30);
-    //if(SCR_confirme(arg + lg + 1) != 0) return 0; /* rep. NON -> ligne suivante */
     if(kconfirm(arg + lg + 1) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
     if(RP_goto_label("label", (char*) name) != 0) return(-3);
@@ -476,8 +472,7 @@ int RP_chdir(char* arg, int unused)
     rc = chdir(arg); 
 #endif
 
-    //ODE_settitle();
-    ksettitle();     // JMP 10/12/2021
+    ksettitle();
     return rc;
 }
 

@@ -19,13 +19,20 @@
  *  ------------------------
  *      char* ODE_INIFILE       Name of the iode.ini file
  */
+#include "scr4/s_a2m.h"
 #include "scr4/s_prost.h"       // SCR_free, SCR_stracpy, SCR_strip
 #include "scr4/s_prodir.h"      // SCR_split_dir
 #include "scr4/s_proini.h"      // IniReadTxtParm, IniWriteParm
+#include "scr4/s_proa2m.h"      // A2mGIF_HTML
 
 #include "api/pch.h"
 #include "api/b_iodeini.h"
 
+
+int A2mGIF_HTML(A2MGRF *go, unsigned char* filename) 
+{
+    return 0;
+}
 
 /**
  *  Retrieves the path to the iode.ini file and stores the result in the global ODE_INIFILE. 

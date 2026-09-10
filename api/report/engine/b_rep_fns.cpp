@@ -2065,8 +2065,7 @@ U_ch *RPF_chdir(U_ch **args)
         #endif
     }    
 
-    //ODE_settitle();
-    ksettitle();     // JMP 10/12/2021
+    ksettitle();
     return(RPF_getdir(NULL));
 }
 
