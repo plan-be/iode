@@ -6,6 +6,6 @@
 #include "cpp_api/utils/super.h"
 #include "cpp_api/report/report.h"
 #include "cpp_api/report/rep_list.h"
-#include "cpp_api/lec/lec.h"
+#include "cpp_api/lec/execute_lec.h"
 
 void cpp_iode_init();
