@@ -236,7 +236,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         }
 
         tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-        hg = T_graph_tbl_1(tbl_ptr.get(), gsmpl, B_viewmode);
+        hg = T_graph_tbl_1(tbl_ptr, gsmpl, B_viewmode);
 
         if(view) 
             W_EndDisplay((char*) T_get_title(tbl_ptr.get()).c_str(), -ng, -i, -1, -1);

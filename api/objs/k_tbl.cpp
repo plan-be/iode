@@ -1146,7 +1146,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     else
         sprintf(gsmpl, "%s", ismpl);
 
-    dim = T_prep_cls(tbl_ptr.get(), gsmpl, &cls);
+    dim = initialize_columns(tbl_ptr, gsmpl, &cls);
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 

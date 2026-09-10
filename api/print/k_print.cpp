@@ -5,25 +5,6 @@
  *  Includes some A2M helper functions. 
  *  
  *  Note that the functions needed to generate graphs from tables can be found in k_graph.c.
- *  
- *  List of functions 
- *  -----------------
- *      int T_prep_cls(Table* tbl, char* smpl, COLS** cls)          Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table
- *      void T_fmt_val(char* buf, double val, int lg, int nd)       Formats a double value
- *      void T_print_val(double val)                                Prints a double value using W_printf()
- *      void T_open_cell(int attr, int straddle, int type)          Prints the header of an a2m table cell
- *      void T_open_attr(int attr)                                  Opens an A2M attribute sequence.
- *      void T_close_attr(int attr)                                 Closes an A2M attribute sequence.
- *      void T_print_title(TableCell* cell, int straddle)           Prints a Table line of type TITLE
- *      void T_print_cell(TableCell* cell, COL* cl, int straddle)   Prints a Table cell on a specific GSample column. 
- *      char **T_find_files(COLS* cls)                              Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
- *      std::string T_get_title(Table* tbl)                         Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE
- *      int T_print_tbl(Table* tbl, char* smpl)                     Computes a table on a GSample and saves the result in A2M format
- *  
- *  Global variables
- *  ----------------
- *      int      K_NBDEC = -1;                                      Default nb of decimals
- *  
  */
 #include "scr4/s_a2m.h"
 
@@ -39,25 +20,28 @@
 /**
  *  Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table.
  *  
- *  @param [in] Table*   tbl      table to compute
- *  @param [in] char*  smpl     GSample 
- *  @param [in] COLS** cls      result = column definition for computing of the table
- *  @return     int             total number of columns for the computed table
+ *  @param [in] std::shared_ptr<Table> tbl_ptr   table to compute
+ *  @param [in] const std::string&     gsample   GSample
+ *  @param [in] COLS**                 cls       result = column definition for computing of the table
+ *  @return     int                              total number of columns for the computed table
  *  
  */
-int T_prep_cls(Table* tbl, char* smpl, COLS** cls)
+int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, COLS** cls)
 {
-    int     dim;
+    *cls = NULL;
+    if(!tbl_ptr)
+        return -1;
 
-    *cls = COL_cc(smpl);
-    if(*cls == NULL) {
-        std::string error_msg = "Illegal sample '" + std::string(smpl) + "': syntax error";
+    *cls = COL_cc((char*) gsample.c_str());
+    if(*cls == NULL)
+    {
+        std::string error_msg = "Illegal sample '" + gsample + "': syntax error";
         error_manager.append_error(error_msg);
         return -1;
     }
 
-    dim = COL_resize(tbl, *cls);
-    return(dim);
+    int dim = COL_resize(tbl_ptr.get(), *cls);
+    return dim;
 }
 
 /**
@@ -471,7 +455,8 @@ int T_print_tbl(Table* tbl, char* smpl)
     int     i, dim, rc = 0, first = 1;
     COLS    *cls;
 
-    dim = T_prep_cls(tbl, smpl, &cls);
+    std::shared_ptr<Table> tbl_ptr(tbl, [](Table*) {});
+    dim = initialize_columns(tbl_ptr, smpl, &cls);
     if(dim < 0) 
         return -1;
 

@@ -1233,7 +1233,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Print tbl as a graph
-    rc = T_graph_tbl_1(tbl_ptr.get(), "2000/1999:15[1;2]", 1);
+    rc = T_graph_tbl_1(tbl_ptr, "2000/1999:15[1;2]", 1);
     EXPECT_EQ(rc, 0);
 
     // Print vars as graphs
