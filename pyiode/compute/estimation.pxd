@@ -16,7 +16,7 @@ from pyiode.iode_database.cpp_api_database cimport KDBEquations
 from pyiode.iode_database.cpp_api_database cimport KDBScalars
 
 
-cdef extern from "cpp_api/compute/edit_estimate_eqs.h":
+cdef extern from "api/estimation/edit_estimate_eqs.h":
     string dynamic_adjustment(const IodeAdjustmentMethod method, const string& eqs, 
                               const string& c1, const string& c2) except +
     shared_ptr[KDBScalars] dickey_fuller_test(const string& lec, bint drift, bint trend, int order) except +
