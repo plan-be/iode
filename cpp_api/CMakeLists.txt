@@ -10,10 +10,6 @@ set(CPP_REPORT
     report/rep_list.h   report/rep_list.cpp
 )
 
-set(CPP_COMPUTE
-    compute/edit_estimate_eqs.h    compute/edit_estimate_eqs.cpp
-    )
-
 set(CPP_LEC 
     lec/lec.h               lec/lec.cpp
     )
@@ -25,7 +21,6 @@ add_library(iode_cpp_api STATIC
             common.h
             ${CPP_UTILS}
             ${CPP_REPORT}
-            ${CPP_COMPUTE}
             ${CPP_LEC}
             ${CPP_LEGACY}
             )

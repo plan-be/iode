@@ -1,6 +1,9 @@
 #pragma once
 #include "api/pch.h"
 
+#include "api/utils/buf.h"
+#include "api/utils/yy.h"
+
 #include "api/time/period.h"
 #include "api/time/sample.h"
 
@@ -12,13 +15,9 @@
 #include "api/k_super.h"
 #include "api/version.h"
 
-#include "api/ascii/ascii.h"
-
 #include "api/io/dif.h"
 #include "api/io/export.h"
 #include "api/io/import.h"
-
-#include "api/estimation/estimation.h"
 
 #include "api/gsample/gsample.h"
 
@@ -42,19 +41,20 @@
 #include "api/objs/ws.h"
 #include "api/objs/xdr.h"
 
+#include "api/ascii/ascii.h"
+
+#include "api/estimation/estimation.h"
+#include "api/estimation/edit_estimate_eqs.h"
+
+#include "api/simulation/simulation.h"
+
 #include "api/computed_table/computed_table.h"
 #include "api/computed_table/computed_table_graph.h"
 
 #include "api/print/print.h"
+#include "api/write/write.h"
 
 #include "api/report/reports.h"
 #include "api/report/commands/commands.h"
 #include "api/report/engine/engine.h"
 #include "api/report/undoc/undoc.h"
-
-#include "api/simulation/simulation.h"
-
-#include "api/utils/buf.h"
-#include "api/utils/yy.h"
-
-#include "api/write/write.h"

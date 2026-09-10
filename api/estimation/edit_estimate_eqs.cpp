@@ -1,4 +1,4 @@
-#include "cpp_api/compute/edit_estimate_eqs.h"
+#include "api/estimation/edit_estimate_eqs.h"
 
 
 std::string dynamic_adjustment(const IodeAdjustmentMethod method, 
