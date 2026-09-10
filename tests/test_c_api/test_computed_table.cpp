@@ -1,7 +1,8 @@
 #include "pch.h"
+#include "api/objs/kdb_reference.h"
 
 
-class ComputedTableTest : public KDBTest, public ::testing::Test
+class ComputedTableTest : public TestAbstract, public ::testing::Test
 {
 protected:
     std::string var_file;
@@ -9,15 +10,15 @@ protected:
 
     void SetUp() override
     {
-        global_ws_tbl->load(input_test_dir + "fun.at");
+        global_ws_tbl->load(str_input_test_dir + "fun.at");
 
-        var_file = input_test_dir + "fun.av";
+        var_file = str_input_test_dir + "fun.av";
         global_ws_var->load(var_file);
 
         // slightly modify variables
         std::string pattern = "Q_F;Q_I;KNFF;KLFHP;TFPFHP_";
-        ref_file = input_test_dir + "ref2.av";
-        global_ws_var->load(input_test_dir + "fun.av");
+        ref_file = str_input_test_dir + "ref2.av";
+        global_ws_var->load(str_input_test_dir + "fun.av");
         KDBVariablesPtr kdb_ref = global_ws_var->get_subset(pattern, true);
         
         double value;
@@ -796,7 +797,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     ComputedTable table_simple(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
-    arg = output_test_dir + "c_api_file.csv C";
+    arg = str_output_test_dir + "c_api_file.csv C";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -804,26 +805,26 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_simple.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
-    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    table_simple.print_to_file(str_output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
     
     // ---- HTML format ----
-    arg = output_test_dir + "c_api_file.html H";
+    arg = str_output_test_dir + "c_api_file.html H";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
     load_reference_kdb(2, ref_file);
-    table_simple.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
-    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+    table_simple.print_to_file(str_output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     ComputedTable table_grt(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
-    arg = output_test_dir + "c_api_file.csv C";
+    arg = str_output_test_dir + "c_api_file.csv C";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -831,11 +832,11 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_grt.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
-    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    table_grt.print_to_file(str_output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
 
     // ---- HTML format ----
-    arg = output_test_dir + "c_api_file.html H";
+    arg = str_output_test_dir + "c_api_file.html H";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -843,15 +844,15 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_grt.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
-    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+    table_grt.print_to_file(str_output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 
     // simple time series (current workspace + one extra file) - 5 observations
     gsample = "2010[1-2]:5";
     ComputedTable table_2_files(ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
-    arg = output_test_dir + "c_api_file.csv C";
+    arg = str_output_test_dir + "c_api_file.csv C";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -859,11 +860,11 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_2_files.print_to_file(output_test_dir + "cpp_api_file.csv", 'C');
-    compare_files(output_test_dir + "c_api_file.csv", output_test_dir + "cpp_api_file.csv");
+    table_2_files.print_to_file(str_output_test_dir + "cpp_api_file.csv", 'C');
+    compare_files(str_output_test_dir + "c_api_file.csv", str_output_test_dir + "cpp_api_file.csv");
 
     // ---- HTML format ----
-    arg = output_test_dir + "c_api_file.html H";
+    arg = str_output_test_dir + "c_api_file.html H";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -871,13 +872,13 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_2_files.print_to_file(output_test_dir + "cpp_api_file.html", 'H');
-    compare_files(output_test_dir + "c_api_file.html", output_test_dir + "cpp_api_file.html");
+    table_2_files.print_to_file(str_output_test_dir + "cpp_api_file.html", 'H');
+    compare_files(str_output_test_dir + "c_api_file.html", str_output_test_dir + "cpp_api_file.html");
 
     // ---- binary table files ----
 
     KDBTablesPtr bin_kdb_tables = KDBTables::Create(false);
-    bin_kdb_tables->load(input_test_dir + "fun.tbl");
+    bin_kdb_tables->load(str_input_test_dir + "fun.tbl");
     
     std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
 
@@ -931,7 +932,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     ComputedTable table_simple_bin(bin_ref_table.get(), gsample, 4);
 
     // ---- CSV format ----
-    arg = output_test_dir + "bin_file.csv C";
+    arg = str_output_test_dir + "bin_file.csv C";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
@@ -939,19 +940,19 @@ TEST_F(ComputedTableTest, PrintToFile)
     EXPECT_EQ(res, 0);
 
     load_reference_kdb(2, ref_file);
-    table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.csv", 'C');
-    compare_files(output_test_dir + "bin_file.csv", output_test_dir + "bin_cpp_file.csv");
+    table_simple_bin.print_to_file(str_output_test_dir + "bin_cpp_file.csv", 'C');
+    compare_files(str_output_test_dir + "bin_file.csv", str_output_test_dir + "bin_cpp_file.csv");
     
     // ---- HTML format ----
-    arg = output_test_dir + "bin_file.html H";
+    arg = str_output_test_dir + "bin_file.html H";
     res = B_PrintDest(arg.data());
     res = B_PrintNbDec("4");
     arg = gsample + " " + table_name;
     res = B_PrintTbl(to_char_array(arg));
     EXPECT_EQ(res, 0);
     load_reference_kdb(2, ref_file);
-    table_simple_bin.print_to_file(output_test_dir + "bin_cpp_file.html", 'H');
-    compare_files(output_test_dir + "bin_file.html", output_test_dir + "bin_cpp_file.html");
+    table_simple_bin.print_to_file(str_output_test_dir + "bin_cpp_file.html", 'H');
+    compare_files(str_output_test_dir + "bin_file.html", str_output_test_dir + "bin_cpp_file.html");
 
     bin_kdb_tables->clear();
 
@@ -972,7 +973,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     second_cell->set_lec("Q_F");
 
     ComputedTable computed_table_sharp(&test_table, gsample, 4);
-    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.a2m", 'A');
-    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.html", 'H');
-    computed_table_sharp.print_to_file(output_test_dir + "cpp_api_sharp.csv", 'C');
+    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.a2m", 'A');
+    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.html", 'H');
+    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.csv", 'C');
 }
