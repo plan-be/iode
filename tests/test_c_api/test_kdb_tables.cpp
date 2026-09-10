@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "cpp_api/KDB/kdb_reference.h"
+#include "api/objs/kdb_reference.h"
 
 
 class KDBTablesTest : public TestAbstract, public ::testing::Test

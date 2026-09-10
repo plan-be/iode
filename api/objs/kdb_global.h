@@ -1,5 +1,10 @@
 #pragma once
-#include "cpp_api/common.h"
+#include "api/pch.h"
+#include "api/constants.h"
+#include "api/objs/kdb.h"
+#include "api/objs/tables.h"
+#include "api/objs/variables.h"
+#include "api/io/export.h"
 
 
 const std::map<char, std::string> mLowToHigh = 

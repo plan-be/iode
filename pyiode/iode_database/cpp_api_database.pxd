@@ -123,11 +123,11 @@ cdef extern from "api/all.h":
 #               from derived cimport DerivedRealName as Derived   
 #            https://stackoverflow.com/a/23455514
 
-cdef extern from "cpp_api/KDB/kdb_global.h":
+cdef extern from "api/objs/kdb_global.h":
     void low_to_high(IodeLowToHigh type_, char method, string& filepath, string& var_list) except +
     void high_to_low(IodeHighToLow type_, string& filepath, string& var_list) except +
 
-cdef extern from "cpp_api/KDB/kdb_reference.h":
+cdef extern from "api/objs/kdb_reference.h":
     void load_reference_kdb(int index, string& filepath) except +
     void clear_reference_kdb(int index) except +
     void clear_all_reference_kdbs() except +

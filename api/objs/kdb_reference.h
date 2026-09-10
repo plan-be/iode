@@ -1,5 +1,7 @@
 #pragma once
-#include "cpp_api/common.h"
+#include "api/pch.h"
+#include "api/constants.h"
+#include "api/objs/kdb.h"
 
 
 // TODO ALD: remove global_ref_xxx and make KDB classes to be able to represent a reference kdb
