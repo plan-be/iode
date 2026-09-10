@@ -724,7 +724,7 @@ U_ch *RPF_ttitle(U_ch** args)
         else 
         {
             tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-            std::string title = T_get_title(tbl_ptr.get());
+            std::string title = T_get_title(tbl_ptr);
             // W_printf() called in RP_ReportExec_tbl() expects OEM encoding, so convert the title 
             // from UTF-8 to OEM before printing
             title = utf8_to_oem(title);

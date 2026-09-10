@@ -1229,7 +1229,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     W_dest("test1_tbl.a2m", W_A2M);
 
     // Print tbl as table
-    rc = T_print_tbl(tbl_ptr.get(), "2000:5[1;2]");
+    rc = T_print_tbl(tbl_ptr, "2000:5[1;2]");
     EXPECT_EQ(rc, 0);
 
     // Print tbl as a graph

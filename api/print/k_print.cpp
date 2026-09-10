@@ -1,9 +1,9 @@
 /**
  *  @header4iode
- *  
+ *
  *  Functions to generate IODE tables in A2M format based on Table structures and GSample definition.
- *  Includes some A2M helper functions. 
- *  
+ *  Includes some A2M helper functions.
+ *
  *  Note that the functions needed to generate graphs from tables can be found in k_graph.c.
  */
 #include "scr4/s_a2m.h"
@@ -19,12 +19,12 @@
 
 /**
  *  Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table.
- *  
+ *
  *  @param [in] std::shared_ptr<Table> tbl_ptr   table to compute
  *  @param [in] const std::string&     gsample   GSample
  *  @param [in] COLS**                 cls       result = column definition for computing of the table
  *  @return     int                              total number of columns for the computed table
- *  
+ *
  */
 int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, COLS** cls)
 {
@@ -46,17 +46,17 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
 
 /**
  *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
- *  
+ *
  *  @param [in, out]    char*       buf     placeholder of the result
  *  @param [in]         double   val     input real value
  *  @param [in]         int         lg      max result string length
- *  @param [in]         int         nd      number of decimal places 
- *  
+ *  @param [in]         int         nd      number of decimal places
+ *
  */
- 
-void T_fmt_val(char* buf, double val, int lg, int nd) 
+
+void T_fmt_val(char* buf, double val, int lg, int nd)
 {
-    if(IODE_IS_A_NUMBER(val)) 
+    if(IODE_IS_A_NUMBER(val))
         SCR_fmt_dbl(val, (unsigned char*) buf, lg, nd);
     else strcpy(buf, "-.-");
     SCR_sqz((unsigned char*) buf);
@@ -65,12 +65,12 @@ void T_fmt_val(char* buf, double val, int lg, int nd)
 
 /**
  *  Prints a double value using W_printf().
- *  
+ *
  *  @param  [in] double  val      value to print
  *  @global [in] int        K_NBDEC  number of decimal places
- *  
+ *
  */
- 
+
 void T_print_val(double val)
 {
     char    buf[64];
@@ -82,13 +82,13 @@ void T_print_val(double val)
 
 /**
  *  Translates a TableCell of type KT_TEXT into a text using COL_text(). Sends the result to W_printf().
- *  
+ *
  *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
- *  @param  [in] string     the table column definition (ex "#s")  
+ *  @param  [in] string     the table column definition (ex "#s")
  *  @global [in] KT_nbnames number of compared files in the COLS definition
- *  
+ *
  */
- 
+
 void T_print_string(COL* cl, char* string)
 {
     char   *ptr = NULL;
@@ -102,15 +102,15 @@ void T_print_string(COL* cl, char* string)
 /**
  *  Prints the header of an a2m table cell: <cellsep><span><align>.
  *  Example: "@2C" if @ is the cell separator, 2 the number of spanned columns and the text must be centered in the column.
- *   
+ *
  *  @param  [in] int attr        alignment attribute: TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_DECIMAL, TABLE_CELL_LEFT.
  *  @param  [in] int straddle    number of spanned columns
  *  @param  [in] int type        column type (TABLE_CELL_STRING, TABLE_CELL_LEC...)
  *  @global [in] int A2M_SEPCH   a2m table cell separator
- *  
+ *
  */
- 
-void T_open_cell(int attr, int straddle, int type) 
+
+void T_open_cell(int attr, int straddle, int type)
 {
     char    align = 'L';
 
@@ -124,9 +124,9 @@ void T_open_cell(int attr, int straddle, int type)
 
 /**
  *  Opens an A2M attribute sequence.
- *  
+ *
  *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
- *  
+ *
  */
 void T_open_attr(int attr)
 {
@@ -139,9 +139,9 @@ void T_open_attr(int attr)
 
 /**
  *  Closes an A2M attribute sequence.
- *  
+ *
  *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
- *  
+ *
  */
 void T_close_attr(int attr)
 {
@@ -152,22 +152,22 @@ void T_close_attr(int attr)
 
 /**
  * @brief Prints a Table line of type TITLE
- * 
- * @param cell 
- * @param straddle 
- * @return int 
+ *
+ * @param cell
+ * @param straddle
+ * @return int
  */
 void T_print_title(TableCell* cell, int straddle)
 {
-    if(cell == nullptr || cell->is_null()) 
+    if(cell == nullptr || cell->is_null())
     {
-        W_printf((char*) "%c1R", A2M_SEPCH); 
-        return;                
+        W_printf((char*) "%c1R", A2M_SEPCH);
+        return;
     }
 
     std::string content = cell->get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
-    //       from UTF-8 to OEM before printing 
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
+    //       from UTF-8 to OEM before printing
     content = utf8_to_oem(content);
 
     int attribute = (int) cell->get_attribute();
@@ -181,31 +181,31 @@ void T_print_title(TableCell* cell, int straddle)
 
 
 /**
- *  Prints a Table cell on a specific GSample column. 
- *  
+ *  Prints a Table cell on a specific GSample column.
+ *
  *  @param [in] TableCell*  cell        table cell to print
  *  @param [in] COL*        cl          GSample column definition with the value already calculated
- *  @param [in] int         straddle    nb of spanned columns int the resulting a2m table 
- *  
+ *  @param [in] int         straddle    nb of spanned columns int the resulting a2m table
+ *
  */
 void T_print_cell(TableCell* cell, COL* cl, int straddle)
 {
-    if(cell == nullptr || cell->is_null()) 
+    if(cell == nullptr || cell->is_null())
     {
-        W_printf((char*) "%c1R", A2M_SEPCH); 
-        return;                
+        W_printf((char*) "%c1R", A2M_SEPCH);
+        return;
     }
 
     TableCellType cell_type = cell->get_type();
-    
+
     std::string content = cell->get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
     //       from UTF-8 to OEM before printing
     content = utf8_to_oem(content);
 
     if(cell_type == TABLE_CELL_STRING && content.find('#') != std::string::npos)
         cell->set_align(TABLE_CELL_RIGHT);
-    
+
     if(cell_type == TABLE_CELL_LEC)
         cell->set_align(TABLE_CELL_DECIMAL);
 
@@ -215,7 +215,7 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
 
     if(cl == NULL || cell_type == TABLE_CELL_STRING)
         T_print_string(cl, (char*) content.c_str());
-    else 
+    else
         T_print_val(cl->cl_res);
 
     T_close_attr(attribute);
@@ -224,29 +224,29 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
 
 /**
  *  Prints one table line for all columns defined in cls.
- *  
+ *
  *  @param [in] Table*    tbl     source table
  *  @param [in] int     i       line to print
  *  @param [in] COLS*   cls     columns to print = compiled GSample
- *  @return     int             0 on success, -1 on error.        
- *  
+ *  @return     int             0 on success, -1 on error.
+ *
  */
 
-int T_print_line(Table* tbl, int i, COLS* cls)
+int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
 {
     COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0)   
+    if(COL_exec(tbl_ptr.get(), i, cls) < 0)
         return -1;
 
     int     d;
     COL*    cl;
     TableCell*  cell;
-    TableLine&  line = tbl->lines[i];
+    TableLine&  line = tbl_ptr->lines[i];
 
-    for(int j = 0; j < cls->cl_nb; j++) 
+    for(int j = 0; j < cls->cl_nb; j++)
     {
-        d = j % tbl->nb_columns;
-        if(tbl->repeat_columns == 0 && d == 0 && j != 0) 
+        d = j % tbl_ptr->nb_columns;
+        if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0)
             continue;
         if(line.cells.size() > d)
         {
@@ -261,12 +261,12 @@ int T_print_line(Table* tbl, int i, COLS* cls)
 
 
 /**
- *  Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES. 
- *   
+ *  Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
+ *
  *  @param [in] COLS*   cls     list of columns (from GSample)
  *  @return     char**          NULL if one of the ref files is not loaded in global_ref_xxx
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
- *  
+ *
  */
 
 char **T_find_files(COLS* cls)
@@ -277,7 +277,7 @@ char **T_find_files(COLS* cls)
     char    **names = 0, buf[K_MAX_FILE + 10];
 
     memset(files, 0, (K_MAX_FREF + 1) * sizeof(int));
-    for(i = 0; i < cls->cl_nb; i++) 
+    for(i = 0; i < cls->cl_nb; i++)
     {
         cl = cls->cl_cols + i;
         files[cl->cl_fnb[0]] = 1;
@@ -285,11 +285,11 @@ char **T_find_files(COLS* cls)
     }
 
     KDBVariablesPtr kdb;
-    for(i = 1; i < K_MAX_FREF + 1; i++) 
+    for(i = 1; i < K_MAX_FREF + 1; i++)
     {
-        if(files[i] == 0) 
+        if(files[i] == 0)
             continue;
-        
+
         kdb = global_ref_var[i - 1];
         if(kdb.get() == nullptr)
         {
@@ -305,27 +305,27 @@ char **T_find_files(COLS* cls)
         //B_path_change(buf);
         SCR_add_ptr((unsigned char***) &names, &nf, (unsigned char*) buf);
     }
-    
+
     SCR_add_ptr((unsigned char***) &names, &nf, 0L);
     return names;
 }
 
 /**
  *  Prints the special Table line of type TABLE_LINE_FILES.
- *  
+ *
  *  @param  [in] COLS*  cls         columns to print = compiled GSample
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
  *  @global [in] char** KT_names    list of formatted filenames
  *  @global [in] int    KT_nbnames  number if filenames
- *  
+ *
  */
- 
+
 void T_print_files(COLS* cls, int dim)
 {
-    if(KT_nbnames <= 0) 
-        return;  
+    if(KT_nbnames <= 0)
+        return;
 
-    for(int i = 0; KT_names[i]; i++) 
+    for(int i = 0; KT_names[i]; i++)
     {
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
         W_printf((char*) "%s", KT_names[i]);
@@ -335,20 +335,20 @@ void T_print_files(COLS* cls, int dim)
 
 /**
  *  Prints the special Table line of type TABLE_LINE_MODE (growth rates, diff...).
- *  
+ *
  *  @param  [in] COLS*  cls         columns to print = compiled GSample
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
  *  @global [in] char** KT_mode     list of modes used in COLS (computed in T_begin_tbl())
- *  
+ *
  */
 
 void T_print_mode(COLS* cls, int dim)
 {
     int    i;
 
-    for(i = 0; i < MAX_MODE; i++) 
+    for(i = 0; i < MAX_MODE; i++)
     {
-        if(KT_mode[i] == 0) 
+        if(KT_mode[i] == 0)
             continue;
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
         W_printf((char*) "(%s) %s", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]);
@@ -358,9 +358,9 @@ void T_print_mode(COLS* cls, int dim)
 
 /**
  *  Prints the special Table line of type TABLE_LINE_DATE.
- *  
+ *
  *  @param  [in] int    dim   total number of columns in the resulting table (size of GSample x nb table cols)
- *  
+ *
  */
 
 void T_print_date(int dim)
@@ -377,34 +377,34 @@ void T_print_date(int dim)
 /**
  *  Prints a table header in A2M.
  *  Initialises globals KT_names, KT_nbnames and KT_mode.
- *  
+ *
  *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
  *  @param [in] COLS*   cls     columns to print = compiled GSample
- *  @return 
+ *  @return
  */
 int T_begin_tbl(int dim, COLS* cls)
 {
     KT_names = T_find_files(cls);
     KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) 
+    if(KT_nbnames == 0)
         return -1;
-    
+
     COL_find_mode(cls, KT_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
 
-    if(A2M_SEPCH == '\t') 
+    if(A2M_SEPCH == '\t')
         W_printf((char*) ".sep TAB");
-    else 
+    else
         W_printf((char*) ".sep %c", A2M_SEPCH);
     W_printf("\n");
-    
+
     return 0;
 }
 
 
 /**
- *  Prints a table footer in A2M and frees the temporary allocated variables. 
+ *  Prints a table footer in A2M and frees the temporary allocated variables.
  */
 void T_end_tbl()
 {
@@ -417,24 +417,24 @@ void T_end_tbl()
 
 /**
  *  Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE.
- *  
- *  @param [in] Table*    tbl   pointer to a table
- *  @return     char*           local static buffer with the contents of the title or the text "No title"
+ *
+ *  @param [in] const std::shared_ptr<Table> tbl_ptr pointer to a table
+ *  @return     std::string contents of the title or the text "No title"
  *                              if no line of type TABLE_LINE_TITLE can be found or if the first line of that type is empty.
  */
-std::string T_get_title(Table* tbl)  
-{   
+std::string T_get_title(const std::shared_ptr<Table> tbl_ptr)
+{
     // get the first line of type TABLE_LINE_TITLE
     int k = 0;
-    for(k = 0; k < tbl->lines.size(); k++)
-        if(tbl->lines[k].get_type() == TABLE_LINE_TITLE) 
+    for(k = 0; k < tbl_ptr->lines.size(); k++)
+        if(tbl_ptr->lines[k].get_type() == TABLE_LINE_TITLE)
             break;
 
-    TableLine line = tbl->lines[k];
+    TableLine line = tbl_ptr->lines[k];
     TableCell cell = line.cells[0];
     std::string title = cell.get_content(false);
 
-    if(k == tbl->lines.size() || title.empty())
+    if(k == tbl_ptr->lines.size() || title.empty())
         title = "No title";
 
     return title;
@@ -442,48 +442,46 @@ std::string T_get_title(Table* tbl)
 
 
 /**
- *  Computes a table on a GSample and saves the result in A2M format (see https://iode.plan.be/doku.php?id=le_langage_a2m for
- *  the syntax of a2m files).
- *  
+ *  Computes a table on a GSample and saves the result in A2M format
+ *  (see https://iode.plan.be/doku.php?id=le_langage_a2m for the syntax of a2m files).
+ *
  *  @param [in] Table*    tbl     table to print
  *  @param [in] char*   smpl    GSample on which the tbl must be computed
- *  @return     int             0 on success, -1 on error (smpl syntax error, files not defined...) 
- *  
+ *  @return     int             0 on success, -1 on error (smpl syntax error, files not defined...)
+ *
  */
-int T_print_tbl(Table* tbl, char* smpl)
+int T_print_tbl(std::shared_ptr<Table> tbl_ptr, const std::string& sample)
 {
-    int     i, dim, rc = 0, first = 1;
-    COLS    *cls;
-
-    std::shared_ptr<Table> tbl_ptr(tbl, [](Table*) {});
-    dim = initialize_columns(tbl_ptr, smpl, &cls);
-    if(dim < 0) 
+    COLS* cls = nullptr;
+    int dim = initialize_columns(tbl_ptr, sample, &cls);
+    if(dim < 0)
         return -1;
 
-    std::string title = T_get_title(tbl);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 
-    //       to OEM before printing 
+    std::string title = T_get_title(tbl_ptr);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8
+    //       to OEM before printing
     title = utf8_to_oem(title);
 
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title.c_str());
+    W_printf(".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title.c_str());
 
-    if(T_begin_tbl(dim, cls)) 
+    if(T_begin_tbl(dim, cls))
         return -1;
-    
+
     W_printf((char*) ".ttitle %s", title.c_str());
-    
+
     TableLine* line;
     TableCell* cell;
-    for(i = 0; rc == 0 && i < tbl->lines.size(); i++) 
+    int rc = 0, first = 1;
+    for(int i = 0; i < tbl_ptr->lines.size(); i++)
     {
-        line = &tbl->lines[i];
-        switch(line->get_type()) 
+        line = &tbl_ptr->lines[i];
+        switch(line->get_type())
         {
             case TABLE_LINE_SEP   :
                 W_printf((char*) ".tl");
                 break;
             case TABLE_LINE_TITLE :
-                if(first) 
+                if(first)
                 {
                     first = 0;
                     break;
@@ -501,7 +499,7 @@ int T_print_tbl(Table* tbl, char* smpl)
                 T_print_files(cls, dim);
                 break;
             case TABLE_LINE_CELL  :
-                if(T_print_line(tbl, i, cls) < 0) 
+                if(T_print_line(tbl_ptr, i, cls) < 0)
                 {
                     std::string error_msg = "Unable to print line '" + std::to_string(i) + "'";
                     error_manager.append_error(error_msg);
@@ -509,8 +507,13 @@ int T_print_tbl(Table* tbl, char* smpl)
                 }
                 break;
         }
+
         W_printf("\n");
+
+        if(rc < 0)
+            break;
     }
+
     T_end_tbl();
 
     COL_free_cols(cls);
