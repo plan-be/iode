@@ -1,4 +1,4 @@
-#include "computed_table_graph.h"
+#include "api/computed_table/computed_table_graph.h"
 
 
 ComputedTableGraph::ComputedTableGraph(Table* ref_table, const std::string& gsample) 

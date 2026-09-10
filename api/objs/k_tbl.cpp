@@ -17,7 +17,7 @@
 #include "api/print/print.h"
 #include "api/utils/buf.h"
 #include "api/report/undoc/undoc.h"
-#include "cpp_api/computed_table/computed_table.h"
+#include "api/computed_table/computed_table.h"
 
 bool debug_unpack = false;
 bool debug_pack = false;

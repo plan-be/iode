@@ -1,0 +1,1 @@
+target_sources(iode_c_api PRIVATE computed_table.cpp computed_table_graph.cpp)
