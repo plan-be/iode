@@ -109,7 +109,6 @@ To build a specific target, you need to run
 where `<target>` is one the item in the list below:
 - `iode_scr4`          -> C library providing many of the utility functions used in the C API.
 - `iode_c_api`         -> Core API of IODE (in pure C).
-- `iode_cpp_api`       -> C++ classes that wrap IODE C structure (used in the GUI Qt part).
 - `iode_cython`        -> Cython wrapper for the C/C++ API.
 - `test_c_api`         -> Builds the tests for the C API (based on Google Test).
 - `iode_doc`           -> Builds the user documentation (using Python Sphinx)
@@ -131,10 +130,9 @@ To build the Python module for IODE (Cython), please:
 
 ## C And C++ API
 
-To test the C and C++ API, you first have to build them as explain above:
+To test the C++ API, you first have to build them as explain above:
 ```bash
 > cmake --build --preset <preset_config> --target iode_c_api
-> cmake --build --preset <preset_config> --target iode_cpp_api
 ```
 
 The second step is to build the tests:

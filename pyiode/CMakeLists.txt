@@ -118,8 +118,8 @@ if(Python_FOUND)
       python_add_library(iode_cython MODULE WITH_SOABI ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
     endif()
     
-    target_link_libraries(iode_cython PRIVATE iode_cpp_api Python::NumPy)
-    target_include_directories(iode_cython PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api ${CMAKE_SOURCE_DIR}/cpp_api)
+    target_link_libraries(iode_cython PRIVATE iode_c_api Python::NumPy)
+    target_include_directories(iode_cython PRIVATE ${CMAKE_SOURCE_DIR}/scr4 ${CMAKE_SOURCE_DIR}/api)
     target_compile_definitions(iode_cython PUBLIC NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION)
 
     # Add a custom command that runs the Python script to generate stub files 

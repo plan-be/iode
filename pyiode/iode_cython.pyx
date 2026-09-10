@@ -20,7 +20,7 @@
 
 # distutils: language = c++
 from pathlib import Path
-from iode_cython cimport cpp_iode_init
+from iode_cython cimport IodeInit
 from iode_cython cimport python_assign_super
 
 # MAIN
@@ -40,7 +40,7 @@ cnp.import_array()
 
 # initialize SWAP memory (SCR4), create empty workspaces and 
 # assign 'super' functions
-cpp_iode_init()
+IodeInit()
 
 # Super C functions are replaced here
 include "super.pyx"

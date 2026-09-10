@@ -40,9 +40,6 @@ cdef extern from "api/all.h":
     cdef int     kconfirm(const char* fmt, ...) noexcept
     cdef void    kpanic()
 
-cdef extern from "cpp_api/iode_cpp_api.h":
-    cdef void   cpp_iode_init() nogil
-
 cdef extern from "cli.cpp":
     cdef int   free_tbl(char** tbl) nogil
 

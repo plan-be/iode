@@ -275,7 +275,6 @@ message(STATUS "CREATE TARGETS:\n")
 # ---- libraries ----
 add_subdirectory ("scr4")
 add_subdirectory ("api")
-add_subdirectory ("cpp_api")
 
 # ---- archives ----
 
@@ -318,13 +317,3 @@ message(STATUS "Compile options:       ${_COMPILE_OPTIONS}")
 message(STATUS "Compile definitions:   ${_COMPILE_DEFINITIONS}")
 message(STATUS "Include directories:   ${_INCLUDE_DIRECTORIES}")
 message(STATUS "Dependencies:          ${_DEPENDENCIES}")
-message(STATUS "======== target iode_cpp_api ========")
-get_target_property(_COMPILE_OPTIONS iode_cpp_api COMPILE_OPTIONS)
-get_target_property(_COMPILE_DEFINITIONS iode_cpp_api COMPILE_DEFINITIONS)
-get_target_property(_INCLUDE_DIRECTORIES iode_cpp_api INCLUDE_DIRECTORIES)
-get_target_property(_DEPENDENCIES iode_cpp_api LINK_LIBRARIES)
-message(STATUS "Compile options:       ${_COMPILE_OPTIONS}")
-message(STATUS "Compile definitions:   ${_COMPILE_DEFINITIONS}")
-message(STATUS "Include directories:   ${_INCLUDE_DIRECTORIES}")
-message(STATUS "Dependencies:          ${_DEPENDENCIES}")
-message(STATUS "===================================")

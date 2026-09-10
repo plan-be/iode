@@ -1,7 +1,6 @@
 #pragma once
 #include <istream>
 #include "api/all.h"
-#include "cpp_api/iode_cpp_api.h"
 
 
 /* Allocation debugging  (see scr/s_allc.c) */
