@@ -11,7 +11,7 @@ set(CPP_REPORT
 )
 
 set(CPP_LEC 
-    lec/lec.h               lec/lec.cpp
+    lec/execute_lec.h       lec/execute_lec.cpp
     )
 
 set(CPP_LEGACY  legacy/s_iode.c)
