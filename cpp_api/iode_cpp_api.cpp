@@ -7,5 +7,5 @@
 void cpp_iode_init()
 {
     IodeInit();
-    cpp_assign_super_API();
+    IODE_assign_super_API();
 }
