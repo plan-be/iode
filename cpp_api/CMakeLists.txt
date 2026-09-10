@@ -1,17 +1,10 @@
 ﻿
 message(STATUS "\n---- C++ API ----\n")
 
-set(CPP_UTILS
-    utils/super.h     utils/super.cpp
-    )
-
-set(CPP_LEGACY  legacy/s_iode.c)
-
 add_library(iode_cpp_api STATIC 
             iode_cpp_api.h      iode_cpp_api.cpp 
             common.h
-            ${CPP_UTILS}
-            ${CPP_LEGACY}
+            legacy/s_iode.c
             )
 
 target_include_directories(iode_cpp_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
