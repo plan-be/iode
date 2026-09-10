@@ -1,8 +1,13 @@
 #pragma once
 
-#include "cpp_api/common.h"
+#include "api/pch.h"
+#include "api/constants.h"
+#include "api/utils/utils.h"
+#include "api/gsample/gsample.h"
 #include "api/objs/tables.h"
 #include "api/objs/variables.h"
+#include "api/print/print.h"
+#include "api/report/undoc/undoc.h"
 
 
 // NOTE: the class below aims to add C++ taste to the C version of gsample

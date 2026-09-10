@@ -42,6 +42,9 @@
 #include "api/objs/ws.h"
 #include "api/objs/xdr.h"
 
+#include "api/computed_table/computed_table.h"
+#include "api/computed_table/computed_table_graph.h"
+
 #include "api/print/print.h"
 
 #include "api/report/reports.h"

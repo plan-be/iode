@@ -8,7 +8,5 @@
 #include "cpp_api/report/rep_list.h"
 #include "cpp_api/lec/lec.h"
 #include "cpp_api/compute/estimation.h"
-#include "cpp_api/computed_table/computed_table.h"
-#include "cpp_api/computed_table/computed_table_graph.h"
 
 void cpp_iode_init();

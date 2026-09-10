@@ -32,7 +32,7 @@ cdef extern from "api/all.h":
     char* COL_ctoa(COL*, int, int, int)     # COL to ASCII
 
 
-cdef extern from "cpp_api/computed_table/computed_table.h":
+cdef extern from "api/computed_table/computed_table.h":
     cdef cppclass CComputedTable "ComputedTable":
         CTable*     ref_table
         int         dim

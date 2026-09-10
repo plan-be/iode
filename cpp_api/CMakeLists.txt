@@ -18,11 +18,6 @@ set(CPP_LEC
     lec/lec.h               lec/lec.cpp
     )
 
-set(CPP_COMPUTED_TABLE
-    computed_table/computed_table.h             computed_table/computed_table.cpp
-    computed_table/computed_table_graph.h       computed_table/computed_table_graph.cpp
-    )
-
 set(CPP_LEGACY  legacy/s_iode.c)
 
 add_library(iode_cpp_api STATIC 
@@ -32,7 +27,6 @@ add_library(iode_cpp_api STATIC
             ${CPP_REPORT}
             ${CPP_COMPUTE}
             ${CPP_LEC}
-            ${CPP_COMPUTED_TABLE}
             ${CPP_LEGACY}
             )
 

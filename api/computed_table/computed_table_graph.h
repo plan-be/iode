@@ -1,6 +1,8 @@
+#pragma once
+
 #include <map>
 #include <vector>
-#include "computed_table.h"
+#include "api/computed_table/computed_table.h"
 
 
 struct ComputedTableGraph: public ComputedTable
