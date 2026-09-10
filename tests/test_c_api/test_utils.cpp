@@ -1,7 +1,7 @@
 #include "pch.h"
 
 
-class UtilsTest : public KDBTest, public ::testing::Test
+class UtilsTest : public TestAbstract, public ::testing::Test
 {
 protected:
 
@@ -30,77 +30,77 @@ TEST_F(UtilsTest, getIodeFileType)
 	filename = "ws";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_ANY);
 
-	EXPECT_EQ(get_iode_file_type(input_test_dir), DIRECTORY);
+	EXPECT_EQ(get_iode_file_type(str_input_test_dir), DIRECTORY);
 
-	filename = input_test_dir + prefix_filename + "fun.cmt";
+	filename = str_input_test_dir + prefix_filename + "fun.cmt";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_COMMENTS);
-	filename = input_test_dir + "fun.ac";
+	filename = str_input_test_dir + "fun.ac";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_COMMENTS);
 
-	filename = input_test_dir + prefix_filename + "fun.eqs";
+	filename = str_input_test_dir + prefix_filename + "fun.eqs";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_EQUATIONS);
-	filename = input_test_dir + "fun.ae";
+	filename = str_input_test_dir + "fun.ae";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_EQUATIONS);
 
-	filename = input_test_dir + prefix_filename + "fun.idt";
+	filename = str_input_test_dir + prefix_filename + "fun.idt";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_IDENTITIES);
-	filename = input_test_dir + "fun.ai";
+	filename = str_input_test_dir + "fun.ai";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_IDENTITIES);
 
-	filename = input_test_dir + prefix_filename + "fun.lst";
+	filename = str_input_test_dir + prefix_filename + "fun.lst";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_LISTS);
-	filename = input_test_dir + "fun.al";
+	filename = str_input_test_dir + "fun.al";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_LISTS);
 
-	filename = input_test_dir + prefix_filename + "fun.scl";
+	filename = str_input_test_dir + prefix_filename + "fun.scl";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_SCALARS);
-	filename = input_test_dir + "fun.as";
+	filename = str_input_test_dir + "fun.as";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_SCALARS);
 
-	filename = input_test_dir + prefix_filename + "fun.tbl";
+	filename = str_input_test_dir + prefix_filename + "fun.tbl";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_TABLES);
-	filename = input_test_dir + "fun.at";
+	filename = str_input_test_dir + "fun.at";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_TABLES);
 
-	filename = input_test_dir + prefix_filename + "fun.var";
+	filename = str_input_test_dir + prefix_filename + "fun.var";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_VARIABLES);
-	filename = input_test_dir + "fun.av";
+	filename = str_input_test_dir + "fun.av";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_VARIABLES);
 
-	filename = input_test_dir + "fun.rep";
+	filename = str_input_test_dir + "fun.rep";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_REP);
 
-	filename = input_test_dir + "fun.log";
+	filename = str_input_test_dir + "fun.log";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_LOG);
 
-	filename = input_test_dir + "fun.ini";
+	filename = str_input_test_dir + "fun.ini";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_SETTINGS);
 
-	filename = input_test_dir + "fun.txt";
+	filename = str_input_test_dir + "fun.txt";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_TXT);
 
-	filename = input_test_dir + "fun.a2m";
+	filename = str_input_test_dir + "fun.a2m";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_A2M);
 
-	filename = input_test_dir + "fun.agl";
+	filename = str_input_test_dir + "fun.agl";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_AGL);
 
-	filename = input_test_dir + "fun.prf";
+	filename = str_input_test_dir + "fun.prf";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_PRF);
 
-	filename = input_test_dir + "fun.dif";
+	filename = str_input_test_dir + "fun.dif";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_DIF);
 
-	filename = input_test_dir + "fun.mif";
+	filename = str_input_test_dir + "fun.mif";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_MIF);
 
-	filename = input_test_dir + "fun.rtf";
+	filename = str_input_test_dir + "fun.rtf";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_RTF);
 
-	filename = input_test_dir + "fun.asc";
+	filename = str_input_test_dir + "fun.asc";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_AAS);
 
-	filename = input_test_dir + "fun.ref";
+	filename = str_input_test_dir + "fun.ref";
 	EXPECT_EQ(get_iode_file_type(filename), FILE_REF);
 }
 
@@ -116,26 +116,26 @@ TEST_F(UtilsTest, checkFilepath)
 	EXPECT_THROW(check_filepath(filepath, FILE_COMMENTS, "save", false), std::invalid_argument);
 
 	// wrong extension
-	filepath = output_test_dir + "fun.eqs";
+	filepath = str_output_test_dir + "fun.eqs";
 	EXPECT_THROW(check_filepath(filepath, FILE_COMMENTS, "save", false), std::invalid_argument);
 
-	filepath = output_test_dir + "fun.docx";
+	filepath = str_output_test_dir + "fun.docx";
 	EXPECT_THROW(check_filepath(filepath, FILE_TXT, "save", false), std::invalid_argument);
 
 	// file does not exist
-	filepath = input_test_dir + "funxxx.cmt";
+	filepath = str_input_test_dir + "funxxx.cmt";
 	EXPECT_THROW(check_filepath(filepath, FILE_COMMENTS, "load", true), std::invalid_argument);
 
 	// file does not exist (no extension given)
-	filepath = input_test_dir + "funxxx";
+	filepath = str_input_test_dir + "funxxx";
 	EXPECT_THROW(check_filepath(filepath, FILE_COMMENTS, "load", true), std::invalid_argument);
 
 	// No extension but not an IODE objects file
-	filepath = input_test_dir + "fun";
+	filepath = str_input_test_dir + "fun";
 	EXPECT_THROW(check_filepath(filepath, FILE_TXT, "load", true), std::invalid_argument);
 
 	// extension added automatically
-	filepath = input_test_dir + prefix_filename + "fun";
+	filepath = str_input_test_dir + prefix_filename + "fun";
 	filepath = check_filepath(filepath, FILE_COMMENTS, "load", true);
-	EXPECT_EQ(filepath, input_test_dir + prefix_filename + "fun.cmt");
+	EXPECT_EQ(filepath, str_input_test_dir + prefix_filename + "fun.cmt");
 }
