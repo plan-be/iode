@@ -1,5 +1,5 @@
 if(BUILD_TESTING)
-add_executable(${test_cpp_api} pch.cpp test_utils.cpp test_report.cpp)
+add_executable(${test_cpp_api} pch.cpp test_utils.cpp)
 
 # Precompiled headers for faster compilation
 target_precompile_headers(${test_cpp_api} PRIVATE pch.h)
