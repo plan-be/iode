@@ -240,8 +240,7 @@ int B_DSImportDb_1(char *arg, Sample *smpl)
     sprintf((char*) request, "TRH>%s;;%s;%s;%c", arg, st_date, nd_date, freq);
 
     kmsg("DSDDE :%s ...", request);
-    //if(SCR_hit_key() != 0) SCR_get_key();
-    if(khitkey() != 0) kgetkey();               // JMP 11/12/2021
+    if(khitkey() != 0) kgetkey();
     
     ptr = WscrDdeGet("DSDDE", "TS", (char*) request);
     if(ptr != NULL) {
