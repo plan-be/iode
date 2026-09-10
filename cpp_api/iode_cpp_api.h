@@ -2,6 +2,6 @@
 
 #pragma once
 
-#include "cpp_api/common.h"
+#include "api/all.h"
 
 void cpp_iode_init();

@@ -221,6 +221,18 @@ inline char    B_SEPS[] = " ,\n\t";     // Accepted separators for fn arguments 
                                         // !! Semi-colon not accepted !!
 inline int     B_MULTIBAR = 0;          // Graph parameter (Geert Bryon)
 
+const static std::vector<std::string> v_graphs_colors = 
+    {"Blue", "Yellow", "Black", "White", "Red", "Green", "Cyan", "Magenta"};
+
+const static std::vector<std::string> v_iode_fonts =
+    {"Helvetica", "Times", "Courier", "Bookman", "Palatino", "Trebuchet MS"};
+
+const static std::vector<std::string> v_print_dest = {"Windows printer", "File"};
+
+const static std::vector<std::string> v_print_formats =
+    {"A2M file (IODE ...)", "RTF file (Word, ...)", "HTML file (Internet)",
+     "MIF file (Frame Maker)", "CSV file (Excel, ....)"};
+
 /*-------------------- MACROS ------------------------*/
 
 #define P_len(ptr)            P_get_len(ptr, -1)

@@ -3,10 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "cpp_api/common.h"
+#include "api/constants.h"
 #include "api/utils/utils.h"
 #include "api/time/period.h"
 #include "api/objs/variables.h"
+#include "api/lec/lec.h"
 
 /**
  *  Evaluate the LEC expression for a specific period t.
