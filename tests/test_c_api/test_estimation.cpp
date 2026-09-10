@@ -1,14 +1,14 @@
 #include "pch.h"
 
 
-class EstimationTest : public KDBTest, public ::testing::Test
+class EstimationTest : public TestAbstract, public ::testing::Test 
 {
 protected:
     void SetUp() override
     {
-        global_ws_eqs->load(input_test_dir + "fun.ae");
-        global_ws_scl->load(input_test_dir + "fun.as");
-        global_ws_var->load(input_test_dir + "fun.av");
+        global_ws_eqs->load(str_input_test_dir + "fun.ae");
+        global_ws_scl->load(str_input_test_dir + "fun.as");
+        global_ws_var->load(str_input_test_dir + "fun.av");
     }
 
     // void TearDown() override {}
