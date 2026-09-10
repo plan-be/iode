@@ -41,15 +41,15 @@ int IodeInit()
     // Initialize chrono for report functions
     RPF_ChronoReset(NULL);      
     
-    // Initialize scr4 SWAP memory management if not yet done // JMP 07/06/2023
-    if(SW_ACTIVE == 0) {            // JMP 08/06/2023
+    // Initialize scr4 SWAP memory management if not yet done
+    if(SW_ACTIVE == 0) 
+    {
         SW_MIN_MEM = 120 * 1024L;
         SW_MIN_SEGS = 2;
         SW_SEG_SIZE = B_IniReadNum("GENERAL", "SEGSIZE", 65500);
-        if(SW_SEG_SIZE < 16384) SW_SEG_SIZE = 16384;            
+        if(SW_SEG_SIZE < 16384) 
+            SW_SEG_SIZE = 16384;            
     }
-    
-    //printf("SW_SEG_SIZE=%d\n", SW_SEG_SIZE);
 
     SW_init(1);
     
@@ -62,10 +62,10 @@ int IodeInit()
     A_SEPS = " ,;\n\t\r";
         
     // Suppress default filename wildcard behavior
-    A_NO_EXPANDSTAR_DFT = 1; // JMP 12-11-2012 
+    A_NO_EXPANDSTAR_DFT = 1; 
 
     // Assign default "super" function pointers
-    IODE_assign_super_API(); // JMP 15/2/2023 
+    IODE_assign_super_API();
     
     return 0;
 }

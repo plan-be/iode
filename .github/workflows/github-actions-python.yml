@@ -80,12 +80,9 @@ jobs:
           - name: Build SCR4
             shell: bash
             run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_scr4 
-          - name: Build C API
-            shell: bash
-            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_c_api 
           - name: Build C++ API
             shell: bash
-            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_cpp_api 
+            run: cmake --build --verbose --preset ${{ env.os }}-${{ inputs.build-config }} --target iode_c_api 
           - name: Build C++ API Tests
             if: runner.os == 'Windows' && matrix.python-minor-version == '3.14'
             shell: bash
