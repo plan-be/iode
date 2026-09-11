@@ -344,9 +344,7 @@ void T_print_files(COLS* cls, int dim)
 
 void T_print_mode(COLS* cls, int dim)
 {
-    int    i;
-
-    for(i = 0; i < MAX_MODE; i++)
+    for(int i = 0; i < MAX_MODE; i++)
     {
         if(KT_mode[i] == 0)
             continue;
@@ -412,30 +410,4 @@ void T_end_tbl()
     SCR_free_tbl((unsigned char**) KT_names);
     KT_names = NULL;
     KT_nbnames = 0;
-}
-
-
-/**
- *  Retrieves a Table title, i.e. the contents of the first line of type TABLE_LINE_TITLE.
- *
- *  @param [in] const std::shared_ptr<Table> tbl_ptr pointer to a table
- *  @return     std::string contents of the title or the text "No title"
- *                              if no line of type TABLE_LINE_TITLE can be found or if the first line of that type is empty.
- */
-std::string T_get_title(const std::shared_ptr<Table> tbl_ptr)
-{
-    // get the first line of type TABLE_LINE_TITLE
-    int k = 0;
-    for(k = 0; k < tbl_ptr->lines.size(); k++)
-        if(tbl_ptr->lines[k].get_type() == TABLE_LINE_TITLE)
-            break;
-
-    TableLine line = tbl_ptr->lines[k];
-    TableCell cell = line.cells[0];
-    std::string title = cell.get_content(false);
-
-    if(k == tbl_ptr->lines.size() || title.empty())
-        title = "No title";
-
-    return title;
 }
