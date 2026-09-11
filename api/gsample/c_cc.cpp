@@ -1258,7 +1258,7 @@ int COL_free_cols(COLS* cls)
 
 
 /**
- *  Analyses the COLS struct cls and set 1 in the vector mode (normally KT_mode) 
+ *  Analyses the COLS struct cls and set 1 in the vector mode (normally tbl_mode) 
  *  for each operation found in cls. Only the operations between COL_DIFF and COL_BASE 
  *  are saved. 
  *  

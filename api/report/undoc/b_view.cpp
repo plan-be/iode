@@ -107,7 +107,7 @@ int B_ViewPrintVar(char* arg, int mode)
 
     int rc = 0;
     int chunk_size = 50;
-    int nb_decimals = K_NBDEC;
+    int nb_decimals = tbl_nb_decimals;
     bool search_comment = false;
     ComputedTable* computed_table = nullptr;
     for (size_t start = 0; start < vars.size(); start += chunk_size) 
@@ -201,7 +201,7 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     }
 
     int rc = 0;
-    int nb_decimals = K_NBDEC;
+    int nb_decimals = tbl_nb_decimals;
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl_ptr.get(), smpl, (char*) name.c_str());
