@@ -61,18 +61,18 @@ TEST_F(ComputedTableTest, GSample)
     // simple time series (current workspace) - 5 observations
     gsample = "2000:5";
     nb_files = 1;
-    cls = COL_cc((char*) gsample.c_str());
+    cls = compile_gsample((char*) gsample.c_str());
     EXPECT_TRUE(cls != NULL);
     EXPECT_EQ(cls->cl_nb, 5);
-    dim = COL_resize(ref_table, cls);
+    dim = resize_tbl_columns(ref_table, cls);
     EXPECT_EQ(dim, 6);
-    res = COL_exec(ref_table, 5, cls);
+    res = execute_tbl_columns(ref_table, 5, cls);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"00", "01", "02", "03", "04"};
     for(int col=1; col < cls->cl_nb; col+=2)
     {
-        column_name = std::string(COL_text(&cls->cl_cols[col], expand, nb_files));
+        column_name = std::string(col_to_text(&cls->cl_cols[col], expand, nb_files));
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -80,24 +80,24 @@ TEST_F(ComputedTableTest, GSample)
 
     expected_cols_names.clear();
     cols_names.clear();
-    COL_free_cols(cls); 
+    free_tbl_columns(cls); 
 
     // two time series (current workspace) - 5 observations
     gsample = "(2010;2010/2009):5";
     nb_files = 1;
-    cls = COL_cc((char*) gsample.c_str());
+    cls = compile_gsample((char*) gsample.c_str());
     EXPECT_TRUE(cls != NULL);
     EXPECT_EQ(cls->cl_nb, 2 * 5);
-    dim = COL_resize(ref_table, cls);
+    dim = resize_tbl_columns(ref_table, cls);
     EXPECT_EQ(dim, 11);
-    res = COL_exec(ref_table, 5, cls);
+    res = execute_tbl_columns(ref_table, 5, cls);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"10", "10/09", "11", "11/10", "12", "12/11", "13", "13/12", 
                            "14", "14/13"};
     for(int col=1; col < cls->cl_nb; col+=2)
     {
-        column_name = std::string(COL_text(&cls->cl_cols[col], expand, nb_files));
+        column_name = std::string(col_to_text(&cls->cl_cols[col], expand, nb_files));
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -105,24 +105,24 @@ TEST_F(ComputedTableTest, GSample)
 
     expected_cols_names.clear();
     cols_names.clear();
-    COL_free_cols(cls);
+    free_tbl_columns(cls);
 
     // simple time series (one extra file) - 5 observations
     gsample = "2010[1;2]:5";
     nb_files = 2;
-    cls = COL_cc((char*) gsample.c_str());
+    cls = compile_gsample((char*) gsample.c_str());
     EXPECT_TRUE(cls != NULL);
     EXPECT_EQ(cls->cl_nb, 2 * 5);
-    dim = COL_resize(ref_table, cls);
+    dim = resize_tbl_columns(ref_table, cls);
     EXPECT_EQ(dim, 11);
-    res = COL_exec(ref_table, 5, cls);
+    res = execute_tbl_columns(ref_table, 5, cls);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"10[1]", "10[2]", "11[1]", "11[2]", "12[1]", "12[2]",
                            "13[1]", "13[2]", "14[1]", "14[2]"};
     for(int col=1; col < cls->cl_nb; col+=2)
     {
-        column_name = std::string(COL_text(&cls->cl_cols[col], expand, nb_files));
+        column_name = std::string(col_to_text(&cls->cl_cols[col], expand, nb_files));
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -130,26 +130,26 @@ TEST_F(ComputedTableTest, GSample)
 
     expected_cols_names.clear();
     cols_names.clear();
-    COL_free_cols(cls);
+    free_tbl_columns(cls);
     */
 
     // list of patterns (one extra file) - 6 observations
     gsample = "2000;2002;2004//2003;2006[1;2];2008[1+2];2010/2009[1^2]";
     nb_files = 2;
-    cls = COL_cc((char*) gsample.c_str());
+    cls = compile_gsample((char*) gsample.c_str());
     EXPECT_TRUE(cls != NULL);
     // "2000;2002;2004//2003" + "2006[1;2]" + "2008[1+2];2010/2009[1^2]"
     EXPECT_EQ(cls->cl_nb, 3 + 2 + 2);
-    dim = COL_resize(ref_table, cls);
+    dim = resize_tbl_columns(ref_table, cls);
     EXPECT_EQ(dim, 8);
-    res = COL_exec(ref_table, 5, cls);
+    res = execute_tbl_columns(ref_table, 5, cls);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"00[1]", "02[1]", "04//03[1]", "06[1]", "06[2]", 
                            "08[1+2]", "10/09[1^2]"};
     for(int col=1; col < cls->cl_nb; col+=2)
     {
-        column_name = std::string(COL_text(&cls->cl_cols[col], expand, nb_files));
+        column_name = std::string(col_to_text(&cls->cl_cols[col], expand, nb_files));
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -157,7 +157,7 @@ TEST_F(ComputedTableTest, GSample)
     
     expected_cols_names.clear(); 
     cols_names.clear();
-    COL_free_cols(cls);
+    free_tbl_columns(cls);
 }
 
 TEST_F(ComputedTableTest, BuildFromTable)

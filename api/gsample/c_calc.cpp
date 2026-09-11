@@ -6,7 +6,7 @@
  *  
  *  This module calculates the values of table cells based on:
  *  - a list of files loaded in memory and stored in global_ref_var.
- *  - a group of column definitions (COLS = GSample compiled by COL_cc(gsample))
+ *  - a group of column definitions (COLS = GSample compiled by compile_gsample(gsample))
  *      where each column defines:
  *          - the period(s) to be used for the calculations (1 or 2 periods)
  *          - an optional operation between the periods (ex growth rates)
@@ -16,18 +16,18 @@
  *  - the LEC formulas defined in the table cells 
  *  
  *  How to use these functions to print a table ?
- *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
- *      2. call COL_resize() to extend COLS according to the number of columns in the Table 
+ *      1. call compile_gsample(smpl) to compile the GSample in a COLS struct, say cls.
+ *      2. call resize_tbl_columns() to extend COLS according to the number of columns in the Table 
  *      3. for each Table line, call: 
- *          COL_clear(cls) to reset the COLS values 
- *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
- *          COL_text() to generate the value of the TABLE_CELL_STRING cells
+ *          clear_tbl_columns(cls) to reset the COLS values 
+ *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
+ *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
  *  
  *  List of functions 
  *  -----------------
- *      int COL_exec(Table* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one Table line for all columns of a GSample.
- *      int COL_resize(Table* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a Table definition
- *      void COL_clear(COLS* cls)                   Resets the values in a COLS structure. 
+ *      int execute_tbl_columns(Table* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one Table line for all columns of a GSample.
+ *      int resize_tbl_columns(Table* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a Table definition
+ *      void clear_tbl_columns(COLS* cls)                   Resets the values in a COLS structure. 
  */
 #include <math.h>
 
@@ -260,12 +260,12 @@ err:
  *  resulting COLS* will contain 5 x 2 COL's.
  *    
  *  @param [in]         Table*    tbl     Table to be calculated
- *  @param [in, out]    COLS*   cls     compiled GSample (via COL_cc())
+ *  @param [in, out]    COLS*   cls     compiled GSample (via compile_gsample())
  *  @return             int             new number of columns in cls
  *  
  */
  
-int COL_resize(Table* tbl, COLS* cls)
+int resize_tbl_columns(Table* tbl, COLS* cls)
 {
     COL     *old, *ptr;
     int     i,j, old_nb, new_nb, dim;
@@ -296,7 +296,7 @@ int COL_resize(Table* tbl, COLS* cls)
  *  @param [in, out] COLS   cls     table of COL's to reset
  *  
  */
-void COL_clear(COLS* cls)
+void clear_tbl_columns(COLS* cls)
 {
     int i;
     COL *cl =  cls->cl_cols;
@@ -318,7 +318,7 @@ void COL_clear(COLS* cls)
  *  
  */
  
-int COL_exec(Table* tbl, int i, COLS* cls)
+int execute_tbl_columns(Table* tbl, int i, COLS* cls)
 {
     int lg = cls->cl_nb / tbl->nb_columns;
 

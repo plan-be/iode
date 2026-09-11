@@ -199,8 +199,8 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
 
     SW_nfree(x);
     SW_nfree(y);
-    COL_free_cols(cls);
-    COL_free_cols(fcls);
+    free_tbl_columns(cls);
+    free_tbl_columns(fcls);
     return w;
 }
 
@@ -258,7 +258,7 @@ static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i)
     content = utf8_to_oem(content);
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
-        fileop = COL_ctoa(cl, 'f', 0, 2);
+        fileop = col_to_string(cl, 'f', 0, 2);
     T_GraphLegend(line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                  (char*) content.c_str(), fileop);
     return 0;
@@ -355,8 +355,8 @@ int T_GraphXYData(int nb, double *x, double *y)
 int T_GraphLine(const std::shared_ptr<Table> tbl_ptr, int i, COLS* cls, const std::shared_ptr<Sample> smpl, 
     double* x, double* y, COLS* fcls)
 {
-    COL_clear(cls);
-    if(COL_exec(tbl_ptr.get(), i, cls) < 0) 
+    clear_tbl_columns(cls);
+    if(execute_tbl_columns(tbl_ptr.get(), i, cls) < 0) 
         return -1;
 
     TableLine* line = &tbl_ptr->lines[i];
@@ -435,7 +435,7 @@ int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl)
         pos = T_find_opf(*fcls, cl);
         if(pos < 0) 
         {
-            *fcls = COL_add_col(*fcls); // JMP 19/04/2022
+            *fcls = add_tbl_column(*fcls); // JMP 19/04/2022
             memcpy((*fcls)->cl_cols + (*fcls)->cl_nb - 1, cl, sizeof(COL));
         }
 
@@ -666,8 +666,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl);
 int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, 
     double *x, double *y, COLS *fcls)
 {
-    COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) 
+    clear_tbl_columns(cls);
+    if(execute_tbl_columns(tbl, i, cls) < 0) 
         return -1;
     
     APICHRT* Chrt = API_CHARTS[hdl];
@@ -782,7 +782,7 @@ int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i)
     content = utf8_to_oem(content);
 
     if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
-        fileop = COL_ctoa(cl, 'f', 0, 2);
+        fileop = col_to_string(cl, 'f', 0, 2);
     APIGraphLegendTitle(hdl, line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                        (char*) content.c_str(), fileop);
     return 0;
@@ -972,8 +972,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     API_CHARTS[hdl]->nb = smpl->nb_periods;
     SW_nfree(x);
     SW_nfree(y);
-    COL_free_cols(cls);
-    COL_free_cols(fcls);
+    free_tbl_columns(cls);
+    free_tbl_columns(fcls);
     return hdl;
 }
 
