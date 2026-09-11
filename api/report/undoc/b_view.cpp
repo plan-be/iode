@@ -25,6 +25,7 @@
 #include "scr4/s_args.h"
 
 #include "api/pch.h"
+#include "api/k_lang.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/objs/objs.h"
@@ -32,6 +33,7 @@
 #include "api/objs/grep.h"
 #include "api/print/print.h"
 #include "api/write/write.h"
+#include "api/computed_table/computed_table.h"
 
 #include "api/report/engine/engine.h"
 #include "api/report/undoc/undoc.h"
@@ -103,9 +105,11 @@ int B_ViewPrintVar(char* arg, int mode)
         return -1;
     }
 
-    int rc;
+    int rc = 0;
     int chunk_size = 50;
+    int nb_decimals = K_NBDEC;
     bool search_comment = false;
+    ComputedTable* computed_table = nullptr;
     for (size_t start = 0; start < vars.size(); start += chunk_size) 
     {
         auto end = std::min(start + chunk_size, vars.size());
@@ -117,8 +121,17 @@ int B_ViewPrintVar(char* arg, int mode)
         }
         else 
         {
-            std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(2, "", chunks, true, true, true, search_comment);
-            rc = T_print_tbl(tbl_ptr, sample);
+            try
+            {                
+                std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(2, "", chunks, true, true, true, search_comment);
+                computed_table = new ComputedTable(tbl_ptr.get(), sample, nb_decimals); 
+                computed_table->print_to_file(true, true);
+                delete computed_table;
+            }
+            catch(const std::exception&)
+            {
+                rc = -1;
+            }
         }
 
         // something went wrong -> exit loop
@@ -126,7 +139,10 @@ int B_ViewPrintVar(char* arg, int mode)
             break;
     }
 
+    // NOTE: do not call W_close() to give the possibility to append 
+    //       new tables in the same open file 
     W_flush();
+
     B_ViewTblEnd();
     return rc;
 }
@@ -177,8 +193,6 @@ int B_PrintGr(char* arg, int unused)
  */
 int B_ViewPrintTbl_1(char* c_name, char* smpl)
 {
-    int rc;
-
     std::string name = std::string(c_name);
     if(!global_ws_tbl->contains(name)) 
     {
@@ -186,11 +200,26 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
         return -1;
     }
 
+    int rc = 0;
+    int nb_decimals = K_NBDEC;
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     if(B_viewmode == 0)
         rc = T_view_tbl(tbl_ptr.get(), smpl, (char*) name.c_str());
     else
-        rc = T_print_tbl(tbl_ptr, smpl);
+    {
+        try
+        {
+            ComputedTable computed_table(tbl_ptr.get(), smpl, nb_decimals); 
+            computed_table.print_to_file(true, true);
+            // NOTE: do not call W_close() to give the possibility to append 
+            //       new tables in the same open file 
+            W_flush();
+        }
+        catch(const std::exception&)
+        {
+            rc = -1;
+        }
+    }
 
     if(rc < 0) 
         error_manager.append_error("Table '" + name + "' not printed");

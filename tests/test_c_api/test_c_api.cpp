@@ -1229,8 +1229,9 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     W_dest("test1_tbl.a2m", W_A2M);
 
     // Print tbl as table
-    rc = T_print_tbl(tbl_ptr, "2000:5[1;2]");
-    EXPECT_EQ(rc, 0);
+    ComputedTable computed_table(tbl_ptr.get(), "2000:5[1;2]"); 
+    computed_table.print_to_file();
+    ComputedTable::finalize_printing();
 
     // Print tbl as a graph
     rc = T_graph_tbl_1(tbl_ptr, "2000/1999:15[1;2]", 1);
