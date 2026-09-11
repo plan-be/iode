@@ -35,11 +35,11 @@
  *  
  *  List of functions 
  *  -----------------
- *      COLS *COL_cc(char* gsample)                         GSample compiler
- *      int COL_free_cols(COLS* cls)                        Frees the allocated space for a COLS structure created by COL_cc()
- *      char *COL_text(COL* cl, char* str, int nbnames)     Constructs a string based on a special table cell text value containing a "#"
- *      COLS *COL_add_col(COLS* cls)                        Adds a new COL struct to the COLS (list of periods in a GSample)
- *      int COL_find_mode(COLS* cls, int* mode, int type)   Analyses a COLS struct and set 1 in the vector mode for each found operation
+ *      COLS *compile_gsample(char* gsample)                         GSample compiler
+ *      int free_tbl_columns(COLS* cls)                        Frees the allocated space for a COLS structure created by compile_gsample()
+ *      char *col_to_text(COL* cl, char* str, int nbnames)     Constructs a string based on a special table cell text value containing a "#"
+ *      COLS *add_tbl_column(COLS* cls)                        Adds a new COL struct to the COLS (list of periods in a GSample)
+ *      int tbl_find_mode(COLS* cls, int* mode, int type)   Analyses a COLS struct and set 1 in the vector mode for each found operation
  *
  */
 #include "scr4/s_prodt.h"
@@ -197,7 +197,7 @@ YYKEYS COL_KEYWS[] =
  *  of a table text cell containing the '#' character and adapted 
  *  to the contents of a specific COL (periods and files). 
  *  
- *  COL_ctoa() is a sub function of COL_text().
+ *  col_to_string() is a sub function of col_to_text().
  *  
  *  Examples
  *  --------
@@ -219,7 +219,7 @@ YYKEYS COL_KEYWS[] =
  *  
  */
 
-char *COL_ctoa(COL* cl, int ch, int n, int nbf)
+char *col_to_string(COL* cl, int ch, int n, int nbf)
 {
     static char res[30];
     Period      *per;
@@ -304,7 +304,7 @@ Num:
 }
 
 /**
- *  The recursive function COL_text() returns an allocated string 
+ *  The recursive function col_to_text() returns an allocated string 
  *  constructed from a Table text cell containing the '#' character. The result
  *  depends on the contents of the specific COL (periods and files) passed as argument. 
  *  
@@ -317,7 +317,7 @@ Num:
  *  TODO: check the allocated length (40+3+..) that could be too small!
  */
  
-char *COL_text(COL* cl, char* str, int nbnames)
+char *col_to_text(COL* cl, char* str, int nbnames)
 {
     int     i, j, op, n, lg;
     char    *res, *txt, *tmp;
@@ -354,7 +354,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
             else if(op == 'S')  tmp = "#T#F";
             else if(op == 't')  tmp = "#y1#P1#n1#o1#y2#P2#n2";
             else if(op == 'T')  tmp = "#Y1#P1#n1#o1#Y2#P2#n2";
-            txt = COL_text(cl, tmp, nbnames);
+            txt = col_to_text(cl, tmp, nbnames);
             if(j + strlen(txt) < lg) 
             {
                 strcat(res, txt);
@@ -365,7 +365,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
         }
         else 
         {
-            txt = COL_ctoa(cl, op, n, nbnames);
+            txt = col_to_string(cl, op, n, nbnames);
             if(j + strlen(txt) >= lg) 
                 break;
             strcat(res, txt);
@@ -386,7 +386,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
  *  
  */
 
-COLS *COL_add_col(COLS* cls)
+COLS *add_tbl_column(COLS* cls)
 {
     if(cls == 0) 
         cls = (COLS *) SW_nalloc(sizeof(COLS));     // BUG corrected: was sizeof(COL)
@@ -639,7 +639,7 @@ static COLS *read_yy_stream(YYFILE* yy)
     if(read_period(yy, &per)) 
         return((COLS *) 0);
     
-    cls = COL_add_col((COLS *) 0);
+    cls = add_tbl_column((COLS *) 0);
     cls->cl_cols[0].cl_opy = COL_NOP;
     memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(Period));
 
@@ -661,7 +661,7 @@ static COLS *read_yy_stream(YYFILE* yy)
 
     if(read_period(yy, &per)) 
     {
-        COL_free_cols(cls);
+        free_tbl_columns(cls);
         return((COLS *) 0);
     }
     memcpy(&(cls->cl_cols[0].cl_per[1]), &per, sizeof(Period));
@@ -939,7 +939,7 @@ static COLS *construct_columns(COLS* cls, COLS* cltmp, const std::vector<FIL>& f
         {
             for(const FIL& file : file_operations) 
             {
-                cls = COL_add_col(cls);
+                cls = add_tbl_column(cls);
                 cl = cls->cl_cols + cls->cl_nb - 1;
                 memcpy(cl, tmp + j, sizeof(COL));
                 cl->cl_per[0] = tmp[j].cl_per[0].shift(i * rep->r_incr);
@@ -1099,7 +1099,7 @@ static COLS *read_columns(YYFILE* yy)
                 //  adds it to the global GSample compiled struct cls.
                 //  The cltmp is added to cols rep->r_nb times * fils.size() times.
                 cls = construct_columns(cls, cltmp, files, &rep, 0, 0);
-                COL_free_cols(cltmp);
+                free_tbl_columns(cltmp);
                 files.clear();
                 rep.r_nb = 0;
                 cltmp = 0;
@@ -1128,8 +1128,8 @@ static COLS *read_columns(YYFILE* yy)
     }
 
 err:
-    COL_free_cols(cls);
-    COL_free_cols(cltmp);
+    free_tbl_columns(cls);
+    free_tbl_columns(cltmp);
     return((COLS *)0);
 }
 
@@ -1142,7 +1142,7 @@ err:
  *  
  */
  
-COLS *COL_cc(char* gsample)
+COLS *compile_gsample(char* gsample)
 {
     COLS    *cls;
     COL     *cl;
@@ -1182,14 +1182,14 @@ COLS *COL_cc(char* gsample)
 
 
 /**
- *  Frees the allocated space for a COLS structure created by COL_cc().
+ *  Frees the allocated space for a COLS structure created by compile_gsample().
  *  
  *  @param [in] COLS*   cls     COLS to free
  *  @return     int             0
  *  
  */
  
-int COL_free_cols(COLS* cls)
+int free_tbl_columns(COLS* cls)
 {
     if(cls == 0) 
         return 0;
@@ -1219,7 +1219,7 @@ int COL_free_cols(COLS* cls)
  *  
  */
  
-int COL_find_mode(COLS* cls, int* mode, int type)
+int tbl_find_mode(COLS* cls, int* mode, int type)
 {
     COL   *cl;
     int    i, nb = 0;

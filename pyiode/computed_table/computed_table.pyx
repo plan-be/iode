@@ -10,7 +10,7 @@ from pyiode.common cimport TableTextAlign as CTableTextAlign
 from pyiode.common cimport TableGraphAxis as CTableGraphAxis 
 from pyiode.common cimport TableGraphGrid as CTableGraphGrid 
 from pyiode.common cimport TableGraphType as CTableGraphType
-from pyiode.computed_table.computed_table cimport CComputedTable, COL, COL_ctoa, COL_NOP
+from pyiode.computed_table.computed_table cimport CComputedTable, COL, col_to_string, COL_NOP
 
 import numpy as np
 
@@ -107,7 +107,7 @@ cdef class ComputedTable:
         if self.get_nb_operations_between_files():
             col = self.c_computed_table.files_ops[op_files]
             if self.get_nb_files() > 1 or col.cl_opf != COL_NOP:
-                b_file_op_name = COL_ctoa(&col, ch, 0, self.get_nb_files())
+                b_file_op_name = col_to_string(&col, ch, 0, self.get_nb_files())
                 name += " " + b_file_op_name.decode()
         return name
 

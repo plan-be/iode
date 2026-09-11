@@ -33,7 +33,7 @@ std::string ComputedTableGraph::get_series_name(const int row, const int fileop)
 {
     std::string name = line_names[row];
     if(files_ops.size() > 1 || files_ops[fileop].cl_opf != COL_NOP)
-        name += " " + std::string(COL_ctoa(&files_ops[fileop], 'f', 0, 2));
+        name += " " + std::string(col_to_string(&files_ops[fileop], 'f', 0, 2));
     return name;
 }
 

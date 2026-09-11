@@ -135,17 +135,17 @@ inline int col_compare(const void* a, const void* b)
 }
 
 /* c_cc.c */
-COLS *COL_cc(char* gsample);
-int COL_free_cols(COLS* cls);
-char *COL_ctoa(COL* cl, int ch, int n, int nbf);
-char *COL_text(COL* cl, char* str, int nbnames);
-COLS *COL_add_col(COLS* cls);
-int COL_find_mode(COLS* cls, int* mode, int type);
+COLS* compile_gsample(char* gsample);
+int free_tbl_columns(COLS* cls);
+char *col_to_string(COL* cl, int ch, int n, int nbf);
+char *col_to_text(COL* cl, char* str, int nbnames);
+COLS* add_tbl_column(COLS* cls);
+int tbl_find_mode(COLS* cls, int* mode, int type);
 
 /* c_calc.c */
-int COL_resize(Table* tbl, COLS* cls);
-void COL_clear(COLS* cls);
-int COL_exec(Table* tbl, int i, COLS* cls);
+int resize_tbl_columns(Table* tbl, COLS* cls);
+void clear_tbl_columns(COLS* cls);
+int execute_tbl_columns(Table* tbl, int i, COLS* cls);
 
 
 extern bool debug_calc;

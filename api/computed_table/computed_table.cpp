@@ -6,16 +6,16 @@ void ComputedTable::initialize()
     std::string error_msg = "Cannot compute table with the generalized sample '" + gsample + "'";
 
     /* ---- see c_calc.c ----
-     *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
-     *      2. call COL_resize() to extend COLS according to the number of columns in the Table 
+     *      1. call compile_gsample(smpl) to compile the GSample in a COLS struct, say cls.
+     *      2. call resize_tbl_columns() to extend COLS according to the number of columns in the Table 
      *      3. for each Table line, call: 
-     *          COL_clear(cls) to reset the COLS values 
-     *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
-     *          COL_text() to generate the value of the TABLE_CELL_STRING cells
+     *          clear_tbl_columns(cls) to reset the COLS values 
+     *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
+     *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
     // Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in the passed table.
-    columns = COL_cc(to_char_array(gsample));
+    columns = compile_gsample(to_char_array(gsample));
     if(columns == NULL) 
         throw std::invalid_argument(error_msg);
 
@@ -49,7 +49,7 @@ void ComputedTable::initialize()
     sample = std::make_shared<Sample>(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
-    dim = COL_resize(ref_table, columns);
+    dim = resize_tbl_columns(ref_table, columns);
     if(dim == 0) 
         throw std::runtime_error(error_msg);
 
@@ -101,7 +101,7 @@ void ComputedTable::initialize()
                 int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
                 for(int col=1; col < columns->cl_nb; col+=step)
                 {
-                    column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
+                    column_name = std::string(col_to_text(&columns->cl_cols[col], c_content, nb_files));
                     column_names.push_back(column_name); 
                     v_pos_in_columns_struct.push_back(col);
                 }
@@ -153,7 +153,7 @@ ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const
 
 ComputedTable::~ComputedTable()
 {
-    COL_free_cols(columns);
+    free_tbl_columns(columns);
     delete ref_table;
 }
 
@@ -185,13 +185,13 @@ void ComputedTable::compute_values()
     for(int row = 0; row < v_line_pos_in_ref_table.size(); row++)
     {
         // resets the values in the COLS
-        COL_clear(columns);
+        clear_tbl_columns(columns);
         
         // Calculates the values of all LEC formulas in ONE table line for all columns 
         // of a GSample (precompiled into a COLS structure). 
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
-        res = COL_exec(ref_table, line, columns);
+        res = execute_tbl_columns(ref_table, line, columns);
         if(res < 0) 
             throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name(row) + "'");
         

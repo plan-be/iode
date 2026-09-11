@@ -1219,7 +1219,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     v_tbl_filenames = T_find_files(cls);
     if(v_tbl_filenames.empty()) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-    COL_find_mode(cls, tbl_mode, 2);
+    tbl_find_mode(cls, tbl_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
@@ -1263,8 +1263,8 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
                 break;
             case TABLE_LINE_CELL  :
-                COL_clear(cls);
-                if(COL_exec(tbl_ptr.get(), i, cls) < 0)
+                clear_tbl_columns(cls);
+                if(execute_tbl_columns(tbl_ptr.get(), i, cls) < 0)
                     strcat(buf, "Error in calc");
                 else
                     for(j = 0; j < cls->cl_nb; j++) 
@@ -1289,7 +1289,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     *nl += nf + nm;
     res = (char*) SCR_mtov((unsigned char**) l, '\n');
 
-    COL_free_cols(cls);
+    free_tbl_columns(cls);
     SCR_free_tbl((unsigned char**) l);
     SCR_free(buf);
 

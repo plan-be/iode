@@ -29,7 +29,7 @@ cdef extern from "api/all.h":
         int      cl_nb               # Number of columns
         COL      *cl_cols            # Pointer to the first COL struct
 
-    char* COL_ctoa(COL*, int, int, int)     # COL to ASCII
+    char* col_to_string(COL*, int, int, int)     # COL to ASCII
 
 
 cdef extern from "api/computed_table/computed_table.h":
