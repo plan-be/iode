@@ -656,6 +656,65 @@ void Table::remove_line(const int row)
 
 // -------- OTHER METHODS --------
 
+bool Table::print_definition() const
+{
+    W_printf((char*) "\n.tl\n");
+
+    /* lines */
+    for(const TableLine& line : lines) 
+    {
+        switch(line.get_type()) 
+        {
+            case TABLE_LINE_CELL :
+                for(const TableCell& cell: line.cells)
+                    cell.print_definition(1);
+                W_printf((char*) "\n");
+                break;
+
+            case TABLE_LINE_TITLE :
+                line.cells[0].print_definition(nb_columns);
+                W_printf((char*) "\n");
+                break;
+
+            case TABLE_LINE_SEP   :
+            case TABLE_ASCII_BOLD_LINE  :
+                W_printf((char*) ".tl\n");
+                break;
+            case TABLE_LINE_MODE  :
+                W_printfRepl((char*) "&%dL[MODE]\n", nb_columns);
+                break;
+            case TABLE_LINE_DATE  :
+                W_printfRepl((char*) "&%dL[DATE]\n", nb_columns);
+                break;
+            case TABLE_LINE_FILES :
+                W_printfRepl((char*) "&%dL[FILES]\n", nb_columns);
+                break;
+
+            default       :
+                break;
+        }
+    }
+
+    /* div */
+    bool print_divider = false;
+    for(const TableCell& cell: divider_line.cells)
+        if(cell.check_print_def())
+        {
+            print_divider = true;
+            break;
+        }
+    
+    if(print_divider) 
+    {
+        W_printfRepl((char*) ".tl\n&%dC%cbColumn divisors%cB\n.tl\n", nb_columns, A2M_ESCCH, A2M_ESCCH); /* JMP 14-06-96 */
+        for(const TableCell& cell: divider_line.cells)
+            cell.print_definition(1);
+    }
+
+    W_printf((char*) "\n.tl\n");
+    return true;
+}
+
 Table32 Table::convert_64_to_32bits()
 {
     Table32 tbl32;
@@ -852,7 +911,7 @@ std::string KDBTables::get_title(const std::string& name) const
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
     std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
-    std::string title = T_get_title(tbl_ptr.get());
+    std::string title = tbl_ptr->get_title();
     return title;
 }
 
@@ -1129,7 +1188,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     int     dim, i, j, d, rc = 0, nli = 0,
                           nf = 0, nm = 0;
     char    gsmpl[128], **l = NULL, *buf, *res = NULL;
-    COLS    *cls;
+    std::vector<COL> columns;
 
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
@@ -1146,15 +1205,14 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     else
         sprintf(gsmpl, "%s", ismpl);
 
-    dim = T_prep_cls(tbl_ptr.get(), gsmpl, &cls);
+    dim = initialize_columns(tbl_ptr, gsmpl, columns);
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
-    KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) 
+    v_tbl_filenames = T_find_files(columns);
+    if(v_tbl_filenames.empty()) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-    COL_find_mode(cls, KT_mode, 2);
+    tbl_find_mode(columns, tbl_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
@@ -1176,7 +1234,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
             case TABLE_LINE_MODE  :
                 for(j = 0; j < MAX_MODE; j++) 
                 {
-                    if(KT_mode[j] == 0) 
+                    if(tbl_mode[j] == 0) 
                         continue;
                     sprintf(date, "(%s) ", COL_OPERS[j + 1]);
                     strcat(buf, date);
@@ -1186,11 +1244,11 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 }
                 break;
             case TABLE_LINE_FILES :
-                for(j = 0; KT_names[j]; j++) 
+                for(const std::string& filename : v_tbl_filenames) 
                 {
-                    strcat(buf, KT_names[j]);
+                    strcat(buf, filename.c_str());
                     strcat(buf, "\n");
-                    nf ++;
+                    nf++;
                 }
                 break;
             case TABLE_LINE_TITLE :
@@ -1198,16 +1256,16 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
                 break;
             case TABLE_LINE_CELL  :
-                COL_clear(cls);
-                if(COL_exec(tbl_ptr.get(), i, cls) < 0)
+                    clear_tbl_columns(columns);
+                    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
                     strcat(buf, "Error in calc");
                 else
-                    for(j = 0; j < cls->cl_nb; j++) 
+                    for(j = 0; j < columns.size(); j++)
                     {
                         d = j % tbl_ptr->nb_columns;
                         if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0) 
                             continue;
-                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
+                        strcat(buf, IodeTblCell(&(line->cells[d]), &columns[j], nbdec));
                         strcat(buf, "\t");
                     }
                 break;
@@ -1224,14 +1282,10 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     *nl += nf + nm;
     res = (char*) SCR_mtov((unsigned char**) l, '\n');
 
-    COL_free_cols(cls);
     SCR_free_tbl((unsigned char**) l);
     SCR_free(buf);
 
-    SCR_free_tbl((unsigned char**) KT_names);
-    KT_names = NULL;
-    KT_nbnames = 0;
-
+    v_tbl_filenames.clear();
     return res;
 }
 
@@ -1257,7 +1311,7 @@ bool KDBTables::print_obj_def(const std::string& name)
     if(!tbl_ptr) 
         return false;
     
-    std::string title = T_get_title(tbl_ptr.get());
+    std::string title = tbl_ptr->get_title();
     // W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing 
     title = utf8_to_oem(title);
     if(B_TABLE_TITLE) 

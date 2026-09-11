@@ -6,35 +6,35 @@ void ComputedTable::initialize()
     std::string error_msg = "Cannot compute table with the generalized sample '" + gsample + "'";
 
     /* ---- see c_calc.c ----
-     *      1. call COL_cc(smpl) to compile the GSample in a COLS struct, say cls.
-     *      2. call COL_resize() to extend COLS according to the number of columns in the Table 
+     *      1. call compile_gsample(smpl) to compile the GSample in a std::vector<COL> struct, say cls.
+     *      2. call resize_tbl_columns() to extend std::vector<COL> according to the number of columns in the Table
      *      3. for each Table line, call: 
-     *          COL_clear(cls) to reset the COLS values 
-     *          COL_exec(tbl, i, cls) to store in cls the computed values of the cells in line i
-     *          COL_text() to generate the value of the TABLE_CELL_STRING cells
+     *          clear_tbl_columns(cls) to reset the std::vector<COL> values
+     *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
+     *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
-    // Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in the passed table.
-    columns = COL_cc(to_char_array(gsample));
-    if(columns == NULL) 
+    // Compiles a GSample into a std::vector<COL> struct and resizes std::vector<COL> according to the nb of cols in the passed table.
+    columns = compile_gsample(to_char_array(gsample));
+    if(columns.empty())
         throw std::invalid_argument(error_msg);
 
     // Compute 
     // - minimum sample containing all periods present in the columns.
     // - the list of unique file_1 (op) file_2 combinations
     // Note: - equivalent to T_prep_smpl()
-    COL column = columns->cl_cols[0];
+    COL column = columns[0];
     Period start_per(column.cl_per[0]);
     Period end_per(column.cl_per[0]);
     int pos;
-    for(int col=0; col < columns->cl_nb; col++)
+    for(int col=0; col < columns.size(); col++)
     {
-        column = columns->cl_cols[col];
+        column = columns[col];
         pos = find_file_op(column);
         if(pos < 0)
             files_ops.push_back(column);
 
-        Period per(columns->cl_cols[col].cl_per[0]);
+        Period per(columns[col].cl_per[0]);
         if(per.difference(start_per) < 0)
         {
             start_per.year = per.year;
@@ -49,16 +49,16 @@ void ComputedTable::initialize()
     sample = std::make_shared<Sample>(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
-    dim = COL_resize(ref_table, columns);
+    dim = resize_tbl_columns(ref_table, columns);
     if(dim == 0) 
         throw std::runtime_error(error_msg);
 
     // Get filepath of each reference file
     // Note: - equivalent to T_find_files()
     std::bitset<K_MAX_FREF + 1> files_usage;
-    for(int col=0; col < columns->cl_nb; col++) 
+    for(int col=0; col < columns.size(); col++)
     {
-        column = columns->cl_cols[col];
+        column = columns[col];
         files_usage[column.cl_fnb[0]] = 1;
         files_usage[column.cl_fnb[1]] = 1;
     }
@@ -99,9 +99,9 @@ void ComputedTable::initialize()
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
                 int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
-                for(int col=1; col < columns->cl_nb; col+=step)
+                for(int col=1; col < columns.size(); col+=step)
                 {
-                    column_name = std::string(COL_text(&columns->cl_cols[col], c_content, nb_files));
+                    column_name = std::string(col_to_text(&columns[col], c_content, nb_files));
                     column_names.push_back(column_name); 
                     v_pos_in_columns_struct.push_back(col);
                 }
@@ -153,7 +153,6 @@ ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const
 
 ComputedTable::~ComputedTable()
 {
-    COL_free_cols(columns);
     delete ref_table;
 }
 
@@ -184,14 +183,14 @@ void ComputedTable::compute_values()
     int pos;
     for(int row = 0; row < v_line_pos_in_ref_table.size(); row++)
     {
-        // resets the values in the COLS
-        COL_clear(columns);
+        // resets the values in the std::vector<COL>
+        clear_tbl_columns(columns);
         
         // Calculates the values of all LEC formulas in ONE table line for all columns 
-        // of a GSample (precompiled into a COLS structure). 
+        // of a GSample (precompiled into a std::vector<COL> structure).
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
-        res = COL_exec(ref_table, line, columns);
+        res = execute_tbl_columns(ref_table, line, columns);
         if(res < 0) 
             throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name(row) + "'");
         
@@ -199,7 +198,7 @@ void ComputedTable::compute_values()
         for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
         {
             pos = v_pos_in_columns_struct[col];
-            values[row][col] = columns->cl_cols[pos].cl_res;
+            values[row][col] = columns[pos].cl_res;
         }
     }
 }
@@ -210,7 +209,7 @@ bool ComputedTable::is_editable(const int line, const int col)
     //         - contains on operation on periods or files
     //         - does not refer to the current workspace
     int col_pos = v_pos_in_columns_struct[col];
-    COL column = columns->cl_cols[col_pos];
+    COL column = columns[col_pos];
     if(column.cl_opy != COL_NOP || column.cl_opf != COL_NOP) 
         return false;
     if(column.cl_fnb[0] != 1) 
@@ -329,7 +328,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     std::string var_to_update = cell_ref.get_variables_from_lec().at(0);
 
     // get period position 
-    COL column = columns->cl_cols[col_pos];
+    COL column = columns[col_pos];
     Sample var_sample(*global_ws_var->get_sample());
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 
@@ -391,45 +390,52 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
     }
 }
 
-void ComputedTable::print_to_file()
+void ComputedTable::print_to_file(const bool global_nb_decimals, const bool global_language)
 {
     int res;
 
-    // set number of decimals to print
-    std::string str_nb_decimals = std::to_string(nb_decimals);
-    res = B_PrintNbDec(str_nb_decimals.data());
-    if(res < 0)
+    if(!global_nb_decimals)
     {
-        std::string error_msg = "Cannot initialize printing.\n";
-        error_msg += "Invalid value for the 'nb_decimals' argument.";
-        error_manager.prepend_error(error_msg);
-        error_manager.display_last_error();
-        return;
+        // set number of decimals to print
+        std::string str_nb_decimals = std::to_string(nb_decimals);
+        res = B_PrintNbDec(str_nb_decimals.data());
+        if(res < 0)
+        {
+            std::string error_msg = "Cannot initialize printing.\n";
+            error_msg += "Invalid value for the 'nb_decimals' argument.";
+            error_manager.prepend_error(error_msg);
+            error_manager.display_last_error();
+            return;
+        }
     }
 
-    // set language
-    std::string language = ref_table->get_language_as_string();
-    if(language.empty())
-        throw std::invalid_argument("Cannot initialize printing. Language is empty.");
-
-    char tlang[2];
-    tlang[0] = language[0];
-    tlang[1] = 0;
-    
-    res = B_PrintLang(tlang);
-    if(res < 0)
+    if(!global_language)
     {
-        std::string error_msg = "Cannot initialize printing.\n"; 
-        error_msg += "Invalid value for the 'language' argument.";
-        error_manager.prepend_error(error_msg);
-        error_manager.display_last_error();
-        return;
+        // set language
+        std::string language = ref_table->get_language_as_string();
+        if(language.empty())
+            throw std::invalid_argument("Cannot initialize printing. Language is empty.");
+        
+        char tlang[2];
+        tlang[0] = language[0];
+        tlang[1] = 0;
+        
+        res = B_PrintLang(tlang);
+        if(res < 0)
+        {
+            std::string error_msg = "Cannot initialize printing.\n"; 
+            error_msg += "Invalid value for the 'language' argument.";
+            error_manager.prepend_error(error_msg);
+            error_manager.display_last_error();
+            return;
+        }
     }
 
-    std::string title_utf8 = T_get_title(ref_table);
+    std::shared_ptr<Table> ref_table_ptr(ref_table, [](Table*) {});
+    std::string title_utf8 = ref_table_ptr->get_title();
     // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
     std::string title_oem = utf8_to_oem(title_utf8);
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title_oem.c_str());
+    W_printf( ".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, title_oem.c_str());
     
     res = T_begin_tbl(dim, columns);
     if(res != 0) 
@@ -468,7 +474,7 @@ void ComputedTable::print_to_file()
                 T_print_files(columns, dim);
                 break;
             case TABLE_LINE_CELL  :
-                res = T_print_line(ref_table, i, columns);
+                res = T_print_line(ref_table_ptr, i, columns);
                 if(res != 0)
                     throw std::runtime_error("Couldn't print table. Couldn't print line " + std::to_string(i));
         }

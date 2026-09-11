@@ -33,7 +33,7 @@ std::string ComputedTableGraph::get_series_name(const int row, const int fileop)
 {
     std::string name = line_names[row];
     if(files_ops.size() > 1 || files_ops[fileop].cl_opf != COL_NOP)
-        name += " " + std::string(COL_ctoa(&files_ops[fileop], 'f', 0, 2));
+        name += " " + std::string(col_to_string(&files_ops[fileop], 'f', 0, 2));
     return name;
 }
 
@@ -69,9 +69,9 @@ std::vector<double> ComputedTableGraph::get_series_values(const int row, const i
     int period_pos;
     int col_val = 0;
     int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
-    for(int col=1; col < columns->cl_nb; col+=step)
+    for(int col=1; col < columns.size(); col+=step)
     {
-        column = columns->cl_cols[col];
+        column = columns[col];
         pos = find_file_op(column);
         if(pos == fileop)
         {

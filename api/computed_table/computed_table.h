@@ -47,7 +47,7 @@ struct ComputedTable
     std::shared_ptr<Sample> sample;
 
     int dim; 
-    COLS* columns;
+    std::vector<COL> columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
     std::vector<std::string> line_names;
@@ -303,7 +303,7 @@ public:
      * @brief Print the present computed table to a file.
      * Version without argument is dedicated to be called from KDBTables::print_to_file()
      */
-    void print_to_file();
+    void print_to_file(const bool global_nb_decimals = false, const bool global_language = false);
 
     /**
      * @brief Print the present computed table to a file.

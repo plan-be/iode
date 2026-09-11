@@ -8,7 +8,7 @@
 
 /*----------------------- ENUMS ----------------------------*/
 
-/* COLS : LANGUAGE ELEMENTS */
+/* std::vector<COL> : LANGUAGE ELEMENTS */
 enum IodeColLangElement
 {
     COL_OBRACK = 1,     // open bracket [
@@ -28,7 +28,7 @@ enum IodeColLangElement
     COL_SUBPER          // sub-period
 };
 
-/* COLS : OPERATIONS */
+/* std::vector<COL> : OPERATIONS */
 enum IodeColOperation
 {
     COL_NOP = 20,   // no operation ""
@@ -74,36 +74,21 @@ struct COL
     */
 };
 
-// COLS: group of COL's = result of a GSample compilation
-struct COLS 
-{
-    int     cl_nb;          // Number of columns
-    COL     *cl_cols;       // Pointer to the first COL struct
-};
-
-
 // REP: definition of the repetition of a group of periods / file
 // GSample example.: (2000/1999):5*4
 struct REP 
 {
-    short   r_nb;           // Nb of repetitions  (in example => 5)
-    short   r_incr;         // Increment          (in example => 4)
+    short r_nb = 0;           // Nb of repetitions  (in example => 5)
+    short r_incr = 0;         // Increment          (in example => 4)
 };
 
 // FIL: files and operation used in a COL
 // GSample example: (2000:10)[2%3]
 struct FIL 
 {
-    short   fl_op;      // Operation on files (in example => %)
-	short   fl_1;       // file nb 1          (in example => 2)
-    short   fl_2;       // file nb 2          (in example => 3)
-};
-
-// FILS: group of FIL's
-struct FILS 
-{
-    int     fl_nb;
-    FIL     *fl_fils;
+    short fl_op = 0;      // Operation on files (in example => %)
+	short fl_1 = 0;       // file nb 1          (in example => 2)
+    short fl_2 = 0;       // file nb 2          (in example => 3)
 };
 
 // FREF Reference tables for the execution of tables */
@@ -142,17 +127,16 @@ inline int col_compare(const void* a, const void* b)
 }
 
 /* c_cc.c */
-COLS *COL_cc(char* gsample);
-int COL_free_cols(COLS* cls);
-char *COL_ctoa(COL* cl, int ch, int n, int nbf);
-char *COL_text(COL* cl, char* str, int nbnames);
-COLS *COL_add_col(COLS* cls);
-int COL_find_mode(COLS* cls, int* mode, int type);
+std::vector<COL> compile_gsample(char* gsample);
+char *col_to_string(const COL* cl, int ch, int n, int nbf);
+char *col_to_text(const COL* cl, char* str, int nbnames);
+void add_tbl_column(std::vector<COL>& columns);
+int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type);
 
 /* c_calc.c */
-int COL_resize(Table* tbl, COLS* cls);
-void COL_clear(COLS* cls);
-int COL_exec(Table* tbl, int i, COLS* cls);
+int resize_tbl_columns(Table* tbl, std::vector<COL>& columns);
+void clear_tbl_columns(std::vector<COL>& columns);
+int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns);
 
 
 extern bool debug_calc;

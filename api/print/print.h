@@ -7,14 +7,11 @@
 #include "api/objs/tables.h"
 
 
-//inline char     KT_sep = '&';          // Table cell separator => replaced by A2M_SEPCH
-inline int      K_NBDEC = -1;          // Default nb of decimals
-
-inline char     **KT_names = NULL;     // Names of the files used in a GSample
-inline int      KT_nbnames = 0;        // Number of names in KT_names
-inline int      KT_mode[MAX_MODE];     // Modes used in a GSample
-inline int      KT_CUR_TOPIC = 0;      // Used in A2M file generation
-inline int      KT_CUR_LEVEL = 0;      // Used in A2M file generation
+inline int tbl_nb_decimals = -1;                    // Default nb of decimals
+inline int tbl_mode[MAX_MODE];                      // Modes used in a GSample
+inline int tbl_current_topic = 0;                   // Used in A2M file generation
+inline int tbl_current_level = 0;                   // Used in A2M file generation
+inline std::vector<std::string> v_tbl_filenames;    // Names of the files used in a GSample
 
 /*----------------------------- DEFINE -----------------------------*/
 
@@ -166,31 +163,30 @@ int APIChartNl(int hdl);
 char *APIChartTitle(int hdl, int i);
 int APIChartType(int hdl, int i);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, double *x, double *y, COLS *fcls);
-int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
+int APIGraphLine(int hdl, Table* tbl, int i, std::vector<COL>& columns, const std::shared_ptr<Sample> smpl, double *x, double *y, const std::vector<COL>& file_columns);
+int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_columns, int i);
 int APIGraphTimeData(int hdl, const std::shared_ptr<Sample> smpl, double *y);
-int APIGraphTitle(int hdl, char *txt, double *x, int nb);
-int APIPrepareChart(Table *tbl, char *gsmpl);
+int APIGraphTitle(int hdl, char* txt, double *x, int nb);
+int APIPrepareChart(Table* tbl, char* gsmpl);
 int T_GraphEnd();
 int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush);
 int T_GraphLegend(int axis, int type, char *txt, char *fileop);
-int T_GraphLine(Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, double *x, double *y, COLS *fcls);
-int T_GraphTest(Table *tbl);
+int T_GraphLine(const std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& columns, const std::shared_ptr<Sample> smpl, double *x, double *y, const std::vector<COL>& file_columns);
+int T_GraphTest(const std::shared_ptr<Table> tbl_ptr);
 int T_GraphTimeData(const std::shared_ptr<Sample> smpl, double *y);
-int T_GraphTitle(char *txt);
+int T_GraphTitle(char* txt);
 int T_GraphXYData(int nb, double *x, double *y);
 int T_GraphXYLegend(int axis, int type, char *txt, char *fileop);
-int T_find_opf(COLS *fcls, COL *cl);
-int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode);
-int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl);
+int T_find_opf(const std::vector<COL>& file_columns, const COL& column);
+int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl, int mode);
+int T_prep_smpl(const std::vector<COL>& columns, std::vector<COL>& file_columns, std::shared_ptr<Sample>& smpl);
 int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, 
     const std::shared_ptr<Sample> smpl, char **names);
 
-/* int.c */
-int T_prep_cls(Table* tbl, char* smpl, COLS** cls);
-int T_print_tbl(Table* tbl, char* smpl);
+/* k_print.c */
+int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns);
 void T_print_title(TableCell* cell, int straddle);
-int T_print_line(Table* tbl, int i, COLS* cls);
+int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& columns);
 void T_print_cell(TableCell* cell, COL* cl, int straddle);
 void T_fmt_val(char* buf, double val, int lg, int nd);
 void T_print_val(double val);
@@ -198,10 +194,9 @@ void T_print_string(COL* cl, char* string);
 void T_open_cell(int attr, int straddle, int type);
 void T_open_attr(int attr);
 void T_close_attr(int attr);
-char **T_find_files(COLS* cls);
-void T_print_files(COLS* cls, int dim);
-void T_print_mode(COLS* cls, int dim);
+std::vector<std::string> T_find_files(const std::vector<COL>& columns);
+void T_print_files(const std::vector<COL>& columns, int dim);
+void T_print_mode(const std::vector<COL>& columns, int dim);
 void T_print_date(int dim);
-int T_begin_tbl(int dim, COLS* cls);
+int T_begin_tbl(int dim, const std::vector<COL>& columns);
 void T_end_tbl(void);
-std::string T_get_title(Table* tbl);

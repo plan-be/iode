@@ -5,24 +5,6 @@
  *  The graphs are based on 
  *      - Table structures and a GSample definition, or
  *      - VAR list(s) or combination(s) or VARS. 
- *  
- *  Includes some A2M helper functions. 
- *  
- *  List of functions 
- *  -----------------
- *      int T_GraphInit(double w, double h, int xgrid, int ygrid, double ymin, double ymax, double zmin, double zmax, int align, int box, int brush)    Initialises a graph by sending a2m commands to W_printf().
- *      int T_GraphTest(Table *tbl)                                               Displays the table tbl as a graph (in level) on the full sample of the current WS.
- *      int T_GraphEnd()                                                        Ends a A2M graph definition by sending the a2m command ".ge" to W_printf().
- *      int T_graph_tbl_1(Table *tbl, char *gsmpl, int mode)                      Generates one graph in A2M format from a Table struct and a GSample.
- *      int T_GraphTitle(char *txt)                                             Defines the graph title by sending a2m command ".gtitle" to W_printf().
- *      int T_GraphLegend(int axis, int type, char *txt, char *fileop)          Adds (in A2M) graph *time* axis (.gty or .gtz, see a2m language) with its position, type and title.
- *      int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)        Adds (in A2M) graph *xy* axis with its position, type and title.
- *      int T_GraphTimeData(Sample *smpl, double *y)                         Adds numerical data on a *time* graph line or bar.
- *      int T_GraphXYData(int nb, double *x, double *y)                   Adds numerical data on a *xy* graph line or bar.
- *      int T_GraphLine(Table *tbl, int i, COLS *cls, Sample *smpl, double *x, double *y, COLS *fcls)   Adds graph curves from a table line definition and a calculated GSample. 
- *      int T_find_opf(COLS *fcls, COL *cl)                                     Tries to find the position in *fcls of the opf (operation on files) in cl.
- *      int T_prep_smpl(COLS *cls, COLS **fcls, Sample *smpl)                   Given a compiled GSample, constructs a new COLS struct with unique file ops and the minimum Sample smpl containing all periods present in cls.
- *      int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, Sample* smpl, char** names)  Prints or displays graph(s) from variable list(s) or combination(s) or variables.
  */
 #include "api/pch.h"
 #include "api/b_errors.h"
@@ -41,9 +23,13 @@
  *  @param [in] Table*    tbl table to print
  *  @return     int         0 on success, -1 on error 
  */
-int T_GraphTest(Table *tbl)
+int T_GraphTest(const std::shared_ptr<Table> tbl_ptr)
 {
-    char    gsmpl[20];
+    char gsmpl[20];
+
+    if(!tbl_ptr)
+        return -1;
+
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
     if(!smpl) 
         return -1;
@@ -52,14 +38,15 @@ int T_GraphTest(Table *tbl)
     std::string str_period = smpl->start_period.to_string();
     sprintf(gsmpl, "%s:%d", (char*) str_period.c_str(), smpl->nb_periods); /* JMP 28-11-93 */
     //KT_nb = 1; // JMP 11/05/2022
-    if(T_graph_tbl_1(tbl, gsmpl, 1)) 
+    if(T_graph_tbl_1(tbl_ptr, gsmpl, 1)) 
     { // JMP 11-05-2022 : mode = 1 => display 
         std::string err_msg = "Testing failed ...";
         error_manager.append_error(err_msg);
         return -1;
     }
 
-    W_EndDisplay((char*) T_get_title(tbl).c_str(), -1, -1, -1, -1);
+    std::string title = tbl_ptr->get_title();
+    W_EndDisplay((char*) title.c_str(), -1, -1, -1, -1);
     return 0;
 }
 
@@ -125,26 +112,26 @@ int T_GraphEnd()
  *  @return     int             0 on success, -1 on error (more than 2 cols in tbl 
  *                              or one of the ref files is not in global_ref_xxx)
  */
-int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
+int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl, int mode)
 {
     // KT_attr = 4;
-    if(tbl->nb_columns != 2) 
+    if(tbl_ptr->nb_columns != 2) 
     {
         std::string err_msg = "Only dimension 2 tables can be graphed";
         error_manager.append_error(err_msg);
         return -1;
     }
 
-    COLS* cls = nullptr;
-    int dim = T_prep_cls(tbl, gsmpl, &cls);
+    std::vector<COL> columns;
+    int dim = initialize_columns(tbl_ptr, gsmpl, columns);
     if(dim < 0) 
         return -1;
 
-    COLS* fcls = nullptr;
+    std::vector<COL> file_columns;
     std::shared_ptr<Sample> smpl = nullptr;
-    T_prep_smpl(cls, &fcls, smpl);
-    char** files = T_find_files(cls);
-    if(files == 0) 
+    T_prep_smpl(columns, file_columns, smpl);
+    std::vector<std::string> files = T_find_files(columns);
+    if(files.empty())
         return -1;
 
     double* x = (double *) SW_nalloc(sizeof(double) * smpl->nb_periods);
@@ -159,7 +146,7 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
 
     if(mode != 0)
     {
-        std::string title = T_get_title(tbl);
+        std::string title = tbl_ptr->get_title();
         // NOTE: W_Print(...) functions expect OEM encoding, so convert title 
         //       from UTF-8 to OEM before printing 
         title = utf8_to_oem(title);
@@ -167,18 +154,19 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
     } 
     
     int w = T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT,
-                    (int) tbl->get_gridx(), (int) tbl->get_gridy(),
-                    (double)tbl->y_min, (double)tbl->y_max,
-                    (double)tbl->z_min, (double)tbl->z_max,
-                    (int) tbl->get_text_alignment(), tbl->chart_box, 50 * tbl->chart_shadow);
+                    (int) tbl_ptr->get_gridx(), (int) tbl_ptr->get_gridy(),
+                    (double)tbl_ptr->y_min, (double)tbl_ptr->y_max,
+                    (double)tbl_ptr->z_min, (double)tbl_ptr->z_max,
+                    (int) tbl_ptr->get_text_alignment(), tbl_ptr->chart_box, 
+                    50 * tbl_ptr->chart_shadow);
 
     int begin = 1;
     std::string content;
     TableLine* line = nullptr;
     TableCell* cells = nullptr; 
-    for(int i = 0; i < tbl->lines.size() && w >= 0; i++) 
+    for(int i = 0; i < tbl_ptr->lines.size() && w >= 0; i++) 
     {
-        line = &tbl->lines[i];
+        line = &tbl_ptr->lines[i];
         cells = line->cells.data();
 
         switch(line->get_type()) 
@@ -187,7 +175,7 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
                 if(cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
                 begin = 0;
-                if(T_GraphLine(tbl, i, cls, smpl, x, y, fcls)) 
+                if(T_GraphLine(tbl_ptr, i, columns, smpl, x, y, file_columns))
                     w = -1;
                 break;
 
@@ -209,11 +197,8 @@ int T_graph_tbl_1(Table* tbl, char* gsmpl, int mode)
     }
     T_GraphEnd();
 
-    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
-    COL_free_cols(cls);
-    COL_free_cols(fcls);
     return w;
 }
 
@@ -257,21 +242,21 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
  *  Adds (in A2M) the graph *time* axis corresponding to a TableLine and a specific COL.
  *  
  *  @param [in] TableLine* line  pointer to a Table line
- *  @param [in] COLS*  fcls      compiled GSample (combination of files, op on files, periods, op on periods)
+ *  @param [in] const std::vector<COL>& file_columns  unique file operations
  *  @param [in] int    i         nb of the GSample column to use for generating the legend
  *  @return 
  */
-static int T_GraphLineTitle(TableLine *line, COLS *fcls, int i) 
+static int T_GraphLineTitle(TableLine *line, const std::vector<COL>& file_columns, int i)
 {
     char    *fileop = NULL;
-    COL     *cl = fcls->cl_cols + i;
+    const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content(false);
     // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM 
     content = utf8_to_oem(content);
 
-    if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP) 
-        fileop = COL_ctoa(cl, 'f', 0, 2);
+    if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
+        fileop = col_to_string(column, 'f', 0, 2);
     T_GraphLegend(line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                  (char*) content.c_str(), fileop);
     return 0;
@@ -356,35 +341,36 @@ int T_GraphXYData(int nb, double *x, double *y)
  *  
  *  @param [in]  Table*        tbl    Source table
  *  @param [in]  int         i      line number
- *  @param [in]  COLS*       cls    compiled GSample containing the calculated values 
+ *  @param [in, out] std::vector<COL>& columns  compiled GSample containing calculated values
  *                                  for each operation on files and periods
  *  @param [in]  Sample*     smpl   Sample of the data
  *  @param [in]  double*  x      unused  
  *  @param [out] double*  y      data of the 
- *  @param [in]  COLS*       fcls   
+ *  @param [in] const std::vector<COL>& file_columns  unique file operations
  *  @return 
  *  
  */
-int T_GraphLine(Table* tbl, int i, COLS* cls, const std::shared_ptr<Sample> smpl, double* x, double* y, COLS* fcls)
+int T_GraphLine(const std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& columns,
+    const std::shared_ptr<Sample> smpl, double* x, double* y, const std::vector<COL>& file_columns)
 {
-    COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) 
+    clear_tbl_columns(columns);
+    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
         return -1;
 
-    TableLine* line = &tbl->lines[i];
-    for(int k = 0 ; k < fcls->cl_nb ; k++) 
+    TableLine* line = &tbl_ptr->lines[i];
+    for(int k = 0; k < file_columns.size(); k++)
     {
-        T_GraphLineTitle(line, fcls, k);
+        T_GraphLineTitle(line, file_columns, k);
 
         for(int j = 0 ; j < smpl->nb_periods ; j++) 
             y[j] = IODE_NAN;
         
         int dt = 0;
         COL* cl = nullptr;
-        for(int j = 1; j < cls->cl_nb; j += 2) 
+        for(int j = 1; j < columns.size(); j += 2)
         {
-            cl = cls->cl_cols + j;
-            if(T_find_opf(fcls, cl) != k) 
+            cl = &columns[j];
+            if(T_find_opf(file_columns, *cl) != k)
                 continue;
             dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
@@ -400,61 +386,54 @@ int T_GraphLine(Table* tbl, int i, COLS* cls, const std::shared_ptr<Sample> smpl
 /**
  *  Tries to find the position in *fcls of the opf (operation on files) in cl.
  *  
- *  @param [in] COLS*   fcls    already found opf's 
+ *  @param [in] const std::vector<COL>& file_columns  already found file operations
  *  @param [in] COL*    cl      opf to search
  *  @return     int             -1 of cl not yet present in fcls, pos if present    
  */
-int T_find_opf(COLS *fcls, COL *cl)
+int T_find_opf(const std::vector<COL>& file_columns, const COL& column)
 {
-    int     i;
-    COL     *fcl;
-
-    if(fcls == 0) return -1;
-    for(i = 0; i < fcls->cl_nb; i++) {
-        fcl = fcls->cl_cols + i;
-        if(fcl->cl_opf    == cl->cl_opf &&
-                fcl->cl_fnb[0] == cl->cl_fnb[0] &&
-                fcl->cl_fnb[1] == cl->cl_fnb[1])
-            return(i);
+    for(int i = 0; i < file_columns.size(); i++)
+    {
+        const COL& file_column = file_columns[i];
+        if(file_column.cl_opf == column.cl_opf &&
+           file_column.cl_fnb[0] == column.cl_fnb[0] &&
+           file_column.cl_fnb[1] == column.cl_fnb[1])
+            return i;
     }
     return -1;
 }
 
 
 /**
- *  Given a COLS struct (compiled GSample), constructs:
- *      - a new COLS struct containing unique files and operation on files
+ *  Given a std::vector<COL> struct (compiled GSample), constructs:
+ *      - a new std::vector<COL> struct containing unique files and operation on files
  *      - the minimum Sample smpl containing all periods present in cls.
  *  
- *  @param [in]  COLS*   cls    compiled GSample
- *  @param [out] COLS**  fcls   unique files / op on files
+ *  @param [in]  const std::vector<COL>& columns       compiled GSample
+ *  @param [out] std::vector<COL>& file_columns        unique file operations
  *  @param [out] Sample* smpl   minimum Sample enclosing cls periods
  *  @return 
  */
-int T_prep_smpl(COLS *cls, COLS **fcls, std::shared_ptr<Sample>& smpl)
+int T_prep_smpl(const std::vector<COL>& columns, std::vector<COL>& file_columns,
+    std::shared_ptr<Sample>& smpl)
 {
-    *fcls = 0;
-
-    COL* cl = cls->cl_cols;  // First col in cls
-    Period start_period = cl->cl_per[0];
-    Period end_period = cl->cl_per[0];
+    const COL* column = &columns[0];
+    Period start_period = column->cl_per[0];
+    Period end_period = column->cl_per[0];
     smpl = std::make_shared<Sample>(start_period, end_period);
     
     int pos;
-    for(int i = 0; i < cls->cl_nb; i++) 
+    for(const COL& current_column : columns)
     {
-        cl = cls->cl_cols + i;
-        pos = T_find_opf(*fcls, cl);
-        if(pos < 0) 
-        {
-            *fcls = COL_add_col(*fcls); // JMP 19/04/2022
-            memcpy((*fcls)->cl_cols + (*fcls)->cl_nb - 1, cl, sizeof(COL));
-        }
+        column = &current_column;
+        pos = T_find_opf(file_columns, current_column);
+        if(pos < 0)
+            file_columns.push_back(current_column);
 
-        if(cl->cl_per[0].difference(smpl->start_period) < 0)
-            smpl->start_period = cl->cl_per[0];
-        if(cl->cl_per[0].difference(smpl->end_period) > 0)
-            smpl->end_period = cl->cl_per[0];
+        if(column->cl_per[0].difference(smpl->start_period) < 0)
+            smpl->start_period = column->cl_per[0];
+        if(column->cl_per[0].difference(smpl->end_period) > 0)
+            smpl->end_period = column->cl_per[0];
     }
     smpl->nb_periods = 1 + smpl->end_period.difference(smpl->start_period);
     return 0;
@@ -656,12 +635,12 @@ APICHRT** API_CHARTS = NULL;
 int       API_NBCHARTS = 0;
 
 // Functions declarations 
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, 
-        double *x, double *y, COLS *fcls);
+int APIGraphLine(int hdl, Table *tbl, int i, std::vector<COL>& columns,
+        const std::shared_ptr<Sample> smpl, double *x, double *y, const std::vector<COL>& file_columns);
 int APIGraphTimeData(int hdl, const std::shared_ptr<Sample> smpl, double *y);
 int APIGraphTitle(int hdl, char *txt, double *x, int nb);
 int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop);
-int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i);
+int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_columns, int i);
 APICHRT *APIChartInit(int nl);
 int APIChartEnd(APICHRT *Chrt);
 int APIChartAlloc(int nl);
@@ -675,27 +654,27 @@ double *APIChartData(int hdl, int i);
 int APIPrepareChart(Table *tbl, char *gsmpl);
 
 
-int APIGraphLine(int hdl, Table *tbl, int i, COLS *cls, const std::shared_ptr<Sample> smpl, 
-    double *x, double *y, COLS *fcls)
+int APIGraphLine(int hdl, Table *tbl, int i, std::vector<COL>& columns,
+    const std::shared_ptr<Sample> smpl, double *x, double *y, const std::vector<COL>& file_columns)
 {
-    COL_clear(cls);
-    if(COL_exec(tbl, i, cls) < 0) 
+    clear_tbl_columns(columns);
+    if(execute_tbl_columns(tbl, i, columns) < 0)
         return -1;
     
     APICHRT* Chrt = API_CHARTS[hdl];
     TableLine* line = &tbl->lines[i];
-    for(int k = 0 ; k < fcls->cl_nb ; k++) 
+    for(int k = 0; k < file_columns.size(); k++)
     {
-        APIGraphLineTitle(hdl, line, fcls, k);
+        APIGraphLineTitle(hdl, line, file_columns, k);
         for(int j = 0 ; j < smpl->nb_periods ; j++)
              y[j] = IODE_NAN;
 
         int dt = 0;
         COL* cl = nullptr;
-        for(int j = 1; j < cls->cl_nb; j += 2) 
+        for(int j = 1; j < columns.size(); j += 2)
         {
-            cl = cls->cl_cols + j;
-            if(T_find_opf(fcls, cl) != k) 
+            cl = &columns[j];
+            if(T_find_opf(file_columns, *cl) != k)
                 continue;
             dt = cl->cl_per->difference(smpl->start_period);
             y[dt] = cl->cl_res;
@@ -779,22 +758,22 @@ int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
  *  
  *  @param [in] int     hdl  
  *  @param [in] TableLine*  line 
- *  @param [in] COLS*   fcls 
+ *  @param [in] const std::vector<COL>& file_columns
  *  @param [in] int     i    
  *  @return 
  *  
  */
-int APIGraphLineTitle(int hdl, TableLine *line, COLS *fcls, int i) 
+int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_columns, int i)
 {
     char    *fileop = NULL;
-    COL     *cl = fcls->cl_cols + i;
+    const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content();
     // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
     content = utf8_to_oem(content);
 
-    if(fcls->cl_nb > 1 || cl->cl_opf != COL_NOP)
-        fileop = COL_ctoa(cl, 'f', 0, 2);
+    if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
+        fileop = col_to_string(column, 'f', 0, 2);
     APIGraphLegendTitle(hdl, line->right_axis, "LSBL"[(int) line->get_graph_type()], 
                        (char*) content.c_str(), fileop);
     return 0;
@@ -931,16 +910,17 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
         return -1;
     }
     
-    COLS* cls = nullptr;
-    int dim = T_prep_cls(tbl, gsmpl, &cls);
+    std::vector<COL> columns;
+    std::shared_ptr<Table> tbl_ptr(tbl, [](Table*) {});
+    int dim = initialize_columns(tbl_ptr, gsmpl, columns);
     if(dim < 0) 
         return -1;
     
-    COLS* fcls = nullptr;
+    std::vector<COL> file_columns;
     std::shared_ptr<Sample> smpl = nullptr;
-    T_prep_smpl(cls, &fcls, smpl);
-    char** files = T_find_files(cls);
-    if(files == 0) 
+    T_prep_smpl(columns, file_columns, smpl);
+    std::vector<std::string> files = T_find_files(columns);
+    if(files.empty()) 
         return -1;
 
     double* x = (double*) SW_nalloc(sizeof(double) * smpl->nb_periods);
@@ -963,7 +943,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
             case TABLE_LINE_CELL  :
                 if(line->cells[1].get_type() != TABLE_CELL_LEC) 
                     break;
-                if(APIGraphLine(hdl, tbl, i, cls, smpl, x, y, fcls)) 
+                if(APIGraphLine(hdl, tbl, i, columns, smpl, x, y, file_columns))
                     w = -1;
                 break;
 
@@ -981,11 +961,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     }
 
     API_CHARTS[hdl]->nb = smpl->nb_periods;
-    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
-    COL_free_cols(cls);
-    COL_free_cols(fcls);
     return hdl;
 }
 

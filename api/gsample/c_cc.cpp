@@ -35,11 +35,10 @@
  *  
  *  List of functions 
  *  -----------------
- *      COLS *COL_cc(char* gsample)                         GSample compiler
- *      int COL_free_cols(COLS* cls)                        Frees the allocated space for a COLS structure created by COL_cc()
- *      char *COL_text(COL* cl, char* str, int nbnames)     Constructs a string based on a special table cell text value containing a "#"
- *      COLS *COL_add_col(COLS* cls)                        Adds a new COL struct to the COLS (list of periods in a GSample)
- *      int COL_find_mode(COLS* cls, int* mode, int type)   Analyses a COLS struct and set 1 in the vector mode for each found operation
+ *      std::vector<COL> compile_gsample(char* gsample)                    GSample compiler
+ *      char *col_to_text(COL* cl, char* str, int nbnames)     Constructs a string based on a special table cell text value containing a "#"
+ *      void add_tbl_column(std::vector<COL>& columns)                    Adds a new COL to the vector
+ *      int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type)
  *
  */
 #include "scr4/s_prodt.h"
@@ -52,20 +51,19 @@
 
 
 // Function declarations
-static void COL_free_fils(FILS* fils);
-static FILS* COL_add_fil(FILS* fils);
-static void COL_apply_fil(COL* cl, FIL* fl);
-static void COL_calc_now(Period *per);
-static int COL_read_long_per(YYFILE *yy);
-static int COL_read_per(YYFILE* yy, Period* per);
-static COLS *COL_read_y(YYFILE* yy);
-static int COL_calc_subper();
-static int COL_read_rep(YYFILE* yy, REP* rep);
-static int COL_read_1f(YYFILE* yy, FIL* fil);
-static FILS *COL_read_f(YYFILE* yy);
-static void COL_shift(COLS *cls, int key, int nb);
-static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval);
-static COLS *COL_read_cols(YYFILE* yy);
+static void apply_file(COL* cl, const FIL& file);
+static void calculate_period_now(Period *per);
+static int read_long_period(YYFILE *yy);
+static int read_period(YYFILE* yy, Period* per);
+static std::vector<COL> read_yy_stream(YYFILE* yy);
+static int calculate_sub_period();
+static int read_repetition(YYFILE* yy, REP* rep);
+static int read_one_file(YYFILE* yy, FIL& fil);
+static bool read_files(YYFILE* yy, std::vector<FIL>& files);
+static void shift_periods(std::vector<COL>& columns, int key, int nb);
+static void construct_columns(std::vector<COL>& columns, const std::vector<COL>& columns_to_add, const std::vector<FIL>& files,
+    REP* rep, int shiftdir, int shiftval);
+static std::vector<COL> read_columns(YYFILE* yy);
 
 
 // GSample tokens -- may be expanded
@@ -192,31 +190,13 @@ YYKEYS COL_KEYWS[] =
 
 
 /**
- *  Frees the allocated space for a FILS structure created by COL_cc().
- *  
- *  @param [in] FILS*   fils    FILS to free
- *  
- */
- 
-static void COL_free_fils(FILS* fils)
-{
-    if(fils == 0) 
-        return;
-    
-    if(fils->fl_nb != 0) 
-        SW_nfree(fils->fl_fils);
-    SW_nfree(fils);
-}
-
-
-/**
  *  Constructs a string based on a special table cell text value containing a "#".
  *  
  *  Returns a static string constructed from an atomic element 
  *  of a table text cell containing the '#' character and adapted 
  *  to the contents of a specific COL (periods and files). 
  *  
- *  COL_ctoa() is a sub function of COL_text().
+ *  col_to_string() is a sub function of col_to_text().
  *  
  *  Examples
  *  --------
@@ -238,10 +218,10 @@ static void COL_free_fils(FILS* fils)
  *  
  */
 
-char *COL_ctoa(COL* cl, int ch, int n, int nbf)
+char *col_to_string(const COL* cl, int ch, int n, int nbf)
 {
     static char res[30];
-    Period      *per;
+    const Period* per;
 
     res[0] = res[1] = 0;
 
@@ -323,7 +303,7 @@ Num:
 }
 
 /**
- *  The recursive function COL_text() returns an allocated string 
+ *  The recursive function col_to_text() returns an allocated string 
  *  constructed from a Table text cell containing the '#' character. The result
  *  depends on the contents of the specific COL (periods and files) passed as argument. 
  *  
@@ -336,7 +316,7 @@ Num:
  *  TODO: check the allocated length (40+3+..) that could be too small!
  */
  
-char *COL_text(COL* cl, char* str, int nbnames)
+char *col_to_text(const COL* cl, char* str, int nbnames)
 {
     int     i, j, op, n, lg;
     char    *res, *txt, *tmp;
@@ -373,7 +353,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
             else if(op == 'S')  tmp = "#T#F";
             else if(op == 't')  tmp = "#y1#P1#n1#o1#y2#P2#n2";
             else if(op == 'T')  tmp = "#Y1#P1#n1#o1#Y2#P2#n2";
-            txt = COL_text(cl, tmp, nbnames);
+            txt = col_to_text(cl, tmp, nbnames);
             if(j + strlen(txt) < lg) 
             {
                 strcat(res, txt);
@@ -384,7 +364,7 @@ char *COL_text(COL* cl, char* str, int nbnames)
         }
         else 
         {
-            txt = COL_ctoa(cl, op, n, nbnames);
+            txt = col_to_string(cl, op, n, nbnames);
             if(j + strlen(txt) >= lg) 
                 break;
             strcat(res, txt);
@@ -398,50 +378,15 @@ char *COL_text(COL* cl, char* str, int nbnames)
 
 
 /**
- *  Adds a new COL struct to the COLS (list of periods in a GSample).
+ *  Adds a new COL struct to the std::vector<COL> (list of periods in a GSample).
  *  
- *  @param [in, out] COLS*  cls     current COLS (before adding a new COL) or NULL 
- *  @return          COLS*          if cols == NULL : newly allocated COLS structure
- *  
- */
-
-COLS *COL_add_col(COLS* cls)
-{
-    if(cls == 0) 
-        cls = (COLS *) SW_nalloc(sizeof(COLS));     // BUG corrected: was sizeof(COL)
-    
-    // enlarges by chunks of 20
-    if(cls->cl_nb % 20 == 0)
-        cls->cl_cols = (COL *) SW_nrealloc(cls->cl_cols,
-                                           sizeof(COL) * cls->cl_nb,
-                                           sizeof(COL) * (cls->cl_nb + 20));
-    cls->cl_nb ++;
-    return(cls);
-}
-
-
-/**
- *  Adds a new FIL struct to the FILS (list of files in a GSample).
- *  
- *  @param [in, out] FILS*  fils    current FILS (before adding a new FIL) or NULL 
- *  @return          FILS*          if fils == NULL : newly allocated FILS structure
+ *  @param [in, out] std::vector<COL>& columns  vector receiving a new COL
  *  
  */
- 
-static FILS* COL_add_fil(FILS* fils)
+
+void add_tbl_column(std::vector<COL>& columns)
 {
-    // BUG in previous versions: 
-    // was SW_nalloc(sizeof(FIL)) instead of SW_nalloc(sizeof(FILS))
-    if(fils == 0)
-        fils = (FILS *) SW_nalloc(sizeof(FILS));
-    
-    // enlarges by chunks of 5
-    if(fils->fl_nb % 5 == 0)
-        fils->fl_fils = (FIL *) SW_nrealloc(fils->fl_fils,
-                                           sizeof(FIL) * fils->fl_nb,
-                                           sizeof(FIL) * (fils->fl_nb + 5));
-    fils->fl_nb++;
-    return(fils);
+    columns.emplace_back();
 }
 
 
@@ -449,19 +394,19 @@ static FILS* COL_add_fil(FILS* fils)
  *  Copies the content of a FIL struct into a COL struct.
  *  
  *  @param [in, out]  COL*  cl  COL to update
- *  @param [in]       FIL*  fl  FIL to copy to cl
+ *  @param [in]       FIL&  fil  FIL to copy to cl
  *  @return 
  *  
  */
 
-static void COL_apply_fil(COL* cl, FIL* fl)
+static void apply_file(COL* cl, const FIL& file)
 {
     if(cl->cl_fnb[0] != 0) 
         return;
     
-    cl->cl_fnb[0] = fl->fl_1;
-    cl->cl_fnb[1] = fl->fl_2;
-    cl->cl_opf = fl->fl_op;
+    cl->cl_fnb[0] = file.fl_1;
+    cl->cl_fnb[1] = file.fl_2;
+    cl->cl_opf = file.fl_op;
 }
 
 
@@ -475,7 +420,7 @@ static void COL_apply_fil(COL* cl, FIL* fl)
  *  
  */
  
-static void COL_calc_now(Period *per)
+static void calculate_period_now(Period *per)
 {
     memcpy(per, &(global_ws_var->get_sample()->start_period), sizeof(Period));
     per->year = SCR_current_date() / 10000L;
@@ -517,7 +462,7 @@ static void COL_calc_now(Period *per)
  *  
  */
  
-static int COL_read_long_per(YYFILE *yy)
+static int read_long_period(YYFILE *yy)
 {
     int     keyw = YY_lex(yy);
 
@@ -526,7 +471,7 @@ static int COL_read_long_per(YYFILE *yy)
     else if(keyw == COL_PER)    
         return(get_nb_periods_per_year(global_ws_var->get_sample()->start_period.periodicity));
     else if(keyw == COL_SUBPER) 
-        return(COL_calc_subper());
+        return(calculate_sub_period());
     else                        
         return -1;
 }
@@ -548,7 +493,7 @@ static int COL_read_long_per(YYFILE *yy)
  *  
  */
 
-static int COL_read_per(YYFILE* yy, Period* per)
+static int read_period(YYFILE* yy, Period* per)
 {
     int     ch, ch1, pos, sign = 1, keyw, shiftval;
 
@@ -588,11 +533,11 @@ static int COL_read_per(YYFILE* yy, Period* per)
             break;
 
         case COL_NOW :
-            COL_calc_now(per);
+            calculate_period_now(per);
             break;
 
         case COL_NOW1 :
-            COL_calc_now(per);
+            calculate_period_now(per);
             per->step = 1;
             break;
 
@@ -633,7 +578,7 @@ nextshift:
     else          
         sign = 1;
     
-    shiftval = COL_read_long_per(yy);
+    shiftval = read_long_period(yy);
     if(shiftval < 0) 
         return -1;
 
@@ -666,26 +611,26 @@ nextshift:
  *  
  *  Syntax:  per1 [op per2]
  *  where 
- *      per1 and per2 : see COL_read_per()
+ *      per1 and per2 : see read_period()
  *      op : "" or one of "-" "--" "~" "^" "+" "=" "/" "//" (see iode manual)
  *  
  *  @param [in, out] YYFILE*    yy  YY stream
- *  @return          COLS*          compiled column
+ *  @return          std::vector<COL>           compiled column
  *  
  */
  
-static COLS *COL_read_y(YYFILE* yy)
+static std::vector<COL> read_yy_stream(YYFILE* yy)
 {
     Period  per;
-    COLS    *cls;
+    std::vector<COL> columns;
     int     op;
 
-    if(COL_read_per(yy, &per)) 
-        return((COLS *) 0);
+    if(read_period(yy, &per))
+        return {};
     
-    cls = COL_add_col((COLS *) 0);
-    cls->cl_cols[0].cl_opy = COL_NOP;
-    memcpy(&(cls->cl_cols[0].cl_per[0]), &per, sizeof(Period));
+    add_tbl_column(columns);
+    columns[0].cl_opy = COL_NOP;
+    memcpy(&(columns[0].cl_per[0]), &per, sizeof(Period));
 
     // YY_COMMENT2 = 0 -> do not consider '//' as the beginning of a comment
     // See function YY_read()
@@ -696,20 +641,17 @@ static COLS *COL_read_y(YYFILE* yy)
     if(op <= COL_NOP || op >= COL_LAST_OP) 
     {
         YY_unread(yy);
-        return(cls);
+        return columns;
     }
 
     YY_COMMENT2 = YY_COMMENT2_OLD;
 
-    cls->cl_cols[0].cl_opy = op;
+    columns[0].cl_opy = op;
 
-    if(COL_read_per(yy, &per)) 
-    {
-        COL_free_cols(cls);
-        return((COLS *) 0);
-    }
-    memcpy(&(cls->cl_cols[0].cl_per[1]), &per, sizeof(Period));
-    return(cls);
+    if(read_period(yy, &per))
+        return {};
+    memcpy(&(columns[0].cl_per[1]), &per, sizeof(Period));
+    return columns;
 }
 
 
@@ -721,7 +663,7 @@ static COLS *COL_read_y(YYFILE* yy)
  *  
  */
  
-static int COL_calc_subper()
+static int calculate_sub_period()
 {
     Period  *per;
     int     p;
@@ -758,7 +700,7 @@ static int COL_calc_subper()
  *  
  */
  
-static int COL_read_rep(YYFILE* yy, REP* rep)
+static int read_repetition(YYFILE* yy, REP* rep)
 {
     int	sign = 1;
     int	keyw;
@@ -767,7 +709,7 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
 
     // Syntax : [:n[*[-]incr]]
     // 1. partie (optionnelle) n
-    rep->r_nb = COL_read_long_per(yy);
+    rep->r_nb = read_long_period(yy);
     if(rep->r_nb < 0) 
         return -1;
 
@@ -785,7 +727,7 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
     else
         YY_unread(yy);
 
-    rep->r_incr = COL_read_long_per(yy);
+    rep->r_incr = read_long_period(yy);
     if(rep->r_incr < 0) 
         return -1;
     
@@ -811,32 +753,29 @@ static int COL_read_rep(YYFILE* yy, REP* rep)
  *  
  */
  
-static int COL_read_1f(YYFILE* yy, FIL* fil)
+static int read_one_file(YYFILE* yy, FIL& file)
 {
-    int     op;
-
-    fil->fl_op = COL_NOP;
-    fil->fl_2  = 0;
+    file.fl_op = COL_NOP;
+    file.fl_2  = 0;
     if(YY_lex(yy) != YY_LONG) 
         return -1;
 
     if(yy->yy_long < 1 || yy->yy_long > 10) 
         return -1;
     
-    fil->fl_1 = (short) yy->yy_long;
-    op = YY_lex(yy);
-    /*GB    if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN) { */
+    file.fl_1 = (short) yy->yy_long;
+    int op = YY_lex(yy);
     if(op != COL_ADD && op != COL_DIFF && op != COL_GRT && op != COL_MEAN && op != COL_BASE) 
     {
         YY_unread(yy);
         return 0;
     }
 
-    fil->fl_op = op;
+    file.fl_op = op;
     if(YY_lex(yy) != YY_LONG) 
         return -1;
     
-    fil->fl_2 = (short)yy->yy_long;
+    file.fl_2 = (short)yy->yy_long;
     return 0;
 }
 
@@ -847,7 +786,7 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
  *  Syntax: 
  *      file_op_1;file_op_2...]
  *      where 
- *           file_op_1 is defined in COL_read_1f()
+ *           file_op_1 is defined in read_one_file()
  *  
  *  Example:  [1/2;1;2]
  *  
@@ -855,35 +794,33 @@ static int COL_read_1f(YYFILE* yy, FIL* fil)
  *  is read by the function.
  *  
  *  @param [in] YYFILE*     yy   YY stream
- *  @return     FILS*            group of FIL struct containing the file references 
- *                               and the operator for each file operation 
- *                               NULL on error
+ *  @param [out] std::vector<FIL>& fils  file references and operators
+ *  @return      int                    0 on success, -1 on error
  */
  
-static FILS *COL_read_f(YYFILE* yy)
+static bool read_files(YYFILE* yy, std::vector<FIL>& files)
 {
-    FILS    *fils = 0;
-
     while(1) 
     {
-        fils = (FILS *)COL_add_fil(fils);
-        if(COL_read_1f(yy, fils->fl_fils + fils->fl_nb - 1)) 
-            goto err;
+        FIL file;
+        if(read_one_file(yy, file))
+        {
+            files.clear();
+            return false;
+        }
+        files.push_back(file);
         
         switch(YY_lex(yy)) 
         {
             case COL_COMMA :
                 break;
             case COL_CBRACK :
-                return(fils);
+                return true;
             default :
-                goto err;
+                files.clear();
+                return false;
         }
     }
-
-err:
-    COL_free_fils(fils);
-    return((FILS *) 0);
 }
 
 
@@ -897,7 +834,7 @@ err:
  *      2000Q1<0 or 2000Q3<0 or ...  === 2000Q1
  *      2000Q3>0 or 2000Q4>0 or ...  === 2000Q4
  *  
- *  @param [in, out] COLS*   cls    partial compiled GSample 
+ *  @param [in, out] std::vector<COL>& columns  partial compiled GSample
  *  @param [in]      int     key    period shift direction: COL_SHIFTL or COL_SHIFTR 
  *  @param [in]      in      nb     if not 0: nb of period to shift 
  *                                  if 0 and key == COL_SHIFTL: shift to the 1st period of the year
@@ -905,74 +842,68 @@ err:
  *  
  */
  
-static void COL_shift(COLS *cls, int key, int nb)
+static void shift_periods(std::vector<COL>& columns, int key, int nb)
 {
-    COL   	*cl;
     Period  per;
 
-    for(int i = 0; i < cls->cl_nb; i++) 
+    for(COL& column : columns)
     {
-        cl = cls->cl_cols + i;
-        if(nb == 0) 
+        if(nb == 0)
         {
             if(key == COL_SHIFTR)
-                cl->cl_per[0].step = cl->cl_per[1].step = get_nb_periods_per_year(cl->cl_per[0].periodicity);
+                column.cl_per[0].step = column.cl_per[1].step = get_nb_periods_per_year(column.cl_per[0].periodicity);
             else
-                cl->cl_per[0].step = cl->cl_per[1].step = 1;
+                column.cl_per[0].step = column.cl_per[1].step = 1;
         }
-        else 
+        else
         {
-            if(key == COL_SHIFTL) 
+            if(key == COL_SHIFTL)
                 nb = -nb;
-            per = cl->cl_per->shift(nb);
-            cl->cl_per[0] = per;
-            if(cl->cl_opy != COL_NOP) 
+            per = column.cl_per->shift(nb);
+            column.cl_per[0] = per;
+            if(column.cl_opy != COL_NOP)
             {
-                per = cl->cl_per[1].shift(nb);
-                cl->cl_per[1] = per;
+                per = column.cl_per[1].shift(nb);
+                column.cl_per[1] = per;
             }
         }
     }
 }
 
 
-// Default FILS for COL_construct()
-static FIL     COL_FIL  = {0, 0, 0};           
-static FILS    COL_FILS = {1, &COL_FIL};
-
-
 /**
  *  Completes the construction of a GSample compiled form.
  *  
- *  Given a COLS struct cltmp (result of a partial GSample compilation, 
+ *  Given columns_to_add (result of a partial GSample compilation,
  *  for ex. "2000:5[1;2]" in "2000:5[1;2];2000/1999:5"), adds it to the global GSample 
  *  compiled struct cls.
  *  
- *  The cltmp is added to cols rep->r_nb times * fils->fl_nb times. 
- *  If cltmp comes from "2000:5[1;2]", adds 5 * 2 the COLS in cltmp to the global cols.
+ *  The cltmp is added to cols rep->r_nb times * fils.size() times.
+ *  If cltmp comes from "2000:5[1;2]", adds 5 * 2 the std::vector<COL> in cltmp to the global cols.
  *  
- *  See more examples in COL_read_cols().
+ *  See more examples in read_columns().
  *  
- *  @param [in, out] COLS*  cls         resulting columns
- *  @param [in]      COLS*  cltmp       compiled GSample to be added to cls rep->r_nb times
- *  @param [in]      FILS*  fils        FILS on which to cltmp must be applied
+ *  @param [in, out] std::vector<COL>& columns         resulting columns
+ *  @param [in]      const std::vector<COL>& columns_to_add  compiled GSample to append
+ *  @param [in]      std::vector<FIL>& fils  file operations on which cltmp must be applied
  *  @param [in]      REP*   rep         repetition format (n * m)
- *  @param [in]      int    shiftdir    unused ? Replaced by COL_shift() ?
+ *  @param [in]      int    shiftdir    unused ? Replaced by shift_periods() ?
  *  @param [in]      int    shiftval    unused ? id.
- *  @return          COLS*              cls (same pointer but content modified)
  *  
  */
 
-static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shiftdir, int shiftval)
+static void construct_columns(std::vector<COL>& columns, const std::vector<COL>& columns_to_add,
+    const std::vector<FIL>& files,
+    REP* rep, int shiftdir, int shiftval)
 {
-    int     i, nbtmp, j, nbfils, k;
-    COL     *cl, *tmp;
     Period  per;
 
-    // if no fils, use a default  value
-    if(fils == 0) 
-        fils = &COL_FILS;
-    nbfils = fils->fl_nb;
+    // if no file operation was specified, use a default value
+    std::vector<FIL> file_operations; 
+    if(files.empty())
+        file_operations.push_back(FIL());
+    else
+        file_operations = files;
 
     if(rep->r_nb == 0) 
     {
@@ -980,24 +911,20 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
         rep->r_incr = 1;
     }
 
-    nbtmp = cltmp->cl_nb;
-    tmp   = cltmp->cl_cols;
-
     // Repetitions
-    for(i = 0 ; i < rep->r_nb ; i++) 
+    for(int i = 0; i < rep->r_nb; i++)
     {
-        for(j = 0 ; j < nbtmp ; j++) 
+        for(const COL& source_column : columns_to_add)
         {
-            for(k = 0 ; k < nbfils ; k++) 
+            for(const FIL& file : file_operations)
             {
-                cls = COL_add_col(cls);
-                cl = cls->cl_cols + cls->cl_nb - 1;
-                memcpy(cl, tmp + j, sizeof(COL));
-                cl->cl_per[0] = tmp[j].cl_per[0].shift(i * rep->r_incr);
-                if(cl->cl_opy != COL_NOP && cl->cl_opy != COL_BASE)
-                    cl->cl_per[1] = tmp[j].cl_per[1].shift(i * rep->r_incr);
-                if(cl->cl_fnb[0] == 0)
-                    COL_apply_fil(cl, fils->fl_fils + k);
+                columns.push_back(source_column);
+                COL& column = columns.back();
+                column.cl_per[0] = column.cl_per[0].shift(i * rep->r_incr);
+                if(column.cl_opy != COL_NOP && column.cl_opy != COL_BASE)
+                    column.cl_per[1] = column.cl_per[1].shift(i * rep->r_incr);
+                if(column.cl_fnb[0] == 0)
+                    apply_file(&column, file);
                 else
                     break;
             }
@@ -1007,39 +934,38 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
     // Shift
     if(shiftdir) 
     {
-        for(i = 0; i < cls->cl_nb; i++) 
+        for(COL& column : columns)
         {
-            cl = cls->cl_cols + i;
-            if(shiftval == 0) {
-                if(shiftdir == COL_SHIFTR)
-                    cl->cl_per[0].step = cl->cl_per[1].step = get_nb_periods_per_year(cl->cl_per[0].periodicity);
-                else
-                    cl->cl_per[0].step = cl->cl_per[1].step = 1;
-            }
-            else 
+            if(shiftval == 0)
             {
-                if(shiftdir == COL_SHIFTL) 
+                if(shiftdir == COL_SHIFTR)
+                    column.cl_per[0].step = column.cl_per[1].step = get_nb_periods_per_year(column.cl_per[0].periodicity);
+                else
+                    column.cl_per[0].step = column.cl_per[1].step = 1;
+            }
+            else
+            {
+                if(shiftdir == COL_SHIFTL)
                     shiftval = -shiftval;
-                per = cl->cl_per[0].shift(shiftval);
-                cl->cl_per[0] = per;
-                if(cl->cl_opy != COL_NOP) 
+                per = column.cl_per[0].shift(shiftval);
+                column.cl_per[0] = per;
+                if(column.cl_opy != COL_NOP)
                 {
-                    per = cl->cl_per[1].shift(shiftval);
-                    cl->cl_per[1] = per;
+                    per = column.cl_per[1].shift(shiftval);
+                    column.cl_per[1] = per;
                 }
             }
         }
     }
-    return(cls);
 }
 
 
 /**
  *  Recursive function to compile a GSample.
- *  Returns a COLS* struct containing the column definitions.
+ *  Returns a vector containing the column definitions.
  *  
  *  @param [in, out] YYFILE*    yy  YY stream
- *  @return          COLS*          compiled columns
+ *  @return          std::vector<COL>           compiled columns
  *
  *  Example 1
  *  ---------
@@ -1050,15 +976,15 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *      "2000:5[1;2]" 
  *      "2000/1999:2"
  *  
- *  First, COL_read_cols() will read the string until reaching ';' or the end of the string, in this case "2000:5[1;2]".
+ *  First, read_columns() will read the string until reaching ';' or the end of the string, in this case "2000:5[1;2]".
  *  It will create during the process:
  *      - cltmp : period(s) + operation on period
  *      - fils  : file(s) + operation on files
  *      - rep   : repetition factor + increment
  *   
- *  Next, fils and rep having been read, COL_construct() is called to add 
- *  cltmp to the final COLS cls (which is still NULL a this moment). 
- *  In this case, cltmp is repeated 5 times (rep.r_nb) x 2 (fils->fl_nb) 
+ *  Next, fils and rep having been read, construct_columns() is called to add 
+ *  columns_to_add to the final columns vector.
+ *  In this case, cltmp is repeated 5 times (rep.r_nb) x 2 (fils.size())
  *  and these columns are stored in cls.
  *  
  *  Next, the remaining string "2000/1999;5" is compiled and added to cls the same way.
@@ -1070,29 +996,27 @@ static COLS *COL_construct(COLS* cls, COLS* cltmp, FILS* fils, REP* rep, int shi
  *  ---------
  *  GSample : "(99Y1;2000Y1;2000Y1/1999Y1)[1;2]:2"
  *  
- *  In this case, COL_read_cols() is called recursively and the total number 
+ *  In this case, read_columns() is called recursively and the total number 
  *  of columns will be 3 x 2 x 2 = 12.
  *  
  *  Example 3
  *  ---------
  *  GSample : "(99:3;2000/99:3)[1;2]:2"
  *  
- *  Again, COL_read_cols() is called recursively and the total number 
+ *  Again, read_columns() is called recursively and the total number 
  *  of columns will be (3 + 3) x 2 x 2 = 24.
  *  
  */
  
-static COLS *COL_read_cols(YYFILE* yy)
+static std::vector<COL> read_columns(YYFILE* yy)
 {
-    COLS    *cls = 0, *cltmp = 0;
+    std::vector<COL> columns;
+    std::vector<COL> columns_to_add;
     int     key, sign = 1, shiftdir = 0, shiftval;
-    FILS    *fils;
     REP     rep;
+    std::vector<FIL> files;
 
-    cltmp = cls = 0;
     rep.r_nb = 0;
-    fils = 0;
-
     while(1) 
     {
         key = YY_lex(yy);
@@ -1105,76 +1029,73 @@ static COLS *COL_read_cols(YYFILE* yy)
             case COL_BOS1:      // 11
             case COL_EOS1:      // 12
             case COL_NOW1:      // 13
-                if(cltmp != 0) 
+                if(!columns_to_add.empty())
                     goto err;
                 YY_unread(yy);
                 // Reads a period or an operation on 2 periods
-                cltmp = COL_read_y(yy);
-                if(cltmp == 0) 
+                columns_to_add = read_yy_stream(yy);
+                if(columns_to_add.empty())
                     goto err;
                 break;
 
             case COL_OPAR :     // 3 '('
-                if(cltmp != 0) 
+                if(!columns_to_add.empty())
                     goto err;
-                // COL_read_cols() -> recursive function to compile a GSample
-                cltmp = COL_read_cols(yy);
-                if(cltmp == 0) 
+                // read_columns() -> recursive function to compile a GSample
+                columns_to_add = read_columns(yy);
+                if(columns_to_add.empty())
                     goto err;
                 break;
 
             case COL_COLON :    // 5 ':'
-                if(cltmp == 0) 
+                if(columns_to_add.empty())
                     goto err;
                 if(rep.r_nb > 0) 
                     goto err;
                 // Reads a repetition factor
-                if(COL_read_rep(yy, &rep)) 
+                if(read_repetition(yy, &rep)) 
                     goto err;
                 break;
 
             case COL_OBRACK :   // 1 '['
-                if(cltmp == 0) 
+                if(columns_to_add.empty())
                     goto err;
-                if(fils != 0) 
+                if(!files.empty())
                     goto err;
                 // Reads in a GSample a list of FILE operations surrounded by brackets []
-                fils = COL_read_f(yy);
-                if(fils == 0) 
+                if(!read_files(yy, files))
                     goto err;
                 break;
 
             case COL_COMMA :    // 6 ';'
             case COL_CPAR :     // 4 ')'
             case YY_EOF :       // -1
-                if(cltmp == 0) 
+                if(columns_to_add.empty())
                     goto err;
-                //  Given a COLS struct cltmp (result of a partial GSample compilation, 
+                // Given a partial GSample compilation,
                 //  adds it to the global GSample compiled struct cls.
-                //  The cltmp is added to cols rep->r_nb times * fils->fl_nb times.
-                cls = COL_construct(cls, cltmp, fils, &rep, 0, 0);
-                COL_free_fils(fils);
-                COL_free_cols(cltmp);
-                fils = 0;
+                //  The cltmp is added to cols rep->r_nb times * fils.size() times.
+                construct_columns(columns, columns_to_add, files, &rep, 0, 0);
+                files.clear();
                 rep.r_nb = 0;
-                cltmp = 0;
+                columns_to_add.clear();
                 shiftdir = 0;
-                if(key != COL_COMMA) 
-                    return(cls);
+                if(key != COL_COMMA)
+                    return columns;
                 break;
 
             case COL_SHIFTL:    // 29 '<'
             case COL_SHIFTR:    // 30 '>'
-                if(cltmp == 0) 
+                if(columns_to_add.empty())
                     goto err;
                 // Reads "P", "PER", "S", "SUB" or a number returns the sub period 
                 // corresponding position
-                shiftval = COL_read_long_per(yy);
+                shiftval = read_long_period(yy);
                 if(shiftval < 0) 
                     goto err;
                 shiftdir = key;
                 // Modifies a partial GSample by shifting all periods by nb positions
-                COL_shift(cltmp, shiftdir, shiftval);
+                shift_periods(columns_to_add, shiftdir, shiftval);
                 break;
 
             default :
@@ -1183,10 +1104,7 @@ static COLS *COL_read_cols(YYFILE* yy)
     }
 
 err:
-    COL_free_cols(cls);
-    COL_free_cols(cltmp);
-    COL_free_fils(fils);
-    return((COLS *)0);
+    return {};
 }
 
 
@@ -1194,17 +1112,15 @@ err:
  *  GSample compiler.
  *  
  *  @param [in]     char*   gsample text representing a GSample 
- *  @return         COLS*           group of COL struct result of the compilation of gsample
+ *  @return         std::vector<COL>            compiled columns; empty on error
  *  
  */
  
-COLS *COL_cc(char* gsample)
+std::vector<COL> compile_gsample(char* gsample)
 {
-    COLS    *cls;
-    COL     *cl;
+    std::vector<COL> columns;
     YYFILE  *yy;
     static  int sorted = 0;
-    int     i;
 
     YY_CASE_SENSITIVE = 1;
     if(sorted == 0) 
@@ -1214,51 +1130,28 @@ COLS *COL_cc(char* gsample)
     }
     yy = YY_open(gsample, COL_KEYWS,
                  sizeof(COL_KEYWS) / sizeof(YYKEYS), YY_MEM);
-    if(yy == 0) 
-        return((COLS *) 0);
+    if(yy == 0)
+        return {};
     
-    cls = COL_read_cols(yy);
+    columns = read_columns(yy);
     YY_close(yy);
     
     // When no file is specified in a COL, force file nb 1 (i.e. workspace) and no operation on files
-    if(cls != 0)
+    for(COL& column : columns)
     {
-        for(i = 0, cl = cls->cl_cols ; i < cls->cl_nb ; i++, cl++) 
-        {
-            if(cl->cl_fnb[0] != 0) 
-                continue;
-            cl->cl_fnb[0] = 1;
-            cl->cl_fnb[1] = 0;
-            cl->cl_opf = COL_NOP;
-        }
+        if(column.cl_fnb[0] != 0)
+            continue;
+        column.cl_fnb[0] = 1;
+        column.cl_fnb[1] = 0;
+        column.cl_opf = COL_NOP;
     }
 
-    return(cls);
+    return columns;
 }
 
 
 /**
- *  Frees the allocated space for a COLS structure created by COL_cc().
- *  
- *  @param [in] COLS*   cls     COLS to free
- *  @return     int             0
- *  
- */
- 
-int COL_free_cols(COLS* cls)
-{
-    if(cls == 0) 
-        return 0;
-    
-    if(cls->cl_nb != 0) 
-        SW_nfree(cls->cl_cols);
-    SW_nfree(cls);
-    return 0;
-}
-
-
-/**
- *  Analyses the COLS struct cls and set 1 in the vector mode (normally KT_mode) 
+ *  Analyses the columns and sets 1 in the vector mode (normally tbl_mode)
  *  for each operation found in cls. Only the operations between COL_DIFF and COL_BASE 
  *  are saved. 
  *  
@@ -1266,7 +1159,7 @@ int COL_free_cols(COLS* cls)
  *  
  *  @note The same vector is used for the operations on periods and on files (TODO: check why)
  *  
- *  @param [in]      COLS*   cls     compiled GSample
+ *  @param [in]      const std::vector<COL>& columns  compiled GSample
  *  @param [in, out] int*    mode    boolean vector containing a 1 for each operation found in cls (COL_DIFF, COL_GRT...)
  *  @param [in]      int     type    0: search in period operations, 
  *                                   1: search in file operations
@@ -1275,29 +1168,26 @@ int COL_free_cols(COLS* cls)
  *  
  */
  
-int COL_find_mode(COLS* cls, int* mode, int type)
+int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type)
 {
-    COL   *cl;
-    int    i, nb = 0;
+    int nb = 0;
 
     memset(mode, 0,  MAX_MODE * sizeof(int));
-    for(i = 0; i < cls->cl_nb; i++) 
+    for(const COL& column : columns)
     {
-        cl = cls->cl_cols + i;
-
         /* 0 ou 2 ==> years */
-        if(type % 2 == 0) 
+        if(type % 2 == 0)
         {
-            if(cl->cl_opy >= COL_DIFF && cl->cl_opy <= COL_BASE)
-                mode[cl->cl_opy - COL_DIFF] = 1;
+            if(column.cl_opy >= COL_DIFF && column.cl_opy <= COL_BASE)
+                mode[column.cl_opy - COL_DIFF] = 1;
             nb = 1;
         }
 
         /* 1 ou 2 ==> files */
         if(type > 0) 
         {
-            if(cl->cl_opf >= COL_DIFF && cl->cl_opf <= COL_BASE)
-                mode[cl->cl_opf - COL_DIFF] = 1;
+            if(column.cl_opf >= COL_DIFF && column.cl_opf <= COL_BASE)
+                mode[column.cl_opf - COL_DIFF] = 1;
             nb = 1;
         }
     }
