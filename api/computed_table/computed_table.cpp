@@ -439,7 +439,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     if(title_oem.empty())
         title_oem = "No title";
     
-    W_printf(".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title_oem.c_str());
+    W_printf(".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, title_oem.c_str());
     
     res = T_begin_tbl(dim, columns);
     if(res != 0) 

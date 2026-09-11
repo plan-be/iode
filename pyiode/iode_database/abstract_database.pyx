@@ -10,7 +10,7 @@ from libc.string cimport strlen
 from libcpp.string cimport string
 from pyiode.iode_cython cimport SCR_free_tbl, SCR_tbl_size, SCR_free
 from pyiode.iode_database.cpp_api_database cimport KDB as CppDatabase
-from pyiode.iode_database.cpp_api_database cimport K_NBDEC
+from pyiode.iode_database.cpp_api_database cimport tbl_nb_decimals
 from pyiode.iode_database.cpp_api_database cimport error_manager
 from pyiode.iode_database.cpp_api_database cimport KDB, K_expand
 from pyiode.iode_database.cpp_api_database cimport B_DataCompare
@@ -54,7 +54,7 @@ cdef class CythonIodeDatabase:
         self.abstract_database.set_description_utf8(value.encode())
 
     def _get_print_nb_decimals(self) -> int:
-        return K_NBDEC
+        return tbl_nb_decimals
 
     def _set_print_nb_decimals(self, value: int):
         cdef bytes b_value = str(value).encode()

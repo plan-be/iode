@@ -120,9 +120,9 @@ void W_print_pg_footer(char* arg)
 void W_print_rtf_topic(char* arg)
 {
     if(arg) {
-        W_printf((char*) ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, arg);
-        if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg);
-        // if(W_type == A2M_DESTHTML && W_htmlhelp) W_printf( ".par1 tit_%d\n%s\n\n", KT_CUR_LEVEL, arg); /* JMP 06-01-02 */
+        W_printf((char*) ".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, arg);
+        if(W_type == A2M_DESTRTF && W_rtfhelp) W_printf((char*) ".par1 tit_%d\n%s\n\n", tbl_current_level, arg);
+        // if(W_type == A2M_DESTHTML && W_htmlhelp) W_printf( ".par1 tit_%d\n%s\n\n", tbl_current_level, arg); /* JMP 06-01-02 */
     }
 }
 

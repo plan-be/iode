@@ -50,12 +50,12 @@
  */
 int B_PrintVal(double val)
 {
-    // B_NBDEC replaced by K_NBDEC JMP 18/04/2022
-    int     nbdec = K_NBDEC;
+    // B_NBDEC replaced by tbl_nb_decimals JMP 18/04/2022
+    int     nbdec = tbl_nb_decimals;
 
-    K_NBDEC = -1;
+    tbl_nb_decimals = -1;
     T_print_val(val);
-    K_NBDEC = nbdec;
+    tbl_nb_decimals = nbdec;
     return 0;
 }
 

@@ -7,12 +7,11 @@
 #include "api/objs/tables.h"
 
 
-inline int      K_NBDEC = -1;          // Default nb of decimals
-inline char     **KT_names = NULL;     // Names of the files used in a GSample
-inline int      KT_nbnames = 0;        // Number of names in KT_names
-inline int      KT_mode[MAX_MODE];     // Modes used in a GSample
-inline int      KT_CUR_TOPIC = 0;      // Used in A2M file generation
-inline int      KT_CUR_LEVEL = 0;      // Used in A2M file generation
+inline int tbl_nb_decimals = -1;                    // Default nb of decimals
+inline int tbl_mode[MAX_MODE];                      // Modes used in a GSample
+inline int tbl_current_topic = 0;                   // Used in A2M file generation
+inline int tbl_current_level = 0;                   // Used in A2M file generation
+inline std::vector<std::string> v_tbl_filenames;    // Names of the files used in a GSample
 
 /*----------------------------- DEFINE -----------------------------*/
 
@@ -195,7 +194,7 @@ void T_print_string(COL* cl, char* string);
 void T_open_cell(int attr, int straddle, int type);
 void T_open_attr(int attr);
 void T_close_attr(int attr);
-char **T_find_files(COLS* cls);
+std::vector<std::string> T_find_files(COLS* cls);
 void T_print_files(COLS* cls, int dim);
 void T_print_mode(COLS* cls, int dim);
 void T_print_date(int dim);

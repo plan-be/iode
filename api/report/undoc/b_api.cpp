@@ -58,7 +58,7 @@ int IodeInit()
 
     // Default values for language, nbdec, separators
     K_LANG = 0;     
-    K_NBDEC = -1;   
+    tbl_nb_decimals = -1;   
     A_SEPS = " ,;\n\t\r";
         
     // Suppress default filename wildcard behavior

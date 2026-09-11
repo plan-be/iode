@@ -66,8 +66,8 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
             if(global_ws_scl->contains(sname)) 
             {
                 scl = global_ws_scl->get_obj_ptr(sname);
-                T_fmt_val(tcoef, scl->value, 15, K_NBDEC);
-                T_fmt_val(ttest, scl->calculate_t_test(), 15, K_NBDEC);
+                T_fmt_val(tcoef, scl->value, 15, tbl_nb_decimals);
+                T_fmt_val(ttest, scl->calculate_t_test(), 15, tbl_nb_decimals);
                 if(coefs == 1) 
                     sprintf(buf, "%ci%s%cI", A2M_ESCCH, tcoef, A2M_ESCCH);
                 if(coefs == 2) 
