@@ -77,8 +77,8 @@ struct COL
 // COLS: group of COL's = result of a GSample compilation
 struct COLS 
 {
-    int     cl_nb;          // Number of columns
-    COL     *cl_cols;       // Pointer to the first COL struct
+    int cl_nb = 0;              // Number of columns
+    COL* cl_cols = NULL;        // Pointer to the first COL struct
 };
 
 
@@ -86,24 +86,17 @@ struct COLS
 // GSample example.: (2000/1999):5*4
 struct REP 
 {
-    short   r_nb;           // Nb of repetitions  (in example => 5)
-    short   r_incr;         // Increment          (in example => 4)
+    short r_nb = 0;           // Nb of repetitions  (in example => 5)
+    short r_incr = 0;         // Increment          (in example => 4)
 };
 
 // FIL: files and operation used in a COL
 // GSample example: (2000:10)[2%3]
 struct FIL 
 {
-    short   fl_op;      // Operation on files (in example => %)
-	short   fl_1;       // file nb 1          (in example => 2)
-    short   fl_2;       // file nb 2          (in example => 3)
-};
-
-// FILS: group of FIL's
-struct FILS 
-{
-    int     fl_nb;
-    FIL     *fl_fils;
+    short fl_op = 0;      // Operation on files (in example => %)
+	short fl_1 = 0;       // file nb 1          (in example => 2)
+    short fl_2 = 0;       // file nb 2          (in example => 3)
 };
 
 // FREF Reference tables for the execution of tables */
