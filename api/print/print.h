@@ -201,4 +201,3 @@ void T_print_mode(COLS* cls, int dim);
 void T_print_date(int dim);
 int T_begin_tbl(int dim, COLS* cls);
 void T_end_tbl(void);
-std::string T_get_title(const std::shared_ptr<Table> tbl_ptr);

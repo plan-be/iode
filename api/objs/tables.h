@@ -564,7 +564,7 @@ public:
 public:
     Table(const int nb_columns);
 
-    Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
+    Table(const int nb_columns, const std::string& def, const std::vector<std::string>& lecs, 
 		  bool mode = false, bool files = false, bool date = false, const bool search_comment = true);
 
     Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
@@ -672,10 +672,17 @@ public:
 
     std::string get_title()
     {
+        std::string title;
         for(TableLine& line : lines)
+        {
             if(line.get_type() == TableLineType::TABLE_LINE_TITLE)
-                return line.cells[0].get_content(false);
-        return "";
+            {
+                title = line.cells[0].get_content(false);
+                return title;
+            }
+        }
+
+        return title;
     }
 
     // we assume that title string is written in UTF8 format

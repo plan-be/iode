@@ -401,7 +401,7 @@ Table::Table(const int nb_columns): nb_columns(nb_columns)
     T_initialize_divider(this->divider_line, nb_columns);
 }
 
-Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& vars, 
+Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& lecs, 
 	bool mode, bool files, bool date, const bool search_comment): nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
@@ -414,28 +414,29 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     T_initialize_col_names(this->lines.back(), nb_columns);
     append_line(TABLE_LINE_SEP);
 
-    std::string lec;
     Comment comment;
-    std::string line_name;
-    std::vector<std::string> v_vars = expand_lecs(vars);
-    for(const std::string& var: v_vars) 
+    std::string line_title;
+    std::vector<std::string> v_lecs = expand_lecs(lecs);
+    for(const std::string& lec: v_lecs) 
     {
         append_line(TABLE_LINE_CELL);
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
-        if(search_comment && global_ws_cmt->contains(var))
+
+        // if lec represents a single variable, check in the 
+        // Comments database for a comment with the same name
+        if(search_comment && global_ws_cmt->contains(lec))
         {
-            comment = global_ws_cmt->get(var);
-            line_name = trim(comment);
+            comment = global_ws_cmt->get(lec);
+            line_title = trim(comment);
         }
         else
-            line_name = var;
+            line_title = lec;
 
-        line.cells[0].set_text(line_name);
+        line.cells[0].set_text(line_title);
 
         // ---- LEC expression (right column) ----
-        lec = var;
         for(int j = 1; j < nb_columns; j++)
             line.cells[j].set_lec(lec);
     }
@@ -478,7 +479,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
     Comment comment;
     std::string lec;
     std::string title;
-    std::string line_name;
+    std::string line_title;
     for(int i = 0; i < (int) titles.size(); i++)
     {
         title = titles[i];
@@ -488,15 +489,18 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
+
+        // if title represents a single variable, check in the 
+        // Comments database for a comment with the same name
         if(search_comment && global_ws_cmt->contains(title))
         {
             comment = global_ws_cmt->get(title);
-            line_name = trim(comment);
+            line_title = trim(comment);
         }
         else
-            line_name = title;
+            line_title = title;
 
-        line.cells[0].set_text(line_name);
+        line.cells[0].set_text(line_title);
 
         // ---- LEC expression (right column) ----
         for(int j = 1; j < nb_columns; j++)
@@ -530,7 +534,7 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
     append_line(TABLE_LINE_SEP);
 
     std::string comment;
-    std::string line_name;
+    std::string line_title;
     std::vector<std::string> v_lecs = expand_lecs(lecs);
     for(const std::string& lec: v_lecs) 
     {
@@ -538,15 +542,18 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         TableLine& line = lines.back();
 
         // ---- line name (left column) ----
+
+        // if lec represents a single variable, check in the 
+        // Comments database for a comment with the same name
         if(search_comment && global_ws_cmt->contains(lec))
         {
             comment = global_ws_cmt->get(lec);
-            line_name = trim(comment);
+            line_title = trim(comment);
         }
         else
-            line_name = lec;
+            line_title = lec;
 
-        line.cells[0].set_text(line_name);
+        line.cells[0].set_text(line_title);
 
         // ---- LEC expression (right column) ----
         for(int j = 1; j < nb_columns; j++)
@@ -911,7 +918,7 @@ std::string KDBTables::get_title(const std::string& name) const
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
     std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
-    std::string title = T_get_title(tbl_ptr);
+    std::string title = tbl_ptr->get_title();
     return title;
 }
 
@@ -1316,7 +1323,7 @@ bool KDBTables::print_obj_def(const std::string& name)
     if(!tbl_ptr) 
         return false;
     
-    std::string title = T_get_title(tbl_ptr);
+    std::string title = tbl_ptr->get_title();
     // W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing 
     title = utf8_to_oem(title);
     if(B_TABLE_TITLE) 
