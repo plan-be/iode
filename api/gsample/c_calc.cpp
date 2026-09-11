@@ -6,7 +6,7 @@
  *  
  *  This module calculates the values of table cells based on:
  *  - a list of files loaded in memory and stored in global_ref_var.
- *  - a group of column definitions (COLS = GSample compiled by compile_gsample(gsample))
+ *  - a group of column definitions (std::vector<COL> = GSample compiled by compile_gsample(gsample))
  *      where each column defines:
  *          - the period(s) to be used for the calculations (1 or 2 periods)
  *          - an optional operation between the periods (ex growth rates)
@@ -16,18 +16,18 @@
  *  - the LEC formulas defined in the table cells 
  *  
  *  How to use these functions to print a table ?
- *      1. call compile_gsample(smpl) to compile the GSample in a COLS struct, say cls.
- *      2. call resize_tbl_columns() to extend COLS according to the number of columns in the Table 
+ *      1. call compile_gsample(smpl) to compile the GSample in a std::vector<COL> struct, say cls.
+ *      2. call resize_tbl_columns() to extend std::vector<COL> according to the number of columns in the Table
  *      3. for each Table line, call: 
- *          clear_tbl_columns(cls) to reset the COLS values 
+ *          clear_tbl_columns(cls) to reset the std::vector<COL> values
  *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
  *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
  *  
  *  List of functions 
  *  -----------------
- *      int execute_tbl_columns(Table* tbl, int i, COLS* cls)    Calculates the values of all LEC formulas in one Table line for all columns of a GSample.
- *      int resize_tbl_columns(Table* tbl, COLS* cls)         Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a Table definition
- *      void clear_tbl_columns(COLS* cls)                   Resets the values in a COLS structure. 
+ *      int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns)
+ *      int resize_tbl_columns(Table* tbl, std::vector<COL>& columns)
+ *      void clear_tbl_columns(std::vector<COL>& columns)
  */
 #include <math.h>
 
@@ -253,37 +253,30 @@ err:
 
 
 /**
- *  After the compilation of a GSample into a COLS structure, multiply the resulting number of COL's 
+ *  After the compilation of a GSample into a std::vector<COL> structure, multiply the resulting number of COL's
  *  by the number of columns in the Table definition (usually 2).
  *  
  *  For example, if the GSample is "2020/2019:5" and the table consists of 2 columns, the 
- *  resulting COLS* will contain 5 x 2 COL's.
+ *  The resulting std::vector<COL> will contain 5 x 2 COL's.
  *    
  *  @param [in]         Table*    tbl     Table to be calculated
- *  @param [in, out]    COLS*   cls     compiled GSample (via compile_gsample())
+ *  @param [in, out] std::vector<COL>& columns  compiled GSample
  *  @return             int             new number of columns in cls
  *  
  */
  
-int resize_tbl_columns(Table* tbl, COLS* cls)
+int resize_tbl_columns(Table* tbl, std::vector<COL>& columns)
 {
-    COL     *old, *ptr;
-    int     i,j, old_nb, new_nb, dim;
+    const std::vector<COL> original_columns = columns;
+    const int old_nb = (int) original_columns.size();
+    const int dim = tbl->nb_columns;
+    const int new_nb = old_nb * dim;
 
-    old = cls->cl_cols;
-    old_nb = cls->cl_nb;
-
-    dim = tbl->nb_columns;
-    new_nb = cls->cl_nb * dim;
-
-    cls->cl_cols = (COL *) SW_nalloc(sizeof(COL)* new_nb);
-    cls->cl_nb = new_nb;
-
-    ptr = cls->cl_cols;
-    for(i = 0; i < old_nb; i++)
-        for(j = 0; j < dim; j++) memcpy(ptr++, old + i, sizeof(COL));
-
-    if(old_nb != 0) SW_nfree(old);
+    columns.clear();
+    columns.reserve(new_nb);
+    for(const COL& column : original_columns)
+        for(int j = 0; j < dim; j++)
+            columns.push_back(column);
 
     if(tbl->repeat_columns == 0) return(1 + old_nb * (dim - 1));
     else return(new_nb);
@@ -291,36 +284,34 @@ int resize_tbl_columns(Table* tbl, COLS* cls)
 
 
 /**
- *  Resets the values in the COLS. 
+ *  Resets the values in the std::vector<COL>.
  *  
- *  @param [in, out] COLS   cls     table of COL's to reset
+ *  @param [in, out] std::vector<COL>   cls     table of COL's to reset
  *  
  */
-void clear_tbl_columns(COLS* cls)
+void clear_tbl_columns(std::vector<COL>& columns)
 {
-    int i;
-    COL *cl =  cls->cl_cols;
-
-    for(i = 0; i < cls->cl_nb ; i++, cl++) cl->cl_res = 0;
+    for(COL& column : columns)
+        column.cl_res = 0;
 }
 
 
 /**
  *  Calculates the values of all LEC formulas in one Table line for all columns 
- *  of a GSample (precompiled into a COLS structure).
+ *  of a GSample (precompiled into a std::vector<COL> structure).
  *  
  *  Stores each column calculated values in cls[i]->cl_res.
  *      
  *  @param [in]      Table*    tbl     Table to be calculated
  *  @param [in]      int     i       line position to be calculated
- *  @param [in, out] COLS*   cls     compiled GSample (group of COL structures)
+ *  @param [in, out] std::vector<COL>& columns  compiled GSample
  *  @return          int             0 on success, -1 on failure   
  *  
  */
  
-int execute_tbl_columns(Table* tbl, int i, COLS* cls)
+int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns)
 {
-    int lg = cls->cl_nb / tbl->nb_columns;
+    int lg = (int) columns.size() / tbl->nb_columns;
 
     COL* cl;
     TableLine& line = tbl->lines[i];
@@ -351,7 +342,7 @@ int execute_tbl_columns(Table* tbl, int i, COLS* cls)
 
         for(int j = 0; j < lg; j++) 
         {
-            cl = cls->cl_cols + d + (j * tbl->nb_columns);
+            cl = columns.data() + d + (j * tbl->nb_columns);
             if(COL_calc(cl, aclec, adclec) < 0) 
                 return -1;
             debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 

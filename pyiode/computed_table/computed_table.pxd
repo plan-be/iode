@@ -25,18 +25,14 @@ cdef extern from "api/all.h":
         double   cl_val[2][2]        # computed values of the LEC formulas on periods / files => max 4 values see table below
         double   cl_res              # computed value (v00 opp v10) opf (v01 opp v11)
 
-    ctypedef struct COLS:
-        int      cl_nb               # Number of columns
-        COL      *cl_cols            # Pointer to the first COL struct
-
-    char* col_to_string(COL*, int, int, int)     # COL to ASCII
+    char* col_to_string(const COL*, int, int, int)     # COL to ASCII
 
 
 cdef extern from "api/computed_table/computed_table.h":
     cdef cppclass CComputedTable "ComputedTable":
         CTable*     ref_table
         int         dim
-        COLS*       columns
+        vector[COL] columns
         vector[COL] files_ops
 
         CComputedTable(CTable* table, const string& gsample, const int nb_decimals) except +

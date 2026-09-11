@@ -8,7 +8,7 @@
 
 /*----------------------- ENUMS ----------------------------*/
 
-/* COLS : LANGUAGE ELEMENTS */
+/* std::vector<COL> : LANGUAGE ELEMENTS */
 enum IodeColLangElement
 {
     COL_OBRACK = 1,     // open bracket [
@@ -28,7 +28,7 @@ enum IodeColLangElement
     COL_SUBPER          // sub-period
 };
 
-/* COLS : OPERATIONS */
+/* std::vector<COL> : OPERATIONS */
 enum IodeColOperation
 {
     COL_NOP = 20,   // no operation ""
@@ -73,14 +73,6 @@ struct COL
             |             |
     */
 };
-
-// COLS: group of COL's = result of a GSample compilation
-struct COLS 
-{
-    int cl_nb = 0;              // Number of columns
-    COL* cl_cols = NULL;        // Pointer to the first COL struct
-};
-
 
 // REP: definition of the repetition of a group of periods / file
 // GSample example.: (2000/1999):5*4
@@ -135,17 +127,16 @@ inline int col_compare(const void* a, const void* b)
 }
 
 /* c_cc.c */
-COLS* compile_gsample(char* gsample);
-int free_tbl_columns(COLS* cls);
-char *col_to_string(COL* cl, int ch, int n, int nbf);
-char *col_to_text(COL* cl, char* str, int nbnames);
-COLS* add_tbl_column(COLS* cls);
-int tbl_find_mode(COLS* cls, int* mode, int type);
+std::vector<COL> compile_gsample(char* gsample);
+char *col_to_string(const COL* cl, int ch, int n, int nbf);
+char *col_to_text(const COL* cl, char* str, int nbnames);
+void add_tbl_column(std::vector<COL>& columns);
+int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type);
 
 /* c_calc.c */
-int resize_tbl_columns(Table* tbl, COLS* cls);
-void clear_tbl_columns(COLS* cls);
-int execute_tbl_columns(Table* tbl, int i, COLS* cls);
+int resize_tbl_columns(Table* tbl, std::vector<COL>& columns);
+void clear_tbl_columns(std::vector<COL>& columns);
+int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns);
 
 
 extern bool debug_calc;
