@@ -6,35 +6,35 @@ void ComputedTable::initialize()
     std::string error_msg = "Cannot compute table with the generalized sample '" + gsample + "'";
 
     /* ---- see c_calc.c ----
-     *      1. call compile_gsample(smpl) to compile the GSample in a COLS struct, say cls.
-     *      2. call resize_tbl_columns() to extend COLS according to the number of columns in the Table 
+     *      1. call compile_gsample(smpl) to compile the GSample in a std::vector<COL> struct, say cls.
+     *      2. call resize_tbl_columns() to extend std::vector<COL> according to the number of columns in the Table
      *      3. for each Table line, call: 
-     *          clear_tbl_columns(cls) to reset the COLS values 
+     *          clear_tbl_columns(cls) to reset the std::vector<COL> values
      *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
      *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
-    // Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in the passed table.
+    // Compiles a GSample into a std::vector<COL> struct and resizes std::vector<COL> according to the nb of cols in the passed table.
     columns = compile_gsample(to_char_array(gsample));
-    if(columns == NULL) 
+    if(columns.empty())
         throw std::invalid_argument(error_msg);
 
     // Compute 
     // - minimum sample containing all periods present in the columns.
     // - the list of unique file_1 (op) file_2 combinations
     // Note: - equivalent to T_prep_smpl()
-    COL column = columns->cl_cols[0];
+    COL column = columns[0];
     Period start_per(column.cl_per[0]);
     Period end_per(column.cl_per[0]);
     int pos;
-    for(int col=0; col < columns->cl_nb; col++)
+    for(int col=0; col < columns.size(); col++)
     {
-        column = columns->cl_cols[col];
+        column = columns[col];
         pos = find_file_op(column);
         if(pos < 0)
             files_ops.push_back(column);
 
-        Period per(columns->cl_cols[col].cl_per[0]);
+        Period per(columns[col].cl_per[0]);
         if(per.difference(start_per) < 0)
         {
             start_per.year = per.year;
@@ -56,9 +56,9 @@ void ComputedTable::initialize()
     // Get filepath of each reference file
     // Note: - equivalent to T_find_files()
     std::bitset<K_MAX_FREF + 1> files_usage;
-    for(int col=0; col < columns->cl_nb; col++) 
+    for(int col=0; col < columns.size(); col++)
     {
-        column = columns->cl_cols[col];
+        column = columns[col];
         files_usage[column.cl_fnb[0]] = 1;
         files_usage[column.cl_fnb[1]] = 1;
     }
@@ -99,9 +99,9 @@ void ComputedTable::initialize()
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
                 int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
-                for(int col=1; col < columns->cl_nb; col+=step)
+                for(int col=1; col < columns.size(); col+=step)
                 {
-                    column_name = std::string(col_to_text(&columns->cl_cols[col], c_content, nb_files));
+                    column_name = std::string(col_to_text(&columns[col], c_content, nb_files));
                     column_names.push_back(column_name); 
                     v_pos_in_columns_struct.push_back(col);
                 }
@@ -153,7 +153,6 @@ ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const
 
 ComputedTable::~ComputedTable()
 {
-    free_tbl_columns(columns);
     delete ref_table;
 }
 
@@ -184,11 +183,11 @@ void ComputedTable::compute_values()
     int pos;
     for(int row = 0; row < v_line_pos_in_ref_table.size(); row++)
     {
-        // resets the values in the COLS
+        // resets the values in the std::vector<COL>
         clear_tbl_columns(columns);
         
         // Calculates the values of all LEC formulas in ONE table line for all columns 
-        // of a GSample (precompiled into a COLS structure). 
+        // of a GSample (precompiled into a std::vector<COL> structure).
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
         res = execute_tbl_columns(ref_table, line, columns);
@@ -199,7 +198,7 @@ void ComputedTable::compute_values()
         for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
         {
             pos = v_pos_in_columns_struct[col];
-            values[row][col] = columns->cl_cols[pos].cl_res;
+            values[row][col] = columns[pos].cl_res;
         }
     }
 }
@@ -210,7 +209,7 @@ bool ComputedTable::is_editable(const int line, const int col)
     //         - contains on operation on periods or files
     //         - does not refer to the current workspace
     int col_pos = v_pos_in_columns_struct[col];
-    COL column = columns->cl_cols[col_pos];
+    COL column = columns[col_pos];
     if(column.cl_opy != COL_NOP || column.cl_opf != COL_NOP) 
         return false;
     if(column.cl_fnb[0] != 1) 
@@ -329,7 +328,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     std::string var_to_update = cell_ref.get_variables_from_lec().at(0);
 
     // get period position 
-    COL column = columns->cl_cols[col_pos];
+    COL column = columns[col_pos];
     Sample var_sample(*global_ws_var->get_sample());
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
 

@@ -47,7 +47,7 @@ struct ComputedTable
     std::shared_ptr<Sample> sample;
 
     int dim; 
-    COLS* columns;
+    std::vector<COL> columns;
     std::vector<COL>         files_ops;
     std::vector<std::string> files;
     std::vector<std::string> line_names;
