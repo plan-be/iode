@@ -391,39 +391,45 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
     }
 }
 
-void ComputedTable::print_to_file()
+void ComputedTable::print_to_file(const bool global_nb_decimals, const bool global_language)
 {
     int res;
 
-    // set number of decimals to print
-    std::string str_nb_decimals = std::to_string(nb_decimals);
-    res = B_PrintNbDec(str_nb_decimals.data());
-    if(res < 0)
+    if(!global_nb_decimals)
     {
-        std::string error_msg = "Cannot initialize printing.\n";
-        error_msg += "Invalid value for the 'nb_decimals' argument.";
-        error_manager.prepend_error(error_msg);
-        error_manager.display_last_error();
-        return;
+        // set number of decimals to print
+        std::string str_nb_decimals = std::to_string(nb_decimals);
+        res = B_PrintNbDec(str_nb_decimals.data());
+        if(res < 0)
+        {
+            std::string error_msg = "Cannot initialize printing.\n";
+            error_msg += "Invalid value for the 'nb_decimals' argument.";
+            error_manager.prepend_error(error_msg);
+            error_manager.display_last_error();
+            return;
+        }
     }
 
-    // set language
-    std::string language = ref_table->get_language_as_string();
-    if(language.empty())
-        throw std::invalid_argument("Cannot initialize printing. Language is empty.");
-
-    char tlang[2];
-    tlang[0] = language[0];
-    tlang[1] = 0;
-    
-    res = B_PrintLang(tlang);
-    if(res < 0)
+    if(!global_language)
     {
-        std::string error_msg = "Cannot initialize printing.\n"; 
-        error_msg += "Invalid value for the 'language' argument.";
-        error_manager.prepend_error(error_msg);
-        error_manager.display_last_error();
-        return;
+        // set language
+        std::string language = ref_table->get_language_as_string();
+        if(language.empty())
+            throw std::invalid_argument("Cannot initialize printing. Language is empty.");
+        
+        char tlang[2];
+        tlang[0] = language[0];
+        tlang[1] = 0;
+        
+        res = B_PrintLang(tlang);
+        if(res < 0)
+        {
+            std::string error_msg = "Cannot initialize printing.\n"; 
+            error_msg += "Invalid value for the 'language' argument.";
+            error_manager.prepend_error(error_msg);
+            error_manager.display_last_error();
+            return;
+        }
     }
 
     std::shared_ptr<Table> ref_table_ptr(ref_table, [](Table*) {});
