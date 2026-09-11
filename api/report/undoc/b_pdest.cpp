@@ -112,7 +112,7 @@ int B_PrintDestFile(char *arg)
     W_flush();
     W_close();
 
-    KT_CUR_TOPIC = 0;
+    tbl_current_topic = 0;
     SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != 0) 
     {
@@ -179,10 +179,10 @@ int B_PrintDestNew(char* file, int unused)
 // $PrintNbDec nb
 int B_PrintNbDec(char* nbdec, int unused)
 {
-    K_NBDEC = atoi(nbdec); 
-    if(K_NBDEC > 99 || (K_NBDEC < 0 && K_NBDEC != -1)) {
+    tbl_nb_decimals = atoi(nbdec); 
+    if(tbl_nb_decimals > 99 || (tbl_nb_decimals < 0 && tbl_nb_decimals != -1)) {
         error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
-        K_NBDEC = 2;
+        tbl_nb_decimals = 2;
         return -1;
     }
    return 0;
@@ -663,11 +663,11 @@ int B_PrintRtfLevel(char* arg, int unused)
     int     level = atoi(arg);
 
     if(level == 0) {
-        if(arg[0] == '+') KT_CUR_LEVEL++;
-        else              KT_CUR_LEVEL--;
+        if(arg[0] == '+') tbl_current_level++;
+        else              tbl_current_level--;
     }
-    else KT_CUR_LEVEL = level;
-    KT_CUR_LEVEL = std::max(0, KT_CUR_LEVEL);
+    else tbl_current_level = level;
+    tbl_current_level = std::max(0, tbl_current_level);
     return 0;
 }
 

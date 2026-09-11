@@ -130,8 +130,8 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
     COLS* fcls = nullptr;
     std::shared_ptr<Sample> smpl = nullptr;
     T_prep_smpl(cls, &fcls, smpl);
-    char** files = T_find_files(cls);
-    if(files == 0) 
+    std::vector<std::string> files = T_find_files(cls);
+    if(files.empty())
         return -1;
 
     double* x = (double *) SW_nalloc(sizeof(double) * smpl->nb_periods);
@@ -197,7 +197,6 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
     }
     T_GraphEnd();
 
-    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
     COL_free_cols(cls);
@@ -929,8 +928,8 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     COLS* fcls = nullptr;
     std::shared_ptr<Sample> smpl = nullptr;
     T_prep_smpl(cls, &fcls, smpl);
-    char** files = T_find_files(cls);
-    if(files == 0) 
+    std::vector<std::string> files = T_find_files(cls);
+    if(files.empty()) 
         return -1;
 
     double* x = (double*) SW_nalloc(sizeof(double) * smpl->nb_periods);
@@ -971,7 +970,6 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     }
 
     API_CHARTS[hdl]->nb = smpl->nb_periods;
-    SCR_free_tbl((unsigned char**) files);
     SW_nfree(x);
     SW_nfree(y);
     COL_free_cols(cls);

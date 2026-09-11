@@ -1209,11 +1209,10 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
-    KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0) 
+    v_tbl_filenames = T_find_files(cls);
+    if(v_tbl_filenames.empty()) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-    COL_find_mode(cls, KT_mode, 2);
+    COL_find_mode(cls, tbl_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
@@ -1235,7 +1234,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
             case TABLE_LINE_MODE  :
                 for(j = 0; j < MAX_MODE; j++) 
                 {
-                    if(KT_mode[j] == 0) 
+                    if(tbl_mode[j] == 0) 
                         continue;
                     sprintf(date, "(%s) ", COL_OPERS[j + 1]);
                     strcat(buf, date);
@@ -1245,11 +1244,11 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 }
                 break;
             case TABLE_LINE_FILES :
-                for(j = 0; KT_names[j]; j++) 
+                for(const std::string& filename : v_tbl_filenames) 
                 {
-                    strcat(buf, KT_names[j]);
+                    strcat(buf, filename.c_str());
                     strcat(buf, "\n");
-                    nf ++;
+                    nf++;
                 }
                 break;
             case TABLE_LINE_TITLE :
@@ -1287,10 +1286,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     SCR_free_tbl((unsigned char**) l);
     SCR_free(buf);
 
-    SCR_free_tbl((unsigned char**) KT_names);
-    KT_names = NULL;
-    KT_nbnames = 0;
-
+    v_tbl_filenames.clear();
     return res;
 }
 

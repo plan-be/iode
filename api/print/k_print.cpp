@@ -67,7 +67,7 @@ void T_fmt_val(char* buf, double val, int lg, int nd)
  *  Prints a double value using W_printf().
  *
  *  @param  [in] double  val      value to print
- *  @global [in] int        K_NBDEC  number of decimal places
+ *  @global [in] int        tbl_nb_decimals  number of decimal places
  *
  */
 
@@ -75,7 +75,7 @@ void T_print_val(double val)
 {
     char    buf[64];
 
-    T_fmt_val(buf, val, 30, K_NBDEC);   // JMP 18-04-2022
+    T_fmt_val(buf, val, 30, tbl_nb_decimals);   // JMP 18-04-2022
     W_printf(buf);
 }
 
@@ -85,15 +85,11 @@ void T_print_val(double val)
  *
  *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
  *  @param  [in] string     the table column definition (ex "#s")
- *  @global [in] KT_nbnames number of compared files in the COLS definition
  *
  */
-
 void T_print_string(COL* cl, char* string)
 {
-    char   *ptr = NULL;
-
-    ptr = (char *) COL_text(cl, string, KT_nbnames);
+    char* ptr = (char *) COL_text(cl, string, (int) v_tbl_filenames.size());
     if(ptr != NULL) W_printf((char*) "%s", ptr);
     SW_nfree(ptr);
 }
@@ -266,48 +262,40 @@ int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
  *  @param [in] COLS*   cls     list of columns (from GSample)
  *  @return     char**          NULL if one of the ref files is not loaded in global_ref_xxx
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
- *
  */
-
-char **T_find_files(COLS* cls)
-{
-    int     i, nf = 0;
-    COL     *cl;
-    int     files[K_MAX_FREF + 1];
-    char    **names = 0, buf[K_MAX_FILE + 10];
-
-    memset(files, 0, (K_MAX_FREF + 1) * sizeof(int));
-    for(i = 0; i < cls->cl_nb; i++)
+std::vector<std::string> T_find_files(COLS* cls)
+{    
+    COL* cl;
+    std::vector<bool> files(K_MAX_FREF + 1, false);
+    for(int i = 0; i < cls->cl_nb; i++)
     {
         cl = cls->cl_cols + i;
-        files[cl->cl_fnb[0]] = 1;
-        files[cl->cl_fnb[1]] = 1;
+        files[cl->cl_fnb[0]] = true;
+        files[cl->cl_fnb[1]] = true;
     }
 
     KDBVariablesPtr kdb;
-    for(i = 1; i < K_MAX_FREF + 1; i++)
+    std::string filename;
+    std::vector<std::string> filenames;
+    for(int i = 1; i < K_MAX_FREF + 1; i++)
     {
-        if(files[i] == 0)
+        if(!files[i])
             continue;
 
         kdb = global_ref_var[i - 1];
-        if(kdb.get() == nullptr)
+        if(!kdb)
         {
             std::string error_msg = "File " + std::to_string(i) + " not present";
             error_manager.append_error(error_msg);
-            SCR_add_ptr((unsigned char***) &names, &nf, 0L);
-            SCR_free_tbl((unsigned char**) names);
-            return NULL;
+            return std::vector<std::string>();
         }
 
-        sprintf(buf, "[%d] %s", i, (char*) kdb->filepath.c_str());
-        SCR_replace((unsigned char*) buf, (unsigned char*) "\\", (unsigned char*) "/");
-        //B_path_change(buf);
-        SCR_add_ptr((unsigned char***) &names, &nf, (unsigned char*) buf);
+        filename = "[" + std::to_string(i) + "] " + kdb->filepath;
+        std::replace(filename.begin(), filename.end(), '\\', '/');
+        filenames.push_back(filename);
     }
 
-    SCR_add_ptr((unsigned char***) &names, &nf, 0L);
-    return names;
+    return filenames;
 }
 
 /**
@@ -315,20 +303,16 @@ char **T_find_files(COLS* cls)
  *
  *  @param  [in] COLS*  cls         columns to print = compiled GSample
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
- *  @global [in] char** KT_names    list of formatted filenames
- *  @global [in] int    KT_nbnames  number if filenames
- *
  */
-
 void T_print_files(COLS* cls, int dim)
 {
-    if(KT_nbnames <= 0)
+    if(v_tbl_filenames.empty())
         return;
 
-    for(int i = 0; KT_names[i]; i++)
+    for(const std::string& filename : v_tbl_filenames)
     {
-        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING); /* JMP 17-12-93 */
-        W_printf((char*) "%s", KT_names[i]);
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        W_printf((char*) "%s", filename.c_str());
     }
 }
 
@@ -338,7 +322,7 @@ void T_print_files(COLS* cls, int dim)
  *
  *  @param  [in] COLS*  cls         columns to print = compiled GSample
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
- *  @global [in] char** KT_mode     list of modes used in COLS (computed in T_begin_tbl())
+ *  @global [in] char** tbl_mode     list of modes used in COLS (computed in T_begin_tbl())
  *
  */
 
@@ -348,7 +332,7 @@ void T_print_mode(COLS* cls, int dim)
 
     for(i = 0; i < MAX_MODE; i++)
     {
-        if(KT_mode[i] == 0)
+        if(tbl_mode[i] == 0)
             continue;
         T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
         W_printf((char*) "(%s) %s", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]);
@@ -376,7 +360,7 @@ void T_print_date(int dim)
 
 /**
  *  Prints a table header in A2M.
- *  Initialises globals KT_names, KT_nbnames and KT_mode.
+ *  Initialises globals v_tbl_filenames and tbl_mode.
  *
  *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
  *  @param [in] COLS*   cls     columns to print = compiled GSample
@@ -384,12 +368,11 @@ void T_print_date(int dim)
  */
 int T_begin_tbl(int dim, COLS* cls)
 {
-    KT_names = T_find_files(cls);
-    KT_nbnames = SCR_tbl_size((unsigned char**) KT_names);
-    if(KT_nbnames == 0)
+    v_tbl_filenames = T_find_files(cls);
+    if(v_tbl_filenames.empty())
         return -1;
 
-    COL_find_mode(cls, KT_mode, 2);
+    COL_find_mode(cls, tbl_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
 
@@ -409,7 +392,5 @@ int T_begin_tbl(int dim, COLS* cls)
 void T_end_tbl()
 {
     W_printf((char*) ".te \n");
-    SCR_free_tbl((unsigned char**) KT_names);
-    KT_names = NULL;
-    KT_nbnames = 0;
+    v_tbl_filenames.clear();
 }

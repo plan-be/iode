@@ -436,7 +436,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     std::string title_utf8 = ref_table_ptr->get_title();
     // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
     std::string title_oem = utf8_to_oem(title_utf8);
-    W_printf( ".topic %d %d %s\n", KT_CUR_TOPIC++, KT_CUR_LEVEL, title_oem.c_str());
+    W_printf( ".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, title_oem.c_str());
     
     res = T_begin_tbl(dim, columns);
     if(res != 0) 
