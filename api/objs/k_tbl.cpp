@@ -1188,7 +1188,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     int     dim, i, j, d, rc = 0, nli = 0,
                           nf = 0, nm = 0;
     char    gsmpl[128], **l = NULL, *buf, *res = NULL;
-    COLS    *cls;
+    std::vector<COL> columns;
 
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
@@ -1205,14 +1205,14 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     else
         sprintf(gsmpl, "%s", ismpl);
 
-    dim = initialize_columns(tbl_ptr, gsmpl, &cls);
+    dim = initialize_columns(tbl_ptr, gsmpl, columns);
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
-    v_tbl_filenames = T_find_files(cls);
+    v_tbl_filenames = T_find_files(columns);
     if(v_tbl_filenames.empty()) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
-    tbl_find_mode(cls, tbl_mode, 2);
+    tbl_find_mode(columns, tbl_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
@@ -1256,16 +1256,16 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
                 break;
             case TABLE_LINE_CELL  :
-                clear_tbl_columns(cls);
-                if(execute_tbl_columns(tbl_ptr.get(), i, cls) < 0)
+                    clear_tbl_columns(columns);
+                    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
                     strcat(buf, "Error in calc");
                 else
-                    for(j = 0; j < cls->cl_nb; j++) 
+                    for(j = 0; j < columns.size(); j++)
                     {
                         d = j % tbl_ptr->nb_columns;
                         if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0) 
                             continue;
-                        strcat(buf, IodeTblCell(&(line->cells[d]), cls->cl_cols + j, nbdec));
+                        strcat(buf, IodeTblCell(&(line->cells[d]), &columns[j], nbdec));
                         strcat(buf, "\t");
                     }
                 break;
@@ -1282,7 +1282,6 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     *nl += nf + nm;
     res = (char*) SCR_mtov((unsigned char**) l, '\n');
 
-    free_tbl_columns(cls);
     SCR_free_tbl((unsigned char**) l);
     SCR_free(buf);
 

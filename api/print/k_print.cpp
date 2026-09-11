@@ -18,29 +18,28 @@
 
 
 /**
- *  Compiles a GSample into a COLS struct and resizes COLS according to the nb of cols in Table.
+ *  Compiles a GSample into a std::vector<COL> struct and resizes std::vector<COL> according to the nb of cols in Table.
  *
  *  @param [in] std::shared_ptr<Table> tbl_ptr   table to compute
  *  @param [in] const std::string&     gsample   GSample
- *  @param [in] COLS**                 cls       result = column definition for computing of the table
+ *  @param [out] std::vector<COL>& columns  column definitions for computing the table
  *  @return     int                              total number of columns for the computed table
  *
  */
-int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, COLS** cls)
+int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns)
 {
-    *cls = NULL;
     if(!tbl_ptr)
         return -1;
 
-    *cls = compile_gsample((char*) gsample.c_str());
-    if(*cls == NULL)
+    columns = compile_gsample((char*) gsample.c_str());
+    if(columns.empty())
     {
         std::string error_msg = "Illegal sample '" + gsample + "': syntax error";
         error_manager.append_error(error_msg);
         return -1;
     }
 
-    int dim = resize_tbl_columns(tbl_ptr.get(), *cls);
+    int dim = resize_tbl_columns(tbl_ptr.get(), columns);
     return dim;
 }
 
@@ -223,15 +222,15 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
  *
  *  @param [in] Table*    tbl     source table
  *  @param [in] int     i       line to print
- *  @param [in] COLS*   cls     columns to print = compiled GSample
+ *  @param [in, out] std::vector<COL>& columns  compiled GSample columns
  *  @return     int             0 on success, -1 on error.
  *
  */
 
-int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
+int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& columns)
 {
-    clear_tbl_columns(cls);
-    if(execute_tbl_columns(tbl_ptr.get(), i, cls) < 0)
+    clear_tbl_columns(columns);
+    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
         return -1;
 
     int     d;
@@ -239,14 +238,14 @@ int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
     TableCell*  cell;
     TableLine&  line = tbl_ptr->lines[i];
 
-    for(int j = 0; j < cls->cl_nb; j++)
+    for(int j = 0; j < columns.size(); j++)
     {
         d = j % tbl_ptr->nb_columns;
         if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0)
             continue;
         if(line.cells.size() > d)
         {
-            cl = cls->cl_cols + j;
+            cl = &columns[j];
             cell = &line.cells[d];
             T_print_cell(cell, cl, 1);
         }
@@ -257,21 +256,19 @@ int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
 
 
 /**
- *  Retrieves the filenames used in the COLS (from GSample) needed to print the special table line TABLE_LINE_FILES.
+ *  Retrieves the filenames used in the std::vector<COL> (from GSample) needed to print the special table line TABLE_LINE_FILES.
  *
- *  @param [in] COLS*   cls     list of columns (from GSample)
+ *  @param [in] const std::vector<COL>& columns  compiled GSample columns
  *  @return     char**          NULL if one of the ref files is not loaded in global_ref_xxx
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
  */
-std::vector<std::string> T_find_files(COLS* cls)
-{    
-    COL* cl;
+std::vector<std::string> T_find_files(const std::vector<COL>& columns)
+{
     std::vector<bool> files(K_MAX_FREF + 1, false);
-    for(int i = 0; i < cls->cl_nb; i++)
+    for(const COL& column : columns)
     {
-        cl = cls->cl_cols + i;
-        files[cl->cl_fnb[0]] = true;
-        files[cl->cl_fnb[1]] = true;
+        files[column.cl_fnb[0]] = true;
+        files[column.cl_fnb[1]] = true;
     }
 
     KDBVariablesPtr kdb;
@@ -301,10 +298,10 @@ std::vector<std::string> T_find_files(COLS* cls)
 /**
  *  Prints the special Table line of type TABLE_LINE_FILES.
  *
- *  @param  [in] COLS*  cls         columns to print = compiled GSample
+ *  @param [in] const std::vector<COL>& columns  compiled GSample columns
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
  */
-void T_print_files(COLS* cls, int dim)
+void T_print_files(const std::vector<COL>& columns, int dim)
 {
     if(v_tbl_filenames.empty())
         return;
@@ -320,13 +317,13 @@ void T_print_files(COLS* cls, int dim)
 /**
  *  Prints the special Table line of type TABLE_LINE_MODE (growth rates, diff...).
  *
- *  @param  [in] COLS*  cls         columns to print = compiled GSample
+ *  @param [in] const std::vector<COL>& columns  compiled GSample columns
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
- *  @global [in] char** tbl_mode     list of modes used in COLS (computed in T_begin_tbl())
+ *  @global [in] char** tbl_mode     list of modes used in std::vector<COL> (computed in T_begin_tbl())
  *
  */
 
-void T_print_mode(COLS* cls, int dim)
+void T_print_mode(const std::vector<COL>& columns, int dim)
 {
     int    i;
 
@@ -363,16 +360,16 @@ void T_print_date(int dim)
  *  Initialises globals v_tbl_filenames and tbl_mode.
  *
  *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
- *  @param [in] COLS*   cls     columns to print = compiled GSample
+ *  @param [in] const std::vector<COL>& columns  compiled GSample columns
  *  @return
  */
-int T_begin_tbl(int dim, COLS* cls)
+int T_begin_tbl(int dim, const std::vector<COL>& columns)
 {
-    v_tbl_filenames = T_find_files(cls);
+    v_tbl_filenames = T_find_files(columns);
     if(v_tbl_filenames.empty())
         return -1;
 
-    tbl_find_mode(cls, tbl_mode, 2);
+    tbl_find_mode(columns, tbl_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
 

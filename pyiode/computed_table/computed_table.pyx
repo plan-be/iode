@@ -129,8 +129,8 @@ cdef class ComputedTable:
         y = np.full(self.get_nb_periods(), np.nan)
 
         col_val = 0
-        for col in range(1, self.c_computed_table.columns.cl_nb, 2):
-            column = self.c_computed_table.columns.cl_cols[col]
+        for col in range(1, self.c_computed_table.columns.size(), 2):
+            column = self.c_computed_table.columns[col]
             pos = self.c_computed_table.find_file_op(column)
             if pos == op_files:
                 c_period = column.cl_per[0]
