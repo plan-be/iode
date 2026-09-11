@@ -911,7 +911,7 @@ std::string KDBTables::get_title(const std::string& name) const
 		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
 			                    "The table with name '" + name + "' does not exist in the database.");
     std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
-    std::string title = T_get_title(tbl_ptr);
+    std::string title = tbl_ptr->get_title();
     return title;
 }
 
@@ -1316,7 +1316,7 @@ bool KDBTables::print_obj_def(const std::string& name)
     if(!tbl_ptr) 
         return false;
     
-    std::string title = T_get_title(tbl_ptr);
+    std::string title = tbl_ptr->get_title();
     // W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing 
     title = utf8_to_oem(title);
     if(B_TABLE_TITLE) 

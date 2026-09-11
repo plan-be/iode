@@ -339,7 +339,7 @@ TEST_F(ComputedTableTest, BuildFromVariables)
 {
     std::string gsample;
     std::vector<std::string> variables = {"Q_I", "Q_F", "Q_I/Q_F", "KNFF[-1]"};
-    std::string title = "";
+    std::string title = "No title";
     int nb_lines = 4;
     std::string sample;
     std::vector<double> values;

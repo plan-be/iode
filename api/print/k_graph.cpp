@@ -45,7 +45,8 @@ int T_GraphTest(const std::shared_ptr<Table> tbl_ptr)
         return -1;
     }
 
-    W_EndDisplay((char*) T_get_title(tbl_ptr).c_str(), -1, -1, -1, -1);
+    std::string title = tbl_ptr->get_title();
+    W_EndDisplay((char*) title.c_str(), -1, -1, -1, -1);
     return 0;
 }
 
@@ -145,7 +146,7 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
 
     if(mode != 0)
     {
-        std::string title = T_get_title(tbl_ptr);
+        std::string title = tbl_ptr->get_title();
         // NOTE: W_Print(...) functions expect OEM encoding, so convert title 
         //       from UTF-8 to OEM before printing 
         title = utf8_to_oem(title);

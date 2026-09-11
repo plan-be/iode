@@ -672,10 +672,11 @@ public:
 
     std::string get_title()
     {
+        std::string title;
         for(TableLine& line : lines)
             if(line.get_type() == TableLineType::TABLE_LINE_TITLE)
-                return line.cells[0].get_content(false);
-        return "";
+                title = line.cells[0].get_content(false);
+        return title.empty() ? "No title" : title;
     }
 
     // we assume that title string is written in UTF8 format
