@@ -32,7 +32,7 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
     if(!tbl_ptr)
         return -1;
 
-    *cls = COL_cc((char*) gsample.c_str());
+    *cls = compile_gsample((char*) gsample.c_str());
     if(*cls == NULL)
     {
         std::string error_msg = "Illegal sample '" + gsample + "': syntax error";
@@ -40,7 +40,7 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
         return -1;
     }
 
-    int dim = COL_resize(tbl_ptr.get(), *cls);
+    int dim = resize_tbl_columns(tbl_ptr.get(), *cls);
     return dim;
 }
 
@@ -81,7 +81,7 @@ void T_print_val(double val)
 
 
 /**
- *  Translates a TableCell of type KT_TEXT into a text using COL_text(). Sends the result to W_printf().
+ *  Translates a TableCell of type KT_TEXT into a text using col_to_text(). Sends the result to W_printf().
  *
  *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
  *  @param  [in] string     the table column definition (ex "#s")
@@ -89,7 +89,7 @@ void T_print_val(double val)
  */
 void T_print_string(COL* cl, char* string)
 {
-    char* ptr = (char *) COL_text(cl, string, (int) v_tbl_filenames.size());
+    char* ptr = (char *) col_to_text(cl, string, (int) v_tbl_filenames.size());
     if(ptr != NULL) W_printf((char*) "%s", ptr);
     SW_nfree(ptr);
 }
@@ -230,8 +230,8 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
 
 int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, COLS* cls)
 {
-    COL_clear(cls);
-    if(COL_exec(tbl_ptr.get(), i, cls) < 0)
+    clear_tbl_columns(cls);
+    if(execute_tbl_columns(tbl_ptr.get(), i, cls) < 0)
         return -1;
 
     int     d;
@@ -372,7 +372,7 @@ int T_begin_tbl(int dim, COLS* cls)
     if(v_tbl_filenames.empty())
         return -1;
 
-    COL_find_mode(cls, tbl_mode, 2);
+    tbl_find_mode(cls, tbl_mode, 2);
 
     W_printf((char*) ".tb %d\n", dim);
 
