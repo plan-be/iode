@@ -31,9 +31,8 @@
  */
 int B_PrintVal(double val)
 {
-    char buf[64];
-    T_fmt_val(buf, val, 30, -1);
-    W_printf(buf);
+    std::string value = format_double_value(val, 30, -1);
+    W_printf((char*) "%s", value.c_str());
     return 0;
 }
 

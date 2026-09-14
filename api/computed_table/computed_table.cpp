@@ -439,9 +439,8 @@ void ComputedTable::print_line_date()
 
 void ComputedTable::print_cell_value(double value) const
 {
-    char buf[64];
-    T_fmt_val(buf, value, 30, tbl_nb_decimals);
-    W_printf(buf);
+    std::string formatted_value = format_double_value(value, 30, tbl_nb_decimals);
+    W_printf((char*) "%s", formatted_value.c_str());
 }
 
 void ComputedTable::print_cell_string(const COL& column, const std::string& content) const

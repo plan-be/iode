@@ -307,7 +307,7 @@ char* IodeTblCell(TableCell *cell, COL *cl, int nbdec)
             SCR_sqz((unsigned char*) buf);                         /* JMP 18-10-07 */
             SCR_pstrip((unsigned char*) buf, (unsigned char*) "0");                 /* JMP 18-10-07 */
         }
-        // T_fmt_val(buf, cl->cl_res, 20, nbdec); /* JMP 18-10-07 */
+        // std::string value = format_double_value(cl->cl_res, 20, nbdec); /* JMP 18-10-07 */
     }
 
     return(buf);

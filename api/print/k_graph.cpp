@@ -294,15 +294,13 @@ int T_GraphXYLegend(int axis, int type, char *txt, char *fileop)
  */
 int T_GraphTimeData(const std::shared_ptr<Sample> smpl, double *y)
 {
-    char buf[21];
-
     std::string str_period = smpl->start_period.to_string();
     W_printf((char*) "%s ", (char*) str_period.c_str());
 
     for(int i = 0; i < smpl->nb_periods; i++) 
     {
-        T_fmt_val(buf, y[i], 16, -1);
-        W_printf((char*) " %s ", buf);
+        std::string value = format_double_value(y[i], 16, -1);
+        W_printf((char*) " %s ", value.c_str());
     }
     W_printf((char*) "\n");
     return 0;
@@ -320,12 +318,12 @@ int T_GraphTimeData(const std::shared_ptr<Sample> smpl, double *y)
 int T_GraphXYData(int nb, double *x, double *y)
 {
     int     i = 0;
-    char    bufx[21], bufy[21];
+    std::string str_x, str_y;
 
     for(i = 0; i < nb; i++) {
-        T_fmt_val(bufx, x[i], 16, -1);
-        T_fmt_val(bufy, y[i], 16, -1);
-        W_printf((char*) " %s %s ", bufx, bufy);
+        str_x = format_double_value(x[i], 16, -1);
+        str_y = format_double_value(y[i], 16, -1);
+        W_printf((char*) " %s %s ", str_x.c_str(), str_y.c_str());
     }
     W_printf((char*) "\n");
     return 0;

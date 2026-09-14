@@ -3,14 +3,14 @@
 
 bool Scalar::print_definition() const
 {    
-    char tcoef[128], trelax[128], tstd[128], tttest[128];
-    T_fmt_val(tcoef,  (double) value, 15, tbl_nb_decimals);
-    T_fmt_val(trelax, (double) relax, 15, -1);
-    T_fmt_val(tstd,   (double) std,   15, tbl_nb_decimals);
+    std::string tcoef, trelax, tstd, tttest;
+    tcoef = format_double_value((double) value, 15, tbl_nb_decimals);
+    trelax = format_double_value((double) relax, 15, -1);
+    tstd = format_double_value((double) std, 15, tbl_nb_decimals);
     
     double ttest = calculate_t_test();
-    T_fmt_val(tttest, ttest, 15, tbl_nb_decimals);
-    W_printfReplEsc((char*) "%s ~i(%s, %s, %s)\n",  tcoef, trelax, tstd, tttest);
+    tttest = format_double_value(ttest, 15, tbl_nb_decimals);
+    W_printfReplEsc((char*) "%s ~i(%s, %s, %s)\n", tcoef.c_str(), trelax.c_str(), tstd.c_str(), tttest.c_str());
 
     return true;        
 }
