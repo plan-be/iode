@@ -374,6 +374,13 @@ int ComputedTable::begin_print_tbl()
 }
 
 
+void ComputedTable::end_print_tbl()
+{
+    W_printf((char*) ".te \n");
+    v_tbl_filenames.clear();
+}
+
+
 void ComputedTable::initialize_printing(const std::string& destination_file, const char format)
 {
     int res;
@@ -503,7 +510,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
         }
         W_printf("\n");
     }
-    T_end_tbl();
+    end_print_tbl();
 }
 
 void ComputedTable::print_to_file(const std::string& destination_file, const char format)

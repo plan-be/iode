@@ -351,13 +351,3 @@ void T_print_date(int dim)
     T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
     W_printf((char*) "%s", date);
 }
-
-
-/**
- *  Prints a table footer in A2M and frees the temporary allocated variables.
- */
-void T_end_tbl()
-{
-    W_printf((char*) ".te \n");
-    v_tbl_filenames.clear();
-}
