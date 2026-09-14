@@ -134,10 +134,11 @@ void add_tbl_column(std::vector<COL>& columns);
 int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type);
 
 /* c_calc.c */
+int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns);
 int resize_tbl_columns(const Table& tbl, std::vector<COL>& columns);
 void clear_tbl_columns(std::vector<COL>& columns);
 int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL>& columns);
-
+std::vector<std::string> extract_files_tbl(const std::vector<COL>& columns);
 
 extern bool debug_calc;
 

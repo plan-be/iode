@@ -152,8 +152,29 @@ enum IodeGraphError
 
 /*----------------------------- FUNCS -----------------------------*/
 
+/**
+ *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
+ *
+ *  @param [in]         double      value          input real value
+ *  @param [in]         int         lg             max result string length
+ *  @param [in]         int         nb_decimals    number of decimal places
+ *  @return std::string formatted value
+ */
+inline std::string format_double_value(double value, int lg, int nb_decimals)
+{
+    if(IODE_IS_A_NUMBER(value))
+    {
+        std::vector<char> buffer(std::max(lg + 1, 4), '\0');
+        SCR_fmt_dbl(value, (unsigned char*) buffer.data(), lg, nb_decimals);
+        SCR_sqz((unsigned char*) buffer.data());
+        return std::string(buffer.data());
+    }
+    else
+        return "-.-";
+}
+
+
 /* k_graph.c */
-/* New auto extraction 1/10/2021 */
 int APIChartAlloc(int nl);
 int APIChartAxis(int hdl, int i);
 double *APIChartData(int hdl, int i);
@@ -182,28 +203,3 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
 int T_prep_smpl(const std::vector<COL>& columns, std::vector<COL>& file_columns, std::shared_ptr<Sample>& smpl);
 int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, 
     const std::shared_ptr<Sample> smpl, char **names);
-
-/* k_print.c */
-int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns);
-std::vector<std::string> extract_files_tbl(const std::vector<COL>& columns);
-
-/**
- *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
- *
- *  @param [in]         double      value          input real value
- *  @param [in]         int         lg             max result string length
- *  @param [in]         int         nb_decimals    number of decimal places
- *  @return std::string formatted value
- */
-inline std::string format_double_value(double value, int lg, int nb_decimals)
-{
-    if(IODE_IS_A_NUMBER(value))
-    {
-        std::vector<char> buffer(std::max(lg + 1, 4), '\0');
-        SCR_fmt_dbl(value, (unsigned char*) buffer.data(), lg, nb_decimals);
-        SCR_sqz((unsigned char*) buffer.data());
-        return std::string(buffer.data());
-    }
-    else
-        return "-.-";
-}
