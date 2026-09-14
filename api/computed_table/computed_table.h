@@ -70,6 +70,13 @@ private:
     void initialize();
 
     /**
+     * @brief Print the table header and initialize the temporary printing state.
+     *
+     * @return 0 on success, -1 if no referenced files were found
+     */
+    int begin_print_tbl();
+
+    /**
      * @brief 
      * 
      * @param lec 

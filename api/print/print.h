@@ -198,5 +198,4 @@ std::vector<std::string> T_find_files(const std::vector<COL>& columns);
 void T_print_files(const std::vector<COL>& columns, int dim);
 void T_print_mode(const std::vector<COL>& columns, int dim);
 void T_print_date(int dim);
-int T_begin_tbl(int dim, const std::vector<COL>& columns);
 void T_end_tbl(void);
