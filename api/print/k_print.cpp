@@ -146,36 +146,6 @@ void T_close_attr(int attr)
 }
 
 /**
- * @brief Prints a Table line of type TITLE
- *
- * @param cell
- * @param straddle
- * @return int
- */
-void T_print_title(const TableCell* cell, int straddle)
-{
-    if(cell == nullptr || cell->is_null())
-    {
-        W_printf((char*) "%c1R", A2M_SEPCH);
-        return;
-    }
-
-    std::string content = cell->get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
-
-    int attribute = (int) cell->get_attribute();
-    T_open_cell(attribute, straddle, TABLE_CELL_STRING);
-    T_open_attr(attribute);
-
-    W_printf((char*) "%s", (char*) content.c_str());
-
-    T_close_attr(attribute);
-}
-
-
-/**
  *  Prints a Table cell on a specific GSample column.
  *
  *  @param [in] TableCell*  cell        table cell to print

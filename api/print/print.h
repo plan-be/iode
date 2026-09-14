@@ -185,7 +185,6 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
 
 /* k_print.c */
 int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns);
-void T_print_title(const TableCell* cell, int straddle);
 void T_print_cell(const TableCell* cell, COL* cl, int straddle);
 void T_fmt_val(char* buf, double val, int lg, int nd);
 void T_print_val(double val);

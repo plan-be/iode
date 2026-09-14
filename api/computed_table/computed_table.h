@@ -86,6 +86,11 @@ private:
     int print_tbl_line(const TableLine& line);
 
     /**
+     * @brief Print a title cell spanning the requested number of columns.
+     */
+    void print_tbl_title(const TableCell& cell, int straddle);
+
+    /**
      * @brief Print table line representing a line separator.
      * 
      */
