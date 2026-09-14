@@ -48,12 +48,14 @@ struct ComputedTable
 
     int dim; 
     std::vector<COL> columns;
-    std::vector<COL>         files_ops;
+    std::vector<COL> files_ops;
     std::vector<std::string> files;
     std::vector<std::string> line_names;
     std::vector<std::string> column_names;
-    std::vector<int>         v_line_pos_in_ref_table;
-    std::vector<int>         v_pos_in_columns_struct;
+
+    std::vector<int> v_line_pos_in_ref_table;
+    std::vector<int> v_pos_in_columns_struct;
+
     // TODO ALD: consider Eigen 3 matrix
     std::vector<std::vector<double>> values;
 
@@ -61,7 +63,6 @@ private:
     int     newton_max_iter = 50;        // Newton-Raphson convergence threshold
     double  newton_epsilon = 1e-6;       // Newton-Raphson: max number of iterations of the Newton-Raphson sub algorithm.
     double  newton_step = 1e-6;          // Newton-Raphson: save a trace of the sub-iterations
-
 
 private:
     /**
@@ -75,6 +76,11 @@ private:
      * @return 0 on success, -1 if no referenced files were found
      */
     int begin_print_tbl();
+
+    /**
+     * @brief Print the table footer and clear the temporary printing state.
+     */
+    void end_print_tbl();
 
     /**
      * @brief 
