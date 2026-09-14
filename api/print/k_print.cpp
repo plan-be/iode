@@ -86,11 +86,11 @@ void T_print_val(double val)
  *  @param  [in] string     the table column definition (ex "#s")
  *
  */
-void T_print_string(COL* cl, char* string)
+void T_print_string(const COL& column, const std::string& content)
 {
-    char* ptr = (char *) col_to_text(cl, string, (int) v_tbl_filenames.size());
-    if(ptr != NULL) W_printf((char*) "%s", ptr);
-    SW_nfree(ptr);
+    std::string text = col_to_text(column, content, (int) v_tbl_filenames.size());
+    if(!text.empty())
+        W_printf((char*) "%s", text.c_str());
 }
 
 
@@ -143,49 +143,6 @@ void T_close_attr(int attr)
     if(attr & TABLE_CELL_BOLD)      W_printfReplEsc("~B");
     if(attr & TABLE_CELL_ITALIC)    W_printfReplEsc("~I");
     if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~U");
-}
-
-/**
- *  Prints a Table cell on a specific GSample column.
- *
- *  @param [in] TableCell*  cell        table cell to print
- *  @param [in] COL*        cl          GSample column definition with the value already calculated
- *  @param [in] int         straddle    nb of spanned columns int the resulting a2m table
- *
- */
-void T_print_cell(const TableCell* cell, COL* cl, int straddle)
-{
-    if(cell == nullptr || cell->is_null())
-    {
-        W_printf((char*) "%c1R", A2M_SEPCH);
-        return;
-    }
-
-    TableCell cell_copy(*cell);
-
-    TableCellType cell_type = cell_copy.get_type();
-
-    std::string content = cell_copy.get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
-
-    if(cell_type == TABLE_CELL_STRING && content.find('#') != std::string::npos)
-        cell_copy.set_align(TABLE_CELL_RIGHT);
-
-    if(cell_type == TABLE_CELL_LEC)
-        cell_copy.set_align(TABLE_CELL_DECIMAL);
-
-    int attribute = (int) cell_copy.get_attribute();
-    T_open_cell(attribute, straddle, (int) cell_type);
-    T_open_attr(attribute);
-
-    if(cl == NULL || cell_type == TABLE_CELL_STRING)
-        T_print_string(cl, (char*) content.c_str());
-    else
-        T_print_val(cl->cl_res);
-
-    T_close_attr(attribute);
 }
 
 

@@ -107,7 +107,7 @@ cdef class ComputedTable:
         if self.get_nb_operations_between_files():
             col = self.c_computed_table.files_ops[op_files]
             if self.get_nb_files() > 1 or col.cl_opf != COL_NOP:
-                b_file_op_name = col_to_string(&col, ch, 0, self.get_nb_files())
+                b_file_op_name = col_to_string(col, ch, 0, self.get_nb_files())
                 name += " " + b_file_op_name.decode()
         return name
 

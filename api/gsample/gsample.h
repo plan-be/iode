@@ -128,8 +128,8 @@ inline int col_compare(const void* a, const void* b)
 
 /* c_cc.c */
 std::vector<COL> compile_gsample(char* gsample);
-char *col_to_string(const COL* cl, int ch, int n, int nbf);
-char *col_to_text(const COL* cl, char* str, int nbnames);
+std::string col_to_string(const COL& column, int ch, int period_pos, int nb_files);
+std::string col_to_text(const COL& column, const std::string& str, int nb_names);
 void add_tbl_column(std::vector<COL>& columns);
 int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type);
 

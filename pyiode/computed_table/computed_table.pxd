@@ -25,7 +25,7 @@ cdef extern from "api/all.h":
         double   cl_val[2][2]        # computed values of the LEC formulas on periods / files => max 4 values see table below
         double   cl_res              # computed value (v00 opp v10) opf (v01 opp v11)
 
-    char* col_to_string(const COL*, int, int, int)     # COL to ASCII
+    string col_to_string(const COL&, int, int, int)     # COL to ASCII
 
 
 cdef extern from "api/computed_table/computed_table.h":
