@@ -119,6 +119,31 @@ void TableCell::set_content(const std::string& content)
  *  @param [in] nb_columns int   number of columns occupied by the cell
  *  @return                bool  true if successful, false otherwise
  */
+void TableCell::start_print(int straddle) const
+{
+    char align = 'L';
+
+    if(attribute & TABLE_CELL_CENTER) align = 'C';
+    if(attribute & TABLE_CELL_RIGHT)  align = 'R';
+    if(type != TABLE_CELL_STRING && (attribute & TABLE_CELL_DECIMAL)) align = 'D';
+
+    W_printf((char*) "%c%d%c", A2M_SEPCH, straddle, align);
+}
+
+void TableCell::print_start_attribute() const
+{
+    if(attribute & TABLE_CELL_BOLD)      W_printfReplEsc("~b");
+    if(attribute & TABLE_CELL_ITALIC)    W_printfReplEsc("~i");
+    if(attribute & TABLE_CELL_UNDERLINE) W_printfReplEsc("~u");
+}
+
+void TableCell::print_end_attribute() const
+{
+    if(attribute & TABLE_CELL_BOLD)      W_printfReplEsc("~B");
+    if(attribute & TABLE_CELL_ITALIC)    W_printfReplEsc("~I");
+    if(attribute & TABLE_CELL_UNDERLINE) W_printfReplEsc("~U");
+}
+
 bool TableCell::print_definition(int nb_columns, const bool title_line) const
 {
     if(!check_print_def()) 
@@ -139,8 +164,8 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
     {
         case TABLE_CELL_STRING :
         {
-            T_open_cell(attribute, nb_columns, TABLE_CELL_STRING);
-            T_open_attr(attribute);
+            start_print(nb_columns);
+            print_start_attribute();
             if(title_line)
                 W_printf((char*) "%s", (char*) content.c_str());
             else
@@ -150,13 +175,13 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
         case TABLE_CELL_LEC :
         {
             W_printfRepl((char*) "&%dL", nb_columns);
-            T_open_attr(attribute);
+            print_start_attribute();
             W_printf((char*) "%s", (char*) content.c_str());
             break;
         }
     }
     
-    T_close_attr(attribute);
+    print_end_attribute();
     return true;
 }
 

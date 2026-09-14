@@ -45,58 +45,6 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
 
 
 /**
- *  Prints the header of an a2m table cell: <cellsep><span><align>.
- *  Example: "@2C" if @ is the cell separator, 2 the number of spanned columns and the text must be centered in the column.
- *
- *  @param  [in] int attr        alignment attribute: TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_DECIMAL, TABLE_CELL_LEFT.
- *  @param  [in] int straddle    number of spanned columns
- *  @param  [in] int type        column type (TABLE_CELL_STRING, TABLE_CELL_LEC...)
- *  @global [in] int A2M_SEPCH   a2m table cell separator
- *
- */
-
-void T_open_cell(int attr, int straddle, int type)
-{
-    char    align = 'L';
-
-    if(attr & TABLE_CELL_CENTER)    align = 'C';
-    if(attr & TABLE_CELL_RIGHT)     align = 'R';
-    if(type != TABLE_CELL_STRING && (attr & TABLE_CELL_DECIMAL))   align = 'D'; /* JMP 17-12-93 */
-
-    W_printf((char*) "%c%d%c", A2M_SEPCH, straddle, align);
-}
-
-
-/**
- *  Opens an A2M attribute sequence.
- *
- *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
- *
- */
-void T_open_attr(int attr)
-{
-
-    if(attr & TABLE_CELL_BOLD)      W_printfReplEsc("~b");
-    if(attr & TABLE_CELL_ITALIC)    W_printfReplEsc("~i");
-    if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~u");
-}
-
-
-/**
- *  Closes an A2M attribute sequence.
- *
- *  @param [in] int     attr    Cell attribute: TABLE_CELL_BOLD...
- *
- */
-void T_close_attr(int attr)
-{
-    if(attr & TABLE_CELL_BOLD)      W_printfReplEsc("~B");
-    if(attr & TABLE_CELL_ITALIC)    W_printfReplEsc("~I");
-    if(attr & TABLE_CELL_UNDERLINE) W_printfReplEsc("~U");
-}
-
-
-/**
  *  Retrieves the filenames used in the std::vector<COL> (from GSample) needed to print the special table line TABLE_LINE_FILES.
  *
  *  @param [in] const std::vector<COL>& columns  compiled GSample columns
