@@ -248,7 +248,7 @@ int T_GraphLegend(int axis, int type, char *txt, char *fileop)
  */
 static int T_GraphLineTitle(TableLine *line, const std::vector<COL>& file_columns, int i)
 {
-    char    *fileop = NULL;
+    std::string fileop;
     const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content(false);
@@ -256,9 +256,9 @@ static int T_GraphLineTitle(TableLine *line, const std::vector<COL>& file_column
     content = utf8_to_oem(content);
 
     if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
-        fileop = col_to_string(column, 'f', 0, 2);
+        fileop = col_to_string(*column, 'f', 0, 2);
     T_GraphLegend(line->right_axis, "LSBL"[(int) line->get_graph_type()], 
-                 (char*) content.c_str(), fileop);
+                 (char*) content.c_str(), fileop.empty() ? nullptr : fileop.data());
     return 0;
 }
 
@@ -765,7 +765,7 @@ int APIGraphLegendTitle(int hdl, int axis, int type, char *txt, char *fileop)
  */
 int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_columns, int i)
 {
-    char    *fileop = NULL;
+    std::string fileop;
     const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content();
@@ -773,9 +773,9 @@ int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_col
     content = utf8_to_oem(content);
 
     if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
-        fileop = col_to_string(column, 'f', 0, 2);
+        fileop = col_to_string(*column, 'f', 0, 2);
     APIGraphLegendTitle(hdl, line->right_axis, "LSBL"[(int) line->get_graph_type()], 
-                       (char*) content.c_str(), fileop);
+                       (char*) content.c_str(), fileop.empty() ? nullptr : fileop.data());
     return 0;
 }
 

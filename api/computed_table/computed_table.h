@@ -112,6 +112,14 @@ private:
     void print_line_date();
 
     /**
+     *  Prints a Table cell on a specific GSample column.
+     *
+     *  @param [in] TableCell*  cell     table cell to print
+     *  @param [in] COL*        column   GSample column definition with the value already calculated
+     */
+    bool print_cell(const TableCell& cell, const COL& column) const;
+
+    /**
      * @brief Print the table footer and clear the temporary printing state.
      */
     void end_print_tbl();

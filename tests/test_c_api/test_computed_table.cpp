@@ -72,7 +72,7 @@ TEST_F(ComputedTableTest, GSample)
     expected_cols_names = {"00", "01", "02", "03", "04"};
     for(int col=1; col < columns.size(); col+=2)
     {
-        column_name = std::string(col_to_text(&columns[col], expand, nb_files));
+        column_name = col_to_text(columns[col], expand, nb_files);
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -97,7 +97,7 @@ TEST_F(ComputedTableTest, GSample)
                            "14", "14/13"};
     for(int col=1; col < columns.size(); col+=2)
     {
-        column_name = std::string(col_to_text(&columns[col], expand, nb_files));
+        column_name = col_to_text(columns[col], expand, nb_files);
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -122,7 +122,7 @@ TEST_F(ComputedTableTest, GSample)
                            "13[1]", "13[2]", "14[1]", "14[2]"};
     for(int col=1; col < columns.size(); col+=2)
     {
-        column_name = std::string(col_to_text(&columns[col], expand, nb_files));
+        column_name = col_to_text(columns[col], expand, nb_files);
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());
@@ -149,7 +149,7 @@ TEST_F(ComputedTableTest, GSample)
                            "08[1+2]", "10/09[1^2]"};
     for(int col=1; col < columns.size(); col+=2)
     {
-        column_name = std::string(col_to_text(&columns[col], expand, nb_files));
+        column_name = col_to_text(columns[col], expand, nb_files);
         cols_names.push_back(column_name);
     }
     EXPECT_EQ(cols_names.size(), expected_cols_names.size());

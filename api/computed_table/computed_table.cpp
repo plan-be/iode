@@ -97,12 +97,11 @@ void ComputedTable::initialize()
             if(content.find('#') != std::string::npos)
             {
                 std::string column_name;
-                char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
                 int step = ref_table->nb_columns;          // to skip first column of the reference table containing text
                 for(int col=1; col < columns.size(); col+=step)
                 {
-                    column_name = std::string(col_to_text(&columns[col], c_content, nb_files));
+                    column_name = col_to_text(columns[col], content, nb_files);
                     column_names.push_back(column_name);
                     v_pos_in_columns_struct.push_back(col);
                 }
@@ -386,13 +385,15 @@ int ComputedTable::print_tbl_line(const TableLine& line)
     if(execute_tbl_columns(*ref_table, line, columns) < 0)
         return -1;
 
+    int d;
     for(int j = 0; j < columns.size(); j++)
     {
-        int d = j % ref_table->nb_columns;
+        d = j % ref_table->nb_columns;
         if(ref_table->repeat_columns == 0 && d == 0 && j != 0)
             continue;
+        
         if(line.cells.size() > d)
-            T_print_cell(&line.cells[d], &columns[j], 1);
+            print_cell(line.cells[d], columns[j]);
     }
 
     return 0;
@@ -434,6 +435,41 @@ void ComputedTable::print_line_date()
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
     T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
     W_printf((char*) "%s", date);
+}
+
+bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
+{
+    if(cell.is_null())
+    {
+        W_printf((char*) "%c1R", A2M_SEPCH);
+        return true;
+    }
+
+    std::string content = cell.get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
+    //       from UTF-8 to OEM before printing
+    content = utf8_to_oem(content);
+
+    TableCell cell_copy(cell);
+    TableCellType cell_type = cell_copy.get_type();
+
+    if(cell_type == TABLE_CELL_STRING && string_contains(content, '#'))
+        cell_copy.set_align(TABLE_CELL_RIGHT);
+
+    if(cell_type == TABLE_CELL_LEC)
+        cell_copy.set_align(TABLE_CELL_DECIMAL);
+
+    int attribute = (int) cell_copy.get_attribute();
+    T_open_cell(attribute, 1, (int) cell_type);
+    T_open_attr(attribute);
+
+    if(cell_type == TABLE_CELL_STRING)
+        T_print_string(column, (char*) content.c_str());
+    else
+        T_print_val(column.cl_res);
+
+    T_close_attr(attribute);
+    return true;
 }
 
 void ComputedTable::end_print_tbl()

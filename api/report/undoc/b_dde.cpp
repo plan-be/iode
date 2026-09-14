@@ -284,8 +284,6 @@ char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)
 char* IodeTblCell(TableCell *cell, COL *cl, int nbdec)
 {
     static char    buf[DDECELLSIZE + 1]; /* JMP 4/4/2016 (PS) !!! */
-    char    *ptr = NULL;
-
     buf[0] = 0;
 
     if(cell->is_null()) 
@@ -294,10 +292,10 @@ char* IodeTblCell(TableCell *cell, COL *cl, int nbdec)
     if(cl == NULL || cell->get_type() == TABLE_CELL_STRING) 
     {
         std::string text = cell->get_content();
-        ptr = (char *) col_to_text(cl, (char*) text.c_str(), (int) v_tbl_filenames.size());
-        SCR_strlcpy((unsigned char*) buf, (unsigned char*) ptr, DDECELLSIZE);
+        if(cl != nullptr)
+            text = col_to_text(*cl, text, (int) v_tbl_filenames.size());
+        SCR_strlcpy((unsigned char*) buf, (unsigned char*) text.c_str(), DDECELLSIZE);
         buf[DDECELLSIZE] = 0;
-        SW_nfree(ptr);
     }
     else 
     {
