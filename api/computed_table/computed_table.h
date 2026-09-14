@@ -86,6 +86,12 @@ private:
     int print_tbl_line(const TableLine& line);
 
     /**
+     * @brief Print table line representing a line separator.
+     * 
+     */
+    void print_line_separator();
+
+    /**
      * @brief Print the table footer and clear the temporary printing state.
      */
     void end_print_tbl();

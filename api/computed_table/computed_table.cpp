@@ -392,6 +392,11 @@ int ComputedTable::print_tbl_line(const TableLine& line)
     return 0;
 }
 
+void print_line_separator()
+{
+    W_printf(".tl");
+}
+
 void ComputedTable::end_print_tbl()
 {
     W_printf((char*) ".te \n");
@@ -498,7 +503,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
         switch(line.get_type())
         {
             case TABLE_LINE_SEP:
-                W_printf(".tl");
+                print_line_separator();
                 break;
             case TABLE_LINE_TITLE:
             {
