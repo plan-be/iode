@@ -319,7 +319,7 @@ void T_print_files(const std::vector<COL>& columns, int dim)
  *
  *  @param [in] const std::vector<COL>& columns  compiled GSample columns
  *  @param  [in] int    dim         total number of columns in the resulting table (size of GSample x nb table cols)
- *  @global [in] char** tbl_mode     list of modes used in std::vector<COL> (computed in T_begin_tbl())
+ *  @global [in] char** tbl_mode     list of modes used in std::vector<COL> (computed in begin_print_tbl())
  *
  */
 
@@ -350,34 +350,6 @@ void T_print_date(int dim)
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
     T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
     W_printf((char*) "%s", date);
-}
-
-
-/**
- *  Prints a table header in A2M.
- *  Initialises globals v_tbl_filenames and tbl_mode.
- *
- *  @param [in] int     dim     total number of columns in the resulting table (size of GSample x nb table cols)
- *  @param [in] const std::vector<COL>& columns  compiled GSample columns
- *  @return
- */
-int T_begin_tbl(int dim, const std::vector<COL>& columns)
-{
-    v_tbl_filenames = T_find_files(columns);
-    if(v_tbl_filenames.empty())
-        return -1;
-
-    tbl_find_mode(columns, tbl_mode, 2);
-
-    W_printf((char*) ".tb %d\n", dim);
-
-    if(A2M_SEPCH == '\t')
-        W_printf((char*) ".sep TAB");
-    else
-        W_printf((char*) ".sep %c", A2M_SEPCH);
-    W_printf("\n");
-
-    return 0;
 }
 
 

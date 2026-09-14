@@ -354,6 +354,26 @@ void ComputedTable::set_value(const int line, const int col, const double value,
    compute_values();
 }
 
+int ComputedTable::begin_print_tbl()
+{
+    v_tbl_filenames = T_find_files(columns);
+    if(v_tbl_filenames.empty())
+        return -1;
+
+    tbl_find_mode(columns, tbl_mode, 2);
+
+    W_printf((char*) ".tb %d\n", dim);
+
+    if(A2M_SEPCH == '\t')
+        W_printf((char*) ".sep TAB");
+    else
+        W_printf((char*) ".sep %c", A2M_SEPCH);
+    W_printf("\n");
+
+    return 0;
+}
+
+
 void ComputedTable::initialize_printing(const std::string& destination_file, const char format)
 {
     int res;
@@ -440,7 +460,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     
     W_printf(".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, title_oem.c_str());
     
-    res = T_begin_tbl(dim, columns);
+    res = begin_print_tbl();
     if(res != 0) 
         throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
 
