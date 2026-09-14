@@ -57,7 +57,7 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     
     std::string sname;
     std::shared_ptr<Scalar> scl = nullptr;
-    char tcoef[128], ttest[128];
+    std::string tcoef, ttest;
     for(const std::string& sname : clec->v_obj_names) 
     {
         buf[0] = 0;
@@ -66,12 +66,12 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
             if(global_ws_scl->contains(sname)) 
             {
                 scl = global_ws_scl->get_obj_ptr(sname);
-                T_fmt_val(tcoef, scl->value, 15, tbl_nb_decimals);
-                T_fmt_val(ttest, scl->calculate_t_test(), 15, tbl_nb_decimals);
+                tcoef = format_double_value(scl->value, 15, tbl_nb_decimals);
+                ttest = format_double_value(scl->calculate_t_test(), 15, tbl_nb_decimals);
                 if(coefs == 1) 
-                    sprintf(buf, "%ci%s%cI", A2M_ESCCH, tcoef, A2M_ESCCH);
+                    sprintf(buf, "%ci%s%cI", A2M_ESCCH, tcoef.c_str(), A2M_ESCCH);
                 if(coefs == 2) 
-                    sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef, ttest, A2M_ESCCH);
+                    sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef.c_str(), ttest.c_str(), A2M_ESCCH);
             }
         }
         if(buf[0] == 0) 

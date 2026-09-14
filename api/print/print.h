@@ -185,8 +185,28 @@ int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double
 
 /* k_print.c */
 int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsample, std::vector<COL>& columns);
-void T_fmt_val(char* buf, double val, int lg, int nd);
 void T_open_cell(int attr, int straddle, int type);
 void T_open_attr(int attr);
 void T_close_attr(int attr);
 std::vector<std::string> extract_files_tbl(const std::vector<COL>& columns);
+
+/**
+ *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
+ *
+ *  @param [in]         double      value          input real value
+ *  @param [in]         int         lg             max result string length
+ *  @param [in]         int         nb_decimals    number of decimal places
+ *  @return std::string formatted value
+ */
+inline std::string format_double_value(double value, int lg, int nb_decimals)
+{
+    if(IODE_IS_A_NUMBER(value))
+    {
+        std::vector<char> buffer(std::max(lg + 1, 4), '\0');
+        SCR_fmt_dbl(value, (unsigned char*) buffer.data(), lg, nb_decimals);
+        SCR_sqz((unsigned char*) buffer.data());
+        return std::string(buffer.data());
+    }
+    else
+        return "-.-";
+}

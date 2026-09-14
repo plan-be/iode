@@ -43,24 +43,6 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
     return dim;
 }
 
-/**
- *  Formats a double value. Uses SCR_fmt_dbl(). See http://xon.be/scr4/libs1/libs1167.htm.
- *
- *  @param [in, out]    char*       buf     placeholder of the result
- *  @param [in]         double   val     input real value
- *  @param [in]         int         lg      max result string length
- *  @param [in]         int         nd      number of decimal places
- *
- */
-
-void T_fmt_val(char* buf, double val, int lg, int nd)
-{
-    if(IODE_IS_A_NUMBER(val))
-        SCR_fmt_dbl(val, (unsigned char*) buf, lg, nd);
-    else strcpy(buf, "-.-");
-    SCR_sqz((unsigned char*) buf);
-}
-
 
 /**
  *  Prints the header of an a2m table cell: <cellsep><span><align>.
