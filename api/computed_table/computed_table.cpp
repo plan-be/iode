@@ -374,6 +374,28 @@ int ComputedTable::begin_print_tbl()
 }
 
 
+void ComputedTable::print_tbl_title(const TableCell& cell, int straddle)
+{
+    if(cell.is_null())
+    {
+        W_printf((char*) "%c1R", A2M_SEPCH);
+        return;
+    }
+
+    std::string content = cell.get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
+    //       from UTF-8 to OEM before printing
+    content = utf8_to_oem(content);
+
+    int attribute = (int) cell.get_attribute();
+    T_open_cell(attribute, straddle, TABLE_CELL_STRING);
+    T_open_attr(attribute);
+
+    W_printf((char*) "%s", (char*) content.c_str());
+
+    T_close_attr(attribute);
+}
+
 int ComputedTable::print_tbl_line(const TableLine& line)
 {
     clear_tbl_columns(columns);
@@ -392,7 +414,7 @@ int ComputedTable::print_tbl_line(const TableLine& line)
     return 0;
 }
 
-void print_line_separator()
+void ComputedTable::print_line_separator()
 {
     W_printf(".tl");
 }
@@ -513,8 +535,7 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
                     first_title = false;
                     break;
                 }
-                const TableCell* cell = &(line.cells[0]);
-                T_print_title(cell, dim);
+                print_tbl_title(line.cells[0], dim);
                 break;
             }
             case TABLE_LINE_DATE  :
