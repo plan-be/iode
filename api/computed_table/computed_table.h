@@ -78,6 +78,14 @@ private:
     int begin_print_tbl();
 
     /**
+     * @brief Print table line for all computed columns.
+     *
+     * @param line line to print
+     * @return 0 on success, -1 on error
+     */
+    int print_tbl_line(const TableLine& line);
+
+    /**
      * @brief Print the table footer and clear the temporary printing state.
      */
     void end_print_tbl();

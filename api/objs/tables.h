@@ -308,7 +308,7 @@ public:
     //       Otherwise, it is a LEC cell.
     void set_content(const std::string& content);
 
-	std::shared_ptr<CLEC> get_compiled_lec()
+	std::shared_ptr<CLEC> get_compiled_lec() const
     {
         if(type != TABLE_CELL_LEC)
             throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");

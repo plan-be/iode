@@ -83,23 +83,9 @@ Examples and more details on GSample can be found in the IODE manual (https://io
 
 GSample compilation functions.
 
-|Syntax|Description|
-|:---|:---|
-|`COLS *compile_gsample(char* gsample)`|GSample compiler|
-|`int free_tbl_columns(COLS* cls)`|Frees the allocated space for a COLS structure created by COL\_cc()|
-|`char *col_to_text(COL* cl, char* str, int nbnames)`|Constructs a string based on a special table cell text value containing a "\#"|
-|`COLS *add_tbl_column(COLS* cls)`|Adds a new COL struct to the COLS (list of periods in a GSample)|
-|`int tbl_find_mode(COLS* cls, int* mode, int type)`|Analyses a COLS struct and set 1 in the vector mode for each found operation|
-
 ### c\_calc.c {#T5}
 
 Table calculation on a GSample.
-
-|Syntax|Description|
-|:---|:---|
-|`int execute_tbl_columns(Table* tbl, int i, COLS* cls)`|Calculates the values of all LEC formulas in one Table line for all columns of a GSample.|
-|`int resize_tbl_columns(Table* tbl, COLS* cls)`|Extends the number of COL's (compiled GSample) by multiplying by the number of columns in a Table definition|
-|`void clear_tbl_columns(COLS* cls)`|Resets the calculated values in a COLS structure.|
 
 ### k\_print.c {#T6}
 
