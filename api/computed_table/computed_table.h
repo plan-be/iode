@@ -97,6 +97,21 @@ private:
     void print_line_separator();
 
     /**
+     * @brief Print the referenced filenames line.
+     */
+    void print_line_files();
+
+    /**
+     * @brief Print the column calculation modes line.
+     */
+    void print_line_mode();
+
+    /**
+     * @brief Print the current date line.
+     */
+    void print_line_date();
+
+    /**
      * @brief Print the table footer and clear the temporary printing state.
      */
     void end_print_tbl();

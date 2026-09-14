@@ -193,6 +193,3 @@ void T_open_cell(int attr, int straddle, int type);
 void T_open_attr(int attr);
 void T_close_attr(int attr);
 std::vector<std::string> T_find_files(const std::vector<COL>& columns);
-void T_print_files(const std::vector<COL>& columns, int dim);
-void T_print_mode(const std::vector<COL>& columns, int dim);
-void T_print_date(int dim);
