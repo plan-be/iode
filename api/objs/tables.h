@@ -344,6 +344,10 @@ public:
         return true;
     }
 
+    void start_print(int straddle) const;
+    void print_start_attribute() const;
+    void print_end_attribute() const;
+
     bool print_definition(int nb_columns, const bool title_line = false) const;
 
     // legacy method to convert a TableCell object to a TableCell32 object 

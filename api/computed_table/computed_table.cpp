@@ -411,7 +411,8 @@ void ComputedTable::print_line_files()
 
     for(const std::string& filename : v_tbl_filenames)
     {
-        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        TableCell cell(TABLE_CELL_STRING);
+        cell.start_print(dim);
         W_printf((char*) "%s", filename.c_str());
     }
 }
@@ -422,7 +423,8 @@ void ComputedTable::print_line_mode()
     {
         if(tbl_mode[i] == 0)
             continue;
-        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        TableCell cell(TABLE_CELL_STRING);
+        cell.start_print(dim);
         W_printf((char*) "(%s) %s", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]);
     }
 }
@@ -433,7 +435,8 @@ void ComputedTable::print_line_date()
     char date[11];
 
     SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
-    T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+    TableCell cell(TABLE_CELL_STRING);
+    cell.start_print(dim);
     W_printf((char*) "%s", date);
 }
 
@@ -472,16 +475,15 @@ bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
     if(cell_type == TABLE_CELL_LEC)
         cell_copy.set_align(TABLE_CELL_DECIMAL);
 
-    int attribute = (int) cell_copy.get_attribute();
-    T_open_cell(attribute, 1, (int) cell_type);
-    T_open_attr(attribute);
+    cell_copy.start_print(1);
+    cell_copy.print_start_attribute();
 
     if(cell_type == TABLE_CELL_STRING)
         print_cell_string(column, content);
     else
         print_cell_value(column.cl_res);
 
-    T_close_attr(attribute);
+    cell_copy.print_end_attribute();
     return true;
 }
 
