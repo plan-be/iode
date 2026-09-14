@@ -1,4 +1,5 @@
 #include "api/computed_table/computed_table.h"
+#include "api/k_lang.h"
 
 
 void ComputedTable::initialize()
@@ -419,6 +420,39 @@ void ComputedTable::print_line_separator()
     W_printf(".tl");
 }
 
+void ComputedTable::print_line_files()
+{
+    if(v_tbl_filenames.empty())
+        return;
+
+    for(const std::string& filename : v_tbl_filenames)
+    {
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        W_printf((char*) "%s", filename.c_str());
+    }
+}
+
+void ComputedTable::print_line_mode()
+{
+    for(int i = 0; i < MAX_MODE; i++)
+    {
+        if(tbl_mode[i] == 0)
+            continue;
+        T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+        W_printf((char*) "(%s) %s", COL_OPERS[i + 1], KLG_OPERS_TEXTS[i + 1][K_LANG]);
+    }
+}
+
+void ComputedTable::print_line_date()
+{
+    long SCR_current_date();
+    char date[11];
+
+    SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
+    T_open_cell(TABLE_CELL_LEFT, dim, TABLE_CELL_STRING);
+    W_printf((char*) "%s", date);
+}
+
 void ComputedTable::end_print_tbl()
 {
     W_printf((char*) ".te \n");
@@ -539,13 +573,13 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
                 break;
             }
             case TABLE_LINE_DATE  :
-                T_print_date(dim);
+                print_line_date();
                 break;
             case TABLE_LINE_MODE  :
-                T_print_mode(columns, dim);
+                print_line_mode();
                 break;
             case TABLE_LINE_FILES :
-                T_print_files(columns, dim);
+                print_line_files();
                 break;
             case TABLE_LINE_CELL  :
                 res = print_tbl_line(line);
