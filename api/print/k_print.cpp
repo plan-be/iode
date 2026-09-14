@@ -63,38 +63,6 @@ void T_fmt_val(char* buf, double val, int lg, int nd)
 
 
 /**
- *  Prints a double value using W_printf().
- *
- *  @param  [in] double  val      value to print
- *  @global [in] int        tbl_nb_decimals  number of decimal places
- *
- */
-
-void T_print_val(double val)
-{
-    char    buf[64];
-
-    T_fmt_val(buf, val, 30, tbl_nb_decimals);   // JMP 18-04-2022
-    W_printf(buf);
-}
-
-
-/**
- *  Translates a TableCell of type KT_TEXT into a text using col_to_text(). Sends the result to W_printf().
- *
- *  @param  [in] cl         the column of the GSample to be printed (period, file nb, operation...)
- *  @param  [in] string     the table column definition (ex "#s")
- *
- */
-void T_print_string(const COL& column, const std::string& content)
-{
-    std::string text = col_to_text(column, content, (int) v_tbl_filenames.size());
-    if(!text.empty())
-        W_printf((char*) "%s", text.c_str());
-}
-
-
-/**
  *  Prints the header of an a2m table cell: <cellsep><span><align>.
  *  Example: "@2C" if @ is the cell separator, 2 the number of spanned columns and the text must be centered in the column.
  *
