@@ -1,32 +1,32 @@
 /**
  *  @header4iode
- *  
+ *
  *  Calculation of Table cells on a GSample
  *  --------------------------------------
- *  
+ *
  *  This module calculates the values of table cells based on:
  *  - a list of files loaded in memory and stored in global_ref_var.
  *  - a group of column definitions (std::vector<COL> = GSample compiled by compile_gsample(gsample))
  *      where each column defines:
  *          - the period(s) to be used for the calculations (1 or 2 periods)
  *          - an optional operation between the periods (ex growth rates)
- *          - the position in global_ref_var[...] of the (max 2) files to be used for the calculations: 
+ *          - the position in global_ref_var[...] of the (max 2) files to be used for the calculations:
  *              1 for the WS, 2 for the file global_ref_var[0]...
  *          - an optional operation between the files (ex: diff in %)
- *  - the LEC formulas defined in the table cells 
- *  
+ *  - the LEC formulas defined in the table cells
+ *
  *  How to use these functions to print a table ?
  *      1. call compile_gsample(smpl) to compile the GSample in a std::vector<COL> struct, say cls.
  *      2. call resize_tbl_columns() to extend std::vector<COL> according to the number of columns in the Table
- *      3. for each Table line, call: 
+ *      3. for each Table line, call:
  *          clear_tbl_columns(cls) to reset the std::vector<COL> values
- *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
+ *          execute_tbl_columns(tbl, line, cls) to store in cls the computed values of the cells in line i
  *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
- *  
- *  List of functions 
+ *
+ *  List of functions
  *  -----------------
- *      int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns)
- *      int resize_tbl_columns(Table* tbl, std::vector<COL>& columns)
+ *      int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL>& columns)
+ *      int resize_tbl_columns(const Table& tbl, std::vector<COL>& columns)
  *      void clear_tbl_columns(std::vector<COL>& columns)
  */
 #include <math.h>
@@ -42,19 +42,19 @@
 #include "api/objs/variables.h"
 
 
-bool debug_calc = false; 
+bool debug_calc = false;
 
 /**
  *  Duplicates a CLEC structure.
- *   
+ *
  *  @param [in] CLEC*   clec    any CLEC pointer
  *  @return     CLEC*           allocated copy of clec or NULL if clec is empty
- *  
+ *
  */
 static std::shared_ptr<CLEC> COL_cp_clec(const std::shared_ptr<CLEC> clec)
 {
     std::shared_ptr<CLEC> aclec = nullptr;
-    if(!clec) 
+    if(!clec)
         return aclec;
 
     // create a copy of clec in a new CLEC structure
@@ -64,18 +64,18 @@ static std::shared_ptr<CLEC> COL_cp_clec(const std::shared_ptr<CLEC> clec)
 
 
 /**
- *  Links a CLEC. The VAR KDB file is global_ref_var[i - 1]. The Scalar KDB is the current workspace. 
- *  
+ *  Links a CLEC. The VAR KDB file is global_ref_var[i - 1]. The Scalar KDB is the current workspace.
+ *
  *  @param [in] int     i       position of the KBD pointer in global_ref_var, starting at 1 for pos 0
  *  @param [in] CLEC*   clec    Compiled LEC to link with global_ref_var]i - 1]
- *  @return     int             0 on success, 
+ *  @return     int             0 on success,
  *                              -1 on error. A message is sent to kmsg() if the file is not present.
- *  
+ *
  */
 static int COL_link(const int i, std::shared_ptr<CLEC>& clec)
 {
     KDBVariablesPtr kdbv = (KDBVariablesPtr) global_ref_var[i - 1];
-    if(!kdbv) 
+    if(!kdbv)
     {
         kmsg("File [%d] not present", i);
         return -1;
@@ -88,20 +88,20 @@ static int COL_link(const int i, std::shared_ptr<CLEC>& clec)
 
 /**
  *  Calculates the value of a table CELL on a specific GSample column (COL).
- *  
- *  First links clec and dclec (divisor) according to the COL definition (which 
- *  includes the files numbers and periods, that both refer to global_ws_var). 
+ *
+ *  First links clec and dclec (divisor) according to the COL definition (which
+ *  includes the files numbers and periods, that both refer to global_ws_var).
  *  The linking of scalars is always done with global_ws_scl, the current Scalar workspace.
- *  
+ *
  *  The result is stored in cl->cl_res, which is IODE_NAN on error.
- *       
+ *
  *  @param [in, out] COL*  cl    COL on which the calculation must be applied
  *  @param [in, out] CLEC* clec  compiled LEC expression of the table cell
  *  @param [in, out] CLEC* dclec compiled LEC expression of the table divisor of the current column
  *  @return          int         0 on success, -1 if dclec cannot be linked (TODO: check this)
- *  
+ *
  */
- 
+
 static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>& dclec)
 {
     int     i, j, t[2], tmp, per;
@@ -109,23 +109,23 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
     KDBVariablesPtr kdb = nullptr;
 
     /* deux fichiers */
-    for(i = 0; i < 2; i++) 
+    for(i = 0; i < 2; i++)
     {
-        if(cl->cl_fnb[i] == 0) 
+        if(cl->cl_fnb[i] == 0)
             continue;
-        
+
         // TODO: consistency: impossible clec link returns 0, but -1 for dclec
-        if(COL_link(cl->cl_fnb[i], clec)) 
-            goto err;                 
-        
-        if(dclec && COL_link(cl->cl_fnb[i], dclec)) 
+        if(COL_link(cl->cl_fnb[i], clec))
+            goto err;
+
+        if(dclec && COL_link(cl->cl_fnb[i], dclec))
             return -1;
-        
+
         kdb = (KDBVariablesPtr) global_ref_var[cl->cl_fnb[i] - 1];
 
-        for(j = 0 ; j < 2 ; j++) 
+        for(j = 0 ; j < 2 ; j++)
         {
-            if(j == 1 && cl->cl_opy == COL_NOP) 
+            if(j == 1 && cl->cl_opy == COL_NOP)
             {
                 t[1]  = t[0];
                 vy[1] = vy[0];
@@ -133,45 +133,45 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
             }
             t[j]  = cl->cl_per[j].difference(kdb->get_sample()->start_period);
             vy[j] = clec->execute(kdb, global_ws_scl, t[j]);
-            if(!IODE_IS_A_NUMBER(vy[j])) 
+            if(!IODE_IS_A_NUMBER(vy[j]))
                 goto err; /* JMP 16-12-93 */
             div = 1.0;
-            if(dclec) 
+            if(dclec)
                 div = dclec->execute(kdb, global_ws_scl, t[j]);
-            if(!IODE_IS_A_NUMBER(div) || div == 0) 
+            if(!IODE_IS_A_NUMBER(div) || div == 0)
                 goto err; /* JMP 16-12-93 */
             vy[j] /= div;
         }
 
-        if(t[0] > t[1]) 
+        if(t[0] > t[1])
         {
             tmp = t[0];
             t[0] = t[1];
             t[1] = tmp;
         }
         per = t[1] - t[0];
-        switch(cl->cl_opy) 
+        switch(cl->cl_opy)
         {
             case COL_NOP  :
                 vf[i] = vy[0];
                 break;
             case COL_MDIFF:
                 vf[i] = 0.0;
-                if(per == 0) 
+                if(per == 0)
                     break;
                 vf[i] = (vy[0] - vy[1]) / per;
                 break;
             case COL_MGRT :
                 vf[i] = 0.0;
-                if(per == 0) 
+                if(per == 0)
                     break;
-                if(vy[1] == 0.0) 
+                if(vy[1] == 0.0)
                     goto err;
 
                 // Correction JMP 13/4/2018 pour taux de croissance négatifs
                 mant = vy[0] / vy[1]; // JMP 16/5/2019
                 sign = 1;
-                if(mant < 0) 
+                if(mant < 0)
                 {
                     mant = -mant;
                     sign = -1;
@@ -182,7 +182,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 //vf[i] = 100 * (pow((vy[0] / vy[1]), (1.0 / per)) -1) ;
                 break;
             case COL_BASE :
-                if(vy[1] == 0.0) 
+                if(vy[1] == 0.0)
                     goto err;
                 vf[i] = 100 * (vy[0] / vy[1]);
                 break;
@@ -190,26 +190,26 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 vf[i] = vy[0] - vy[1];
                 break;
             case COL_GRT  :
-                if(vy[1] == 0.0) 
+                if(vy[1] == 0.0)
                     goto err;
                 vf[i] = 100 * (vy[0] / vy[1] - 1.0);
                 break;
             case COL_MEAN :
             case COL_ADD  :
                 vf[i] = 0.0;
-                for(j = t[0]; j <= t[1] ; j++) 
+                for(j = t[0]; j <= t[1] ; j++)
                 {
                     vy[0] = clec->execute(kdb, global_ws_scl, j);
-                    if(!IODE_IS_A_NUMBER(vy[0])) 
+                    if(!IODE_IS_A_NUMBER(vy[0]))
                         goto err; /* JMP 16-12-93 */
                     div = 1.0;
-                    if(dclec) 
+                    if(dclec)
                         div = dclec->execute(kdb, global_ws_scl, j);
-                    if(!IODE_IS_A_NUMBER(div) || div == 0) 
+                    if(!IODE_IS_A_NUMBER(div) || div == 0)
                         goto err; /* JMP 16-12-93 */
                     vf[i] += vy[0] / div;
                 }
-                if(cl->cl_opy == COL_MEAN) 
+                if(cl->cl_opy == COL_MEAN)
                     vf[i] /= per + 1;
                 break;
             default :
@@ -217,7 +217,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
         }
     }
 
-    switch(cl->cl_opf) 
+    switch(cl->cl_opf)
     {
         case COL_NOP  :
             cl->cl_res = vf[0];
@@ -229,12 +229,12 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
             cl->cl_res = 0.5 * (vf[0] + vf[1]);
             break;
         case COL_GRT  :
-            if(vf[1] == 0) 
+            if(vf[1] == 0)
                 goto err;
             cl->cl_res = 100 * (vf[0] / vf[1] - 1);
             break;
         case COL_BASE  :
-            if(vf[1] == 0) 
+            if(vf[1] == 0)
                 goto err;
             cl->cl_res = 100 * (vf[0] / vf[1]);
             break;
@@ -255,21 +255,19 @@ err:
 /**
  *  After the compilation of a GSample into a std::vector<COL> structure, multiply the resulting number of COL's
  *  by the number of columns in the Table definition (usually 2).
- *  
- *  For example, if the GSample is "2020/2019:5" and the table consists of 2 columns, the 
+ *
+ *  For example, if the GSample is "2020/2019:5" and the table consists of 2 columns, the
  *  The resulting std::vector<COL> will contain 5 x 2 COL's.
- *    
- *  @param [in]         Table*    tbl     Table to be calculated
- *  @param [in, out] std::vector<COL>& columns  compiled GSample
- *  @return             int             new number of columns in cls
- *  
+ *
+ *  @param [in]      Table              tbl      Table to be calculated
+ *  @param [in, out] std::vector<COL>&  columns  compiled GSample
+ *  @return          int                         new number of columns in cls
  */
- 
-int resize_tbl_columns(Table* tbl, std::vector<COL>& columns)
+int resize_tbl_columns(const Table& tbl, std::vector<COL>& columns)
 {
     const std::vector<COL> original_columns = columns;
     const int old_nb = (int) original_columns.size();
-    const int dim = tbl->nb_columns;
+    const int dim = tbl.nb_columns;
     const int new_nb = old_nb * dim;
 
     columns.clear();
@@ -278,16 +276,18 @@ int resize_tbl_columns(Table* tbl, std::vector<COL>& columns)
         for(int j = 0; j < dim; j++)
             columns.push_back(column);
 
-    if(tbl->repeat_columns == 0) return(1 + old_nb * (dim - 1));
-    else return(new_nb);
+    if(tbl.repeat_columns == 0) 
+        return 1 + old_nb * (dim - 1);
+    else 
+        return new_nb;
 }
 
 
 /**
  *  Resets the values in the std::vector<COL>.
- *  
+ *
  *  @param [in, out] std::vector<COL>   cls     table of COL's to reset
- *  
+ *
  */
 void clear_tbl_columns(std::vector<COL>& columns)
 {
@@ -297,56 +297,55 @@ void clear_tbl_columns(std::vector<COL>& columns)
 
 
 /**
- *  Calculates the values of all LEC formulas in one Table line for all columns 
+ *  Calculates the values of all LEC formulas in one Table line for all columns
  *  of a GSample (precompiled into a std::vector<COL> structure).
- *  
+ *
  *  Stores each column calculated values in cls[i]->cl_res.
- *      
- *  @param [in]      Table*    tbl     Table to be calculated
- *  @param [in]      int     i       line position to be calculated
+ *
+ *  @param [in]      const Table& tbl       table to be calculated
+ *  @param [in]      const TableLine& line  table line to be calculated
  *  @param [in, out] std::vector<COL>& columns  compiled GSample
- *  @return          int             0 on success, -1 on failure   
- *  
+ *  @return          int             0 on success, -1 on failure
+ *
  */
- 
-int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns)
+
+int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL>& columns)
 {
-    int lg = (int) columns.size() / tbl->nb_columns;
+    int lg = (int) columns.size() / tbl.nb_columns;
 
     COL* cl;
-    TableLine& line = tbl->lines[i];
-    TableLine& divider_line = tbl->divider_line;
-    TableCell* cell = nullptr;
-    TableCell* dcell = nullptr;
+    const TableLine& divider_line = tbl.divider_line;
+    const TableCell* cell = nullptr;
+    const TableCell* dcell = nullptr;
     std::shared_ptr<CLEC> clec = nullptr;
     std::shared_ptr<CLEC> dclec = nullptr;
-    std::shared_ptr<CLEC> aclec = nullptr; 
+    std::shared_ptr<CLEC> aclec = nullptr;
     std::shared_ptr<CLEC> adclec = nullptr;
-    for(int d = 0; d < tbl->nb_columns; d++) 
+    for(int d = 0; d < tbl.nb_columns; d++)
     {
         cell = &line.cells[d];
 
-        if(cell->get_type() != TABLE_CELL_LEC) 
+        if(cell->get_type() != TABLE_CELL_LEC)
             continue;
 
-        if(cell->is_null()) 
+        if(cell->is_null())
             continue;
 
         clec = cell->get_compiled_lec();
         aclec = COL_cp_clec(clec);
 
-        dcell = &divider_line.cells[d]; 
+        dcell = &divider_line.cells[d];
         dclec = (dcell->is_null()) ? NULL : dcell->get_compiled_lec();
-        
+
         adclec = COL_cp_clec(dclec);
 
-        for(int j = 0; j < lg; j++) 
+        for(int j = 0; j < lg; j++)
         {
-            cl = columns.data() + d + (j * tbl->nb_columns);
-            if(COL_calc(cl, aclec, adclec) < 0) 
+            cl = columns.data() + d + (j * tbl.nb_columns);
+            if(COL_calc(cl, aclec, adclec) < 0)
                 return -1;
-            debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(), 
-                             aclec, adclec, i, d, j);
+            debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(),
+                             aclec, adclec, line, d, j);
         }
     }
     return 0;

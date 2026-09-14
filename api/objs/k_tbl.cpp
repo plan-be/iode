@@ -1264,7 +1264,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
                 break;
             case TABLE_LINE_CELL  :
                     clear_tbl_columns(columns);
-                    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
+                    if(execute_tbl_columns(*tbl_ptr, *line, columns) < 0)
                     strcat(buf, "Error in calc");
                 else
                     for(j = 0; j < columns.size(); j++)

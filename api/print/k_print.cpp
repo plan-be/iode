@@ -39,7 +39,7 @@ int initialize_columns(std::shared_ptr<Table> tbl_ptr, const std::string& gsampl
         return -1;
     }
 
-    int dim = resize_tbl_columns(tbl_ptr.get(), columns);
+    int dim = resize_tbl_columns(*tbl_ptr, columns);
     return dim;
 }
 
@@ -152,7 +152,7 @@ void T_close_attr(int attr)
  * @param straddle
  * @return int
  */
-void T_print_title(TableCell* cell, int straddle)
+void T_print_title(const TableCell* cell, int straddle)
 {
     if(cell == nullptr || cell->is_null())
     {
@@ -183,7 +183,7 @@ void T_print_title(TableCell* cell, int straddle)
  *  @param [in] int         straddle    nb of spanned columns int the resulting a2m table
  *
  */
-void T_print_cell(TableCell* cell, COL* cl, int straddle)
+void T_print_cell(const TableCell* cell, COL* cl, int straddle)
 {
     if(cell == nullptr || cell->is_null())
     {
@@ -191,20 +191,22 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
         return;
     }
 
-    TableCellType cell_type = cell->get_type();
+    TableCell cell_copy(*cell);
 
-    std::string content = cell->get_content(false);
+    TableCellType cell_type = cell_copy.get_type();
+
+    std::string content = cell_copy.get_content(false);
     // NOTE: W_Print(...) functions expect OEM encoding, so convert content
     //       from UTF-8 to OEM before printing
     content = utf8_to_oem(content);
 
     if(cell_type == TABLE_CELL_STRING && content.find('#') != std::string::npos)
-        cell->set_align(TABLE_CELL_RIGHT);
+        cell_copy.set_align(TABLE_CELL_RIGHT);
 
     if(cell_type == TABLE_CELL_LEC)
-        cell->set_align(TABLE_CELL_DECIMAL);
+        cell_copy.set_align(TABLE_CELL_DECIMAL);
 
-    int attribute = (int) cell->get_attribute();
+    int attribute = (int) cell_copy.get_attribute();
     T_open_cell(attribute, straddle, (int) cell_type);
     T_open_attr(attribute);
 
@@ -214,44 +216,6 @@ void T_print_cell(TableCell* cell, COL* cl, int straddle)
         T_print_val(cl->cl_res);
 
     T_close_attr(attribute);
-}
-
-
-/**
- *  Prints one table line for all columns defined in cls.
- *
- *  @param [in] Table*    tbl     source table
- *  @param [in] int     i       line to print
- *  @param [in, out] std::vector<COL>& columns  compiled GSample columns
- *  @return     int             0 on success, -1 on error.
- *
- */
-
-int T_print_line(std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& columns)
-{
-    clear_tbl_columns(columns);
-    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
-        return -1;
-
-    int     d;
-    COL*    cl;
-    TableCell*  cell;
-    TableLine&  line = tbl_ptr->lines[i];
-
-    for(int j = 0; j < columns.size(); j++)
-    {
-        d = j % tbl_ptr->nb_columns;
-        if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0)
-            continue;
-        if(line.cells.size() > d)
-        {
-            cl = &columns[j];
-            cell = &line.cells[d];
-            T_print_cell(cell, cl, 1);
-        }
-    }
-
-    return 0;
 }
 
 

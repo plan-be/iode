@@ -354,7 +354,7 @@ int T_GraphLine(const std::shared_ptr<Table> tbl_ptr, int i, std::vector<COL>& c
     const std::shared_ptr<Sample> smpl, double* x, double* y, const std::vector<COL>& file_columns)
 {
     clear_tbl_columns(columns);
-    if(execute_tbl_columns(tbl_ptr.get(), i, columns) < 0)
+    if(execute_tbl_columns(*tbl_ptr, tbl_ptr->lines[i], columns) < 0)
         return -1;
 
     TableLine* line = &tbl_ptr->lines[i];
@@ -658,7 +658,7 @@ int APIGraphLine(int hdl, Table *tbl, int i, std::vector<COL>& columns,
     const std::shared_ptr<Sample> smpl, double *x, double *y, const std::vector<COL>& file_columns)
 {
     clear_tbl_columns(columns);
-    if(execute_tbl_columns(tbl, i, columns) < 0)
+    if(execute_tbl_columns(*tbl, tbl->lines[i], columns) < 0)
         return -1;
     
     APICHRT* Chrt = API_CHARTS[hdl];

@@ -64,9 +64,9 @@ TEST_F(ComputedTableTest, GSample)
     columns = compile_gsample((char*) gsample.c_str());
     EXPECT_FALSE(columns.empty());
     EXPECT_EQ(columns.size(), 5);
-    dim = resize_tbl_columns(ref_table, columns);
+    dim = resize_tbl_columns(*ref_table, columns);
     EXPECT_EQ(dim, 6);
-    res = execute_tbl_columns(ref_table, 5, columns);
+    res = execute_tbl_columns(*ref_table, ref_table->lines[5], columns);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"00", "01", "02", "03", "04"};
@@ -88,9 +88,9 @@ TEST_F(ComputedTableTest, GSample)
     columns = compile_gsample((char*) gsample.c_str());
     EXPECT_FALSE(columns.empty());
     EXPECT_EQ(columns.size(), 2 * 5);
-    dim = resize_tbl_columns(ref_table, columns);
+    dim = resize_tbl_columns(*ref_table, columns);
     EXPECT_EQ(dim, 11);
-    res = execute_tbl_columns(ref_table, 5, columns);
+    res = execute_tbl_columns(*ref_table, ref_table->lines[5], columns);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"10", "10/09", "11", "11/10", "12", "12/11", "13", "13/12", 
@@ -113,9 +113,9 @@ TEST_F(ComputedTableTest, GSample)
     columns = compile_gsample((char*) gsample.c_str());
     EXPECT_FALSE(columns.empty());
     EXPECT_EQ(columns.size(), 2 * 5);
-    dim = resize_tbl_columns(ref_table, columns);
+    dim = resize_tbl_columns(*ref_table, columns);
     EXPECT_EQ(dim, 11);
-    res = execute_tbl_columns(ref_table, 5, columns);
+    res = execute_tbl_columns(*ref_table, ref_table->lines[5], columns);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"10[1]", "10[2]", "11[1]", "11[2]", "12[1]", "12[2]",
@@ -140,9 +140,9 @@ TEST_F(ComputedTableTest, GSample)
     EXPECT_FALSE(columns.empty());
     // "2000;2002;2004//2003" + "2006[1;2]" + "2008[1+2];2010/2009[1^2]"
     EXPECT_EQ(columns.size(), 3 + 2 + 2);
-    dim = resize_tbl_columns(ref_table, columns);
+    dim = resize_tbl_columns(*ref_table, columns);
     EXPECT_EQ(dim, 8);
-    res = execute_tbl_columns(ref_table, 5, columns);
+    res = execute_tbl_columns(*ref_table, ref_table->lines[5], columns);
     EXPECT_EQ(res, 0);
 
     expected_cols_names = {"00[1]", "02[1]", "04//03[1]", "06[1]", "06[2]", 

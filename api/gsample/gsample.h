@@ -134,21 +134,21 @@ void add_tbl_column(std::vector<COL>& columns);
 int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type);
 
 /* c_calc.c */
-int resize_tbl_columns(Table* tbl, std::vector<COL>& columns);
+int resize_tbl_columns(const Table& tbl, std::vector<COL>& columns);
 void clear_tbl_columns(std::vector<COL>& columns);
-int execute_tbl_columns(Table* tbl, int i, std::vector<COL>& columns);
+int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL>& columns);
 
 
 extern bool debug_calc;
 
 inline void debug_calc_table(const COL* cl, const std::string& lec, const std::string& dlec, 
-    const std::shared_ptr<CLEC> clec, const std::shared_ptr<CLEC> dclec, const int line, 
+    const std::shared_ptr<CLEC> clec, const std::shared_ptr<CLEC> dclec, const TableLine& line, 
     const int d, const int j)
 {
     if(!debug_calc)
         return;
     
-    std::cout << "computed COL* for line " << line << ", d=" << d << " and j=" << j << " :" << std::endl;
+    std::cout << "computed COL*: d=" << d << " and j=" << j << " :" << std::endl;
     std::cout << "  LEC: " << lec << ", divider LEC:" << dlec << std::endl;
     
     std::cout << "  clec  -> ";

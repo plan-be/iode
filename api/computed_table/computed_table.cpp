@@ -8,9 +8,9 @@ void ComputedTable::initialize()
     /* ---- see c_calc.c ----
      *      1. call compile_gsample(smpl) to compile the GSample in a std::vector<COL> struct, say cls.
      *      2. call resize_tbl_columns() to extend std::vector<COL> according to the number of columns in the Table
-     *      3. for each Table line, call: 
+     *      3. for each Table line, call:
      *          clear_tbl_columns(cls) to reset the std::vector<COL> values
-     *          execute_tbl_columns(tbl, i, cls) to store in cls the computed values of the cells in line i
+     *          execute_tbl_columns(tbl, line, cls) to store in cls the computed values of the cells in line i
      *          col_to_text() to generate the value of the TABLE_CELL_STRING cells
      */
 
@@ -19,7 +19,7 @@ void ComputedTable::initialize()
     if(columns.empty())
         throw std::invalid_argument(error_msg);
 
-    // Compute 
+    // Compute
     // - minimum sample containing all periods present in the columns.
     // - the list of unique file_1 (op) file_2 combinations
     // Note: - equivalent to T_prep_smpl()
@@ -49,8 +49,8 @@ void ComputedTable::initialize()
     sample = std::make_shared<Sample>(start_per, end_per);
 
     // Returns the number of columns for the computed table + 1.
-    dim = resize_tbl_columns(ref_table, columns);
-    if(dim == 0) 
+    dim = resize_tbl_columns(*ref_table, columns);
+    if(dim == 0)
         throw std::runtime_error(error_msg);
 
     // Get filepath of each reference file
@@ -64,12 +64,12 @@ void ComputedTable::initialize()
     }
 
     KDBVariablesPtr kdb = nullptr;
-    for(int ref=1; ref < K_MAX_FREF + 1; ref++) 
+    for(int ref=1; ref < K_MAX_FREF + 1; ref++)
     {
         if(files_usage.test(ref))
         {
             kdb = global_ref_var[ref - 1];
-            if(!kdb) 
+            if(!kdb)
                 throw std::invalid_argument("file[" + std::to_string(ref) + "] is not present");
             files.push_back(kdb->filepath);
         }
@@ -79,15 +79,15 @@ void ComputedTable::initialize()
     // QUESTION FOR JMP: Would it be possible to have a table with several cells containing the '#' character ?
     //                   How the GSample is build in that case ? -> What would be the column names ?
     // TODO JMP: please check the code to get column names below carefully.
-    //           For instance, when there is only 1 file involved (current workspace), the returned column name 
-    //           does not ends with '[1]' while it is the case in the old GUI. 
+    //           For instance, when there is only 1 file involved (current workspace), the returned column name
+    //           does not ends with '[1]' while it is the case in the old GUI.
     for(int row=0; row < (int) ref_table->lines.size(); row++)
     {
         TableLine& line = ref_table->lines[row];
 
-        if(line.get_type() != TableLineType::TABLE_LINE_CELL) 
+        if(line.get_type() != TableLineType::TABLE_LINE_CELL)
             continue;
-        
+
         // QUESTION FOR JMP: Can we assume that the cell containing the '#' character will always be the second ?
         TableCell& cell = line.cells[1];
         if(cell.get_type() == TableCellType::TABLE_CELL_STRING)
@@ -98,11 +98,11 @@ void ComputedTable::initialize()
                 std::string column_name;
                 char* c_content = to_char_array(content);
                 int nb_files = (int) files.size();
-                int step = ref_table->nb_columns;          // to skip first column of the reference table containing text 
+                int step = ref_table->nb_columns;          // to skip first column of the reference table containing text
                 for(int col=1; col < columns.size(); col+=step)
                 {
                     column_name = std::string(col_to_text(&columns[col], c_content, nb_files));
-                    column_names.push_back(column_name); 
+                    column_names.push_back(column_name);
                     v_pos_in_columns_struct.push_back(col);
                 }
                 break;
@@ -116,7 +116,7 @@ void ComputedTable::initialize()
     {
         TableLine& line = ref_table->lines[row];
 
-        // QUESTION FOR JMP: Can we always assume that 
+        // QUESTION FOR JMP: Can we always assume that
         //                   - the first cell will contain the name of the line ?
         //                   - the second cell will contain either the '#' character or a LEC expression ?
         // In k_graph.c, in function T_graph_tbl_1() lines 181 to 185, the code is:
@@ -126,7 +126,7 @@ void ComputedTable::initialize()
         //        if(T_GraphLine(tbl, i, cls, &smpl, x, y, /*c, t,*/ fcls)) w = -1;
         //        break;
         // from which I understand that you assume that the LEC expression WILL be in the second cell
-        if(line.get_type() == TableLineType::TABLE_LINE_CELL && 
+        if(line.get_type() == TableLineType::TABLE_LINE_CELL &&
            line.cells[1].get_type() == TableCellType::TABLE_CELL_LEC)
         {
             name = line.cells[0].get_content(false);
@@ -141,7 +141,7 @@ void ComputedTable::initialize()
     compute_values();
 }
 
-ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals) 
+ComputedTable::ComputedTable(Table* ref_table, const std::string& gsample, const int nb_decimals)
     : gsample(gsample)
 {
     if(!ref_table)
@@ -176,7 +176,7 @@ int ComputedTable::find_file_op(const COL& col)
 
 void ComputedTable::compute_values()
 {
-    // For each ref_table line containing a LEC cell, compute and store all values using 
+    // For each ref_table line containing a LEC cell, compute and store all values using
     // the generalized sample
     int res;
     int line;
@@ -185,15 +185,15 @@ void ComputedTable::compute_values()
     {
         // resets the values in the std::vector<COL>
         clear_tbl_columns(columns);
-        
-        // Calculates the values of all LEC formulas in ONE table line for all columns 
+
+        // Calculates the values of all LEC formulas in ONE table line for all columns
         // of a GSample (precompiled into a std::vector<COL> structure).
         // Stores each column calculated values in cls[i]->cl_res.
         line = v_line_pos_in_ref_table[row];
-        res = execute_tbl_columns(ref_table, line, columns);
-        if(res < 0) 
+        res = execute_tbl_columns(*ref_table, ref_table->lines[line], columns);
+        if(res < 0)
             throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name(row) + "'");
-        
+
         // store all values
         for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
         {
@@ -210,12 +210,12 @@ bool ComputedTable::is_editable(const int line, const int col)
     //         - does not refer to the current workspace
     int col_pos = v_pos_in_columns_struct[col];
     COL column = columns[col_pos];
-    if(column.cl_opy != COL_NOP || column.cl_opf != COL_NOP) 
+    if(column.cl_opy != COL_NOP || column.cl_opf != COL_NOP)
         return false;
-    if(column.cl_fnb[0] != 1) 
+    if(column.cl_fnb[0] != 1)
         return false;
 
-    // RULE 2: A cell cannot be updated if the corresponding LEC expression from the 
+    // RULE 2: A cell cannot be updated if the corresponding LEC expression from the
     //         reference table starts with 0+
     int line_ref_pos = v_line_pos_in_ref_table.at(line);
     TableLine& line_ref = ref_table->lines[line_ref_pos];
@@ -224,7 +224,7 @@ bool ComputedTable::is_editable(const int line, const int col)
     if(lec.substr(0, 2) == "0+")
         return false;
 
-    // RULE 3: A cell cannot be updated if the corresponding LEC expression from the 
+    // RULE 3: A cell cannot be updated if the corresponding LEC expression from the
     //         reference table does not refer to at least one variable
     std::vector<std::string> variables = cell_ref.get_variables_from_lec();
     if(variables.size() == 0)
@@ -235,9 +235,9 @@ bool ComputedTable::is_editable(const int line, const int col)
 
 // TODO : use a KDBVariable object instead of K_find and KV_set.
 //        For the moment, there is a memory problem when the function ends and
-//        thus when the KDBVariable object is destroyed. 
+//        thus when the KDBVariable object is destroyed.
 //        -> problem linked to the compiler option /Zp1
-bool ComputedTable::propagate_new_value(const std::string& lec, const std::string& div_lec, 
+bool ComputedTable::propagate_new_value(const std::string& lec, const std::string& div_lec,
         const std::string& var_name, const double value, const int period_pos)
 {
     double res;
@@ -247,8 +247,8 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     oss << std::setw(20) << std::fixed << std::setprecision(8) << value;
 
     std::string formula = lec + " := " + oss.str() + " * " + div_lec;
-    std::shared_ptr<CLEC> clec = nullptr; 
-    
+    std::shared_ptr<CLEC> clec = nullptr;
+
     try
     {
         clec = std::make_shared<CLEC>(formula, var_name);
@@ -257,14 +257,14 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
     {
         return false;
     }
-    
-    // if the formula is not inversible regarding to the variable var_name, 
+
+    // if the formula is not inversible regarding to the variable var_name,
     // the Newton-Raphson method is used
     if(clec->duplicated_endo)
     {
-        if(clec && clec->duplicated_endo) 
+        if(clec && clec->duplicated_endo)
             clec.reset();
-        
+
         oss.clear();
         oss << std::fixed << std::setprecision(15) << value;
 
@@ -284,7 +284,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
             return false;
 
         // Newton-Raphson method
-        res = clec->zero(global_ws_var, global_ws_scl, newton_step, newton_epsilon, 
+        res = clec->zero(global_ws_var, global_ws_scl, newton_step, newton_epsilon,
             newton_max_iter, period_pos, var_name, var_name);
     }
     else
@@ -305,7 +305,7 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
 
 // TODO : use a KDBVariable object instead of KSMPL(global_ws_var).
 //        For the moment, there is a memory problem when the function ends and
-//        thus when the KDBVariable object is destroyed. 
+//        thus when the KDBVariable object is destroyed.
 //        -> problem linked to the compiler option /Zp1
 void ComputedTable::set_value(const int line, const int col, const double value, bool check_if_editable)
 {
@@ -327,7 +327,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     // RULE 4: Only the first variable found in the LEC expression is updated
     std::string var_to_update = cell_ref.get_variables_from_lec().at(0);
 
-    // get period position 
+    // get period position
     COL column = columns[col_pos];
     Sample var_sample(*global_ws_var->get_sample());
     int period_pos = Period(column.cl_per[0]).difference(var_sample.start_period);
@@ -346,8 +346,8 @@ void ComputedTable::set_value(const int line, const int col, const double value,
     bool success = propagate_new_value(lec, div_lec, var_to_update, value, period_pos);
     if(!success)
         throw std::runtime_error("The cell corresponding to the line\n" + line_names[line] + "\n" +
-            "and column\n" + column_names[col] + "\ncannot be edited.\n\n" + 
-            "Cannot calculate the new value for the variable " + var_to_update + "\n" + 
+            "and column\n" + column_names[col] + "\ncannot be edited.\n\n" +
+            "Cannot calculate the new value for the variable " + var_to_update + "\n" +
             "LEC expression: " + lec);
 
    // recompute all values of the ComputedTable table
@@ -373,6 +373,24 @@ int ComputedTable::begin_print_tbl()
     return 0;
 }
 
+
+int ComputedTable::print_tbl_line(const TableLine& line)
+{
+    clear_tbl_columns(columns);
+    if(execute_tbl_columns(*ref_table, line, columns) < 0)
+        return -1;
+
+    for(int j = 0; j < columns.size(); j++)
+    {
+        int d = j % ref_table->nb_columns;
+        if(ref_table->repeat_columns == 0 && d == 0 && j != 0)
+            continue;
+        if(line.cells.size() > d)
+            T_print_cell(&line.cells[d], &columns[j], 1);
+    }
+
+    return 0;
+}
 
 void ComputedTable::end_print_tbl()
 {
@@ -406,7 +424,7 @@ void ComputedTable::initialize_printing(const std::string& destination_file, con
         }
         std::string arg = destination_file + " " + upper_format;
         res = B_PrintDest(arg.data());
-    }   
+    }
 
     if(res < 0)
     {
@@ -442,15 +460,15 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
         std::string language = ref_table->get_language_as_string();
         if(language.empty())
             throw std::invalid_argument("Cannot initialize printing. Language is empty.");
-        
+
         char tlang[2];
         tlang[0] = language[0];
         tlang[1] = 0;
-        
+
         res = B_PrintLang(tlang);
         if(res < 0)
         {
-            std::string error_msg = "Cannot initialize printing.\n"; 
+            std::string error_msg = "Cannot initialize printing.\n";
             error_msg += "Invalid value for the 'language' argument.";
             error_manager.prepend_error(error_msg);
             error_manager.display_last_error();
@@ -464,36 +482,36 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     std::string title_oem = utf8_to_oem(title_utf8);
     if(title_oem.empty())
         title_oem = "No title";
-    
+
     W_printf(".topic %d %d %s\n", tbl_current_topic++, tbl_current_level, title_oem.c_str());
-    
+
     res = begin_print_tbl();
-    if(res != 0) 
+    if(res != 0)
         throw std::runtime_error("Couldn't print table. Couldn't print the table header.");
 
     W_printf(".ttitle %s", title_oem.c_str());
 
-    TableCell* cell;
+    int i = 0;
     bool first_title = true;
-    for(int i = 0; i < ref_table->lines.size(); i++) 
+    for(const TableLine& line : ref_table->lines)
     {
-        TableLine& line = ref_table->lines[i];
-
-        switch(line.get_type()) 
+        switch(line.get_type())
         {
             case TABLE_LINE_SEP:
                 W_printf(".tl");
                 break;
             case TABLE_LINE_TITLE:
+            {
                 // 1st title has already been printed by W_printf(".ttitle %s\n", ...) above
                 if(first_title)
                 {
                     first_title = false;
                     break;
                 }
-                cell = &(line.cells[0]);
+                const TableCell* cell = &(line.cells[0]);
                 T_print_title(cell, dim);
                 break;
+            }
             case TABLE_LINE_DATE  :
                 T_print_date(dim);
                 break;
@@ -504,12 +522,15 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
                 T_print_files(columns, dim);
                 break;
             case TABLE_LINE_CELL  :
-                res = T_print_line(ref_table_ptr, i, columns);
+                res = print_tbl_line(line);
                 if(res != 0)
                     throw std::runtime_error("Couldn't print table. Couldn't print line " + std::to_string(i));
         }
+
         W_printf("\n");
+        i++;
     }
+
     end_print_tbl();
 }
 
