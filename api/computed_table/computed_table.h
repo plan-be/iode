@@ -112,10 +112,20 @@ private:
     void print_line_date();
 
     /**
-     *  Prints a Table cell on a specific GSample column.
+     * @brief Format and print a numeric cell value.
+     */
+    void print_cell_value(double value) const;
+
+    /**
+     * @brief Expand and print a string cell for a GSample column.
+     */
+    void print_cell_string(const COL& column, const std::string& content) const;
+
+    /**
+     * Prints a Table cell on a specific GSample column.
      *
-     *  @param [in] TableCell*  cell     table cell to print
-     *  @param [in] COL*        column   GSample column definition with the value already calculated
+     * @param cell table cell to print
+     * @param column GSample column definition with the value already calculated
      */
     bool print_cell(const TableCell& cell, const COL& column) const;
 

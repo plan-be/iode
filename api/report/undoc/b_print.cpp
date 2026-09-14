@@ -1,22 +1,3 @@
-/**
- * @header4iode
- *
- * Functions to print IODE object definitions.
- *
- *  List of functions 
- *  -----------------
- *    int B_PrintVal(double val)                                    | Print a double with the function T_print_val() and with the number of decimals set to -1
- *    int B_replesc(unsigned char* out, unsigned char* in)             | Replace \ by / in a string
- *    int B_isdef(char* txt)                                           | Checks if a string contains non space charaters.
- *    int B_get1int(char* arg)                                         | Return the integer value of the beginning of a string.
- *    int B_ScrollSet(char* arg, long *plong, int inf, int sup)        | Interprets the first part of a string as a integer and check that the value is between 2 boundaries.
- *    int B_PrintObjTblTitle(char* arg, int unused)                                | $PrintObjTitle 0 or 1
- *    int B_PrintObjLec(char* arg, int unused)                                     | $PrintObjLec {0|1|2}
- *    int B_PrintObjEqsInfos(char* arg, int unused)                                | $PrintObjInfos {0|1|2}
- *    int B_PrintObjDef_1(char* arg, int* type)                        | Print the definition of the object named arg of the given type
- *    int B_PrintObjDef(char* arg, int type)                           | $PrintObjDefXxx object_list
- *    int B_PrintObjDefArgs(char* arg, int type)                       | Print a list of objects of a given type.
- */
 #include "api/pch.h"
 #include "scr4/s_prost.h"
 
@@ -43,19 +24,16 @@
 /*================================= UTILITIES ===============================*/
 
 /**
- *  Print a double with the function T_print_val() and with the number of decimals set to -1.
+ *  Print a double.
  *  
  *  @param [in] val double  value to print
  *  @return         int     0
  */
 int B_PrintVal(double val)
 {
-    // B_NBDEC replaced by tbl_nb_decimals JMP 18/04/2022
-    int     nbdec = tbl_nb_decimals;
-
-    tbl_nb_decimals = -1;
-    T_print_val(val);
-    tbl_nb_decimals = nbdec;
+    char buf[64];
+    T_fmt_val(buf, val, 30, -1);
+    W_printf(buf);
     return 0;
 }
 

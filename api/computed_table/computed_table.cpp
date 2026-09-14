@@ -437,6 +437,20 @@ void ComputedTable::print_line_date()
     W_printf((char*) "%s", date);
 }
 
+void ComputedTable::print_cell_value(double value) const
+{
+    char buf[64];
+    T_fmt_val(buf, value, 30, tbl_nb_decimals);
+    W_printf(buf);
+}
+
+void ComputedTable::print_cell_string(const COL& column, const std::string& content) const
+{
+    std::string text = col_to_text(column, content, (int) v_tbl_filenames.size());
+    if(!text.empty())
+        W_printf((char*) "%s", text.c_str());
+}
+
 bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
 {
     if(cell.is_null())
@@ -464,9 +478,9 @@ bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
     T_open_attr(attribute);
 
     if(cell_type == TABLE_CELL_STRING)
-        T_print_string(column, (char*) content.c_str());
+        print_cell_string(column, content);
     else
-        T_print_val(column.cl_res);
+        print_cell_value(column.cl_res);
 
     T_close_attr(attribute);
     return true;
