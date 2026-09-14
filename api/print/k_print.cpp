@@ -196,7 +196,7 @@ void T_print_cell(const TableCell* cell, COL* cl, int straddle)
  *  @return     char**          NULL if one of the ref files is not loaded in global_ref_xxx
  *                              table of filenames in the form "[<file number>] <filename>" if all files are in mem
  */
-std::vector<std::string> T_find_files(const std::vector<COL>& columns)
+std::vector<std::string> extract_files_tbl(const std::vector<COL>& columns)
 {
     std::vector<bool> files(K_MAX_FREF + 1, false);
     for(const COL& column : columns)

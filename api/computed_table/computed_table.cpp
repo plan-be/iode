@@ -55,7 +55,7 @@ void ComputedTable::initialize()
         throw std::runtime_error(error_msg);
 
     // Get filepath of each reference file
-    // Note: - equivalent to T_find_files()
+    // Note: - equivalent to extract_files_tbl()
     std::bitset<K_MAX_FREF + 1> files_usage;
     for(int col=0; col < columns.size(); col++)
     {
@@ -357,7 +357,7 @@ void ComputedTable::set_value(const int line, const int col, const double value,
 
 int ComputedTable::begin_print_tbl()
 {
-    v_tbl_filenames = T_find_files(columns);
+    v_tbl_filenames = extract_files_tbl(columns);
     if(v_tbl_filenames.empty())
         return -1;
 

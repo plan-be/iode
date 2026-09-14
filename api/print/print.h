@@ -192,4 +192,4 @@ void T_print_string(COL* cl, char* string);
 void T_open_cell(int attr, int straddle, int type);
 void T_open_attr(int attr);
 void T_close_attr(int attr);
-std::vector<std::string> T_find_files(const std::vector<COL>& columns);
+std::vector<std::string> extract_files_tbl(const std::vector<COL>& columns);

@@ -130,7 +130,7 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
     std::vector<COL> file_columns;
     std::shared_ptr<Sample> smpl = nullptr;
     T_prep_smpl(columns, file_columns, smpl);
-    std::vector<std::string> files = T_find_files(columns);
+    std::vector<std::string> files = extract_files_tbl(columns);
     if(files.empty())
         return -1;
 
@@ -919,7 +919,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
     std::vector<COL> file_columns;
     std::shared_ptr<Sample> smpl = nullptr;
     T_prep_smpl(columns, file_columns, smpl);
-    std::vector<std::string> files = T_find_files(columns);
+    std::vector<std::string> files = extract_files_tbl(columns);
     if(files.empty()) 
         return -1;
 

@@ -1216,7 +1216,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
     if(dim < 0) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
 
-    v_tbl_filenames = T_find_files(columns);
+    v_tbl_filenames = extract_files_tbl(columns);
     if(v_tbl_filenames.empty()) 
         return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
     tbl_find_mode(columns, tbl_mode, 2);
