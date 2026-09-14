@@ -119,31 +119,41 @@ void TableCell::set_content(const std::string& content)
  *  @param [in] nb_columns int   number of columns occupied by the cell
  *  @return                bool  true if successful, false otherwise
  */
-bool TableCell::print_definition(int nb_columns) const
+bool TableCell::print_definition(int nb_columns, const bool title_line) const
 {
     if(!check_print_def()) 
     {
-        W_printfRepl((char*) "&%dL ", nb_columns);
+        if(title_line)
+            W_printf((char*) "%c1R", A2M_SEPCH);
+        else
+            W_printfRepl((char*) "&%dL ", nb_columns);
         return true;
     }
 
     int attribute = (int) get_attribute();
     std::string content = get_content(false);
-    // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
+    //       from UTF-8 to OEM before printing
     content = utf8_to_oem(content);
     switch(get_type()) 
     {
         case TABLE_CELL_STRING :
+        {
             T_open_cell(attribute, nb_columns, TABLE_CELL_STRING);
             T_open_attr(attribute);
-            W_printf((char*) "\"%s\"", (char*) content.c_str());
+            if(title_line)
+                W_printf((char*) "%s", (char*) content.c_str());
+            else
+                W_printf((char*) "\"%s\"", (char*) content.c_str());
             break;
-
+        }
         case TABLE_CELL_LEC :
+        {
             W_printfRepl((char*) "&%dL", nb_columns);
             T_open_attr(attribute);
             W_printf((char*) "%s", (char*) content.c_str());
             break;
+        }
     }
     
     T_close_attr(attribute);

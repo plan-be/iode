@@ -377,24 +377,7 @@ int ComputedTable::begin_print_tbl()
 
 void ComputedTable::print_tbl_title(const TableCell& cell, int straddle)
 {
-    if(cell.is_null())
-    {
-        W_printf((char*) "%c1R", A2M_SEPCH);
-        return;
-    }
-
-    std::string content = cell.get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
-
-    int attribute = (int) cell.get_attribute();
-    T_open_cell(attribute, straddle, TABLE_CELL_STRING);
-    T_open_attr(attribute);
-
-    W_printf((char*) "%s", (char*) content.c_str());
-
-    T_close_attr(attribute);
+    cell.print_definition(straddle, true);
 }
 
 int ComputedTable::print_tbl_line(const TableLine& line)

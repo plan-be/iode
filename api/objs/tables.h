@@ -344,7 +344,7 @@ public:
         return true;
     }
 
-    bool print_definition(int nb_columns) const;
+    bool print_definition(int nb_columns, const bool title_line = false) const;
 
     // legacy method to convert a TableCell object to a TableCell32 object 
     // to be used when writing to binary files. 
