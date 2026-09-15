@@ -51,7 +51,7 @@ bool debug_calc = false;
  *  @return     CLEC*           allocated copy of clec or NULL if clec is empty
  *
  */
-static std::shared_ptr<CLEC> COL_cp_clec(const std::shared_ptr<CLEC> clec)
+static std::shared_ptr<CLEC> COL_copy_clec(const std::shared_ptr<CLEC> clec)
 {
     std::shared_ptr<CLEC> aclec = nullptr;
     if(!clec)
@@ -114,9 +114,11 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
         if(cl->cl_fnb[i] == 0)
             continue;
 
-        // TODO: consistency: impossible clec link returns 0, but -1 for dclec
         if(COL_link(cl->cl_fnb[i], clec))
-            goto err;
+        {
+            cl->cl_res = IODE_NAN;
+            return 0;
+        }
 
         if(dclec && COL_link(cl->cl_fnb[i], dclec))
             return -1;
@@ -134,12 +136,18 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
             t[j]  = cl->cl_per[j].difference(kdb->get_sample()->start_period);
             vy[j] = clec->execute(kdb, global_ws_scl, t[j]);
             if(!IODE_IS_A_NUMBER(vy[j]))
-                goto err; /* JMP 16-12-93 */
+            {
+                cl->cl_res = IODE_NAN;
+                return 0;
+            }
             div = 1.0;
             if(dclec)
                 div = dclec->execute(kdb, global_ws_scl, t[j]);
             if(!IODE_IS_A_NUMBER(div) || div == 0)
-                goto err; /* JMP 16-12-93 */
+            {
+                cl->cl_res = IODE_NAN;
+                return 0;
+            }
             vy[j] /= div;
         }
 
@@ -166,7 +174,10 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 if(per == 0)
                     break;
                 if(vy[1] == 0.0)
-                    goto err;
+                {
+                    cl->cl_res = IODE_NAN;
+                    return 0;
+                }
 
                 // Correction JMP 13/4/2018 pour taux de croissance négatifs
                 mant = vy[0] / vy[1]; // JMP 16/5/2019
@@ -183,7 +194,10 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 break;
             case COL_BASE :
                 if(vy[1] == 0.0)
-                    goto err;
+                {
+                    cl->cl_res = IODE_NAN;
+                    return 0;
+                }
                 vf[i] = 100 * (vy[0] / vy[1]);
                 break;
             case COL_DIFF :
@@ -191,7 +205,10 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 break;
             case COL_GRT  :
                 if(vy[1] == 0.0)
-                    goto err;
+                {
+                    cl->cl_res = IODE_NAN;
+                    return 0;
+                }
                 vf[i] = 100 * (vy[0] / vy[1] - 1.0);
                 break;
             case COL_MEAN :
@@ -201,19 +218,26 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 {
                     vy[0] = clec->execute(kdb, global_ws_scl, j);
                     if(!IODE_IS_A_NUMBER(vy[0]))
-                        goto err; /* JMP 16-12-93 */
+                    {
+                        cl->cl_res = IODE_NAN;
+                        return 0;
+                    }
                     div = 1.0;
                     if(dclec)
                         div = dclec->execute(kdb, global_ws_scl, j);
                     if(!IODE_IS_A_NUMBER(div) || div == 0)
-                        goto err; /* JMP 16-12-93 */
+                    {
+                        cl->cl_res = IODE_NAN;
+                        return 0;
+                    }
                     vf[i] += vy[0] / div;
                 }
                 if(cl->cl_opy == COL_MEAN)
                     vf[i] /= per + 1;
                 break;
             default :
-                goto err;
+                cl->cl_res = IODE_NAN;
+                return 0;
         }
     }
 
@@ -230,24 +254,28 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
             break;
         case COL_GRT  :
             if(vf[1] == 0)
-                goto err;
+            {
+                cl->cl_res = IODE_NAN;
+                return 0;
+            }
             cl->cl_res = 100 * (vf[0] / vf[1] - 1);
             break;
         case COL_BASE  :
             if(vf[1] == 0)
-                goto err;
+            {
+                cl->cl_res = IODE_NAN;
+                return 0;
+            }
             cl->cl_res = 100 * (vf[0] / vf[1]);
             break;
         case COL_ADD  :
             cl->cl_res = vf[0] + vf[1];
             break;
         default       :
-            goto err;
+            cl->cl_res = IODE_NAN;
+            return 0;
     }
 
-    return 0;
-err:
-    cl->cl_res = IODE_NAN;
     return 0;
 }
 
@@ -340,7 +368,8 @@ int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL
 {
     int lg = (int) columns.size() / tbl.nb_columns;
 
-    COL* cl;
+    int col_pos;
+    COL* column;
     const TableLine& divider_line = tbl.divider_line;
     const TableCell* cell = nullptr;
     const TableCell* dcell = nullptr;
@@ -348,9 +377,9 @@ int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL
     std::shared_ptr<CLEC> dclec = nullptr;
     std::shared_ptr<CLEC> aclec = nullptr;
     std::shared_ptr<CLEC> adclec = nullptr;
-    for(int d = 0; d < tbl.nb_columns; d++)
+    for(int cell_pos = 0; cell_pos < tbl.nb_columns; cell_pos++)
     {
-        cell = &line.cells[d];
+        cell = &line.cells[cell_pos];
 
         if(cell->get_type() != TABLE_CELL_LEC)
             continue;
@@ -359,20 +388,24 @@ int execute_tbl_columns(const Table& tbl, const TableLine& line, std::vector<COL
             continue;
 
         clec = cell->get_compiled_lec();
-        aclec = COL_cp_clec(clec);
+        aclec = COL_copy_clec(clec);
 
-        dcell = &divider_line.cells[d];
-        dclec = (dcell->is_null()) ? NULL : dcell->get_compiled_lec();
+        dcell = &divider_line.cells[cell_pos];
+        if(dcell->is_null())
+            dclec = std::make_shared<CLEC>("1.0"); 
+        else
+            dclec = dcell->get_compiled_lec();
 
-        adclec = COL_cp_clec(dclec);
+        adclec = COL_copy_clec(dclec);
 
         for(int j = 0; j < lg; j++)
         {
-            cl = columns.data() + d + (j * tbl.nb_columns);
-            if(COL_calc(cl, aclec, adclec) < 0)
+            col_pos = cell_pos + (j * tbl.nb_columns);
+            column = &columns[col_pos];
+            if(COL_calc(column, aclec, adclec) < 0)
                 return -1;
-            debug_calc_table(cl, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(),
-                             aclec, adclec, line, d, j);
+            debug_calc_table(column, cell->get_content(), (dcell->is_null()) ? "" : dcell->get_content(),
+                             aclec, adclec, line, cell_pos, j);
         }
     }
     return 0;

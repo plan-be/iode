@@ -112,6 +112,14 @@ private:
     void print_line_date();
 
     /**
+     * @brief Print a Table cell from the left column.
+     * The left column contains the "title" of the current line. 
+     * 
+     * @param cell 
+     */
+    void print_cell_left_column(const TableCell& cell) const;
+
+    /**
      * @brief Format and print a numeric cell value.
      */
     void print_cell_value(double value) const;
@@ -127,7 +135,7 @@ private:
      * @param cell table cell to print
      * @param column GSample column definition with the value already calculated
      */
-    bool print_cell(const TableCell& cell, const COL& column) const;
+    void print_cell_right_column(const TableCell& cell, const COL& column) const;
 
     /**
      * @brief Print the table footer and clear the temporary printing state.

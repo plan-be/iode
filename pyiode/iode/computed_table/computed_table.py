@@ -795,7 +795,7 @@ class ComputedTable:
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
         >>> table = Table(2, title, lecs)
         >>> table                       # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1             |
+        DIVIS | 1             |         1.0
         TITLE |       "Example Table"
         ----- | ---------------------------
         CELL  |               |     "#S"
@@ -1081,7 +1081,7 @@ class ComputedTable:
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
         >>> table = Table(2, title, lecs)
         >>> table                       # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1             |
+        DIVIS | 1             |         1.0
         TITLE |       "Example Table"
         ----- | ---------------------------
         CELL  |               |     "#S"
@@ -1169,7 +1169,7 @@ class ComputedTable:
         >>> lecs = ["Q_F", "Q_I", "Q_F/Q_I", "ln(Q_I+Q_F)", "KNFF", "KNFF[-1]", "3+ln(10)", "0+KNFF"]
         >>> table = Table(2, title, lecs)
         >>> table                       # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1             |
+        DIVIS | 1             |         1.0
         TITLE |       "Example Table"
         ----- | ---------------------------
         CELL  |               |     "#S"

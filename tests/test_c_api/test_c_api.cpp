@@ -786,7 +786,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     EXPECT_EQ(cells[0].get_type(), TABLE_CELL_LEC);
     EXPECT_EQ(cells[0].get_content(), "1");
     EXPECT_EQ(cells[1].get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(cells[1].get_content(), "");
+    EXPECT_EQ(cells[1].get_content(), "1.0");
     cells.clear();
     // title + sep + line #S + sep + 8 lines with cells + sep + mode + files + date
     EXPECT_EQ(tbl->lines.size(), 16);

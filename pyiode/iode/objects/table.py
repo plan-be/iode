@@ -881,7 +881,7 @@ class Table:
     >>> # empty table
     >>> table = Table()
     >>> table           # doctest: +NORMALIZE_WHITESPACE
-    DIVIS | 1 |
+    DIVIS | 1 |  1.0
     TITLE |
     ----- | --------
     CELL  |   | "#S"
@@ -905,7 +905,7 @@ class Table:
     >>> lines_lecs = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"]
     >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
     >>> table           # doctest: +NORMALIZE_WHITESPACE
-    DIVIS | 1              |
+    DIVIS | 1              |         1.0
     TITLE | "Table example with titles on the left and LEC expressions on the right"
     ----- | ------------------------------------------------------------------------
     CELL  |                |     "#S"
@@ -940,7 +940,7 @@ class Table:
     >>> lines_vars = ["GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG", "COTRES", "RIDG", "OCUG", "$ENVI"]
     >>> table = Table(2, table_title, lines_vars, mode=True, files=True, date=True)
     >>> table           # doctest: +NORMALIZE_WHITESPACE
-    DIVIS | 1                                                                    |
+    DIVIS | 1                                                                    |     1.0
     TITLE |                      "Table example with variables only"
     ----- | ------------------------------------------------------------------------------
     CELL  |                                                                      |   "#S"
@@ -983,7 +983,7 @@ class Table:
     >>> table_title = "Table example with all variables passed as a single string"
     >>> table = Table(2, table_title, lines_vars, mode=True, files=True, date=True)
     >>> table           # doctest: +NORMALIZE_WHITESPACE
-    DIVIS | 1                                                                    |
+    DIVIS | 1                                                                    |     1.0
     TITLE |          "Table example with all variables passed as a single string"
     ----- | ------------------------------------------------------------------------------
     CELL  |                                                                      |   "#S"
@@ -1506,7 +1506,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -1570,7 +1570,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -1615,7 +1615,7 @@ class Table:
         >>> table.insert(index, ['"RIDG:', 'RIDG'])
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2006,7 +2006,7 @@ class Table:
         >>> from iode import Table
         >>> table = Table()
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1 |
+        DIVIS | 1 |  1.0
         TITLE |
         ----- | --------
         CELL  |   | "#S"
@@ -2060,7 +2060,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2135,7 +2135,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2172,7 +2172,7 @@ class Table:
         ('"YSSG:"', 'YSSG')
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1       |
+        DIVIS | 1       |  1.0
         TITLE |  "New title"
         ----- | --------------
         CELL  |         | "#S"
@@ -2228,7 +2228,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles, True, True, True)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2253,7 +2253,7 @@ class Table:
         >>> # remove the MODE line
         >>> del table[-3]
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2308,7 +2308,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2341,7 +2341,7 @@ class Table:
         >>> table += ['"RIDG:"', 'RIDG']
 
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -2464,7 +2464,7 @@ class Table:
         >>> lines_lecs = ["GOSG", "YSSG+COTRES", "OCUG"]
         >>> table = Table(2, table_title, lines_lecs, lines_titles)
         >>> table           # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |       "Table example"
         ----- | ----------------------------
         CELL  |                |     "#S"

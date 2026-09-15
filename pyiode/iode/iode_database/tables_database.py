@@ -413,7 +413,7 @@ class Tables(IodeDatabase):
         >>> tables["TABLE_CELL_LECS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": lines_lecs, 
         ...                              "lines_titles": lines_titles, "mode": True, "files": True, "date": True} 
         >>> tables["TABLE_CELL_LECS"]         # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |         "New Table"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -445,7 +445,7 @@ class Tables(IodeDatabase):
         >>> tables["TABLE_VARS"] = {"nb_columns": 2, "table_title": "New Table", "lecs_or_vars": vars_list, 
         ...                         "mode": True, "files": True, "date": True}
         >>> tables["TABLE_VARS"]             # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1                                                                    |
+        DIVIS | 1                                                                    |     1.0
         TITLE |                                  "New Table"
         ----- | ------------------------------------------------------------------------------
         CELL  |                                                                      |   "#S"
@@ -486,7 +486,7 @@ class Tables(IodeDatabase):
         >>> # b) -------- update table --------
         >>> table = tables["TABLE_CELL_LECS"]
         >>> table                                   # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1              |
+        DIVIS | 1              |         1.0
         TITLE |         "New Table"
         ----- | ----------------------------
         CELL  |                |     "#S"
@@ -552,7 +552,7 @@ class Tables(IodeDatabase):
         >>> table += '-'
 
         >>> tables["TABLE_CELL_LECS"]               # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1       |
+        DIVIS | 1       |  1.0
         TITLE |  "New Table"
         ----- | --------------
         CELL  |         | "#S"
@@ -592,7 +592,7 @@ class Tables(IodeDatabase):
         >>> tables_subset["X_GRT"] = {"nb_columns": 2, "table_title": "Croissance", "lecs_or_vars": vars_list, 
         ...                           "mode": True, "files": True, "date": True}  
         >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1                                                       |
+        DIVIS | 1                                                       |    1.0
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
         CELL  |                                                         |  "#S"
@@ -618,7 +618,7 @@ class Tables(IodeDatabase):
         >>> "X_GRT" in tables
         True
         >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1                                                       |
+        DIVIS | 1                                                       |    1.0
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
         CELL  |                                                         |  "#S"
@@ -646,7 +646,7 @@ class Tables(IodeDatabase):
         >>> table_x_grt.insert(index + 1, (f'"{comments["XQWXSS"]}"', "XQWXSS"))
         >>> tables_subset["X_GRT"] = table_x_grt
         >>> tables_subset["X_GRT"]                      # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1                                                       |
+        DIVIS | 1                                                       |    1.0
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
         CELL  |                                                         |  "#S"
@@ -671,7 +671,7 @@ class Tables(IodeDatabase):
         <BLANKLINE>
         >>> # --> table is also updated in the global workspace
         >>> tables["X_GRT"]                             # doctest: +NORMALIZE_WHITESPACE
-        DIVIS | 1                                                       |
+        DIVIS | 1                                                       |    1.0
         TITLE |                           "Croissance"
         ----- | ----------------------------------------------------------------
         CELL  |                                                         |  "#S"
