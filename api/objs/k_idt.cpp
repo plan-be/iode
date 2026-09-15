@@ -230,7 +230,7 @@ bool KDBIdentities::print_obj_def(const std::string& name)
 
 void KDBIdentities::update_reference_db()
 {
-    global_ref_idt[0] = this->get_subset("*", false);
+    global_ref_idt[0] = this->shared_from_this();
 }
 
 bool KDBIdentities::scan(const std::string& list_var, const std::string& list_scal)
