@@ -46,6 +46,7 @@ TEST_F(TablesTest, AddGetTable)
     ASSERT_EQ(cell->get_content(), "1");
     cell = &(tbl->divider_line.cells[1]);
     ASSERT_EQ(cell->get_type(), TABLE_CELL_LEC);
+    ASSERT_EQ(cell->get_content(), "1.0");
     // --- title line ---
     int i = 0;
     line = &tbl->lines[i++];

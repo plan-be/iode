@@ -385,15 +385,21 @@ int ComputedTable::print_tbl_line(const TableLine& line)
     if(execute_tbl_columns(*ref_table, line, columns) < 0)
         return -1;
 
-    int d;
+    int cell_pos;
     for(int j = 0; j < columns.size(); j++)
     {
-        d = j % ref_table->nb_columns;
-        if(ref_table->repeat_columns == 0 && d == 0 && j != 0)
+        cell_pos = j % ref_table->nb_columns;
+        if(ref_table->repeat_columns == 0 && cell_pos == 0 && j != 0)
             continue;
         
-        if(line.cells.size() > d)
-            print_cell(line.cells[d], columns[j]);
+        if(cell_pos >= line.cells.size())
+            continue;
+
+        const TableCell& cell = line.cells[cell_pos];
+        if(cell_pos == 0)
+            print_cell_left_column(cell);
+        else
+            print_cell_right_column(cell, columns[j]);
     }
 
     return 0;
@@ -440,6 +446,31 @@ void ComputedTable::print_line_date()
     W_printf((char*) "%s", date);
 }
 
+void ComputedTable::print_cell_left_column(const TableCell& cell) const
+{
+    if(cell.is_null())
+    {
+        W_printf((char*) "%c1R", A2M_SEPCH);
+        return;
+    }
+
+    std::string content = cell.get_content(false);
+    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
+    //       from UTF-8 to OEM before printing
+    content = utf8_to_oem(content);
+    W_replace_line_break(content);
+
+    cell.start_print(1);
+    cell.print_start_attribute();
+
+    if(cell.get_type() == TABLE_CELL_STRING)
+        W_printf((char*) "%s", content.c_str());
+    else
+        kwarning("IODE table - left column: Expected a cell of type STRING");
+
+    cell.print_end_attribute();
+}
+
 void ComputedTable::print_cell_value(double value) const
 {
     std::string formatted_value = format_double_value(value, 30, tbl_nb_decimals);
@@ -450,15 +481,18 @@ void ComputedTable::print_cell_string(const COL& column, const std::string& cont
 {
     std::string text = col_to_text(column, content, (int) v_tbl_filenames.size());
     if(!text.empty())
+    {
+        W_replace_line_break(text);
         W_printf((char*) "%s", text.c_str());
+    }
 }
 
-bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
+void ComputedTable::print_cell_right_column(const TableCell& cell, const COL& column) const
 {
     if(cell.is_null())
     {
         W_printf((char*) "%c1R", A2M_SEPCH);
-        return true;
+        return;
     }
 
     std::string content = cell.get_content(false);
@@ -484,7 +518,6 @@ bool ComputedTable::print_cell(const TableCell& cell, const COL& column) const
         print_cell_value(column.cl_res);
 
     cell_copy.print_end_attribute();
-    return true;
 }
 
 void ComputedTable::end_print_tbl()
@@ -571,10 +604,15 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
         }
     }
 
+    // temporary override A2M_SEPCH to allow the character '&' in cells of type STRING
+    int OLD_A2M_SEPCH = A2M_SEPCH;
+    A2M_SEPCH = '¿';
+
     std::shared_ptr<Table> ref_table_ptr(ref_table, [](Table*) {});
     std::string title_utf8 = ref_table_ptr->get_title();
     // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
     std::string title_oem = utf8_to_oem(title_utf8);
+    W_replace_line_break(title_oem);
     if(title_oem.empty())
         title_oem = "No title";
 
@@ -626,6 +664,9 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     }
 
     end_print_tbl();
+
+    // reset default value for the A2M 'separator' character 
+    A2M_SEPCH = OLD_A2M_SEPCH;
 }
 
 void ComputedTable::print_to_file(const std::string& destination_file, const char format)

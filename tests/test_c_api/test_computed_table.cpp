@@ -954,25 +954,61 @@ TEST_F(ComputedTableTest, PrintToFile)
     compare_files(str_output_test_dir + "bin_file.html", str_output_test_dir + "bin_cpp_file.html");
 
     bin_kdb_tables->clear();
+}
 
-    // ---- titles with special character '#' ----
+TEST_F(ComputedTableTest, PrintToFileSpecialCharacter)
+{
+    global_ws_cmt->add("SPECAND", "Comment with special char & in it");
+    global_ws_cmt->add("SPECSHARP", "Comment with special char # in it");
+    global_ws_cmt->add("SPECLINEBREAK", "Comment with line break\nin it");
+
+    global_ws_var->add("SPECAND", "t");
+    global_ws_var->add("SPECSHARP", "3 * t");
+    global_ws_var->add("SPECLINEBREAK", "2 * t"); 
     
-    gsample = "2000:10";
-    title = "Test table with special char # in titles";
-    std::vector<std::string> variables = {"Q_I"};
-    Table test_table(2, title, variables, false, false, false);
+    ASSERT_EQ(global_ws_var->get_var("SPECAND", "2000Y1"), 40.0);
+    ASSERT_EQ(global_ws_var->get_var("SPECAND", "2001Y1"), 41.0);
+    ASSERT_EQ(global_ws_var->get_var("SPECAND", "2002Y1"), 42.0);
 
-    test_table.add_title("title with special char # in #it");
-    test_table.add_line_separator();
+    std::string def = "Testing table with\nspecial characters & and #";
+    std::vector<std::string> vars = {"SPECAND", "SPECLINEBREAK", "SPECSHARP"}; 
+    bool mode = false;
+    bool files = false;
+    bool date = false; 
+    bool search_comment = true;
 
-    TableLine* new_line = test_table.add_line_with_cells();
-    TableCell* first_cell = &new_line->cells[0];
-    first_cell->set_text("Q_F");
-    TableCell* second_cell = &new_line->cells[1];
-    second_cell->set_lec("Q_F");
+    Table table(2, def, vars, mode, files, date, search_comment);
 
-    ComputedTable computed_table_sharp(&test_table, gsample, 4);
-    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.a2m", 'A');
-    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.html", 'H');
-    computed_table_sharp.print_to_file(str_output_test_dir + "cpp_api_sharp.csv", 'C');
+    std::string gsample = "2000:3";
+    ComputedTable computed_table(&table, gsample);
+
+    ASSERT_EQ(computed_table.line_names.size(), 3);
+    ASSERT_EQ(computed_table.line_names[0], "Comment with special char & in it");
+    ASSERT_EQ(computed_table.line_names[1], "Comment with line break\nin it");
+    ASSERT_EQ(computed_table.line_names[2], "Comment with special char # in it");
+
+    // lec = t
+    ASSERT_EQ(computed_table.get_value(0, 0), 40.0);
+    ASSERT_EQ(computed_table.get_value(0, 1), 41.0);
+    ASSERT_EQ(computed_table.get_value(0, 2), 42.0);
+    // lec = 2 * t
+    ASSERT_EQ(computed_table.get_value(1, 0), 80.0);
+    ASSERT_EQ(computed_table.get_value(1, 1), 82.0);
+    ASSERT_EQ(computed_table.get_value(1, 2), 84.0);
+    // lec = 3 * t
+    ASSERT_EQ(computed_table.get_value(2, 0), 120.0);
+    ASSERT_EQ(computed_table.get_value(2, 1), 123.0);
+    ASSERT_EQ(computed_table.get_value(2, 2), 126.0);
+
+    computed_table.print_to_file(str_output_test_dir + "table_special_characters.a2m", 'A');
+    compare_files(str_output_test_dir + "table_special_characters.a2m", str_output_test_dir + "table_special_characters.ref.a2m");
+    
+    computed_table.print_to_file(str_output_test_dir + "table_special_characters.csv", 'C');
+    compare_files(str_output_test_dir + "table_special_characters.csv", str_output_test_dir + "table_special_characters.ref.csv");
+    
+    computed_table.print_to_file(str_output_test_dir + "table_special_characters.html", 'H');
+    compare_files(str_output_test_dir + "table_special_characters.html", str_output_test_dir + "table_special_characters.ref.html");
+
+    computed_table.print_to_file(str_output_test_dir + "table_special_characters.rtf", 'R');
+    compare_files(str_output_test_dir + "table_special_characters.rtf", str_output_test_dir + "table_special_characters.ref.rtf");
 }

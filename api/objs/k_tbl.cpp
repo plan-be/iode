@@ -160,6 +160,8 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
     // NOTE: W_Print(...) functions expect OEM encoding, so convert content
     //       from UTF-8 to OEM before printing
     content = utf8_to_oem(content);
+    W_replace_line_break(content);
+
     switch(get_type()) 
     {
         case TABLE_CELL_STRING :
@@ -377,7 +379,7 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
 {
     divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1", 0));
     for(int j = 1; j < nb_columns; j++) 
-        divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "", j));
+        divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1.0", j));
 }
 
 static void T_initialize_title(TableLine& title_line, const std::string& def)

@@ -19,6 +19,8 @@ Improvements
 Fixed Bugs 
 ----------
 
+- PYTHON: fixed exporting IODE tables to files when the title or cells from the left 
+  column contain line breaks or the special character '&' or '#' (closes :issue:`1297`)
 
 Miscellaneous 
 -------------

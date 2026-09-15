@@ -1,0 +1,11 @@
+.topic 0 0 Testing table with\pspecial characters & and #
+.tb 4
+.sep ¿
+.ttitle Testing table with\pspecial characters & and #
+.tl
+¿1R¿1R2000¿1R2001¿1R2002
+.tl
+¿1LComment with special char & in it¿1D40.00¿1D41.00¿1D42.00
+¿1LComment with line break\pin it¿1D80.00¿1D82.00¿1D84.00
+¿1CComment with special char # in it¿1D120.00¿1D123.00¿1D126.00
+.te 

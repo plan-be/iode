@@ -1,0 +1,9 @@
+"Testing table with
+special characters & and #"
+
+" ","2000","2001","2002",
+
+"Comment with special char & in it","40.00","41.00","42.00",
+"Comment with line break
+in it","80.00","82.00","84.00",
+"Comment with special char # in it","120.00","123.00","126.00",
