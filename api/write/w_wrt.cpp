@@ -502,6 +502,34 @@ int W_printfReplEsc(char* fmt, ...)
 }
 
 
+/**
+ * @brief Replace line breaks in text with the A2M paragraph marker \\p.
+ *
+ * CRLF pairs are treated as a single line break.
+ *
+ * @param text text to update in place
+ */
+void W_replace_line_break(std::string& text)
+{
+    std::string result;
+    result.reserve(text.size());
+
+    for(size_t i = 0; i < text.size(); i++)
+    {
+        if(text[i] == '\r')
+        {
+            if(i + 1 < text.size() && text[i + 1] == '\n')
+                i++;
+            result += "\\p";
+        }
+        else if(text[i] == '\n')
+            result += "\\p";
+        else
+            result += text[i];
+    }
+
+    text.swap(result);
+}
 
 
 /**
