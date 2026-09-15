@@ -150,8 +150,13 @@ class EditEquationDialog(MixinSettingsDialog):
             return
 
         eq_sample: Sample = self.eq.sample
-        from_period: str = str(eq_sample.start) if eq_sample.start is not None else ""
-        to_period: str = str(eq_sample.end) if eq_sample.end is not None else ""
+        from_period = ""
+        to_period = ""
+
+        if eq_sample and eq_sample.start:
+            from_period: str = str(eq_sample.start)
+        if eq_sample and eq_sample.end: 
+            to_period: str = str(eq_sample.end)
         
         if not from_period or not to_period:
             # try to get the sample from the Variables workspace
