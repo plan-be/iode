@@ -2,6 +2,8 @@ import itertools
 import numpy as np
 from pathlib import Path
 from iode import variables
+from iode import skip_message       # iode version >= 7.0.8
+# from iode import suppress_msgs    # iode version < 7.0.8
 
 
 def populate_big_vars():
@@ -19,9 +21,18 @@ def save_big_vars_ws(filepath: str):
     variables.save(filepath)
     print(f"Saved big vars workspace to '{filepath}'")
 
+def load_big_vars_ws(filepath: str):
+    variables.clear()
+    variables.load(filepath)
+    print(f"Loaded big vars workspace from '{filepath}'")
 
 if __name__ == "__main__":
     current_dir = Path(__file__).parent.resolve()
+
+    # iode version < 7.0.8
+    # suppress_msgs()
+    # iode version >= 7.0.8
+    skip_message(True)
 
     populate_big_vars()
 
@@ -32,6 +43,12 @@ if __name__ == "__main__":
     if not filepath.exists():
         save_big_vars_ws(str(filepath))
 
+    if filepath.exists():
+        load_big_vars_ws(str(filepath))
+
     filepath = filepath.with_suffix(".av")
     if not filepath.exists():
         save_big_vars_ws(str(filepath))
+
+    if filepath.exists():
+        load_big_vars_ws(str(filepath))
