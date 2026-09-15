@@ -22,6 +22,17 @@ TEST_F(UtilsTest, convertBetweenCodepages)
 }
 
 
+TEST_F(UtilsTest, replaceLineBreak)
+{
+    std::string text = "unchanged";
+    W_replace_line_break(text);
+    EXPECT_EQ(text, "unchanged");
+
+    text = "first\nsecond\r\nthird\rfourth\n\nlast";
+    W_replace_line_break(text);
+    EXPECT_EQ(text, "first\\psecond\\pthird\\pfourth\\p\\plast");
+}
+
 TEST_F(UtilsTest, getIodeFileType)
 {
 	std::string filename = "";

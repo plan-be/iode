@@ -46,6 +46,8 @@ int W_printfRepl(char* fmt, ...);
 int W_printfReplEsc(char* fmt, ...);
 int W_printfEx(int dup, int ch1, int ch2, char* fmt, va_list args);
 
+void W_replace_line_break(std::string& text);
+
 /* w_wrt1.c */
 void W_print_enum(int n);
 void W_print_cmd(int n);
