@@ -85,7 +85,7 @@ bool KDBScalars::print_obj_def(const std::string& name)
 
 void KDBScalars::update_reference_db()
 {
-    global_ref_scl[0] = this->get_subset("*", false);
+    global_ref_scl[0] = this->shared_from_this();
 }
 
 bool KDBScalars::scan(const std::string& list_var, const std::string& list_scal) 
