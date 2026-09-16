@@ -57,7 +57,7 @@ extern int              (*TarNextFn)(int);
 }
 #endif
 
-#include <s_protar.h>
+#include "s_protar.h"
 #endif /* _S_TAR_ */
 
 

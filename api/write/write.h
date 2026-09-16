@@ -1,6 +1,6 @@
 #pragma once
-#include "scr4/s_prost.h"       // SCR_free, SCR_stracpy, SCR_strip
-#include "scr4/s_a2m.h"
+#include "scr4/strs/s_prost.h"       // SCR_free, SCR_stracpy, SCR_strip
+#include "scr4/a2m/s_a2m.h"
 
 #include <stdarg.h>             // for va_list
 

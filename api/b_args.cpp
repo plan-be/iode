@@ -13,8 +13,8 @@
  *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
  *   
  */
-#include "scr4/s_prost.h"
-#include "scr4/s_strs.h"
+#include "scr4/strs/s_prost.h"
+#include "scr4/strs/s_strs.h"
 
 #include "api/b_args.h"
 #include "api/b_errors.h"

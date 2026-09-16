@@ -35,7 +35,7 @@
  * int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
  * int B_CsvDec(char *dec, int unused)                           $CsvDec char
  */
-#include "scr4/s_args.h"
+#include "scr4/args/s_args.h"
 #include "api/k_super.h"
 #include "api/b_args.h"
 #include "api/b_errors.h"

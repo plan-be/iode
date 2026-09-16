@@ -7,7 +7,7 @@
  *  and the workspaces of equations and scalars where the estimation results 
  *  are stored. 
  */
-#include "scr4/s_prodt.h"
+#include "scr4/date/s_prodt.h"
 
 #include "api/b_errors.h"
 #include "api/objs/objs.h"

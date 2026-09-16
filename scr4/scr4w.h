@@ -1,7 +1,7 @@
-#ifndef DOS
-#include <scr4.h>
-#include <s_mat.h>
-#include <s_xdr.h>
+﻿#ifndef DOS
+#include "scr4.h"
+#include "mat/s_mat.h"
+#include "s_xdr.h"
 
 #else
 
@@ -15,11 +15,11 @@
 #endif     
 #define __SIMPLE_LOCALES__
 #include <windows.h>
-#include <scr4.h> 
-#include <s_swap.h>
-#include <s_mat.h>
-#include <s_xdr.h>
-#include <s_scroll.h>
+#include "scr4.h" 
+#include "swap/s_swap.h"
+#include "mat/s_mat.h"
+#include "s_xdr.h"
+#include "s_scroll.h"
 #include <ddeml.h>
 
 
@@ -260,8 +260,8 @@ extern int  WSCR_FONTSIZE;
 
 
 /* ====== FNS PROTOTYPES =========================== */
-#include <s_prowin.h>
-#include <s_prowis.h>
+#include "s_prowin.h"
+#include "s_prowis.h"
 
 extern HWND WscrMain(int, U_ch **);
 

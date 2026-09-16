@@ -1,5 +1,5 @@
 #pragma once
-#include "scr4/s_yy.h"      // YYKEYS
+#include "scr4/yy/s_yy.h"      // YYKEYS
 
 #include "api/pch.h"
 #include "api/time/period.h"

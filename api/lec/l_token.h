@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scr4/s_yy.h"          // YYKEYS
+#include "scr4/yy/s_yy.h"          // YYKEYS
 
 #include "api/lec/l_common.h"
 #include "api/lec/l_exec_fns.h"

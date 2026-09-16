@@ -66,9 +66,9 @@
  *      int B_PrintHtmlTHClass(char *th_class, int unused)             | $PrintHtmlTHClass class_name
  *      int B_PrintHtmlTDClass(char *td_class, int unused)             | $PrintHtmlTDClass class_name
  */
-#include "scr4/s_a2m.h"
-#include "scr4/s_args.h"
-#include "scr4/s_proa2m.h"
+#include "scr4/a2m/s_a2m.h"
+#include "scr4/args/s_args.h"
+#include "scr4/a2m/s_proa2m.h"
 
 #include "api/pch.h"
 #include "api/b_a2mini.h"

@@ -1,4 +1,4 @@
-/* =+======== SCR.H =================================================== */
+﻿/* =+======== SCR.H =================================================== */
 
 #ifndef _SCR4_H_
 #define _SCR4_H_
@@ -103,17 +103,17 @@
 //#include <ctype.h>
 
 //#include <s_alldoc.h>
-#include <s_yy.h>
-#include <s_date.h>
-#include <s_strs.h>
-#include <s_tar.h>
-#include <s_dir.h>
-#include <s_ini.h>
-#include <s_isc.h>
+#include "yy/s_yy.h"
+#include "date/s_date.h"
+#include "strs/s_strs.h"
+#include "s_tar.h"
+#include "base/s_dir.h"
+#include "ini/s_ini.h"
+#include "strs/s_isc.h"
 
 #include <scr4_key.h>
 #include <scr4_box.h>
-#include <scr4_str.h>
+#include "strs/scr4_str.h"
 #include <scr4_rd.h>
 
 #ifdef __cplusplus
@@ -1095,8 +1095,8 @@ extern long    WSCR_PALETTE[6 * (SCR_CHELP2 + 1) /* 1024*/];  /* JMP 14-09-2015 
 #define WSCR_MAX_DOSKEYS    20
 
 /* ========== COMPATIBILITY BETWEEN VERSIONS ============ */
-extern int  SCR_COMP_RI; /* MPIS et EDIS : edite index méme si champ Hidden ou Output */
-extern int  SCR_COMP_PG_ABORT; /* Reset SCR_PG_ABORT aprés action PG_EDIT */
+extern int  SCR_COMP_RI; /* MPIS et EDIS : edite index mÃ©me si champ Hidden ou Output */
+extern int  SCR_COMP_PG_ABORT; /* Reset SCR_PG_ABORT aprÃ©s action PG_EDIT */
 extern int  SCR_SC_HIT_KEY; /* JMP 15-01-03 : Change check_key en hit_key dans SC_hit_key() SILMM */
 
 extern int  SCR_MP_REDISPLAY;   /* BP_M 25-01-2013 15:16 */
@@ -1486,8 +1486,8 @@ extern char *SCR_HttpGetFile();
 }
 #endif /* __cplusplus */
 
-#include <s_probas.h>
-#include <s_probis.h>
+#include "s_probas.h"
+#include "s_probis.h"
 
 extern int  (*SCR_FN_KEY)(int, int);
 extern int  (*SCR_HIT_KEY_FN)(void);

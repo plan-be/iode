@@ -2,8 +2,8 @@
     #include <io.h>
 #endif
 
-#include "scr4/s_swap.h"        // SWHDL
-#include "scr4/s_prodir.h"
+#include "scr4/swap/s_swap.h"        // SWHDL
+#include "scr4/base/s_prodir.h"
 
 #include "api/pch.h"
 #include "api/k_super.h"
