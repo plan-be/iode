@@ -1486,7 +1486,6 @@ extern char *SCR_HttpGetFile();
 #endif /* __cplusplus */
 
 #include "s_probas.h"
-#include "s_probis.h"
 
 extern int  (*SCR_FN_KEY)(int, int);
 extern int  (*SCR_HIT_KEY_FN)(void);
