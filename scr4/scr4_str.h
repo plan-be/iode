@@ -19,8 +19,6 @@
 #define U_ch  unsigned char
 // #define INT short /* JMP 14-10-96 */
 
-//#include "scr4web.h"
-
 typedef char GZIPFILE; /* JMP 19-10-00 */
 
 typedef struct status {
