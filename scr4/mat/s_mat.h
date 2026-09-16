@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "scr4/swap/s_swap.h"
-//#include <s_scroll.h>
 
 #define NOSWAP
 

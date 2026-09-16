@@ -195,8 +195,6 @@ extern int W2scrlGetHeight(WSCROLL *wscrl,int line);
 extern unsigned char *W2scrlGetText(WSCROLL *wscrl,int i,int j);
 extern int W2scrlFnkey(WSCROLL *wscrl,int i,int j,int scrkey);
 extern int W2scrlCommand(WSCROLL *wscrl,int i,int j,int wParam);
-extern HMENU W2scrlCreateMenu(SCROLL *scrl);
-extern WSCROLL *WscrSCROLLToWSCROLL(SCROLL *scrl);
 extern int WscrScrollSetCurSel(HWND hWndScroll,int line,int col);
 extern int WscrScrollCellChanged(HWND hWndScroll,int line,int col);
 extern int WscrScrollSetSelect(HWND hWndScroll,int fl,int tl,int fc,int tc);
