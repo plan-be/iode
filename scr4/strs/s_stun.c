@@ -1,4 +1,4 @@
-#include "scr.h"
+#include "scr4.h"
 
 /*NH*/
 int SCR_add_tbl(tbl, nb, str)                  /* JMP 07-02-97 */
