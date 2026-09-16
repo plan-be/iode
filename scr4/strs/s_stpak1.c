@@ -1,4 +1,4 @@
-#include "scr.h"
+#include "scr4.h"
 #include <stdlib.h>
 
 int             AR_BUFSIZE = 8192;
