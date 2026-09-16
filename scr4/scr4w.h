@@ -19,7 +19,6 @@
 #include "swap/s_swap.h"
 #include "mat/s_mat.h"
 #include "s_xdr.h"
-#include "s_scroll.h"
 #include <ddeml.h>
 
 
