@@ -1,5 +1,5 @@
 #pragma once
-#include "scr4/s_mat.h"
+#include "scr4/mat/s_mat.h"
 #include "scr4/scr4.h"
 
 #include "api/pch.h"

@@ -113,9 +113,9 @@
  *      
  *  
  */
-#include "scr4/s_prodir.h"
-#include "scr4/s_prost.h"
-#include "scr4/s_prodt.h"
+#include "scr4/base/s_prodir.h"
+#include "scr4/strs/s_prost.h"
+#include "scr4/date/s_prodt.h"
 
 #include "api/pch.h"
 #include "api/k_super.h"

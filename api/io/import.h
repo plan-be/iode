@@ -1,5 +1,5 @@
 #pragma once
-#include "scr4/s_yy.h"
+#include "scr4/yy/s_yy.h"
 
 #include "api/pch.h"
 #include "api/b_errors.h"

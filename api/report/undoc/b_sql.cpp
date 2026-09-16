@@ -85,7 +85,7 @@ U_ch    *RPS_Close(U_ch** args)
 // Embarcadero 32 bits
 // ------------------- 
 
-#include <s_odbc.h>
+#include "scr4/odbc/s_odbc.h"
 //#include <sqltypes.h>
 #include "sql.h"
 #include "sqlext.h"

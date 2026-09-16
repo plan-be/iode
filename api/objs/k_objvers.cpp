@@ -20,7 +20,7 @@
  *  
  *     int get_version(char* label): returns the current object version (0-2) from an IODE file header. 
  */
-#include "scr4/s_swap.h"        // SWHDL
+#include "scr4/swap/s_swap.h"        // SWHDL
 
 #include "api/objs/kdb.h"
 #include "api/objs/objs.h"

@@ -13,7 +13,7 @@
  *      int IodeInit()              | Initialise an IODE session.
  *      int IodeEnd()               | Terminate an IODE session. 
  */
-#include "scr4/s_args.h"
+#include "scr4/args/s_args.h"
 
 #include "api/pch.h"
 #include "api/b_iodeini.h"

@@ -22,7 +22,7 @@
  *      int B_ViewTblFile(char* arg, int unused)            | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
-#include "scr4/s_args.h"
+#include "scr4/args/s_args.h"
 
 #include "api/pch.h"
 #include "api/k_lang.h"

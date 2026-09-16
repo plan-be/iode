@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scr4/s_mat.h"
+#include "scr4/mat/s_mat.h"
 
 #include "api/pch.h"
 #include "api/b_errors.h"

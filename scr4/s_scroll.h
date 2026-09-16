@@ -146,7 +146,7 @@ extern SCROLL  *SCRL;
 extern int      SCRL_end;
 
 #ifdef SCRPROTO
-#include <s_proscl.h>
+#include "s_proscl.h"
 #endif
 
 #endif

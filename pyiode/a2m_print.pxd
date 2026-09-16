@@ -1,4 +1,4 @@
-cdef extern from "scr4/s_a2m.h":
+cdef extern from "scr4/a2m/s_a2m.h":
     # Public (Modifiables par programme)
     cdef int    A2M_TFONTSIZE
     cdef int    A2M_FONTSIZE

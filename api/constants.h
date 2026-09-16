@@ -23,7 +23,7 @@
 #define _max_(a, b)        (((a) > (b)) ? (a) : (b))
 #define _min_(a, b)        (((a) < (b)) ? (a) : (b))
 
-#include "scr4/s_strs.h"
+#include "scr4/strs/s_strs.h"
 
 /*---------------- DEFINE ------------------------*/
 

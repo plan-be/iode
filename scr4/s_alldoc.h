@@ -2,7 +2,7 @@
 
 #define _ALLOCDOC_
 
-#include "s_strs.h" // JMP 14/3/2017
+#include "strs/s_strs.h" // JMP 14/3/2017
 
 #ifdef ALLOCDOCOFF
 
