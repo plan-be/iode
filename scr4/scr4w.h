@@ -259,7 +259,7 @@ extern int  WSCR_FONTSIZE;
 
 
 /* ====== FNS PROTOTYPES =========================== */
-#include "s_prowin.h"
+#include "wsys/s_prowin.h"
 
 extern HWND WscrMain(int, U_ch **);
 
