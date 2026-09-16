@@ -106,7 +106,6 @@
 #include "yy/s_yy.h"
 #include "date/s_date.h"
 #include "strs/s_strs.h"
-#include "s_tar.h"
 #include "base/s_dir.h"
 #include "ini/s_ini.h"
 #include "strs/s_isc.h"
