@@ -22,7 +22,7 @@
 #include "scr4/a2m/s_a2m.h"
 #include "scr4/args/s_args.h"
 #ifdef _MSC_VER
-    #include "scr4/s_prowin.h"
+    #include "scr4/wsys/s_prowin.h"
 #endif
 
 #include "api/pch.h"
