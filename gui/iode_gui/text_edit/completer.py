@@ -231,20 +231,23 @@ class IodeWidgetWithCompleter():
         # see https://doc.qt.io/qt-6/qt.html#Key-enum for maximal value of letter + digit key
         if force_autocomplete or event.key() == Qt.Key.Key_Backspace or event.key() < 255:
             super_cls.keyPressEvent(event)
-
-            self._completer.setCompletionPrefix(self._text_under_cursor())
-            if force_autocomplete or len(self._completer.completionPrefix()):
-                if isinstance(self, QLineEdit):
-                    self._completer.complete()
-                else:
-                    cr = self.cursorRect()
-                    cr.setWidth(self._completer.popup().sizeHintForColumn(0) + 
-                                self._completer.popup().verticalScrollBar().sizeHint().width())
-                    self._completer.complete(cr)
-            else:
-                self._completer.popup().hide()
+            self._update_completion_popup(force_autocomplete)
         else:
             super_cls.keyPressEvent(event)
+
+    def _update_completion_popup(self, force_autocomplete: bool=False):
+        """Refresh the completion popup from the current text cursor."""
+        self._completer.setCompletionPrefix(self._text_under_cursor())
+        if force_autocomplete or len(self._completer.completionPrefix()):
+            if isinstance(self, QLineEdit):
+                self._completer.complete()
+            else:
+                cr = self.cursorRect()
+                cr.setWidth(self._completer.popup().sizeHintForColumn(0) +
+                            self._completer.popup().verticalScrollBar().sizeHint().width())
+                self._completer.complete(cr)
+        else:
+            self._completer.popup().hide()
 
     def _text_under_cursor(self) -> str:
         raise NotImplementedError()

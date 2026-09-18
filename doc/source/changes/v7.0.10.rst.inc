@@ -6,6 +6,9 @@ In development
 New Features 
 ------------
 
+- GUI: allow to edit multiple lines at once in IODE reports or in text tabs 
+  (press ALT + left-click or CTRL + ALT + UP/DOWN to enable multiple cursors, 
+  ESC to disable it) (closes :issue:`1307`)
 
 Improvements 
 ------------

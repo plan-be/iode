@@ -1,7 +1,8 @@
-from qtpy.QtWidgets import QWidget
-from qtpy.QtGui import (QPaintEvent, QResizeEvent, QFontMetricsF, QPainter, QShortcut, 
-                           QKeySequence, QTextBlock, QTextCursor)
-from qtpy.QtCore import Qt, QRect, QSize, QPoint, QSettings, Slot
+from qtpy.QtWidgets import QWidget, QTextEdit
+from qtpy.QtGui import (QKeyEvent, QMouseEvent, QPaintEvent, QResizeEvent,
+                        QFontMetricsF, QPainter, QShortcut, QKeySequence,
+                        QTextBlock, QTextCursor)
+from qtpy.QtCore import Qt, QKeyCombination, QRect, QSize, QPoint, QSettings, Slot
 
 from .find_and_replace_dialog import FindAndReplaceDialog
 from .complete_text_edit import IodeAutoCompleteTextEdit
@@ -13,8 +14,15 @@ class LeftArea(QWidget):
 
 class IodeTextEditor(IodeAutoCompleteTextEdit):
     """
-    A custom text editor widget that supports auto-completion.
+    A custom text editor widget that supports auto-completion and multiple
+    cursors.
+
+    Additional cursors can be added with Alt+click, Alt+left-drag, or
+    Ctrl+Alt+Up/Down. Alt+left-drag makes a rectangular text selection.
+    Escape returns to a single cursor.
     """
+
+    INDENT = ' ' * 4
 
     def __init__(self, parent=None):
         """
@@ -23,6 +31,13 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         :param parent: The parent widget.
         """
         super().__init__(parent)
+
+        # QPlainTextEdit only owns one cursor. Keep the other cursors here and
+        # paint/edit them explicitly.
+        self._extra_cursors: list[QTextCursor] = []
+        self._multi_cursor_drag_anchor: QTextCursor | None = None
+        self._multi_cursor_drag_x: int = 0
+        self._multi_cursor_drag_active: bool = False
 
         self.left_area = LeftArea(self)
 
@@ -66,6 +81,344 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         self.delete_line_shortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_U), self)
         self.delete_line_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.delete_line_shortcut.activated.connect(self.delete_line)
+
+    def _all_cursors(self) -> list[QTextCursor]:
+        """Return the primary cursor followed by the additional cursors."""
+        return [QTextCursor(self.textCursor())] + self._extra_cursors
+
+    def _set_cursors(self, cursors: list[QTextCursor]):
+        """Install a primary cursor and a de-duplicated set of extra ones."""
+        unique_cursors: list[QTextCursor] = []
+        positions: set[tuple[int, int]] = set()
+        for cursor in cursors:
+            cursor_position = (cursor.position(), cursor.anchor())
+            if cursor_position not in positions:
+                unique_cursors.append(cursor)
+                positions.add(cursor_position)
+
+        if not unique_cursors:
+            return
+
+        self.setTextCursor(unique_cursors[0])
+        self._extra_cursors = [QTextCursor(cursor) for cursor in unique_cursors[1:]]
+        self._update_extra_selections()
+        self.viewport().update()
+
+    def _update_extra_selections(self):
+        """Render the selection range of every secondary cursor."""
+        selections: list[QTextEdit.ExtraSelection] = []
+        for cursor in self._extra_cursors:
+            if not cursor.hasSelection():
+                continue
+
+            selection = QTextEdit.ExtraSelection()
+            selection.cursor = QTextCursor(cursor)
+            selection.format.setBackground(self.palette().highlight())
+            selection.format.setForeground(self.palette().highlightedText())
+            selections.append(selection)
+        self.setExtraSelections(selections)
+
+    def clear_extra_cursors(self):
+        """Return the editor to its normal, single-cursor mode."""
+        if self._extra_cursors:
+            self._extra_cursors.clear()
+            self.setExtraSelections([])
+            self.viewport().update()
+
+    def _add_cursor_vertically(self, operation: QTextCursor.MoveOperation):
+        """Add a cursor one line above or below the outermost cursor."""
+        cursors = self._all_cursors()
+        source = min(cursors, key=lambda cursor: cursor.position()) \
+            if operation == QTextCursor.MoveOperation.Up \
+            else max(cursors, key=lambda cursor: cursor.position())
+        new_cursor = QTextCursor(source)
+        new_cursor.clearSelection()
+        if new_cursor.movePosition(operation):
+            cursors.append(new_cursor)
+            self._set_cursors(cursors)
+
+    def _selected_blocks(self, cursor: QTextCursor) -> list[QTextBlock]:
+        """Return each document block touched by *cursor* exactly once."""
+        start = cursor.selectionStart()
+        end = cursor.selectionEnd()
+        # A selection ending at the start of a block does not touch that block.
+        last_position = end - 1 if end > start else end
+        first_block = self.document().findBlock(start)
+        last_block = self.document().findBlock(last_position)
+
+        blocks: list[QTextBlock] = []
+        block = first_block
+        while block.isValid():
+            blocks.append(block)
+            if block == last_block:
+                break
+            block = block.next()
+        return blocks
+
+    def _change_indentation(self, cursors: list[QTextCursor], indent: bool):
+        """Indent or unindent every line touched by *cursors*."""
+        blocks = {block.blockNumber(): block for cursor in cursors
+                  for block in self._selected_blocks(cursor)}
+        edit_cursor = QTextCursor(cursors[0])
+        edit_cursor.beginEditBlock()
+        for block_number in sorted(blocks, reverse=True):
+            block = blocks[block_number]
+            line_cursor = QTextCursor(block)
+            if indent:
+                line_cursor.insertText(self.INDENT)
+                continue
+
+            text = block.text()
+            characters_to_remove = 1 if text.startswith('\t') else \
+                min(len(text) - len(text.lstrip(' ')), len(self.INDENT))
+            if characters_to_remove:
+                line_cursor.movePosition(
+                    QTextCursor.MoveOperation.Right,
+                    QTextCursor.MoveMode.KeepAnchor,
+                    characters_to_remove)
+                line_cursor.removeSelectedText()
+        edit_cursor.endEditBlock()
+        self._set_cursors(cursors)
+
+    # Note: 'edit' is a function taking a QTextCursor as argument
+    def _edit_at_all_cursors(self, edit):
+        """Apply one edit at every cursor as a single undo operation."""
+        cursors = self._all_cursors()
+        edit_cursor = QTextCursor(cursors[0])
+        edit_cursor.beginEditBlock()
+        # Editing backwards keeps earlier cursor positions stable. QTextCursor
+        # instances automatically follow changes made before their positions.
+        for cursor in sorted(cursors, key=lambda item: item.selectionStart(), reverse=True):
+            edit(cursor)
+        edit_cursor.endEditBlock()
+        self._set_cursors(cursors)
+
+    def _move_all_cursors(self, operation: QTextCursor.MoveOperation,
+                          mode: QTextCursor.MoveMode):
+        """Move all cursors using the same QTextCursor operation."""
+        cursors = self._all_cursors()
+        for cursor in cursors:
+            cursor.movePosition(operation, mode)
+        self._set_cursors(cursors)
+
+    # override IodeAutoCompleteTextEdit method
+    def insert_completion(self, completion: str):
+        """Insert a completion at every active cursor."""
+        if not self._extra_cursors:
+            super().insert_completion(completion)
+            return
+
+        prefix_length = len(self._completer.completionPrefix())
+
+        def replace_prefix(cursor: QTextCursor):
+            for _ in range(prefix_length):
+                cursor.deletePreviousChar()
+            cursor.insertText(completion)
+
+        self._edit_at_all_cursors(replace_prefix)
+        self._completer.popup().hide()
+
+    # override QPlainTextEdit method
+    def keyPressEvent(self, event: QKeyEvent):
+        """Handle multi-cursor shortcuts and simultaneous edits."""
+        key = event.key()
+        modifiers = event.modifiers()
+        control = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
+        alt = bool(modifiers & Qt.KeyboardModifier.AltModifier)
+        shift = bool(modifiers & Qt.KeyboardModifier.ShiftModifier)
+
+        if control and alt and key in (Qt.Key.Key_Up, Qt.Key.Key_Down):
+            if key == Qt.Key.Key_Up:
+                operation = QTextCursor.MoveOperation.Up
+            else: 
+                operation = QTextCursor.MoveOperation.Down
+            self._add_cursor_vertically(operation)
+            event.accept()
+            return
+
+        completer_visible = self._completer is not None and \
+            self._completer.popup().isVisible()
+        if completer_visible and self._extra_cursors:
+            popup_keys = (Qt.Key.Key_Tab, Qt.Key.Key_Backtab,
+                          Qt.Key.Key_Enter, Qt.Key.Key_Return,
+                          Qt.Key.Key_Escape, Qt.Key.Key_Up,
+                          Qt.Key.Key_Down, Qt.Key.Key_PageUp,
+                          Qt.Key.Key_PageDown)
+            if key in popup_keys:
+                super().keyPressEvent(event)
+                return
+            self._completer.popup().hide()
+
+        if key == Qt.Key.Key_Escape and self._extra_cursors:
+            self.clear_extra_cursors()
+            event.accept()
+            return
+
+        # Let an open completer consume Tab in the usual way.
+        if key in (Qt.Key.Key_Tab, Qt.Key.Key_Backtab) and not completer_visible:
+            cursors = self._all_cursors()
+            if key == Qt.Key.Key_Backtab or shift:
+                self._change_indentation(cursors, False)
+            elif any(cursor.hasSelection() for cursor in cursors):
+                self._change_indentation(cursors, True)
+            else:
+                self._edit_at_all_cursors(lambda cursor: cursor.insertText(self.INDENT))
+            event.accept()
+            return
+
+        if not self._extra_cursors:
+            super().keyPressEvent(event)
+            return
+
+        force_autocomplete = event.keyCombination() == \
+            QKeyCombination(Qt.KeyboardModifier.ControlModifier | Qt.Key.Key_Space)
+        if force_autocomplete:
+            self._update_completion_popup(True)
+            event.accept()
+            return
+
+        self._completer.popup().hide()
+
+        if event.matches(QKeySequence.StandardKey.Paste):
+            from qtpy.QtWidgets import QApplication
+            text = QApplication.clipboard().text()
+            self._edit_at_all_cursors(lambda cursor: cursor.insertText(text))
+        elif key == Qt.Key.Key_Backspace:
+            self._edit_at_all_cursors(lambda cursor: cursor.deletePreviousChar())
+        elif key == Qt.Key.Key_Delete:
+            self._edit_at_all_cursors(lambda cursor: cursor.deleteChar())
+        elif key in (Qt.Key.Key_Enter, Qt.Key.Key_Return):
+            self._edit_at_all_cursors(lambda cursor: cursor.insertText('\n'))
+        elif key in (Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up,
+                     Qt.Key.Key_Down, Qt.Key.Key_Home, Qt.Key.Key_End):
+            if key == Qt.Key.Key_Left:
+                operation = QTextCursor.MoveOperation.PreviousWord if control \
+                    else QTextCursor.MoveOperation.Left
+            elif key == Qt.Key.Key_Right:
+                operation = QTextCursor.MoveOperation.NextWord if control \
+                    else QTextCursor.MoveOperation.Right
+            elif key == Qt.Key.Key_Up:
+                operation = QTextCursor.MoveOperation.Up
+            elif key == Qt.Key.Key_Down:
+                operation = QTextCursor.MoveOperation.Down
+            elif key == Qt.Key.Key_Home:
+                operation = QTextCursor.MoveOperation.Start if control \
+                    else QTextCursor.MoveOperation.StartOfLine
+            else:
+                operation = QTextCursor.MoveOperation.End if control \
+                    else QTextCursor.MoveOperation.EndOfLine
+            mode = QTextCursor.MoveMode.KeepAnchor if shift \
+                else QTextCursor.MoveMode.MoveAnchor
+            self._move_all_cursors(operation, mode)
+        elif event.text() and not control and not alt:
+            text = event.text()
+            self._edit_at_all_cursors(lambda cursor: cursor.insertText(text))
+        else:
+            # Undo, redo, copy and other standard shortcuts still belong to
+            # QPlainTextEdit. Clear secondary cursors if the document may move.
+            if event.matches(QKeySequence.StandardKey.Undo) or \
+                    event.matches(QKeySequence.StandardKey.Redo):
+                self.clear_extra_cursors()
+            super().keyPressEvent(event)
+            return
+
+        if key == Qt.Key.Key_Backspace or key < 255:
+            self._update_completion_popup()
+        event.accept()
+
+    # override QPlainTextEdit method
+    def mousePressEvent(self, event: QMouseEvent):
+        """Use Alt+left-click to add a cursor or start a multi-cursor drag."""
+        self.clear_extra_cursors()
+
+        left_click = bool(event.buttons() & Qt.MouseButton.LeftButton)
+        alt = bool(event.modifiers() & Qt.KeyboardModifier.AltModifier)
+        if alt and left_click:
+            clicked_cursor = self.cursorForPosition(event.position().toPoint())
+            self._multi_cursor_drag_anchor = QTextCursor(clicked_cursor)
+            self._multi_cursor_drag_x = round(event.position().x())
+            self._multi_cursor_drag_active = False
+            cursors = self._all_cursors()
+            matching_index = next((index for index, cursor in enumerate(cursors)
+                 if cursor.position() == clicked_cursor.position()), None)
+            if matching_index is None:
+                cursors.append(clicked_cursor)
+            elif matching_index > 0:
+                cursors.pop(matching_index)
+            self._set_cursors(cursors)
+            self.setFocus()
+            event.accept()
+            return
+
+        super().mousePressEvent(event)
+
+    # override QPlainTextEdit method
+    def mouseMoveEvent(self, event: QMouseEvent):
+        """Create a rectangular text selection while Alt+dragging the mouse."""
+        left_click = bool(event.buttons() & Qt.MouseButton.LeftButton)
+        if self._multi_cursor_drag_anchor is None or not left_click:
+            super().mouseMoveEvent(event)
+            return
+
+        anchor_block_number = self._multi_cursor_drag_anchor.blockNumber()
+        current_cursor = self.cursorForPosition(event.position().toPoint())
+        current_block_number = current_cursor.blockNumber()
+        if current_cursor.position() == self._multi_cursor_drag_anchor.position():
+            if self._multi_cursor_drag_active:
+                self._set_cursors([QTextCursor(self._multi_cursor_drag_anchor)])
+            event.accept()
+            return
+
+        self._multi_cursor_drag_active = True
+        first_block_number = min(anchor_block_number, current_block_number)
+        last_block_number = max(anchor_block_number, current_block_number)
+
+        cursors: list[QTextCursor] = []
+        for block_number in range(first_block_number, last_block_number + 1):
+            block = self.document().findBlockByNumber(block_number)
+            if not block.isValid() or not block.isVisible():
+                continue
+
+            block_top = self.blockBoundingGeometry(block).translated(
+                self.contentOffset()).top()
+            line_y = round(block_top + self.blockBoundingRect(block).height() / 2)
+            line_cursor = self.cursorForPosition(
+                QPoint(self._multi_cursor_drag_x, line_y))
+            current_line_cursor = self.cursorForPosition(
+                QPoint(round(event.position().x()), line_y))
+            line_cursor.setPosition(current_line_cursor.position(),
+                                    QTextCursor.MoveMode.KeepAnchor)
+            cursors.append(line_cursor)
+
+        self._set_cursors(cursors)
+        event.accept()
+
+    # override QPlainTextEdit method
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        """Finish an Alt+left-drag without forwarding it as a text selection."""
+        left_click = bool(event.buttons() & Qt.MouseButton.LeftButton)
+        if self._multi_cursor_drag_anchor is not None and left_click:
+            self._multi_cursor_drag_anchor = None
+            self._multi_cursor_drag_active = False
+            event.accept()
+            return
+
+        super().mouseReleaseEvent(event)
+
+    # override QPlainTextEdit method
+    def paintEvent(self, event: QPaintEvent):
+        """Paint the additional cursor carets after the editor contents."""
+        super().paintEvent(event)
+        if not self._extra_cursors or not self.hasFocus():
+            return
+
+        painter = QPainter(self.viewport())
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(self.palette().text())
+        for cursor in self._extra_cursors:
+            cursor_rect = self.cursorRect(cursor)
+            cursor_rect.setWidth(self.cursorWidth())
+            painter.drawRect(cursor_rect)
 
     def left_area_paint_event(self, event: QPaintEvent):
         """
