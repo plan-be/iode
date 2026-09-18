@@ -6,6 +6,8 @@ In development
 New Features 
 ------------
 
+- GUI: allow to edit multiple lines at once in IODE reports or in text tabs 
+  (press ALT to enable multiple cursors) (closes :issue:`1307`)
 
 Improvements 
 ------------
