@@ -74,33 +74,7 @@ public:
 
 	char* U_test_read_file(char*filename, long *size)
 	{
-	    return((char*)SCR_LoadRawFile(filename, size));
-	
-	//    FILE    *fd;
-	//    char    *content = 0;
-	//
-	//    *size = 0;
-	//    fd = fopen(filename, "rb");
-	//    if(fd == 0) return NULL;
-	//
-	//    while(!feof(fd)) {
-	//        if(*size % 1024 == 0)
-	//            content = SCR_realloc(content, 1, *size, 1 + 1024 + *size);
-	//        content[*size] = fgetc(fd);
-	//        (*size)++;
-	//    }
-	//    content[*size] = 0; // Juste pour dire
-	//    fclose(fd);
-	//    return(content);
-	}
-
-	void U_test_print_title(char* title)
-	{
-	    int i;
-	
-	    printf("\n\n%s\n", title);
-	    for (i = 0; title[i]; i++) printf("-");
-	    printf("\n");
+	    return((char*) SCR_LoadRawFile(filename, size));
 	}
 
 	void U_test_suppress_a2m_msgs()
@@ -111,131 +85,6 @@ public:
 	void U_test_reset_a2m_msgs()
 	{
 	    A2mMessage_toggle(1);
-	}
-
-	void U_test_CreateObjects()
-	{
-        double*     values;
-	    Sample*     smpl;
-	    std::string lst;
-	    static int  done = 0;
-
-        KDBListsPtr     kdb_lst = global_ws_lst;
-        KDBVariablesPtr kdb_var = global_ws_var;
-	
-	    // Create or update lists
-        if(kdb_lst->contains("LST1"))
-	        kdb_lst->update("LST1", "A,B");
-        else
-            kdb_lst->add("LST1", "A,B");
-	    lst = kdb_lst->get("LST1");
-        EXPECT_EQ(lst, "A,B");
-
-        if(kdb_lst->contains("LST2"))
-            kdb_lst->update("LST2", "A,B,A");
-        else
-	        kdb_lst->add("LST2", "A,B,A");
-        lst = kdb_lst->get("LST2");
-        EXPECT_EQ(lst, "A,B,A");
-
-	    // Set the sample for the variable WS
-	    smpl = new Sample("2000Y1", "2020Y1");
-	    kdb_var->set_sample(*smpl);
-	    EXPECT_TRUE(kdb_var->get_sample() != nullptr);
-	
-	    // Creates or update new vars
-        Variable A;
-        Variable B;
-	    int nb = smpl->nb_periods;
-	    for(int i = 0; i < nb; i++) 
-        {
-	       A.push_back(i);
-	       B.push_back(i*2);
-	    }
-	
-        if(kdb_var->contains("A"))
-            kdb_var->update("A", A);
-        else
-	        kdb_var->add("A", A);
-        values = kdb_var->get_var_ptr("A");
-        EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", 0), A[0]);
-        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", nb-1), A[nb-1]);
-	    
-        if(kdb_var->contains("B"))
-            kdb_var->update("B", B);
-        else
-            kdb_var->add("B", B);
-        values = kdb_var->get_var_ptr("B");
-        EXPECT_NE(values, nullptr);
-        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", 0), B[0]);
-        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", nb-1), B[nb-1]);
-
-	    // For B_DataPattern()
-        if(kdb_lst->contains("AB"))
-            kdb_lst->update("AB", "A,B");
-        else
-	        kdb_lst->add("AB", "A,B");
-
-        if(kdb_lst->contains("BC"))
-            kdb_lst->update("BC", "B,C");
-        else
-	        kdb_lst->add("BC", "B,C");
-
-        if(kdb_var->contains("AB"))
-	        kdb_var->update("AB", B);
-        else
-	        kdb_var->add("AB", B);
-
-        if(kdb_var->contains("AC"))
-	        kdb_var->update("AC", B);
-        else
-	        kdb_var->add("AC", B);
-        
-        if(kdb_var->contains("BB"))
-            kdb_var->update("BB", B);
-        else
-            kdb_var->add("BB", B);
-        
-        if(kdb_var->contains("BC"))
-            kdb_var->update("BC", B);
-        else
-            kdb_var->add("BC", B);
-	}
-
-	void U_test_lec(char* title, char* lec, int t, double expected_val)
-	{
-        // make sure that 't' is valid
-        Period per = global_ws_var->get_sample()->start_period.shift(t);
-        
-        // make sure that the LEC expression is valid
-	    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
-
-	    int rc = clec->link(global_ws_var, global_ws_scl);
-	    EXPECT_EQ(rc, 0);
-
-	    double calc_val = clec->execute(global_ws_var, global_ws_scl, t);
-	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
-	}
-
-	double U_test_calc_lec(char* lec, int t)
-	{
-        // make sure that the 'lec' expression is valid
-	    std::shared_ptr<CLEC> clec = nullptr; 
-        try
-        {
-            clec = std::make_shared<CLEC>(lec);
-        }
-        catch(const std::exception&)
-        {
-            return IODE_NAN;
-        }
-        
-	    if(clec->link(global_ws_var, global_ws_scl) != 0) 
-            return IODE_NAN;
-        
-	    double res = clec->execute(global_ws_var, global_ws_scl, t);
-	    return res;
 	}
 
 	void U_test_load(int type, char* filename)
@@ -423,8 +272,8 @@ public:
         EXPECT_EQ(rc, 0);
         EXPECT_EQ(global_ws_var->size(), 394);
         EXPECT_TRUE(global_ws_var->get_sample() != nullptr);
-	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
-	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+	    ACAF92 = calculate_lec("ACAF[1992Y1]", 0);
+	    ACAG92 = calculate_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
@@ -447,10 +296,10 @@ public:
         EXPECT_EQ(rc, 0);
 
 	    // 2.3 Tests
-	    ACAF91 = U_test_calc_lec("ACAF[1991Y1]", 0);
-	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
-	    ACAG90 = U_test_calc_lec("ACAG[1990Y1]", 0);
-	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+	    ACAF91 = calculate_lec("ACAF[1991Y1]", 0);
+	    ACAF92 = calculate_lec("ACAF[1992Y1]", 0);
+	    ACAG90 = calculate_lec("ACAG[1990Y1]", 0);
+	    ACAG92 = calculate_lec("ACAG[1992Y1]", 0);
 	    EXPECT_DOUBLE_EQ(ACAF91, 1.0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG90, IODE_NAN);	    
@@ -466,8 +315,8 @@ public:
 	    rc = B_WsCopy(arg, VARIABLES);
         EXPECT_EQ(rc, 0);
         
-	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
-	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+	    ACAF92 = calculate_lec("ACAF[1992Y1]", 0);
+	    ACAG92 = calculate_lec("ACAG[1992Y1]", 0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
 	
@@ -498,8 +347,8 @@ public:
 	    B_WsClearAll("");
 	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
-	    ACAF92 = U_test_calc_lec("ACAF[1992Y1]", 0);
-	    ACAG92 = U_test_calc_lec("ACAG[1992Y1]", 0);
+	    ACAF92 = calculate_lec("ACAF[1992Y1]", 0);
+	    ACAG92 = calculate_lec("ACAG[1992Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF92, 30.159000);
 	    EXPECT_DOUBLE_EQ(ACAG92, -40.285998999999997);
@@ -519,9 +368,9 @@ public:
 	    sprintf(arg,  "%sfun.av", input_test_dir);
 	    rc = B_WsMerge(arg, VARIABLES);
 	    //Check
-	    ACAF00 = U_test_calc_lec("ACAF[2000Y1]", 0);
-	    ACAF16 = U_test_calc_lec("ACAF[2016Y1]", 0);
-	    ACAG00 = U_test_calc_lec("ACAG[2000Y1]", 0);
+	    ACAF00 = calculate_lec("ACAF[2000Y1]", 0);
+	    ACAF16 = calculate_lec("ACAF[2016Y1]", 0);
+	    ACAG00 = calculate_lec("ACAG[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(round(ACAF00 * 1e8) / 1e8, 10.04661079);
 	    EXPECT_DOUBLE_EQ(ACAF16, 16.0);
@@ -565,7 +414,7 @@ public:
 	    // $WsExtrapolate [method] from to [variable list]
 	    sprintf(arg, "%d 2000Y1 2010Y1 ACAF", method);
 	    int rc = B_WsExtrapolate(arg);
-	    ACAF2002 = U_test_calc_lec("ACAF[2002Y1]", 0);
+	    ACAF2002 = calculate_lec("ACAF[2002Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(ACAF2002, expected_value);
 	    return true;
@@ -608,8 +457,8 @@ public:
 	    // $WsAggrSum  pattern
 	    strcpy(arg, "(?)[?]");
 	    rc = B_WsAggrSum(arg);
-	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
-	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+	    A_2000 = calculate_lec("A[2000Y1]", 0);
+	    B_2000 = calculate_lec("B[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(A_2000, 5 + 5*2); 
         EXPECT_EQ(B_2000, 5 * 5 + 5 * 5 * 5);
@@ -617,8 +466,8 @@ public:
 	    // $WsAggrProd  pattern
 	    strcpy(arg, "(?)[?]");
 	    rc = B_WsAggrProd(arg);
-	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
-	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+	    A_2000 = calculate_lec("A[2000Y1]", 0);
+	    B_2000 = calculate_lec("B[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_EQ(A_2000, (5) * (5*2));
         EXPECT_EQ(B_2000, (5 * 5) * (5 * 5 * 5));
@@ -626,8 +475,8 @@ public:
 	    // $WsAggrMean  pattern
 	    strcpy(arg, "(?)[?]");
 	    rc = B_WsAggrMean(arg);
-	    A_2000 = U_test_calc_lec("A[2000Y1]", 0);
-	    B_2000 = U_test_calc_lec("B[2000Y1]", 0);
+	    A_2000 = calculate_lec("A[2000Y1]", 0);
+	    B_2000 = calculate_lec("B[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(A_2000, 7.5); 
         EXPECT_DOUBLE_EQ(B_2000, 75.0);
@@ -635,7 +484,7 @@ public:
 	    // $WsAggrSum  pattern filename
 	    sprintf(arg,  "(AC)[??] %sfun.av", input_test_dir);
 	    rc = B_WsAggrSum(arg);
-	    AC_2000 = U_test_calc_lec("AC[2000Y1]", 0);
+	    AC_2000 = calculate_lec("AC[2000Y1]", 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(round(AC_2000 * 1e8) / 1e8, -31.48817578);
 	
@@ -656,7 +505,7 @@ public:
         for (int i = 0; i < strlen(varname); i++)
             lowercase_var_name[i] = tolower((unsigned char) varname[i]);
 	    sprintf(scalar, "df_%s", lowercase_var_name);
-	    df = U_test_calc_lec(scalar, 0);
+	    df = calculate_lec(scalar, 0);
         EXPECT_EQ(rc, 0);
 	    EXPECT_DOUBLE_EQ(df, expected_df);
 	    return true;
@@ -709,7 +558,7 @@ public:
 
 TEST_F(LegacyAPITest, Tests_BUF)
 {
-    U_test_print_title("Tests BUF");
+    print_test_title("Tests BUF");
     EXPECT_EQ(BUF_DATA, nullptr);
     EXPECT_NE(BUF_strcpy("ABCD"), nullptr);
     EXPECT_NE(BUF_alloc(100), nullptr);
@@ -725,8 +574,8 @@ TEST_F(LegacyAPITest, Tests_OBJECTS)
     std::string lst;
     static int  done = 0;
 
-    U_test_print_title("Tests OBJECTS");
-    U_test_CreateObjects();
+    print_test_title("Tests OBJECTS");
+    create_dummy_lists_and_vars();
 
     // Create lists
     found = global_ws_lst->contains("LST1");
@@ -770,7 +619,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     bool files = true;
     bool date = true;
 
-    U_test_print_title("Tests Table: Table(...) constructor vs get_obj_ptr()");
+    print_test_title("Tests Table: Table(...) constructor vs get_obj_ptr()");
 
     // --- create an instance of Table;
     tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
@@ -915,156 +764,16 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     global_ws_tbl->remove(name);
 }
 
-TEST_F(LegacyAPITest, Tests_LEC)
-{
-    int t = 2;
-    double expected_value = 0.0;
-
-    U_test_print_title("Tests LEC");
-
-    // Create objects
-    U_test_CreateObjects();
-
-    // A = 0 1 2 3 4  5  6  7  8  9 10
-    // B = 0 2 4 6 8 10 12 14 16 18 20
-    Variable A = global_ws_var->get("A");
-    Variable B = global_ws_var->get("B");
-
-    // Tests LEC
-    
-    // ---- test lag ----
-    U_test_lec("LEC", "A[2002Y1]",     t, A[2]);
-    U_test_lec("LEC", "A[2002Y1][-1]", t, A[2]);
-    U_test_lec("LEC", "A[-1]",         t, A[1]);
-    U_test_lec("LEC", "A[-1][2002Y1]", t, A[1]);
-    
-    // ---- test operators (LEC_OP) ----
-    U_test_lec("LEC", "A + B",  t, A[t] + B[t]);
-    
-    // ---- test no-time functions (LEC_FN) ----
-    U_test_lec("LEC", "ln A", t, log(A[t]));
-    U_test_lec("LEC", "ln B", t, log(B[t]));
-    U_test_lec("LEC", "ln A + ln B", t, log(A[t]) + log(B[t]));
-    U_test_lec("LEC", "ln (A + B)", t, log(A[t] + B[t]));
-    
-    // ---- test time functions (LEC_TFN) ----
-    expected_value = 0.0;
-    for(int k = 1; k < 11; k++)
-        expected_value += A[k];
-    U_test_lec("LEC", "sum(2001Y1, 2010Y1, A)", t, expected_value);
-
-    expected_value = 0.0;
-    for(int k = 1; k <= t; k++)
-        expected_value += A[k];
-    U_test_lec("LEC", "sum(2001Y1, A)", t, expected_value);
-
-    expected_value = 0.0;
-    for(int k = 0; k <= t; k++)
-        expected_value += A[k];
-    U_test_lec("LEC", "sum(A)", t, expected_value);
-
-    expected_value = 0.0;
-    for(int k = 1; k < 11; k++)
-        expected_value += A[k];
-    for(int k = 2; k < 9; k++)
-        expected_value += B[k];
-    U_test_lec("LEC", "sum(2001Y1, 2010Y1, A) + sum(2002Y1, 2008Y1, B)", t, expected_value);
-
-    expected_value = (A[t] + A[t+1] + A[t+2]) / 3.0;
-    U_test_lec("LEC", "mean(t, t+2, A)", t, expected_value);
-
-    expected_value = B[t] * (A[t] + A[t+1] + A[t+2]) / 3.0;
-    U_test_lec("LEC", "B * mean(t, t+2, A)", t, expected_value);
-
-    expected_value = A[t] / A[t-1];
-    U_test_lec("LEC", "r(A)", t, expected_value);
-    
-    expected_value = B[t] / B[t-1];
-    U_test_lec("LEC", "r(B)", t, expected_value);
-    
-    // ---- test variadic time functions (LEC_MTFN) ----
-    // covar0([from [,to],] X, Y) = sum(Xi * Yi) / n 
-    expected_value = 0.0;
-    for(int k = 0; k < 11; k++)
-        expected_value += A[k] * B[k];
-    expected_value /= 11.0;
-    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B)", t, expected_value);
-
-    double covar0_1 = expected_value;
-    double covar0_2 = 0.0;
-    for(int k = 2; k < 9; k++)
-        covar0_2 += A[k] * B[k];
-    covar0_2 /= 7.0;
-    expected_value = covar0_1 + covar0_2;
-    U_test_lec("LEC", "covar0(2000Y1, 2010Y1, A, B) + covar0(2002Y1, 2008Y1, A, B)", t, expected_value);
-
-    // ---- test macros (LEC_MACRO) ----
-    std::string lst = global_ws_lst->get("LST1");
-    EXPECT_EQ(lst, "A,B");
-    lst = global_ws_lst->get("LST2");
-    EXPECT_EQ(lst, "A,B,A");
-
-    double max_value = (A[t] > B[t]) ? A[t] : B[t];
-    U_test_lec("LEC-MACRO", "1 + max($LST1)", t, 1.0 + max_value);
-    U_test_lec("LEC-MACRO", "1 + max(60, $LST1)", t, 61.0);
-    U_test_lec("LEC-MACRO", "1 + max($LST2)", t, 1.0 + max_value);
-}
-
-TEST_F(LegacyAPITest, Tests_CLEC_Compile)
-{
-    U_test_print_title("Tests CLEC compile");
-
-    std::string lec = "A + 1";
-    std::shared_ptr<CLEC> clec = nullptr;
-    
-    U_test_CreateObjects();
-
-    Variable A = global_ws_var->get("A");
-    Variable B = global_ws_var->get("B");
-
-    clec = std::make_shared<CLEC>(lec);
-    EXPECT_EQ(clec->duplicated_endo, false);
-    EXPECT_EQ(clec->v_expression.size(), 3);
-    EXPECT_EQ(clec->v_obj_names.size(), 1);
-    EXPECT_TRUE(lec_contains(clec, "A"));
-    
-    // Using macros in LEC
-    clec = std::make_shared<CLEC>("1 + vmax($LST1)");
-    EXPECT_EQ(clec->v_obj_names.size(), 2);
-    EXPECT_TRUE(lec_contains(clec, "A"));
-    EXPECT_TRUE(lec_contains(clec, "B"));
-
-    clec = std::make_shared<CLEC>("1 + vmax($LST2)");
-    EXPECT_EQ(clec->v_obj_names.size(), 2);
-    EXPECT_TRUE(lec_contains(clec, "A"));
-    EXPECT_TRUE(lec_contains(clec, "B"));
-}
-
-TEST_F(LegacyAPITest, Tests_CLEC_Copy)
-{
-    U_test_print_title("Tests CLEC copy");
-
-    std::string lec = "A + 1";
-    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
-    std::shared_ptr<CLEC> copy_clec = std::make_shared<CLEC>(*clec);
-
-    EXPECT_TRUE(copy_clec != nullptr);
-    EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
-    EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
-    EXPECT_EQ(copy_clec->v_obj_names.size(), clec->v_obj_names.size());
-    EXPECT_EQ(copy_clec->v_obj_names, clec->v_obj_names);
-}
-
 TEST_F(LegacyAPITest, Tests_ARGS)
 {
     char **args;
     char *list[] = {"A1", "A2", 0};
     char filename[256];
 
-    U_test_print_title("Tests ARGS");
+    print_test_title("Tests ARGS");
 
     // Create objects
-    U_test_CreateObjects();
+    create_dummy_lists_and_vars();
 
     // A_init
     args = B_ainit_chk("A B;C,D", NULL, 0); // => "A" "B;C" "D"
@@ -1087,7 +796,7 @@ TEST_F(LegacyAPITest, Tests_ARGS)
 
 TEST_F(LegacyAPITest, Tests_ERRMSGS)
 {
-    U_test_print_title("Tests Err Msgs");
+    print_test_title("Tests Err Msgs");
 
     error_manager.append_error("bla bla: incorrect period");
     kerror(0, "Coucou de kerror %s", "Hello");
@@ -1100,7 +809,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     char in_filename[256];
     char out_filename[256];
 
-    U_test_print_title("Tests K_OBJFILE");
+    print_test_title("Tests K_OBJFILE");
 
     sprintf(in_filename,  "%sfun.var", input_test_dir);
     sprintf(out_filename, "%sfun_copy.var", output_test_dir);
@@ -1152,7 +861,7 @@ TEST_F(LegacyAPITest, Tests_Simulation)
     List    lst, expected_lst;
     void    (*kmsg_super_ptr)(const char*);
 
-    U_test_print_title("Tests Simulation");
+    print_test_title("Tests Simulation");
 
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
@@ -1206,7 +915,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 
     U_test_suppress_a2m_msgs();
 
-    U_test_print_title("Tests Print Table as Tables and Graphs");
+    print_test_title("Tests Print Table as Tables and Graphs");
 
     // Load the VAR workspace
     U_test_load(VARIABLES, "fun.av");
@@ -1310,7 +1019,7 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     std::shared_ptr<Sample> smpl;
 
     U_test_suppress_a2m_msgs();
-    U_test_print_title("Tests Estimation");
+    print_test_title("Tests Estimation");
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
@@ -1326,7 +1035,7 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     rc = est.estimate("1980Y1", "1996Y1");
     EXPECT_EQ(rc, 0);
 
-    EXPECT_DOUBLE_EQ(round(U_test_calc_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
+    EXPECT_DOUBLE_EQ(round(calculate_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
     EXPECT_DOUBLE_EQ(round(global_ws_eqs->get_obj_ptr("ACAF")->get_test_r2() * 1e6) / 1e6, 0.821815);
     //TODO : add some tests with other estimation methods / on blocks / with instruments
 
@@ -1396,7 +1105,7 @@ TEST_F(LegacyAPITest, Tests_Estimation_Step_Wise)
     std::shared_ptr<Sample> smpl;
 
     U_test_suppress_a2m_msgs();
-    U_test_print_title("Tests Estimation Step Wise");
+    print_test_title("Tests Estimation Step Wise");
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
@@ -1455,7 +1164,7 @@ TEST_F(LegacyAPITest, Tests_B_EqsStepWise)
     double      r2;
 
     U_test_suppress_a2m_msgs();
-    U_test_print_title("Tests Estimation Step Wise");
+    print_test_title("Tests Estimation Step Wise");
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
@@ -1499,7 +1208,7 @@ TEST_F(LegacyAPITest, Tests_Dickey_Fuller)
     double      *df;
 
     U_test_suppress_a2m_msgs();
-    U_test_print_title("Tests Dickey_Fuller");
+    print_test_title("Tests Dickey_Fuller");
 
     kmsg_super_ptr = kmsg_super;
     kmsg_super = kmsg_null; // Suppress messages at each iteration during simulation
@@ -1523,7 +1232,7 @@ TEST_F(LegacyAPITest, Tests_Dickey_Fuller)
 
 TEST_F(LegacyAPITest, Tests_ALIGN)
 {
-    U_test_print_title("Tests ALIGN");
+    print_test_title("Tests ALIGN");
     
     Table* p_tbl = new Table(2);
     int offset = (int) ((char*)(p_tbl + 1) - (char*)p_tbl);
@@ -1534,7 +1243,7 @@ TEST_F(LegacyAPITest, Tests_ALIGN)
 
 TEST_F(LegacyAPITest, Tests_W_printf)
 {
-    U_test_print_title("Tests W_printf");
+    print_test_title("Tests W_printf");
 
     U_test_suppress_a2m_msgs();
 
@@ -1567,7 +1276,7 @@ TEST_F(LegacyAPITest, Tests_SWAP)
     SWHDL item; 
     SWHDL item2;
 
-    U_test_print_title("Tests SWAP");
+    print_test_title("Tests SWAP");
 
     // test 1 : deux frees successifs
     item = SW_alloc(20);
@@ -1592,7 +1301,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     char        *filename = "fun";
     std::shared_ptr<Sample> smpl;
 
-    U_test_print_title("Tests B_DATA");
+    print_test_title("Tests B_DATA");
 
     KDBCommentsPtr kdb_cmt = global_ws_cmt;
     KDBEquationsPtr kdb_eqs = global_ws_eqs;
@@ -1611,7 +1320,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     global_ws_idt->clear();
     global_ws_lst->clear();
     global_ws_tbl->clear();
-    U_test_CreateObjects();
+    create_dummy_lists_and_vars();
 
     // B_DataPattern()
     // Foireux. Faut utiliser des listes (avec A;B au lieu de $AB ca marche pas...) => A changer ? Voir B_DataListSort()
@@ -1799,7 +1508,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
 {
     int rc;
 
-    U_test_print_title("Tests B_EQS");
+    print_test_title("Tests B_EQS");
 
     // (Re-)loads 3 WS and check ok
     U_test_load_fun_esv("fun");
@@ -1831,7 +1540,7 @@ TEST_F(LegacyAPITest, Tests_B_FILE)
 {
     int     rc;
 
-    U_test_print_title("Tests B_FILE");
+    print_test_title("Tests B_FILE");
 
     // Cleanup files
     _unlink("test.a2m");
@@ -1870,7 +1579,7 @@ TEST_F(LegacyAPITest, Tests_B_FSYS)
     int     rc;
     char    arg[1024];
 
-    U_test_print_title("Tests B_FSYS");
+    print_test_title("Tests B_FSYS");
 
     char test_a2m_file[1024];
     sprintf(test_a2m_file, "%stest.a2m", output_test_dir);
@@ -1972,7 +1681,7 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     char filename[256];
     int  rc;
 
-    U_test_print_title("Tests B_IDT");
+    print_test_title("Tests B_IDT");
 
     // Init -> clear ws
     global_ws_cmt->clear();
@@ -1982,7 +1691,7 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
 
     // Create vars on 2000Y1:2020Y1 
     //  => A = [0, 1...], B = [0, 2, 4...], AB = AC = BB = BC = B
-    U_test_CreateObjects();
+    create_dummy_lists_and_vars();
 
     std::shared_ptr<Identity> idt_ptr_C = std::make_shared<Identity>("D * 2 + ACAF");
     std::shared_ptr<Identity> idt_ptr_D = std::make_shared<Identity>("A + B");
@@ -2009,7 +1718,7 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
     global_ws_var->clear();
     // Create vars on 2000Y1:2020Y1 
     //  => A = [0, 1...], B = [0, 2, 4...], AB = AC = BB = BC = B
-    U_test_CreateObjects();
+    create_dummy_lists_and_vars();
 
     sprintf(filename,  "WS %sfun", input_test_dir);
     rc = B_IdtExecuteVarFiles(filename);
@@ -2039,7 +1748,7 @@ TEST_F(LegacyAPITest, Tests_B_IDT_EXECUTE)
     double  *AOUC;
     int     rc;
 
-    U_test_print_title("Tests B_IDT_EXECUTE");
+    print_test_title("Tests B_IDT_EXECUTE");
 
     // Loads 3 WS and check ok
     U_test_load(IDENTITIES, "fun");
@@ -2068,7 +1777,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     int     rc;
     bool    success;
 
-    U_test_print_title("Tests EXP: Export CSV and rcsv");
+    print_test_title("Tests EXP: Export CSV and rcsv");
 
     // Export
     // Exports VAR files into external formats.
@@ -2097,7 +1806,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     EXPECT_EQ(rc, 0);
     compare_files(output_test_dir, "fun2.tsp", output_test_dir, "fun2.ref.tsp");
 
-    U_test_print_title("Tests IMP VAR: Import Ascii Variables");
+    print_test_title("Tests IMP VAR: Import Ascii Variables");
 
     sprintf(reffile, "%sfun_xode.av.ref", input_test_dir);
     sprintf(outfile, "%sfun_xode.var", output_test_dir);
@@ -2108,9 +1817,9 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
     success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var = kdb_var;
-    U_test_lec("ACAF[2002Y1]", "ACAF[2002Y1]", 0, -0.92921251);
+    check_lec("ACAF[2002Y1]", 0, -0.92921251);
 
-    U_test_print_title("Tests IMP CMT: Import Ascii Comments");
+    print_test_title("Tests IMP CMT: Import Ascii Comments");
 
     sprintf(reffile, "%sfun_xode.ac.ref", input_test_dir);
     sprintf(outfile, "%sfun_xode.cmt", output_test_dir);
@@ -2138,7 +1847,7 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     char    trace[] = " ";
     int     rc;
 
-    U_test_print_title("Tests XODE: Import ASCII via report function");
+    print_test_title("Tests XODE: Import ASCII via report function");
 
     sprintf(reffile, "%sfun_xode.av.ref", input_test_dir);
     sprintf(outfile, "%sfun_xode.var", output_test_dir);
@@ -2152,7 +1861,7 @@ TEST_F(LegacyAPITest, Tests_B_IMP_ASCII)
     bool success = kdb_var->load(std::string(outfile));
     EXPECT_TRUE(success);
     global_ws_var = kdb_var;
-    U_test_lec("KK_AF[2002Y1]", "KK_AF[2002Y1]", 0, -0.92921251);
+    check_lec("KK_AF[2002Y1]", 0, -0.92921251);
 
 }
 
@@ -2164,7 +1873,7 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     Sample  *smpl;
     int     rc;
 
-    U_test_print_title("Tests B_LTOH: convert low periodicity to high periodicity");
+    print_test_title("Tests B_LTOH: convert low periodicity to high periodicity");
 
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
@@ -2178,37 +1887,37 @@ TEST_F(LegacyAPITest, Tests_B_LTOH)
     sprintf(cmd, "L %s ACAF", varfile);
     rc = B_WsLtoHStock(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -79.729132);
+    check_lec("ACAF[2014Q3]", 0, -79.729132);
 
     // Linear interpolation / flow
     sprintf(cmd, "L %s ACAG", varfile);
     rc = B_WsLtoHFlow(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.105075);
+    check_lec("ACAG[2014Q3]", 0, 8.105075);
 
     // Cubic Splines / stock
     sprintf(cmd, "C %s ACAF", varfile);
     rc = B_WsLtoHStock(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2012Q3]", "ACAF[2012Q3]", 0, -52.805666);
+    check_lec("ACAF[2012Q3]", 0, -52.805666);
 
     // Cubic splines / flow
     sprintf(cmd, "C %s ACAG", varfile);
     rc = B_WsLtoHFlow(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAG[2012Q3]", "ACAG[2012Q3]", 0, 7.6135768);
+    check_lec("ACAG[2012Q3]", 0, 7.6135768);
 
     // Step / stock
     sprintf(cmd, "S %s ACAF", varfile);
     rc = B_WsLtoHStock(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2014Q3]", "ACAF[2014Q3]", 0, -83.340625);
+    check_lec("ACAF[2014Q3]", 0, -83.340625);
 
     // Step / flow
     sprintf(cmd, "S %s ACAG", varfile);
     rc = B_WsLtoHFlow(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAG[2014Q3]", "ACAG[2014Q3]", 0, 8.1050747);
+    check_lec("ACAG[2014Q3]", 0, 8.1050747);
 }
 
 
@@ -2223,7 +1932,7 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     //getcwd(current_dir, sizeof(current_dir));
     //printf("%s\n", current_dir);
 
-    U_test_print_title("Tests B_HTOL: convert high periodicity to low periodicity");
+    print_test_title("Tests B_HTOL: convert high periodicity to low periodicity");
 
     // Clear the vars and set the sample for the variable WS
     global_ws_var->clear();
@@ -2237,19 +1946,19 @@ TEST_F(LegacyAPITest, Tests_B_HTOL)
     sprintf(cmd, "%s ACAF", varfile);
     rc = B_WsHtoLLast(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAF[2014Y1]", "ACAF[2014Y1]", 0, -83.340625);
+    check_lec("ACAF[2014Y1]", 0, -83.340625);
 
     // Mean
     sprintf(cmd, "%s ACAG", varfile);
     rc = B_WsHtoLMean(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("ACAG[2014Y1]", "ACAG[2014Y1]", 0, 8.1050747);
+    check_lec("ACAG[2014Y1]", 0, 8.1050747);
 
     // Sum
     sprintf(cmd, "%s AOUC", varfile);
     rc = B_WsHtoLSum(cmd);
     EXPECT_EQ(rc, 0);
-    U_test_lec("AOUC[2014Y1]", "AOUC[2014Y1]", 0, 1.423714 );
+    check_lec("AOUC[2014Y1]", 0, 1.423714 );
 }
 
 
@@ -2269,7 +1978,7 @@ TEST_F(LegacyAPITest, Tests_B_MODEL)
     // int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
     // int B_ModelSimulateSaveNorms(char *arg)                     $ModelSimulateSaveNorms varname
 
-    U_test_print_title("Tests B_Model*(): simulation parameters and model simulation");
+    print_test_title("Tests B_Model*(): simulation parameters and model simulation");
 
     // Loads 3 WS and check ok
     U_test_load_fun_esv(filename);
@@ -2381,7 +2090,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     int rc;
     std::string filepath;
     
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -2405,7 +2114,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     global_ws_tbl->clear();
     global_ws_var->clear();
 
-    U_test_print_title("B_WsLoad() -> binary files");
+    print_test_title("B_WsLoad() -> binary files");
 
     filepath = str_input_test_dir + "fun.cmt";
     rc = B_WsLoad((char*) filepath.c_str(), COMMENTS);
@@ -2567,7 +2276,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     global_ws_tbl->clear();
     global_ws_var->clear();
     
-    U_test_print_title("B_WsLoad() -> ascii files");
+    print_test_title("B_WsLoad() -> ascii files");
 
     filepath = str_input_test_dir + "fun.ac";
     rc = B_WsLoad((char*) filepath.c_str(), COMMENTS);
@@ -2728,7 +2437,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     std::string in_filepath;
     std::string out_filepath;
     
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -2752,7 +2461,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     global_ws_tbl->clear();
     global_ws_var->clear();
 
-    U_test_print_title("B_WsSave() -> binary files");
+    print_test_title("B_WsSave() -> binary files");
 
     in_filepath = str_input_test_dir + "fun.cmt";
     B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
@@ -2956,7 +2665,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     global_ws_tbl->clear();
     global_ws_var->clear();
     
-    U_test_print_title("B_WsSave() -> ascii files");
+    print_test_title("B_WsSave() -> ascii files");
 
     in_filepath = str_input_test_dir + "fun.ac";
     B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
@@ -3160,7 +2869,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     std::string in_filepath;
     std::string out_filepath;
     
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     int t;
     std::shared_ptr<Sample> var_sample;
@@ -3183,7 +2892,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     global_ws_tbl->clear();
     global_ws_var->clear();
 
-    U_test_print_title("B_WsSaveCmp() -> compressed binary files");
+    print_test_title("B_WsSaveCmp() -> compressed binary files");
 
     in_filepath = str_input_test_dir + "fun.cmt";
     B_WsLoad((char*) in_filepath.c_str(), COMMENTS);
@@ -3385,10 +3094,10 @@ TEST_F(LegacyAPITest, Tests_B_WsExport)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3398,7 +3107,7 @@ TEST_F(LegacyAPITest, Tests_B_WsExport)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsExport(char* arg, int type)               $WsExport<type> filename
-    U_test_print_title("B_WsExport()");
+    print_test_title("B_WsExport()");
     U_test_B_WsExport("fun.cmt", "fun2.ac", COMMENTS);
     U_test_B_WsExport("fun.eqs", "fun2.ae", EQUATIONS);
     U_test_B_WsExport("fun.idt", "fun2.ai", IDENTITIES);
@@ -3414,10 +3123,10 @@ TEST_F(LegacyAPITest, Tests_B_WsClear)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3427,7 +3136,7 @@ TEST_F(LegacyAPITest, Tests_B_WsClear)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsClear(char* arg, int type)                $WsClear<type>
-    U_test_print_title("B_WsClear()");
+    print_test_title("B_WsClear()");
     U_test_B_WsClear(COMMENTS);
     U_test_B_WsClear(EQUATIONS);
     U_test_B_WsClear(IDENTITIES);
@@ -3443,10 +3152,10 @@ TEST_F(LegacyAPITest, Tests_B_WsImport)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3456,7 +3165,7 @@ TEST_F(LegacyAPITest, Tests_B_WsImport)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsImport(char* arg, int type)               $WsImport<type> filename
-    U_test_print_title("B_WsImport()");
+    print_test_title("B_WsImport()");
     U_test_B_WsImport("fun2.ac", COMMENTS, 317);
     U_test_B_WsImport("fun2.ae", EQUATIONS, 274);
     U_test_B_WsImport("fun2.ai", IDENTITIES, 48);
@@ -3473,10 +3182,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3486,7 +3195,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSample)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
-    U_test_print_title("B_WsSample()");
+    print_test_title("B_WsSample()");
     int rc = B_WsSample("1965Y1 2020Y1");
     Sample smpl("1965Y1", "2020Y1");
     EXPECT_EQ(rc, 0);
@@ -3501,10 +3210,10 @@ TEST_F(LegacyAPITest, Tests_B_WsClearAll)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3514,7 +3223,7 @@ TEST_F(LegacyAPITest, Tests_B_WsClearAll)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsClearAll(char* arg, int unused)                       $WsClearAll
-    U_test_print_title("B_WsClearAll()");
+    print_test_title("B_WsClearAll()");
     rc = B_WsClearAll("");
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 0);
@@ -3532,10 +3241,10 @@ TEST_F(LegacyAPITest, Tests_B_WsDescr)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3545,7 +3254,7 @@ TEST_F(LegacyAPITest, Tests_B_WsDescr)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
-    U_test_print_title("B_WsDescr()");
+    print_test_title("B_WsDescr()");
     U_test_B_WsDescr("Ws content description", COMMENTS);
     U_test_B_WsDescr("Ws content description", EQUATIONS);
     U_test_B_WsDescr("Ws content description", IDENTITIES);
@@ -3561,10 +3270,10 @@ TEST_F(LegacyAPITest, Tests_B_WsName)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3573,7 +3282,7 @@ TEST_F(LegacyAPITest, Tests_B_WsName)
     B_WsLoad(fullfilename, TABLES);
     B_WsLoad(fullfilename, VARIABLES);
 
-    U_test_print_title("B_WsName()");
+    print_test_title("B_WsName()");
     U_test_B_WsName("funtest", COMMENTS);
     U_test_B_WsName("funtest", EQUATIONS);
     U_test_B_WsName("funtest", IDENTITIES);
@@ -3588,10 +3297,10 @@ TEST_F(LegacyAPITest, Tests_B_WsCopy)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3601,10 +3310,10 @@ TEST_F(LegacyAPITest, Tests_B_WsCopy)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
-    U_test_print_title("B_WsCopy() - VARIABLES");
+    print_test_title("B_WsCopy() - VARIABLES");
     U_test_B_WsCopyVar();
 
-    U_test_print_title("B_WsCopy() - other objects");
+    print_test_title("B_WsCopy() - other objects");
     U_test_B_WsCopy("fun", COMMENTS, 317);
     U_test_B_WsCopy("fun", EQUATIONS, 274);  // scalar gamma in EQ W is illegal since the implementation th gamma function in LEC
     U_test_B_WsCopy("fun", IDENTITIES, 48);   // Idem in IDT NAWRU
@@ -3619,10 +3328,10 @@ TEST_F(LegacyAPITest, Tests_B_WsMerge)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3632,10 +3341,10 @@ TEST_F(LegacyAPITest, Tests_B_WsMerge)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
-    U_test_print_title("B_WsMerge() - VARIABLES");
+    print_test_title("B_WsMerge() - VARIABLES");
     U_test_B_WsMergeVar();
 
-    U_test_print_title("B_WsMerge() - other objects");
+    print_test_title("B_WsMerge() - other objects");
     U_test_B_WsMerge("fun", COMMENTS, 317);
     U_test_B_WsMerge("fun", EQUATIONS, 274);
     U_test_B_WsMerge("fun", IDENTITIES, 48);
@@ -3652,10 +3361,10 @@ TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3665,7 +3374,7 @@ TEST_F(LegacyAPITest, Tests_B_WsExtrapolate)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
-    U_test_print_title("B_WsExtrapolate");
+    print_test_title("B_WsExtrapolate");
     U_test_B_WsExtrapolate(0, 6.0);
     U_test_B_WsExtrapolate(1, 4.0);
     U_test_B_WsExtrapolate(2, 7.0);
@@ -3682,10 +3391,10 @@ TEST_F(LegacyAPITest, Tests_B_WsAggregate)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3698,7 +3407,7 @@ TEST_F(LegacyAPITest, Tests_B_WsAggregate)
     // int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
     // int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
     // int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
-    U_test_print_title("B_WsAggregate");
+    print_test_title("B_WsAggregate");
     U_test_B_WsAggregate();
 }
 
@@ -3708,10 +3417,10 @@ TEST_F(LegacyAPITest, Tests_B_StatUnitRoot)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3721,7 +3430,7 @@ TEST_F(LegacyAPITest, Tests_B_StatUnitRoot)
     B_WsLoad(fullfilename, VARIABLES);
 
     // int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
-    U_test_print_title("B_StatUnitRoot");
+    print_test_title("B_StatUnitRoot");
     B_WsLoad(fullfilename, SCALARS);
     B_WsLoad(fullfilename, VARIABLES);
 
@@ -3737,10 +3446,10 @@ TEST_F(LegacyAPITest, Tests_B_Csv)
 	char fullfilename[256];
 	sprintf(fullfilename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_Ws*(): report functions $Ws*");
+    print_test_title("Tests B_Ws*(): report functions $Ws*");
 
     // int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
-    U_test_print_title("B_WsLoad()");
+    print_test_title("B_WsLoad()");
     B_WsLoad(fullfilename, COMMENTS);
     B_WsLoad(fullfilename, EQUATIONS);
     B_WsLoad(fullfilename, IDENTITIES);
@@ -3755,7 +3464,7 @@ TEST_F(LegacyAPITest, Tests_B_Csv)
     // int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
     // int B_CsvDec(char *dec, int unused)                           $CsvDec char
     // int B_CsvSave(char* arg, int type)                            $CsvSave<type> file name1 name2 ...
-    U_test_print_title("B_Csv*");
+    print_test_title("B_Csv*");
     U_test_B_Csv();
 }
 
@@ -3764,7 +3473,7 @@ TEST_F(LegacyAPITest, Tests_B_PRINT_Table_DEF)
     char in_filename[256];
     sprintf(in_filename,  "%s%s", input_test_dir, "fun");
 
-    U_test_print_title("Tests B_PrintObjDef()");
+    print_test_title("Tests B_PrintObjDef()");
 
     B_WsLoad(in_filename, COMMENTS);
     B_WsLoad(in_filename, EQUATIONS);

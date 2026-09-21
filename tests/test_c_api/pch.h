@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <filesystem>
 #include <string>
@@ -84,6 +85,137 @@ public:
 	}
 
 protected:
+	void print_test_title(const std::string& title)
+	{
+		std::cout << "\n\n" << title << std::endl;
+		std::cout << std::string(title.size(), '-') << std::endl;
+	}
+
+	void create_dummy_lists_and_vars()
+	{
+		// Create or update lists
+		std::string lst;
+        KDBListsPtr kdb_lst = global_ws_lst;
+
+        if(kdb_lst->contains("LST1"))
+	        kdb_lst->update("LST1", "A,B");
+        else
+            kdb_lst->add("LST1", "A,B");
+	    lst = kdb_lst->get("LST1");
+        EXPECT_EQ(lst, "A,B");
+
+        if(kdb_lst->contains("LST2"))
+            kdb_lst->update("LST2", "A,B,A");
+        else
+	        kdb_lst->add("LST2", "A,B,A");
+        lst = kdb_lst->get("LST2");
+        EXPECT_EQ(lst, "A,B,A");
+
+	    // Set the sample for the variable WS
+		KDBVariablesPtr kdb_var = global_ws_var;
+	    std::shared_ptr<Sample> smpl_ptr = std::make_shared<Sample>("2000Y1", "2020Y1");
+	    kdb_var->set_sample(*smpl_ptr);
+	    EXPECT_TRUE(kdb_var->get_sample() != nullptr);
+	
+	    // Creates or update new vars
+        Variable A;
+        Variable B;
+	    int nb = smpl_ptr->nb_periods;
+	    for(int i = 0; i < nb; i++) 
+        {
+	       A.push_back(i);
+	       B.push_back(i*2);
+	    }
+	
+        if(kdb_var->contains("A"))
+            kdb_var->update("A", A);
+        else
+	        kdb_var->add("A", A);
+        double* values = kdb_var->get_var_ptr("A");
+        EXPECT_NE(values, nullptr);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", 0), A[0]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("A", nb-1), A[nb-1]);
+	    
+        if(kdb_var->contains("B"))
+            kdb_var->update("B", B);
+        else
+            kdb_var->add("B", B);
+        values = kdb_var->get_var_ptr("B");
+        EXPECT_NE(values, nullptr);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", 0), B[0]);
+        EXPECT_DOUBLE_EQ(kdb_var->get_value("B", nb-1), B[nb-1]);
+
+	    // For B_DataPattern()
+        if(kdb_lst->contains("AB"))
+            kdb_lst->update("AB", "A,B");
+        else
+	        kdb_lst->add("AB", "A,B");
+
+        if(kdb_lst->contains("BC"))
+            kdb_lst->update("BC", "B,C");
+        else
+	        kdb_lst->add("BC", "B,C");
+
+        if(kdb_var->contains("AB"))
+	        kdb_var->update("AB", B);
+        else
+	        kdb_var->add("AB", B);
+
+        if(kdb_var->contains("AC"))
+	        kdb_var->update("AC", B);
+        else
+	        kdb_var->add("AC", B);
+        
+        if(kdb_var->contains("BB"))
+            kdb_var->update("BB", B);
+        else
+            kdb_var->add("BB", B);
+        
+        if(kdb_var->contains("BC"))
+            kdb_var->update("BC", B);
+        else
+            kdb_var->add("BC", B);
+	}
+
+	double calculate_lec(const std::string& lec, int t)
+	{
+        // make sure that the 'lec' expression is valid
+	    std::shared_ptr<CLEC> clec = nullptr; 
+        try
+        {
+            clec = std::make_shared<CLEC>(lec);
+        }
+        catch(const std::exception&)
+        {
+            return IODE_NAN;
+        }
+        
+	    if(clec->link(global_ws_var, global_ws_scl) != 0) 
+            return IODE_NAN;
+        
+	    double res = clec->execute(global_ws_var, global_ws_scl, t);
+	    return res;
+	}
+
+	void check_lec(const std::string& lec, int t, double expected_val)
+	{
+		double precision = 1e6;
+
+        // make sure that 't' is valid
+        Period per = global_ws_var->get_sample()->start_period.shift(t);
+        
+        // make sure that the LEC expression is valid
+	    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec);
+
+		std::cout << "linking LEC expression '" << lec << "'" << std::endl;
+	    int rc = clec->link(global_ws_var, global_ws_scl);
+	    EXPECT_EQ(rc, 0);
+
+		std::cout << "computing LEC expression for the period '" << per.to_string() << "'" << std::endl;
+	    double calc_val = clec->execute(global_ws_var, global_ws_scl, t);
+	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
+	}
+
 	void compare_files(const std::string& filepath1, const std::string& filepath2, 
 		std::set<int> ignore_lines = std::set<int>())
 	{	
