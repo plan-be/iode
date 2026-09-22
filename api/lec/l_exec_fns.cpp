@@ -366,6 +366,9 @@ double L_round(std::deque<double>& stack, int nargs)
     return res / shift;
 }
 
+/**
+ * @brief urandom(max): randomly and uniformly distributed within the interval [0, max[ 
+ */
 double L_urandom(std::deque<double>& stack, int unused)
 {
     static bool init = false;
@@ -418,6 +421,10 @@ static double randBoxMuller(double rv_mean, double rv_sd)
     return rv_mean + rv_sd * z1;
 }
 
+/**
+ * @brief grandom(m, sd): random variable with a normal distribution 
+ * with mean 'm' and standard deviation 'sd'.
+ */
 double L_grandom(std::deque<double>& stack, int unused)
 {
     double sd = stack.back();
