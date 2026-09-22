@@ -1,7 +1,7 @@
 Version 7.0.10
 ==============
 
-In development
+Released on 22/09/2026
 
 New Features 
 ------------
@@ -27,7 +27,3 @@ Fixed Bugs
 
 - IODE REPORTS: fixed IODE commands `IF` and `DIV0` returning a wrong value 
   (closes :issue:`1298`)
-
-Miscellaneous 
--------------
-
