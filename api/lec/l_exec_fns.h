@@ -71,7 +71,7 @@ inline double u_rand()
     return ((double) rand() / (1.0 + (double) RAND_MAX));
 }
 
-double L_logn(const double v);
+double L_log10(const double v);
 
 double L_uminus(std::deque<double>& stack, int nbargs);
 double L_uplus(std::deque<double>& stack, int nbargs);

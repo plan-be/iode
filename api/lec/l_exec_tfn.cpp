@@ -199,7 +199,7 @@ double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from,
     if(!IODE_IS_A_NUMBER(v2)) 
         return IODE_NAN;
     
-    return L_logn(L_divide(v1, v2));
+    return L_log10(L_divide(v1, v2));
 }
 
 
