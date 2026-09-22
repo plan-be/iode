@@ -14,6 +14,7 @@
  * For some very specific operations (comparison of workspaces for example), temporary KDB may be created for the duration 
  * of the operation.
  */
+#include "api/iode_scr4.h"
 #include "scr4/base/s_dir.h"
 
 #include "api/b_errors.h"

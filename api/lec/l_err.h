@@ -1,6 +1,8 @@
 #pragma once
-#include "api/pch.h"
+#include "api/iode_scr4.h"
 #include "scr4/yy/s_yy.h"              // YYKEYS
+
+#include "api/pch.h"
 
 inline int L_errno = 0;             // LEC error number (during compilation)
 inline YYFILE* L_YY = nullptr;      // LEC stream the compiler is reading from

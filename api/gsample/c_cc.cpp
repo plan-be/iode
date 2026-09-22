@@ -41,6 +41,7 @@
  *      int tbl_find_mode(const std::vector<COL>& columns, int* mode, int type)
  *
  */
+#include "api/iode_scr4.h"
 #include "scr4/date/s_prodt.h"
 
 #include "api/pch.h"

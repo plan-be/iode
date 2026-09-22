@@ -1,4 +1,7 @@
 #pragma once 
+#include "api/iode_scr4.h"
+#include "scr4/args/s_args.h"
+
 #include "api/pch.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"

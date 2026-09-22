@@ -9,6 +9,7 @@
  *      int K_aggr(char* pattern, char* ename, char* nname) *                                           Transforms a variable name based on an "aggregation" pattern.
  *  
  */
+#include "api/iode_scr4.h"
 #include "scr4/args/s_args.h"
 #include "scr4/strs/s_prost.h"
 

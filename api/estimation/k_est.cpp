@@ -7,6 +7,7 @@
  *  and the workspaces of equations and scalars where the estimation results 
  *  are stored. 
  */
+#include "api/iode_scr4.h"
 #include "scr4/date/s_prodt.h"
 
 #include "api/b_errors.h"

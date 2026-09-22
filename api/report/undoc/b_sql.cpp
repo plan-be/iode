@@ -85,6 +85,7 @@ U_ch    *RPS_Close(U_ch** args)
 // Embarcadero 32 bits
 // ------------------- 
 
+#include "api/iode_scr4.h"
 #include "scr4/odbc/s_odbc.h"
 //#include <sqltypes.h>
 #include "sql.h"

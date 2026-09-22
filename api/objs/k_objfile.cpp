@@ -2,6 +2,7 @@
     #include <io.h>
 #endif
 
+#include "api/iode_scr4.h"
 #include "scr4/swap/s_swap.h"        // SWHDL
 #include "scr4/base/s_prodir.h"
 
@@ -74,7 +75,7 @@ static bool kread(void* buf, size_t elements_size, size_t elements_count, FILE* 
 static int K_read_len(FILE* fd, int vers, OSIZE* len)
 {
     OSIZE   os;
-    U_sh    us;
+    unsigned short    us;
     bool    success; 
 
     if(vers == 0 || vers == 3)  
@@ -92,12 +93,12 @@ static int K_read_len(FILE* fd, int vers, OSIZE* len)
     }
     else 
     {
-        success = fread(&us, (int)sizeof(U_sh), 1, fd);
+        success = fread(&us, (int)sizeof(unsigned short), 1, fd);
         if(!success) 
             return -1;
         
         K_xdrPINT((unsigned char*) &us);
-        success = kseek(fd, (long) (-1 * sizeof(U_sh)), 1);
+        success = kseek(fd, (long) (-1 * sizeof(unsigned short)), 1);
         if(!success) 
             return -1;
         

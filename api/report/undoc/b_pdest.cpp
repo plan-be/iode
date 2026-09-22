@@ -66,6 +66,7 @@
  *      int B_PrintHtmlTHClass(char *th_class, int unused)             | $PrintHtmlTHClass class_name
  *      int B_PrintHtmlTDClass(char *td_class, int unused)             | $PrintHtmlTDClass class_name
  */
+#include "api/iode_scr4.h"
 #include "scr4/a2m/s_a2m.h"
 #include "scr4/args/s_args.h"
 #include "scr4/a2m/s_proa2m.h"

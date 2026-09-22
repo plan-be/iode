@@ -6,6 +6,7 @@
  *    char *K_LastVersion(): returns in an allocated string the current version of IODE. 
  *    char *K_CurrentVersion(): returns in an allocated string the IODE version of the current executable.
  */
+#include "api/iode_scr4.h"
 #include "scr4/strs/s_strs.h"
 
 #include "api/pch.h"

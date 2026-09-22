@@ -20,6 +20,7 @@
  *  
  *     int get_version(char* label): returns the current object version (0-2) from an IODE file header. 
  */
+#include "api/iode_scr4.h"
 #include "scr4/swap/s_swap.h"        // SWHDL
 
 #include "api/objs/kdb.h"
@@ -78,10 +79,10 @@ int get_version(char* label)
 static char* Pack16To32(char* opack)
 {
     OSIZE   *ptr;
-    U_sh    *old_ptr = (U_sh *)opack;
+    unsigned short    *old_ptr = (unsigned short *)opack;
     int     nlg, add, lendata, i;
 
-    add = (old_ptr[1] + 2 + old_ptr[1] % 2) * (sizeof(OSIZE) - sizeof(U_sh));
+    add = (old_ptr[1] + 2 + old_ptr[1] % 2) * (sizeof(OSIZE) - sizeof(unsigned short));
     nlg = old_ptr[0] + add;
     ptr = (OSIZE *)SW_nalloc(nlg);
     ptr[0] = nlg;
@@ -91,7 +92,7 @@ static char* Pack16To32(char* opack)
 
     lendata = nlg - (ptr[1] + 2 + old_ptr[1] % 2) * sizeof(OSIZE);
     memcpy(((char *) ptr) + (ptr[1]  + 2 + ptr[1] % 2) * sizeof(OSIZE),
-           ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(U_sh),
+           ((char *)old_ptr) + (old_ptr[1] + 2 + old_ptr[1] % 2) * sizeof(unsigned short),
            lendata);
     return((char *)ptr);
 }

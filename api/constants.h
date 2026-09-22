@@ -5,32 +5,9 @@
 #include <cstring>      // for std strncpy
 #include <iostream>
 
-// set SCR4 flags to help IntelliSense (VS Code) 
-// to find the right functions and variables definitions
-#ifndef REALD
-    #define REALD
-#endif
-#ifndef SCRPROTO
-    #define SCRPROTO
-#endif 
-#ifndef NOEMS 
-    #define NOEMS
-#endif
-#ifndef NOEMF
-    #define NOEMF
-#endif
-
-#define _max_(a, b)        (((a) > (b)) ? (a) : (b))
-#define _min_(a, b)        (((a) < (b)) ? (a) : (b))
-
-#include "scr4/strs/s_strs.h"
-
 /*---------------- DEFINE ------------------------*/
 
-// ALD 23/11/2023
 #include "version.h"
-
-#define __DBG__ DebugForce("%s[%d]\n", __FILE__, __LINE__);     // tests
 
 #ifdef __GNUC__
     #include <sys/stat.h>   // for mkdir
@@ -47,17 +24,17 @@
     #define vsnprintf_s vsnprintf
 #endif
 
-// values.h n'existe pas en  VCC, remplacer les defines
+// values.h does not exist in MSVC -> replace defines
 #ifndef _MSC_VER
-#include <values.h>
+    #include <values.h>
 #else
-#include <float.h>
-#define DMAXEXP   DBL_MAX_EXP
-#define DMINEXP   DBL_MIN_EXP
-#define MAXDOUBLE DBL_MAX
-#define MINDOUBLE DBL_MIN
-#define MAXFLOAT  FLT_MAX
-#define MINFLOAT  FLT_MIN
+    #include <float.h>
+    #define DMAXEXP   DBL_MAX_EXP
+    #define DMINEXP   DBL_MIN_EXP
+    #define MAXDOUBLE DBL_MAX
+    #define MINDOUBLE DBL_MIN
+    #define MAXFLOAT  FLT_MAX
+    #define MINFLOAT  FLT_MIN
 #endif
 
 #include <set>
@@ -69,40 +46,6 @@
 #include <algorithm>        // for std::min, std::max
 
 #include "api/utils/logging.h"
-
-
-/* ALLOCS DOC 28/8/2012 */
-// A PLACER DEVANT LES INCLUDES DE SCR (ou dans cc -c -DALLOCDOCON ...)
-#define ALLOCDOCON
-
-// REALD defines if not yet defined (to avoid compilation warning)
-#ifndef REALD
-    #define REALD
-#endif
-
-#if defined(DOS) || defined(SCRW32)
-#define P_ALIGN     4
-#endif
-
-#ifdef UNIX
-#define P_ALIGN     4
-#endif
-
-#ifdef SUN3
-#define P_ALIGN     4
-#endif
-
-#ifdef SUN4
-#define P_ALIGN     4
-#endif
-
-#ifdef HP
-#define P_ALIGN     4
-#endif
-
-#ifndef U_sh
-#define U_sh    unsigned short
-#endif
 
 #define K_VERSION  "1.0"
 #define OK_MAX_NAME  10

@@ -37,11 +37,8 @@
  *      int      A2M_GIF_TRCOLOR_NB     Number of the TR color of the gif graphs // JMP 1/5/2022 
  *  
  */
-#include "scr4/a2m/s_a2m.h"
-
 #include "api/b_a2mini.h"
-#include "api/write/write.h"
-#include "b_iodeini.h"
+#include "api/b_iodeini.h"
 
 
 /**

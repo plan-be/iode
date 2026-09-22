@@ -13,6 +13,7 @@
  *      void wks_name(char* str, int c1, int r1, int c2, int r2)
  *  
  */
+#include "api/iode_scr4.h"
 #include "scr4/s_xdr.h"
 
 #include "api/io/import.h"

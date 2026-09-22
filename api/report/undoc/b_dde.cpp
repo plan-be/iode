@@ -52,6 +52,7 @@
  *      int B_ExcelNew(char *arg, int unused)
  *      int IodeFmtVal(char *buf, double val)
  */
+#include "api/iode_scr4.h"
 #include "scr4/scr4w.h"
 
 #include "api/pch.h"

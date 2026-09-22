@@ -1,5 +1,5 @@
 #pragma once
-
+#include "api/iode_scr4.h"
 #include "scr4/yy/s_yy.h"          // YYKEYS
 
 #include "api/lec/l_common.h"
