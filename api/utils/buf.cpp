@@ -13,8 +13,10 @@
  * 
  *   - char *BUF_DATA : NULL or pointer to the allocated buffer
  */
-#include "api/pch.h"
+#include "api/iode_scr4.h"
 #include "scr4/swap/s_swap.h"
+
+#include "api/pch.h"
 #include "api/utils/buf.h"
 
 

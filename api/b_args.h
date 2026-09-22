@@ -1,5 +1,9 @@
 #pragma once
+#include "api/iode_scr4.h"
 #include "scr4/args/s_args.h"
+#include "scr4/strs/s_prost.h"
+#include "scr4/strs/s_strs.h"
+
 #include "api/pch.h"
 
 char **B_ainit_chk(char* arg, ADEF* adef, int nb);

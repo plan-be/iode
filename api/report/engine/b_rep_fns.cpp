@@ -113,6 +113,7 @@
  *      
  *  
  */
+#include "api/iode_scr4.h"
 #include "scr4/base/s_prodir.h"
 #include "scr4/strs/s_prost.h"
 #include "scr4/date/s_prodt.h"

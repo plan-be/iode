@@ -19,6 +19,7 @@
  *      int B_DSImportDb_1(char *arg, Sample *smpl)
  *      int B_DSImportDb(char *arg, int unused)
  */ 
+#include "api/iode_scr4.h"
 #include "scr4/a2m/s_a2m.h"
 #include "scr4/args/s_args.h"
 #ifdef _MSC_VER

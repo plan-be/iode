@@ -72,11 +72,14 @@
  *      int P_nb(char *ptr) : Retrieves the number of elements in a pack pointed to by ptr.
  */
 #pragma once
+#include "api/iode_scr4.h"
 #include "scr4/swap/s_swap.h"        // SW_nalloc(), SW_nrealloc(), SW_getptr(), SW_nfree()
 
 #include "api/pch.h"
 #include "api/utils/buf.h"
 #include "api/objs/pack.h"
+
+#define P_ALIGN 4
 
 
 /**
@@ -88,9 +91,9 @@
 */
 void *P_create()
 {
-    U_sh* ptr;
+    unsigned short* ptr;
 
-    ptr = (U_sh *) SW_nalloc(2 * sizeof(OSIZE));     
+    ptr = (unsigned short *) SW_nalloc(2 * sizeof(OSIZE));     
     if(!ptr) 
         return NULL;
     

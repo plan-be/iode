@@ -9,6 +9,7 @@
  *  
  *  
  */
+#include "api/iode_scr4.h"
 #include "scr4/mat/s_mat.h"
 
 #include "api/pch.h"

@@ -1,3 +1,4 @@
+#include "api/iode_scr4.h"
 #include "scr4/a2m/s_a2m.h"
 
 void set_page_header(char* c_page_header, size_t length_page_header)

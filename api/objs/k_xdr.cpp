@@ -312,7 +312,7 @@ static void K_xdrTable(unsigned char* pack, int mode)
 static int K_oxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 {
     int     len;
-    U_sh    *pos;
+    unsigned short    *pos;
 
     if(xdr_ptr == NULL) {
         /* intel read */
@@ -478,13 +478,13 @@ static int K_txdr(unsigned char* ptr, unsigned char** xdr_ptr)
 static int K_vxdr(unsigned char* ptr, unsigned char** xdr_ptr)
 {
     int     len;
-    U_sh    *pos;
+    unsigned short    *pos;
 
     if(xdr_ptr == NULL) {
         /* intel read */
         K_xdrPACK(ptr, 0);
 
-        pos = (U_sh *) ptr;
+        pos = (unsigned short *) ptr;
         len = P_get_len(ptr, 0);
         XDR_rev(P_get_ptr(ptr, 0), len/sizeof(double), sizeof(double));
     }
@@ -510,7 +510,7 @@ static int K_vxdr(unsigned char* ptr, unsigned char** xdr_ptr)
  */
 void K_xdrPINT(unsigned char* a)
 {
-    XDR_rev(a, 1, sizeof(U_sh));
+    XDR_rev(a, 1, sizeof(unsigned short));
 }
 
 

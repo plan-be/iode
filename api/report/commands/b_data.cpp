@@ -92,6 +92,7 @@
  *      int B_DataDisplayGraph(char* arg, int unused)           This function allows you to view VARs or combinations of VARS in graphical form.
  *      int B_DataPrintGraph(char* arg, int unused)             This function allows you to print VARs or combinations of VARS in graphical form.
  */
+#include "api/iode_scr4.h"
 #include "scr4/args/s_args.h"
 
 #include "api/pch.h"

@@ -26,6 +26,7 @@
  *  Note that RP_exec_fn() calls the function with a second parameter "type" which, being
  *  not needed by these functions, is ignored. 
  */
+#include "api/iode_scr4.h"
 #include "scr4/scr4.h"
 
 #include "api/pch.h"

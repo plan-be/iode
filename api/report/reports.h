@@ -40,7 +40,7 @@ const static int BFNS_NB_GROUPS = 2;
 
 struct RPFN 
 {
-    U_ch*   (*fn)(U_ch** args);     // Pointer to the corresponding function
+    unsigned char*   (*fn)(unsigned char** args);     // Pointer to the corresponding function
 };
 
 /*------------------------ GLOBALS ----------------------- */
