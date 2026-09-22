@@ -120,17 +120,6 @@ The LEC syntax depends on variables defined in l\_token.c. These variables are a
 
 ### l\_token.c {#T9}
 
-|Variable|Description|
-|:---|:---|
-|`L_TABLE `|keywords recognised in a LEC expression, like '\+' or 'ln'|
-|`L_PRIOR `|table of the operator execution priorities (which one is executed first, second...)|
-|`L_MIN_FARGS `|table of minimum number of arguments for the math functions (like log())|
-|`L_MAX_FARGS `|table of maximum number of arguments for the math functions|
-|`L_MIN_TARGS `|table of minimum number of arguments for the time functions (like grt())|
-|`L_MAX_TARGS `|table of minimum number of arguments for the time functions|
-|`L_MIN_MTARGS `|table of minimum number of arguments for the functions with multiple time expressions|
-|`L_MAX_MTARGS `|table of minimum number of arguments for the functions with multiple time expressions|
-
 These variables may be changed (but with some care).
 
 ## LEC utilities {#T10}
@@ -139,29 +128,13 @@ These variables may be changed (but with some care).
 
 Functions to allocate and free standard memory (on the "heap") for the LEC group of functions. Could be replaced by another implementation if needed.
 
-|Syntax|Description|
-|:---|:---|
-|`char *L_malloc(int lg)`|Allocates lg bytes in conventional memory. Fills the allocated space with nulls.|
-|`void L_free(void *ptr)`|Frees an allocated buffer. If ptr is null, does nothing.|
-
 ### l\_err.c {#T12}
 
 Function and variables to manage error messages.
 
-|Syntax|Description|
-|:---|:---|
-|`int L_errno`|Last error number during LEC compilation|
-|`char* L_error()`|Returns a static buffer containing the last LEC compilation error message.|
-
 ### l\_debug.c {#T13}
 
 Function to save debugging info in a text file.
-
-|Syntax|Description|
-|:---|:---|
-|`void L_debug(char* fmt, ...)`|appends a message to the file L\_DEBUG\_FILENAME ("simul.dbg" by default).|
-|**bGlobal variable**||
-|`char* L_DEBUG_FILENAME = 0;`|name of the output file (default "simul.dbg")|
 
 ## LEC compiler {#T14}
 
@@ -171,23 +144,9 @@ Functions and associated variables to "open" a LEC expression and to read the ex
 
 The variables defining the LEC syntax (L\_TABLE, L\_PRIOR, L\_MIN...) are described above.
 
-Main functions:
-
-|Syntax|Description|
-|:---|:---|
-|`int L_open_all(char* file_or_string, int type)`|Opens a file or a string for reading and assigns the open stream to L\_YY.|
-|`void L_close()`|Close the stream L\_YY.|
-|`int L_read_next_token()`|Main function to browse a LEC expression (in L\_YY) token by token.|
-
 ### l\_compile.c {#T16}
 
 LEC compilation.
-
-Main functions:
-
-|Syntax|Description|
-|:---|:---|
-|`int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)`|Computes the position of the beginning of a sub\-expression|
 
 ### l\_eqs.c {#T18}
 
@@ -211,132 +170,27 @@ Functions to evaluate a compiled and linked LEC expression.
 
 ### l\_exec\_var.c {#T23}
 
-Functions to evaluate LEC constants:
-
-|Syntax|Description|
-|:---|:---|
-|`static double L_pi ()`||
-|`static double L_euro()`||
-|`static double L_e ()`||
-|`static double L_time(int t)`||
-|`static double L_i(int t)`||
+Functions to evaluate LEC constants.
 
 ### l\_exec\_ops.c {#T24}
 
 Functions to evaluate LEC "operators".
 
-|Syntax|Description|
-|:---|:---|
-|`static double L_or (double a, double b)`||
-|`static double L_and (double a, double b)`||
-|`static double L_ge (double a, double b)`||
-|`static double L_gt (double a, double b)`||
-|`static double L_le (double a, double b)`||
-|`static double L_lt (double a, double b)`||
-|`static double L_eq (double a, double b)`||
-|`static double L_ne (double a, double b)`||
-|`static double L_plus (double a, double b)`||
-|`static double L_minus(double a, double b)`||
-|`static double L_times(double a, double b)`||
-|` double L_divide(double a, double b)`||
-|` double L_exp(double a, double b)`||
-
 ### l\_exec\_fns.c {#T25}
 
 Functions to evaluate LEC "functions".
-
-|Syntax|Description|
-|:---|:---|
-|`double L_logn(const double v)`||
-|`static double L_uminus(std::deque<double>& stack)`||
-|`static double L_uplus (std::deque<double>& stack)`||
-|`static double L_log(std::deque<double>& stack, int nargs)`||
-|`static double L_ln(std::deque<double>& stack)`||
-|`static double L_not(std::deque<double>& stack)`||
-|`static double L_expn(std::deque<double>& stack, int nargs)`||
-|`static double L_max(std::deque<double>& stack, int nargs)`||
-|`static double L_min(std::deque<double>& stack, int nargs)`||
-|`static double L_sin (std::deque<double>& stack)`||
-|`static double L_cos (std::deque<double>& stack)`||
-|`static double L_acos (std::deque<double>& stack)`||
-|`static double L_asin (std::deque<double>& stack)`||
-|`static double L_tan (std::deque<double>& stack)`||
-|`static double L_atan (std::deque<double>& stack)`||
-|`static double L_tanh (std::deque<double>& stack)`||
-|`static double L_sinh (std::deque<double>& stack)`||
-|`static double L_cosh (std::deque<double>& stack)`||
-|`static double L_abs (std::deque<double>& stack)`||
-|`static double L_sqrt (std::deque<double>& stack)`||
-|`static double L_int (std::deque<double>& stack)`||
-|`static double L_rad (std::deque<double>& stack)`||
-|`static double L_if(std::deque<double>& stack, int nargs)`||
-|`static double L_lsum(std::deque<double>& stack, int nargs)`||
-|`static double L_lmean(std::deque<double>& stack, int nargs)`||
-|`static double L_fnisan(std::deque<double>& stack, int nargs)`||
-|`static double L_lcount(std::deque<double>& stack, int nargs)`||
-|`static double L_lprod(std::deque<double>& stack, int nargs)`||
-|`static double L_sign(std::deque<double>& stack)`||
-|`static double L_lstderr(std::deque<double>& stack, int nargs)`||
-|`static double L_random(std::deque<double>& stack)`||
-|`static double L_floor(std::deque<double>& stack)`||
-|`static double L_ceil (std::deque<double>& stack)`||
-|`static double L_round(std::deque<double>& stack, int nargs)`||
-|`static double L_urandom(std::deque<double>& stack)`||
-|`static double L_grandom(std::deque<double>& stack)`||
-|`static double L_gamma(std::deque<double>& stack)`||
-|`static double L_div0(double *stack, int nargs)`||
 
 ### l\_exec\_tfn.c {#T26}
 
 Functions to evaluate LEC "time functions".
 
-|Syntax|Description|
-|:---|:---|
-|`static double L_lag(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_diff(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_rapp(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_dln(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_grt(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_mavg(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_vmax(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_vmin(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_sum(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_prod(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|` double L_mean(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_stderr(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_lastobs(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-
 ### l\_exec\_mtfn.c {#T27}
 
 Functions to evaluate LEC "time functions" with possibly multiple arguments.
 
-|Syntax|Description|
-|:---|:---|
-|`static double L_calccorr(AbstractCLEC& clec, int start_1, short len1, int start_2, short len2, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_corr(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_calccovar(AbstractCLEC& clec, int start_1, short len1, int start_2, short len2, int t, std::deque<double>& stack, int nargs, int orig)`||
-|`static double L_covar(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_covar0(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_var(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_stddev(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_index(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_acf(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static int L_calcvals(AbstractCLEC& clec, int start, short length, int t, std::deque<double>& stack, int* vt, double* vy, int notnul)`||
-|`static double L_interpol(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_app(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_dapp(unsigned char* expr, short nvargs, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_hpall(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs, int std)`||
-|`static double L_hp(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-|`static double L_hpstd(unsigned char* expr, short len, int t, std::deque<double>& stack, int nargs)`||
-
 ### l\_hodrick.c {#T28}
 
 Hodrick\-Prescott filter. These functions are subfunctions of L\_hp\*() defined on l\_exec\_mtfn.c.
-
-|Syntax|Description|
-|:---|:---|
-|`int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)`|Hodrick\-Prescott filter.|
-|`void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)`|Prepares HP\_calc()|
 
 ## LEC virtual functions {#T29}
 

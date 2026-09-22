@@ -349,7 +349,9 @@ The mathematical functions are:
 - ``floor(expr)``: integer part of the expression
 - ``ceil(expr)``: integer part of the expression plus 1
 - ``round(expr [, n])``: rounds *expr* to the nth decimal place. If *n* is not defined, it is set to 0.
-- ``random(expr)``: provides a random number between -expr/2 and +expr/2.
+- ``random(expr)``: provides a pseudo-random number between -expr/2 and +expr/2.
+- ``urandom(max)``: provides a random number following an uniform distribution within the interval [0, max[. 
+- ``grandom(m, sd)``: provides a random number following a normal distribution with mean *m* and standard deviation *sd*.
 
 Some operators require further explanation:
 
@@ -415,10 +417,20 @@ The sign function returns the sign of an expression::
 Random function
 ~~~~~~~~~~~~~~~
 
-The random function provides a pseudo-random number between *-expr/2* and *+expr/2*. 
+The `random` function provides a pseudo-random number between *-expr/2* and *+expr/2*. 
 Its syntax is::
 
     random(expr)
+
+The `urandom` function provides a random number following an uniform distribution 
+within the interval [0, max[. Its syntax is::
+
+    urandom(max)
+
+The `grandom` provides a random number following a normal distribution with 
+mean *m* and standard deviation *sd*. Its syntax is::
+
+    grandom(m, sd)
 
 
 .. _time_functions:
