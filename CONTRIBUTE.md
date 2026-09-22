@@ -392,9 +392,13 @@ The change log files for each version are located in the directory doc/changes.
 ## Before the release
 
 1. Create a local branch based on `origin master` with the name containing the keyword `release`.
-2. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on `<current date>`".
-3. Commit your changes (the commit message should be something like `RELEASE: released version <tag>`)
-4. Create an annotated tag on the new commit.
+2. Build the *iode* Python package (see below) and install it locally. 
+3. Rerun all Jupyter notebooks in the directory doc/source/tutorial (make sure that 
+   the kernel is running with the version of *iode* to be released).
+4. Commit your changes. 
+5. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on `<current date>`".
+6. Commit your changes (the commit message should be something like `RELEASE: released version <tag>`)
+7. Create an annotated tag on the new commit.
    The name of the tag is the name of the last change log file in doc/changelog/versions (`v<major>.<minor>.<patch>(-beta.<beta>)`).
    The annotation should be something like `RELEASE: release <tag> on <current date>`.
 
