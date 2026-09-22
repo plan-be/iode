@@ -473,9 +473,9 @@ double L_gamma(std::deque<double>& stack, int unused)
 
 double L_div0(std::deque<double>& stack, int unused)
 {
-    double a = stack.back();
-    stack.pop_back();
     double b = stack.back();
+    stack.pop_back();
+    double a = stack.back();
     stack.pop_back();
 
     double res;

@@ -22,7 +22,8 @@ Fixed Bugs
 - PYTHON: fixed exporting IODE tables to files when the title or cells from the left 
   column contain line breaks or the special character '&' or '#' (closes :issue:`1297`)
 
-- IODE REPORTS: fixed IODE commands `IF` returning a wrong value (closes :issue:`1298`)
+- IODE REPORTS: fixed IODE commands `IF` and `DIV0` returning a wrong value 
+  (closes :issue:`1298`)
 
 Miscellaneous 
 -------------
