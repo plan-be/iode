@@ -91,7 +91,9 @@ TEST_F(LecTest, Tests_LEC)
     check_lec("ln (A + B)", t, log(A[t] + B[t]));
     check_lec("if(t=2002Y1, A + B, A - B)", t, A[t] + B[t]);
     check_lec("if(t=2002Y1, A + B, A - B)", t-1, A[t-1] - B[t-1]);
-    
+    check_lec("div0(A, B)", t, A[t] / B[t]);
+    check_lec("div0(A, B)", 0, 0.0);            // B[...] = 0.0
+
     // ---- test time functions (LEC_TFN) ----
     expected_value = 0.0;
     for(int k = 1; k < 11; k++)
