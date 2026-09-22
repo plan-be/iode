@@ -8,8 +8,7 @@
     #define _isnan isnan
 #endif
 
-/* Global functions (not static!) */
-double L_logn(const double v)
+double L_log10(const double v)
 {
     double x;
     if(!IODE_IS_A_NUMBER(v) || v <= 0) 
@@ -39,26 +38,29 @@ double L_uplus (std::deque<double>& stack, int unused)
 
 double L_log(std::deque<double>& stack, int nargs)
 {   
-    double value = stack.back();
-    stack.pop_back();
-
     if(nargs == 2)
     {
-        double res2 = L_logn(value);
-        value = stack.back();
+        double base = stack.back();
         stack.pop_back();
-        double res1 = L_logn(value);
-        return L_divide(res1, res2);
+        double log_b = L_log10(base);
+        double x = stack.back();
+        stack.pop_back();
+        double log_x = L_log10(x);
+        return L_divide(log_x, log_b);
     }
     else
-        return L_logn(value);
+    {
+        double value = stack.back();
+        stack.pop_back();
+        return L_log10(value);
+    }
 }
 
 double L_ln(std::deque<double>& stack, int unused)  
 {
     double value = stack.back();
     stack.pop_back();
-    return L_logn(value);
+    return L_log10(value);
 }
 
 double L_not(std::deque<double>& stack, int unused) 
@@ -75,15 +77,14 @@ double L_not(std::deque<double>& stack, int unused)
  */
 double L_expn(std::deque<double>& stack, int nargs)
 {
-    double n = stack.back();
-    stack.pop_back();
-
     if(nargs == 1) 
     {
-        if(n >= DMAXEXP || n <= DMINEXP)
+        double x = stack.back();
+        stack.pop_back();
+        if(x >= DMAXEXP || x <= DMINEXP)
             return IODE_NAN;
         
-        double res = exp(n);
+        double res = exp(x);
         if(res >= MAXDOUBLE || res <= MINDOUBLE)
             return IODE_NAN;
         
@@ -91,6 +92,8 @@ double L_expn(std::deque<double>& stack, int nargs)
     }
     else 
     {
+        double n = stack.back();
+        stack.pop_back();
         double x = stack.back();
         stack.pop_back();
         return L_exp(x, n);
@@ -351,17 +354,23 @@ double L_ceil(std::deque<double>& stack, int unused)
 
 double L_round(std::deque<double>& stack, int nargs)
 {
+    double value = 0.0;
     int nb_digits = 0;
+
     if(nargs == 2) 
     {
         nb_digits = (int) stack.back();
         stack.pop_back();
+        value = stack.back();
+        stack.pop_back();
     }
+    else
+    {
+        value = stack.back();
+        stack.pop_back();
+    }
+
     double shift = pow(10, nb_digits);
-
-    double value = stack.back();
-    stack.pop_back();
-
     double res = floor(0.5 + (value * shift));
     return res / shift;
 }

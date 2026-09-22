@@ -182,7 +182,7 @@ CLEC::CLEC(const std::string& lec, const bool side_of_eq) : AbstractCLEC()
         throw std::runtime_error("Error opening LEC string");
 
     if(parse(side_of_eq) != 0)
-        throw std::runtime_error("Error generating LEC expression");
+        throw std::runtime_error("Error computing LEC expression " + lec);
     
     if(!side_of_eq)
         reorder_expression();
