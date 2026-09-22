@@ -216,11 +216,11 @@ double L_rad(std::deque<double>& stack, int unused)
 
 double L_if(std::deque<double>& stack, int nargs)
 {
-    double cond = stack.back();
-    stack.pop_back();
     double arg2 = stack.back();
     stack.pop_back();
     double arg1 = stack.back();
+    stack.pop_back();
+    double cond = stack.back();
     stack.pop_back();
 
     if(!IODE_IS_A_NUMBER(cond) || fabs(cond) < 1e-15)  

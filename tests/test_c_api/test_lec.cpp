@@ -83,12 +83,14 @@ TEST_F(LecTest, Tests_LEC)
     
     // ---- test operators (LEC_OP) ----
     check_lec("A + B",  t, A[t] + B[t]);
-    
+
     // ---- test no-time functions (LEC_FN) ----
     check_lec("ln A", t, log(A[t]));
     check_lec("ln B", t, log(B[t]));
     check_lec("ln A + ln B", t, log(A[t]) + log(B[t]));
     check_lec("ln (A + B)", t, log(A[t] + B[t]));
+    check_lec("if(t=2002Y1, A + B, A - B)", t, A[t] + B[t]);
+    check_lec("if(t=2002Y1, A + B, A - B)", t-1, A[t-1] - B[t-1]);
     
     // ---- test time functions (LEC_TFN) ----
     expected_value = 0.0;
