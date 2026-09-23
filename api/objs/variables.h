@@ -78,8 +78,13 @@ struct KDBVariables : public KDBTemplate<KDBVariables, Variable>
     static int   CSV_NBDEC;
 
 private:
-    // periods of the Variables database
+    // Full sample of the Variables database. Variable values are always indexed
+    // against this sample, including for subsets.
     std::shared_ptr<Sample> sample = nullptr;
+
+    // Visible sample of a period-restricted subset. A null pointer means that
+    // the whole Variables sample is visible.
+    std::shared_ptr<Sample> subset_sample = nullptr;
 
     void check_var_size(const std::string& action, const std::string& name, const Variable& variable)
     {
@@ -122,11 +127,15 @@ private:
     // copy constructor
     KDBVariables(const KDBVariables& other): KDBTemplate(other) 
     {
-        Sample* other_sample = other.sample.get();
-        if(other_sample)
-            this->sample = std::make_shared<Sample>(*other_sample);
+        if(other.sample)
+            this->sample = std::make_shared<Sample>(*(other.sample));
         else
             this->sample = nullptr;
+
+        if(other.subset_sample)
+            this->subset_sample = std::make_shared<Sample>(*(other.subset_sample));
+        else
+            this->subset_sample = nullptr;
     }
 
 public:
@@ -156,6 +165,8 @@ public:
 
         if(this->sample)
             this->sample.reset();
+        if(this->subset_sample)
+            this->subset_sample.reset();
         
         // reset the sample of all children databases (subsets)
         for(std::shared_ptr<KDBVariables> child : this->get_children_db())
@@ -180,6 +191,14 @@ public:
         
         return subset_ptr;
     }
+
+    std::shared_ptr<KDBVariables> get_subset(const std::string& pattern, const bool copy) override
+    {
+        return KDBTemplate::get_subset(pattern, copy);
+    }
+
+    std::shared_ptr<KDBVariables> get_subset(const std::string& pattern, const bool copy,
+        const std::string& first_period, const std::string& last_period);
 
     double get_value(const std::string& name, const int t) const
     {
@@ -234,6 +253,11 @@ public:
     void update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period);
 
     std::shared_ptr<Sample> get_sample() const;
+    std::shared_ptr<Sample> get_visible_sample() const;
+    bool is_subset_over_periods() const;
+    int get_first_period_position() const;
+    int get_last_period_position() const;
+    int get_real_period_position(const Period& period) const;
 
     bool check_sample() const
     {
@@ -250,6 +274,7 @@ public:
     bool set_sample(const Period& from, const Period& to);
     bool set_sample(const Sample& new_sample);
     void update_sample_child(std::shared_ptr<Sample> parent_sample);
+    void update_subset_sample();
 
     int get_nb_periods() const;
     std::string get_period(const int t) const;

@@ -873,9 +873,105 @@ void KDBVariables::update(const std::string& name, const std::string& lec, const
 	this->update(name, lec, t_first, t_last);
 }
 
+std::shared_ptr<KDBVariables> KDBVariables::get_subset(const std::string& pattern, const bool copy,
+	const std::string& first_period, const std::string& last_period)
+{
+	if(!sample || sample->nb_periods == 0)
+		throw std::runtime_error("Cannot create a subset because the sample of the Variables database is not defined yet");
+
+	std::shared_ptr<Sample> max_subset_sample = get_visible_sample();
+	Period first = first_period.empty() ? max_subset_sample->start_period : Period(first_period);
+	Period last = last_period.empty() ? max_subset_sample->end_period : Period(last_period);
+
+	try
+	{
+		sample->get_period_position(first);
+	}
+	catch(const std::exception&)
+	{
+        std::string error_msg = "subset: first period of the subset '" + first.to_string() + "' ";
+        error_msg += "is not inside the Variables sample '" + sample->to_string() + "'";
+		throw std::invalid_argument(error_msg);
+	}
+
+	try
+	{
+		sample->get_period_position(last);
+	}
+	catch(const std::exception&)
+	{
+        std::string error_msg = "subset: last period of the subset '" + last.to_string() + "' ";
+        error_msg += "is not inside the Variables sample '" + sample->to_string() + "'";
+		throw std::invalid_argument(error_msg);
+	}
+
+	if(last.difference(first) < 0)
+    {
+        std::string error_msg = "subset: first period of the subset ('" + first.to_string() + "') ";
+        error_msg += "must be <= last period of the subset ('" + last.to_string() + "')";
+		throw std::invalid_argument(error_msg);
+    }
+
+	std::shared_ptr<KDBVariables> subset_ptr = KDBTemplate::get_subset(pattern, copy);
+	if(first == sample->start_period && last == sample->end_period)
+		subset_ptr->subset_sample.reset();
+	else
+		subset_ptr->subset_sample = std::make_shared<Sample>(first, last);
+
+	return subset_ptr;
+}
+
 std::shared_ptr<Sample> KDBVariables::get_sample() const
 {
 	return this->sample;
+}
+
+std::shared_ptr<Sample> KDBVariables::get_visible_sample() const
+{
+	return subset_sample ? subset_sample : sample;
+}
+
+bool KDBVariables::is_subset_over_periods() const
+{
+	return subset_sample != nullptr;
+}
+
+int KDBVariables::get_first_period_position() const
+{
+    if(!subset_sample)
+        return 0;
+
+	return sample->get_period_position(subset_sample->start_period);
+}
+
+int KDBVariables::get_last_period_position() const
+{
+    if(!subset_sample)
+        return sample->nb_periods - 1;
+
+	return sample->get_period_position(subset_sample->end_period);
+}
+
+int KDBVariables::get_real_period_position(const Period& period) const
+{
+    std::shared_ptr<Sample> visible_sample = get_visible_sample();
+	if(!sample || !visible_sample || sample->nb_periods == 0)
+		throw std::runtime_error("The sample of the IODE Variables workspace is not defined");
+
+	try
+	{
+		visible_sample->get_period_position(period);
+	}
+	catch(const std::exception&)
+	{
+        std::string error_msg = "The period '" + period.to_string() + "' is outside the ";
+        if(is_subset_over_periods())
+            error_msg += "subset ";     
+        error_msg += "sample '" + visible_sample->to_string() + "'";
+		throw std::out_of_range(error_msg);
+	}
+
+	return sample->get_period_position(period);
 }
 
 bool KDBVariables::set_sample(const std::string& from, const std::string& to)
@@ -919,6 +1015,38 @@ void KDBVariables::update_sample_child(std::shared_ptr<Sample> parent_sample)
     this->sample.reset();
     if(parent_sample)
         this->sample = parent_sample;
+    update_subset_sample();
+}
+
+void KDBVariables::update_subset_sample()
+{
+	if(!sample || sample->nb_periods == 0)
+	{
+		subset_sample.reset();
+		return;
+	}
+
+	if(!subset_sample)
+		return;
+
+	Period first = subset_sample->start_period;
+	Period last = subset_sample->end_period;
+	if(first.difference(sample->end_period) > 0 || last.difference(sample->start_period) < 0)
+	{
+		subset_sample.reset();
+		return;
+	}
+
+	if(first.difference(sample->start_period) < 0)
+		first = sample->start_period;
+
+	if(last.difference(sample->end_period) > 0)
+		last = sample->end_period;
+
+	if(first == sample->start_period && last == sample->end_period)
+		subset_sample.reset();
+	else
+		subset_sample = std::make_shared<Sample>(first, last);
 }
 
 bool KDBVariables::set_sample(const Sample& new_sample)
@@ -941,7 +1069,7 @@ bool KDBVariables::set_sample(const Sample& new_sample)
 	//                the global database is NOT changed. Now, let's say the sample of the global KDB is [1990, 2010] 
 	//                and the sample of the subset (shallow copy) is [1990, 2000]. Then calling global_ws_var[var_name, 2001] is still 
 	//                possible but will return garbage.
-	if(this->is_subset_database())
+	if(this->is_subset_database() || is_subset_over_periods())
 		throw std::runtime_error("Changing the sample on a subset of the Variables workspace is not allowed");
 
     Sample intersection_smpl;

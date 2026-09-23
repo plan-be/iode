@@ -10,6 +10,7 @@ protected:
         global_ref_cmt[0] = nullptr;
 
         global_ws_cmt->clear();
+        global_ws_var->clear();
     }
 
     void TearDown() override 
@@ -19,9 +20,48 @@ protected:
         global_ref_cmt[0] = nullptr;
         
         global_ws_cmt->clear();
+        global_ws_var->clear();
     }
 };
 
+
+TEST_F(SubsetsTest, VariablesPeriodBoundaries)
+{
+    global_ws_var->load(str_input_test_dir + "fun.var");
+    ASSERT_NE(global_ws_var->get_sample(), nullptr);
+    EXPECT_EQ(global_ws_var->get_sample()->to_string(), "1960Y1:2015Y1");
+
+    KDBVariablesPtr subset = global_ws_var->get_subset("A*", false, "1990Y1", "2000Y1");
+    ASSERT_NE(subset->get_visible_sample(), nullptr);
+    EXPECT_EQ(subset->get_sample()->to_string(), "1960Y1:2015Y1");
+    EXPECT_EQ(subset->get_visible_sample()->to_string(), "1990Y1:2000Y1");
+    EXPECT_TRUE(subset->is_subset_over_periods());
+    EXPECT_EQ(subset->get_first_period_position(), 30);
+    EXPECT_EQ(subset->get_last_period_position(), 40);
+    EXPECT_EQ(subset->get_real_period_position(Period("1995Y1")), 35);
+    EXPECT_THROW(subset->get_real_period_position(Period("1989Y1")), std::out_of_range);
+
+    KDBVariablesPtr nested_subset = subset->get_subset("AC*", false, "", "1995Y1");
+    EXPECT_EQ(nested_subset->get_visible_sample()->to_string(), "1990Y1:1995Y1");
+    EXPECT_EQ(nested_subset->get_first_period_position(), 30);
+    EXPECT_EQ(nested_subset->get_last_period_position(), 35);
+
+    KDBVariablesPtr whole_sample = global_ws_var->get_subset("A*", true, "", "");
+    EXPECT_FALSE(whole_sample->is_subset_over_periods());
+    EXPECT_EQ(whole_sample->get_visible_sample()->to_string(), "1960Y1:2015Y1");
+
+    EXPECT_THROW(global_ws_var->get_subset("A*", false, "1959Y1", ""), std::invalid_argument);
+    EXPECT_THROW(global_ws_var->get_subset("A*", false, "", "2016Y1"), std::invalid_argument);
+    EXPECT_THROW(global_ws_var->get_subset("A*", false, "2001Y1", "2000Y1"), std::invalid_argument);
+
+    global_ws_var->set_sample("1980Y1", "1995Y1");
+    EXPECT_EQ(subset->get_visible_sample()->to_string(), "1990Y1:1995Y1");
+    EXPECT_TRUE(subset->is_subset_over_periods());
+
+    subset->update_sample_child(std::make_shared<Sample>("2005Y1", "2010Y1"));
+    EXPECT_EQ(subset->get_visible_sample()->to_string(), "2005Y1:2010Y1");
+    EXPECT_FALSE(subset->is_subset_over_periods());
+}
 
 TEST_F(SubsetsTest, Subset)
 {

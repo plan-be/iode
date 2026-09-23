@@ -330,7 +330,7 @@ cdef extern from "api/objs/variables.h":
         shared_ptr[KDBVariables] Create(bool is_global) except +
 
         # subset (shallow or deep copy) 
-        shared_ptr[KDBVariables] get_subset(string pattern, bool copy) except + 
+        shared_ptr[KDBVariables] get_subset(string pattern, bool copy, string first_period, string last_period) except +
 
         # Public methods
         vector[double]* get_obj_ptr(string& name) except +
@@ -347,6 +347,12 @@ cdef extern from "api/objs/variables.h":
         bool set_var(string& name, double* value) except +
 
         shared_ptr[CSample] get_sample()
+        shared_ptr[CSample] get_visible_sample()
+        bint is_subset_over_periods()
+        int get_first_period_position() except +
+        int get_last_period_position() except +
+        int get_real_period_position(const CPeriod& period) except +
+        void update_subset_sample()
         bint set_sample(string& from_period, string& to_period) except +
 
         int get_nb_periods()

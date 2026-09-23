@@ -184,45 +184,11 @@ class Variables(IodeDatabase):
         if isinstance(last_period, str):
             last_period = Period(last_period)
 
-        # get the sample of the real database
-        whole_db_sample: Sample = self._get_whole_sample()
-        if whole_db_sample is None:
-            raise RuntimeError("Cannot create subset because the sample of the Variables "
-                               "database is not defined yet. ")
-
-        # get the position of "self" first and last periods according to the real database sample
-        self_t_first, self_t_last = self._get_periods_bounds()
-
-        # if first_period and last_period arguments are None, they will be set to the first 
-        # and last periods of the parent database sample (if the parent db is a subset of the real db)
-        sample = self.sample
-        if not sample:
-            sample = whole_db_sample
-        if first_period is None and self_t_first > 0:
-            first_period = sample.start
-        if last_period is None and self_t_last < whole_db_sample.nb_periods - 1:
-            last_period = sample.end
-
-        # check that first period subset < last period subset
-        if first_period is not None and last_period is not None and first_period > last_period:
-            raise ValueError(f"subset: first period of the subset ('{first_period}') must be " 
-                             f"<= last period of the subset ('{last_period}')")
-        
-        # check that first period of the subset is inside the real Variables sample 
-        if first_period is not None and (first_period < whole_db_sample.start or first_period > whole_db_sample.end):
-            raise ValueError(f"subset: first period of the subset '{first_period}' is not inside the Variables sample '{whole_db_sample}'")
-        
-        # check that last period of the subset is inside the real Variables sample 
-        if last_period is not None and (last_period < whole_db_sample.start or last_period > whole_db_sample.end):
-            raise ValueError(f"subset: last period of the subset '{last_period}' is not inside the Variables sample '{whole_db_sample}'")
-
         cy_first_period = first_period._cy_period if first_period is not None else None
         cy_last_period = last_period._cy_period if last_period is not None else None
-        
-        cy_self = self._cy_database
-        cy_subset = cy_self.initialize_subset(pattern, copy, cy_first_period, cy_last_period)
-        subset = Variables.from_cython_obj(cy_subset)
-        return subset
+        cy_subset = self._cy_database.initialize_subset(
+            pattern, copy, cy_first_period, cy_last_period)
+        return Variables.from_cython_obj(cy_subset)
 
     def copy(self, pattern: str=None) -> Self:
         r"""
