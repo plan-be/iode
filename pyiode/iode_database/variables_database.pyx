@@ -34,7 +34,6 @@ from pyiode.iode_database.cpp_api_database cimport hash_value
 from pyiode.iode_database.cpp_api_database cimport K_COMPARE_EPS
 from pyiode.iode_database.cpp_api_database cimport B_DataCompareEps
 from pyiode.iode_database.cpp_api_database cimport KDBVariables
-from pyiode.iode_database.cpp_api_database cimport KDBVariables
 from pyiode.iode_database.cpp_api_database cimport global_ws_var as cpp_global_variables
 from pyiode.iode_database.cpp_api_database cimport low_to_high as cpp_low_to_high
 from pyiode.iode_database.cpp_api_database cimport high_to_low as cpp_high_to_low
@@ -57,8 +56,6 @@ cdef class Variables(CythonIodeDatabase):
     cdef KDBVariables* database
     
     cdef IodeVarMode mode_
-    cdef Period first_period_subset
-    cdef Period last_period_subset
 
     def __cinit__(self, filepath: str=None) -> Variables:
         self.database_ptr = cpp_global_variables
@@ -66,8 +63,6 @@ cdef class Variables(CythonIodeDatabase):
         self.abstract_database = self.database
         
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        self.first_period_subset = None
-        self.last_period_subset = None
 
     def __dealloc__(self):
         self.database_ptr.reset()
@@ -85,27 +80,13 @@ cdef class Variables(CythonIodeDatabase):
         wrapper.abstract_database = wrapper.database
         
         wrapper.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        wrapper.first_period_subset = None
-        wrapper.last_period_subset = None
         return wrapper
 
     def _get_periods_bounds(self) -> Tuple[int, int]:
-        sample: Sample = self.get_sample()
-        if not sample:
+        if self.database.get_sample().get() is NULL:
             warnings.warn("The sample of the IODE Variables workspace is not defined")
             return 0, 0
-        
-        if self.first_period_subset is None:
-            t_first_period: int = 0  
-        else: 
-            t_first_period: int = self._get_real_period_position(self.first_period_subset)
-        
-        if self.last_period_subset is None:
-            t_last_period: int = sample.get_nb_periods() - 1
-        else:
-            t_last_period: int = self._get_real_period_position(self.last_period_subset)
-
-        return t_first_period, t_last_period
+        return self.database.get_first_period_position(), self.database.get_last_period_position()
 
     def _load(self, filepath: str):
         if self.database is NULL:
@@ -114,22 +95,23 @@ cdef class Variables(CythonIodeDatabase):
             return
         self.database.load(filepath.encode())
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        self.first_period_subset: Period = None
-        self.last_period_subset: Period = None
 
     def finish_clear(self):
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        self.first_period_subset: Period = None
-        self.last_period_subset: Period = None
 
     def initialize_subset(self, pattern: str, copy: bool, 
                           first_period: Optional[Period], last_period: Optional[Period]) -> Variables:
-        cdef shared_ptr[KDBVariables] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)
+        cdef string c_first_period = <string>b""
+        cdef string c_last_period = <string>b""
+        if first_period is not None:
+            c_first_period = (<Period>first_period).c_period.to_string()
+        if last_period is not None:
+            c_last_period = (<Period>last_period).c_period.to_string()
+        cdef shared_ptr[KDBVariables] subset_db_ptr = self.database.get_subset(
+            pattern.encode(), <bint>copy, c_first_period, c_last_period)
         subset = Variables._from_ptr(subset_db_ptr)
 
         subset.mode_ = IodeVarMode.VAR_MODE_LEVEL
-        subset.first_period_subset = first_period
-        subset.last_period_subset = last_period
         return subset
 
     def _get_whole_sample(self) -> Sample:
@@ -142,50 +124,12 @@ cdef class Variables(CythonIodeDatabase):
         return Sample._from_ptr(sample_ptr)
 
     def _maybe_update_subset_sample(self):
-        whole_db_sample: Sample = self._get_whole_sample()
-        if not whole_db_sample:
-            self.first_period_subset = None
-            self.last_period_subset = None
-            return
-        
-        if self.first_period_subset is None and self.last_period_subset is None:
-            return 
-        
-        global_first_period = whole_db_sample.get_start()
-        global_last_period = whole_db_sample.get_end()
-
-        if self.first_period_subset is not None:
-            if self.first_period_subset < global_first_period:
-                self.first_period_subset = global_first_period
-            if self.first_period_subset > global_last_period:
-                self.first_period_subset = None
-                self.last_period_subset = None
-
-        if self.last_period_subset is not None:
-            if self.last_period_subset > global_last_period:
-                self.last_period_subset = global_last_period
-            if self.last_period_subset < global_first_period:
-                self.first_period_subset = None
-                self.last_period_subset = None
+        self.database.update_subset_sample()
 
     cdef int c_get_real_period_position(self, CPeriod c_period):
-        """
-        Get the position of a period in the Variables database sample (not the subset).
-        """
-        cdef shared_ptr[CSample] sample_ptr = self.database.get_sample()
-        cdef CSample* c_sample = sample_ptr.get()
-        if c_sample is NULL:
-            return -1
-        if c_sample.start_period.year == 0 or c_sample.nb_periods == 0:
-            return -1
-        return c_sample.get_period_position(<CPeriod>c_period)
+        return self.database.get_real_period_position(c_period)
 
     def _get_real_period_position(self, period: Period) -> int:
-        sample: Sample = self.get_sample()
-        if sample is None or sample.is_undefined():
-            raise RuntimeError("The sample of the IODE Variables workspace is not defined")
-        if period < sample.get_start() or period > sample.get_end():
-            raise IndexError(f"The period '{period}' is outside the sample '{sample}'")
         return self.c_get_real_period_position(period.c_period)
 
     def _get_variable(self, name: str, key_periods: Union[Period, List[Period]]) -> Union[float, List[float]]:
@@ -481,63 +425,24 @@ cdef class Variables(CythonIodeDatabase):
         self.mode_ = <IodeVarMode>value
 
     def get_first_period(self) -> Period:
-        if self.first_period_subset is not None:
-            return self.first_period_subset 
-        else:
-            whole_db_sample: Sample = self._get_whole_sample()
-            if not whole_db_sample:
-                return None
-            return whole_db_sample.get_start()
+        sample: Sample = self.get_sample()
+        return sample.get_start() if sample is not None else None
 
     def get_last_period(self) -> Period:
-        if self.last_period_subset is not None:
-            return self.last_period_subset 
-        else:
-            whole_db_sample: Sample = self._get_whole_sample()
-            if not whole_db_sample:
-                return None
-            return whole_db_sample.get_end()
+        sample: Sample = self.get_sample()
+        return sample.get_end() if sample is not None else None
 
     def get_is_subset_over_periods(self) -> bool:
-        if self.first_period_subset is None and self.last_period_subset is None:
-            return False
-        
-        whole_db_sample: Sample = self._get_whole_sample()
-        if not whole_db_sample:
-            return False 
-
-        global_first_period = whole_db_sample.get_start()
-        global_last_period = whole_db_sample.get_end()
-        if self.first_period_subset is not None: 
-            return self.first_period_subset != global_first_period
-        if self.last_period_subset is not None:
-            return self.last_period_subset != global_last_period
-        
-        return False
+        return self.database.is_subset_over_periods()
 
     def get_sample(self) -> Sample:
-        whole_db_sample: Sample = self._get_whole_sample()
-        self._maybe_update_subset_sample()
-        if not whole_db_sample:
-             return None
-
-        if self.first_period_subset is None and self.last_period_subset is None:
-            return whole_db_sample
-
-        if self.first_period_subset is not None:
-            first_period = self.first_period_subset
-        else: 
-            first_period = whole_db_sample.get_start()
-
-        if self.last_period_subset is not None:
-            last_period = self.last_period_subset
-        else:
-            last_period = whole_db_sample.get_end()
-
-        if first_period is None or last_period is None:
+        cdef shared_ptr[CSample] sample_ptr = self.database.get_visible_sample()
+        cdef CSample* c_sample = sample_ptr.get()
+        if c_sample is NULL:
             return None
-        else:
-            return Sample(str(first_period), str(last_period))
+        if c_sample.start_period.year == 0 or c_sample.nb_periods == 0:
+            return None
+        return Sample._from_ptr(sample_ptr)
 
     def set_sample(self, from_period: str, to_period: str):
         self.database.set_sample(from_period.encode(), to_period.encode())
