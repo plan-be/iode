@@ -35,24 +35,21 @@
 
 int B_FileCopy(char* arg, int type)
 {
-    char** args = B_ainit_chk(arg, 0L, 2);
-    if(!args) 
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileCopy<type>");
         return -1;
     }
 
-    int nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args != 2)
+    if(v_args.size() != 2)
     {
-        A_free((unsigned char**) args);
         kwarning("Syntax error: expected '$FileCopy<type> source_file dest_file'");
         return -1;
     }
 
-    std::string buf_from(args[0]);
-    std::string buf_to(args[1]);
-    A_free((unsigned char**) args);
+    std::string buf_from = v_args[0];
+    std::string buf_to = v_args[1];
 
     buf_from = set_file_extension(buf_from, type);
     buf_to = set_file_extension(buf_to, type);
@@ -104,24 +101,21 @@ int B_FileCopy(char* arg, int type)
  */
 int B_FileRename(char* arg, int type)
 {
-    char** args = B_ainit_chk(arg, 0L, 2);
-    if(!args) 
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileRename<type>");
         return -1;
     }
 
-    int nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args != 2)
+    if(v_args.size() != 2)
     {
-        A_free((unsigned char**) args);
         kwarning("Syntax error: expected '$FileRename<type> source_file dest_file'");
         return -1;
     }
 
-    std::string buf_from(args[0]);
-    std::string buf_to(args[1]);
-    A_free((unsigned char**) args);
+    std::string buf_from = v_args[0];
+    std::string buf_to = v_args[1];
 
     buf_from = set_file_extension(buf_from, type);
     buf_to = set_file_extension(buf_to, type);
@@ -165,23 +159,19 @@ int B_FileRename(char* arg, int type)
  */
 int B_FileDelete(char* arg, int type)
 {
-    char** args = B_ainit_chk(arg, 0L, 2);
-    if(!args) 
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileDelete<type>");
         return -1;
     }
 
-    int nb_args = SCR_tbl_size((unsigned char**) args);
     std::vector<std::string> files_to_delete;
-    for(int i = 0; i < nb_args; i++)
+    for(const std::string& filename : v_args)
     {
-        std::string buf(args[i]);
-
-        buf = set_file_extension(buf, type);
+        std::string buf = set_file_extension(filename, type);
         files_to_delete.push_back(buf);
     }
-    A_free((unsigned char**) args);
 
     for(const std::string& file : files_to_delete)
     {

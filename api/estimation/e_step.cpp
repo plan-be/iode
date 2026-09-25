@@ -233,25 +233,21 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
     int l = 0;
 
     // Crée le tableau d'équations à partir de arg
-    char** eqs = B_ainit_chk(eqname, NULL, 0);         
-    if(eqs == NULL) 
+    std::vector<std::string> v_eqs = expand_arg(eqname, 0);
+    if(v_eqs.empty())
         return 0.0;
 
-    if(SCR_tbl_size((unsigned char **) eqs) > 1)
+    if(v_eqs.size() > 1)
     {
         std::string msg = "Warning: more than one equation name found in argument eqname.";
         msg += " Only one is expected.";
         kwarning(msg.c_str());
-        SCR_free_tbl((unsigned char**) eqs);
         return 0.0;
     }
     
-    std::string name = std::string(eqs[0]);
-    SCR_free_tbl((unsigned char**) eqs);
+    std::string name = v_eqs[0];
     if(!global_ws_eqs->contains(name)) 
         return 0.0;
-
-    std::vector<std::string> v_eqs = { name };
 
     // Construit le tableau de scalaires contenus dans l'équation eqs
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);               

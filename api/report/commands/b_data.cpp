@@ -134,42 +134,58 @@
  
 int B_DataPattern(char* arg,int type)
 {
-    char    **args, *lstname, *pattern;
-    char    **xvars = NULL, **yvars = NULL;
-    char    cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1], toappend[2*K_MAX_NAME +3];
-    int     rc = -1, nrows = 0, ncols = 0, crow, ccol;
-    int     nbargs;
+    char *lstname, *pattern;
+    std::vector<std::string> xvars;
+    std::vector<std::string> yvars;
+    char cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1], toappend[2*K_MAX_NAME +3];
+    int  rc = -1, nrows = 0, ncols = 0, crow, ccol;
 
-    args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
-    nbargs = SCR_tbl_size((unsigned char**) args);
-    if(nbargs < 3) goto cleanup;
-    else {
+    char** args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
+    int nbargs = SCR_tbl_size((unsigned char**) args);
+    if(nbargs < 3) 
+        goto cleanup;
+    else 
+    {
         lstname = args[0];
         pattern = args[1];
-        xvars = B_ainit_chk(args[2], NULL, 0);
-        nrows = SCR_tbl_size((unsigned char**) xvars);
+        xvars = expand_arg(args[2], 0);
+        nrows = (int) xvars.size();
 
-        if(nbargs > 3) {
-            yvars = B_ainit_chk(args[3], NULL, 0);
-            ncols = SCR_tbl_size((unsigned char**) yvars);
+        if(nbargs > 3) 
+        {
+            yvars = expand_arg(args[3], 0);
+            ncols = (int) yvars.size();
         }
 
-        if(nrows == 0) goto cleanup;
-        for(crow = 0; crow < nrows; crow++) {
+        if(nrows == 0) 
+            goto cleanup;
+        
+        for(crow = 0; crow < nrows; crow++) 
+        {
             strcpy(rvar, pattern);
-            SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow]);
-            if(ncols == 0) {
+            SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow].c_str());
+            if(ncols == 0) 
+            {
                 sprintf(toappend, "%s %s", lstname, rvar);
-                if(crow == 0) B_DataUpdate(toappend, LISTS);
-                else B_DataAppend(toappend, LISTS);
+                if(crow == 0) 
+                    B_DataUpdate(toappend, LISTS);
+                else 
+                    B_DataAppend(toappend, LISTS);
             }
-            for(ccol = 0; ccol < ncols; ccol++) {
+
+            for(ccol = 0; ccol < ncols; ccol++) 
+            {
                 strcpy(cvar, rvar);
-                SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol]);
-                if(B_DataExist(cvar, type) >= 0) {
+                SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol].c_str());
+                if(B_DataExist(cvar, type) >= 0) 
+                {
                     sprintf(toappend, "%s %s", lstname, cvar);
-                    if(crow == 0 && ccol == 0) B_DataUpdate(toappend, LISTS); // Creates the list
-                    else B_DataAppend(toappend, LISTS);                       // Appends to the list  
+                    // Creates the list
+                    if(crow == 0 && ccol == 0) 
+                        B_DataUpdate(toappend, LISTS);
+                    // Appends to the list  
+                    else 
+                        B_DataAppend(toappend, LISTS);
                 }
             }
         }
@@ -178,8 +194,6 @@ int B_DataPattern(char* arg,int type)
 
 cleanup:
     SCR_free_tbl((unsigned char**) args);
-    SCR_free_tbl((unsigned char**) xvars);
-    SCR_free_tbl((unsigned char**) yvars);
     return rc;
 }
 
@@ -478,23 +492,21 @@ int B_DataDelete(char* arg, int type)
  */
 int B_DataRename(char* arg, int type)
 {
-    int     rc = 0;
-    char    **args;
-
     if(type == EQUATIONS) 
         return -1; /* Rename of EQS has no sense */
-
-    args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) 
+    
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
         return -1;
-
+    
+    int rc = 0;
     try
     {
-        bool success = get_global_db(type).rename(std::string(args[0]), std::string(args[1]));
+        bool success = get_global_db(type).rename(v_args[0], v_args[1]);
         if(!success) 
         {
-            std::string error_msg = "DataRename '" + std::string(args[0]) + "' to '";
-            error_msg += std::string(args[1]) + "' failed";
+            std::string error_msg = "DataRename '" + v_args[0] + "' to '";
+            error_msg += v_args[1] + "' failed";
             error_manager.append_error(error_msg);
             rc = -1;
         }
@@ -505,7 +517,6 @@ int B_DataRename(char* arg, int type)
         rc = -1;
     }
 
-    A_free((unsigned char**) args);
     return rc;
 }
 
@@ -530,12 +541,11 @@ int B_DataRename(char* arg, int type)
         return -1; /* Duplicate of EQS has no sense */
     }
     
-    char** args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) 
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
         return -1;
-    std::string old_name = std::string(args[0]);
-    std::string new_name = std::string(args[1]);
-    A_free((unsigned char**) args);
+    std::string old_name = v_args[0];
+    std::string new_name = v_args[1];
     
     try
     {
@@ -911,7 +921,8 @@ int B_DataListSort(char* arg, int unused)
     int    rc = 0;
     char   *in, *out;
     char*  old_A_SEPS;
-    char** lsti;
+    std::string sorted;
+    std::vector<std::string> v_lst_idt;
 
     char** args = B_vtom_chk(arg, 2);
     if(args == NULL) 
@@ -947,20 +958,20 @@ int B_DataListSort(char* arg, int unused)
     // Changed A_SEPS to allow ; as separator
     old_A_SEPS = A_SEPS;
     A_SEPS = " \t\n\r;, ";  
-    lsti = B_ainit_chk(lst, NULL, 0);
+    v_lst_idt = expand_arg(lst, 0);
     A_SEPS = old_A_SEPS;
-    if(lsti == NULL) 
+    if(v_lst_idt.empty())
     {
         rc = -1;
         goto done;
     }
 
-    qsort(lsti, SCR_tbl_size((unsigned char**) lsti), sizeof(char **), my_strcmp);
-    lst = (char*) SCR_mtov((unsigned char**) lsti, ';');
+    std::sort(v_lst_idt.begin(), v_lst_idt.end());
+    sorted = join(v_lst_idt, ";");
 
     try
     {
-        List sorted_lst(lst);
+        List sorted_lst(sorted);
         global_ws_lst->set(out, sorted_lst); 
     }
     catch (const std::runtime_error& e)
@@ -969,9 +980,6 @@ int B_DataListSort(char* arg, int unused)
                                    "' cannot be created:\n" + e.what());
         rc = -1;
     }
-
-    SCR_free_tbl((unsigned char**) lsti);
-    SCR_free(lst);
 
 done:
     A_free((unsigned char**) args);
@@ -1376,8 +1384,12 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
 int B_DataCalcLst(char* arg, int unused)
 {
     int rc = 0;
-    unsigned char **args = NULL, **l1 = NULL, **l2 = NULL, **lst = NULL,
+    unsigned char **args = NULL, **lst = NULL,
                   *res, *list1, *list2, *op;
+    std::vector<std::string> v_l1;
+    std::vector<std::string> v_l2;
+    std::vector<char*> l1;
+    std::vector<char*> l2;
     std::shared_ptr<List> list1_ptr;
     std::shared_ptr<List> list2_ptr;
 
@@ -1410,24 +1422,30 @@ int B_DataCalcLst(char* arg, int unused)
     }
 
     list1_ptr = global_ws_lst->get_obj_ptr((char*) list1);
-    l1 = (unsigned char**) B_ainit_chk((char*) list1_ptr->c_str(), NULL, 0);
+    v_l1 = expand_arg(*list1_ptr, 0);
+    for(std::string& item : v_l1)
+        l1.push_back(item.data());
+    l1.push_back(NULL);
 
     list2_ptr = global_ws_lst->get_obj_ptr((char*) list2);
-    l2 = (unsigned char**) B_ainit_chk((char*) list2_ptr->c_str(), NULL, 0);
+    v_l2 = expand_arg(*list2_ptr, 0);
+    for(std::string& item : v_l2)
+        l2.push_back(item.data());
+    l2.push_back(NULL);
 
     switch(op[0]) 
     {
     case '+' :
-        lst = SCR_union(l1, l2);
+        lst = SCR_union((unsigned char**) l1.data(), (unsigned char**) l2.data());
         break;
     case '*' :
-        lst = SCR_inter(l1, l2);
+        lst = SCR_inter((unsigned char**) l1.data(), (unsigned char**) l2.data());
         break;
     case '-' :
-        lst = SCR_dif(l1, l2);
+        lst = SCR_dif((unsigned char**) l1.data(), (unsigned char**) l2.data());
         break;
     case 'x' :
-        lst = Lst_times(l1, l2);
+        lst = Lst_times((unsigned char**) l1.data(), (unsigned char**) l2.data());
         break;
     default  :
         rc = -1;
@@ -1438,8 +1456,6 @@ int B_DataCalcLst(char* arg, int unused)
 
 done :
     A_free((unsigned char**) args);
-    A_free((unsigned char**) l1);
-    A_free((unsigned char**) l2);
     SCR_free_tbl(lst);
     return rc;
 }
@@ -1453,16 +1469,11 @@ done :
 int B_DataListCount(char* name, int unused)
 {
     std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(name);
-    char* lst = (char*) SCR_stracpy((unsigned char*) lst_ptr->c_str());
-    if(lst == NULL) 
+    if(!lst_ptr) 
         return -1;
 
-    char** lsti = B_ainit_chk(lst, NULL, 0);
-    int nb = SCR_tbl_size((unsigned char**) lsti);
-    SCR_free_tbl((unsigned char**) lsti);
-    SCR_free(lst);
-
-    return nb;
+    std::vector<std::string> v_lst_idt = expand_arg(*lst_ptr, 0);
+    return (int) v_lst_idt.size();
 }
 
 /**
@@ -1645,51 +1656,52 @@ int B_DataCompare(char* arg, int type)
  */
 static int B_DataEditGraph(int view, char* arg)
 {
-    char** args = B_ainit_chk(arg, NULL, 0);
-    int nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 10) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    if(v_args.size() < 10) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");
-        A_free((unsigned char**) args);
         return -1;
     }
 
-    int mode = get_pos_in_char_array("LDGdg", args[0][0]);
+    int mode = get_pos_in_char_array("LDGdg", v_args[0][0]);
     mode = std::max(0, mode);
 
-    int type  = B_argpos("LSBM", args[1][0]);
-    int xgrid = B_argpos("JNM",  args[2][0]);
-    int ygrid = B_argpos("JNM",  args[3][0]);
+    int type  = B_argpos("LSBM", v_args[1][0]);
+    int xgrid = B_argpos("JNM",  v_args[2][0]);
+    int ygrid = B_argpos("JNM",  v_args[3][0]);
  
-    int axis = B_argpos("LGSP", args[4][0]);
+    int axis = B_argpos("LGSP", v_args[4][0]);
 
     double ymin;
-    if(memcmp(args[5], "--", 2) == 0) 
+    if(v_args[5] == "--")
         ymin = IODE_NAN;
     else                              
-        ymin = atof(args[5]);
+        ymin = atof(v_args[5].c_str());
 
     double ymax;
-    if(memcmp(args[6], "--", 2) == 0) 
+    if(v_args[6] == "--")
         ymax = IODE_NAN;
     else                              
-        ymax = atof(args[6]);
+        ymax = atof(v_args[6].c_str());
 
     std::shared_ptr<Sample> smpl = nullptr;
     try
     {
-        smpl = std::make_shared<Sample>(std::string(args[7]), std::string(args[8]));
+        smpl = std::make_shared<Sample>(v_args[7], v_args[8]);
     }
     catch(const std::exception& e)
     {
         error_manager.append_error(std::string(e.what()));
-        A_free((unsigned char**) args);
         return -1;
     }
 
+    std::vector<char*> names;
+    for(size_t i = 9; i < v_args.size(); i++)
+        names.push_back(v_args[i].data());
+    names.push_back(NULL);
+
     int rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
-		             smpl, args + 9);
-    A_free((unsigned char**) args);
+		             smpl, names.data());
     return rc;
 }
 

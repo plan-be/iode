@@ -87,14 +87,12 @@ int B_isdef(char* txt)
  */
 int B_get1int(char* arg)
 {
-    char    **args;
-    int     n;
-
-    args = B_ainit_chk(arg, 0L, 1);
-    if(args == 0) return(-100);
-    n = atoi(args[0]);
-    SCR_free_tbl((unsigned char**) args);
-    return(n);
+    std::vector<std::string> v_args = expand_arg(arg, 1);
+    if(v_args.empty()) 
+        return(-100);
+    
+    int n = atoi(v_args[0].c_str());
+    return n;
 }
 
 

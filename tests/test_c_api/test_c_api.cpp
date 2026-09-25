@@ -766,8 +766,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
 
 TEST_F(LegacyAPITest, Tests_ARGS)
 {
-    char **args;
-    char *list[] = {"A1", "A2", 0};
+    std::vector<std::string> v_args;
     char filename[256];
 
     print_test_title("Tests ARGS");
@@ -776,21 +775,18 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     create_dummy_lists_and_vars();
 
     // A_init
-    args = B_ainit_chk("A B;C,D", NULL, 0); // => "A" "B;C" "D"
-    EXPECT_TRUE(U_cmp_tbls(args, "A|B;C|D"));
-    SCR_free_tbl((unsigned char**) args);
+    v_args = expand_arg("A B;C,D", 0); // => "A" "B;C" "D"
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B;C", "D"}));
 
     // A_init
-    args = B_ainit_chk("$LST1", NULL, 0);
-    EXPECT_TRUE(U_cmp_tbls(args, "A|B"));
-    SCR_free_tbl((unsigned char**) args);
+    v_args = expand_arg("$LST1", 0);
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B"}));
 
     // Test parameters in a file. test.args must exist in the current dir 
     // and contain the line A1 A2
     sprintf(filename, "@%stest.args", input_test_dir);
-    args = B_ainit_chk(filename, NULL, 0);
-    EXPECT_TRUE(U_cmp_tbls(args, "A1|A2"));
-    SCR_free_tbl((unsigned char**) args);
+    v_args = expand_arg(filename, 0);
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A1", "A2"}));
 }
 
 
@@ -833,11 +829,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     kdb_var.reset();
 
     // load only 2 objects
-    char** objs = B_ainit_chk("ACAF ACAG", NULL, 0);
-    std::vector<std::string> v_objs;
-    for(int i = 0; objs[i] != NULL; i++)
-        v_objs.push_back(std::string(objs[i]));
-    SCR_free_tbl((unsigned char**) objs);
+    std::vector<std::string> v_objs = expand_arg("ACAF ACAG", 0);
 
     kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename, v_objs);
@@ -1743,7 +1735,6 @@ TEST_F(LegacyAPITest, Tests_B_IDT)
 
 TEST_F(LegacyAPITest, Tests_B_IDT_EXECUTE)
 {
-    char    **idts;
     Sample  *smpl = NULL;
     double  *AOUC;
     int     rc;
@@ -1759,7 +1750,7 @@ TEST_F(LegacyAPITest, Tests_B_IDT_EXECUTE)
 
     // Sample (null => full sample, see K_exec())
     smpl = new Sample("1961Y1", "2015Y1");   
-    idts = (char**) SCR_vtoms((U_ch*) "AOUC", (U_ch*) " ,;\t");
+    std::vector<std::string> idts = {"AOUC"};
     rc = B_IdtExecuteIdts(smpl, idts);
     EXPECT_EQ(rc, 0);
     EXPECT_DOUBLE_EQ(round(AOUC[1] * 1e8) / 1e8, 0.24783192);

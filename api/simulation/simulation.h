@@ -258,8 +258,8 @@ protected:
         if(list_eqs.empty())
             return v_eqs;
 
-        char** c_eqs = B_ainit_chk((char*) list_eqs.c_str(), NULL, 0);
-        if(c_eqs == NULL) 
+        std::vector<std::string> v_tmp_eqs = expand_arg(list_eqs, 0);
+        if(v_tmp_eqs.empty())
         {
             std::string error_msg = "Invalid equations list: " + list_eqs;
             throw std::invalid_argument(error_msg);
@@ -267,9 +267,9 @@ protected:
 
         std::string eq_name;
         v_eqs.reserve(sim_dbe->size());
-        for(int i = 0; c_eqs[i] != NULL; i++)
+        for(const std::string& item : v_tmp_eqs)
         {
-            eq_name = std::string(c_eqs[i]);
+            eq_name = item;
             if(!sim_dbe->contains(eq_name))
             {
                 std::string error_msg = "Equation '" + eq_name + "' not found in the model\n";

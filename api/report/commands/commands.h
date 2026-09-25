@@ -66,7 +66,7 @@ int B_WsHtoLSum(char* arg, int unused=-1);
 
 /* b_idt.c */
 int B_IdtExecute(char* arg, int unused=-1);
-int B_IdtExecuteIdts(Sample* smpl, char** c_idts);
+int B_IdtExecuteIdts(Sample* smpl, const std::vector<std::string>& idts);
 int B_IdtExecuteVarFiles(char* arg, int unused=-1);
 int B_IdtExecuteSclFiles(char* arg, int unused=-1);
 int B_IdtExecuteTrace(char* arg, int unused=-1);

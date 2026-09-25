@@ -81,27 +81,13 @@
 void KDBIdentities::set_scl_files(char* arg)
 {
     v_scl_files.clear();
-    char** tbl_scl_files = B_ainit_chk(arg, NULL, 0);
-    int nb_scl_files = SCR_tbl_size((unsigned char**) tbl_scl_files);
-    if(nb_scl_files > 0)
-    {
-        for(int i=0; i < nb_scl_files; i++)
-            v_scl_files.push_back(tbl_scl_files[i]);
-    }
-    SCR_free_tbl((unsigned char**) tbl_scl_files);
+    v_scl_files = expand_arg(arg, 0);
 }
 
 void KDBIdentities::set_var_files(char* arg)
 {
     v_var_files.clear();
-    char** tbl_var_files = B_ainit_chk(arg, NULL, 0);
-    int nb_var_files = SCR_tbl_size((unsigned char**) tbl_var_files);
-    if(nb_var_files > 0)
-    {
-        for(int i=0; i < nb_var_files; i++)
-            v_var_files.push_back(tbl_var_files[i]);
-    }
-    SCR_free_tbl((unsigned char**) tbl_var_files);
+    v_var_files = expand_arg(arg, 0);
 }
 
 void KDBIdentities::clear_files()

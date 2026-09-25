@@ -1509,8 +1509,7 @@ int RP_ReportExec_1(char* file)
 
 int B_ReportExec(char* arg, int unused)
 {
-    unsigned char   **argv = NULL, 
-                    **o_argv,
+    unsigned char   **o_argv,
                     **SCR_vtomsq();
     int             rc = 0, 
                     o_arg0;
@@ -1520,8 +1519,9 @@ int B_ReportExec(char* arg, int unused)
     o_arg0 = RP_ARG0;
 
     /* argv = SCR_vtomsq(arg, B_SEPS, '"'); */
-    argv = (unsigned char**) B_ainit_chk(arg, NULL, 0);
-    if(argv == NULL || SCR_tbl_size(argv) == 0) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<char*> argv;
+    if(v_args.empty())
     {
         rc = -1;
         goto done;
@@ -1533,18 +1533,21 @@ int B_ReportExec(char* arg, int unused)
         memset(&RP_PER, 0, sizeof(Period));
     }
     
+    argv.reserve(v_args.size() + 1);
+    for(std::string& item : v_args)
+        argv.push_back(item.data());
+    argv.push_back(NULL);
+
     // Changes the report context
-    RP_ARGV = (char**) argv + 1;
+    RP_ARGV = argv.data() + 1;
     RP_ARG0 = 0;
-    
+
     // Executes the report argv[0]
     RP_DEPTH ++; // Recursive level of the current report
-    rc = RP_ReportExec_1((char*) argv[0]);
+    rc = RP_ReportExec_1(argv[0]);
     RP_DEPTH --;
 
 done:
-    SCR_free_tbl(argv);
-    
     // Restores the report context at the time of entering the function
     RP_ARGV = (char**) o_argv;
     RP_ARG0 = o_arg0;
@@ -1572,7 +1575,7 @@ done:
 
 int B_ReportLine(char* line, int cleanup)
 {
-    unsigned char       **argv = NULL, **o_argv,
+    unsigned char       **o_argv,
                           **SCR_vtomsq();
     int                 rc = 0, o_arg0,
                         RP_ReportExec_1();
@@ -1582,10 +1585,10 @@ int B_ReportLine(char* line, int cleanup)
     o_argv = (unsigned char**) RP_ARGV;
     o_arg0 = RP_ARG0;
 
-    // To mimic B_Report(), argv is artificially created as if a report called "temp.rep" were executed 
-    argv = (unsigned char**) B_ainit_chk("temp.rep", NULL, 0);
-    // Impossible ?
-    if(argv == NULL || SCR_tbl_size(argv) == 0) 
+    // To mimic B_Report(), args is artificially created as if a report called "temp.rep" were executed
+    std::vector<std::string> v_args = expand_arg("temp.rep", 0);
+    std::vector<char*> argv;
+    if(v_args.empty())
     {
         rc = -1;
         goto done;
@@ -1598,8 +1601,13 @@ int B_ReportLine(char* line, int cleanup)
         memset(&RP_PER, 0, sizeof(Period));
     }
 
+    argv.reserve(v_args.size() + 1);
+    for(std::string& item : v_args)
+        argv.push_back(item.data());
+    argv.push_back(NULL);
+
     // Sauve les arguments pour usage dans les ss fonctions
-    RP_ARGV = (char**) argv + 1;
+    RP_ARGV = argv.data() + 1;
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
@@ -1621,7 +1629,6 @@ int B_ReportLine(char* line, int cleanup)
 
 done:
     // Resets previous report context 
-    SCR_free_tbl(argv);
     RP_ARGV = (char**) o_argv;
     RP_ARG0 = o_arg0;
 

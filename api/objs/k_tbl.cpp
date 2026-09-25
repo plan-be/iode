@@ -417,12 +417,9 @@ static std::vector<std::string> expand_lecs(const std::string& lecs)
 		// Parses a string and replaces @filename and $listname by their contents
         char* OLD_SEPS = A_SEPS;
         A_SEPS = (char*) ";\t\n";
-		char** c_lecs = B_ainit_chk(lst, NULL, 0);
+        v_lecs = lst ? expand_arg(lst, 0) : std::vector<std::string>();
         A_SEPS = OLD_SEPS;
-        for(int i = 0; i < SCR_tbl_size((unsigned char**) c_lecs); i++)
-            v_lecs.push_back(std::string(c_lecs[i]));
 		SCR_free(lst);
-        SCR_free_tbl((unsigned char**) c_lecs);
 	}
     return v_lecs;
 }

@@ -66,42 +66,48 @@ int RP_repeatstring(char* buf, int unused)   /* JMP 06-06-99 */
 // $repeat <command>
 // Nouvelle version améliorée pour les allocs JAN 2009
 int RP_repeat(char* buf, int unused)
-{
-    U_ch    *line = 0, *cmd;
-    U_ch    **args;
-    int     rc, i, pos1, pos2, maxlg = 0, lg;
+{    
+    unsigned char* line = NULL;
+    int rc = RP_expand((char**) &line, buf);
+    if(rc) 
+        return rc;
 
-    rc = RP_expand((char**) &line, buf);
-    if(rc) return rc;
-
-    pos1 = U_pos('"', line); // Position du premier " dans line
-    if(pos1 < 0) {
+    int pos1 = U_pos('"', line); // Position du premier " dans line
+    if(pos1 < 0) 
+    {
         SCR_free(line);
         return -1;
     }
-    pos2 = pos1 + 1 + U_pos('"', line + pos1 + 1); // Position du second " dans line
+    int pos2 = pos1 + 1 + U_pos('"', line + pos1 + 1); // Position du second " dans line
     line[pos2] = 0; // line + pos1  devient la commande ($repeat "$DatadeleteVar _ _" donne dans line + pos 1 = [$DataDeleteVar _ _] par exemple)
-    args = (unsigned char**) B_ainit_chk(((char*) line) + pos2 + 1, NULL, 0); // Arguments sur lesquels il faut boucler
+    std::vector<std::string> v_args = expand_arg(((char*) line) + pos2 + 1, 0); // Arguments sur lesquels il faut boucler
 
-    if(args == NULL) {
+    if(v_args.empty()) 
+    {
         SCR_free(line);
         return -1;
     }
 
-    if(RP_RPTSTR == 0) RP_repeatstring("_");
+    if(RP_RPTSTR == 0) 
+        RP_repeatstring("_");
 
     // Calcule la longueur max d'un arg et alloue une commande assez longue
-    for(maxlg = i = 0 ; args[i] ; i++) {
-        lg = (int) strlen((char*) args[i]);
-        if(lg > maxlg) maxlg = lg;
+    int i, maxlg, lg;
+    for(maxlg = i = 0; i < v_args.size(); i++) 
+    {
+        lg = (int) v_args[i].size();
+        if(lg > maxlg) 
+            maxlg = lg;
     }
+
     //cmd = SCR_malloc(strlen(line + pos1 + 1) + 10 * maxlg + 64);
-    cmd = (unsigned char*) RP_alloc((int) strlen(((char*) line) + pos1 + 1) + 10 * maxlg + 64);
+    unsigned char* cmd = (unsigned char*) RP_alloc((int) strlen(((char*) line) + pos1 + 1) + 10 * maxlg + 64);
 
     // Démarre la boucle
-    for(i = 0 ; args[i] ; i++) {
+    for(i = 0; i < v_args.size(); i++) 
+    {
         strcpy((char*) cmd, ((char*) line) + pos1 + 1); // Commande
-        SCR_replace(cmd, (unsigned char*) RP_RPTSTR, args[i]);
+        SCR_replace(cmd, (unsigned char*) RP_RPTSTR, (unsigned char*) v_args[i].c_str());
         rc = B_ReportLine((char*) cmd, 1);
         if(rc) break;
     }
@@ -109,7 +115,6 @@ int RP_repeat(char* buf, int unused)
     //SCR_free(cmd);
     RP_free((char*) cmd);
     SCR_free(line); //GB 20/08/2012 solved memory leak
-    SCR_free_tbl(args);
     return 0;
 }
 

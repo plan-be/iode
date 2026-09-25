@@ -5,10 +5,10 @@
  *
  *  Main functions
  *  --------------
- *      char **B_ainit_chk(char* arg, ADEF* adef, int nb)                   : expands an argument by replacing @filename and $listname by their contents
+ *      std::vector<std::string> expand_arg(const std::string& arg, const int nb) : expands an argument by replacing @filename and $listname by their contents
  *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
  *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
- *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
+ *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls expand_arg() to expand arg, then calls B_loop() on the resulting table of strings.
  *      int B_get_arg0(char* arg0, char*arg, int lg)                        : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
  *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
  *   
@@ -39,33 +39,40 @@
  *  If nb is > 0, the function checks that, after expanding arg, the resulting number or arguments 
  *  equals nb (the expected value). 
  *  
- *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
+ *  On error, IodeErrorManager::append_error() is called and the function returns an empty vector.
  *  
- *  Calls A_init() and A_check() functions from the s_args group (see http://xon.be/scr4/libs1/libs12.htm)
+ *  Calls A_init() from the s_args group (see http://xon.be/scr4/libs1/libs12.htm)
  *  
- *  @param [in] arg     char*   argument    
- *  @param [in] adef    ADEF*   list of ADEF structures (always NULL in the IODE functions)
- *  @param [in] nb      int     0 or expected number of arguments after expansion if adef is not NULL
- *  @return             char**  NULL on error 
- *                              list of arguments after expansion
+ *  @param [in] arg     const std::string&        argument
+ *  @param [in] nb      const int                 0 or expected number of arguments after expansion
+ *  @return             std::vector<std::string>  empty on error, otherwise the arguments after expansion
  *  
  */
-char **B_ainit_chk(char* arg, ADEF* adef, int nb)
+std::vector<std::string> expand_arg(const std::string& arg, const int nb)
 {
-    char    **args;
+    std::vector<std::string> args;
     
-    A_NO_EXPANDSTAR_DFT = 1; // Suppress default filename expansion JMP 14/01/2022 
+    // Suppress default filename expansion JMP 14/01/2022
+    A_NO_EXPANDSTAR_DFT = 1;
     
-    args = A_init(arg);
-    if(args == 0) return(args);
-    if((adef && A_check(args, adef)) ||
-            (nb > 0 && SCR_tbl_size((unsigned char**) args) != nb)) {
+    char** c_args = A_init(to_char_array(arg));
+    if(c_args == NULL)
+        return args;
+
+    if(nb > 0 && SCR_tbl_size((unsigned char**) c_args) != nb)
+    {
         error_manager.append_error("Illegal argument(s)");
-        A_free((unsigned char**) args);
-        args = 0;
+        SCR_free_tbl((unsigned char**) c_args);
+        return args;
     }
 
-    return(args);
+    int nb_args = SCR_tbl_size((unsigned char**) c_args);
+    args.reserve(nb_args);
+    for(int i = 0; i < nb_args; i++)
+        args.emplace_back(c_args[i]);
+
+    SCR_free_tbl((unsigned char**) c_args);
+    return args;
 }
 
 
@@ -137,9 +144,9 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Calls B_ainit_check() to expand arg, then calls B_loop() on the resulting table of strings.
+ *  Calls expand_arg() to expand arg, then calls B_loop() on the resulting table of strings.
  *  
- *  @see B_ainit_check() and B_loop().
+ *  @see expand_arg() and B_loop().
  *  
  *  @param [in] arg     char*                   argument 
  *  @param [in] fn      int (*fn)(char*, char*) fn pointer
@@ -149,12 +156,16 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
  */
 int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 {
-    char    **argv;
-    int     rc;
+    std::vector<std::string> args = expand_arg(arg, 0);
+    if(args.empty()) return -1;
 
-    if((argv = B_ainit_chk(arg, 0L, 0)) == 0) return -1;
-    rc = B_loop(argv, fn, client);
-    A_free((unsigned char**) argv);
+    std::vector<char*> argv;
+    argv.reserve(args.size() + 1);
+    for(std::string& item : args)
+        argv.push_back(item.data());
+    argv.push_back(NULL);
+
+    int rc = B_loop(argv.data(), fn, client);
     return rc;
 }
 
