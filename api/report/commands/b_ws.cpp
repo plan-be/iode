@@ -274,13 +274,13 @@ int B_WsSample(char* arg, int unused)
     bool success = false;
     Sample* new_smpl = nullptr;
     
-    char** args = B_ainit_chk(arg, NULL, 2);
-    if(args == NULL) 
+    std::vector<std::string> v_args = expand_arg(arg, 2);
+    if(v_args.empty())
         goto err;
 
     try
     {
-        new_smpl = new Sample(std::string(args[0]), std::string(args[1]));
+        new_smpl = new Sample(v_args[0], v_args[1]);
     }
     catch(const std::exception& e)
     {
@@ -303,13 +303,11 @@ int B_WsSample(char* arg, int unused)
 
     delete new_smpl;
     new_smpl = nullptr;
-    A_free((unsigned char**) args);
     return 0;
 
 err:
     if(new_smpl) delete new_smpl;
     new_smpl = nullptr;
-    A_free((unsigned char **) args);
     return -1;
 }
 
@@ -534,20 +532,18 @@ int B_WsMerge(char* arg, int type)
 int B_WsExtrapolate(char* arg, int unused)
 {
     int     p = 0, method = 0, nb_vars = 0, rc = -1;
-    char**  vars = NULL;
     Sample* smpl = nullptr;
     std::string pattern;
 
-    char** args = B_ainit_chk(arg, NULL, 0);
-    int nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 2) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    if(v_args.size() < 2) 
     {
         error_manager.append_error("WsExtrapolate: syntax error (method from to vars ...)");
         goto done;
     }
     else 
     {
-        method = atoi(args[0]);
+        method = atoi(v_args[0].c_str());
         if(method < 0 || method > 6) 
             method = 0;
         else 
@@ -556,7 +552,7 @@ int B_WsExtrapolate(char* arg, int unused)
 
     try
     {
-        smpl = new Sample(std::string(args[p]), std::string(args[p + 1]));
+        smpl = new Sample(v_args[p], v_args[p + 1]);
     }
     catch(const std::exception& e)
     {
@@ -570,20 +566,18 @@ int B_WsExtrapolate(char* arg, int unused)
         goto done;
     }
 
-    vars = args + p + 2;
-    nb_vars = SCR_tbl_size((unsigned char**) vars);
-    if(nb_vars == 0) 
+    nb_vars = v_args.size() - p - 2;
+    if(nb_vars == 0)
         pattern = "*";
     else 
     {
         for(int i = 0; i < nb_vars; i++) 
         {
-            pattern += vars[i];
+            pattern += v_args[p + 2 + i];
             if(i < nb_vars - 1) 
                 pattern += ",";
         }
     }
-    SCR_free_tbl((unsigned char**) args);
 
     rc = KV_extrapolate(global_ws_var, method, smpl, (char*) pattern.c_str());
 
@@ -605,26 +599,23 @@ done:
  */
 int B_WsAggr(int method, char* arg)
 {
-    char** args = B_ainit_chk(arg, NULL, 0);
-    int nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 1) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    if(v_args.empty()) 
     {
         error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
-        SCR_free_tbl((unsigned char**) args);
         return -1;
     }
 
-    std::string pattern = std::string(copy_char_array(args[0]));
-    std::string filename; 
-    if(nb_args > 1 && args[1] != NULL)
-        filename = std::string(copy_char_array(args[1]));
+    std::string pattern = v_args[0];
+    std::string filename;
+    if(v_args.size() > 1)
+        filename = v_args[1];
 
     KDBVariablesPtr kdb = global_ws_var;
     KDBVariablesPtr nkdb = KV_aggregate(kdb, method, pattern, filename);
     if(!nkdb)
     {
         error_manager.append_error("WsAggr* : aggregation failed");
-        SCR_free_tbl((unsigned char**) args);
         return -1;
     }
 
@@ -771,50 +762,37 @@ int B_CsvSave(char* arg, int type)
     char* old_seps = A_SEPS;
     A_SEPS = " ,;\t\n";
     char* lst = K_expand(type, NULL, arg + lg, '*');
-    char** data0 = B_ainit_chk(lst, NULL, 0);
+    std::vector<std::string> v_data0 = lst ? expand_arg(lst, 0) : std::vector<std::string>();
     SCR_free(lst);
     A_SEPS = old_seps;   
     
-    if(SCR_tbl_size((unsigned char**) data0) == 0) 
-    {
-        SCR_free_tbl((unsigned char**) data0);
-        data0 = NULL;
-    }
-
     int shift = 0;
     std::shared_ptr<Sample> smpl = nullptr;
-    if(data0 && type == VARIABLES && SCR_tbl_size((unsigned char**) data0) >= 2) 
+    if(type == VARIABLES && v_data0.size() >= 2)
     {
         // check if from to passed as arguments
-        if(SCR_is_num(data0[0][0]) && SCR_is_num(data0[1][0])) 
+        if(SCR_is_num(v_data0[0][0]) && SCR_is_num(v_data0[1][0])) 
         {
             try
             {
-                smpl = std::make_shared<Sample>(std::string(data0[0]), std::string(data0[1]));
+                smpl = std::make_shared<Sample>(v_data0[0], v_data0[1]);
                 shift = 2;
             }
             catch(const std::exception& e)
             {
                 error_manager.append_error("CsvSave : invalid sample\n" + std::string(e.what()));
-                SCR_free_tbl((unsigned char**) data0);
-                data0 = 0;
+                v_data0.clear();
             }
         }
         
-        if(SCR_tbl_size((unsigned char**) data0) <= shift) 
+        if(v_data0.size() <= shift)
         {
-            SCR_free_tbl((unsigned char**) data0);
-            data0 = 0;
+            v_data0.clear();
             shift = 0;
         }
     }
 
-    std::vector<std::string> vars;
-    if(data0 + shift != NULL) 
-    {
-        for(int i = 0; data0[shift + i] != NULL; i++) 
-            vars.push_back(std::string(data0[shift + i]));
-    }
+    std::vector<std::string> vars(v_data0.begin() + shift, v_data0.end());
 
     int rc = 0;
     try
@@ -828,7 +806,6 @@ int B_CsvSave(char* arg, int type)
         rc = -1;
     }
 
-    SCR_free_tbl((unsigned char**) data0);
     return rc;
 }
 

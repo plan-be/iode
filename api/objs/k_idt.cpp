@@ -120,11 +120,9 @@ bool KDBIdentities::execute_identities(const Period& from, const Period& to, con
     B_IdtExecuteTrace(const_cast<char*>(trace ? "Y" : "N"));
 
     Sample sample(from, to);
-    char* c_identities_list = to_char_array(identities_list);
-    char** idts = B_ainit_chk(c_identities_list, NULL, 0);
+    std::vector<std::string> v_idts = expand_arg(identities_list, 0);
 
-    int rc = B_IdtExecuteIdts(&sample, idts);
-    SCR_free_tbl((unsigned char**) idts);
+    int rc = B_IdtExecuteIdts(&sample, v_idts);
     if(rc != 0)
     {
         std::string error_msg = "Cannot execute identities '" + identities_list;

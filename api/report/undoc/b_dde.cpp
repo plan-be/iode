@@ -331,21 +331,22 @@ char *IodeDdeGetReportRC(char *szItem)
 
 char *IodeDdeGetXObj(char *szItem, int type)
 {
-    U_ch    **tbl, **lst;
+    U_ch    **tbl;
     char    *res = 0, *sheet, *item,
-             *plst =  NULL;
+    *plst =  NULL;
     int     i, l, h;
     HCONV   hConv;
     std::string name;
+    std::vector<std::string> v_lst;
 
     try
     {
         tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
-        if(SCR_tbl_size(tbl) < 1) lst = SCR_vtom((unsigned char*) "", (int) ',');
-        else 
+        if(SCR_tbl_size(tbl) >= 1)
         {
             plst = K_expand(type, NULL, (char*) tbl[0], '*');
-            lst = (unsigned char**) B_ainit_chk(plst, NULL, 0);
+            if(plst != NULL)
+                v_lst = expand_arg(plst, 0);
         }
     
         if(SCR_tbl_size(tbl) < 2) 
@@ -367,7 +368,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
             case VARIABLES:
             {
                 int nb_periods = global_ws_var->get_sample()->nb_periods;
-                if(SCR_tbl_size(lst) == 0) 
+                if(v_lst.empty())
                 {
                     res = IodeDdeCreatePer(0);
                     WscrDdeSetItem(hConv, IodeDdeXlsCell(item, 0, 1, nb_periods, 1), 
@@ -375,7 +376,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                     SCR_free(res);
                 }
     
-                if(SCR_tbl_size(lst) == 0) 
+                if(v_lst.empty())
                 {
                     i = 0;
                     for(const auto& [var_name, _] : global_ws_var->k_objs) 
@@ -389,10 +390,11 @@ char *IodeDdeGetXObj(char *szItem, int type)
                 }
                 else 
                 {
-                    for(i = 0 ; lst[i] ; i++) 
+                    for(i = 0; i < v_lst.size(); i++)
                     {
-                        name = std::string((char*) lst[i]);
-                        if(strcmp((char*) lst[i], "t") == 0) {
+                        name = v_lst[i];
+                        if(name == "t") 
+                        {
                             res = IodeDdeCreatePer(0);
                             WscrDdeSetItem(hConv, IodeDdeXlsCell(item, i, 1, 1 + nb_periods, 1), 
                                            (unsigned char*) res);
@@ -415,7 +417,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
             default :
             {
                 KDB& kdb = get_global_db(type);
-                if(SCR_tbl_size(lst) == 0) 
+                if(v_lst.empty())
                 {
                     i = 0;
                     for(const std::string& name : kdb.get_names()) 
@@ -429,9 +431,9 @@ char *IodeDdeGetXObj(char *szItem, int type)
                 }
                 else 
                 {
-                    for(i = 0 ; lst[i] ; i++) 
+                    for(i = 0; i < v_lst.size(); i++)
                     {
-                        name = std::string((char*) lst[i]);
+                        name = v_lst[i];
                         if(!kdb.contains(name)) 
                             continue;
                         
@@ -445,7 +447,6 @@ char *IodeDdeGetXObj(char *szItem, int type)
             }
         }
     
-        SCR_free_tbl(lst);
         SCR_free(plst);
         WscrDdeEnd(hConv) ;
         SCR_free_tbl(tbl);

@@ -804,8 +804,8 @@ bool CSimulation::exchange(const std::string& list_endo_exo)
     if(list_endo_exo.empty())
         return false;
 
-    char** c_endo_exo = B_ainit_chk((char*) list_endo_exo.c_str(), NULL, 0);
-    if(c_endo_exo == NULL && !list_endo_exo.empty()) 
+    std::vector<std::string> v_tmp_endo_exo = expand_arg(list_endo_exo, 0);
+    if(v_tmp_endo_exo.empty())
     {
         std::string error_msg = "Cannot exchange the model variables:\n";
         error_msg += "Invalid list of endogenous-exogenous pairs: " + list_endo_exo;
@@ -813,11 +813,7 @@ bool CSimulation::exchange(const std::string& list_endo_exo)
         return false;
     }
 
-    int nb = SCR_tbl_size((unsigned char**) c_endo_exo);
-    for(int i = 0; i < nb; i++) 
-        v_endo_exo.push_back(std::string(c_endo_exo[i]));
-    SCR_free_tbl((unsigned char**) c_endo_exo);
-    
+    v_endo_exo = std::move(v_tmp_endo_exo);
     return true;
 }
 

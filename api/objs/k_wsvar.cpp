@@ -1269,7 +1269,7 @@ bool KDBVariables::copy_from(const std::vector<std::string>& input_files, const 
     // NOTE: objects_names.size() == 0 meaning all objects -> no error thrown
 
     Sample* copy_sample = nullptr;
-    if((!from.empty()) || (!to.empty()))
+    if((!from.empty())|| (!to.empty()))
     {
         auto var_sample = this->get_sample();
         std::string _from_ = from.empty() ? var_sample->start_period.to_string() : from;
@@ -1348,11 +1348,11 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 	input_file = check_filepath(input_file, FILE_VARIABLES, "seasonal_adjustment", true);
 	args = input_file + " "; 
 
-	if(series.empty()) 
+	if(series.empty())
 		throw std::invalid_argument(std::string("Cannot run seasonal adjustment: Passed value for ") + 
 		                            "the variables list argument is empty");
-	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
-    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+	std::vector<std::string> v_series = expand_arg(series, 0);
+    if(v_series.empty())
 		throw std::invalid_argument("Cannot run seasonal adjustment: Passed value \"" + series + 
 		                            "\" for the variables list argument is invalid");
 	args += series + " ";
@@ -1382,11 +1382,11 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 
 	args += std::to_string(lambda) + " ";
 
-	if(series.empty()) 
+	if(series.empty())
 		throw std::invalid_argument(std::string("Cannot run trend correction: Passed value for ") + 
 		                            "the variables list argument is empty");
-	char** c_series = B_ainit_chk(to_char_array(series), NULL, 0);
-    if(SCR_tbl_size((unsigned char**) c_series) == 0) 
+	std::vector<std::string> v_series = expand_arg(series, 0);
+    if(v_series.empty())
 		throw std::invalid_argument("Cannot run trend correction: Passed value \"" + series + 
 		                            "\" for the variables list argument is invalid");
 	args += series;

@@ -27,26 +27,22 @@ int B_WsSeasonAdj(char *arg, int unused)
 
 int B_season(char* arg)
 {
-    int     res, rc = -1, shift, beg, dim, nbper;
+    int     res, rc = -1, shift, beg, dim, nbper, nb;
     char    name[K_MAX_FILE + 1];
     double  *t_vec = NULL, *c_vec = NULL, *i_vec = NULL,
             eps, scale, season[12];
     int     file_type;
     std::shared_ptr<Sample> t_smpl = nullptr;
-    std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
     int lg = B_get_arg0(name, arg, 80);
-    char** data = B_ainit_chk(arg + lg, NULL, 0);
-    int nb = SCR_tbl_size((unsigned char**) data);
-    if(nb == 0) 
+    std::vector<std::string> v_data = expand_arg(arg + lg, 0);
+    if(v_data.empty()) 
         goto done;
 
-    for(int i = 0; i < nb; i++) 
-        v_data.push_back(std::string(data[i]));
-
-    eps = atof(data[nb - 1]);
+    nb = (int) v_data.size();
+    eps = atof(v_data[nb - 1].c_str());
     if(IODE_IS_0(eps)) 
         SEASON_EPS = 5.0;
     else 
@@ -121,7 +117,6 @@ done:
     from->clear();
     from.reset();
 
-    SCR_free_tbl((unsigned char**) data);
     SW_nfree(t_vec);
     SW_nfree(c_vec);
     SW_nfree(i_vec);

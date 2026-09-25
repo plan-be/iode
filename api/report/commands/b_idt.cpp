@@ -39,7 +39,7 @@ int B_IdtExecute(char* arg, int unused)
 {
     int     lg1, lg2;
     int     rc = 0;
-    char    from[16], to[16], **idts;
+    char    from[16], to[16];
     Sample  *smpl;
 
     error_manager.clear();
@@ -57,11 +57,10 @@ int B_IdtExecute(char* arg, int unused)
         return -1;
     }
 
-    idts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
+    std::vector<std::string> v_idts = expand_arg(arg + lg1 + lg2, 0);
 
-    rc = B_IdtExecuteIdts(smpl, idts);
+    rc = B_IdtExecuteIdts(smpl, v_idts);
 
-    SCR_free_tbl((unsigned char**) idts);
     delete smpl;
     smpl = nullptr;
 
@@ -87,22 +86,20 @@ int B_IdtExecute(char* arg, int unused)
  *  @return int     0 on success, -1 on error (file not found,)
  */
 
-int B_IdtExecuteIdts(Sample* smpl, char** c_idts)
+int B_IdtExecuteIdts(Sample* smpl, const std::vector<std::string>& idts)
 {
     error_manager.clear();
 
-    int nb_idts = SCR_tbl_size((unsigned char**) c_idts);
-
     KDBVariablesPtr kdb_var = nullptr;
-    if(c_idts == NULL || nb_idts == 0)
+    if(idts.empty())
         kdb_var = global_ws_idt->exec(global_ws_var, global_ws_scl, smpl);
     else 
     {
-        std::string idts;
-        for(int i = 0; i < nb_idts; i++)
-            idts += std::string(c_idts[i]) + ";";
+        std::string idts_list;
+        for(const std::string& idt : idts)
+            idts_list += idt + ";";
 
-        KDBIdentitiesPtr kdb_idt = global_ws_idt->get_subset(idts, false);
+        KDBIdentitiesPtr kdb_idt = global_ws_idt->get_subset(idts_list, false);
         kdb_var = kdb_idt->exec(global_ws_var, global_ws_scl, smpl);
     }
 

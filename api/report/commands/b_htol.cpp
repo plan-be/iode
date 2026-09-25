@@ -107,20 +107,15 @@ static int B_htol(int method, char* arg)
     char file[K_MAX_FILE + 1];
     int file_type;
     std::shared_ptr<Sample> t_smpl = nullptr;
-    std::vector<std::string> v_data;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
-    char** data = B_ainit_chk(arg + lg, NULL, 0);
-    int nb = SCR_tbl_size((unsigned char**) data);
-    if(nb == 0) 
+    std::vector<std::string> v_data = expand_arg(arg + lg, 0);
+    if(v_data.empty()) 
         goto done;
-
-    for(int i = 0; i < nb; i++) 
-        v_data.push_back(std::string(data[i]));
-        
+    
     file_type = get_file_type_from_file(file, VARIABLES);
     if(file_type < 0) 
         from->load_asc(file);
@@ -184,7 +179,7 @@ static int B_htol(int method, char* arg)
                 to_values[t] /= shift;
         }
 
-        nb = t_smpl->nb_periods;
+        int nb = t_smpl->nb_periods;
         for(; t < nb; t++) 
             to_values[t] = IODE_NAN;
 
@@ -200,7 +195,6 @@ done:
     from->clear();
     from.reset();
     
-    SCR_free_tbl((unsigned char**) data);
 
     if(rc < 0) 
         return -1;

@@ -33,27 +33,26 @@
  */
 int B_FileImportCmt(char* arg, int unused)
 {
-    int     rc = 0, nb_args, format, lang;
-    char    **args = NULL, *trace, *rule, *infile, *oufile, empty_buf[1];
+    int     rc = 0, format, lang;
+    char    *trace, *rule, *infile, *oufile, empty_buf[1];
 
     empty_buf[0] = 0;
-    args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size((unsigned char**) args);
-    if(nb_args < 5) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    if(v_args.size() < 5) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
     }
 
-    format = B_argpos("ARDDNGPT", args[0][0]);
-    rule   = args[1];
-    infile = args[2];
-    oufile = args[3];
-    lang   = B_argpos("EFD", args[4][0]);
+    format = B_argpos("ARDDNGPT", v_args[0][0]);
+    rule   = v_args[1].data();
+    infile = v_args[2].data();
+    oufile = v_args[3].data();
+    lang   = B_argpos("EFD", v_args[4].data()[0]);
 
-    if(nb_args == 6) 
-        trace = args[5];
+    if(v_args.size() == 6) 
+        trace = v_args[5].data();
     else             
         trace = empty_buf;
 
@@ -61,7 +60,6 @@ int B_FileImportCmt(char* arg, int unused)
                         empty_buf, empty_buf, format, lang);
 
 fin:
-    A_free((unsigned char**) args);
     return rc;
 }
 
@@ -82,28 +80,27 @@ fin:
  */
 int B_FileImportVar(char* arg, int unused)
 {
-    int     rc = 0, nb_args, format;
-    char    **args = NULL, *trace, *rule, *from, *to,*infile, *oufile, empty_buf[1];
+    int     rc = 0, format;
+    char    *trace, *rule, *from, *to, *infile, *oufile, empty_buf[1];
 
     empty_buf[0] = 0;
-    args = B_ainit_chk(arg, NULL, 0);
-    nb_args = SCR_tbl_size((unsigned char**) args);    /* JMP 16-12-93 */
-    if(nb_args < 6) 
+    std::vector<std::string> v_args = expand_arg(arg, 0);
+    if(v_args.size() < 6) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");
         rc = -1;
         goto fin;
     }
 
-    format = B_argpos("ARDDNGPT", args[0][0]);
-    rule   = args[1];
-    infile = args[2];
-    oufile = args[3];
-    from   = args[4];
-    to     = args[5];
+    format = B_argpos("ARDDNGPT", v_args[0][0]);
+    rule   = v_args[1].data();
+    infile = v_args[2].data();
+    oufile = v_args[3].data();
+    from   = v_args[4].data();
+    to     = v_args[5].data();
 
-    if(nb_args == 7) 
-        trace = args[6];
+    if(v_args.size() == 7) 
+        trace = v_args[6].data();
     else             
         trace = empty_buf;
 
@@ -111,6 +108,5 @@ int B_FileImportVar(char* arg, int unused)
                         from, to, format, 0);
 
 fin:
-    A_free((unsigned char**) args);
     return rc;
 }

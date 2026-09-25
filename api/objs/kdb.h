@@ -1,6 +1,6 @@
 #pragma once
 #include "api/pch.h"
-#include "api/b_args.h"         // B_ainit_chk
+#include "api/b_args.h"         // expand_arg
 #include "api/b_errors.h"       // error_manager
 #include "api/time/sample.h"    // Period, Sample
 #include "api/objs/xdr.h"
@@ -323,18 +323,16 @@ public:
             throw std::runtime_error(error_msg);
         
         // Parses a string and replaces @filename and $listname by their contents
-        char** c_names = B_ainit_chk((char*) lst.c_str(), NULL, 0);
+        std::vector<std::string> v_names = expand_arg(lst, 0);
 
         A_SEPS = OLD_SEPS;
 
-        // 1. convert char** -> std::vector<std::string>
-        // 2. check that each name exists in the database (if must_exist == true)
+        // Check that each name exists in the database (if must_exist == true)
+
         std::string name;
         std::string key;
-        int nb_names = SCR_tbl_size((unsigned char **) c_names);
-        for(int i = 0; i < nb_names; i++)
+        for(const std::string& name : v_names)
         {
-            name = std::string(c_names[i]);
             if(name.empty())
                 continue;
             
@@ -347,12 +345,10 @@ public:
             else
                 names.insert(key);
         }
-        SCR_free_tbl((unsigned char **) c_names);
 
         if(names.size() == 0)
             throw std::runtime_error(error_msg);
         
-        // return names
         return names; 
     }
 

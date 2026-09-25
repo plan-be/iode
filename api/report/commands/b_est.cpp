@@ -185,18 +185,15 @@ int B_EqsSetSample(char* arg, int unused)
  */
 int B_EqsSetMethod(char* arg, int unused)
 {
-    int     lg1, meth, rc = 0;
-    char    tmeth[16], **eqs = 0;
-
-    lg1 = B_get_arg0(tmeth, arg, 15);
-    meth = atoi(tmeth);
-    eqs = B_ainit_chk(arg + lg1, NULL, 0);
-
+    char tmeth[16];
+    int lg1 = B_get_arg0(tmeth, arg, 15);
+    int meth = atoi(tmeth);
+    std::vector<std::string> v_eqs = expand_arg(arg + lg1, 0);
+    
+    int rc = 0;
     std::shared_ptr<Equation> eq_ptr;
-    std::string eq_name;
-    for(int i = 0 ; eqs[i] ; i++) 
+    for(const std::string eq_name : v_eqs)
     {
-        eq_name = eqs[i];
         eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
         if(!eq_ptr)
         {
@@ -206,7 +203,6 @@ int B_EqsSetMethod(char* arg, int unused)
         eq_ptr->method = (char) meth;
     }
 
-    SCR_free_tbl((unsigned char**) eqs);
     return rc;
 }
 
@@ -224,28 +220,22 @@ int B_EqsSetMethod(char* arg, int unused)
  */
 int B_EqsSetBloc(char* arg, int unused)
 {
-    int     rc = 0;
-    char    **eqs = 0, *bloc;
-
-    eqs = B_ainit_chk(arg, NULL, 0);
-    bloc = (char*) SCR_mtov((unsigned char**) eqs, (int) ';');
-
+    std::vector<std::string> v_eqs = expand_arg(arg, 0);
+    std::string bloc = join(v_eqs, ";");
+    
+    int rc = 0;
     std::shared_ptr<Equation> eq_ptr;
-    std::string eq_name;
-    for(int i = 0 ; eqs[i] ; i++) 
+    for(const std::string& eq_name : v_eqs)
     {
-        eq_name = eqs[i];
         eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
         if(!eq_ptr)
         {
             rc = -1;
             break;
         }
-        eq_ptr->block = std::string(bloc);
+        eq_ptr->block = bloc;
     }
 
-    SCR_free_tbl((unsigned char**) eqs);
-    SCR_free(bloc);
     return rc;
 }
 

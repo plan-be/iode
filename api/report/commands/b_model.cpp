@@ -42,23 +42,11 @@
  *  @param [in] char**  eqs     NULL or list of equations defining the model 
  *  @return     int             0 on success, return code of simulate() on error.    
  */
-static int B_ModelSimulateEqs(Sample* smpl, char** c_eqs)
+static int B_ModelSimulateEqs(Sample* smpl, const std::vector<std::string>& v_eqs)
 {
     std::string s_eqs;
-    std::vector<std::string> v_eqs;
-    if(c_eqs != NULL) 
-    {
-        int nb_eqs = SCR_tbl_size((unsigned char**) c_eqs);
-        v_eqs.reserve(nb_eqs);
-
-        std::string eq_name;
-        for(int i = 0; i < nb_eqs; i++)
-        {
-            eq_name = std::string(c_eqs[i]);
-            v_eqs.push_back(eq_name);
-            s_eqs += eq_name + ";";
-        } 
-    }
+    for(const std::string& eq_name : v_eqs)
+        s_eqs += eq_name + ";";
 
     bool success;
     if(v_eqs.size() == 0)
@@ -83,8 +71,9 @@ int B_ModelSimulate(char *const_arg, int unused)
 {
     int     lg1, lg2;
     int     rc = -1;
-    char    from[16], to[16], **eqs = 0;
+    char    from[16], to[16];
     Sample  *smpl = nullptr;
+    std::vector<std::string> v_eqs;
     char    *arg;
 
     // Copy for C++ strings = read only (const)
@@ -103,16 +92,11 @@ int B_ModelSimulate(char *const_arg, int unused)
         goto err;
     }
 
-    eqs = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(eqs == 0) 
-        goto err;
-    
-    rc = B_ModelSimulateEqs(smpl, eqs);
+    v_eqs = expand_arg(arg + lg1 + lg2, 0);
+    rc = B_ModelSimulateEqs(smpl, v_eqs);
 
 err:
     if(smpl) delete smpl;
-    smpl = nullptr;
-    SCR_free_tbl((unsigned char**) eqs);
     SCR_free(arg);
     return rc;
 }
@@ -179,14 +163,7 @@ int B_ModelExchange(char* const_arg, int unused)
     global_simu->v_endo_exo.clear();
     if(arg && SCR_strip((unsigned char*) arg)[0])
     {
-        char** lst = B_ainit_chk(arg, NULL, 0);
-        if(lst != NULL)
-        {
-            int nb = SCR_tbl_size((unsigned char**) lst);
-            for(int i = 0; i < nb; i++)
-                global_simu->v_endo_exo.push_back(std::string(lst[i]));
-            SCR_free_tbl((unsigned char**) lst);
-        }
+        global_simu->v_endo_exo = expand_arg(arg, 0);
     } 
     
     SCR_free(arg);
@@ -289,28 +266,26 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     }
 
     // Extrait les listes restantes
-    char** lsts = B_ainit_chk(arg + lg1 + lg2, NULL, 0);
-    if(lsts == 0 || SCR_tbl_size((unsigned char**) lsts) != 3) 
+    std::vector<std::string> v_lst = expand_arg(arg + lg1 + lg2, 0);
+    if(v_lst.size() != 3)
     {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");
         SCR_free(arg);
-        SCR_free_tbl((unsigned char**) lsts);
         if(smpl) delete smpl;
         return -1;
     }
 
-    if(!(global_ws_lst->contains(lsts[0]) && global_ws_lst->contains(lsts[1]) && global_ws_lst->contains(lsts[2]))) 
+    if(!(global_ws_lst->contains(v_lst[0]) && global_ws_lst->contains(v_lst[1]) && global_ws_lst->contains(v_lst[2]))) 
     {
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         SCR_free(arg);
-        SCR_free_tbl((unsigned char**) lsts);
         if(smpl) delete smpl;
         return -1;
     }
 
     int nb;
 
-    std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(lsts[0]);
+    std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(v_lst[0]);
     char** c_pre = (char**) KL_expand((char*) pre_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> pre;
@@ -319,7 +294,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         pre.push_back(std::string(c_pre[i]));
     SCR_free_tbl((unsigned char**) c_pre);
 
-    std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(lsts[1]);
+    std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(v_lst[1]);
     char** c_inter = (char**) KL_expand((char*) inter_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> inter;
@@ -328,7 +303,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         inter.push_back(std::string(c_inter[i]));
     SCR_free_tbl((unsigned char**) c_inter);
 
-    std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(lsts[2]);
+    std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(v_lst[2]);
     char** c_post = (char**) KL_expand((char*) post_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> post;
@@ -336,8 +311,6 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     for(int i = 0; i < nb; i++) 
         post.push_back(std::string(c_post[i]));
     SCR_free_tbl((unsigned char**) c_post);
-
-    SCR_free_tbl((unsigned char**) lsts);
 
     // union of pre, inter and post -> to create a subset of global_ws_eqs to simulate
     std::set<std::string> v_eqs;

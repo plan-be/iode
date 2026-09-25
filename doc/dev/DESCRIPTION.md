@@ -149,63 +149,17 @@ The web page http://www.xon.be/scr4/libs1/libs1.htm contains a list of all avail
 
 Functions to share and reuse a large allocated buffer in different parts of the application.
 
-|Syntax|Description|
-|:---|:---|
-|`char *BUF_alloc(int len)`|allocates or extends a global buffer of at least len bytes.|
-|`void BUF_free()`|frees the buffer|
-|`void BUF_lock()`|reserves the buffer utilisation|
-|`void BUF_unlock()`|unlocks the buffer|
-|`char *BUF_memcpy(char *ptr, int lg)`|copies the the first lg bytes following address ptr to the buffer BUF\_DATA|
-|`char *BUF_strcpy(char *ptr)`|copies a null terminated string to the buffer|
-| ||
-|`char *BUF_DATA`|NULL or pointer to the allocated buffer|
-
 ### pack.c {#T7}
 
 Packing (serialize) and unpacking (deserialize) objects.
-
-|Syntax|Description|
-|:---|:---|
-|`void *P_create()`|creates (allocated) a new pack object|
-|`int P_free(char *ptr)`|frees a pack object|
-|`void *P_add(void *vptr1, void *vptr2, int lg)`|appends to the pack pointed to by vptr1 the content pointed to by vptr2 which has a length of lg bytes.|
-|`void *P_get_ptr(void *vptr, int i)`|retrieves the pointer to the i'th element of a pack.|
-|`OSIZE P_get_len(void *vptr, int i)`|retrieves the length (in bytes) of the i'th element of a pack or the length of the full pack if i < 0.|
-|`int P_nb(char *ptr)`|retrieves the number of elements in the pack pointed to by ptr.|
 
 ### yy.c {#T12}
 
 Helper functions for reading and writing IODE ascii files.
 
-|Syntax|Description|
-|:---|:---|
-|`double K_read_real(YYFILE *yy)`|reads a token on the YY stream and interprets the token as a IODE\_REAL (double) if possible.|
-|`long K_read_long(YYFILE* yy)`|reads the next token on the YY stream and returns a long.|
-|`char* K_read_str(YYFILE* yy)`|reads the next token on the YY stream. If it is a string, returns an allocated copy of the string.|
-|`Period* K_read_per(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Period definition (\{long\}\{char\}\{long\}).|
-|`std::shared_ptr<Sample> K_read_smpl(YYFILE* yy)`|reads the next tokens on the YY stream and tries to interpret them as a Sample.|
-|`int K_read_align(YYFILE* yy)`|reads the next token on the YY stream: LEFT, RIGHT or CENTER.|
-|                                          ||
-|`void K_stracpy(char** to, char* from)`|allocates and copies a null terminated string.|
-|`int K_wrdef(FILE* fd, YYKEYS* table, int def)`|searches the position of a integer in a table of YYKEYS and writes the corresponding token onto fd.|
-|`int K_compare(YYKEYS* yy1, YYKEYS* yy2)`|helper function passed as parameter to qsort to sort a table of YYKEYS.|
-|`char *K_wrap(char *in, int lg)`|wraps a string (by inserting \\n) to limit each line to lg characters.|
-
 ### b\_iodeini.c {#T13}
 
 Functions to read and write parameters in iode.ini.
-
-|Syntax|Description|
-|:---|:---|
-|`void B_IodeIniFile()`|Retrieves the path to the iode.ini file|
-|`int B_IniReadText(char* section, char* parm, char* res, int maxlen, char* dft)`|Reads a text parameter in the current iode.ini file.|
-|`int B_IniReadChar(char* section, char* parm, char dft)`|Reads a character parameter in the current iode.ini file.|
-|`int B_IniReadNum(char* section, char* parm, int dft)`|Reads a integer parameter in the current iode.ini file.|
-|`int B_IniReadYN(char* section, char* parm, int dft)`|Reads a Y/N parameter in the current iode.ini file.|
-|`int B_IniWriteText(char* section, char* parm, char* val)`|Saves a text parameter in the current iode.ini file|
-|`int B_IniWriteChar(char* section, char* parm, char val)`|Saves a char parameter in the current iode.ini file|
-|`int B_IniWriteNum(char* section, char* parm, int val)`|Saves a integer parameter in the current iode.ini file|
-|`int B_IniWriteYN(char* section, char* parm, int val)`|Saves a boolean parameter in the current iode.ini file|
 
 ## Group "Pseudo\-virtual functions" {#T14}
 
@@ -217,59 +171,7 @@ At the same time, an optional "super function" pointer may point to an alternati
 
 ### k\_super.c {#T15}
 
-#### List of functions that can be superseeded {#T16}
-
-Functions used in any context of IODE (GUI or not\-GUI).
-
-|Syntax|Description|
-|:---|:---|
-|`void kerror(int level, char* fmt, ...)`|Displays an error message and optionally exits the program.|
-|`void kpause()`|Displays the message "Press ENTER to continue" and waits for the user to press ENTER.|
-|`void kwarning(char* fmt, ...)`|Displays a message and optionally asks the user to press ENTER before continuing.|
-|`void kmsg(char* fmt, ...)`|Displays a message.|
-|`void skip_message(int IsOn)`|Suppresses or restores the message output by replacing kmsg\_super()|
-|`int kconfirm(char *fmt,...)`|Displays a message and optionally asks confirmation before continuing.|
-|`int kinformation(unsigned char *str, unsigned char *v, unsigned char **buts)`|Displays a message box with optional buttons.|
-|`void krecordkey(int key)`|Records a key in the keyboard buffer.|
-|`int Wprintf(char* fmt, ...)`|Displays a message.|
-|`int SCR_panic()`|Exits the program (normally on a "memory full" event).|
-
-Functions used only in a GUI context.
-
-|Syntax|Description|
-|:---|:---|
-|`void ksettitle()`|Set the window title (GUI only).|
-|`int ktermvkey(int vkey)`|Defines the interval to wait between two checks on the keyboard buffer length (GUI only).|
-|`int khitkey()`|Checks whether the keyboard buffer is not empty (GUI only).|
-|`int kgetkey()`|Reads the next character in the keyboard buffer (GUI only).|
-|`void kbeep()`|Plays a sound (GUI only).|
-|`Sample *kasksmpl()`|Asks the user to give a Sample (GUI only).|
-|`int kexecsystem()`|Calls the fonction system().|
-|`int kshellexec()`|Call the Win32 function ShellExecuteEx().|
-
-#### List of function pointers that can replace the standard implementations {#T17}
-
-|Syntax|
-|:---|
-|`int (*kerror_super)(int level, char*msg);`|
-|`void (*kpause_super)();`|
-|`int KPAUSE_CONTINUE = 0;`|
-|`void (*kwarning_super)(char* msg);`|
-|`void (*kmsg_super)(char* msg);`|
-|`int (*kwprintf_super)(char* msg);`|
-|`void (*kpanic_super)(void);`|
-|`int (*kconfirm_super)(char* msg);`|
-|`int (*kinformation_super)(const char* msg);`|
-|`int KMSGBOX_CONTINUE = 0;`|
-|`void (*krecordkey_super)(int ch);`|
-|`void (*ksettitle_super)(void);`|
-|`int (*ktermvkey_super)(int vkey);`|
-|`int (*khitkey_super)();`|
-|`int (*kgetkey_super)();`|
-|`void (*kbeep_super)(void);`|
-|`Sample *(*kasksmpl_super)(void);`|
-|\`cint kexecsystem\_super(char\*);|
-|\`cint kshellexec\_super(char\*);|
+List of functions that can be superseeded
 
 ## Group "IODE Version" {#T18}
 
@@ -277,38 +179,15 @@ Functions used only in a GUI context.
 
 Functions to retrieve the current IODE version.
 
-|Syntax|Description|
-|:---|:---|
-|`char *K_LastVersion()`|returns in an allocated string the current version of IODE.|
-|`char *K_CurrentVersion()`|returns in an allocated string the IODE version of the current executable.|
-
 ## Group "KDB management" {#T20}
 
 ### k\_ws.c {#T22}
 
 Variables and functions for initializing and cleaning up the "in memory" workspaces.
 
-|Syntax|Description|
-|:---|:---|
-|`KDB* get_global_db(const int iode_type)`|returns the global database corresponding to the IODE type i|
-|`void K_init_ws(int ws)`|sets the filename of all global databases to I_DEFAULT_FILENAME|
-|`void K_end_ws(int ws)`|saves content of all global databases|
-|`int K_load_RWS(int ref, char *filename)`|Load a VAR file for use in GSample (print tables and graphs)|
-
 ### k\_wsvar.c {#T23}
 
 Functions acting on workspaces of variables.
-
-|Syntax|Description|
-|:---|:---|
-|`int KV_merge(KDB* kdb1, KDB* kdb2, int replace)`|Merges two KDB of variables: kdb1 <\- kdb1 \+ kdb2.|
-|`void KV_merge_del(KDB* kdb1, KDB* kdb2, int replace)`|Merges 2 KDB of variables, then deletes the second one.|
-|`bool KV_add(KDBVariablesPtr kdb, std::string& varname)`|Adds a new variable in kdb. Fills it with L\_NAN.|
-|`double KV_get(KDB* kdb, int pos, int t, int mode)`|Gets VAR\[t\] where VAR is the series in position pos in kdb.|
-|`void KV_set(KDB* kdb, int pos, int t, int mode, double new)`|Sets VAR\[t\], where VAR is the series in position pos in kdb.|
-|`int KV_extrapolate(KDB* dbv, int method, Sample *smpl, char* pattern)`|Extrapolates variables on a selected Sample according to one of the available methods.|
-|`KDB *KV_aggregate(KDBVariablesPtrdbv, int method, char *pattern, char *filename)`|Creates a new KDB with variables created by aggregation based on variable names.\_|
-|`void KV_init_values_1(double* val, int t, int method)`|Extrapolates 1 value val\[t\] based on val\[t\], val\[t\-1\] and a selected method.|
 
 ## Group "Object management" {#T24}
 
@@ -325,21 +204,13 @@ Functions acting on workspaces of variables.
 
 ### k\_objvers.c {#T27}
 
-Functions to detect IODE object file version and to convert an object to the current IODE version.\_
-
-|Syntax|Description|
-|:---|:---|
-|`int get_version(char* label):`|returns the current object version (0\-2) from an IODE file header.|
+Functions to detect IODE object file version and to convert an object to the current IODE version.
 
 ### k\_pack.c {#T28}
 
 Functions for "packing" and "unpacking" IODE objects.
 
 #### Packing functions {#T29}
-
-|Syntax|Description|
-|:---|:---|
-|`bool K_opack(char** pack, char* a1, int* a2)`|Reserved for future new objects|
 
 ### k\_val.c {#T32}
 
@@ -349,23 +220,9 @@ Basic functions to retrieve object data based on their position or name in the k
 
 Functions to manipulate equation expressions and objects.
 
-|`void E_free(Equation* eq)`|Frees an EQ struct and all its elements|
-|:---|:---|
-|`int E_split_eq(char* lec, char** lhs, char** rhs)`|Extracts the left and right sides of a lec equation|
-|`int E_dynadj(int method, char* lec, char* c1, char* c2, char** adjlec)`|Transforms a LEC equation to add dynamic adjustment|
-|`E_DynamicAdjustment(int method, char** eqs, char*c1, char*c2)`|Transforms a LEC equation "in place" to add dynamic adjustment|
-
 ### k\_lst.c {#T34}
 
 Basic functions to manipulate lists and to extract lists of VARs and Scalars from IODE objects.
-
-|`Syntax`|Description|
-|:---|:---|
-|`void KE_scan(KDB* dbe, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of EQs and extracts all VARs and all Scalars from the CLEC struct.|
-|`void KI_scan(KDB* dbi, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB dbi of IDTs and extracts all VARs and all Scalars from the LEC expression.|
-|`void KT_scan(KDB* dbt, int i, KDB* exo, KDB* scal)`|Analyses object i from a KDB of Tables and extracts all VARs and all Scalars from the LEC expressions found in the TableCells.|
-|`int KL_lst(char* name, char** lst, int chunck)`|Creates a list from a table of strings. The elements in the new list are separated by semi\-colons.|
-|`unsigned char **KL_expand(char *str)`|Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.|
 
 ### k\_tbl.c {#T35}
 
@@ -375,31 +232,13 @@ Functions to manage Table objects.
 
 Function to compare two IODE objects.
 
-|Syntax|Description|
-|:---|:---|
-|`int K_compare(char* name, const KDB& kdb1, const KDB& kdb2)`|Compares IODE objects having the same name in two KDB.|
-
 ### k\_grep.c {#T37}
 
 Functions to search strings in KDB objects.
 
-|Syntax|Description|
-|:---|:---|
-|`std::vector<std::string> KDB::grep(std::string& pattern, bool ecase, bool names, bool forms, bool texts, char all)`|Creates a list of all objects in a KDB having a specific pattern in their names or LEC expression, comment...|
-|`char *K_expand(int type, char* file, char* pattern, int all)`|Retrieves all object names matching one or more patterns in a workspace or an object file.|
-|`int K_aggr(char* pattern, char* ename, char* nname) *`|Transforms a variable name based on an "aggregation" pattern.|
-
 ### k\_xdr.c {#T41}
 
 Functions to convert big\-endian data, used by processors like RISC,... into little\-endian format (x86,...) and vice\-versa.
-
-|Syntax|Description|
-|:---|:---|
-|`void K_xdrPINT(unsigned char* a)`|Converts un short int from l\-e to b\-e and vice\-versa|
-|`void K_xdrPLONG(unsigned char* a)`|Converts un long int from l\-e to b\-e and vice\-versa|
-|`void template_xdr(KDB* ikdb, KDB** okdb)`|Converts a KDB t from l\-e to b\-e and vice\-versa|
-|                                       ||
-|`int (*K_xdrobj[])()`|Table of function pointers, one function for each object type, for converting|
 
 ## Group "IODE object ascii formats" {#T42}
 
@@ -422,81 +261,33 @@ Functions to load and save files in IODE ascii format and LArray csv format.
 
 Tables of pointers to functions for reading and writing IODE objects in ASCII and CSV formats.
 
-|Syntax|
-|:---|
-|`KDB *(*K_load_asc[])()`|
-|`int (*K_save_asc[])()`|
-|`int (*K_save_csv[])()`|
-
 ### k\_cccmt.c {#T45}
 
 Loading and saving IODE ascii comment files.
-
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KC_load_asc(char* filename, int db_global)`||
-|`int KC_save_asc(KDB* kdb, char* filename)`||
-|`int KC_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cceqs.c {#T46}
 
 Loading and saving IODE ascii equation files.
 
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KE_load_asc(char* filename, int db_global)`||
-|`int KE_save_asc(KDB* kdb, char* filename)`||
-|`int KE_save_csv(KDB* kdb, char *filename)`|Not implemented|
-
 ### k\_ccidt.c {#T47}
 
 Loading and saving IODE ascii identity files.
-
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KI_load_asc(char* filename, int db_global)`||
-|`int KI_save_asc(KDB* kdb, char* filename)`||
-|`int KI_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cclst.c {#T48}
 
 Loading and saving IODE ascii list files.
 
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KL_load_asc(char* filename, int db_global)`||
-|`int KL_save_asc(KDB* kdb, char* filename)`||
-|`int KL_save_csv(KDB* kdb, char *filename)`|Not implemented|
-
 ### k\_ccscl.c {#T49}
 
 Loading and saving IODE ascii scalar files.
-
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KS_load_asc(char* filename, int db_global)`||
-|`int KS_save_asc(KDB* kdb, char* filename)`||
-|`int KS_save_csv(KDB* kdb, char *filename)`|Not implemented|
 
 ### k\_cctbl.c {#T50}
 
 Loading and saving IODE ascii table files.
 
-|Syntax|Remark|
-|:---|:---|
-|`KDB *KT_load_asc(char* filename, int db_global)`||
-|`int KT_save_asc(KDB* kdb, char* filename)`||
-|`int KT_save_csv(KDB* kdb, char *filename)`|Not implemented|
-
 ### k\_ccvar.c {#T51}
 
 Functions to import and export IODE files to/from ascii and LArray\-csv format.
-
-|Syntax|
-|:---|
-|`KDB *KV_load_asc(char *filename)`|
-|`KV_save_asc(KDB* kdb, char* filename)`|
-|`int KV_save_csv(KDB* kdb, char *filename, Sample *smpl, char **varlist)`|
 
 ## Group "LEC language" {#T52}
 
@@ -511,15 +302,6 @@ Implemention of the LEC library virtual functions for Scalar and VAR references.
 ### b\_args.c {#T55}
 
 Basic functions for managing function and report arguments.
-
-|Syntax|Description|
-|:---|:---|
-|`char **B_ainit_chk(char* arg, ADEF* adef, int nb)`|expands an argument by replacing @filename and $listname by their contents|
-|`char **B_vtom_chk(char* arg, int nb)`|splits a string (generally a function argument) into a table of strings.|
-|`int B_loop(char *argv[], int (*fn)(), char* client)`|executes the function fn(char\*, char\*) for each string in the table of strings argv.|
-|`int B_ainit_loop(char* arg, int (*fn)(), char* client)`|calls B\_ainit\_check() to expand arg, then calls B\_loop() on the resulting table of strings.|
-|`int B_get_arg0(char* arg0, char*arg, int lg)`|computes arg0, the first arg ('word') of max lg bytes, in the string arg.|
-|`int B_argpos(char* str, int ch)`|returns the position of a char in a string.|
 
 ## Group "Execution of identities" {#T57}
 
@@ -555,11 +337,6 @@ See [REPORTS.md](REPORTS.md).
 
 Set of high\-level functions essentially developed for the creation of the Cython implementation of IODE. Most of these functions are (almost) aliases to other API functions but with a different and more coherent naming convention.
 
-|Syntax|Description|
-|:---|:---|
-|`int IodeInit()`|Initialise an IODE session.|
-|`int IodeEnd()`|Terminate an IODE session.|
-
 ## Group "DDE communcations" {#T66}
 
 ### b\_dde.c {#T67}
@@ -567,49 +344,3 @@ Set of high\-level functions essentially developed for the creation of the Cytho
 This file contains 2 groups of functions: the implementation of the IODE DDE server, allowing access to IODE functions from inside any program able to interact with a DDE server, like Excel or Word and functions to access the Excel DDE server.
 
 Some of IODE report commands line $ExcelGet are implemented here.
-
-|Syntax|Description|
-|:---|:---|
-|`int IodeDdeLocale(char *buf)`||
-|`int IodeDdeUnLocale(char *buf)`||
-|`int IodeDdeType(char *szTopic)`||
-|`char *IodeDdeGetWS(char *szItem)`||
-|`char *IodeDdeCreateSeries(int objnb, int bt)`||
-|`char *IodeDdeCreatePer(int bt)`||
-|`char *ToBase26(int num)`||
-|`char *IodeDdeXlsCell(char *offset, int i, int j, int lg, int hg)`||
-|`char *IodeTblCell(TableCell *cell, COL *cl, int nbdec)`||
-|`char *IodeDdeGetReportRC(char *szItem)`||
-|`char *IodeDdeGetXObj(char *szItem, int type)`||
-|`char *IodeDdeGetItem(char *szTopic, char *szItem)`||
-|`int IodeDdeSetWS(char *szItem, char *szBuffer)`||
-|`int IodeDdePlay(char *szItem, char *szBuffer)`||
-|`int DdeTsfKey(char *key)`||
-|`int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)`||
-|`char *B_ExcelGetItem(char *arg)`||
-|`int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)`||
-|`int B_ExcelDecimal(char *arg, int unused)`||
-|`int B_ExcelThousand(char *arg, int unused)`||
-|`int B_ExcelCurrency(char *arg, int unused)`||
-|`int B_ExcelLang(char *arg, int unused)`||
-|`int B_ExcelGet(char *arg, int type)`||
-|`int B_ExcelSet(char *arg, int type)`||
-|`int B_ExcelExecute(char *arg, int unused)`||
-|`int B_ExcelCmd(char *cmd, char *arg)`||
-|`int B_DDEGet(char *arg, int unused)`||
-|`int B_ExcelWrite(char *ptr, int unused)`||
-|`int B_DDEGet(char *arg, int unused)`||
-|`char *B_ExcelGetItem(char *arg)`||
-|`int B_ExcelGet(char *arg, int type)`||
-|`int B_ExcelSet(char *arg, int type)`||
-|`int B_ExcelExecute(char *arg, int unused)`||
-|`int B_ExcelCmd(char *cmd, char *arg)`||
-|`int B_ExcelWrite(char *ptr, int unused)`||
-|`int B_ExcelOpen(char *arg, int unused)`||
-|`int B_ExcelClose(char *arg, int unused)`||
-|`int B_ExcelPrint(char *arg, int unused)`||
-|`int B_ExcelSave(char *arg, int unused)`||
-|`int B_ExcelSaveAs(char *arg, int unused)`||
-|`int B_ExcelNew(char *arg, int unused)`||
-|`int IodeFmtVal(char *buf, double val)`||
-
