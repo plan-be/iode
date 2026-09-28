@@ -774,18 +774,18 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     // Create objects
     create_dummy_lists_and_vars();
 
-    // A_init
-    v_args = expand_arg("A B;C,D", 0); // => "A" "B;C" "D"
-    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B;C", "D"}));
+    // expand_args
+    v_args = expand_args("A B;C,D", 0); // => "A" "B" "C" "D"
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B", "C", "D"}));
 
-    // A_init
-    v_args = expand_arg("$LST1", 0);
+    // expand_args
+    v_args = expand_args("$LST1", 0);
     EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B"}));
 
     // Test parameters in a file. test.args must exist in the current dir 
     // and contain the line A1 A2
     sprintf(filename, "@%stest.args", input_test_dir);
-    v_args = expand_arg(filename, 0);
+    v_args = expand_args(filename, 0);
     EXPECT_EQ(v_args, (std::vector<std::string>{"A1", "A2"}));
 }
 
@@ -829,7 +829,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
     kdb_var.reset();
 
     // load only 2 objects
-    std::vector<std::string> v_objs = expand_arg("ACAF ACAG", 0);
+    std::vector<std::string> v_objs = expand_args("ACAF ACAG", 0);
 
     kdb_var = KDBVariables::Create(true);
     kdb_var->load_binary(in_filename, v_objs);

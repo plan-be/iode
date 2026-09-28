@@ -57,7 +57,7 @@ int B_IdtExecute(char* arg, int unused)
         return -1;
     }
 
-    std::vector<std::string> v_idts = expand_arg(arg + lg1 + lg2, 0);
+    std::vector<std::string> v_idts = expand_args(arg + lg1 + lg2, 0);
 
     rc = B_IdtExecuteIdts(smpl, v_idts);
 

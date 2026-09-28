@@ -112,7 +112,7 @@ static int B_htol(int method, char* arg)
 
     int lg = B_get_arg0(file, arg, K_MAX_FILE);
 
-    std::vector<std::string> v_data = expand_arg(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(arg + lg, 0);
     if(v_data.empty()) 
         goto done;
     

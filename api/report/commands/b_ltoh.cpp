@@ -331,7 +331,7 @@ static int B_ltoh(int type, char* arg)
 
     lg += B_get_arg0(file, arg + lg, K_MAX_FILE);
 
-    std::vector<std::string> v_data = expand_arg(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(arg + lg, 0);
     if(v_data.empty()) 
         goto done;
 

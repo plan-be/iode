@@ -87,7 +87,7 @@ int B_isdef(char* txt)
  */
 int B_get1int(char* arg)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 1);
+    std::vector<std::string> v_args = expand_args(arg, 1);
     if(v_args.empty()) 
         return(-100);
     

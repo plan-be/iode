@@ -60,13 +60,6 @@ int IodeInit()
     // Default values for language, nbdec, separators
     K_LANG = 0;     
     tbl_nb_decimals = -1;   
-    A_SEPS = " ,;\n\t\r";
-        
-    // Suppress default filename wildcard behavior
-    A_NO_EXPANDSTAR_DFT = 1; 
-
-    // Assign default "super" function pointers
-    IODE_assign_super_API();
     
     return 0;
 }

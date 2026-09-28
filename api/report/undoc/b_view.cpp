@@ -94,10 +94,10 @@ int B_ViewPrintVar(char* arg, int mode)
     std::string vars_str = arg_str.substr(pos + 1);
     vars_str = trim(vars_str);
 
-    char* OLD_SEPS = A_SEPS;
-    A_SEPS = (char*) ";\t\n";
-    std::vector<std::string> vars = split_multi(vars_str, std::string(A_SEPS));
-    A_SEPS = OLD_SEPS;
+    std::string OLD_SEPS = ARGS_SEPS;
+    ARGS_SEPS = ";\t\n";
+    std::vector<std::string> vars = split_multi(vars_str, ARGS_SEPS);
+    ARGS_SEPS = OLD_SEPS;
     if(vars.size() == 0) 
     {
         error_manager.append_error("Invalid argument");

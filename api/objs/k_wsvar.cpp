@@ -1351,7 +1351,7 @@ void KDBVariables::seasonal_adjustment(std::string& input_file, const std::strin
 	if(series.empty())
 		throw std::invalid_argument(std::string("Cannot run seasonal adjustment: Passed value for ") + 
 		                            "the variables list argument is empty");
-	std::vector<std::string> v_series = expand_arg(series, 0);
+	std::vector<std::string> v_series = expand_args(series, 0);
     if(v_series.empty())
 		throw std::invalid_argument("Cannot run seasonal adjustment: Passed value \"" + series + 
 		                            "\" for the variables list argument is invalid");
@@ -1385,7 +1385,7 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 	if(series.empty())
 		throw std::invalid_argument(std::string("Cannot run trend correction: Passed value for ") + 
 		                            "the variables list argument is empty");
-	std::vector<std::string> v_series = expand_arg(series, 0);
+	std::vector<std::string> v_series = expand_args(series, 0);
     if(v_series.empty())
 		throw std::invalid_argument("Cannot run trend correction: Passed value \"" + series + 
 		                            "\" for the variables list argument is invalid");

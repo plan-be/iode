@@ -258,7 +258,7 @@ protected:
         if(list_eqs.empty())
             return v_eqs;
 
-        std::vector<std::string> v_tmp_eqs = expand_arg(list_eqs, 0);
+        std::vector<std::string> v_tmp_eqs = expand_args(list_eqs, 0);
         if(v_tmp_eqs.empty())
         {
             std::string error_msg = "Invalid equations list: " + list_eqs;

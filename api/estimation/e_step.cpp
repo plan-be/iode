@@ -233,7 +233,7 @@ double estimate_step_wise(const std::shared_ptr<Sample> smpl, char* eqname, char
     int l = 0;
 
     // Crée le tableau d'équations à partir de arg
-    std::vector<std::string> v_eqs = expand_arg(eqname, 0);
+    std::vector<std::string> v_eqs = expand_args(eqname, 0);
     if(v_eqs.empty())
         return 0.0;
 

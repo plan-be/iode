@@ -170,10 +170,10 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
         if(rt < 0 || ct < 0) 
             goto cleanup;
 
-        xvars = expand_arg(xdim, 0);
+        xvars = expand_args(xdim, 0);
         nrows = (int) xvars.size() - 1;
 
-        yvars = expand_arg(ydim, 0);
+        yvars = expand_args(ydim, 0);
         ncols = (int) yvars.size() - 1;
 
         if(nrows == 0 || ncols == 0) goto cleanup;

@@ -1,6 +1,5 @@
 #pragma once 
 #include "api/iode_scr4.h"
-#include "scr4/args/s_args.h"
 
 #include "api/pch.h"
 #include "api/time/period.h"
@@ -55,6 +54,4 @@ void    kbeep();
 std::shared_ptr<Sample> kasksmpl();
 int     kexecsystem(const char* arg);
 int     kshellexec(const char* arg);
-char    *A_expand_super_API(char* name);
 int     ODE_end(const int st);
-void    IODE_assign_super_API(void);

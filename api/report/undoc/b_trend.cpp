@@ -68,7 +68,7 @@ static int B_WsTrendAll(char* arg, int std)
 
     int lg = B_get_arg0(file, arg, 80);
 
-    std::vector<std::string> v_data = expand_arg(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(arg + lg, 0);
     double lambda = atof(v_data[0].c_str());
     if(v_data.empty()) 
         goto done;

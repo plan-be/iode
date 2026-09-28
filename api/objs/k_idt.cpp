@@ -120,7 +120,7 @@ bool KDBIdentities::execute_identities(const Period& from, const Period& to, con
     B_IdtExecuteTrace(const_cast<char*>(trace ? "Y" : "N"));
 
     Sample sample(from, to);
-    std::vector<std::string> v_idts = expand_arg(identities_list, 0);
+    std::vector<std::string> v_idts = expand_args(identities_list, 0);
 
     int rc = B_IdtExecuteIdts(&sample, v_idts);
     if(rc != 0)

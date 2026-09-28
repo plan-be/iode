@@ -188,7 +188,7 @@ int B_EqsSetMethod(char* arg, int unused)
     char tmeth[16];
     int lg1 = B_get_arg0(tmeth, arg, 15);
     int meth = atoi(tmeth);
-    std::vector<std::string> v_eqs = expand_arg(arg + lg1, 0);
+    std::vector<std::string> v_eqs = expand_args(arg + lg1, 0);
     
     int rc = 0;
     std::shared_ptr<Equation> eq_ptr;
@@ -220,7 +220,7 @@ int B_EqsSetMethod(char* arg, int unused)
  */
 int B_EqsSetBloc(char* arg, int unused)
 {
-    std::vector<std::string> v_eqs = expand_arg(arg, 0);
+    std::vector<std::string> v_eqs = expand_args(arg, 0);
     std::string bloc = join(v_eqs, ";");
     
     int rc = 0;

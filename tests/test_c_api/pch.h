@@ -46,9 +46,6 @@ protected:
 public:
 	TestAbstract()
 	{
-		// set *_super fn pointers
-		IODE_assign_super_API();
-
 		KPAUSE_CONTINUE = 1;
 		// suppress messages from kmsg()
 		skip_message(true);

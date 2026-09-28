@@ -153,7 +153,7 @@ int B_PrintDestFile(char *arg)
             type = W_A2M;
         
         rc = B_PrintDestExt(args[0], type);
-        A_free((unsigned char**) args);
+        SCR_free_tbl((unsigned char**) args);
     }
     else 
         rc = B_PrintDestExt("", W_GDI);

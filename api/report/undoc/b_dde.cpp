@@ -346,7 +346,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
         {
             plst = K_expand(type, NULL, (char*) tbl[0], '*');
             if(plst != NULL)
-                v_lst = expand_arg(plst, 0);
+                v_lst = expand_args(plst, 0);
         }
     
         if(SCR_tbl_size(tbl) < 2) 
