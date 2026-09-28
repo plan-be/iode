@@ -92,7 +92,7 @@ int B_ModelSimulate(char *const_arg, int unused)
         goto err;
     }
 
-    v_eqs = expand_arg(arg + lg1 + lg2, 0);
+    v_eqs = expand_args(arg + lg1 + lg2, 0);
     rc = B_ModelSimulateEqs(smpl, v_eqs);
 
 err:
@@ -163,7 +163,7 @@ int B_ModelExchange(char* const_arg, int unused)
     global_simu->v_endo_exo.clear();
     if(arg && SCR_strip((unsigned char*) arg)[0])
     {
-        global_simu->v_endo_exo = expand_arg(arg, 0);
+        global_simu->v_endo_exo = expand_args(arg, 0);
     } 
     
     SCR_free(arg);
@@ -266,7 +266,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     }
 
     // Extrait les listes restantes
-    std::vector<std::string> v_lst = expand_arg(arg + lg1 + lg2, 0);
+    std::vector<std::string> v_lst = expand_args(arg + lg1 + lg2, 0);
     if(v_lst.size() != 3)
     {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");

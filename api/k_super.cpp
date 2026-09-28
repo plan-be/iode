@@ -34,11 +34,6 @@
  *     int kshellexec()                                         Call the Win32 function ShellExecuteEx().
  *
  *     int ODE_end()                                            Ends an IODE session.
- *
- * SCR4 superseeded functions + assign
- * -----------------------------------
- *     char *A_expand_super_API(char* name)                     Default implementation of A_expand() in IODE API
- *     void IODE_assign_super_API()                             Assigns default values to "super" (virtual) functions. 
  * 
  * List of function pointers that can replace the standard implementation  
  * ----------------------------------------------------------------------
@@ -568,27 +563,6 @@ int kshellexec(const char *arg)
 
 
 /**
- *  Default implementation of A_expand() in IODE API.
- *  Replaces "$LISTNAME" by the list "LISTNAME" contents.
- *  
- *  @param [in] name    char*   string to be expanded
- *  @return             char*   expanded string  
- *  
- */
-char* A_expand_super_API(char* name)
-{
-    if(!global_ws_lst->contains(name)) 
-        return NULL;
-    
-    std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(name);
-    if(!lst) 
-        return NULL;
-    
-    return (char*) lst->c_str();
-}
-
-
-/**
  *  Ends an IODE session. Cleans up the allocated variables.
  *  If ODE_end_super is not null, it replaces the default behaviour.
  *  
@@ -603,19 +577,4 @@ int ODE_end(const int st)
 
     // Default implementation
     return IodeEnd();
-}
-
-/**
- *  Assigns default values to "super" (virtual) functions. 
- *  Specifically, implements scr4 functions that can be superseeded (2022 version only).
- *  
- *  In the past, some scr4 functions have been replaced in IODE but with some linker, that method
- *  was not always acceptable. An alternative fonction is thus assigned to a fn pointer
- *  that, if not null, will replace the original implementation.
- *   
- */
-void IODE_assign_super_API()
-{
-    A_expand_super = A_expand_super_API;   // Ok for other implementations (DOS, IODECOM, PYTHON, Qt)
-    // A_error_super  = A_error_super_API; //  To be implemented for DOS and Qt (IODECOM ?)
 }

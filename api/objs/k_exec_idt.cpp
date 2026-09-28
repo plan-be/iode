@@ -81,13 +81,13 @@
 void KDBIdentities::set_scl_files(char* arg)
 {
     v_scl_files.clear();
-    v_scl_files = expand_arg(arg, 0);
+    v_scl_files = expand_args(arg, 0);
 }
 
 void KDBIdentities::set_var_files(char* arg)
 {
     v_var_files.clear();
-    v_var_files = expand_arg(arg, 0);
+    v_var_files = expand_args(arg, 0);
 }
 
 void KDBIdentities::clear_files()

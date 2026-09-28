@@ -104,7 +104,7 @@ std::string template_expand(const std::string& filename, const std::string& patt
  *  
  *  @param [in] type    int     Object type (COMMENTS -> VARIABLES)
  *  @param [in] file    char*   filename to search into or null to look in the workspace 
- *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
+ *  @param [in] pattern char*   list of patterns separated by one of ARGS_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
  *  
  *  @return             char*   allocated semi-colon separated string with all matching names
@@ -176,7 +176,7 @@ char* K_expand(int type, char* file, char* c_pattern, int all)
  *  
  *  @param [in] kdb     KDB*    KDB to search into or null to look in the workspace 
  *  @param [in] type    int     Object type (COMMENTS -> VARIABLES)
- *  @param [in] pattern char*   list of patterns separated by one of A_SEPS chars
+ *  @param [in] pattern char*   list of patterns separated by one of ARGS_SEPS chars
  *  @param [in] all     int     character meaning "any char sequence" (normally '*')
  *  
  *  @return             char*   allocated semi-colon separated string with all matching names
@@ -187,7 +187,7 @@ std::string KDB::expand(const std::string& pattern, const char all) const
     if(pattern.empty()) 
         return "";
 
-    std::vector<std::string> patterns = split_multi(pattern, std::string(A_SEPS));
+    std::vector<std::string> patterns = split_multi(pattern, ARGS_SEPS);
     
     std::string sub_pattern;
     std::vector<std::string> v_names;

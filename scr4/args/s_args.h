@@ -22,9 +22,6 @@ typedef struct   _adef_ {
 
 /* VARIABLES DECLARATION */
 
-extern  int     A_NB_VAL;
-extern  char    **A_VAL;
-extern  char    *A_SEPS;
 extern   int    A_NO_EXPANDSTAR_DFT;
 extern  char    *(*A_expand_super)(char*); // JMP 16/01/2022
 

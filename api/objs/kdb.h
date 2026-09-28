@@ -1,6 +1,6 @@
 #pragma once
 #include "api/pch.h"
-#include "api/b_args.h"         // expand_arg
+#include "api/b_args.h"         // expand_args
 #include "api/b_errors.h"       // error_manager
 #include "api/time/sample.h"    // Period, Sample
 #include "api/objs/xdr.h"
@@ -313,8 +313,8 @@ public:
 
         std::string error_msg = "No names found matching the pattern '" + pattern + "'";
         
-        char* OLD_SEPS = A_SEPS;
-        A_SEPS = (char*) " ,;\n\t\r";
+        std::string OLD_SEPS = ARGS_SEPS;
+        ARGS_SEPS = " ,;\n\t\r";
 
         // Retrieves all object names matching one or more patterns in the 
         // global or standalone database (similar to grep)
@@ -323,9 +323,9 @@ public:
             throw std::runtime_error(error_msg);
         
         // Parses a string and replaces @filename and $listname by their contents
-        std::vector<std::string> v_names = expand_arg(lst, 0);
+        std::vector<std::string> v_names = expand_args(lst, 0);
 
-        A_SEPS = OLD_SEPS;
+        ARGS_SEPS = OLD_SEPS;
 
         // Check that each name exists in the database (if must_exist == true)
 

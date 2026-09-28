@@ -1519,7 +1519,7 @@ int B_ReportExec(char* arg, int unused)
     o_arg0 = RP_ARG0;
 
     /* argv = SCR_vtomsq(arg, B_SEPS, '"'); */
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     std::vector<char*> argv;
     if(v_args.empty())
     {
@@ -1586,7 +1586,7 @@ int B_ReportLine(char* line, int cleanup)
     o_arg0 = RP_ARG0;
 
     // To mimic B_Report(), args is artificially created as if a report called "temp.rep" were executed
-    std::vector<std::string> v_args = expand_arg("temp.rep", 0);
+    std::vector<std::string> v_args = expand_args("temp.rep", 0);
     std::vector<char*> argv;
     if(v_args.empty())
     {

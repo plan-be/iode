@@ -80,7 +80,7 @@ int RP_repeat(char* buf, int unused)
     }
     int pos2 = pos1 + 1 + U_pos('"', line + pos1 + 1); // Position du second " dans line
     line[pos2] = 0; // line + pos1  devient la commande ($repeat "$DatadeleteVar _ _" donne dans line + pos 1 = [$DataDeleteVar _ _] par exemple)
-    std::vector<std::string> v_args = expand_arg(((char*) line) + pos2 + 1, 0); // Arguments sur lesquels il faut boucler
+    std::vector<std::string> v_args = expand_args(((char*) line) + pos2 + 1, 0); // Arguments sur lesquels il faut boucler
 
     if(v_args.empty()) 
     {

@@ -37,7 +37,7 @@ int B_FileImportCmt(char* arg, int unused)
     char    *trace, *rule, *infile, *oufile, empty_buf[1];
 
     empty_buf[0] = 0;
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.size() < 5) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");
@@ -84,7 +84,7 @@ int B_FileImportVar(char* arg, int unused)
     char    *trace, *rule, *from, *to, *infile, *oufile, empty_buf[1];
 
     empty_buf[0] = 0;
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.size() < 6) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");

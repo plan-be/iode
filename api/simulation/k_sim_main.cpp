@@ -804,7 +804,7 @@ bool CSimulation::exchange(const std::string& list_endo_exo)
     if(list_endo_exo.empty())
         return false;
 
-    std::vector<std::string> v_tmp_endo_exo = expand_arg(list_endo_exo, 0);
+    std::vector<std::string> v_tmp_endo_exo = expand_args(list_endo_exo, 0);
     if(v_tmp_endo_exo.empty())
     {
         std::string error_msg = "Cannot exchange the model variables:\n";

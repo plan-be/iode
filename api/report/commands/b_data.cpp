@@ -148,12 +148,12 @@ int B_DataPattern(char* arg,int type)
     {
         lstname = args[0];
         pattern = args[1];
-        xvars = expand_arg(args[2], 0);
+        xvars = expand_args(args[2], 0);
         nrows = (int) xvars.size();
 
         if(nbargs > 3) 
         {
-            yvars = expand_arg(args[3], 0);
+            yvars = expand_args(args[3], 0);
             ncols = (int) yvars.size();
         }
 
@@ -495,7 +495,7 @@ int B_DataRename(char* arg, int type)
     if(type == EQUATIONS) 
         return -1; /* Rename of EQS has no sense */
     
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
         return -1;
     
@@ -541,7 +541,7 @@ int B_DataRename(char* arg, int type)
         return -1; /* Duplicate of EQS has no sense */
     }
     
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
         return -1;
     std::string old_name = v_args[0];
@@ -752,7 +752,7 @@ int B_DataUpdate(char* arg, int type)
         success = false;
     }
 
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
     return success ? 0 : -1;
 }
 
@@ -844,7 +844,7 @@ int B_DataSearch(char* arg, int type)
     rc = KL_lst(args[6], lst, 200);
     SCR_free_tbl((unsigned char**) lst);
 
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
 
     return rc;
 }
@@ -879,7 +879,7 @@ int B_DataEditCnf(char* arg, int unused)
     VN = std::max(-1, VN);
     VN = std::min(6, VN);
     //BGUI_DataEditGlobal(VM, VN);  // JMP 2/8/2022 => no used 
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 
@@ -920,7 +920,7 @@ int B_DataListSort(char* arg, int unused)
 {
     int    rc = 0;
     char   *in, *out;
-    char*  old_A_SEPS;
+    std::string OLD_ARGS_SEPS;
     std::string sorted;
     std::vector<std::string> v_lst_idt;
 
@@ -955,11 +955,11 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
 
-    // Changed A_SEPS to allow ; as separator
-    old_A_SEPS = A_SEPS;
-    A_SEPS = " \t\n\r;, ";  
-    v_lst_idt = expand_arg(lst, 0);
-    A_SEPS = old_A_SEPS;
+    // Changed ARGS_SEPS to allow ; as separator
+    OLD_ARGS_SEPS = ARGS_SEPS;
+    ARGS_SEPS = " \t\n\r;, ";  
+    v_lst_idt = expand_args(lst, 0);
+    ARGS_SEPS = OLD_ARGS_SEPS;
     if(v_lst_idt.empty())
     {
         rc = -1;
@@ -982,7 +982,7 @@ int B_DataListSort(char* arg, int unused)
     }
 
 done:
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 
@@ -1259,7 +1259,7 @@ int B_DataList(char* arg, int type)
         filename = std::string(args[2]);
     }
 
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
 
     std::vector<std::string> lst;
     if(filename.empty())
@@ -1422,13 +1422,13 @@ int B_DataCalcLst(char* arg, int unused)
     }
 
     list1_ptr = global_ws_lst->get_obj_ptr((char*) list1);
-    v_l1 = expand_arg(*list1_ptr, 0);
+    v_l1 = expand_args(*list1_ptr, 0);
     for(std::string& item : v_l1)
         l1.push_back(item.data());
     l1.push_back(NULL);
 
     list2_ptr = global_ws_lst->get_obj_ptr((char*) list2);
-    v_l2 = expand_arg(*list2_ptr, 0);
+    v_l2 = expand_args(*list2_ptr, 0);
     for(std::string& item : v_l2)
         l2.push_back(item.data());
     l2.push_back(NULL);
@@ -1455,7 +1455,7 @@ int B_DataCalcLst(char* arg, int unused)
     rc = KL_lst((char*) res, (char**) lst, -1); 
 
 done :
-    A_free((unsigned char**) args);
+    SCR_free_tbl((unsigned char**) args);
     SCR_free_tbl(lst);
     return rc;
 }
@@ -1472,7 +1472,7 @@ int B_DataListCount(char* name, int unused)
     if(!lst_ptr) 
         return -1;
 
-    std::vector<std::string> v_lst_idt = expand_arg(*lst_ptr, 0);
+    std::vector<std::string> v_lst_idt = expand_args(*lst_ptr, 0);
     return (int) v_lst_idt.size();
 }
 
@@ -1656,7 +1656,7 @@ int B_DataCompare(char* arg, int type)
  */
 static int B_DataEditGraph(int view, char* arg)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.size() < 10) 
     {
         error_manager.append_error("DataEditGraph : Syntax error");

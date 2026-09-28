@@ -274,7 +274,7 @@ int B_WsSample(char* arg, int unused)
     bool success = false;
     Sample* new_smpl = nullptr;
     
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
         goto err;
 
@@ -535,7 +535,7 @@ int B_WsExtrapolate(char* arg, int unused)
     Sample* smpl = nullptr;
     std::string pattern;
 
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.size() < 2) 
     {
         error_manager.append_error("WsExtrapolate: syntax error (method from to vars ...)");
@@ -566,7 +566,7 @@ int B_WsExtrapolate(char* arg, int unused)
         goto done;
     }
 
-    nb_vars = v_args.size() - p - 2;
+    nb_vars = (int) v_args.size() - p - 2;
     if(nb_vars == 0)
         pattern = "*";
     else 
@@ -599,7 +599,7 @@ done:
  */
 int B_WsAggr(int method, char* arg)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 0);
+    std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.empty()) 
     {
         error_manager.append_error("WsAggr* : syntax error (pattern [filename])");
@@ -759,12 +759,12 @@ int B_CsvSave(char* arg, int type)
     filepath = set_file_extension(filepath, FILE_CSV);
 
     // [sample] [vars]
-    char* old_seps = A_SEPS;
-    A_SEPS = " ,;\t\n";
+    std::string old_seps = ARGS_SEPS;
+    ARGS_SEPS = " ,;\t\n";
     char* lst = K_expand(type, NULL, arg + lg, '*');
-    std::vector<std::string> v_data0 = lst ? expand_arg(lst, 0) : std::vector<std::string>();
+    std::vector<std::string> v_data0 = lst ? expand_args(lst, 0) : std::vector<std::string>();
     SCR_free(lst);
-    A_SEPS = old_seps;   
+    ARGS_SEPS = old_seps;   
     
     int shift = 0;
     std::shared_ptr<Sample> smpl = nullptr;

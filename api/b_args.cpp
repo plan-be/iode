@@ -5,10 +5,10 @@
  *
  *  Main functions
  *  --------------
- *      std::vector<std::string> expand_arg(const std::string& arg, const int nb) : expands an argument by replacing @filename and $listname by their contents
+ *      std::vector<std::string> expand_args(const std::string& arg, const int nb) : expands an argument by replacing @filename and $listname by their contents
  *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
  *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
- *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls expand_arg() to expand arg, then calls B_loop() on the resulting table of strings.
+ *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls expand_args() to expand arg, then calls B_loop() on the resulting table of strings.
  *      int B_get_arg0(char* arg0, char*arg, int lg)                        : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
  *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
  *   
@@ -17,7 +17,244 @@
 #include "api/b_errors.h"
 #include "api/time/period.h"
 #include "api/time/sample.h"
+#include "api/objs/lists.h"
 #include "api/report/engine/engine.h"       // SCR_vtomsq
+
+#define MAX_LENGTH_ARG  128
+#define MAX_FILES_OPEN  10
+
+char** A_VAL;
+int NB_ARGS; 
+int NB_FILES_OPEN;
+
+
+/**
+ * @brief Add an argument in the table A_VAL and increment NB_ARGS.
+ * 
+ * @param arg 
+ */
+static void add_to_vector_of_args(char* arg)
+{
+    SCR_add_ptr((unsigned char***) &A_VAL, &NB_ARGS, (unsigned char*) arg);
+    if(arg == NULL) 
+        NB_ARGS--;
+}
+
+/**
+ * @brief Expand an IODE list (declared as $listname)
+ * 
+ * @param listname 
+ * @return char* 
+ */
+char* expand_list(char* listname)
+{
+    if(!global_ws_lst->contains(listname)) 
+        return NULL;
+    
+    std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(listname);
+    if(!lst) 
+        return NULL;
+    
+    return (char*) lst->c_str();
+}
+
+
+/**
+ * @brief Read next word in file.
+ * 
+ * @param type 
+ * @param buf 
+ * @param word 
+ * @param max_lg 
+ */
+static bool read_next_word(int type, char** buf, char* word, int max_lg)
+{
+    int lg = 0, c, q = 0;
+
+    while(1) 
+    {
+        // Gets next char
+        if(type == 0) 
+        {
+            c = **buf;
+            if(c == 0) 
+                c = EOF;
+            else 
+                (*buf)++;
+        }
+        else 
+            c = getc((FILE*) buf);
+
+        // Check if 'c' is EOF
+        if(c == EOF) 
+        {
+            word[lg] = 0;
+            return (lg == 0) ? false : true;
+        }
+
+        // Check if 'c' is a separator character
+        if(q == 0 && ARGS_SEPS.find(c) != std::string::npos) 
+        {
+            if(lg > 0) 
+            {
+                word[lg] = 0;
+                return true;
+            }
+        }
+        else if(lg < max_lg) 
+        {
+            if(c == '"') 
+            {
+                if(lg == 0) 
+                    q = 1;
+                else if(q == 1) 
+                {
+                    word[lg] = 0;
+                    return true;
+                }
+            }
+            else 
+                word[lg++] = c;
+        }
+	}
+}
+
+
+/**
+ * @brief Parse an argument. Then add the argument in the table A_VAL 
+ * and increment NB_ARGS.
+ * 
+ * @filename : replaces @filename by the content of the file "filename"
+ * $listname : replaces @listname by the content of the list "listname"
+ * 
+ * @param arg 
+ */
+static bool parse_arg(char* arg)
+{
+    if(arg == NULL) 
+    {
+	    add_to_vector_of_args(arg);
+	    return true;
+    }
+
+    FILE* fd = NULL;
+    char* tmp = NULL; 
+    char word[MAX_LENGTH_ARG + 1];
+    switch(arg[0]) 
+    {
+	case '@':
+    {
+	    if(NB_FILES_OPEN >= MAX_FILES_OPEN) 
+        {
+		    kwarning("parse_arg: Maximum 10 levels of nesting");
+		    return false;
+	    }
+	    tmp = arg;
+	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG);
+	    fd = fopen(word + 1, "r");
+	    if(fd == NULL) 
+        {
+            std::string error_msg = "parse_arg: Cannot open file ";
+            error_msg += "'" + std::string(word + 1) + "'";
+		    kwarning(error_msg.c_str());
+		    return false;
+	    }
+	    NB_FILES_OPEN++;
+
+	    while(read_next_word(1, (char **)fd, word, MAX_LENGTH_ARG))
+        {
+            if(word[0] != 0) 
+                parse_arg(word);
+        } 
+	    fclose(fd);
+	    NB_FILES_OPEN--;
+	    break;
+    }
+
+	case '$':
+    {
+	    if(NB_FILES_OPEN >= MAX_FILES_OPEN) 
+        {
+		    kwarning("parse_arg: Maximum 10 levels of nesting");
+		    return false;
+	    }
+	    tmp = arg;
+	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG);
+	    char* exp = expand_list(word + 1);
+	    if(exp == NULL) 
+        {
+		    add_to_vector_of_args(word);
+		    return true;
+	    }
+	    NB_FILES_OPEN++;
+
+	    while(read_next_word(0, &exp, word, MAX_LENGTH_ARG))
+		    if(word[0] != 0) parse_arg(word);
+	    NB_FILES_OPEN--;
+	    break;
+    }
+
+	default:
+    {
+	    tmp = arg;
+	    break;
+    }
+
+    // end switch
+	}
+
+    while(read_next_word(0, &tmp, word, MAX_LENGTH_ARG)) 
+    {
+        if(word[0] != 0) 
+        {
+            if(word[0] == '@' || word[0] == '$') 
+                parse_arg(word);
+            else
+                add_to_vector_of_args(word);
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ * @brief Parses the arguments and performs the expand of $ and @
+ * 
+ * @param argv 
+ */
+static bool prepare_vector_of_args(char** argv)
+{
+    NB_ARGS = 0;
+    A_VAL = 0;
+    NB_FILES_OPEN = 0;
+
+    bool success = true;
+    for(int i = 0; argv[i] != 0 ; i++) 
+		success &= parse_arg(argv[i]);
+    success &= parse_arg(0L);
+    return success;
+}
+
+
+static char** sub_expand_args(char** argv)
+{
+    bool success = prepare_vector_of_args(argv);
+    if(success) 
+        return A_VAL;
+
+    for(int i = 0; i < NB_ARGS; i++)
+    {
+        if(A_VAL[i][0] == '$')
+        {
+            std::string error_msg = "expand_args: " + std::string(A_VAL[i]) + " cannot be expanded";
+            kwarning(error_msg.c_str());
+        }
+    }
+
+    SCR_free_tbl((unsigned char**) A_VAL);
+    return NULL;
+}
 
 
 /**
@@ -30,32 +267,26 @@
  *  $LST1 and @otherfile will be recursively replaced up to 10 levels of depth.
  *  
  *  The string resulting from the expansion is then split on the separators defined in 
- *      A_SEPS, by default " ,\n\t\r".
- *  
- *  
- *  Info : when A_NO_EXPANDSTAR_DFT is null, which is never the case in IODE, 
- *  filenames matching arg (ex "*.txt") will be included in the resulting table of strings.
+ *      ARGS_SEPS, by default " ,\n\t\r".
  *  
  *  If nb is > 0, the function checks that, after expanding arg, the resulting number or arguments 
  *  equals nb (the expected value). 
  *  
- *  On error, IodeErrorManager::append_error() is called and the function returns an empty vector.
+ *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
  *  
- *  Calls A_init() from the s_args group (see http://xon.be/scr4/libs1/libs12.htm)
- *  
- *  @param [in] arg     const std::string&        argument
+ *  @param [in] arg     const std::string&        arguments to be expanded
  *  @param [in] nb      const int                 0 or expected number of arguments after expansion
  *  @return             std::vector<std::string>  empty on error, otherwise the arguments after expansion
  *  
  */
-std::vector<std::string> expand_arg(const std::string& arg, const int nb)
+std::vector<std::string> expand_args(const std::string& arg, const int nb)
 {
     std::vector<std::string> args;
-    
-    // Suppress default filename expansion JMP 14/01/2022
-    A_NO_EXPANDSTAR_DFT = 1;
-    
-    char** c_args = A_init(to_char_array(arg));
+
+    char* argv[12];
+    argv[0] = (char*) arg.c_str();
+    argv[1] = 0L;
+    char** c_args = sub_expand_args(argv);
     if(c_args == NULL)
         return args;
 
@@ -144,9 +375,9 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Calls expand_arg() to expand arg, then calls B_loop() on the resulting table of strings.
+ *  Calls expand_args() to expand arg, then calls B_loop() on the resulting table of strings.
  *  
- *  @see expand_arg() and B_loop().
+ *  @see expand_args() and B_loop().
  *  
  *  @param [in] arg     char*                   argument 
  *  @param [in] fn      int (*fn)(char*, char*) fn pointer
@@ -156,7 +387,7 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
  */
 int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 {
-    std::vector<std::string> args = expand_arg(arg, 0);
+    std::vector<std::string> args = expand_args(arg, 0);
     if(args.empty()) return -1;
 
     std::vector<char*> argv;

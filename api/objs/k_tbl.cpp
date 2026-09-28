@@ -415,10 +415,10 @@ static std::vector<std::string> expand_lecs(const std::string& lecs)
 		// Retrieves all variable names matching one or more patterns in global_ws_var (similar to grep)
 		char* lst = K_expand(VARIABLES, NULL, pattern, '*');
 		// Parses a string and replaces @filename and $listname by their contents
-        char* OLD_SEPS = A_SEPS;
-        A_SEPS = (char*) ";\t\n";
-        v_lecs = lst ? expand_arg(lst, 0) : std::vector<std::string>();
-        A_SEPS = OLD_SEPS;
+        std::string OLD_SEPS = ARGS_SEPS;
+        ARGS_SEPS = ";\t\n";
+        v_lecs = lst ? expand_args(lst, 0) : std::vector<std::string>();
+        ARGS_SEPS = OLD_SEPS;
 		SCR_free(lst);
 	}
     return v_lecs;

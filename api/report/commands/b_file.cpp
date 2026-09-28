@@ -35,7 +35,7 @@
 
 int B_FileCopy(char* arg, int type)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileCopy<type>");
@@ -101,7 +101,7 @@ int B_FileCopy(char* arg, int type)
  */
 int B_FileRename(char* arg, int type)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileRename<type>");
@@ -159,7 +159,7 @@ int B_FileRename(char* arg, int type)
  */
 int B_FileDelete(char* arg, int type)
 {
-    std::vector<std::string> v_args = expand_arg(arg, 2);
+    std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
     {
         kwarning("Syntax error: no argument passed to $FileDelete<type>");
