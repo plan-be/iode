@@ -14,7 +14,6 @@
  *      int IodeEnd()               | Terminate an IODE session. 
  */
 #include "api/iode_scr4.h"
-#include "scr4/args/s_args.h"
 
 #include "api/pch.h"
 #include "api/b_iodeini.h"
