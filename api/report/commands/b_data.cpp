@@ -920,7 +920,6 @@ int B_DataListSort(char* arg, int unused)
 {
     int    rc = 0;
     char   *in, *out;
-    std::string OLD_ARGS_SEPS;
     std::string sorted;
     std::vector<std::string> v_lst_idt;
 
@@ -955,11 +954,7 @@ int B_DataListSort(char* arg, int unused)
         goto done;
     }
 
-    // Changed ARGS_SEPS to allow ; as separator
-    OLD_ARGS_SEPS = ARGS_SEPS;
-    ARGS_SEPS = " \t\n\r;, ";  
-    v_lst_idt = expand_args(lst, 0);
-    ARGS_SEPS = OLD_ARGS_SEPS;
+    v_lst_idt = expand_args(lst, 0, " \t\n\r;,");
     if(v_lst_idt.empty())
     {
         rc = -1;
