@@ -778,8 +778,20 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     v_args = expand_args("A B;C,D", 0); // => "A" "B" "C" "D"
     EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B", "C", "D"}));
 
+    v_args = expand_args("A B;C,D", 0, ";");
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A B", "C,D"}));
+
+    v_args = expand_args("A B;C,D", 0, ";");
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A B", "C,D"}));
+
     // expand_args
     v_args = expand_args("$LST1", 0);
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B"}));
+
+    v_args = expand_args("$LST1", 0, ",");
+    EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B"}));
+
+    v_args = expand_args("$LST1", 0, ",");
     EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B"}));
 
     // Test parameters in a file. test.args must exist in the current dir 

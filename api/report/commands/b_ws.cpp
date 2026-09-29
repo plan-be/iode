@@ -759,12 +759,9 @@ int B_CsvSave(char* arg, int type)
     filepath = set_file_extension(filepath, FILE_CSV);
 
     // [sample] [vars]
-    std::string old_seps = ARGS_SEPS;
-    ARGS_SEPS = " ,;\t\n";
     char* lst = K_expand(type, NULL, arg + lg, '*');
-    std::vector<std::string> v_data0 = lst ? expand_args(lst, 0) : std::vector<std::string>();
+    std::vector<std::string> v_data0 = lst ? expand_args(lst, 0, " ,;\t\n") : std::vector<std::string>();
     SCR_free(lst);
-    ARGS_SEPS = old_seps;   
     
     int shift = 0;
     std::shared_ptr<Sample> smpl = nullptr;

@@ -5,7 +5,7 @@
  *
  *  Main functions
  *  --------------
- *      std::vector<std::string> expand_args(const std::string& arg, const int nb) : expands an argument by replacing @filename and $listname by their contents
+ *      std::vector<std::string> expand_args(const std::string& arg, const int nb, const std::string& separators) : expands an argument by replacing @filename and $listname by their contents
  *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
  *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
  *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls expand_args() to expand arg, then calls B_loop() on the resulting table of strings.
@@ -67,7 +67,8 @@ char* expand_list(char* listname)
  * @param word 
  * @param max_lg 
  */
-static bool read_next_word(int type, char** buf, char* word, int max_lg)
+static bool read_next_word(int type, char** buf, char* word, int max_lg,
+    const std::string& separators)
 {
     int lg = 0, c, q = 0;
 
@@ -93,7 +94,7 @@ static bool read_next_word(int type, char** buf, char* word, int max_lg)
         }
 
         // Check if 'c' is a separator character
-        if(q == 0 && ARGS_SEPS.find(c) != std::string::npos) 
+        if(q == 0 && separators.find(c) != std::string::npos)
         {
             if(lg > 0) 
             {
@@ -129,7 +130,7 @@ static bool read_next_word(int type, char** buf, char* word, int max_lg)
  * 
  * @param arg 
  */
-static bool parse_arg(char* arg)
+static bool parse_arg(char* arg, const std::string& separators)
 {
     if(arg == NULL) 
     {
@@ -150,7 +151,7 @@ static bool parse_arg(char* arg)
 		    return false;
 	    }
 	    tmp = arg;
-	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG);
+	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators);
 	    fd = fopen(word + 1, "r");
 	    if(fd == NULL) 
         {
@@ -161,10 +162,10 @@ static bool parse_arg(char* arg)
 	    }
 	    NB_FILES_OPEN++;
 
-	    while(read_next_word(1, (char **)fd, word, MAX_LENGTH_ARG))
+	    while(read_next_word(1, (char **)fd, word, MAX_LENGTH_ARG, separators))
         {
             if(word[0] != 0) 
-                parse_arg(word);
+                parse_arg(word, separators);
         } 
 	    fclose(fd);
 	    NB_FILES_OPEN--;
@@ -179,7 +180,7 @@ static bool parse_arg(char* arg)
 		    return false;
 	    }
 	    tmp = arg;
-	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG);
+	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators);
 	    char* exp = expand_list(word + 1);
 	    if(exp == NULL) 
         {
@@ -188,8 +189,8 @@ static bool parse_arg(char* arg)
 	    }
 	    NB_FILES_OPEN++;
 
-	    while(read_next_word(0, &exp, word, MAX_LENGTH_ARG))
-		    if(word[0] != 0) parse_arg(word);
+	    while(read_next_word(0, &exp, word, MAX_LENGTH_ARG, separators))
+		    if(word[0] != 0) parse_arg(word, separators);
 	    NB_FILES_OPEN--;
 	    break;
     }
@@ -203,12 +204,12 @@ static bool parse_arg(char* arg)
     // end switch
 	}
 
-    while(read_next_word(0, &tmp, word, MAX_LENGTH_ARG)) 
+    while(read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators))
     {
         if(word[0] != 0) 
         {
             if(word[0] == '@' || word[0] == '$') 
-                parse_arg(word);
+                parse_arg(word, separators);
             else
                 add_to_vector_of_args(word);
         }
@@ -223,7 +224,7 @@ static bool parse_arg(char* arg)
  * 
  * @param argv 
  */
-static bool prepare_vector_of_args(char** argv)
+static bool prepare_vector_of_args(char** argv, const std::string& separators)
 {
     NB_ARGS = 0;
     A_VAL = 0;
@@ -231,15 +232,15 @@ static bool prepare_vector_of_args(char** argv)
 
     bool success = true;
     for(int i = 0; argv[i] != 0 ; i++) 
-		success &= parse_arg(argv[i]);
-    success &= parse_arg(0L);
+		success &= parse_arg(argv[i], separators);
+    success &= parse_arg(0L, separators);
     return success;
 }
 
 
-static char** sub_expand_args(char** argv)
+static char** sub_expand_args(char** argv, const std::string& separators)
 {
-    bool success = prepare_vector_of_args(argv);
+    bool success = prepare_vector_of_args(argv, separators);
     if(success) 
         return A_VAL;
 
@@ -266,8 +267,8 @@ static char** sub_expand_args(char** argv)
  *  Expansion can be recursive, i.e. if the file contains $LST1 or/and @otherfile, 
  *  $LST1 and @otherfile will be recursively replaced up to 10 levels of depth.
  *  
- *  The string resulting from the expansion is then split on the separators defined in 
- *      ARGS_SEPS, by default " ,\n\t\r".
+ *  The string resulting from the expansion is then split on separators, whose default value is
+ *  " ,;\n\t\r".
  *  
  *  If nb is > 0, the function checks that, after expanding arg, the resulting number or arguments 
  *  equals nb (the expected value). 
@@ -276,17 +277,19 @@ static char** sub_expand_args(char** argv)
  *  
  *  @param [in] arg     const std::string&        arguments to be expanded
  *  @param [in] nb      const int                 0 or expected number of arguments after expansion
+ *  @param [in] separators const std::string&      characters used to separate arguments
  *  @return             std::vector<std::string>  empty on error, otherwise the arguments after expansion
  *  
  */
-std::vector<std::string> expand_args(const std::string& arg, const int nb)
+std::vector<std::string> expand_args(const std::string& arg, const int nb,
+    const std::string& separators)
 {
     std::vector<std::string> args;
 
     char* argv[12];
     argv[0] = (char*) arg.c_str();
     argv[1] = 0L;
-    char** c_args = sub_expand_args(argv);
+    char** c_args = sub_expand_args(argv, separators);
     if(c_args == NULL)
         return args;
 

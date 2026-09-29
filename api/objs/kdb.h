@@ -313,9 +313,6 @@ public:
 
         std::string error_msg = "No names found matching the pattern '" + pattern + "'";
         
-        std::string OLD_SEPS = ARGS_SEPS;
-        ARGS_SEPS = " ,;\n\t\r";
-
         // Retrieves all object names matching one or more patterns in the 
         // global or standalone database (similar to grep)
         std::string lst = this->expand(pattern, '*');
@@ -324,8 +321,6 @@ public:
         
         // Parses a string and replaces @filename and $listname by their contents
         std::vector<std::string> v_names = expand_args(lst, 0);
-
-        ARGS_SEPS = OLD_SEPS;
 
         // Check that each name exists in the database (if must_exist == true)
 
