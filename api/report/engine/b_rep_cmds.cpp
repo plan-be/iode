@@ -248,36 +248,35 @@ done:
 // See RP_goto_label().
 int RP_goto(char* arg, int unused)
 {
-    unsigned    char    **args;
-    int                 rc = 0, nb;
-
-    args = SCR_vtomsq(arg, (char*) " ,\n\t", '"');
-    nb = SCR_tbl_size(args);
-    switch(nb) {
-        case 0 : // JMP 13-12-12: erreur si pas d'arg uniquement
+    int rc = 0;
+    std::vector<std::string> v_args = split_multi_quoted(arg, " ,\n\t", '"');
+    int nb = (int) v_args.size();
+    switch(nb) 
+    {
+        // NOTE: error only if no argument has been passed
+        case 0 :
             rc = -3;
             break;
 
         case 1 :
-            rc = RP_goto_label("label", (char*) args[0]);
+            rc = RP_goto_label("label", (char*) v_args[0].c_str());
             break;
 
-        default: // JMP 13-12-12: Ok si plus de 2 args
-            rc = atoi((char*) args[1]);
-            switch(rc) {
+        // NOTE: If more than 2 args, the others are ignored
+        default:
+            rc = stoi(v_args[1]);
+            switch(rc) 
+            {
                 case  0 :
                 case -1 :
                     break;
-                //case  1 : // JMP 12-12-12 !!
-                default :   // JMP 12-12-12 !!
-                    rc = RP_goto_label("label", (char*) args[0]);
+                default :
+                    rc = RP_goto_label("label", (char*) v_args[0].c_str());
                     break;
             }
             break;
-
     }
-
-    SCR_free_tbl(args);
+    
     return rc;
 }
 

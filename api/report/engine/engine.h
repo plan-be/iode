@@ -19,7 +19,6 @@ unsigned char **RP_vtom(unsigned char* str, int sep);
 int RP_free_tbl(unsigned char** tbl);
 int RP_tbl_size(unsigned char** tbl);
 int RP_is_cmd(char* line);
-U_ch **SCR_vtomsq(char* str, char* seps, int quote);
 
 /* b_rep_debug.c */
 void RP_debug(char* txt);

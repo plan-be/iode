@@ -422,18 +422,6 @@ Compilation and execution of report procedures (`$prodef, $procexec`).
 - procedures are called by the command $procexec
 - a procedure must be defined before its first use
 
-#### List of functions {#T24}
-
-|Syntax|Description|
-|:---|:---|
-|`static int RP_proc_find(char *name)`|Retrieves the position of a REP\_PROC in REP\_PROCS by its name (case sensitive\!)|
-|`static int RP_proc_is_procend(char *line)`|Checks if a line closes a PROC (i.e.: contains "$procend").|
-|`static void RP_proc_delete(int proc_nb)`|Deletes a REP\_PROC object and frees its reference in the table REP\_PROCS.|
-|`static int RP_proc_create(char *name)`|Adds a new empty PROC in REP\_PROCS.|
-|`void RP_proc_free_all()`|Frees all the defined procedures and the table REP\_PROCS.|
-|`int RP_procdef(char* arg, int unused)`|Reads and creates a new PROC.|
-|`int RP_procexec(char* arg, int unused)`|Executes a procedure (called by $procexec parms).|
-
 #### List of global variables {#T25}
 
 |Syntax|Description|
@@ -454,13 +442,6 @@ To add a new $command to IODE reports, add a new line in B\_fns\[\] with the nam
 
 To add a new @function to IODE reports, add a new line in RP\_FNS\[\] with the name in lowercase and the function pointer.
 
-#### List of global variables {#T27}
-
-|Syntax|Description|
-|:---|:---|
-|`BFNS B_fns[]`|Names of the report commands \+ GUI and non\-GUI function pointers \+ type defining the allowed suffixes.|
-|`RPFN RP_FNS[]`|Names of the report @functions and their function pointers|
-
 ### b\_rep\_utils.c {#T28}
 
 This file contains utilities used inside IODE report functions.
@@ -468,21 +449,6 @@ This file contains utilities used inside IODE report functions.
 The main part of this file contains *allocation functions* that are aimed to optimize allocations during report executions. These functions superseed SCR\_malloc(), SCR\_free()...
 
 Note : WARNING: in the most recent versions of IODE, the define `RP_STDMALLOC` is set to 1. Therefore, the standard functions (SCR\_malloc()...) are used inside RP\_alloc(), RP\_free()...
-
-#### List of functions {#T29}
-
-|Syntax|Description|
-|:---|:---|
-|`char *RP_alloc(int size)`|Mimics SCR\_malloc() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`int RP_free(char *ptr)`|Mimics SCR\_free() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`void RP_free_bufs()`|Frees all memory buffers allocated by the RP\_ALLOCATIONS library.|
-|`char *RP_stracpy(char *ptr)`|Mimics SCR\_stracpy() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)`|Mimics SCR\_vtoms() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`unsigned char **RP_vtom(unsigned char* str, int sep)`|Mimics SCR\_vtom() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`int RP_free_tbl(unsigned char **tbl)`|Mimics SCR\_free\_tbl() using RP\_ALLOCATIONS if RP\_STDALLOC is null.|
-|`int RP_tbl_size(unsigned char **tbl)`|Mimics SCR\_tbl\_size().|
-|`int RP_is_cmd(char *line)`|Checks that a report line is a command ($command or \#command).|
-|`U_ch **SCR_vtomsq(char* str, char* seps, int quote)`|Splits a string on one of separators. Text enclosed in quote char are not split.|
 
 ## IODE Report commands {#T30}
 
@@ -586,53 +552,17 @@ For these functions, the parameters and return values are as follows:
 
 File manipulation and conversion from/to ansi\-oem\-utf8.
 
-#### List of functions {#T36}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_SysRename(char* arg, int unused)`|$SysMoveFile filein fileout|
-|`int B_SysCopy(char* arg, int unused)`|$SysCopyFile filein fileout|
-|`int B_SysAppend(char* arg, int unused)`|$SysAppendFile filein fileout|
-|`int B_SysDelete(char* arg, int unused)`|$SysDeleteFile file1 file2 ...|
-|`int B_SysOemToUTF8(char *arg)`|$SysOemToUTF8 inputfile outputfile|
-|`int B_SysAnsiToUTF8(char *arg)`|$SysAnsiToUTF8 inputfile outputfile|
-|`int B_SysAnsiToOem(char *arg)`|$SysAnsiToOem inputfile outputfile|
-|`int B_SysOemToAnsi(char *arg)`|$SysOemToAnsi inputfile outputfile|
-
 ### b\_file.c {#T37}
 
 Functions acting on files called by the report engine (see b\_rep\_syntax.c).
-
-#### List of functions {#T38}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_FileCopy(char* arg, int type)`|$FileCopy<type> source\_file dest\_file|
-|`int B_FileRename(char* arg, int type)`|$FileRename<type> source\_file dest\_file|
-|`int B_FileDelete(char* arg, int type)`|$FileDelete<type> file1 \[file2...\]|
 
 ### b\_xode.c {#T39}
 
 Report functions to import comments and variables from various non\-IODE formats.
 
-#### List of functions {#T40}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_FileImportCmt(char* arg, int unused)`|$FileImportCmt format rule infile outfile language \[trace\]|
-|`int B_FileImportVar(char* arg, int unused)`|$FileImportVar format rule infile outfile from to \[trace\]$FileImportVar format rule infile outfile from to \[trace\]|
-
 ### b\_htol.c {#T41}
 
 Report functions to transform high periodicity to low periodicity series.
-
-#### List of functions {#T42}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_WsHtoLLast(char* arg, int unused)`|$WsHtoLLast Filename VarList|
-|`int B_WsHtoLMean(char* arg, int unused)`|$WsHtoLMean Filename VarList|
-|`int B_WsHtoLSum(char* arg, int unused)`|$WsHtoLSum Filename VarList|
 
 ### b\_ltoh.c {#T43}
 
@@ -643,33 +573,13 @@ Two types of series are considered: stock and flow:
 - in the first case, the interpolated values are of the same order of magnitude as the original values
 - in the latter case, the values of the sub\-periods are additive over a period.
 
-#### List of functions {#T44}
-
-|Syntax|Equivalent in Reports|||
-|:---|:---|:---|:---|
-|`int B_WsLtoHStock(char* arg, int unused)`|$WsLtoHStock \{L|C|S\} Filename VarList|
-|`int B_WsLtoHFlow(char* arg, int unused)`|$WsLtoHFlow \{L|C|S\} Filename VarList|
-
 ### b\_trend.c {#T45}
 
 Implementation of the \*\*Hodrick\-Prescott\*\* method for trend series construction.
 
-#### List of functions {#T46}
-
-|Syntax|Description|
-|:---|:---|
-|`int B_WsTrend(char* arg, int unused)`|$WsTrend VarFilename Lambda series1 series2 ...|
-|`int B_WsTrendStd(char* arg, int unsued)`|$WsTrendStd VarFilename Lambda series1 series2 ...|
-
 ### b\_ras.c {#T47}
 
 Implementation of a RAS algorithm.
-
-#### List of functions {#T48}
-
-|Syntax|Description|
-|:---|:---|
-|`int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper, int maxit, double eps)`|Implementation of a RAS algorithm|
 
 ### b\_data.c {#T49}
 
@@ -720,31 +630,6 @@ For these functions, the parameters and return values are as follows:
 @return     int             0 on success, -1 on error (not enough args)
 ```
 
-#### List of functions {#T52}
-
-|Syntax|Description|
-|:---|:---|
-|`int B_DataPattern(char* arg,int type)`|Creates an IODE list with all existing objects of a given type having the name constructed by the combinations of 2 lists.|
-|`int B_DataRasVar(char* arg, int unused)`|RAS method implementation.|
-|`int B_DataCalcVar(char* arg, int unused)`|Computes a new variable based on a LEC expression.|
-|`int B_DataCreate(char* arg, int type)`|Creates one or more new objects.|
-|`int B_DataDelete(char* arg, int type)`|Deletes one or more objects.|
-|`int B_DataRename(char* arg, int type)`|Renames an object. Equations cannot be renamed.|
-|`int B_DataDuplicate(char* arg, int type)`|Duplicates an object. Equations cannot be duplicated.|
-|`int B_DataUpdate(char* arg, int type)`|Updates an object. The syntax can differ according to the object type.|
-|`int B_DataSearch(char* arg, int type)`|Searches all objects containing a given string in their names and/or definitions.|
-|`int B_DataListSort(char* arg, int unused)`|Sorts a list alphanumerically.|
-|`int B_DataScan(char* arg, int type)`|Analyses a KDB content and creates 2 lists \_EXO and \_SCAL with all VAR and all Scalar found in the kdb objects.|
-|`int B_DataExist(char* arg, int type)`|Checks that an object exists. Returns \-1 if not, the object position in WS otherwise.|
-|`int B_DataAppend(char* arg, int type)`|Appends data (a string) to a CMT or a LST.|
-|`int B_DataList(char* arg, int type)`|Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.|
-|`int B_DataCalcLst(char* arg, int unused)`|List calculus: 4 operations between 2 lists.|
-|`int B_DataListCount(char* arg, int unused)`|Returns the number of elements in a list.|
-|`int B_DataCompareEps(char* arg, int unused)`|Defines the threshold under which the difference between 2 variables are considered equal.|
-|`int B_DataCompare(char* arg, int type)`|Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.|
-|`int B_DataDisplayGraph(char* arg, int unused)`|Shows VARs or combinations of VARS in graphical form.|
-|`int B_DataPrintGraph(char* arg, int unused)`|Prints VARs or combinations of VARS in graphical form.|
-
 ### b\_est.c {#T53}
 
 Estimation functions called in IODE reports.
@@ -759,79 +644,17 @@ Except for B\_EqsEstimateEqs(), all functions in this group share the same synta
         the return code is 0 on success, any other value indicating and error
 ```
 
-#### List of functions {#T54}
-
-|Syntax|Description|
-|:---|:---|
-|`int B_EqsEstimateEqs(Sample* smpl, char* pattern)`|Estimates a bloc of equations on a defined Sample.|
-|`int B_EqsEstimate(char* arg, int unused)`|Implementation of the report function $EqsEstimate.|
-|`int B_EqsSetSample(char* arg, int unused)`|Implementation of the report function $EqsSetSample.|
-|`int B_EqsSetMethod(char* arg, int unused)`|Implementation of the report function $EqsSetMethod.|
-|`int B_EqsSetBloc(char* arg, int unused)`|Implementation of the report function $EqsSetBlock|
-|`int B_EqsSetCmt(char* arg, int unused)`|Implementation of the report function $EqsSetCmt.|
-|`int B_EqsSetInstrs(char* arg, int unused)`|Implementation of the report function $EqsSetInstrs.|
-
 ### b\_step.c {#T55}
 
 Report function that estimates a block of equations and finds the best possible tests for all possible combinations of coefficients.
-
-#### List of functions {#T56}
-
-|Syntax|Description||
-|:---|:---|:---|
-|`int B_EqsStepWise(char* arg, int unused)`|$EqsStepWise from to eqname leccond \{r2|fstat\}|
 
 ### b\_model.c {#T57}
 
 Report functions related to model simulations.
 
-#### List of functions {#T58}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_ModelSimulate(char *arg)`|$ModelSimulate per\_from per\_to equation\_list|
-|`int B_ModelSimulateParms(char* arg, int unused)`|$ModelSimulateParms eps relax maxit \{Connex, Triang, None \} 0 \- 4 (starting values) \{Yes, no \} nbtri \{yes, No \}|
-|`int B_ModelExchange(char* arg, int unused)`|$ModelExchange eqname1\-varname1,eqname2\-varname2,...|
-|`int B_ModelCompile(char* arg, int unused)`|$ModelCompile \[eqname1, eqname2, ... \]|
-|`int B_ModelCalcSCC(char *arg)`|$ModelCalcSCC nbtris prename intername postname \[eqs\]|
-|`int B_ModelSimulateSCC(char *arg)`|$ModelSimulateSCC from to pre inter post|
-|`int B_ModelSimulateSaveNIters(char *arg)`|$ModelSimulateSaveNiters varname|
-|`int B_ModelSimulateSaveNorms(char *arg)`|$ModelSimulateSaveNorms varname|
-
 ### b\_ws.c {#T59}
 
 Functions related to WS management (clear, load, save, sample, import...).
-
-#### List of functions {#T60}
-
-|Syntax|Equivalent in Reports|
-|:---|:---|
-|`int B_WsLoad(char* arg, int type)`|$WsLoad<type> filename|
-|`int B_WsDump(KDB* kdb, char* filename)`|Dumps the content of KDB in a file|
-|`int B_WsSave(char* arg, int type)`|$WsSave<type> filename|
-|`int B_WsSaveCmp(char* arg, int type)`|$WsSaveCmp<type> filename|
-|`int B_WsExport(char* arg, int type)`|$WsExport<type> filename|
-|`int B_WsImport(char* arg, int type)`|$WsImport<type> filename|
-|`int B_WsSample(char* arg, int unused)`|$WsSample period\_from period\_to|
-|`int B_WsClear(char* arg, int type)`|$WsClear<type>|
-|`int B_WsClearAll(char* arg, int unused)`|$WsClearAll|
-|`int B_WsDescr(char* arg, int type)`|$WsDescr<type> free text|
-|`int B_WsName(char* arg, int type)`|Sets the WS name. Obsolete as report function.|
-|`int B_WsCopy(char* arg, int type)`|$WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. \[from to\] obj1 obj2...|
-|`int B_WsMerge(char* arg, int type)`|$WsMerge<type> filename|
-|`int B_WsExtrapolate(char* arg, int unused)`|$WsExtrapolate \[method\] from to \[variable list\]|
-|`int B_WsAggrChar(char* arg, int unused)`|$WsAggrChar char|
-|`int B_WsAggrSum(char* arg, int unused)`|$WsAggrSum pattern filename|
-|`int B_WsAggrProd(char* arg, int unused)`|$WsAggrProd pattern filename|
-|`int B_WsAggrMean(char* arg, int unused)`|$WsAggrMean pattern filename|
-|`double *B_StatUnitRoot_1(char* arg, int print)`|Sub function of B\_StatUnitRoot() with an optional parameter to print the result (or not).|
-|`int B_StatUnitRoot(char* arg, int unused)`|$StatUnitRoot drift trend order expression|
-|`int B_CsvSave(char* arg, int type)`|$CsvSave<type> file name1 name2 ...|
-|`int B_CsvNbDec(char *nbdec, int unused)`|$CsvNbDec nn|
-|`int B_CsvSep(char *sep, int unused)`|$CsvSep char|
-|`int B_CsvNaN(char *nan, int unused)`|$CsvNaN text|
-|`int B_CsvAxes(char *var, int unused)`|$CsvAxes AxisName|
-|`int B_CsvDec(char *dec, int unused)`|$CsvDec char|
 
 ### b\_rep\_super.c {#T61}
 
@@ -870,109 +693,15 @@ In the GUI version, the function pointer SB\_WsLoad\_super should be replaced by
 
 Functions (and their subfunctions) called by the report engine to set up printing parameters and to generate outputs in various formats.
 
-#### List of functions {#T63}
-
-|Syntax|Description or equivalent in Reports||||||||
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-|`int B_PrintDestExt(char* file, int type)`|Define the printing destination.||||||||
-|`int B_PrintDestFile(char *arg)`|Define the output file for the following printouts.||||||||
-|`int B_PrintDest(char *file)`|$PrintDest \[nom\_fichier\] \[format\]||||||||
-|`int B_PrintDestNew(char* file, int unused)`|$PrintDestNew \[nom\_fichier\] \[format\]||||||||
-|`int B_PrintNbDec(char* nbdec, int unused)`|$PrintNbDec nb||||||||
-|`int B_PrintLang(char* lang, int unused)`|$PrintLang \{English|French|Dutch\}||||||
-|`int B_PrintMulti(char* multi, int unused)`|$PrintMulti STACKMODE||||||||
-|`int B_PrintA2mAppend(char* arg, int unused)`|$PrintA2mAppend \[NO|Yes\]|||||||
-|`int B_PrintTBreak(char* arg, int unused)`|$PrintTableBreak \[NO|Yes\]|||||||
-|`int B_PrintTPage(char* arg, int unused)`|$PrintTablePage \[NO|Yes\]|||||||
-|`int B_PrintGPage(char* arg, int unused)`|$PrintGraphPage \[NO|Yes\]|||||||
-|`int B_PrintParaNum(char* arg, int unused)`|$PrintParanum \[NO|Yes\]|||||||
-|`int B_PrintPageHeader(char* arg, int unused)`|$PrintPageHeader following\_pages\_title||||||||
-|`int B_PrintPageFooter(char* arg, int unused)`|$PrintPageFooter following\_pages\_footer||||||||
-|`int B_PrintFont(char* arg, int unused)`|$PrintFont Times|Helvetica|Courier|Bookman|Palatino \[size \[incr\]\]||||
-|`int B_PrintTFont(char* arg, int unused)`|$PrintTableFont Times|Helvetica|Courier|Bookman|Palatino \[size\]||||
-|`int B_PrintTBox(char* arg, int unused)`|$PrintTableBox n||||||||
-|`int B_PrintTColor(char* arg, int unused)`|$PrintTableColor \[NO|Yes\]|||||||
-|`int B_PrintTWidth(char* arg, int unused)`|$PrintTableWidth width \[col1 \[coln\]\]||||||||
-|`int B_PrintGSize(char* arg, int unused)`|$PrintGraphSize width \[height\] \[fontsize\]||||||||
-|`int B_PrintGTheme(char* arg, int unused)`|$PrintGraphTheme theme||||||||
-|`int B_PrintGBand(char* arg, int unused)`|$PrintGraphBand \[per\_from per\_to\]||||||||
-|`int B_PrintGBox(char* arg, int unused)`|$PrintGraphBox n||||||||
-|`int B_PrintGBrush(char* arg, int unused)`|$PrintGraphBrush pct|Yes|||||||
-|`int B_GetColor(char* arg, int unused)`|Sub function of B\_PrintColor() to interpret color names.||||||||
-|`int B_PrintGColor(char* arg, int unused)`|$PrintBackground Black|Blue|Magenta|Cyan|Red|Green|Yellow|White|
-|`int B_PrintRtfHelp(char* arg, int unused)`|$PrintRtfHelp \[YES|No\]|||||||
-|`int B_PrintHtmlHelp(char* arg, int unused)`|$PrintHtmlHelp \[YES|No\]|||||||
-|`int B_PrintRtfTitle(char* arg, int unused)`|$PrintRtfTitle Help title||||||||
-|`int B_PrintRtfCopy(char* arg, int unused)`|$PrintRtfCopyright copyright text||||||||
-|`int B_PrintRtfLevel(char* arg, int unused)`|$PrintRtfLevel \[\+||n\]||||||
-|`int B_PrintRtfTopic(char* arg, int unused)`|$PrintRtfTopic topic title||||||||
-|`int B_PrintGdiOrient(char* arg, int unused)`|$PrintOrientation \{Portrait|Landscape\}|||||||
-|`int B_PrintGdiDuplex(char* arg, int unused)`|$PrintDuplex \{Simplex|Duplex|VerticalDuplex\}||||||
-|`int B_PrintGdiPrinter(char* arg, int unused)`|$SetPrinter printer\_name||||||||
-|`int B_PrintGIFBackColor(char* arg, int unused)`|$PrintGIFBackColor \{Black|Blue|Magenta|Cyan|Red|Green|Yellow|White\}|
-|`int B_PrintGIFTransColor(char* arg, int unused)`|$PrintGIFTransColor \{Black|Blue|Magenta|Cyan|Red|Green|Yellow|White\}|
-|`int B_PrintGIFInterlaced(char* arg, int unused)`|$PrintGIFInterlaced \{Yes|No\}|||||||
-|`int B_PrintGIFTransparent(char* arg, int unused)`|$PrintGIFTransparent \{Yes|No\}|||||||
-|`int B_PrintGIFFilled(char* arg, int unused)`|$PrintGIFilled \{Yes|No\}|||||||
-|`int B_PrintGIFFont(char* arg, int unused)`|$PrintGIFFont FontNb (between 0 and 5)||||||||
-|`int B_PrintHtmlStrip(char* arg, int unused)`|$PrintHtmlStrip \[YES|No\]|||||||
-|`int B_PrintHtmlStyle(char* arg, int unused)`|$PrintHtmlStyle filename||||||||
-|`int B_A2mToAll(char* arg, int type)`|Convert an A2M file to another format.||||||||
-|`int B_A2mToPrinter(char* arg, int unused)`|$A2mToPrinter file.a2m||||||||
-|`int B_A2mToHtml(char* arg, int unused)`|$A2mToHtml filein fileout||||||||
-|`int B_A2mToRtf(char* arg, int unused)`|$A2mToRtf filein fileout||||||||
-|`int B_A2mToMif(char* arg, int unused)`|$A2mToMif filein fileout||||||||
-|`int B_A2mToCsv(char* arg, int unused)`|$A2mToCsv filein fileout||||||||
-|`int B_A2mSetCol(int *dest, int col)`|Extracts a color definition from B\_GIFCOLS and saves it in dest\[3\].||||||||
-|`int B_PrintHtmlTableClass(char *table_class, int unused)`|$PrintHtmlTableClass class\_name||||||||
-|`int B_PrintHtmlTRClass(char *tr_class, int unused)`|$PrintHtmlTRClass class\_name||||||||
-|`int B_PrintHtmlTHClass(char *th_class, int unused)`|$PrintHtmlTHClass class\_name||||||||
-|`int B_PrintHtmlTDClass(char *td_class, int unused)`|$PrintHtmlTDClass class\_name||||||||
-
 ### b\_print.c {#T64}
 
 Functions (and their subfunctions) to print IODE object definitions.
-
-#### List of functions {#T65}
-
-|Syntax|Description or equivalent in Reports|||
-|:---|:---|:---|:---|
-|`int B_PrintVal(double val)`|Print a double with the function T\_print\_val() and with the number of decimals set to \-1|||
-|`int B_replesc(unsigned char* out, unsigned char* in)`|Replace \\ by / in a string|||
-|`int B_isdef(char* txt)`|Checks if a string contains non space charaters.|||
-|`int dump_string(unsigned char* head, unsigned char* txt)`|Print a header and a modified text: spaces are added before and after specific characters in the text|||
-|`int B_get1int(char* arg)`|Return the integer value of the beginning of a string.|||
-|`int B_ScrollSet(char* arg, long *plong, int inf, int sup)`|Interprets the first part of a string as a integer and check that the value is between 2 boundaries.|||
-|`int B_PrintObjTblTitle(char* arg, int unused)`|$PrintObjTitle 0 or 1|||
-|`int B_PrintObjLec(char* arg, int unused)`|$PrintObjLec \{0||\}|
-|`int B_PrintObjEqsInfos(char* arg, int unused)`|$PrintObjInfos \{0||\}|
-|`int B_PrintObjDef_1(char* arg, int* type)`|Print the definition of the object named arg of the given type|||
-|`int B_PrintObjDef(char* arg, int type)`|$PrintObjDefXxx object\_list|||
-|`int B_PrintObjDefArgs(char* arg, int type)`|Print a list of objects of a given type.|||
 
 ### b\_view.c {#T66}
 
 Functions to display or print calculated tables and tables of variables. The same functions are used to print and to display tables as graphs or as text.
 
 The functions generate IODE tables in A2M format based on Table structures and GSample definition.
-
-#### List of functions {#T67}
-
-|Syntax|Description or equivalent in Reports|
-|:---|:---|
-|`int B_ViewVar(char* arg, int unused)`|Display a list of variables in the form of tables of max 50 variables.|
-|`int B_PrintVar(char* arg, int unused)`|Print a list of variables in the form of tables of max 50 variables.|
-|`int B_ViewPrintVar(char* arg, int mode)`|Print or display (according to the mode parameter) variables in the form of tables.|
-|`int B_ViewByTbl(char* arg, int unused)`|$ViewTbl sample table \[list of tables\]|
-|`int B_ViewTbl(char* arg, int unused)`|Alias of B\_ViewByTbl()|
-|`int B_PrintTbl(char* arg, int unused)`|$PrintTbl gsample table1 \[table2...\]|
-|`int B_ViewGr(char* arg, int unused)`|$ViewGr gsample tbl1\[\+tbl2\] tbl3 ...|
-|`int B_PrintGr(char* arg, int unused)`|$PrintGr gsample table1 \[table2...\]|
-|`int B_ViewPrintTbl_1(char* name, char* smpl)`|Calculate and display (or print according to the value of B\_viewmode) a table on a specified GSample.|
-|`int B_ViewPrintGr_1(char* names, char* gsmpl)`|Calculate and display (or print according to the value of B\_viewmode) a graph on a specified GSample, based on Table definition(s).|
-|`int B_ViewPrintTbl(char* arg, int type, int mode)`|Calculate, then print or display (according to the mode parameter) IODE Tables either in the form of graphs or in the form of text (SCROLLs).|
-|`int B_ViewTblFile(char* arg, int unused)`|$PrintTblFile n varfilename (n := 2, 3, 4, 5)|
-|`int B_ViewTblEnd()`|Close a Print tables or Print variables session.|
 
 ## Iode Report @\-functions {#T68}
 

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "api/constants.h"
 
 #include <regex>
@@ -263,6 +262,76 @@ inline std::vector<std::string> split_multi(const std::string& str, const std::s
         result.push_back(str.substr(start, pos - start));
         start = pos + 1;
     }
+    return result;
+}
+
+/**
+ * @brief Split a string according to the separators in delimiters.
+ * Text enclosed in the quote character is not split.
+ *
+ * For example:
+ * split_multi_quoted("abc,def,\"hij,klm\",z", ",", '"') returns
+ * {"abc", "def", "hij,klm", "z"}.
+ *
+ * @param str string to split
+ * @param delimiters separator characters
+ * @param quote character opening and closing non-split substrings
+ * @return split substrings
+ */
+inline std::vector<std::string> split_multi_quoted(const std::string& str,
+    const std::string& delimiters, char quote)
+{
+    std::vector<std::string> result;
+    size_t cursor = 0;
+    bool in_quote = false;
+
+    while(true)
+    {
+        size_t offset = 0;
+        while(cursor + offset < str.size() && !in_quote)
+        {
+            const char current = str[cursor + offset];
+            if(delimiters.find(current) != std::string::npos)
+            {
+                ++offset;
+                continue;
+            }
+            if(current == quote)
+            {
+                in_quote = true;
+                ++offset;
+                continue;
+            }
+            break;
+        }
+
+        if(cursor + offset == str.size())
+            break;
+
+        cursor += offset;
+        size_t end;
+        if(in_quote)
+        {
+            end = str.find(quote, cursor);
+            in_quote = false;
+        }
+        else
+        {
+            end = str.find_first_of(delimiters, cursor);
+            if(end != std::string::npos && str[end] == quote)
+                in_quote = true;
+        }
+
+        if(end == std::string::npos)
+            end = str.size();
+
+        result.emplace_back(str.substr(cursor, end - cursor));
+        if(end == str.size())
+            break;
+
+        cursor = end + 1;
+    }
+
     return result;
 }
 

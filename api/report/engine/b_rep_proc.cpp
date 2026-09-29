@@ -264,53 +264,60 @@ int RP_procdef(char* arg, int unused)
  *  @return     int             -1 if the PROC does not exist
  */
 int RP_procexec(char* arg, int unused)
-{
-    unsigned char   name[128], *list, **aparms, *lastparms;
-    int             rc = 0, i, nformal, nactual, proc_nb;
-    REP_PROC        *proc;
-
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
+{   
+    unsigned char* list;
+    unsigned char name[128]; 
+    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) 
+        return -1;
 
     // Searches the proc definition
-    proc_nb = RP_proc_find((char*) name);
-    if(proc_nb < 0) {
+    int proc_nb = RP_proc_find((char*) name);
+    if(proc_nb < 0) 
+    {
         error_manager.append_error("Procedure '" + std::string((char*) name) + "': not defined");
         return -1;
     }
-    proc = REP_PROCS[proc_nb];
+    REP_PROC* proc = REP_PROCS[proc_nb];
 
     // Saves (temporarily pushes) the defines with the same names as the formal parameters
-    rc = RP_define_save_list(proc->proc_parms);
-    if(rc < 0) return rc;
+    int rc = RP_define_save_list(proc->proc_parms);
+    if(rc < 0) 
+        return rc;
 
     // Creates macros with the actual parameters
-    aparms = SCR_vtomsq((char*) list, (char*) " ,\n\t", '"');
-    //aparms = SCR_vtoms(list, " ");
-    nactual = SCR_tbl_size(aparms);
-    nformal = proc->proc_nb_parms;
+    std::vector<std::string> v_params = split_multi_quoted((char*) list, " ,\n\t", '"');
+    int nactual = (int) v_params.size();
+    int nformal = proc->proc_nb_parms;
 
     // Creates macros (=defines) for each actual parameter.
     // If there are less actual parms than formal parms, creates only $defines for the actual ones
-    if(nformal >= nactual) {
-        for(i = 0 ; i < nactual; i++) {
-            rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
-            if(rc < 0) return rc;
+    if(nformal >= nactual) 
+    {
+        for(int i = 0 ; i < nactual; i++) 
+        {
+            rc = RP_define_1(proc->proc_parms[i], (char*) v_params[i].c_str());
+            if(rc < 0) 
+                return rc;
         }
     }
     // If there are more actual parms than formal parms, the last $define (formal parm)
-    //  is created with the list of all remaining actual parms separated by a space
-    else {
-        for(i = 0 ; i < nformal - 1; i++) {
-            rc = RP_define_1(proc->proc_parms[i], (char*) aparms[i]);
-            if(rc < 0) return rc;
+    // is created with the list of all remaining actual parms separated by a space
+    else 
+    {
+        for(int i = 0; i < nformal - 1; i++) 
+        {
+            rc = RP_define_1(proc->proc_parms[i], (char*) v_params[i].c_str());
+            if(rc < 0) 
+                return rc;
         }
-        lastparms = SCR_mtov(aparms + nformal - 1, ' ');
-        rc = RP_define_1(proc->proc_parms[nformal - 1], (char*) lastparms);
-        SCR_free(lastparms);
-        if(rc < 0) return rc;
-    }
 
-    SCR_free_tbl(aparms);
+        std::string last_params; 
+        for(int i = nformal - 1; i < nactual; i++) 
+            last_params += v_params[i] + " ";
+        rc = RP_define_1(proc->proc_parms[nformal - 1], (char*) last_params.c_str());
+        if(rc < 0) 
+            return rc;
+    }
 
     // Executes the proc lines like a normal report
     proc->proc_rf->curline = 0;

@@ -8,22 +8,7 @@
  *  
  *  WARNING: in the most recent versions of IODE, the define RP_STDMALLOC is set to 1.
  *  Therefore, the standard functions (SCR_malloc()...) are used inside RP_alloc(), RP_free()...
- *   
- *  List of functions
- *  -----------------
- *      char *RP_alloc(int size)                                             Mimics SCR_malloc() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      int RP_free(char *ptr)                                               Mimics SCR_free() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      void RP_free_bufs()                                                  Frees all memory buffers allocated by the RP_ALLOCATIONS library.
- *      char *RP_stracpy(char *ptr)                                          Mimics SCR_stracpy() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)    Mimics SCR_vtoms() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      unsigned char **RP_vtom(unsigned char* str, int sep)                 Mimics SCR_vtom() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      int RP_free_tbl(unsigned char **tbl)                                 Mimics SCR_free_tbl() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *      int RP_tbl_size(unsigned char **tbl)                                 Mimics SCR_tbl_size().
- *      int RP_is_cmd(char *line)                                            Checks that a report line is a command ($command or #command).
- *      U_ch **SCR_vtomsq(char* str, char* seps, int quote)                  Splits a string on one of separators. Text enclosed in quote char are not split.
- *      
  */
-
 #include "api/report/engine/engine.h"
 
 //  RP_ALLOCATIONS
@@ -337,64 +322,3 @@ int RP_is_cmd(char *line)
     else
         return 0;
 }
-
-
-/**
- *  Splits a string on one of separators. Text enclosed in quote char are not split.
- *  
- *  SCR_vtomsq("abc,def,\"hij,klm\",z", ",", "\"") 
- *  =>  abc
- *      def
- *      hij,klm
- *      z
- *  
- *  @param [in] char*   str     string
- *  @param [in] char*   seps    list of allowed seps
- *  @param [in] int     quote   character opening and closing non split substrings.
- *  @return     U_ch**          table of strings
- */
-U_ch **SCR_vtomsq(char* str, char* seps, int quote)
-{
-    U_ch    **tbl = 0, tmp;
-    int     ntbl = 0, i, inquote;
-
-    inquote = 0;
-    while(1) {
-        for(i = 0; str[i] && !inquote; i++) {
-            if(U_is_in(str[i], seps)) continue; /* SKIP SEPS */
-            if(str[i] == quote) {
-                inquote = 1;
-                continue;
-            }
-            break;
-        }
-        if(str[i] == 0) break;
-
-        str += i;
-        if(inquote) {
-            for(i = 0; str[i]; i++)
-                if(str[i] == quote) break;
-            inquote = 0;
-        }
-        else {
-            for(i = 0; str[i]; i++)
-                if(U_is_in(str[i], seps)) break;
-            if(str[i] == quote) {
-                inquote = 1;
-                break;
-            }
-        }
-
-        tmp = str[i];
-        str[i] = 0;
-
-        SCR_add_ptr(&tbl, &ntbl, (unsigned char*) str);
-        str[i] = tmp;
-        if(tmp == 0) break;
-        str += i + 1;
-    }
-
-    SCR_add_ptr(&tbl, &ntbl, NULL);
-    return(tbl);
-}
-

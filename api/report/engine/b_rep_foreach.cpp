@@ -221,27 +221,29 @@ done:
  */
 int RP_foreach_next(char* arg, int unused)
 {
-    unsigned    char    **args;
-    int                 rc = 0, nb,
-                        curline = CUR_REPFILE->curline;
+    int curline = CUR_REPFILE->curline;
 
-    args = SCR_vtomsq(arg, (char*) " ,\n\t", '"');
-    nb = SCR_tbl_size(args);
-    switch(nb) {
+    int rc = 0;
+    std::vector<std::string> v_args = split_multi_quoted(arg, " ,\n\t", '"');
+    int nb = (int) v_args.size();
+    switch(nb) 
+    {
         case 1 :
-            rc = RP_foreach_goto_next((char*) args[0]);
+            rc = RP_foreach_goto_next((char*) v_args[0].c_str());
             break;
 
-        default: // $next must have exactly 1 arg
+        // $next must have exactly 1 arg
+        default:
             rc = -3;
             break;
     }
 
-    SCR_free_tbl(args);
-    if(rc != 0) {
+    if(rc != 0) 
+    {
         CUR_REPFILE->curline = curline;
         rc = 0;
     }
+
     return rc;
 }
 
