@@ -23,195 +23,156 @@
 #define MAX_LENGTH_ARG  128
 #define MAX_FILES_OPEN  10
 
-char** A_VAL;
-int NB_ARGS; 
+std::vector<std::string> A_VAL;
 int NB_FILES_OPEN;
 
 
 /**
- * @brief Add an argument in the table A_VAL and increment NB_ARGS.
- * 
- * @param arg 
- */
-static void add_to_vector_of_args(char* arg)
-{
-    SCR_add_ptr((unsigned char***) &A_VAL, &NB_ARGS, (unsigned char*) arg);
-    if(arg == NULL) 
-        NB_ARGS--;
-}
-
-/**
  * @brief Expand an IODE list (declared as $listname)
  * 
- * @param listname 
- * @return char* 
+ * @param  listname     name of the IODE list to expand
+ * @return std::string  expanded IODE list content
  */
-char* expand_list(char* listname)
+static std::string expand_list(const std::string& listname)
 {
-    if(!global_ws_lst->contains(listname)) 
-        return NULL;
+    if(!global_ws_lst->contains(listname))
+        return "";
     
     std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(listname);
-    if(!lst) 
-        return NULL;
+    if(!lst)
+        return "";
     
-    return (char*) lst->c_str();
+    return *lst;
 }
 
 
 /**
- * @brief Read next word in file.
+ * @brief Read the next word from a stream.
  * 
- * @param type 
- * @param buf 
- * @param word 
- * @param max_lg 
+ * @param input
+ * @param word
+ * @param max_lg
+ * @param separators
  */
-static bool read_next_word(int type, char** buf, char* word, int max_lg,
+static bool read_next_word(std::istream& input, std::string& word, const int max_lg,
     const std::string& separators)
 {
-    int lg = 0, c, q = 0;
+    char c;
+    bool quoted = false;
+    word.clear();
 
-    while(1) 
+    while(input.get(c))
     {
-        // Gets next char
-        if(type == 0) 
-        {
-            c = **buf;
-            if(c == 0) 
-                c = EOF;
-            else 
-                (*buf)++;
-        }
-        else 
-            c = getc((FILE*) buf);
-
-        // Check if 'c' is EOF
-        if(c == EOF) 
-        {
-            word[lg] = 0;
-            return (lg == 0) ? false : true;
-        }
-
         // Check if 'c' is a separator character
-        if(q == 0 && separators.find(c) != std::string::npos)
+        if(!quoted && separators.find(c) != std::string::npos)
         {
-            if(lg > 0) 
-            {
-                word[lg] = 0;
+            if(!word.empty())
                 return true;
-            }
         }
-        else if(lg < max_lg) 
+        else if(word.size() < static_cast<size_t>(max_lg))
         {
-            if(c == '"') 
+            if(c == '"')
             {
-                if(lg == 0) 
-                    q = 1;
-                else if(q == 1) 
-                {
-                    word[lg] = 0;
+                if(word.empty())
+                    quoted = true;
+                else if(quoted)
                     return true;
-                }
             }
-            else 
-                word[lg++] = c;
+            else
+                word += c;
         }
-	}
+    }
+
+    return !word.empty();
 }
 
 
 /**
- * @brief Parse an argument. Then add the argument in the table A_VAL 
- * and increment NB_ARGS.
+ * @brief Parse an argument and add each resulting value to A_VAL.
  * 
  * @filename : replaces @filename by the content of the file "filename"
  * $listname : replaces @listname by the content of the list "listname"
  * 
- * @param arg 
+ * @param arg
+ * @param separators
  */
-static bool parse_arg(char* arg, const std::string& separators)
+static bool parse_arg(const std::string& arg, const std::string& separators)
 {
-    if(arg == NULL) 
-    {
-	    add_to_vector_of_args(arg);
-	    return true;
-    }
+    if(arg.empty())
+        return true;
 
-    FILE* fd = NULL;
-    char* tmp = NULL; 
-    char word[MAX_LENGTH_ARG + 1];
-    switch(arg[0]) 
+    std::istringstream arg_stream(arg);
+    std::string word;
+
+    switch(arg[0])
     {
-	case '@':
+    case '@':
     {
-	    if(NB_FILES_OPEN >= MAX_FILES_OPEN) 
+        if(NB_FILES_OPEN >= MAX_FILES_OPEN)
         {
-		    kwarning("parse_arg: Maximum 10 levels of nesting");
-		    return false;
-	    }
-	    tmp = arg;
-	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators);
-	    fd = fopen(word + 1, "r");
-	    if(fd == NULL) 
+            kwarning("parse_arg: Maximum 10 levels of nesting");
+            return false;
+        }
+
+        read_next_word(arg_stream, word, MAX_LENGTH_ARG, separators);
+        std::ifstream file(word.substr(1));
+        if(!file.is_open())
         {
             std::string error_msg = "parse_arg: Cannot open file ";
-            error_msg += "'" + std::string(word + 1) + "'";
-		    kwarning(error_msg.c_str());
-		    return false;
-	    }
-	    NB_FILES_OPEN++;
+            error_msg += "'" + word.substr(1) + "'";
+            kwarning(error_msg.c_str());
+            return false;
+        }
 
-	    while(read_next_word(1, (char **)fd, word, MAX_LENGTH_ARG, separators))
+        NB_FILES_OPEN++;
+        while(read_next_word(file, word, MAX_LENGTH_ARG, separators))
         {
-            if(word[0] != 0) 
+            if(!word.empty())
                 parse_arg(word, separators);
-        } 
-	    fclose(fd);
-	    NB_FILES_OPEN--;
-	    break;
+        }
+        NB_FILES_OPEN--;
+        break;
     }
 
-	case '$':
+    case '$':
     {
-	    if(NB_FILES_OPEN >= MAX_FILES_OPEN) 
+        if(NB_FILES_OPEN >= MAX_FILES_OPEN)
         {
-		    kwarning("parse_arg: Maximum 10 levels of nesting");
-		    return false;
-	    }
-	    tmp = arg;
-	    read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators);
-	    char* exp = expand_list(word + 1);
-	    if(exp == NULL) 
-        {
-		    add_to_vector_of_args(word);
-		    return true;
-	    }
-	    NB_FILES_OPEN++;
+            kwarning("parse_arg: Maximum 10 levels of nesting");
+            return false;
+        }
 
-	    while(read_next_word(0, &exp, word, MAX_LENGTH_ARG, separators))
-		    if(word[0] != 0) parse_arg(word, separators);
-	    NB_FILES_OPEN--;
-	    break;
+        read_next_word(arg_stream, word, MAX_LENGTH_ARG, separators);
+        std::string expanded_list = expand_list(word.substr(1));
+        if(expanded_list.empty())
+        {
+            A_VAL.push_back(word);
+            return true;
+        }
+
+        NB_FILES_OPEN++;
+        std::istringstream list_stream(expanded_list);
+        while(read_next_word(list_stream, word, MAX_LENGTH_ARG, separators))
+        {
+            if(!word.empty())
+                parse_arg(word, separators);
+        }
+        NB_FILES_OPEN--;
+        break;
     }
 
-	default:
-    {
-	    tmp = arg;
-	    break;
+    default:
+        break;
     }
 
-    // end switch
-	}
-
-    while(read_next_word(0, &tmp, word, MAX_LENGTH_ARG, separators))
+    while(read_next_word(arg_stream, word, MAX_LENGTH_ARG, separators))
     {
-        if(word[0] != 0) 
+        if(!word.empty())
         {
-            if(word[0] == '@' || word[0] == '$') 
+            if(word[0] == '@' || word[0] == '$')
                 parse_arg(word, separators);
             else
-                add_to_vector_of_args(word);
+                A_VAL.push_back(word);
         }
     }
 
@@ -220,41 +181,43 @@ static bool parse_arg(char* arg, const std::string& separators)
 
 
 /**
- * @brief Parses the arguments and performs the expand of $ and @
+ * @brief Parses the arguments and performs the expansion of $ and @.
  * 
- * @param argv 
+ * @param argv
+ * @param separators
  */
-static bool prepare_vector_of_args(char** argv, const std::string& separators)
+static bool prepare_vector_of_args(const std::string& arg, const std::string& separators)
 {
-    NB_ARGS = 0;
-    A_VAL = 0;
+    A_VAL.clear();
     NB_FILES_OPEN = 0;
 
-    bool success = true;
-    for(int i = 0; argv[i] != 0 ; i++) 
-		success &= parse_arg(argv[i], separators);
-    success &= parse_arg(0L, separators);
+    bool success = parse_arg(arg, separators);
     return success;
 }
 
 
-static char** sub_expand_args(char** argv, const std::string& separators)
+static std::vector<std::string> sub_expand_args(const std::string& arg, 
+    const std::string& separators, bool& success)
 {
-    bool success = prepare_vector_of_args(argv, separators);
-    if(success) 
-        return A_VAL;
-
-    for(int i = 0; i < NB_ARGS; i++)
+    success = prepare_vector_of_args(arg, separators);
+    if(!success)
     {
-        if(A_VAL[i][0] == '$')
+        for(const std::string& arg : A_VAL)
         {
-            std::string error_msg = "expand_args: " + std::string(A_VAL[i]) + " cannot be expanded";
-            kwarning(error_msg.c_str());
+            if(!arg.empty() && arg[0] == '$')
+            {
+                std::string error_msg = "expand_arg: " + arg + " cannot be expanded";
+                kwarning(error_msg.c_str());
+            }
         }
+
+        A_VAL.clear();
+        return {};
     }
 
-    SCR_free_tbl((unsigned char**) A_VAL);
-    return NULL;
+    std::vector<std::string> args;
+    args.swap(A_VAL);
+    return args;
 }
 
 
@@ -273,7 +236,7 @@ static char** sub_expand_args(char** argv, const std::string& separators)
  *  If nb is > 0, the function checks that, after expanding arg, the resulting number or arguments 
  *  equals nb (the expected value). 
  *  
- *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
+ *  On error, IodeErrorManager::append_error() is called and the function returns an empty vector.
  *  
  *  @param [in] arg     const std::string&        arguments to be expanded
  *  @param [in] nb      const int                 0 or expected number of arguments after expansion
@@ -284,28 +247,17 @@ static char** sub_expand_args(char** argv, const std::string& separators)
 std::vector<std::string> expand_args(const std::string& arg, const int nb,
     const std::string& separators)
 {
-    std::vector<std::string> args;
+    bool success;
+    std::vector<std::string> args = sub_expand_args(arg, separators, success);
+    if(!success)
+        return {};
 
-    char* argv[12];
-    argv[0] = (char*) arg.c_str();
-    argv[1] = 0L;
-    char** c_args = sub_expand_args(argv, separators);
-    if(c_args == NULL)
-        return args;
-
-    if(nb > 0 && SCR_tbl_size((unsigned char**) c_args) != nb)
+    if(nb > 0 && args.size() != static_cast<size_t>(nb))
     {
         error_manager.append_error("Illegal argument(s)");
-        SCR_free_tbl((unsigned char**) c_args);
-        return args;
+        return {};
     }
 
-    int nb_args = SCR_tbl_size((unsigned char**) c_args);
-    args.reserve(nb_args);
-    for(int i = 0; i < nb_args; i++)
-        args.emplace_back(c_args[i]);
-
-    SCR_free_tbl((unsigned char**) c_args);
     return args;
 }
 
