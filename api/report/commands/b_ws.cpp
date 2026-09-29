@@ -36,7 +36,6 @@
  * int B_CsvDec(char *dec, int unused)                           $CsvDec char
  */
 #include "api/iode_scr4.h"
-#include "scr4/args/s_args.h"
 
 #include "api/k_super.h"
 #include "api/b_args.h"

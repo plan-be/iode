@@ -23,7 +23,6 @@
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
 #include "api/iode_scr4.h"
-#include "scr4/args/s_args.h"
 
 #include "api/pch.h"
 #include "api/k_lang.h"
