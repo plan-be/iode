@@ -18,7 +18,6 @@
 #include "api/time/period.h"
 #include "api/time/sample.h"
 #include "api/objs/lists.h"
-#include "api/report/engine/engine.h"       // SCR_vtomsq
 
 #define MAX_LENGTH_ARG  128
 #define MAX_FILES_OPEN  10
@@ -252,21 +251,22 @@ std::vector<std::string> expand_args(const std::string& arg, const int nb,
  *                          table of string (split arg)
  *  
  */
-char **B_vtom_chk(char* arg, int nb)
+char** B_vtom_chk(char* arg, int nb)
 {
-    unsigned char **args;
-    char *tmp = (char*) SCR_stracpy((unsigned char*) arg);       // need to create a copy of arg to avoid segmentation fault 
-                                        // when called from C++/cython: 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
+        return NULL;
 
-    args = SCR_vtomsq(tmp, (char*) " ,\n\t", '"');
-    if(args == 0) return((char**) args);
-    if((nb > 0 && SCR_tbl_size(args) != nb)) {
-        error_manager.append_error("Illegal argument(s)");
-        SCR_free_tbl(args);
-        args = 0;
+    if((nb > 0 && v_args.size() != nb)) 
+    {
+        std::string error_msg = "Failed to extract arguments: expected " + std::to_string(nb) + " ";
+        error_msg += "arguments but got " + std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return NULL;
     }
 
-    return((char**) args);
+    char** c_args = vector_to_double_char(v_args);
+    return c_args;
 }
 
 
@@ -337,9 +337,10 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
  *  
  *  Example: 
  *      char arg0[21];
- *  
  *      B_get_arg0(arg0 , " ACAF ACAG XYZ ", sizeof(arg0));  
- *      printf("'%s'", txt); // 'ACAF'
+ *      printf("'%s'", txt);
+ * 
+ *      returns 'ACAF'
  *  
  *  @param [out] arg0    char*  first arg in the string arg 
  *  @param [in]  arg     char*  any string 
@@ -348,18 +349,20 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
  *  
  *  @details 
  */
-int B_get_arg0(char* arg0, char*arg, int lg)
+int B_get_arg0(char* arg0, char* arg, int lg)
 {
-    int     i;
-
     SCR_replace((unsigned char*) arg, (unsigned char*) "\t", (unsigned char*) " ");
     U_ljust_text((unsigned char*) arg);
-    for(i = 0; i < lg - 1 && arg[i] ; i++) {
-        if(U_is_in(arg[i], (char*) " ,\n\t")) break;
+
+    int i;
+    for(i = 0; i < lg - 1 && arg[i]; i++) 
+    {
+        if(U_is_in(arg[i], (char*) " ,\n\t")) 
+            break;
         arg0[i] = arg[i];
     }
     arg0[i] = 0;
-    return(i);
+    return i;
 }
 
 

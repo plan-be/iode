@@ -1053,28 +1053,28 @@ char *RP_extractpar(char* buf, int* i, char* brackets)
 int RP_fneval(char** res, char* str)
 {
     *res = 0;
-    // tbl = SCR_vtoms3(str, "(,", 1);  // buggy if fn("ssdff","sdfsdf")
-    U_ch** tbl = SCR_vtomsq(str, "(,", '"');
+    std::vector<std::string> v_args = split_multi_quoted(str, "(,", '"');
     
     // find the function name (in lowercase)
-    std::string name = std::string((char*) tbl[0]);
+    std::string name = v_args[0];
     name = trim(name);
     name = to_lower(name);
 
     int rc = -1;
+    char** tbl_args = vector_to_double_char(v_args);
     for(auto& [func_name, fns]: RP_FNS)
     {
         if(name == func_name)
         {
             // execute the @function 
-            *res = (char*) fns.fn((U_ch**) tbl + 1);
+            *res = (char*) fns.fn((unsigned char**) tbl_args + 1);
             if(*res == NULL) 
                 rc = -1;
             rc = 0;
         }
     }
 
-    SCR_free_tbl(tbl);
+    SCR_free_tbl((unsigned char**) tbl_args);
     return rc;
 }
 
@@ -1509,8 +1509,7 @@ int RP_ReportExec_1(char* file)
 
 int B_ReportExec(char* arg, int unused)
 {
-    unsigned char   **o_argv,
-                    **SCR_vtomsq();
+    unsigned char   **o_argv;
     int             rc = 0, 
                     o_arg0;
 
@@ -1518,7 +1517,6 @@ int B_ReportExec(char* arg, int unused)
     o_argv = (unsigned char**) RP_ARGV;
     o_arg0 = RP_ARG0;
 
-    /* argv = SCR_vtomsq(arg, (char*) " ,\n\t", '"'); */
     std::vector<std::string> v_args = expand_args(arg, 0);
     std::vector<char*> argv;
     if(v_args.empty())
@@ -1575,8 +1573,7 @@ done:
 
 int B_ReportLine(char* line, int cleanup)
 {
-    unsigned char       **o_argv,
-                          **SCR_vtomsq();
+    unsigned char       **o_argv;
     int                 rc = 0, o_arg0,
                         RP_ReportExec_1();
     REPFILE             *rf;

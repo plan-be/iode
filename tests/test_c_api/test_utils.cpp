@@ -33,6 +33,27 @@ TEST_F(UtilsTest, replaceLineBreak)
     EXPECT_EQ(text, "first\\psecond\\pthird\\pfourth\\p\\plast");
 }
 
+TEST_F(UtilsTest, splitMultiQuoted)
+{
+    EXPECT_EQ(split_multi_quoted("", ",", '"'),
+              std::vector<std::string>({}));
+    EXPECT_EQ(split_multi_quoted(",,,", ",", '"'),
+              std::vector<std::string>({}));
+
+    EXPECT_EQ(split_multi_quoted("abc,def,ghi", ",", '"'),
+              std::vector<std::string>({"abc", "def", "ghi"}));
+    EXPECT_EQ(split_multi_quoted("  abc,,def;\tghi", " ,;\t", '"'),
+              std::vector<std::string>({"abc", "def", "ghi"}));
+
+    EXPECT_EQ(split_multi_quoted("abc,def,\"hij,klm\",z", ",", '"'),
+              std::vector<std::string>({"abc", "def", "hij,klm", "z"}));
+    EXPECT_EQ(split_multi_quoted("abc,\"\",def", ",", '"'),
+              std::vector<std::string>({"abc", "", "def"}));
+    EXPECT_EQ(split_multi_quoted("abc,\"def,ghi", ",", '"'),
+              std::vector<std::string>({"abc", "def,ghi"}));
+}
+
+
 TEST_F(UtilsTest, getIodeFileType)
 {
 	std::string filename = "";
