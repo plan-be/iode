@@ -251,7 +251,7 @@ int RP_goto(char* arg, int unused)
     unsigned    char    **args;
     int                 rc = 0, nb;
 
-    args = SCR_vtomsq(arg, B_SEPS, '"');
+    args = SCR_vtomsq(arg, (char*) " ,\n\t", '"');
     nb = SCR_tbl_size(args);
     switch(nb) {
         case 0 : // JMP 13-12-12: erreur si pas d'arg uniquement

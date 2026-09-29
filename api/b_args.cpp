@@ -240,7 +240,7 @@ std::vector<std::string> expand_args(const std::string& arg, const int nb,
 
 /**
  *  Splits a string (generally a function argument) into a table of strings. 
- *  The possible string separators are the chars in B_SEPS (by default " ,\n\t").
+ *  The possible string separators are " ,\n\t".
  *  
  *  If nb is not null, checks that the number of parameters is equal to n. 
  *  
@@ -258,7 +258,7 @@ char **B_vtom_chk(char* arg, int nb)
     char *tmp = (char*) SCR_stracpy((unsigned char*) arg);       // need to create a copy of arg to avoid segmentation fault 
                                         // when called from C++/cython: 
 
-    args = SCR_vtomsq(tmp, B_SEPS, '"');
+    args = SCR_vtomsq(tmp, (char*) " ,\n\t", '"');
     if(args == 0) return((char**) args);
     if((nb > 0 && SCR_tbl_size(args) != nb)) {
         error_manager.append_error("Illegal argument(s)");
@@ -355,7 +355,7 @@ int B_get_arg0(char* arg0, char*arg, int lg)
     SCR_replace((unsigned char*) arg, (unsigned char*) "\t", (unsigned char*) " ");
     U_ljust_text((unsigned char*) arg);
     for(i = 0; i < lg - 1 && arg[i] ; i++) {
-        if(U_is_in(arg[i], B_SEPS)) break;
+        if(U_is_in(arg[i], (char*) " ,\n\t")) break;
         arg0[i] = arg[i];
     }
     arg0[i] = 0;

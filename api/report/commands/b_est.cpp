@@ -38,7 +38,7 @@
  */
 static std::vector<std::string> B_EqsSplitSmplName(const std::string& arg, Sample **psmpl)
 {
-    std::vector<std::string> args = split_multi(arg, std::string(B_SEPS));
+    std::vector<std::string> args = split_multi(arg, " ,\n\t");
     if(args.size() < 2)
     {
         *psmpl = nullptr;

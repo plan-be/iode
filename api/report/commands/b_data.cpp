@@ -654,7 +654,7 @@ int B_DataUpdate(char* arg, int type)
         }
         case SCALARS :
         {
-            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
             int nb_args = SCR_tbl_size((unsigned char**) args);
 
             std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
@@ -676,7 +676,7 @@ int B_DataUpdate(char* arg, int type)
         }
         case VARIABLES :
         {
-            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
             int nb_args = SCR_tbl_size((unsigned char**) args);
             /* Name [D|d|G|g|L|l] Period nVal */
             if(nb_args > 1) 

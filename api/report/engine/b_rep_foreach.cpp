@@ -225,7 +225,7 @@ int RP_foreach_next(char* arg, int unused)
     int                 rc = 0, nb,
                         curline = CUR_REPFILE->curline;
 
-    args = SCR_vtomsq(arg, B_SEPS, '"');
+    args = SCR_vtomsq(arg, (char*) " ,\n\t", '"');
     nb = SCR_tbl_size(args);
     switch(nb) {
         case 1 :

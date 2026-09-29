@@ -1518,7 +1518,7 @@ int B_ReportExec(char* arg, int unused)
     o_argv = (unsigned char**) RP_ARGV;
     o_arg0 = RP_ARG0;
 
-    /* argv = SCR_vtomsq(arg, B_SEPS, '"'); */
+    /* argv = SCR_vtomsq(arg, (char*) " ,\n\t", '"'); */
     std::vector<std::string> v_args = expand_args(arg, 0);
     std::vector<char*> argv;
     if(v_args.empty())
