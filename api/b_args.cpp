@@ -23,7 +23,6 @@
 #define MAX_LENGTH_ARG  128
 #define MAX_FILES_OPEN  10
 
-std::vector<std::string> A_VAL;
 int NB_FILES_OPEN;
 
 
@@ -88,7 +87,7 @@ static bool read_next_word(std::istream& input, std::string& word, const int max
 
 
 /**
- * @brief Parse an argument and add each resulting value to A_VAL.
+ * @brief Parse an argument and add each resulting value to v_expanded_args.
  * 
  * @filename : replaces @filename by the content of the file "filename"
  * $listname : replaces @listname by the content of the list "listname"
@@ -96,7 +95,8 @@ static bool read_next_word(std::istream& input, std::string& word, const int max
  * @param arg
  * @param separators
  */
-static bool parse_arg(const std::string& arg, const std::string& separators)
+static bool parse_arg(const std::string& arg, const std::string& separators,
+    std::vector<std::string>& v_expanded_args)
 {
     if(arg.empty())
         return true;
@@ -128,7 +128,7 @@ static bool parse_arg(const std::string& arg, const std::string& separators)
         while(read_next_word(file, word, MAX_LENGTH_ARG, separators))
         {
             if(!word.empty())
-                parse_arg(word, separators);
+                parse_arg(word, separators, v_expanded_args);
         }
         NB_FILES_OPEN--;
         break;
@@ -146,7 +146,7 @@ static bool parse_arg(const std::string& arg, const std::string& separators)
         std::string expanded_list = expand_list(word.substr(1));
         if(expanded_list.empty())
         {
-            A_VAL.push_back(word);
+            v_expanded_args.push_back(word);
             return true;
         }
 
@@ -155,7 +155,7 @@ static bool parse_arg(const std::string& arg, const std::string& separators)
         while(read_next_word(list_stream, word, MAX_LENGTH_ARG, separators))
         {
             if(!word.empty())
-                parse_arg(word, separators);
+                parse_arg(word, separators, v_expanded_args);
         }
         NB_FILES_OPEN--;
         break;
@@ -170,54 +170,13 @@ static bool parse_arg(const std::string& arg, const std::string& separators)
         if(!word.empty())
         {
             if(word[0] == '@' || word[0] == '$')
-                parse_arg(word, separators);
+                parse_arg(word, separators, v_expanded_args);
             else
-                A_VAL.push_back(word);
+                v_expanded_args.push_back(word);
         }
     }
 
     return true;
-}
-
-
-/**
- * @brief Parses the arguments and performs the expansion of $ and @.
- * 
- * @param argv
- * @param separators
- */
-static bool prepare_vector_of_args(const std::string& arg, const std::string& separators)
-{
-    A_VAL.clear();
-    NB_FILES_OPEN = 0;
-
-    bool success = parse_arg(arg, separators);
-    return success;
-}
-
-
-static std::vector<std::string> sub_expand_args(const std::string& arg, 
-    const std::string& separators, bool& success)
-{
-    success = prepare_vector_of_args(arg, separators);
-    if(!success)
-    {
-        for(const std::string& arg : A_VAL)
-        {
-            if(!arg.empty() && arg[0] == '$')
-            {
-                std::string error_msg = "expand_arg: " + arg + " cannot be expanded";
-                kwarning(error_msg.c_str());
-            }
-        }
-
-        A_VAL.clear();
-        return {};
-    }
-
-    std::vector<std::string> args;
-    args.swap(A_VAL);
-    return args;
 }
 
 
@@ -247,18 +206,35 @@ static std::vector<std::string> sub_expand_args(const std::string& arg,
 std::vector<std::string> expand_args(const std::string& arg, const int nb,
     const std::string& separators)
 {
-    bool success;
-    std::vector<std::string> args = sub_expand_args(arg, separators, success);
-    if(!success)
-        return {};
+    NB_FILES_OPEN = 0;
 
-    if(nb > 0 && args.size() != static_cast<size_t>(nb))
+    std::vector<std::string> v_expanded_args;
+    bool success = parse_arg(arg, separators, v_expanded_args);
+    if(!success)
     {
-        error_manager.append_error("Illegal argument(s)");
+        for(const std::string& arg : v_expanded_args)
+        {
+            if(!arg.empty() && arg[0] == '$')
+            {
+                std::string error_msg = "expand_args: '" + arg + "' cannot be expanded";
+                kwarning(error_msg.c_str());
+            }
+        }
+
+        v_expanded_args.clear();
+        return v_expanded_args;
+    }
+
+    if(nb > 0 && v_expanded_args.size() != static_cast<size_t>(nb))
+    {
+        std::string error_msg = "expand_args: Could not parse properly arguments ";
+        error_msg += "'" + arg + "'.\nExpected " + std::to_string(nb) + " arguments ";
+        error_msg += "but got " + std::to_string(v_expanded_args.size()) + " arguments.";
+        kwarning(error_msg.c_str());
         return {};
     }
 
-    return args;
+    return v_expanded_args;
 }
 
 
