@@ -284,7 +284,7 @@ int RP_procexec(char* arg, int unused)
     if(rc < 0) return rc;
 
     // Creates macros with the actual parameters
-    aparms = SCR_vtomsq((char*) list, B_SEPS, '"');
+    aparms = SCR_vtomsq((char*) list, (char*) " ,\n\t", '"');
     //aparms = SCR_vtoms(list, " ");
     nactual = SCR_tbl_size(aparms);
     nformal = proc->proc_nb_parms;

@@ -160,8 +160,6 @@ const static int IODE_NB_FILE_EXT = 31;
 constexpr int EQS_NBTESTS = 20;
 
 inline char    *BUF_DATA = NULL;
-inline char    B_SEPS[] = " ,\n\t";     // Accepted separators for fn arguments (in report, DOS GUI..)
-// !! Semi-colon not accepted !!
 inline int     B_MULTIBAR = 0;          // Graph parameter (Geert Bryon)
 
 const static std::vector<std::string> v_graphs_colors = 

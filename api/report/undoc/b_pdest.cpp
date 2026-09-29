@@ -116,7 +116,7 @@ int B_PrintDestFile(char *arg)
     SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != 0) 
     {
-        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
         nb_args = SCR_tbl_size((unsigned char**) args);
         if(nb_args > 1) 
         {

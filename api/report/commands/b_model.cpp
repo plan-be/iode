@@ -117,7 +117,7 @@ int B_ModelSimulateParms(char* arg, int unused)
     char    **args;
     int     rc = 0, nargs;
 
-    args = (char **) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char **) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nargs = SCR_tbl_size((unsigned char**) args);
     if(nargs < 6) {
         error_manager.append_error("ModelSimulateParms: incorrect number of parameters");

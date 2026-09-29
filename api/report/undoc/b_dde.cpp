@@ -727,7 +727,7 @@ int B_ExcelDecimal(char *arg, int unused)
     char    **args;
     int     nb_args, rc= 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
@@ -762,7 +762,7 @@ int B_ExcelThousand(char *arg, int unused)
     char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
@@ -814,7 +814,7 @@ int B_ExcelCurrency(char *arg, int unused)
     char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
@@ -850,7 +850,7 @@ int B_ExcelLang(char *arg, int unused)
     char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     if(nb_args == 1) {
@@ -884,7 +884,7 @@ int B_ExcelGet(char *arg, int type)
     int     nb_args, ntbl = 0,
                      i, rc = -1;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     ddeptr = B_ExcelGetItem(args[nb_args - 1]);
@@ -919,7 +919,7 @@ int B_ExcelSet(char *arg, int type)
     std::string name;
     std::string lec;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) B_SEPS);
+    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
     nb_args = SCR_tbl_size((unsigned char**) args);
 
     name = std::string((char*) args[0]);
