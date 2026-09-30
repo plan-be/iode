@@ -774,6 +774,18 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     // Create objects
     create_dummy_lists_and_vars();
 
+    // get_next_arg
+    char args[] = "\t  ACAF ACAG XYZ ";
+    char arg0[21];
+    EXPECT_EQ(get_next_arg(arg0, args, sizeof(arg0)), 4);
+    EXPECT_STREQ(arg0, "ACAF");
+    EXPECT_STREQ(args, "ACAF ACAG XYZ    ");
+
+    char truncated_args[] = " ABCDE";
+    char truncated_arg[4];
+    EXPECT_EQ(get_next_arg(truncated_arg, truncated_args, sizeof(truncated_arg)), 3);
+    EXPECT_STREQ(truncated_arg, "ABC");
+
     // expand_args
     v_args = expand_args("A B;C,D", 0); // => "A" "B" "C" "D"
     EXPECT_EQ(v_args, (std::vector<std::string>{"A", "B", "C", "D"}));

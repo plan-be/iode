@@ -326,10 +326,10 @@ static int B_ltoh(int type, char* arg)
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
-    int lg = B_get_arg0(method, arg, 80);
+    int lg = get_next_arg(method, arg, 80);
     U_sqz_text((unsigned char*) method);
 
-    lg += B_get_arg0(file, arg + lg, K_MAX_FILE);
+    lg += get_next_arg(file, arg + lg, K_MAX_FILE);
 
     std::vector<std::string> v_data = expand_args(arg + lg, 0);
     if(v_data.empty()) 

@@ -254,7 +254,7 @@ int B_DataCalcVar(char* arg, int unused)
     KDBVariablesPtr kdb = global_ws_var;
     int nb_periods = kdb->get_nb_periods();
 
-    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
 
     char* lec = arg + lg + 1;
     SCR_strip((unsigned char*) lec);
@@ -596,7 +596,7 @@ int B_DataUpdate(char* arg, int type)
 {
     char name[K_MAX_NAME + 1];
     char **args = NULL;
-    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
     
     bool success = true;
     try
@@ -1134,7 +1134,7 @@ int B_DataAppend(char* arg, int type)
     }
 
     char name[K_MAX_NAME + 1];
-    int lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
     std::string text_to_append = std::string(arg + lg + 1);
 
     try

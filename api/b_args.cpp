@@ -285,11 +285,11 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
+ *  Extract the first argument (= word) of max 'lg' bytes, in the string 'args'. 
  *  
  *  Example: 
  *      char arg0[21];
- *      B_get_arg0(arg0 , " ACAF ACAG XYZ ", sizeof(arg0));  
+ *      get_next_arg(arg0 , " ACAF ACAG XYZ ", sizeof(arg0));  
  *      printf("'%s'", txt);
  * 
  *      returns 'ACAF'
@@ -301,17 +301,18 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
  *  
  *  @details 
  */
-int B_get_arg0(char* arg0, char* arg, int lg)
+int get_next_arg(char* arg0, char* args, int lg)
 {
-    SCR_replace((unsigned char*) arg, (unsigned char*) "\t", (unsigned char*) " ");
-    U_ljust_text((unsigned char*) arg);
+    SCR_replace((unsigned char*) args, (unsigned char*) "\t", (unsigned char*) " ");
+    U_ljust_text((unsigned char*) args);
 
     int i;
-    for(i = 0; i < lg - 1 && arg[i]; i++) 
+    std::string separators = " ,\n\t";
+    for(i = 0; i < lg - 1 && args[i]; i++) 
     {
-        if(U_is_in(arg[i], (char*) " ,\n\t")) 
+        if(separators.find(args[i]) != std::string::npos) 
             break;
-        arg0[i] = arg[i];
+        arg0[i] = args[i];
     }
     arg0[i] = 0;
     
@@ -332,10 +333,8 @@ int B_get_arg0(char* arg0, char* arg, int lg)
  */
 int B_argpos(char* str, int ch)
 {
-    int     pos;
-
     ch = SCR_upper_char(ch);
-    pos = get_pos_in_char_array(str, ch);
+    int pos = get_pos_in_char_array(str, ch);
     pos = std::max(0, pos);
-    return(pos);
+    return pos;
 }

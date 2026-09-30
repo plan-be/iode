@@ -876,7 +876,7 @@ int RP_eval(char** res, char* farg)
             inv = true; 
         
         // Retrieve the command name (max 30 chars)
-        B_get_arg0(name, farg + 1 + (int) inv, 30);
+        get_next_arg(name, farg + 1 + (int) inv, 30);
 
         // Execute the function name
         rc = RP_exec_fn(name, farg + strlen(name) + 2, ch);

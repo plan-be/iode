@@ -66,7 +66,7 @@ static int B_WsTrendAll(char* arg, int std)
     KDBVariablesPtr from = KDBVariables::Create(false);
     std::shared_ptr<Variable> var_ptr;
 
-    int lg = B_get_arg0(file, arg, 80);
+    int lg = get_next_arg(file, arg, 80);
 
     std::vector<std::string> v_data = expand_args(arg + lg, 0);
     double lambda = atof(v_data[0].c_str());

@@ -70,7 +70,7 @@ int RP_define(char* arg, int unused)
     ONAME   name;
     char    *macro;
 
-    lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    lg = get_next_arg(name, arg, K_MAX_NAME + 1);
     macro = arg + lg + 1;
     U_ljust_text((unsigned char*) macro);
     SCR_strip((unsigned char*) macro);

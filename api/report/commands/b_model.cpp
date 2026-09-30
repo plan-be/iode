@@ -79,8 +79,8 @@ int B_ModelSimulate(char *const_arg, int unused)
     // Copy for C++ strings = read only (const)
     arg = (char*) SCR_stracpy((unsigned char*) const_arg);
     
-    lg1 = B_get_arg0(from, arg, 15);
-    lg2 = B_get_arg0(to, arg + lg1, 15);
+    lg1 = get_next_arg(from, arg, 15);
+    lg2 = get_next_arg(to, arg + lg1, 15);
     try
     {
         smpl = new Sample(std::string((char*) from), std::string((char*) to));
@@ -210,16 +210,16 @@ int B_ModelCalcSCC(char *const_arg, int unused)
     
     // Tri
     char buf[256];
-    int lg1 = B_get_arg0(buf, arg, 15);
+    int lg1 = get_next_arg(buf, arg, 15);
     int tris = atoi(buf); 
     if(tris < 0) 
         tris = 0;
 
     // result list names
     char pre[64], inter[64], post[64];
-    lg1 += B_get_arg0(pre,   arg + lg1, 20);
-    lg1 += B_get_arg0(inter, arg + lg1, 20);
-    lg1 += B_get_arg0(post,  arg + lg1, 20);
+    lg1 += get_next_arg(pre,   arg + lg1, 20);
+    lg1 += get_next_arg(inter, arg + lg1, 20);
+    lg1 += get_next_arg(post,  arg + lg1, 20);
     if(strlen(pre) == 0 || strlen(inter) == 0 || strlen(post) == 0)
     {
         SCR_free(arg);
@@ -251,8 +251,8 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     Sample* smpl = nullptr;
     char from[16], to[16];
-    int lg1 = B_get_arg0(from, arg, 15);
-    int lg2 = B_get_arg0(to, arg + lg1, 15);
+    int lg1 = get_next_arg(from, arg, 15);
+    int lg2 = get_next_arg(to, arg + lg1, 15);
     try
     {
         smpl = new Sample(std::string((char*) from), std::string((char*) to));

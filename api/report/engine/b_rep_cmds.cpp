@@ -340,7 +340,7 @@ int RP_ask(char* arg, int unused)
     int     lg;
     U_ch    name[31];
 
-    lg = B_get_arg0((char*) name, arg, 30);
+    lg = get_next_arg((char*) name, arg, 30);
     if(kconfirm(arg + lg + 1) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
     if(RP_goto_label("label", (char*) name) != 0) return(-3);

@@ -9,5 +9,5 @@ std::vector<std::string> expand_args(const std::string& arg, const int nb,
     const std::string& separators = " ,;\n\t\r");
 int B_loop(char** argv, int (*fn)(char*, void*), char* client);
 int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client);
-int B_get_arg0(char* arg0, char* arg, int lg);
+int get_next_arg(char* arg0, char* arg, int lg);
 int B_argpos(char* str, int ch);
