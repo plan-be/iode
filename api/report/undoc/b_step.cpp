@@ -24,21 +24,19 @@
  *  
  *  Sub-function of B_EqsStepWise().
  *  
- *  @param [in] char*   eqs     equation name
+ *  @param [in] string   eqs    equation name
  *  @return     int             1 on success, -1 if some variable present in eqs does not exist in global_ws_var
  */
-static int check_scl_var(char *eqs)
+static int check_scl_var(const std::string& name)
 {
-    char buf[1024];
-    std::string name = std::string(eqs);
-
     if(!global_ws_eqs->contains(name)) 
         return -1;
     
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name) ;
     if(!eq_ptr) 
         return -1;
-
+    
+    char buf[1024];
     std::shared_ptr<CLEC> cl = eq_ptr->clec;
     for(const std::string& cl_name : cl->v_obj_names) 
     {
@@ -55,7 +53,7 @@ static int check_scl_var(char *eqs)
         {
             if(!global_ws_var->contains(cl_name))
             {
-                kerror(0, "Var %s from %s not found", cl_name.c_str(), eqs);
+                kerror(0, "Var %s from %s not found", cl_name.c_str(), name.c_str());
                 return -1;
             }
         }
@@ -76,65 +74,61 @@ static int check_scl_var(char *eqs)
  */
 int B_EqsStepWise(char* arg, int unused)                                                 
 {
-    char** args = B_vtom_chk(arg, 5);
-    if(args == NULL) 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
         return 1;
 
+    if(v_args.size() != 5)
+    {
+        std::string error_msg = "EqsStepWise: expected 5 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return 1;
+    }
+
     std::shared_ptr<Sample> smpl = nullptr;
-    std::string from = std::string(args[0]);                                              
-    std::string to = std::string(args[1]);
+    std::string from = v_args[0];                                              
+    std::string to = v_args[1];
     try
     {
-        /*Calcule le sample*/
         smpl = std::make_shared<Sample>(from, to);
     }
     catch(const std::exception& e)
     {   
-        /*Gère les erreurs de sample */                                    
-        SCR_free_tbl((unsigned char**) args);
-        kerror(0,e.what());
-        return(1);
-    }
-
-    char* c_eq_name = args[2];
-    std::string eq_name = std::string(c_eq_name);                                               
-    if(!global_ws_eqs->contains(eq_name)) 
-    {                            
-        kerror(0,"Eqs %s not found", c_eq_name);
-        SCR_free_tbl((unsigned char**) args);
+        kerror(0, e.what());
         return 1;
     }
 
-    char* cond = args[3]; 
-    double value = C_evallec(cond, 0); 
+    std::string eq_name = v_args[2];                                               
+    if(!global_ws_eqs->contains(eq_name)) 
+    {                            
+        kerror(0, "Eqs %s not found", eq_name.c_str());
+        return 1;
+    }
+
+    std::string cond = v_args[3]; 
+    double value = C_evallec((char*) cond.c_str(), 0); 
     // manage errors from the lec condition                                   
     if(int(value) == -1)
-    {
-        SCR_free_tbl((unsigned char**) args);
-        return(1);                          
-    }
+        return 1;
 
-    char* tmp = args[4];
-    char* test = (char*) SCR_stracpy(SCR_lower((unsigned char*) tmp));
+    std::string test = v_args[4];
     // manage errors from the r2 and fstat tests
-    if(strcmp(test,"r2")!=0 && strcmp(test,"fstat")!=0)
+    if(test != "r2" && test != "fstat")
     {
-        kerror(0,"Incorrect test name");
-        SCR_free_tbl((unsigned char**) args);
-        return(1);
+        std::string error_msg = "Incorrect test name '" + test + "'. ";
+        error_msg += "Expected 'r2' or 'fstat'.";
+        kerror(0, (char*) error_msg.c_str());
+        return 1;
     }
 
-    int res = check_scl_var(c_eq_name);
+    int res = check_scl_var(eq_name);
     // case where some scalars and/or variables declared in the equation 
     // are not present in the global workspaces
     if(res == -1)
-    {
-        SCR_free_tbl((unsigned char**) args);
-        return(1);                      
-    }
+        return 1;                      
 
-    estimate_step_wise(smpl, c_eq_name, cond, test);            /* Effectue les estimations */
+    estimate_step_wise(smpl, (char*) eq_name.c_str(), (char*) cond.c_str(), (char*) test.c_str());
     
-    SCR_free_tbl((unsigned char**) args);
     return 0;
 }
