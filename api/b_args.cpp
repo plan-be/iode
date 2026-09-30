@@ -1,18 +1,3 @@
-/**
- * @header4iode
- *
- * Basic functions for managing function and report arguments.
- *
- *  Main functions
- *  --------------
- *      std::vector<std::string> expand_args(const std::string& arg, const int nb, const std::string& separators) : expands an argument by replacing @filename and $listname by their contents
- *      char **B_vtom_chk(char* arg, int nb)                                : splits a string (generally a function argument) into a table of strings. 
- *      int B_loop(char *argv[], int (*fn)(char*, void*), char* client)     : executes the function fn(char*, char*) for each string in the table of strings argv.
- *      int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)  : calls expand_args() to expand arg, then calls B_loop() on the resulting table of strings.
- *      int B_get_arg0(char* arg0, char*arg, int lg)                        : computes arg0, the first arg ('word') of max lg bytes, in the string arg. 
- *      int B_argpos(char* str, int ch)                                     : returns the position of a char in a string. 
- *   
- */
 #include "api/b_args.h"
 #include "api/b_errors.h"
 #include "api/time/period.h"
@@ -238,39 +223,6 @@ std::vector<std::string> expand_args(const std::string& arg, const int nb,
 
 
 /**
- *  Splits a string (generally a function argument) into a table of strings. 
- *  The possible string separators are " ,\n\t".
- *  
- *  If nb is not null, checks that the number of parameters is equal to n. 
- *  
- *  On error, IodeErrorManager::append_error() is called and the function returns NULL.
- *  
- *  @param [in] arg char*   argument
- *  @param [in] nb  int     if not null, expected nb of args after splitting arg
- *  @return         char**  NULL on error or if arg is NULL        
- *                          table of string (split arg)
- *  
- */
-char** B_vtom_chk(char* arg, int nb)
-{
-    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
-    if(v_args.empty()) 
-        return NULL;
-
-    if((nb > 0 && v_args.size() != nb)) 
-    {
-        std::string error_msg = "Failed to extract arguments: expected " + std::to_string(nb) + " ";
-        error_msg += "arguments but got " + std::to_string(v_args.size()) + " arguments instead.";
-        error_manager.append_error(error_msg);
-        return NULL;
-    }
-
-    char** c_args = vector_to_double_char(v_args);
-    return c_args;
-}
-
-
-/**
  *  Executes the function fn(char*, char*) for each string in the table of strings argv.
  *  Stops as soon as fn(arg) returns a non null value.
  *  
@@ -362,6 +314,7 @@ int B_get_arg0(char* arg0, char* arg, int lg)
         arg0[i] = arg[i];
     }
     arg0[i] = 0;
+    
     return i;
 }
 

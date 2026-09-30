@@ -825,25 +825,29 @@ char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, 
  */
 int B_DataSearch(char* arg, int type)
 {
-    int rc = 0, word, ecase, names, forms, texts;
-    char **args = NULL, **lst;
-
-    args = B_vtom_chk(arg, 7); /* pattern list */
-    if(args == NULL) 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
         return -1;
+
+    if(v_args.size() != 7)
+    {
+        std::string error_msg = "DataSearch: expected 7 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return -1;
+    }
     
-    word  = atoi(args[1]);
-    ecase = atoi(args[2]);
-    names = atoi(args[3]);
-    forms = atoi(args[4]);
-    texts = atoi(args[5]);
+    std::string name = v_args[0];
+    int word  = stoi(v_args[1]);
+    int ecase = stoi(v_args[2]);
+    int names = stoi(v_args[3]);
+    int forms = stoi(v_args[4]);
+    int texts = stoi(v_args[5]);
+    std::string list_result = v_args[6];
 
-    lst = B_DataSearchParms(args[0], word, ecase, names, forms, texts, type);
-  
-    rc = KL_lst(args[6], lst, 200);
+    char** lst = B_DataSearchParms((char*) name.c_str(), word, ecase, names, forms, texts, type);
+    int rc = KL_lst((char*) list_result.c_str(), lst, 200);
     SCR_free_tbl((unsigned char**) lst);
-
-    SCR_free_tbl((unsigned char**) args);
 
     return rc;
 }
@@ -853,33 +857,9 @@ int B_DataSearch(char* arg, int type)
  */
 int B_DataEditCnf(char* arg, int unused)
 {
-    int     rc = 0, VM, VN;
-    char    **args = NULL;
-
-    args = B_vtom_chk(arg, 2); // pattern list 
-    if(args == NULL) return -1;
-
-    switch(toupper(args[0][0])) {
-    case 'L' :
-        VM = 0;
-        break;
-    case 'D' :
-        VM = 1;
-        break;
-    case 'G' :
-        VM = 2;
-        break;
-    default  :
-        VM = 0;
-        break;
-    }
-
-    VN = atoi(args[1]);          /* JMP38 01-10-92 */
-    VN = std::max(-1, VN);
-    VN = std::min(6, VN);
-    //BGUI_DataEditGlobal(VM, VN);  // JMP 2/8/2022 => no used 
-    SCR_free_tbl((unsigned char**) args);
-    return rc;
+    // JMP 2/8/2022 => no used 
+    // BGUI_DataEditGlobal(VM, VN);
+    return 0;
 }
 
 /**
@@ -917,27 +897,26 @@ static int my_strcmp(const void *pa, const void *pb)
 
 int B_DataListSort(char* arg, int unused)
 {
-    int    rc = 0;
-    char   *in, *out;
-    std::string sorted;
-    std::vector<std::string> v_lst_idt;
-
-    char** args = B_vtom_chk(arg, 2);
-    if(args == NULL) 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
         return -1;
-    else 
+
+    if(v_args.size() != 2)
     {
-        in = args[0];
-        out = args[1];
+        std::string error_msg = "DataListSort: expected 2 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return -1;
     }
+
+    std::string in = v_args[0];
+    std::string out = v_args[1];
 
     char* lst;
     if(!global_ws_lst->contains(in)) 
     {
-        error_manager.append_error("List '" + std::string(args[0]) + 
-                                   "' not found in the Lists workspace");
-        rc = -1;
-        goto done;
+        error_manager.append_error("List '" + in + "' not found in the Lists workspace");
+        return -1;
     }
     else
     {
@@ -947,22 +926,18 @@ int B_DataListSort(char* arg, int unused)
     
     if(lst == NULL) 
     {
-        error_manager.append_error("List '" + std::string(args[0]) + 
-                                   "' not found in the Lists workspace");
-        rc = -1;
-        goto done;
+        error_manager.append_error("List '" + in + "' not found in the Lists workspace");
+        return -1;
     }
 
-    v_lst_idt = expand_args(lst, 0, " \t\n\r;,");
+    std::vector<std::string> v_lst_idt = expand_args(lst, 0, " \t\n\r;,");
     if(v_lst_idt.empty())
-    {
-        rc = -1;
-        goto done;
-    }
+        return -1;
 
     std::sort(v_lst_idt.begin(), v_lst_idt.end());
-    sorted = join(v_lst_idt, ";");
+    std::string sorted = join(v_lst_idt, ";");
 
+    int rc = 0;
     try
     {
         List sorted_lst(sorted);
@@ -970,13 +945,10 @@ int B_DataListSort(char* arg, int unused)
     }
     catch (const std::runtime_error& e)
     {
-        error_manager.append_error("Sorted List '" + std::string(out) + 
-                                   "' cannot be created:\n" + e.what());
+        error_manager.append_error("Sorted List '" + out + "' cannot be created:\n" + e.what());
         rc = -1;
     }
 
-done:
-    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 
@@ -1230,30 +1202,21 @@ std::vector<std::string> template_data_list(const std::string& filename, const s
  */
 int B_DataList(char* arg, int type)
 {
-    std::string name;
-    std::string filename;
-    std::string pattern;
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
+        return -1;
 
-    char** args = B_vtom_chk(arg, 3);
-    if(args == NULL) 
+    if(v_args.size() < 2 || v_args.size() > 3)
     {
-        args = B_vtom_chk(arg, 2);
-        if(args == NULL) 
-            return -1;
-        else 
-        {
-            name    = std::string(args[0]);
-            pattern = std::string(args[1]);
-        }
-    }
-    else 
-    {
-        name     = std::string(args[0]);
-        pattern  = std::string(args[1]);
-        filename = std::string(args[2]);
+        std::string error_msg = "B_DataList: expected 2 or 3 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return -1;
     }
 
-    SCR_free_tbl((unsigned char**) args);
+    std::string name = v_args[0];
+    std::string pattern = v_args[1];
+    std::string filename = (v_args.size() == 3) ? v_args[2] : "";
 
     std::vector<std::string> lst;
     if(filename.empty())
@@ -1378,8 +1341,7 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
 int B_DataCalcLst(char* arg, int unused)
 {
     int rc = 0;
-    unsigned char **args = NULL, **lst = NULL,
-                  *res, *list1, *list2, *op;
+    unsigned char **args = NULL, **lst = NULL;
     std::vector<std::string> v_l1;
     std::vector<std::string> v_l2;
     std::vector<char*> l1;
@@ -1388,40 +1350,48 @@ int B_DataCalcLst(char* arg, int unused)
     std::shared_ptr<List> list2_ptr;
 
     /* arg: res list1 op list2 */
-    args = (unsigned char**) B_vtom_chk(arg, 4);
-    if(args == NULL) 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
         return -1;
+
+    if(v_args.size() != 4)
+    {
+        std::string error_msg = "DataCalcLst: expected 4 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return -1;
+    }
     
-    res   = args[0];
-    list1 = args[1];
-    op    = args[2];
-    list2 = args[3];
+    std::string res   = v_args[0];
+    std::string list1 = v_args[1];
+    std::string op    = v_args[2];
+    std::string list2 = v_args[3];
 
-    if(!global_ws_lst->contains((char*) list1))
+    if(!global_ws_lst->contains(list1))
     {
-        std::string error_msg = "List '" + std::string((char*) list1);
+        std::string error_msg = "List '" + list1;
         error_msg += "' not found in the Lists workspace";
         error_manager.append_error(error_msg);
         rc = -1;
         goto done;
     }
 
-    if(!global_ws_lst->contains((char*) list2))
+    if(!global_ws_lst->contains(list2))
     {
-        std::string error_msg = "List '" + std::string((char*) list2);
+        std::string error_msg = "List '" + list2;
         error_msg += "' not found in the Lists workspace";
         error_manager.append_error(error_msg);
         rc = -1;
         goto done;
     }
 
-    list1_ptr = global_ws_lst->get_obj_ptr((char*) list1);
+    list1_ptr = global_ws_lst->get_obj_ptr(list1);
     v_l1 = expand_args(*list1_ptr, 0);
     for(std::string& item : v_l1)
         l1.push_back(item.data());
     l1.push_back(NULL);
 
-    list2_ptr = global_ws_lst->get_obj_ptr((char*) list2);
+    list2_ptr = global_ws_lst->get_obj_ptr(list2);
     v_l2 = expand_args(*list2_ptr, 0);
     for(std::string& item : v_l2)
         l2.push_back(item.data());
@@ -1446,10 +1416,9 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
     
-    rc = KL_lst((char*) res, (char**) lst, -1); 
+    rc = KL_lst((char*) res.c_str(), (char**) lst, -1); 
 
 done :
-    SCR_free_tbl((unsigned char**) args);
     SCR_free_tbl(lst);
     return rc;
 }
@@ -1597,18 +1566,23 @@ int template_data_compare(const std::string& filename, const std::string& one, c
  */
 int B_DataCompare(char* arg, int type)
 {
-    char** args = B_vtom_chk(arg, 5);
-    if(args == NULL) 
+    std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
+    if(v_args.empty()) 
         return -1;
+
+    if(v_args.size() != 5)
+    {
+        std::string error_msg = "DataCompare: expected 5 arguments but got ";
+        error_msg += std::to_string(v_args.size()) + " arguments instead.";
+        error_manager.append_error(error_msg);
+        return -1;
+    }
     
-    std::string filename = std::string(args[0]);
-
-    std::string one   = std::string(args[1]);
-    std::string two   = std::string(args[2]);
-    std::string three = std::string(args[3]);
-    std::string four  = std::string(args[4]);
-
-    SCR_free_tbl((unsigned char**) args);
+    std::string filename = v_args[0];
+    std::string one      = v_args[1];
+    std::string two      = v_args[2];
+    std::string three    = v_args[3];
+    std::string four     = v_args[4];
 
     int rc = -1;
     switch(type) 
