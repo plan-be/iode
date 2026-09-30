@@ -401,7 +401,7 @@ int B_WsName(char* arg, int type)
 int B_WsCopy(char* arg, int type)
 {   
     char c_files[K_MAX_FILE + 1];
-    int lg = B_get_arg0(c_files, arg, K_MAX_FILE);
+    int lg = get_next_arg(c_files, arg, K_MAX_FILE);
     std::vector<std::string> v_files = split_multi(std::string(c_files), " ,;\t\n");
     if(v_files.size() == 0)
     {
@@ -496,7 +496,7 @@ int B_WsCopy(char* arg, int type)
 int B_WsMerge(char* arg, int type)
 {
     char file[K_MAX_FILE + 1];
-    int lg = B_get_arg0(file, arg, K_MAX_FILE);
+    int lg = get_next_arg(file, arg, K_MAX_FILE);
 
     try
     {
@@ -684,13 +684,13 @@ double *B_StatUnitRoot_1(char* arg, int print)
     char    name[80], buf[1024];
     double    *df = NULL;
 
-    lg = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    lg = get_next_arg(name, arg, K_MAX_NAME + 1);
     drift = atoi(name);
 
-    lg = B_get_arg0(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
+    lg = get_next_arg(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
     trend = atoi(name);
 
-    lg = B_get_arg0(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
+    lg = get_next_arg(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
     order = atoi(name);
 
     df = E_UnitRoot(arg + lg + 1, drift, trend, order);
@@ -753,7 +753,7 @@ int B_CsvSave(char* arg, int type)
 
     // filename
     char c_file[K_MAX_FILE + 1];
-    int lg = B_get_arg0(c_file, arg, K_MAX_FILE);
+    int lg = get_next_arg(c_file, arg, K_MAX_FILE);
     std::string filepath = std::string(c_file);
     filepath = set_file_extension(filepath, FILE_CSV);
 

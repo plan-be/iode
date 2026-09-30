@@ -186,7 +186,7 @@ int B_EqsSetSample(char* arg, int unused)
 int B_EqsSetMethod(char* arg, int unused)
 {
     char tmeth[16];
-    int lg1 = B_get_arg0(tmeth, arg, 15);
+    int lg1 = get_next_arg(tmeth, arg, 15);
     int meth = atoi(tmeth);
     std::vector<std::string> v_eqs = expand_args(arg + lg1, 0);
     
@@ -257,7 +257,7 @@ int B_EqsSetCmt(char* arg, int unused)
     int     lg1;
     char    name[16];
 
-    lg1 = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    lg1 = get_next_arg(name, arg, K_MAX_NAME + 1);
     Comment cmt(arg + lg1 + 1);
 
     std::string eq_name(name);
@@ -286,7 +286,7 @@ int B_EqsSetInstrs(char* arg, int unused)
     int     lg1;
     char    name[16];
 
-    lg1 = B_get_arg0(name, arg, K_MAX_NAME + 1);
+    lg1 = get_next_arg(name, arg, K_MAX_NAME + 1);
     std::string instrs(arg + lg1 + 1);
 
     std::string eq_name(name);

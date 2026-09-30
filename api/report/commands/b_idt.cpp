@@ -44,8 +44,8 @@ int B_IdtExecute(char* arg, int unused)
 
     error_manager.clear();
 
-    lg1 = B_get_arg0(from, arg, 15);
-    lg2 = B_get_arg0(to, arg + lg1, 15);
+    lg1 = get_next_arg(from, arg, 15);
+    lg2 = get_next_arg(to, arg + lg1, 15);
     try
     {
         smpl = new Sample(std::string((char*) from), std::string((char*) to));
