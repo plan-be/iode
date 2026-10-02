@@ -107,6 +107,7 @@ private:
         v_endo_values_1.clear();
         map_exchange.clear();
         map_exchange_rev.clear();
+        map_eq_name_index.clear();
         v_ordered_eqs.clear();
         v_ordered_eqs_pos.clear();
         v_permut.clear();
@@ -246,8 +247,8 @@ protected:
 
 	/* k_sim_order.c */
 	std::string find_eq_name(const std::string& var);
-	void order(KDBEquationsPtr dbe, const std::vector<std::string>& eqs = std::vector<std::string>());
-	void compute_tri(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, int passes);
+	void order(const std::vector<std::string>& eqs = std::vector<std::string>());
+	void compute_tri(std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
 	bool exo_to_endo(const std::string& endo, const std::string& exo);
@@ -291,6 +292,28 @@ private:
             return eq_name;
     }
 
+    bool set_sim_dbe(KDBEquationsPtr dbe)
+    {
+        if(dbe->size() == 0) 
+        {
+            std::string error_msg = "Empty set of equations";
+            error_manager.append_error(error_msg);
+            return false;
+        }
+    
+        sim_dbe = dbe;
+    
+        int idx = 0;
+        map_eq_name_index.clear();
+        for(const auto& [name, _] : sim_dbe->k_objs) 
+        {
+            map_eq_name_index[name] = idx;
+            idx++;
+        }
+
+        return true;
+    }
+
 	/* k_sim_main.c */
 	void init_values(int t);
 	void restore_values(int t);
@@ -304,18 +327,18 @@ private:
 	void sub_build_lists_order(const std::string& lstname, int eq1, int eqn);
 
 	/* k_sim_order.c */
-	int pre_order(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
-	int build_pre_post_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& v_eq_vars, int from);
-	int build_inter_list(KDBEquationsPtr dbe, std::vector<std::vector<int>>& predecessors);
-	void compute_tri_perm1(KDBEquationsPtr dbe, int i, std::vector<int>& v_vars);
-	int compute_tri_begin(KDBEquationsPtr dbe);
-	int compute_tri_end(KDBEquationsPtr dbe);
+	int pre_order(std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
+	int build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, int from);
+	int build_inter_list(std::vector<std::vector<int>>& predecessors);
+	void compute_tri_perm1(int i, std::vector<int>& v_vars);
+	int compute_tri_begin();
+	int compute_tri_end();
 
 	/* k_sim_exo2endo.c */
 	bool find_path(const std::string& endo, const std::string& exo, int& depth);
 
 	/* k_sim_scc.c */
-	bool simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl);
+	bool simulate_SCC_init(Sample& smpl);
 };
 
 /*----------------------- GLOBALS ----------------------------*/
