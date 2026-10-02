@@ -73,12 +73,16 @@ TEST_F(SimulationTest, Simulation)
     success = global_simu->simulate(from, to, "$UNKNOWN_LIST");
     EXPECT_FALSE(success);
 
+
+
     // Test simulation: divergence
+    EXPECT_FALSE(global_ws_lst->contains("_DIVER"));
     global_simu->max_iter = 2;
     success = global_simu->simulate(from, to);
     EXPECT_FALSE(success);
 
     // Check _DIVER list (divergent equations)
+    EXPECT_TRUE(global_ws_lst->contains("_DIVER"));
     std::string lst_diver = global_ws_lst->get("_DIVER");
     std::string expected_lst_diver = "WBG,YDH,QMT,QI5";
     EXPECT_EQ(lst_diver, expected_lst_diver);
@@ -276,4 +280,116 @@ TEST_F(SimulationTest, SimulateSCC)
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e3) / 10e3, 0.40);
+}
+
+TEST_F(SimulationTest, B_MODEL)
+{
+    char* filename = "fun";
+    int rc;
+
+    print_test_title("Tests B_Model*(): simulation parameters and model simulation");
+
+    // Check
+    KDBVariablesPtr kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
+    KDBScalarsPtr kdbs = global_ws_scl;
+    EXPECT_NE(kdbs.get(), nullptr);
+    KDBEquationsPtr kdbe = global_ws_eqs;
+    EXPECT_NE(kdbe.get(), nullptr);
+
+    // B_ModelSimulateParms()
+    global_simu->init_algo = VAR_INIT_TM1;
+    global_simu->epsilon = 0.00001;
+    global_simu->max_iter = 1000;
+    global_simu->relax = 1.0;
+    global_simu->sorting_algo = 0;
+    global_simu->nb_passes = 3;
+    global_simu->debug = 1;
+    rc = B_ModelSimulateParms("0.0001 0.7 100 Triang 0 no 5 no");
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(global_simu->epsilon, 0.0001);
+    EXPECT_EQ(global_simu->max_iter, 100);
+    EXPECT_EQ(global_simu->relax, 0.7);
+    EXPECT_EQ(global_simu->debug, 0);
+    EXPECT_EQ(global_simu->nb_passes, 5);
+
+    // TODO: check result of one ENDO
+    // B_ModelSimulate()
+    rc = B_ModelSimulate("2000Y1 2002Y1");
+    EXPECT_EQ(rc, 0);
+    // --- check one Variable ---
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "1999Y1") * 1e6) / 1e6, 13.530405);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2000Y1") * 1e6) / 1e6, 10.046611);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2001Y1") * 1e6) / 1e6, 2.623791);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274625);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2003Y1") * 1e6) / 1e6, -6.091565);
+
+    // Reloads 3 WS
+    global_ws_eqs->load(str_input_test_dir + "fun.ae");
+    global_ws_scl->load(str_input_test_dir + "fun.as");
+    global_ws_var->load(str_input_test_dir + "fun.av");
+
+    // Check
+    kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
+    kdbs = global_ws_scl;
+    EXPECT_NE(kdbs.get(), nullptr);
+    kdbe = global_ws_eqs;
+    EXPECT_NE(kdbe.get(), nullptr);
+
+    // Set values of endo UY
+    global_ws_var->set_var("UY", "2000Y1", 650.0);
+    global_ws_var->set_var("UY", "2001Y1", 670.0);
+    global_ws_var->set_var("UY", "2002Y1", 680.0);
+
+    // Exchange
+    rc = B_ModelExchange("UY-XNATY");
+    EXPECT_EQ(rc, 0);
+
+    // Simulate
+    rc = B_ModelSimulate("2000Y1 2002Y1");
+    EXPECT_EQ(rc, 0);
+
+    // Check some results
+    EXPECT_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
+    //printf("XNATY_2000Y1 = %lg\n", XNATY_2000Y1);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 1e6) / 1e6, 0.800674);
+
+    // B_ModelCompile(char* arg, int unused)
+    rc = B_ModelCompile("");
+    EXPECT_EQ(rc, 0);
+
+    // $ModelCalcSCC nbtris prename intername postname [eqs]
+    rc = B_ModelCalcSCC("5 _PRE2 _INTER2 _POST2");
+    EXPECT_EQ(rc, 0);
+    std::string expected_list = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR;NATY;";
+    expected_list += "POIL;PW3;PWMAB;PWMS;PWXAB;PWXS;PXAB;PXE;QAH;QWXAB;QWXS;QWXSS;SBGX;TFPFHP_;";
+    expected_list += "TWG;TWGP;ZZF_;DTH1;PMAB;PME;PMS;PMT";
+    EXPECT_EQ(global_ws_lst->get("_PRE2"), expected_list);
+
+    // int B_ModelSimulateSCC(char *arg)    $ModelSimulateSCC from to pre inter post
+    //  1. Annuler Exchange
+    rc = B_ModelExchange("");
+    EXPECT_EQ(rc, 0);
+
+    //  2. ReLoads 3 WS to reset EXO XNATY to its original value
+    global_ws_eqs->load(str_input_test_dir + "fun.ae");
+    global_ws_scl->load(str_input_test_dir + "fun.as");
+    global_ws_var->load(str_input_test_dir + "fun.av");
+
+    // Check
+    kdb_var = global_ws_var;
+    EXPECT_NE(kdb_var.get(), nullptr);
+    kdbs = global_ws_scl;
+    EXPECT_NE(kdbs.get(), nullptr);
+    kdbe = global_ws_eqs;
+    EXPECT_NE(kdbe.get(), nullptr);
+
+    //  3. Simulate & compare
+    rc = B_ModelSimulateSCC("2000Y1 2002Y1 _PRE2 _INTER2 _POST2");
+    EXPECT_EQ(rc, 0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ACAF", "2002Y1") * 1e6) / 1e6, -1.274625);
+
+    // B_ModelSimulateSaveNIters(char *arg)                    
+    // $ModelSimulateSaveNiters varname
 }
