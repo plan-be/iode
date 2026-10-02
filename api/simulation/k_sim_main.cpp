@@ -527,16 +527,12 @@ int CSimulation::sub_simulate(int t)
 bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
     const std::vector<std::string>& eqs)
 {
-    if(dbe->size() == 0) 
-    {
-        std::string err_msg = "Empty set of equations";
-        error_manager.append_error(err_msg);
-        return false;
-    }
-
     // Assign static global variables to avoid passing to many parameters to sub functions
+    bool success = set_sim_dbe(dbe);
+    if(!success)
+        return false;
+    
     sim_dbv = dbv;
-    sim_dbe = dbe;
     sim_dbs = dbs;
 
     // Find in the sim_dbv sample the position t of the first period to simulate
@@ -593,7 +589,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     std::vector<std::string> v_exo;
     if(!v_endo_exo.empty()) 
     {
-        bool success = false;
+        success = false;
         std::string endo, exo;
         path_examined.clear();
         for(const std::string& endo_exo : v_endo_exo) 
@@ -640,7 +636,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     }
 
     // ORDERING EQUATIONS 
-    order(dbe, eqs);
+    order(eqs);
     if(debug) 
         build_lists_order("_PRE", "_INTER", "_POST");
 
@@ -651,7 +647,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     v_endo_values_1.resize(nb_inter, 0.0);
 
     int cpu_iter;
-    bool success = false;
+    success = false;
     for(int i = 0; i < smpl->nb_periods; i++, t++) 
     {
         cpu_iter = WscrGetMS();
@@ -912,6 +908,7 @@ bool CSimulation::simulate(const std::string& from, const std::string& to,
             KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
             if(tdbe->size() > 0)
             {
+                sim_dbe = tdbe;
                 std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
                 success = simulate(tdbe, global_ws_var, global_ws_scl, sample, v_eqs);
             }

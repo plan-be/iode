@@ -1389,6 +1389,8 @@ class Simulation:
         Loading .../fun.var
         394 objects loaded
 
+        Simulate the whole equations workspace
+        
         >>> # exogenous variable 
         >>> equations["UY"].lec
         'UY := NATY-NDOMY-NIY-NGY-(EFXY-EFMY)-NFY'
@@ -1424,7 +1426,7 @@ class Simulation:
         >>> # reset to default values for the simulation parameters
         >>> simulation.reset()
         
-        >>> # simulate the model (no reordering)
+        >>> # simulate the model
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
         Calculating SCC...
@@ -1450,6 +1452,55 @@ class Simulation:
         <BLANKLINE>
         name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
         UY          624.18  645.05  661.61  ...  549.24  533.37  525.13
+        <BLANKLINE>
+
+        Simulate a set of equations
+        
+        >>> # reset to default values for the simulation parameters
+        >>> simulation.reset()
+
+        >>> list_eqs = ["BRUGP", "DTH1C", "EX", "ITCEE", "ITCR", "ITGR", "ITI5R"]
+        >>> variables[list_eqs, "2000Y1:2015Y1"] = 0.0
+        >>> variables[list_eqs, "1998Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 7
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1998Y1:2015Y1
+        mode: LEVEL
+         name      1998Y1  1999Y1  2000Y1  2001Y1  2002Y1  2003Y1  ...     2009Y1  2010Y1  2011Y1       2012Y1  2013Y1  2014Y1  2015Y1
+        BRUGP       53.65    0.00    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        DTH1C       69.35   68.47    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        EX          36.28   37.89    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        ITCEE       90.33   90.33    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        ITCR         0.14    0.13    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        ITGR         0.11    0.11    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        ITI5R        0.10    0.10    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        <BLANKLINE>  
+
+        >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Linking equations ....
+        Calculating SCC...
+        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
+        Reordering interdependent block...
+        Reordering interdependent block...
+        >>> success
+        True
+        >>> variables[list_eqs, "1998Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        Workspace: Variables
+        nb variables: 7
+        filename: ...fun.var
+        description: Modèle fun - Simulation 1
+        sample: 1998Y1:2015Y1
+        mode: LEVEL
+         name      1998Y1  1999Y1  2000Y1  2001Y1  2002Y1  2003Y1  ...     2009Y1  2010Y1  2011Y1       2012Y1  2013Y1  2014Y1  2015Y1
+        BRUGP       53.65    0.00    0.00    0.00    0.00    0.00  ...       0.00    0.00    0.00         0.00    0.00    0.00    0.00
+        DTH1C       69.35   68.47   68.47   68.47   68.47   68.47  ...      68.47   68.47   68.47        68.47   68.47   68.47   68.47
+        EX          36.28   37.89   37.89   44.98   42.68   34.32  ...      27.24   27.24   27.24        27.24   27.24   27.24   27.24
+        ITCEE       90.33   90.33   90.33   90.33   90.33   90.33  ...      90.33   90.33   90.33        90.33   90.33   90.33   90.33
+        ITCR         0.14    0.13    0.13    0.13    0.13    0.13  ...       0.13    0.13    0.13         0.13    0.13    0.13    0.13
+        ITGR         0.11    0.11    0.11    0.11    0.11    0.11  ...       0.11    0.11    0.11         0.11    0.11    0.11    0.11
+        ITI5R        0.10    0.10    0.10    0.10    0.10    0.10  ...       0.10    0.10    0.10         0.10    0.10    0.10    0.10
         <BLANKLINE>
         """
         if isinstance(from_period, Period):

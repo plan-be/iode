@@ -73,8 +73,6 @@ TEST_F(SimulationTest, Simulation)
     success = global_simu->simulate(from, to, "$UNKNOWN_LIST");
     EXPECT_FALSE(success);
 
-
-
     // Test simulation: divergence
     EXPECT_FALSE(global_ws_lst->contains("_DIVER"));
     global_simu->max_iter = 2;
@@ -176,6 +174,53 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.801325);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e5) / 10e5, 0.633894);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e5) / 10e5, 0.395619);
+}
+
+TEST_F(SimulationTest, SimulateListEqs)
+{
+    // =========== independent equations ===========
+    std::string list_eqs = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR";
+    std::vector<std::string> v_eqs = split(list_eqs, ';');
+    std::vector<std::string> v_periods = {"2000Y1", "2001Y1", "2002Y1"};
+
+    global_simu->reset();
+    for(const std::string& var_name : v_eqs)
+    {
+        for(const std::string& period : v_periods)
+            global_ws_var->set_var(var_name, period, 0.0);
+    }
+
+    global_simu->max_iter = 100;
+    global_simu->set_debug(true);
+    bool success = global_simu->simulate(from, to, list_eqs);
+    EXPECT_TRUE(success);
+
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("DTH1C", "2000Y1") * 10e5) / 10e5, 68.466844);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("DTH1C", "2001Y1") * 10e5) / 10e5, 68.466844);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("DTH1C", "2002Y1") * 10e5) / 10e5, 68.466844);
+
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITMQR", "2000Y1") * 10e5) / 10e5, 0.013212);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITMQR", "2001Y1") * 10e5) / 10e5, 0.013212);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITMQR", "2002Y1") * 10e5) / 10e5, 0.013212);
+
+
+    // =========== one equation alone ===========
+    list_eqs = "ITFGO";
+    for(const std::string& period : v_periods)
+        global_ws_var->set_var("ITFGO", period, 0.0);
+
+    success = global_simu->simulate(from, to, list_eqs);
+    EXPECT_TRUE(success);
+
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITFGO", "2000Y1") * 10e5) / 10e5, 16.895888);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITFGO", "2001Y1") * 10e5) / 10e5, 17.834693);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("ITFGO", "2002Y1") * 10e5) / 10e5, 18.56616);
+
+    global_simu->reset();
+    global_simu->simulate("2000Y1", "2010Y1");
+
+    success = global_simu->simulate("2000Y1", "2010Y1", "YDH");
+    EXPECT_TRUE(success);
 }
 
 TEST_F(SimulationTest, CalculateSCC)

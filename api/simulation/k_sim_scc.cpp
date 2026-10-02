@@ -38,14 +38,10 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     int opasses = nb_passes;
     int osort = sorting_algo;
 
-    if(dbe->size() == 0) 
-    {
-        std::string error_msg = "Empty set of equations";
-        error_manager.append_error(error_msg);
+    bool success = set_sim_dbe(dbe);
+    if(!success)
         return false;
-    }
 
-    sim_dbe = dbe;
     nb_passes = tris;
 
     // to build the PRE, INTER and POST lists in build_lists_order()
@@ -87,7 +83,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     }
 
     /* ORDERING EQUATIONS */
-    order(dbe);
+    order();
     build_lists_order(pre, inter, post);
 
     v_ordered_eqs.clear();
@@ -103,29 +99,15 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
 /**
  *  Initialize the function simulate_SCC by allocating the needed global vars and linking the equations.
  *  
- *  @param [in]         KDB*    dbe         global_ws_eqs or subset of global_ws_eqs containing all the model equations
- *  @param [in, out]    KDB*    dbv         KDB containing at minimum the model variables (endo + exo)
- *  @param [in]         KDB*    dbs         KDB containing the model scalars
  *  @param [in]         Sample* smpl        simulation Sample
  *  @return             bool                true on success, false if dbe is empty or smpl in incompatible with that of dbs 
  *                                          or the link is impossible or the simulation does not succeed
  */
-bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl)
+bool CSimulation::simulate_SCC_init(Sample& smpl)
 {
-    if(dbe->size() == 0) 
-    {
-        std::string error_msg = "Empty set of equations";
-        error_manager.append_error(error_msg);
-        return false;
-    }
-
-    sim_dbv = dbv;
-    sim_dbe = dbe;
-    sim_dbs = dbs;
-
     // Check Sample dans les bornes du WS
-    int t = smpl->start_period.difference(dbv->get_sample()->start_period);
-    int at = dbv->get_sample()->end_period.difference(smpl->end_period);
+    int t = smpl.start_period.difference(sim_dbv->get_sample()->start_period);
+    int at = sim_dbv->get_sample()->end_period.difference(smpl.end_period);
     if(t < 0 || at < 0) 
     {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
@@ -133,18 +115,15 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
         return false;
     }
 
-    map_exchange.clear();
-    map_exchange_rev.clear();
-
     // Initialise les nouvelles vars pour conserver les résultats de sim
     // WARNING: DO NOT FREE v_norm and v_nb_iterations later because they are used 
     //          for reporting afterwards!
     v_norm.clear();
     v_nb_iterations.clear();
     v_cpu_time.clear();
-    v_norm.resize(dbv->get_sample()->nb_periods, 0.0);
-    v_nb_iterations.resize(dbv->get_sample()->nb_periods, 0);
-    v_cpu_time.resize(dbv->get_sample()->nb_periods, 0);
+    v_norm.resize(sim_dbv->get_sample()->nb_periods, 0.0);
+    v_nb_iterations.resize(sim_dbv->get_sample()->nb_periods, 0);
+    v_cpu_time.resize(sim_dbv->get_sample()->nb_periods, 0);
 
     /* LINK EQUATIONS + SAVE ENDO POSITIONS */
     int rc = 0;
@@ -152,9 +131,9 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr = nullptr;
     kmsg("Linking equations ....");
-    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
+    for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
     {
-        if(!dbv->contains(eq_name)) 
+        if(!sim_dbv->contains(eq_name)) 
         {
             std::string error_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(error_msg);
@@ -162,7 +141,7 @@ bool CSimulation::simulate_SCC_init(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KD
         }
         
         eq_ptr->compile();
-        rc = eq_ptr->clec->link(dbv, dbs);
+        rc = eq_ptr->clec->link(sim_dbv, sim_dbs);
         if(rc) 
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
@@ -199,7 +178,17 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
     nb_inter = (int) inter.size();
     nb_post = (int) post.size();
 
-    bool success = simulate_SCC_init(dbe, dbv, dbs, smpl);
+    bool success = set_sim_dbe(dbe);
+    if(!success)
+        return false;
+
+    sim_dbv = dbv;
+    sim_dbs = dbs;
+
+    map_exchange.clear();
+    map_exchange_rev.clear();
+
+    success = simulate_SCC_init(*smpl);
     if(!success) 
         return false;
 

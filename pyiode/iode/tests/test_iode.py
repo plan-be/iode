@@ -1361,6 +1361,24 @@ def test_simulation(capsys):
                                             r"converge after 2 iterations\n"):
         simulation.model_simulate("2000Y1", "2010Y1")
 
+    # ======== test simulate list of equations ========
+    # unique equation 
+    success = simulation.model_simulate("2000Y1", "2010Y1", "DTH1C")
+    assert success
+
+    # list of equations
+    list_eqs = "BRUGP;DTH1C;EX;ITCEE;ITCR;ITGR;ITI5R;ITIFR;ITIGR;ITMQR"
+    success = simulation.model_simulate("2000Y1", "2010Y1", list_eqs)
+    assert success
+
+    # equation that does not exist
+    with pytest.warns(RuntimeWarning, match=r"Cannot simulate the model for the sample "
+                                            r"'2000Y1:2010Y1' and for the equations list 'BRUDP':\n"
+                                            r"\tCannot create a subset the database of type "
+                                            r"'equations' using the pattern 'BRUDP':\nNo names found "
+                                            r"matching the pattern 'BRUDP' in the parent database"):
+        simulation.model_simulate("2000Y1", "2010Y1", "BRUDP")
+
     # ======== test quiet mode ========
     captured = capsys.readouterr()
 
