@@ -40,6 +40,7 @@ if(NOT SKBUILD)
 	target_link_libraries(iode_c_api PUBLIC gtest_main)
 endif()
 target_link_libraries(iode_c_api PUBLIC "iode_scr4")
+target_link_libraries(iode_c_api PUBLIC Eigen3::Eigen)
 target_include_directories(iode_c_api PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(NOT SKBUILD)
