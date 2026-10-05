@@ -1,8 +1,9 @@
 from qtpy.QtWidgets import QWidget, QMessageBox, QSplitter
 from qtpy.QtPrintSupport import QPrinter, QPrintPreviewDialog
-from qtpy.QtCore import Slot
+from qtpy.QtCore import Slot, QSettings
 
 from iode_gui.util.filepath import ask_filepath
+from iode_gui.settings import get_settings
 from iode_gui.abstract_main_window import AbstractMainWindow
 from iode_gui.tabs.tab_text_abstract import AbstractTextWidget
 from iode_gui.text_edit.text_editor import IodeTextEditor
@@ -69,6 +70,25 @@ class TextWidget(AbstractTextWidget):
                 file_filter = f"{ext[1:].upper()} Files (*{ext})"
         new_filepath = ask_filepath(IodeFileType.FILE_ANY, self.project_dir, file_filter)
         return self.save(new_filepath)
+
+    def load_settings(self):
+        """Restore the text editor font size from project settings."""
+        settings: QSettings = get_settings()
+        if not settings:
+            return
+
+        current_font_size = self._editor.document().defaultFont().pointSize()
+        font_size = settings.value("text_font_size", current_font_size, type=int)
+        self._editor.set_font_size(font_size)
+
+    def save_settings(self):
+        """Save the text editor font size to project settings."""
+        settings: QSettings = get_settings()
+        if not settings:
+            return
+
+        current_font_size = self._editor.document().defaultFont().pointSize()
+        settings.setValue("text_font_size", current_font_size)
 
     @Slot()
     def render_for_printing(self):

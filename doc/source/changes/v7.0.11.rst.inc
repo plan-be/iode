@@ -10,6 +10,10 @@ New Features
 Improvements 
 ------------
 
+- GUI: inside a text or report tab, the shortcuts `CTRL and +` and `CTRL and =` 
+  increase the font size, while the shortcut `CTRL + -` decrease it 
+  (closes :issue:`1236`) 
+
 
 Fixed Bugs 
 ----------
