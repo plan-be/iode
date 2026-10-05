@@ -12,11 +12,11 @@ include(CMakePrintHelpers)
 string(TIMESTAMP CURRENT_YEAR "%Y")
 
 # ---- dependencies ----
+include(FetchContent)
 
 # -- Google Test --
 if(NOT SKBUILD)
   # lines below declares a dependency on GoogleTest which is downloaded from GitHub and installed
-  include(FetchContent)
   FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
@@ -24,6 +24,17 @@ if(NOT SKBUILD)
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(googletest)
+endif()
+
+# -- C++ Eigen3 --
+# FetchContent adds Eigen3::Eigen directly; no installed package is needed.
+FetchContent_Declare(
+  Eigen3
+  URL https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.zip
+)
+FetchContent_MakeAvailable(Eigen3)
+if(NOT TARGET Eigen3::Eigen)
+  message(FATAL_ERROR "Eigen3::Eigen target was not created by FetchContent")
 endif()
 
 # ---- main project ----
