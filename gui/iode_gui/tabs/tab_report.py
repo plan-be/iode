@@ -96,13 +96,17 @@ class ReportWidget(AbstractTextWidget):
         if not settings:
             return
 
+        current_font_size = self._editor.document().defaultFont().pointSize()
+
         parameters = settings.value("report_parameters", "")
         language_index = settings.value("report_language", 0, type=int)
         nb_decimals = settings.value("report_nb_decimals", 2, type=int)
+        font_size = settings.value("report_font_size", current_font_size, type=int)
 
         self.ui.lineEdit_parameters.setText(parameters)
         self.ui.comboBox_language.setCurrentIndex(language_index)
         self.ui.spinBox_nbDecimals.setValue(nb_decimals)
+        self._editor.set_font_size(font_size)
 
     def save_settings(self):
         """
@@ -116,9 +120,12 @@ class ReportWidget(AbstractTextWidget):
         language_index = self.ui.comboBox_language.currentIndex()
         nb_decimals = self.ui.spinBox_nbDecimals.value()
 
+        current_font_size = self._editor.document().defaultFont().pointSize()
+
         settings.setValue("report_parameters", parameters)
         settings.setValue("report_language", language_index)
         settings.setValue("report_nb_decimals", nb_decimals)
+        settings.setValue("report_font_size", current_font_size)
 
     # overrides from IodeAbstractWidget
     def update_colors(self):

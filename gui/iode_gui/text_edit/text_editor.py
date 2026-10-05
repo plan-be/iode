@@ -20,6 +20,9 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
     Additional cursors can be added with Alt+click, Alt+left-drag, or
     Ctrl+Alt+Up/Down. Alt+left-drag makes a rectangular text selection.
     Escape returns to a single cursor.
+
+    Shortcuts CTRL + + and CTRL + = increase the font size while the 
+    shortcut CTRL + - decrease it.
     """
 
     INDENT = ' ' * 4
@@ -201,6 +204,14 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
             cursor.movePosition(operation, mode)
         self._set_cursors(cursors)
 
+    def set_font_size(self, size: int):
+        """Set the editor font size in points and keep tab stops aligned."""
+        current_size = self.document().defaultFont().pointSize()
+        if size > 0 and current_size > 0:
+            self.zoomIn(size - current_size)
+            self.setTabStopDistance(
+                QFontMetricsF(self.document().defaultFont()).horizontalAdvance(' ') * 4)
+
     # override IodeAutoCompleteTextEdit method
     def insert_completion(self, completion: str):
         """Insert a completion at every active cursor."""
@@ -226,6 +237,13 @@ class IodeTextEditor(IodeAutoCompleteTextEdit):
         control = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
         alt = bool(modifiers & Qt.KeyboardModifier.AltModifier)
         shift = bool(modifiers & Qt.KeyboardModifier.ShiftModifier)
+
+        if control and not alt and not (modifiers & Qt.KeyboardModifier.MetaModifier):
+            if key in (Qt.Key.Key_Plus, Qt.Key.Key_Equal, Qt.Key.Key_Minus):
+                size = self.document().defaultFont().pointSize()
+                self.set_font_size(size + (1 if key != Qt.Key.Key_Minus else -1))
+                event.accept()
+                return
 
         if control and alt and key in (Qt.Key.Key_Up, Qt.Key.Key_Down):
             if key == Qt.Key.Key_Up:
