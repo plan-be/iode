@@ -84,7 +84,7 @@ void Estimation::E_print_coefs()
                  scl_name.c_str(),
                  (double) scl_ptr->value,
                  (double) scl_ptr->std,
-                 (double) E_div_0(scl_ptr->value, scl_ptr->std),
+                 (double) div_not_0(scl_ptr->value, scl_ptr->std),
                  (double) scl_ptr->relax);
     }
     
@@ -101,24 +101,26 @@ void Estimation::E_print_mcorr()
 
     W_printfRepl((char*) "&1C ");
     for(int i = 0; i < v_coef_names.size(); i++)
-        if(MATE(E_SMO, i, 0)) 
+        if(SMO(i)) 
             W_printfRepl((char*) "&1C%s", v_coef_names[i]);
 
     int ic = 0;
     W_printf((char*) "\n.tl\n");
     for(int i = 0; i < v_coef_names.size(); i++) 
     {
-        if(MATE(E_SMO, i, 0) == 0) 
+        // relax = 0
+        if(SMO(i) == 0) 
             continue;
 
         int jc = 0;
         W_printfRepl((char*) "&1L%s", v_coef_names[i]);
         for(int j = 0; j < v_coef_names.size(); j++) 
         {
-            if(MATE(E_SMO, j, 0) == 0) 
+            // relax = 0
+            if(SMO(j) == 0) 
                 continue;
             
-            W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORR, ic, jc));
+            W_printfRepl((char*) "&1D%lf", MCORR(ic, jc));
             jc++;
         }
         W_printf((char*) "\n");
@@ -144,7 +146,7 @@ void Estimation::E_print_mcorru()
     {
         W_printfRepl((char*) "&1L%s", v_block_endos[i].c_str());
         for(int j = 0 ; j < E_NEQ ; j++) 
-            W_printfRepl((char*) "&1D%lf", (double) MATE(E_MCORRU, i, j));
+            W_printfRepl((char*) "&1D%lf", MCORRU(i, j));
         W_printfRepl((char*) "\n");
     }
     
@@ -163,22 +165,22 @@ void Estimation::E_print_eqres_1(int eq_nb)
 
     W_printfRepl((char*) "&1C &1CValue\n");
     W_printfRepl((char*) ".tl\n");
-    W_printfRepl((char*) "&1LNumber of coefficients      &1D%d\n", (int)MATE(E_NBCE, 0, eq_nb));
+    W_printfRepl((char*) "&1LNumber of coefficients      &1D%d\n", NB_COEFS_EQ(eq_nb));
     W_printfRepl((char*) "&1LNumber of observations      &1D%d\n", E_T);
-    W_printfRepl((char*) "&1LStandard deviation on YOBS  &1D%lf\n", (double) MATE(E_STDEV, 0, eq_nb));
-    W_printfRepl((char*) "&1LMean of YOBS                &1D%lf\n", (double) MATE(E_MEAN_Y, 0, eq_nb));
+    W_printfRepl((char*) "&1LStandard deviation on YOBS  &1D%lf\n", STDEV(eq_nb));
+    W_printfRepl((char*) "&1LMean of YOBS                &1D%lf\n", MEAN_Y(eq_nb));
     W_printfRepl((char*) ".tl\n");
 
     W_printfRepl((char*) "&1CTests&1CValue\n");
     W_printfRepl((char*) ".tl\n");
-    W_printfRepl((char*) "&1LSum of square of residuals  &1D%lf\n", (double) MATE(E_SSRES, 0, eq_nb));
-    W_printfRepl((char*) "&1LStandard error              &1D%lf\n", (double) MATE(E_STDERR, 0, eq_nb));
-    W_printfRepl((char*) "&1LStandard error in %%        &1D%lf\n", (double) MATE(E_STD_PCT, 0, eq_nb));
-    W_printfRepl((char*) "&1LF-Stat                      &1D%lf\n", (double) MATE(E_FSTAT, 0, eq_nb));
-    W_printfRepl((char*) "&1LR2                          &1D%lf\n", (double) MATE(E_RSQUARE, 0, eq_nb));
-    W_printfRepl((char*) "&1LR2 adjusted                 &1D%lf\n", (double) MATE(E_RSQUARE_ADJ, 0, eq_nb));
-    W_printfRepl((char*) "&1LDurbin-Watson test          &1D%lf\n", (double) MATE(E_DW, 0, eq_nb));
-    W_printfRepl((char*) "&1LLog likelihood              &1D%lf\n", (double) MATE(E_LOGLIK, 0, eq_nb));
+    W_printfRepl((char*) "&1LSum of square of residuals  &1D%lf\n", SSRES(eq_nb));
+    W_printfRepl((char*) "&1LStandard error              &1D%lf\n", STDERR(eq_nb));
+    W_printfRepl((char*) "&1LStandard error in %%        &1D%lf\n", STD_PCT(eq_nb));
+    W_printfRepl((char*) "&1LF-Stat                      &1D%lf\n", FSTAT(eq_nb));
+    W_printfRepl((char*) "&1LR2                          &1D%lf\n", RSQUARE(eq_nb));
+    W_printfRepl((char*) "&1LR2 adjusted                 &1D%lf\n", RSQUARE_ADJ(eq_nb));
+    W_printfRepl((char*) "&1LDurbin-Watson test          &1D%lf\n", DW(eq_nb));
+    W_printfRepl((char*) "&1LLog likelihood              &1D%lf\n", LOGLIK(eq_nb));
     W_printfRepl((char*) ".tl\n");
     W_printfRepl((char*) ".te\n");
 }
@@ -201,12 +203,10 @@ void Estimation::E_print_eqres_2(int eq_nb)
     {
         Period per = E_SMPL->start_period.shift(i);
         std::string str_period = per.to_string();
-        respct = 100 * E_div_0(MATE(E_U, eq_nb, i), MATE(E_LHS, eq_nb, i));
+        respct = 100 * div_not_0(U(eq_nb, i), LHS(eq_nb, i));
         W_printfRepl((char*) "&1L%s&1C%lf&1C%lf&1C%lf&1C%lf\n",
                  (char*) str_period.c_str(),
-                 (double) MATE(E_LHS, eq_nb, i),
-                 (double) MATE(E_RHS, eq_nb, i),
-                 (double) MATE(E_U, eq_nb, i),
+                 LHS(eq_nb, i), RHS(eq_nb, i), U(eq_nb, i),
                  respct);
     }
 
@@ -272,19 +272,19 @@ static int E_graph_calc_lhs(const std::string& name, char* res, char* rhs)
  *  
  *  @param [in] char**      titles  titles, 1/graph
  *  @param [in] Sample*     smpl    sample of the estimation
- *  @param [in] MAT*        mlhs    array of LHS values
- *  @param [in] MAT*        mrhs    array of RHS values
+ *  @param [in] MATRIX      mlhs    array of LHS values
+ *  @param [in] MATRIX      mrhs    array of RHS values
  *  @param [in] int         view    displays (1) or print (0) the graph
  *  @param [in] int         res     print residuals 
  *  @return     int                 0 always
  */
 int Estimation::E_graph(const std::vector<std::string>& titles, const std::shared_ptr<Sample> smpl, 
-    MAT* mlhs, MAT* mrhs, int view, int res)
+    Eigen::MatrixXd& mlhs, Eigen::MatrixXd& mrhs, int view, int res)
 {
     char buf[256], lhs[80], rhs[80];
 
-    int ng = M_NL(mlhs);
-    int nt = M_NC(mlhs);
+    int ng = (int) mlhs.rows();
+    int nt = (int) mlhs.cols();
 
     double* y = (double*) SW_nalloc(sizeof(double) * nt);
 
@@ -298,7 +298,7 @@ int Estimation::E_graph(const std::vector<std::string>& titles, const std::share
         T_GraphTitle(buf);
 
         for(int t = 0; t < nt; t ++) 
-            y[t] = MATE(mlhs, i, t);
+            y[t] = mlhs(i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "%s : observed", lhs);
         T_GraphLegend(0, 'L', buf, NULL);
@@ -306,7 +306,7 @@ int Estimation::E_graph(const std::vector<std::string>& titles, const std::share
         T_GraphTimeData(smpl, y);
 
         for(int t = 0; t < nt; t ++) 
-            y[t] = MATE(mrhs, i, t);
+            y[t] = mrhs(i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "%s : fitted", lhs);
         T_GraphLegend(0, 'L', buf, NULL);
@@ -329,7 +329,7 @@ int Estimation::E_graph(const std::vector<std::string>& titles, const std::share
         T_GraphTitle(buf);
 
         for(int t = 0; t < nt; t ++) 
-            y[t] = MATE(mlhs, i, t) - MATE(mrhs, i, t);
+            y[t] = mlhs(i, t) - mrhs(i, t);
         E_graph_calc_lhs(titles[i], lhs, rhs);
         sprintf(buf, "(%s) - (%s) : residuals", lhs, rhs);
         T_GraphLegend(0, 'L', buf, NULL);
@@ -380,9 +380,9 @@ int Estimation::E_print_results(int corr, int corru, int obs, int grobs, int grr
         E_print_mcorru();
     E_print_eqres(obs);
     if(grobs) 
-        E_graph(v_block_endos, E_SMPL, E_LHS, E_RHS, 0, 0);
+        E_graph(v_block_endos, E_SMPL, LHS, RHS, 0, 0);
     if(grres) 
-        E_graph(v_block_endos, E_SMPL, E_LHS, E_RHS, 0, 1);
+        E_graph(v_block_endos, E_SMPL, LHS, RHS, 0, 1);
 
     W_flush();
     return 0;

@@ -35,25 +35,27 @@ KDBScalarsPtr dickey_fuller_test(const std::string& lec, bool drift, bool trend,
 class CorrelationMatrix
 {
     const std::vector<std::string> coeffs;
-    const MAT* corr_matrix;
+    const Eigen::MatrixXd corr_matrix;
 
 public:
     const int nb_coeffs;
 
 public:
-    CorrelationMatrix(const std::set<std::string>& coeffs, const MAT* corr_matrix):
+    CorrelationMatrix(const std::set<std::string>& coeffs, const Eigen::MatrixXd& corr_matrix):
         nb_coeffs((int) coeffs.size()), coeffs(coeffs.begin(), coeffs.end()), corr_matrix(corr_matrix)
     {
-        if(corr_matrix->m_nl != corr_matrix->m_nc)
+        int nb_rows = (int) corr_matrix.rows();
+        int nb_columns = (int) corr_matrix.cols();
+        if(nb_rows != nb_columns)
             throw std::runtime_error("Cannot initialize the correlation matrix.\nNumber of lines " + 
-                std::to_string(corr_matrix->m_nl) + " is different from the number of columns " + 
-                std::to_string(corr_matrix->m_nc));
+                std::to_string(nb_rows) + " is different from the number of columns " + 
+                std::to_string(nb_columns));
         
-        if(corr_matrix->m_nl != nb_coeffs)
+        if(nb_rows != nb_coeffs)
             throw std::runtime_error(std::string("Cannot initialize the correlation matrix.\n") + 
             "The list of coefficients contains " + std::to_string(nb_coeffs) + " names while the " + 
-            "found correlation matrix is of shape " + std::to_string(corr_matrix->m_nl) + " x " + 
-            std::to_string(corr_matrix->m_nc));
+            "found correlation matrix is of shape " + std::to_string(nb_rows) + " x " + 
+            std::to_string(nb_columns));
     }
 
     ~CorrelationMatrix() {} 
@@ -68,7 +70,7 @@ public:
     {
         check_index(row, "Row");
         check_index(col, "Column");
-        return MATE(corr_matrix, row, col);
+        return corr_matrix(row, col);
     }
 
 private:

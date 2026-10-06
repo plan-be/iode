@@ -13,32 +13,6 @@
 #include "api/objs/variables.h"
 #include "api/estimation/estimation.h"
 
-// Generic matrix print function
-static void print_matrix(const std::string& name, MAT* mat, int precision = 6) 
-{
-    std::cout << name << " (" << mat->m_nl << ", " << mat->m_nc << "):" << std::endl;
-    // Find max width for alignment
-    int max_width = 0;
-    for(int i = 0; i < mat->m_nl; i++) 
-    {
-        for(int j = 0; j < mat->m_nc; j++) 
-        {
-            std::ostringstream oss;
-            oss << std::fixed << std::setprecision(precision) << MATE(mat, i, j);
-            int len = static_cast<int>(oss.str().length());
-            if(len > max_width) max_width = len;
-        }
-    }
-
-    for(int i = 0; i < mat->m_nl; i++) 
-    {
-        for(int j = 0; j < mat->m_nc; j++)
-            std::cout << std::setw(max_width) << std::fixed << std::setprecision(precision) << MATE(mat, i, j) << " ";
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
 
 /**
  *  Computes VCC, the matrix of var/covar bw the coefficients (?).
@@ -47,28 +21,32 @@ static void print_matrix(const std::string& name, MAT* mat, int precision = 6)
  */
 int Estimation::E_c_gmg()
 {
-    int i, j;
-
-    M_clear(E_VCC);
-    for(i = 0 ; i < E_NEQ  ; i++) 
+    Eigen::MatrixXd M = Eigen::MatrixXd::Zero(E_T, E_NCE);
+    Eigen::MatrixXd M_TMP = Eigen::MatrixXd::Zero(E_T, E_NCE);
+    Eigen::MatrixXd MT_TMP = Eigen::MatrixXd::Zero(E_NCE, E_T);
+    Eigen::MatrixXd VCC_TMP = Eigen::MatrixXd::Zero(E_NCE, E_NCE);
+    
+    VCC.setZero();
+    for(int i = 0 ; i < E_NEQ  ; i++) 
     {
-        M_clear(E_M);                   // M = 0
-        for(j = 0 ; j < E_NEQ ; j++) 
+        M.setZero();
+        for(int j = 0 ; j < E_NEQ ; j++) 
         {
-            M_extr(E_MTMPP, E_G, 0, E_T * j, E_NCE, E_T);   // MTMPP = G[0:E_NCE, E_T*j:E_T*(j+1)]
-            M_trans(E_MTMP, E_MTMPP);                                   // MTMP = MTMPP^T
-            M_scale(E_MTMP, E_MTMP, MATE(E_IVCU, i, j));          // MTMP = MTMP * IVCU[i, j]
-            M_calc(E_M, E_M, E_MTMP, '+');                     // M = M + MTMP
+            MT_TMP = G.block(0, E_T * j, E_NCE, E_T);       // MT_TMP = G[0:E_NCE, E_T*j:E_T*(j+1)]
+            M_TMP = MT_TMP.transpose();                     // M_TMP = MT_TMP^T
+            M_TMP *= IVCU(i, j);                            // M_TMP = M_TMP * IVCU[i, j]
+            M += M_TMP;                                     // M = M + M_TMP
         }
         if(E_NINSTR > 1) 
-            M_prod(E_MTMP, E_D, E_M);                               // MTMP = D \dot M
+            M_TMP = D * M;                                  // M_TMP = D * M
         else 
-            M_copy(E_MTMP, E_M);
+            M_TMP = M;
 
-        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);       // MTMPP = G[0:E_NCE, E_T*i:E_T*(i+1)]
-        M_prod(E_VCCTMP, E_MTMPP, E_MTMP);                          // VCCTMP = MTMPP \dot MTMP
-        M_calc(E_VCC, E_VCCTMP, E_VCC, '+');                    // VCC = VCCTMP + VCC
+        MT_TMP = G.block(0, E_T * i, E_NCE, E_T);           // MT_TMP = G[0:E_NCE, E_T*i:E_T*(i+1)]
+        VCC_TMP = MT_TMP * M_TMP;                           // VCC_TMP = MT_TMP * M_TMP
+        VCC += VCC_TMP;                                     // VCC = VCC_TMP + VCC
     }
+
     return 0;
 }
 
@@ -94,22 +72,20 @@ double Estimation::E_rhs_ij(int i, int t)
  *  Calculates the right members of the equations (RHS) with the current values of 
  *  the coefficients in E_DBS.
  *  
- *  The result is stored in the E_RHS(NEQ x T). 
+ *  The result is stored in the RHS(NEQ x T). 
  *  
  *  @return     int     0 on success, -1 on error in the calculation of RHS
  */
 int Estimation::E_c_rhs()
 {
-    int      i, t;
-    double   x;
-
-    for(i = 0 ; i < E_NEQ ; i++) 
+    double x;
+    for(int i = 0 ; i < E_NEQ ; i++) 
     {
-        for(t = 0 ; t < E_T ; t++) 
+        for(int t = 0 ; t < E_T ; t++) 
         {
             x = E_rhs_ij(i, t);
             if(IODE_IS_A_NUMBER(x)) 
-                MATE(E_RHS, i, t) = x;
+                RHS(i, t) = x;
             else  
             {
                 error_manager.append_error("Estimation: NaN Generated");
@@ -122,7 +98,7 @@ int Estimation::E_c_rhs()
 
 
 /**
- *  Calculates the matrix E_U of residuals: E_U = E_LHS - E_RHS. 
+ *  Calculates the matrix U of residuals: U = LHS - RHS. 
  *  
  *  @return     int     0 on success, -1 on error in the calculation of RHS
  */
@@ -131,25 +107,27 @@ int Estimation::E_residuals()
     /* COMPUTE RHS */
     if(E_c_rhs() != 0) 
         return -1;
-    M_calc(E_U, E_LHS, E_RHS, '-');
+    U = LHS - RHS;
     return 0;
 }
 
 
 /**
- *  Solves the linear system E_VCC * E_dC = E_GMU.
- *  The solution is saved in the MAT E_dC.
+ *  Solves the linear system VCC * DELTA_COEFS = GMU.
+ *  The solution is saved in the DELTA_COEFS.
  *  
  *  @return  int    0 or -1 on error
  */
 int Estimation::E_deltac()
-{
-    M_solve(E_dC, E_VCC, E_GMU);
-    if(M_errno)
+{   
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(VCC);
+    if (!lu.isInvertible())
     {
         error_manager.append_error("Estimation: Singular Matrix (VCC)");
         return -1;
-    } 
+    }
+    DELTA_COEFS = lu.solve(GMU);
+    
     return 0;
 }
 
@@ -161,10 +139,10 @@ int Estimation::E_deltac()
  *  
  *      f(est_coef_nb + h) - f(est_coef_nb)) / h 
  *  
- *  for each period of the estimation sample and to save the result in E_G[est_coef_nb,:]
+ *  for each period of the estimation sample and to save the result in G[est_coef_nb,:]
  *  
- *  @note E_RHS must already have been computed with the current values of the coefs 
- *  @note AFTER the calculation of E_RHS, a step of size h must have been added to 
+ *  @note RHS must already have been computed with the current values of the coefs 
+ *  @note AFTER the calculation of RHS, a step of size h must have been added to 
  *  the coefficients so that E_rhs_ij(i, j) = f(est_coef_nb + h).
  *   
  *  @param [in] int     coef_nb     coefficient position in the list of all coefs, non estimed include
@@ -174,21 +152,21 @@ int Estimation::E_deltac()
  */
 int Estimation::E_mod_residuals(const std::string& coef_name, int est_coef_nb, double h)
 {
-    // Pour toute équation
+    // for each equation
     double x;
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         if(E_scl_in_eq(coef_name, i)) 
         {
-            // Si le scalaire i est dans l'éq : calculer le RHS (pour chaque année)
-            // et sauver la dérivée dans la matrice E_G  : (f(x + h) - f(x)) / h
+            // If the scalar i is in the equation: calculate the RHS (for each year) 
+            // and save the derivative in matrix G: (f(x + h) - f(x)) / h.
             for(int t = 0; t < E_T; t++) 
             {
                 x = E_rhs_ij(i, t);
                 if(x >= MAXFLOAT) 
                     x = IODE_NAN;
                 if(IODE_IS_A_NUMBER(x))
-                    MATE(E_G, est_coef_nb, i * E_T + t) = (x - MATE(E_RHS, i, t)) / h;
+                    G(est_coef_nb, i * E_T + t) = (x - RHS(i, t)) / h;
                 else  
                 {
                     error_manager.append_error("Estimation: NaN Generated");
@@ -197,9 +175,9 @@ int Estimation::E_mod_residuals(const std::string& coef_name, int est_coef_nb, d
             }
         }
         else
-            // Sinon, placer des 0 dans la matrice E_G pour le coef en question
+            // Otherwise, place 0s in matrix G for the coefficient in question.
             for(int t = 0; t < E_T; t++)
-                MATE(E_G, est_coef_nb, i * E_T + t) = 0;
+                G(est_coef_nb, i * E_T + t) = 0;
     }
 
     return 0;
@@ -208,7 +186,7 @@ int Estimation::E_mod_residuals(const std::string& coef_name, int est_coef_nb, d
 
 /**
  *  Computes the numerical Jacobian of the non linear equation system.
- *  The solution is saved in the MAT E_G (E_NCE, E_T * E_NEQ).
+ *  The solution is saved in the G (E_NCE, E_T * E_NEQ).
  *  
  *          EQ1:0..T-1  EQ2:T..2xT-1  ...  EQM:(M-1)xT...MxT-1
  *  coef1 |           |             |    |                      |
@@ -226,20 +204,20 @@ int Estimation::E_jacobian()
     for(const std::string& scl_name : v_coef_names) 
     {
         scl_ptr = E_DBS->get_obj_ptr(scl_name);
-        // Uniquement pour les coef estimés (relax <> 0)
+        // Only for estimated coeffs (relax <> 0)
         if(scl_ptr->relax != 0) 
         {      
-            oldc = scl_ptr->value;                          // Stocke l'ancienne valeur du coef
-            if(fabs(oldc) < 1e-15)                      // ou 0.1 si coef proche de nul
+            oldc = scl_ptr->value;      // store previous value of the coef
+            if(fabs(oldc) < 1e-15)      // or 0.1 if coef is close to 0.0
                 oldc = 0.1;                      
-            scl_ptr->value = oldc * (1.0 + h);              // coef augmenté de h pourcents
+            scl_ptr->value = oldc * (1.0 + h);              // coef increased by h procents
             if(0 != E_mod_residuals(scl_name, j, oldc * h)) 
             {  /* compute G : (NCE, T*N) */
                 // PROBLEME : reset et sort avec -1
-                scl_ptr->value = oldc;                      /* reset coef */
+                scl_ptr->value = oldc;                      // reset coef to previous value
                 return -1;
             }
-            scl_ptr->value = oldc;                          /* reset coef */
+            scl_ptr->value = oldc;                          // reset coef to previous value
             j++;
         }
     }
@@ -272,7 +250,7 @@ int Estimation::E_scl_in_eq(const std::string& coef_name, int eq_nb)
 
 
 /**
- *  Computes E_GMU.
+ *  Computes GMU.
  *  
  *  TODO: describe GMU (from Fair's book).
  *  
@@ -281,29 +259,32 @@ int Estimation::E_scl_in_eq(const std::string& coef_name, int eq_nb)
  */
 int Estimation::E_c_gmu()
 {
-    int     i, j;
-
-    M_clear(E_GMU);
-    for(i = 0 ; i < E_NEQ  ; i++) 
+    Eigen::VectorXd UM = Eigen::VectorXd::Zero(E_T);
+    Eigen::VectorXd UM_TMP = Eigen::VectorXd::Zero(E_T);
+    Eigen::MatrixXd M_TMP = Eigen::MatrixXd::Zero(E_NCE, E_T);
+    Eigen::VectorXd GMU_TMP = Eigen::VectorXd::Zero(E_NCE);
+    
+    GMU.setZero();
+    for(int i = 0; i < E_NEQ; i++) 
     {
-        M_clear(E_UM);                  // UM = 0
-        for(j = 0 ; j < E_NEQ ; j++) 
+        UM.setZero();
+        for(int j = 0; j < E_NEQ; j++) 
         {
-            M_extr(E_UMT, E_U, j, 0, 1, E_T);           // UMT = U[j, 0:E_T] (residuals of eq j)
-            M_trans(E_UMTMP, E_UMT);                                // UMTMP = UMT^T
-            M_scale(E_UMTMP, E_UMTMP, MATE(E_IVCU, i, j));    // UMTMP = UMTMP * IVCU[i, j]
-            M_calc(E_UM, E_UM, E_UMTMP, '+');               // UM = UM + UMTMP
+            UM_TMP = U.row(j);                      // UM_TMP = U[j, 0:E_T] (residuals of eq j)
+            UM_TMP *= IVCU(i, j);                   // UM_TMP = UM_TMP * IVCU[i, j]
+            UM += UM_TMP;                           // UM = UM + UM_TMP
         }
 
-        if(E_NINSTR >= 1) 
-            M_prod(E_UMTMP, E_D, E_UM);                         // UMTMP = D \dot UM
+        if(E_NINSTR >= 1)
+            UM_TMP = D * UM;                        // UM_TMP = D * UM
         else 
-            M_copy(E_UMTMP, E_UM);
+            UM_TMP = UM;
 
-        M_extr(E_MTMPP, E_G, 0, E_T * i, E_NCE, E_T);   // M = G[0:E_NCE, E_T*i:E_T*(i+1)]
-        M_prod(E_GMUTMP, E_MTMPP, E_UMTMP);                     // GMUTMP = MTMPP \dot UMTMP
-        M_calc(E_GMU, E_GMUTMP, E_GMU, '+');                // GMU = GMUTMP + GMU
+        M_TMP = G.block(0, E_T * i, E_NCE, E_T);    // M_TMP = G[0:E_NCE, E_T*i:E_T*(i+1)]
+        GMU_TMP = M_TMP * UM_TMP;                   // GMU_TMP = M_TMP * UM_TMP
+        GMU += GMU_TMP;                             // GMU = GMU_TMP + GMU
     }
+
     return 0;
 }
 
@@ -319,18 +300,18 @@ int Estimation::E_c_gmu()
  */
 int Estimation::E_testcv()
 {
-    int         i, j;
-    double      sum = 0, tmp, ci, dci;
+    double sum = 0, tmp, ci, dci;
 
     E_CONV = 0;
     E_get_C();
-    for(i = 0, j = 0; i < v_coef_names.size(); i++) 
+    for(int i = 0, j = 0; i < v_coef_names.size(); i++) 
     {
-        if(MATE(E_SMO, i, 0) == 0) 
-            continue; /* relax == 0 */
+        // relax == 0
+        if(SMO(i) == 0) 
+            continue;
 
-        ci  = MATE(E_C, i, 0);
-        dci = MATE(E_dC, j, 0);
+        ci  = COEFS(i);
+        dci = DELTA_COEFS(j);
         if(ci != 0) 
         {
             tmp = fabs(dci / ci);
@@ -351,20 +332,20 @@ int Estimation::E_testcv()
 
 /**
  *  Adds to each estimated coefficient (i.e. where relax <> 0) the value 
- *  of a step (E_dC) calculated in E_deltac() multiplied by lambda (E_SMO).
+ *  of a step (DELTA_COEFS) calculated in E_deltac() multiplied by lambda (SMO).
  *  
  *  @return int     0   always
  */
 int Estimation::E_adaptcoef()
 {
-    int i, j;
-    for(i = 0, j = 0; i < v_coef_names.size(); i++) 
+    for(int i = 0, j = 0; i < v_coef_names.size(); i++) 
     {
-        if(MATE(E_SMO, i, 0) == 0) 
+        // relax = 0
+        if(SMO(i) == 0) 
             continue;
 
-        /* C = C + dC * lambda */
-        MATE(E_C, i, 0) += MATE(E_dC, j, 0) * MATE(E_SMO, i, 0);
+        // COEFS = COEFS + delta_COEFS * lambda
+        COEFS(i) += DELTA_COEFS(j) * SMO(i);
         j++;
     }
     
@@ -382,8 +363,14 @@ int Estimation::E_adaptcoef()
  */
 int Estimation::E_c_vcu()
 {
-    M_xxprim(E_VCU, E_U);
-    M_scale(E_VCU, E_VCU, 1.0 / E_T);
+    // Note: In Eigen, aliasing refers to assignment statement in which 
+    //       the same matrix (or array or vector) appears on the left and 
+    //       on the right of the assignment operators. Statements like 
+    //       'mat = 2 * mat' or 'mat = mat.transpose()' exhibit aliasing.
+    //       The method noalias() assumes no alias and improve performance
+    //       but must be used with care.
+    VCU.noalias() = U * U.transpose();
+    VCU /= static_cast<double>(E_T);
     return 0;
 }
 
@@ -391,18 +378,20 @@ int Estimation::E_c_vcu()
 /**
  *  Computes the inverse of VCU: 
  *  
- *      IVCU = VCU^-1  (NEQ x NEQ)
+ *      IVCU = VCU^{-1} (NEQ x NEQ)
  *  
  *  @return     int     0 on success, -1 on error
  */
 int Estimation::E_c_ivcu()
 {
-    M_inv_1(E_IVCU, E_VCU);
-    if(M_errno)
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(VCU);
+    if(!lu.isInvertible())
     {
         error_manager.append_error("Estimation : Singular Matrix (VCU)");
         return -1;
-    } 
+    }
+
+    IVCU = lu.inverse();
     return 0;
 }
 
@@ -411,22 +400,21 @@ int Estimation::E_c_ivcu()
  *  Computes MCU (NEQ x NEQ), (the matrix of the correlations bw residuals in a 
  *  system of equations TODO:Check this).
  *  
- *       MCU[i,j] = MCU[j,i] = VCU[i,j] / (VCU[i, i] * VCU[j,j])^-2 
+ *       MCU[i,j] = MCU[j,i] = VCU[i,j] / sqrt(VCU[i, i] * VCU[j,j])
  *  
  *  @return     int     0 always
  */
 int Estimation::E_c_mcu()
 {
-    M_clear(E_MCU);
-
     double x = 0.0;
+    MCU.setZero();
     for(int i = 0 ; i < E_NEQ ; i++)
     {
         for(int j = 0 ; j <= i ; j++) 
         {
-            x = sqrt(MATE(E_VCU, i, i) * MATE(E_VCU, j, j));
+            x = sqrt(VCU(i, i) * VCU(j, j));
             if(!IODE_IS_0(x))
-                MATE(E_MCU, i, j) = MATE(E_MCU, j, i) = MATE(E_VCU, i, j) / x;
+                MCU(i, j) = MCU(j, i) = VCU(i, j) / x;
         }
     }
 
@@ -436,19 +424,21 @@ int Estimation::E_c_mcu()
 /**
  *  Computes the inverse of VCC and save the result in VCC:
  *  
- *      VCC = VCC^-1 (NCE x NCE)
+ *      VCC = VCC^{-1} (NCE x NCE)
  *  
  *  @return     int     0 on success, -1 on error
  */
 int Estimation::E_c_ivcc()
 {
-    M_inv_1(E_VCCTMP, E_VCC);
-    if(M_errno)
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(VCC);
+    if(!lu.isInvertible())
     {
-        error_manager.append_error("Estimation: Singular Matrix (VCC)");
+        error_manager.append_error("Estimation : Singular Matrix (VCC)");
         return -1;
     }
-    M_copy(E_VCC, E_VCCTMP);
+
+    Eigen::MatrixXd VCC_TMP = lu.inverse();
+    VCC = VCC_TMP;
     return 0;
 }
 
@@ -459,7 +449,7 @@ int Estimation::E_c_ivcc()
  */
 int Estimation::E_c_vcc()
 {
-    M_clear(E_IVCU);
+    IVCU.setZero();
     E_c_ivcu();
     E_c_gmg();
     if(E_c_ivcc()) 
@@ -584,7 +574,6 @@ int Estimation::E_est(const std::vector<std::string>& v_block_endos, const std::
 {
     int  rc = -1, rc_prep = -1, rc_est = -1;
 
-    M_errno = 0;
     this->v_block_endos = v_block_endos;
     this->v_block_lecs = v_block_lecs;
     this->v_block_instrs = v_block_instrs;

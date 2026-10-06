@@ -87,7 +87,7 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
  *  
  *  The created (or replaced) VAR name is name<eqnb>, for example: 
  *  
- *      E_savevar("_YCALC", 2, E_RHS)
+ *      E_savevar("_YCALC", 2, RHS)
  *  
  *  creates _YCALC2 containing the RHS of equation number 2 (i.e. the third one) in the estimated block.
  *    
@@ -97,7 +97,7 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
  *  @param [in] int   eqnb  Suffix of the variable
  *  @param [in] MAT*  mat   content to store in the variable
  */
- void Estimation::E_savevar(char* name, int eqnb, MAT* mat) 
+ void Estimation::E_savevar(char* name, int eqnb, Eigen::MatrixXd& mat) 
 {
     // varname = name{eqnb}. Ex: _YRES0, _YCALC1...
     char varname[80];
@@ -111,7 +111,7 @@ void Estimation::E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int 
     // copy mat to name from E_FROM to E_FROM + E_T
     double* var = global_ws_var->get_var_ptr(varname);
     for(int t = E_FROM; t < E_FROM + E_T; t++)
-        var[t] =  MATE(mat, eqnb, t - E_FROM);
+        var[t] =  mat(eqnb, t - E_FROM);
 }
 
 
@@ -280,17 +280,17 @@ int Estimation::estimate_sample(const std::shared_ptr<Sample> smpl)
             std::string lec;
             for(int j = 0; j < _v_block_endos_.size(); j++) 
             {
-                tests[EQ_CORR]    = (float) MATE(E_MCORRU,      0, j);
-                tests[EQ_STDEV]   = (float) MATE(E_STDEV,       0, j);
-                tests[EQ_MEANY]   = (float) MATE(E_MEAN_Y,      0, j);
-                tests[EQ_SSRES]   = (float) MATE(E_SSRES,       0, j);
-                tests[EQ_STDERR]  = (float) MATE(E_STDERR,      0, j);
-                tests[EQ_STDERRP] = (float) MATE(E_STD_PCT,     0, j);
-                tests[EQ_FSTAT]   = (float) MATE(E_FSTAT,       0, j);
-                tests[EQ_R2]      = (float) MATE(E_RSQUARE,     0, j);
-                tests[EQ_R2ADJ]   = (float) MATE(E_RSQUARE_ADJ, 0, j);
-                tests[EQ_DW]      = (float) MATE(E_DW,          0, j);
-                tests[EQ_LOGLIK]  = (float) MATE(E_LOGLIK,      0, j);
+                tests[EQ_CORR]    = (float) MCORRU(0, j);
+                tests[EQ_STDEV]   = (float) STDEV(j);
+                tests[EQ_MEANY]   = (float) MEAN_Y(j);
+                tests[EQ_SSRES]   = (float) SSRES(j);
+                tests[EQ_STDERR]  = (float) STDERR(j);
+                tests[EQ_STDERRP] = (float) STD_PCT(j);
+                tests[EQ_FSTAT]   = (float) FSTAT(j);
+                tests[EQ_R2]      = (float) RSQUARE(j);
+                tests[EQ_R2ADJ]   = (float) RSQUARE_ADJ(j);
+                tests[EQ_DW]      = (float) DW(j);
+                tests[EQ_LOGLIK]  = (float) LOGLIK(j);
 
                 eq_name = _v_block_endos_[j];
                 lec = _v_block_lecs_[j];
@@ -299,9 +299,9 @@ int Estimation::estimate_sample(const std::shared_ptr<Sample> smpl)
                 eq_ptr = E_DBE->get_obj_ptr(eq_name);
                 E_tests2scl(eq_ptr, j, E_T, E_NCE);
                 // create the Variables containing the fitted, observed and residual values
-                E_savevar("_YCALC", j, E_RHS);   
-                E_savevar("_YOBS", j, E_LHS);    
-                E_savevar("_YRES", j, E_U);      
+                E_savevar("_YCALC", j, RHS);   
+                E_savevar("_YOBS", j, LHS);    
+                E_savevar("_YRES", j, U);      
 
                 estimated_eqs.insert(eq_name);    // mark the equation as estimated
             }

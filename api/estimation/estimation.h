@@ -1,6 +1,6 @@
 #pragma once
-#include "api/iode_scr4.h"
-#include "scr4/mat/s_mat.h"
+#include <Eigen/Dense>
+#include <Eigen/LU>
 
 #include "api/pch.h"
 #include "api/b_errors.h"
@@ -78,43 +78,38 @@ protected:
     std::vector<std::string> v_block_lecs;      // List (block) of LEC expressions of the current estimation
     std::vector<std::string> v_block_instrs;    // List (block) of instruments (LEC formulas) of the current estimation    
     
-    MAT* E_U;                 // Residuals (neq x t)
-    MAT* E_VCU;               // Variance / covariance of the residuals (neq x neq)    
-    MAT* E_IVCU;              // Inverse of E_VCU
-    MAT* E_LHS;               // Left side of equations (neq x t)
-    MAT* E_RHS;               // Right side of equations (neq x t)
-    MAT* E_G;                 // Jacobian matrix of the system
-    MAT* E_VCC;               // Var/covar of the coefficients
-    MAT* E_VCCTMP;
-    MAT* E_C;                 // Vector (MAT 1 col) of estimated coefficients
-    MAT* E_SMO;               // Vector of of relaxation params
-    MAT* E_D;
-    MAT* E_dC;                // Vector of coefficient increments
-    MAT* E_DF;                // Degrees of freedom of each coefficient
-    MAT* E_STDERR;            // Std error of each equation 
-    MAT* E_SSRES;             // Sum of squares of residuals of each eq
-    MAT* E_MEAN_Y;            // Mean of the LHS on each equation 
-    MAT* E_STDEV;             // Std deviation of each equation 
-    MAT* E_RSQUARE;           // R-square of each equation
-    MAT* E_RSQUARE_ADJ;       // Adjusted R-square of each equation
-    MAT* E_DW;                // Durbin-Watson test of each equation
-    MAT* E_FSTAT;             // F-Stat of each equation
-    MAT* E_LOGLIK;            // Log-likelihood of each equation
-    MAT* E_STD_PCT;           // Standard errors in % for each equation
-    MAT* E_M;
-    MAT* E_MTMP;
-    MAT* E_MTMPP;
-    MAT* E_MCORR;             // Correlation matrix bw coefficients
-    MAT* E_MCORRU;            // Correlation matrix bw error terms of equations
-    MAT* E_DEV;               // Deviation between observed and calculated values
-    MAT* E_NBCE;
-    MAT* E_MCU;
-    MAT* E_GMU;
-    MAT* E_UM;
-    MAT* E_UMT;
-    MAT* E_UMTMP;
-    MAT* E_UVCCTMP;
-    MAT* E_GMUTMP;
+    Eigen::MatrixXd U;              // Residuals (neq x t)
+    Eigen::MatrixXd VCU;            // Variance / covariance of the residuals (neq x neq)    
+    Eigen::MatrixXd IVCU;           // Inverse of VCU
+    Eigen::MatrixXd LHS;            // Left side of equations (neq x t)
+    Eigen::MatrixXd RHS;            // Right side of equations (neq x t)
+
+    Eigen::VectorXd COEFS;          // Vector of estimated coefficients
+    Eigen::VectorXd SMO;            // Vector of relaxation params
+    Eigen::VectorXd DELTA_COEFS;    // Vector of coefficient increments
+    Eigen::VectorXi DEG_FREEDOM;    // Degrees of freedom of each coefficient
+    Eigen::VectorXi NB_COEFS_EQ;    // Nb of estimated coefficients per equation
+
+    Eigen::VectorXd STDERR;         // Std error of each equation 
+    Eigen::VectorXd SSRES;          // Sum of squares of residuals of each eq
+    Eigen::VectorXd MEAN_Y;         // Mean of the LHS on each equation 
+    Eigen::VectorXd STDEV;          // Std deviation of each equation 
+    Eigen::VectorXd RSQUARE;        // R-square of each equation
+    Eigen::VectorXd RSQUARE_ADJ;    // Adjusted R-square of each equation
+    Eigen::VectorXd DW;             // Durbin-Watson test of each equation
+    Eigen::VectorXd FSTAT;          // F-Stat of each equation
+    Eigen::VectorXd LOGLIK;         // Log-likelihood of each equation
+    Eigen::VectorXd STD_PCT;        // Standard errors in % for each equation
+
+    Eigen::MatrixXd MCORR;          // Correlation matrix bw coefficients
+    Eigen::MatrixXd MCORRU;         // Correlation matrix bw error terms of equations
+    Eigen::MatrixXd DEV;            // Deviation between observed and calculated values
+
+    Eigen::MatrixXd G;              // Jacobian matrix of the system
+    Eigen::MatrixXd VCC;            // Var/covar of the coefficients
+    Eigen::MatrixXd D;              // matrix of instruments (E_T x E_T)
+    Eigen::MatrixXd MCU;
+    Eigen::VectorXd GMU;
 
 public:
 
@@ -181,12 +176,12 @@ public:
     ~Estimation()
     { 
         // Destructor to clean up resources if needed
-        E_free_work();
+        clear();
     }
 
-    MAT* get_MCORR() const
+    Eigen::MatrixXd get_MCORR() const
     {
-        return E_MCORR;
+        return MCORR;
     }
 
     /**
@@ -231,7 +226,8 @@ public:
             throw std::out_of_range("Equation number out of range");
 
         std::vector<double> values;
-        for(int t = 0; t < M_NC(E_LHS); t++) values.push_back(MATE(E_LHS, eq_nb, t));
+        for(int t = 0; t < LHS.cols(); t++) 
+            values.push_back(LHS(eq_nb, t));
         return values;
     }
 
@@ -241,7 +237,8 @@ public:
             throw std::out_of_range("Equation number out of range");
 
         std::vector<double> values;
-        for(int t = 0; t < M_NC(E_RHS); t++) values.push_back(MATE(E_RHS, eq_nb, t));
+        for(int t = 0; t < RHS.cols(); t++) 
+            values.push_back(RHS(eq_nb, t));
         return values;
     }
 
@@ -251,8 +248,8 @@ public:
             throw std::out_of_range("Equation number out of range");
 
         std::vector<double> values;
-        for(int t = 0; t < M_NC(E_LHS); t++) 
-            values.push_back(MATE(E_LHS, eq_nb, t) - MATE(E_RHS, eq_nb, t));
+        for(int t = 0; t < LHS.cols(); t++) 
+            values.push_back(LHS(eq_nb, t) - RHS(eq_nb, t));
         return values;
     }
 
@@ -315,29 +312,45 @@ private:
         const std::vector<std::string>& v_block_instrs);
 
     /* e_tests.c */
-    double M_c_line(MAT* m1, int line, int oper);
-    double E_div_0(double a, double b);
-    double E_sqrt(double val);
+    /**
+     *  Divides a by b if b is not null. If b is null, returns 0.0.
+     *  
+     *  @param [in] double  a   numerator
+     *  @param [in] double  b   denominator
+     *  @return     double      0.0 if b is null, a / b if not
+     */
+    double div_not_0(double a, double b)
+    {
+        return (b == 0.0) ? 0.0 : a / b;
+    }
+
+    /**
+     *  Returns the square root of val if val >= 0. If not, returns 0.0.
+     */
+    double sqrt_not_neg(double val)
+    {
+        return (val < 0) ? 0.0 : sqrt(val);
+    }
+
     void E_deg_freed();
     double E_c_umu();
     int E_c_loglik();
     int E_c_mcorr();
     int E_c_mcorru();
     int E_c_ttests();
-    int E_output(void);
+    int E_output();
 
     /* e_prep.c */
     int E_prep();
-    int E_prep_alloc();
+    int E_prep_matrices();
     int E_prep_lecs();
     int E_prep_instrs();
     int E_prep_coefs();
     int E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs);
-    void E_prep_reset();
     void E_get_C(void);
     void E_put_C(void);
     void E_get_SMO(void);
-    void E_free_work(void);
+    void clear(void);
 
     /* e_print.c */
     void E_print_parms();
@@ -349,13 +362,14 @@ private:
     void E_print_eqres_1(int eq_nb);
     void E_print_eqres_2(int eq_nb);
     void E_print_eqres(int obs);
-    int E_graph(const std::vector<std::string>& titles, std::shared_ptr<Sample> smpl, MAT* mlhs, MAT* mrhs, int view, int res);
+    int E_graph(const std::vector<std::string>& titles, std::shared_ptr<Sample> smpl, 
+        Eigen::MatrixXd& mlhs, Eigen::MatrixXd& mrhs, int view, int res);
     int E_print_results(int corr, int corru, int obs, int grobs, int grres);
 
     /* k_est.c */
     void E_tests2scl(const std::shared_ptr<Equation>& eq_ptr, const int j, const int n, const int k);
     void E_savescl(double val, int eqnb, char* txt);
-    void E_savevar(char* name, int eqnb, MAT* mat);
+    void E_savevar(char* name, int eqnb, Eigen::MatrixXd& mat);
     int estimate_sample(const std::shared_ptr<Sample> smpl);
     int update_eq(const std::string& name, const std::string& lec, int method, const std::shared_ptr<Sample> smpl, float* tests);
 };
