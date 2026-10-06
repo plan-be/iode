@@ -380,14 +380,14 @@ class Equation:
         >>> # estimate the ACAF equation
         >>> success = eq_ACAF.estimate("1980Y1", "2000Y1") 
         Estimating : iteration 1 (||eps|| = 0.173205)
-        Estimating : iteration 2 (||eps|| = 9.24137e-09)
+        Estimating : iteration 2 (||eps|| = 9.23592e-09)
         Solution reached after 2 iteration(s). Creating results file ...
         >>> success
         True
         >>> scalars["acaf1"]
         Scalar(0.0150646, 1, 0.00118455)
         >>> scalars["acaf2"]
-        Scalar(-6.90855e-06, 1, 1.07873e-06)
+        Scalar(-6.90855e-06, 1, 1.07878e-06)
         >>> scalars["acaf4"]
         Scalar(-0.00915675, 1, 0.00209541)
         >>> eq_ACAF                             # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -551,39 +551,24 @@ class Equation:
         >>> # estimate 
         >>> success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1")      # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 2.4346e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 2.42586e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 , r2=0.575200
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 1.75111e-10)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf4 , r2=0.324238
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , r2=-1.058215
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.793875
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.793875
         >>> success
         True
@@ -594,7 +579,7 @@ class Equation:
         >>> for name in coefficient_names:
         ...     print(f"{name} -> {scalars[name]}")
         acaf1 -> Scalar(0.0150646, 1, 0.00118455)
-        acaf2 -> Scalar(-6.90855e-06, 1, 1.07873e-06)
+        acaf2 -> Scalar(-6.90855e-06, 1, 1.07878e-06)
         acaf4 -> Scalar(-0.00915675, 1, 0.00209541)
 
         Estimate the equation for the test 'fstat' with no condition
@@ -604,39 +589,24 @@ class Equation:
         >>> # estimate 
         >>> success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1", test="fstat")        # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 2.4346e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 2.42586e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 , fstat=25.726931
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 1.75111e-10)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf4 , fstat=9.116395
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , fstat=-9.768702
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , fstat=34.662926
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , fstat=34.662926
         >>> success
         True
@@ -647,7 +617,7 @@ class Equation:
         >>> for name in coefficient_names:
         ...     print(f"{name} -> {scalars[name]}")
         acaf1 -> Scalar(0.0150646, 1, 0.00118455)
-        acaf2 -> Scalar(-6.90855e-06, 1, 1.07873e-06)
+        acaf2 -> Scalar(-6.90855e-06, 1, 1.07878e-06)
         acaf4 -> Scalar(-0.00915675, 1, 0.00209541)
 
         Estimate the equation for the test 'r2' with condition (acaf2 > 0)
@@ -661,39 +631,24 @@ class Equation:
         >>> # estimate 
         >>> success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1", lec_condition)       # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 2.4346e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 2.42586e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 , r2=0.575200
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 1.75111e-10)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf4 , r2=0.324238
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , r2=-1.058215
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , r2=0.793875
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , r2=-1.058215
         >>> success
         True
@@ -704,7 +659,7 @@ class Equation:
         >>> for name in coefficient_names:
         ...     print(f"{name} -> {scalars[name]}")
         acaf1 -> Scalar(0, 0, 0)
-        acaf2 -> Scalar(5.76933e-06, 1, 1.26806e-06)
+        acaf2 -> Scalar(5.76933e-06, 1, 1.26812e-06)
         acaf4 -> Scalar(-0.0104115, 1, 0.00643766)
 
         Estimate the equation for the test 'fstat' with condition (acaf2 > 0)
@@ -714,39 +669,24 @@ class Equation:
         >>> # estimate 
         >>> success = eq_ACAF.estimate_step_wise("1980Y1", "2000Y1", lec_condition, "fstat")      # doctest: +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 2.4346e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 2.42586e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 , fstat=25.726931
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 1.75111e-10)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf4 , fstat=9.116395
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , fstat=-9.768702
         Estimating : iteration 1 (||eps|| = 1.55885)
-        <BLANKLINE>
-        Estimating : iteration 2 (||eps|| = 5.30092e-08)
-        <BLANKLINE>
+        Estimating : iteration 2 (||eps|| = 5.29579e-08)
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf1 acaf2 acaf4 , fstat=34.662926
         Estimating : iteration 1 (||eps|| = 1.27279)
-        <BLANKLINE>
         Estimating : iteration 2 (||eps|| = 4.13603e-08)
-        <BLANKLINE>
         Solution reached after 2 iteration(s). Creating results file ...
-        <BLANKLINE>
         ACAF: scalars : acaf2 acaf4 , fstat=-9.768702
         >>> success
         True
@@ -757,7 +697,7 @@ class Equation:
         >>> for name in coefficient_names:
         ...     print(f"{name} -> {scalars[name]}")
         acaf1 -> Scalar(0, 0, 0)
-        acaf2 -> Scalar(5.76933e-06, 1, 1.26806e-06)
+        acaf2 -> Scalar(5.76933e-06, 1, 1.26812e-06)
         acaf4 -> Scalar(-0.0104115, 1, 0.00643766)
         """
         from iode import equations

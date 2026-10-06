@@ -11,47 +11,34 @@
  *  
  *  @return     int     0 or -1
  */
-int Estimation::E_prep_alloc()
+int Estimation::E_prep_matrices()
 {
-    E_U             = M_alloc(E_NEQ, E_T);          // Residuals (neq x t)
-    E_VCU           = M_diag(E_NEQ, 1.0);           // Variance / covariance of the residuals (neq x neq)    
-    E_IVCU          = M_diag(E_NEQ, 1.0);           // Inverse of E_VCU
-    E_RHS           = M_alloc(E_NEQ, E_T);          // Right side of equations (neq x t)
-    E_MCU           = M_alloc(E_NEQ, E_NEQ);        //   
-    E_G             = M_alloc(E_NCE, E_T * E_NEQ);  // Jacobian matrix of the system
-    E_VCC           = M_alloc(E_NCE, E_NCE);        // Var/covar of the coefficients
-    E_GMU           = M_alloc(E_NCE, 1);            // 
-    E_dC            = M_alloc(E_NCE, 1);            // Vector of coefficient increments
-    E_M             = M_alloc(E_T, E_NCE);          // 
-    E_MTMP          = M_alloc(E_T, E_NCE);          //
-    E_MTMPP         = M_alloc(E_NCE, E_T);          //
-    E_VCCTMP        = M_alloc(E_NCE, E_NCE);        //
-    E_UM            = M_alloc(E_T, 1);              //
-    E_UMT           = M_alloc(1, E_T);              //
-    E_UMTMP         = M_alloc(E_T, 1);              //
-    E_UVCCTMP       = M_alloc(E_NCE, E_T);          //
-    E_GMUTMP        = M_alloc(E_NCE, 1);            //
-        
-    E_DF            = M_alloc(1, E_NCE);            // Degrees of freedom of each coefficient
-    E_STDERR        = M_alloc(1, E_NEQ);            // Std error of each equation 
-    E_SSRES         = M_alloc(1, E_NEQ);            // Sum of squares of residuals of each eq
-    E_MEAN_Y        = M_alloc(1, E_NEQ);            // Mean of the LHS on each equation 
-    E_STDEV         = M_alloc(1, E_NEQ);            // Std deviation of each equation 
-    E_RSQUARE       = M_alloc(1, E_NEQ);            // R-square of each equation
-    E_RSQUARE_ADJ   = M_alloc(1, E_NEQ);            // Adjusted R-square of each equation
-    E_DW            = M_alloc(1, E_NEQ);            // Durbin-Watson test of each equation
-    E_FSTAT         = M_alloc(1, E_NEQ);            // F-Stat of each equation
-    E_LOGLIK        = M_alloc(1, E_NEQ);            // Log-likelihood of each equation
-    E_STD_PCT       = M_alloc(1, E_NEQ);            // Standard errors in % for each equation
-    E_MCORR         = M_alloc(E_NCE, E_NCE);        // Correlation matrix bw coefficients
-    E_MCORRU        = M_alloc(E_NEQ, E_NEQ);        // Correlation matrix bw error terms of equations
-    E_DEV           = M_alloc(E_NEQ, E_T);          // Deviation between observed and calculated values
+    U.setZero(E_NEQ, E_T);                        // Residuals (neq x t)
+    VCU.setIdentity(E_NEQ, E_NEQ);                // Variance / covariance of the residuals (neq x neq)    
+    IVCU.setIdentity(E_NEQ, E_NEQ);               // Inverse of VCU
+    RHS.setZero(E_NEQ, E_T);                      // Right side of equations (neq x t)
+    MCU.setZero(E_NEQ, E_NEQ);
+    G.setZero(E_NCE, E_T * E_NEQ);                // Jacobian matrix of the system
+    VCC.setZero(E_NCE, E_NCE);                    // Var/covar of the coefficients
+    GMU.setZero(E_NCE);
+    DELTA_COEFS.setZero(E_NCE);                   // Vector of coefficient increments
+    DEG_FREEDOM.setZero(E_NCE);                            // Degrees of freedom of each coefficient
+    
+    STDERR.setZero(E_NEQ);                    // Std error of each equation 
+    SSRES.setZero(E_NEQ);                     // Sum of squares of residuals of each eq
+    MEAN_Y.setZero(E_NEQ);                    // Mean of the LHS on each equation 
+    STDEV.setZero(E_NEQ);                     // Std deviation of each equation 
+    RSQUARE.setZero(E_NEQ);                   // R-square of each equation
+    RSQUARE_ADJ.setZero(E_NEQ);               // Adjusted R-square of each equation
+    DW.setZero(E_NEQ);                        // Durbin-Watson test of each equation
+    FSTAT.setZero(E_NEQ);                     // F-Stat of each equation
+    LOGLIK.setZero(E_NEQ);                    // Log-likelihood of each equation
+    STD_PCT.setZero(E_NEQ);                   // Standard errors in % for each equation
 
-    if(M_errno)
-    {
-        error_manager.append_error("Estimation : Memory Error");
-        return -1;
-    } 
+    MCORR.setZero(E_NCE, E_NCE);              // Correlation matrix bw coefficients
+    MCORRU.setZero(E_NEQ, E_NEQ);             // Correlation matrix bw error terms of equations
+    DEV.setZero(E_NEQ, E_T);                  // Deviation between observed and calculated values
+
     return 0;
 }
 
@@ -59,12 +46,12 @@ int Estimation::E_prep_alloc()
 /**
  *  Analyses the LEC equations and set various variables for the estimation process:  
  *      - E_NEQ
- *      - E_LHS 
+ *      - LHS 
  *      - v_block_rhs
  *      - ...
  *   
  *  Compiles the left members of each equations and link them with E_DBV and E_DBS.
- *  Computes the left members on [E_FROM, E_FROM+E_T] and saves the result in the array E_LHS.
+ *  Computes the left members on [E_FROM, E_FROM+E_T] and saves the result in the array LHS.
  *  
  *  Compiles the right members of each eq and saves the resulting CLEC* in v_block_rhs.
  *  Adds all coefficients in E_DBS if needed.
@@ -83,12 +70,8 @@ int Estimation::E_prep_lecs()
         return -1;
     }
 
-    E_LHS = M_alloc(E_NEQ, E_T);
-    if(!E_LHS)
-    {
-        error_manager.append_error("Estimation: Memory Error");
-        return -1;
-    }
+    LHS.resize(E_NEQ, E_T);
+    LHS.setZero();
 
     v_block_rhs.clear();
     v_block_rhs.resize(E_NEQ, nullptr);
@@ -141,7 +124,7 @@ int Estimation::E_prep_lecs()
                 error_manager.append_error("Estimation: NaN Generated");
                 return -1;
             }
-            MATE(E_LHS, i, t) = x;
+            LHS(i, t) = x;
         }
         
         right_hand_side = lec.substr(pos+2); 
@@ -198,13 +181,13 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 
 
 /**
- *  Computes the matrix E_D (E_T x E_T) of instruments.
+ *  Computes the matrix D (E_T x E_T) of instruments.
  *  Each instrument is a LEC formula that is first compiled and linked. 
  *  It is then computed on [E_FROM, E_FROM+E_T] and saved in the array E_D.
  *  
  *  @param [in] char**  instrs 
  *  @return     int     0 or -1        
- *  @global     MAT*    E_D (E_T, E_T)
+ *  @global     MAT*    D (E_T, E_T)
  */
 int Estimation::E_prep_instrs()
 {
@@ -219,22 +202,11 @@ int Estimation::E_prep_instrs()
         return 0;
 
     // Alloc local MAT
-    MAT* minstr  = M_alloc(E_T, E_NINSTR + 1);
-    MAT* mip     = M_alloc(E_NINSTR + 1, E_T);
-    MAT* miip    = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
-    MAT* miipi   = M_alloc(E_NINSTR + 1, E_NINSTR + 1);
-    MAT* mipiipi = M_alloc(E_T, E_NINSTR + 1);
-    E_D = M_alloc(E_T, E_T);
-
-    // Check allocation succeeded
-    if(!minstr || !mip || !miip || !miipi || !mipiipi || !E_D) 
-    {
-        error_manager.append_error("Estimation: Memory Error");
-        goto fin;
-    }
-
-    for(int i = 0 ; i < E_T ; i++) 
-        MATE(minstr, i, 0) = 1.0;
+    D.setZero(E_T, E_T);
+    
+    Eigen::MatrixXd m = Eigen::MatrixXd::Zero(E_T, E_NINSTR + 1);
+    for(int i = 0; i < E_T; i++) 
+        m(i, 0) = 1.0;
    
     double x;
     for(const std::string& instr : v_block_instrs) 
@@ -246,13 +218,13 @@ int Estimation::E_prep_instrs()
         catch(const std::exception&) 
         {
             error_manager.append_error("Estimation: Syntax Error");
-            goto fin;
+            return -1;
         }
 
         if(clec->link(E_DBV, E_DBS) != 0) 
         {
             error_manager.append_error("Estimation: Link Error");
-            goto fin;
+            return -1;
         }
 
         for(int t = 0 ; t < E_T ; t++) 
@@ -261,26 +233,25 @@ int Estimation::E_prep_instrs()
         }
     }
 
-    M_xprimx(miip, minstr);
-    M_inv_1(miipi, miip);
-    if(M_errno) 
-    {
-        error_manager.append_error("Estimation : Dreg Error");
-        goto fin;
-    }
+    // (m^T m)
+    Eigen::MatrixXd mT = m.transpose();
+    Eigen::MatrixXd mTm = mT * m;
     
-    M_trans(mip, minstr);
-    M_prod(mipiipi, minstr, miipi);
-    M_prod(E_D, mipiipi, mip);
-    return 0;
+    // (m^T m)^{-1}
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(mTm);
+    if(!lu.isInvertible())
+    {
+        error_manager.append_error("Estimation : Cannot compute the matrix of instruments");
+        return -1;
+    }
+    Eigen::MatrixXd mTm_inv = lu.inverse();
+    
+    // m (m^T m)^{-1}
+    Eigen::MatrixXd m_mTm_inv = m * mTm_inv;
 
-fin:
-    M_free(minstr);
-    M_free(mip);
-    M_free(miip);
-    M_free(miipi);
-    M_free(mipiipi);
-    return -1;
+    // D = m (m^T m)^{-1} m^T
+    D = m_mTm_inv * mT;
+    return 0;
 }
 
 
@@ -293,11 +264,11 @@ fin:
  *  
  *  @global     int  E_NC       Nb of coefficients (total)
  *  @global     int  E_NCE      Nb of estimated coefficients (total)
- *  @global     MAT* E_NBCE     Nb of estimated coefficients per equation (MAT(1,E_NEQ))
+ *  @global     MAT* NB_COEFS_EQ     Nb of estimated coefficients per equation
  *  @global     std::vector<int> v_coef_names    position in E_DBS of the estimated coefs
  *  @global     int  E_DBS      global KDB of scalars
- *  @global     MAT* E_C        MAT 1 col of estimated coefficients
- *  @global     MAT* E_SMO      MAT 1 col of relaxation params
+ *  @global     MAT* COEFS    MAT 1 col of estimated coefficients
+ *  @global     MAT* SMO      MAT 1 col of relaxation params
  *  @return     int             0 on success, -1 on error
  *  
  */
@@ -308,7 +279,7 @@ int Estimation::E_prep_coefs()
     
     // Loop on equations and names in each equations (linked before with E_BDS)
     E_NCE = 0;
-    E_NBCE = M_alloc(1, E_NEQ);
+    NB_COEFS_EQ.setZero(E_NEQ);
 
     std::shared_ptr<CLEC> clec = nullptr; 
     for(int i = 0 ; i < E_NEQ ; i++) 
@@ -333,7 +304,7 @@ int Estimation::E_prep_coefs()
                 if(E_DBS->get_obj_ptr(name)->relax > 0)
                 {
                     E_NCE++;
-                    MATE(E_NBCE, 0, i)++;
+                    NB_COEFS_EQ(i)++;
                 } 
             }
         }
@@ -348,8 +319,8 @@ int Estimation::E_prep_coefs()
     }
 
     int nb_coefs = (int) v_coef_names.size();
-    E_C = M_alloc(nb_coefs, 1);
-    E_SMO = M_alloc(nb_coefs, 1);
+    COEFS.setZero(nb_coefs);
+    SMO.setZero(nb_coefs);
     E_get_SMO();
     E_get_C();
     return 0;
@@ -357,15 +328,15 @@ int Estimation::E_prep_coefs()
 
 
 /**
- *  Saves in E_C the values of the estimated coefficients. 
+ *  Saves in COEFS the values of the estimated coefficients. 
  *  These values are retrieved from E_DBS.
  *  
  *  If the absolute value of an estimated coefficient is less than 1e-15, 
  *  it is replaced by 0.1 in E_DBS to avoid precision and convergence problems.
  *    
- *  @global     MAT*    E_C (E_NC x 1)   Array of estimated coefficient values
- *  @global     std::vector<int> v_coef_names    position in E_DBS of the estimated coefs
- *  @global     KDB*    E_DBS               KDB of scalars for the estimation
+ *  @global     MAT*    COEFS             Array of estimated coefficient values
+ *  @global     vector<int> v_coef_names    position in E_DBS of the estimated coefs
+ *  @global     KDB    E_DBS                KDB of scalars for the estimation
  */
 void Estimation::E_get_C()
 {
@@ -379,141 +350,66 @@ void Estimation::E_get_C()
             c = 0.1;
             E_DBS->get_obj_ptr(scl_name)->value = c;
         }
-        MATE(E_C, i, 0) = c;
+        COEFS(i) = c;
         i++;
     }
 }
 
 
 /**
- *  Copies the values in E_C to the KDB E_DBS.
+ *  Copies the values in COEFS to the KDB E_DBS.
  *  
- *  @global     MAT*    E_C       Array of estimated coefficient values: MAT(E_NC, 1)
- *  @global     std::vector<int> v_coef_names   position in E_DBS of the estimated coefs
- *  @global     KDB*    E_DBS     KDB of scalars for the estimation
+ *  @global     MAT*    COEFS             Array of estimated coefficient values
+ *  @global     vector<int> v_coef_names    position in E_DBS of the estimated coefs
+ *  @global     KDB*    E_DBS               KDB of scalars for the estimation
  */
 void Estimation::E_put_C()
 {
     int i = 0;
     for(const std::string& scl_name : v_coef_names) 
     {
-        E_DBS->get_obj_ptr(scl_name)->value = MATE(E_C, i, 0);
+        E_DBS->get_obj_ptr(scl_name)->value = COEFS(i);
         i++;
     }
 }
 
 
 /**
- *  Saves in E_SMO (NC x 1) the relaxation parameters of each coefficient of the equation block. 
+ *  Saves in SMO (size NC) the relaxation parameters of each coefficient of the equation block. 
  *  These values are searched in E_DBS.
  *  
- *  @global     MAT*    E_SMO          Array of relaxation parameters (E_NC x 1)
- *  @global     std::vector<int> v_coef_names        position in E_DBS of the estimated coefs
- *  @global     KDB*    E_DBS          KDB of scalars for the estimation
+ *  @global     MAT*    SMO               Vector of relaxation parameters
+ *  @global     vector<int> v_coef_names    position in E_DBS of the estimated coefs
+ *  @global     KDB*    E_DBS               KDB of scalars for the estimation
  */
 void Estimation::E_get_SMO()
 {
     int i = 0;
     for(const std::string& scl_name : v_coef_names) 
     {
-        MATE(E_SMO, i, 0) = E_DBS->get_obj_ptr(scl_name)->relax;
+        SMO(i) = E_DBS->get_obj_ptr(scl_name)->relax;
         i++;
     }
-}
-
-
-/**
- *  Resets all global variables.
- */
-void Estimation::E_prep_reset()
-{
-    v_block_rhs.clear();
-    v_coef_names.clear();
-
-    E_NINSTR = 0;
-    E_RHS = 0;
-    E_LHS = 0;
-    E_U = 0;
-    E_G = 0;
-    E_VCC = 0;
-    E_VCCTMP = 0;
-    E_M = 0;
-    E_MTMP = 0;
-    E_MTMPP = 0;
-    E_D = 0;
-    E_C = 0;
-    E_SMO = 0;
-    E_NBCE = 0;
-    E_VCU = 0;
-    E_IVCU = 0;
-    E_MCU = 0;
-    E_GMU = 0;
-    E_dC = 0;
-    E_DF = 0;
-    E_SSRES = 0;
-    E_RSQUARE_ADJ = 0;
-    E_DW = 0;
-    E_LOGLIK = 0;
-    E_STDERR = 0;
-    E_MEAN_Y = 0;
-    E_STDEV = 0;
-    E_RSQUARE = 0;
-    E_FSTAT = 0;
-    E_STD_PCT = 0;
-    E_MCORR = 0;
-    E_MCORRU = 0;
-    E_DEV = 0;
-    E_UM = 0;
-    E_UMT = 0;
-    E_UMTMP = 0;
-    E_UVCCTMP = 0;
-    E_GMUTMP = 0;
 }
 
 /**
  *  Frees all allocated variables for the last estimation.
  */
-void Estimation::E_free_work()
+void Estimation::clear()
 {
-    M_free(E_RHS);
-    M_free(E_LHS);
-    M_free(E_U);
-    M_free(E_G);
-    M_free(E_VCC);
-    M_free(E_VCCTMP);
-    M_free(E_M);
-    M_free(E_MTMP);
-    M_free(E_MTMPP);
-    M_free(E_D);
-    M_free(E_C);
-    M_free(E_SMO);
-    M_free(E_NBCE);
-    M_free(E_VCU);
-    M_free(E_IVCU);
-    M_free(E_MCU);
-    M_free(E_GMU);
-    M_free(E_dC);
-    M_free(E_DF);
-    M_free(E_RSQUARE_ADJ);
-    M_free(E_DW);
-    M_free(E_LOGLIK);
-    M_free(E_SSRES);
-    M_free(E_STDERR);
-    M_free(E_MEAN_Y);
-    M_free(E_STDEV);
-    M_free(E_RSQUARE);
-    M_free(E_FSTAT);
-    M_free(E_STD_PCT);
-    M_free(E_MCORR);
-    M_free(E_MCORRU);
-    M_free(E_DEV);
-    M_free(E_UM);
-    M_free(E_UMT);
-    M_free(E_UMTMP);
-    M_free(E_UVCCTMP);
-    M_free(E_GMUTMP);
+    E_NINSTR = 0;
+    v_block_rhs.clear();
+    v_coef_names.clear();
 
-    E_prep_reset();
+    RHS.resize(0, 0);
+    LHS.resize(0, 0);
+    U.resize(0, 0);
+    VCU.resize(0, 0);
+    IVCU.resize(0, 0);
+    D.resize(0, 0);
+    G.resize(0, 0);
+    VCC.resize(0, 0);
+    MCU.resize(0, 0);
 }
 
 
@@ -532,14 +428,14 @@ void Estimation::E_free_work()
  */
 int Estimation::E_prep()
 {
-    E_prep_reset();
+    clear();
     if(E_prep_lecs()) 
         return -1;
     if(E_prep_instrs()) 
         return -1;
     if(E_prep_coefs()) 
         return -1;
-    if(E_prep_alloc()) 
+    if(E_prep_matrices()) 
         return -1;
     return 0;
 }

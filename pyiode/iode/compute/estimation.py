@@ -118,7 +118,7 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     >>> #     df1 * d(ACAF[-1]) + df2*d(ACAF[-2]) + df3*d(ACAF[-3])  (ORDER)
     >>> df_scalars = dickey_fuller_test("ACAF", True, True, 3)
     Estimating : iteration 1 (||eps|| = 2.20454)
-    Estimating : iteration 2 (||eps|| = 2.39047e-10)
+    Estimating : iteration 2 (||eps|| = 1.2551e-10)
     Solution reached after 2 iteration(s). Creating results file ...
     >>> df_scalars.get_names("df*")
     ['df1', 'df2', 'df3', 'df_', 'df_d', 'df_t']
@@ -916,7 +916,7 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
 
         >>> corr_matrix = estimation.correlation_matrix
@@ -927,11 +927,11 @@ class EditAndEstimateEquations:
         >>> corr_matrix         # doctest: +NORMALIZE_WHITESPACE
                    |      acaf1       acaf2       acaf4      dpuh_1      dpuh_2
         ------------------------------------------------------------------------
-             acaf1 |          1   -0.935266    0.200167   0.0448324  -0.0372903
-             acaf2 |  -0.935266           1   -0.300833  -0.0016619   0.0395814
-             acaf4 |   0.200167   -0.300833           1  0.00037477  -0.00892588
-            dpuh_1 |  0.0448324  -0.0016619  0.00037477           1  -0.0419869
-            dpuh_2 | -0.0372903   0.0395814  -0.00892588  -0.0419869           1
+             acaf1 |          1   -0.935309    0.200167   0.0448324  -0.0372903
+             acaf2 |  -0.935309           1   -0.300856  -0.00166203   0.0395846
+             acaf4 |   0.200167   -0.300856           1  0.00037477  -0.00892588
+            dpuh_1 |  0.0448324  -0.00166203  0.00037477           1  -0.0419869
+            dpuh_2 | -0.0372903   0.0395846  -0.00892588  -0.0419869           1
         <BLANKLINE>
         """
         cy_corr_matrix = self._cy_estimation.get_correlation_matrix()
@@ -962,15 +962,15 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.012562123799025719, 0.012491075190782528, ..., -0.0029850522299011313, 0.004490336374472843]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.0011500819360282539, 0.0035371269900280385, ..., -8.673617379884035e-19, 0.0024666316945562974]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
@@ -1006,15 +1006,15 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.012562123799025719, 0.012491075190782528, ..., -0.0029850522299011313, 0.004490336374472843]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.0011500819360282539, 0.0035371269900280385, ..., -8.673617379884035e-19, 0.0024666316945562974]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
@@ -1050,15 +1050,15 @@ class EditAndEstimateEquations:
         >>> estimation.block = "ACAF;DPUH", "ACAF"
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
 
         >>> estimation.get_observed_values("ACAF")      # doctest: +ELLIPSIS
         [0.011412041862997465, 0.016028202180810566, ..., -0.002985052229901132, 0.00695696806902914]
         >>> estimation.get_fitted_values("ACAF")        # doctest: +ELLIPSIS
-        [0.01256212379902523, 0.01249107519078205, ..., -0.002985052229901133, 0.004490336374473415]
+        [0.012562123799025719, 0.012491075190782528, ..., -0.0029850522299011313, 0.004490336374472843]
         >>> estimation.get_residual_values("ACAF")      # doctest: +ELLIPSIS
-        [-0.0011500819360277647, 0.0035371269900285156, ..., 8.673617379884035e-19, 0.002466631694555725]
+        [-0.0011500819360282539, 0.0035371269900280385, ..., -8.673617379884035e-19, 0.0024666316945562974]
 
         >>> estimation.get_observed_values("DPUH")      # doctest: +ELLIPSIS
         [0.06044527980207867, 0.08768972383253629, ..., 0.0424313077256923, 0.0064336499579307135]
@@ -1145,7 +1145,7 @@ class EditAndEstimateEquations:
         False
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
         >>> estimation.is_done
         True
@@ -1163,11 +1163,11 @@ class EditAndEstimateEquations:
         >>> corr_matrix         # doctest: +NORMALIZE_WHITESPACE
                    |      acaf1       acaf2       acaf4      dpuh_1      dpuh_2
         ------------------------------------------------------------------------
-             acaf1 |          1   -0.935266    0.200167   0.0448324  -0.0372903
-             acaf2 |  -0.935266           1   -0.300833  -0.0016619   0.0395814
-             acaf4 |   0.200167   -0.300833           1  0.00037477  -0.00892588
-            dpuh_1 |  0.0448324  -0.0016619  0.00037477           1  -0.0419869
-            dpuh_2 | -0.0372903   0.0395814  -0.00892588  -0.0419869           1
+             acaf1 |          1   -0.935309    0.200167   0.0448324  -0.0372903
+             acaf2 |  -0.935309           1   -0.300856  -0.00166203   0.0395846
+             acaf4 |   0.200167   -0.300856           1  0.00037477  -0.00892588
+            dpuh_1 |  0.0448324  -0.00166203  0.00037477           1  -0.0419869
+            dpuh_2 | -0.0372903   0.0395846  -0.00892588  -0.0419869           1
         <BLANKLINE>
 
         >>> equations_est["ACAF"]             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
@@ -1402,7 +1402,7 @@ class EditAndEstimateEquations:
 
         >>> success = estimation.estimate()                 # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Estimating : iteration 1 (||eps|| = 2.01246)
-        Estimating : iteration 2 (||eps|| = 7.77305e-08)
+        Estimating : iteration 2 (||eps|| = 7.76463e-08)
         Solution reached after 2 iteration(s). Creating results file ...
 
         >>> scalars["acaf1"]
@@ -1431,5 +1431,4 @@ class EditAndEstimateEquations:
             to_period = str(to_period)
         
         return self._cy_estimation.save(from_period, to_period)
-
 

@@ -242,19 +242,19 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(m_corr->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr->get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 1)) / 1e6, -0.935266);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 1)) / 1e6, -0.935309);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 2)) / 1e6, 0.200167);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 3)) / 1e6, 0.044832);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 4)) / 1e6, -0.03729);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 0)) / 1e6, -0.935266);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 0)) / 1e6, -0.935309);
     EXPECT_DOUBLE_EQ(m_corr->get_value(1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 2)) / 1e6, -0.300833);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 2)) / 1e6, -0.300856);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 3)) / 1e6, -0.001662);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 4)) / 1e6, 0.039581);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 4)) / 1e6, 0.039585);
     // -- line 2
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 0)) / 1e6, 0.200167);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 1)) / 1e6, -0.300833);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 1)) / 1e6, -0.300856);
     EXPECT_DOUBLE_EQ(m_corr->get_value(2, 2), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 3)) / 1e6, 0.000375);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 4)) / 1e6, -0.008926);
@@ -266,7 +266,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(3, 4)) / 1e6, -0.041987);
     // -- line 3
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 0)) / 1e6, -0.03729);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 1)) / 1e6, 0.039581);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 1)) / 1e6, 0.039585);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 2)) / 1e6, -0.008926);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 3)) / 1e6, -0.041987);
     EXPECT_DOUBLE_EQ(m_corr->get_value(4, 4), 1.);
@@ -373,15 +373,15 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_EQ(m_corr2->nb_coeffs, c_estimation->E_NCE);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr2->get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(0, 1)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(0, 1)) / 1e6, -0.936096);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(0, 2)) / 1e6, 0.20017);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(1, 0)) / 1e6, -0.936111);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(1, 0)) / 1e6, -0.936096);
     EXPECT_DOUBLE_EQ(m_corr2->get_value(1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(1, 2)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(1, 2)) / 1e6, -0.30075);
     // -- line 2
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(2, 0)) / 1e6, 0.20017);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(2, 1)) / 1e6, -0.300746);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr2->get_value(2, 1)) / 1e6, -0.30075);
     EXPECT_DOUBLE_EQ(m_corr2->get_value(2, 2), 1.);
 
     // -- DPUH
@@ -480,19 +480,19 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     EXPECT_EQ(m_corr->nb_coeffs, 5);
     // -- line 0
     EXPECT_DOUBLE_EQ(m_corr->get_value(0, 0), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 1)) / 1e6, -0.935266);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 1)) / 1e6, -0.935309);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 2)) / 1e6, 0.200167);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 3)) / 1e6, 0.044832);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(0, 4)) / 1e6, -0.03729);
     // -- line 1
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 0)) / 1e6, -0.935266);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 0)) / 1e6, -0.935309);
     EXPECT_DOUBLE_EQ(m_corr->get_value(1, 1), 1.);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 2)) / 1e6, -0.300833);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 2)) / 1e6, -0.300856);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 3)) / 1e6, -0.001662);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 4)) / 1e6, 0.039581);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(1, 4)) / 1e6, 0.039585);
     // -- line 2
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 0)) / 1e6, 0.200167);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 1)) / 1e6, -0.300833);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 1)) / 1e6, -0.300856);
     EXPECT_DOUBLE_EQ(m_corr->get_value(2, 2), 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 3)) / 1e6, 0.000375);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(2, 4)) / 1e6, -0.008926);
@@ -504,7 +504,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(3, 4)) / 1e6, -0.041987);
     // -- line 3
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 0)) / 1e6, -0.03729);
-    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 1)) / 1e6, 0.039581);
+    EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 1)) / 1e6, 0.039585);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 2)) / 1e6, -0.008926);
     EXPECT_DOUBLE_EQ(round(1e6 * m_corr->get_value(4, 3)) / 1e6, -0.041987);
     EXPECT_DOUBLE_EQ(m_corr->get_value(4, 4), 1.);

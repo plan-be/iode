@@ -41,6 +41,11 @@
 #include <stdexcept>
 #include <filesystem>
 
+// For Eigen3 -> raise an exception instead of aborting the program
+#undef eigen_assert
+#define eigen_assert(x)  if(!(x)) { throw std::runtime_error("Eigen: method or operation invalid."); }
+
+
 // Platform-specific headers
 #ifdef _WIN32
     #include <Windows.h>
