@@ -10,7 +10,8 @@
  *      void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)           Prepares HP_calc()
  */
 #include "api/iode_scr4.h"
-#include "scr4/mat/s_mat.h"
+#include <Eigen/Dense>
+#include <Eigen/LU>
 
 #include "api/lec/lec.h"
 
@@ -30,79 +31,82 @@
  */
 int HP_calc(double *f_vec, double *t_vec, int nb, double lambda, int std)
 {
+    double y1[3] = {1.0, -2.0, 1.0};
+    double y2[4] = {-2.0, 5.0, -4.0, 1.0};
+    double yn[5] = {1.0, -4.0, 6.0, -4.0, 1.0};
 
-    static  double y1[3] = {1.0, -2.0, 1.0},
-                      y2[4] = {-2.0, 5.0, -4.0, 1.0},
-                      yn[5] = {1.0, -4.0, 6.0, -4.0, 1.0};
-    int     i, j;
-    MAT     *yt = NULL, 
-            *gt = NULL, 
-            *a = NULL;
-
-    // nb must be ge 4 (0 <= nb - 1 - j avec j = 3) // JMP 5/7/2017
-    if(nb < 4) {
-        for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN;
+    // nb must be ge 4 (0 <= nb - 1 - j with j = 3)
+    if(nb < 4) 
+    {
+        for(int i = 0; i < nb; i++) 
+            t_vec[i] = IODE_NAN;
         return -1;
     }
-    // JMP 5/7/2017
 
-    yt = M_alloc(nb, 1);
-    gt = M_alloc(nb, 1);
-    a  = M_alloc(nb, nb);
+    Eigen::VectorXd yt = Eigen::VectorXd::Zero(nb);
+    Eigen::VectorXd gt = Eigen::VectorXd::Zero(nb);
+    Eigen::MatrixXd a  = Eigen::MatrixXd::Zero(nb, nb);
 
-    if(yt == NULL || gt == NULL  || a == NULL) goto err;
-
-    // Prépare la matrice (weights)
-    for(j = 0; j < 3; j ++) {
-        MATE(a, 0, j) = lambda * y1[j];
-        MATE(a, nb - 1, nb - 1 - j) = lambda * y1[j];
+    // prepare weights
+    for(int j = 0; j < 3; j ++) 
+    {
+        a(0, j) = lambda * y1[j];
+        a(nb - 1, nb - 1 - j) = lambda * y1[j];
     }
 
-    for(j = 0; j < 4; j ++) {
-        MATE(a, 1, j) = lambda * y2[j];
-        MATE(a, nb - 2, nb - 1 - j) = lambda * y2[j];
+    for(int j = 0; j < 4; j ++) 
+    {
+        a(1, j) = lambda * y2[j];
+        a(nb - 2, nb - 1 - j) = lambda * y2[j];
     }
 
-    for(i = 2; i < nb - 2; i++) {
-        for(j = 0; j < 5; j++) MATE(a, i, j + i - 2) = lambda * yn[j];
-    }
-    for(i = 0; i < nb; i++) MATE(a, i, i) = MATE(a, i, i) + 1;
+    for(int i = 2; i < nb - 2; i++) 
+        for(int j = 0; j < 5; j++) 
+            a(i, j + i - 2) = lambda * yn[j];
+
+    for(int i = 0; i < nb; i++) 
+        a(i, i) += 1;
 
     // Compute the vector yt to smooth
-    for(i = 0; i < nb; i++)
-        MATE(yt, i, 0) = f_vec[i];
+    for(int i = 0; i < nb; i++)
+        yt(i) = f_vec[i];
 
     // Compute log(yt) if std == 0
-    if(std == 0) {
-        for(i = 0; i < nb; i++) {
-            if(f_vec[i] <= 0) goto err;    // JMP 26-07-11
-            MATE(yt, i, 0) = log(MATE(yt, i, 0));
+    if(std == 0) 
+    {
+        for(int i = 0; i < nb; i++) 
+        {
+            if(f_vec[i] <= 0)
+            {
+                for(int i = 0; i < nb; i++) 
+                    t_vec[i] = IODE_NAN;
+                return -1;
+            } 
+            
+            yt(i) = log(yt(i));
         }
     }
 
-    // Solve the system yt = a . gt and save result in t_vec
-    M_solve(gt, a, yt);
-    for(i = 0; i < nb; i++)
-        t_vec[i] = MATE(gt, i, 0);
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(a);
+    if(!lu.isInvertible())
+    {
+        for(int i = 0; i < nb; i++) 
+            t_vec[i] = IODE_NAN;
+        return -1;
+    }
+    gt = lu.solve(yt);
+    
+    for(int i = 0; i < nb; i++)
+        t_vec[i] = gt(i);
 
     // exp(t_vec) if std == 0
-    if(std == 0) {
-        for(i = 0; i < nb; i++)
+    if(std == 0) 
+    {
+        for(int i = 0; i < nb; i++)
             t_vec[i] = exp(t_vec[i]);
     }
 
-    // Free mem
-    M_free(yt);
-    M_free(gt);
-    M_free(a);
     return 0;
-
-err:
-    M_free(yt);
-    M_free(gt);
-    M_free(a);
-    for(i = 0; i < nb; i++) t_vec[i] = IODE_NAN; /* JMP 26-07-11 */
-    return -1;
 }
 
 
@@ -125,13 +129,14 @@ err:
  */
 void HP_test(double *f_vec, double *t_vec, int nb, int *beg, int *dim)
 {
-    int     i;
-
     for(*beg = 0; *beg < nb && !IODE_IS_A_NUMBER(f_vec[*beg]); (*beg)++)
         t_vec[*beg] = IODE_NAN;
+    
     for(*dim = *beg; *dim < nb && IODE_IS_A_NUMBER(f_vec[*dim]); (*dim)++);
 
-    for(i = *dim; i < nb; i++) t_vec[i] = IODE_NAN;
-    *dim -= *beg; /* JMP 26-07-11 */
+    for(int i = *dim; i < nb; i++) 
+        t_vec[i] = IODE_NAN;
+    
+    *dim -= *beg;
 }
 
