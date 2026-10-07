@@ -1,6 +1,5 @@
 ﻿#ifndef DOS
 #include "scr4.h"
-#include "mat/s_mat.h"
 #include "s_xdr.h"
 
 #else
@@ -17,7 +16,6 @@
 #include <windows.h>
 #include "scr4.h" 
 #include "swap/s_swap.h"
-#include "mat/s_mat.h"
 #include "s_xdr.h"
 #include <ddeml.h>
 
