@@ -1,16 +1,5 @@
-/**
- *  @header4iode
- * 
- *  Implementation of a RAS algorithm. 
- *  
- *  List of functions
- *  -----------------
- *      int RasExecute(char *pattern, char *xdim, char *ydim, Period *rper, Period *cper, int maxit, double eps) | Implementation of a RAS algorithm
- *  
- *  
- */
 #include "api/iode_scr4.h"
-#include "scr4/mat/s_mat.h"
+#include <Eigen/Dense>
 
 #include "api/pch.h"
 #include "api/b_args.h"
@@ -58,20 +47,21 @@ static double RasGetVar(char* c_name, int t)
     return(var);
 }
 
-static int RasCalc(MAT *A, double *row, double *col, int maxiter, double eps)
+static int RasCalc(Eigen::MatrixXd& A, double *row, double *col, int maxiter, double eps)
 {
     int rc = 0;
     int i, j, iter,ncols, nrows,imax,jmax;
     double rsum,csum,dis,dismax,rdismax,cdismax,cdis,rdis;
 
-    nrows = A->m_nl;
-    ncols = A->m_nc;
+    nrows = (int) A.rows();
+    ncols = (int) A.cols();
     // Ensure that the sum of the controls are the same
     rsum = 0.;
     csum = 0.;
     for(i = 0; i < nrows; i++) rsum += row[i];
     for(j = 0; j < ncols; j++) csum += col[j];
-    if(fabs(csum - rsum) > eps) {
+    if(fabs(csum - rsum) > eps) 
+    {
         std::string error_msg = "RAS : sum of rows (" + std::to_string(rsum);
         error_msg += ") != sum of cols (" + std::to_string(csum) + ")";
         error_manager.append_error(error_msg);
@@ -84,32 +74,47 @@ top:
     rdismax = 0.;
     cdismax = 0.;
     // scale columns
-    for(j = 0; j < ncols; j++) {
-        if(col[j] == 0) continue;
+    for(j = 0; j < ncols; j++) 
+    {
+        if(col[j] == 0) 
+            continue;
         csum = 0.;
 
-        for(i = 0; i < nrows; i++) csum += MATE(A, i, j);
-        if(fabs(csum) > 0) csum = col[j]/csum;
-        else csum = 0.;
+        for(i = 0; i < nrows; i++) 
+            csum += A(i, j);
+        if(fabs(csum) > 0) 
+            csum = col[j]/csum;
+        else 
+            csum = 0.;
 
-        for(i = 0; i < nrows; i++) MATE(A, i, j) *= csum;
+        for(i = 0; i < nrows; i++) 
+            A(i, j) *= csum;
         dis = fabs(csum -1.);
-        if(dis > cdismax) {
+        if(dis > cdismax) 
+        {
             cdismax = dis;
             cdis = csum -1.;
             jmax = j;
         }
     }
     // scale rows
-    for(i = 0; i < nrows; i++) {
-        if(row[i] == 0) continue;
+    for(i = 0; i < nrows; i++) 
+    {
+        if(row[i] == 0) 
+            continue;
         rsum = 0;
-        for(j = 0; j < ncols; j++) rsum += MATE(A, i, j);
-        if(fabs(rsum) > 0) rsum = row[i]/rsum;
-        else rsum = 0.;
-        for(j = 0; j < ncols; j++) MATE(A, i, j) *= rsum;
+        for(j = 0; j < ncols; j++) 
+            rsum += A(i, j);
+        if(fabs(rsum) > 0) 
+            rsum = row[i]/rsum;
+        else 
+            rsum = 0.;
+
+        for(j = 0; j < ncols; j++) 
+            A(i, j) *= rsum;
         dis = fabs(rsum -1.);
-        if(dis > rdismax) {
+        if(dis > rdismax) 
+        {
             rdismax = dis;
             rdis = rsum -1.;
             imax = i;
@@ -118,15 +123,18 @@ top:
     // convergence check
     dismax = cdismax > rdismax ? cdismax : rdismax;
     kmsg("RAS             %d iter, %f < %f", iter, dismax, eps);
-    if(iter <= maxiter && dismax > eps) goto top;
+    if(iter <= maxiter && dismax > eps) 
+        goto top;
 
-    if(dismax > eps) {
+    if(dismax > eps) 
+    {
         std::string error_msg = "RAS : diverges (" + std::to_string(dismax);
         error_msg += " > " + std::to_string(eps) + ")";
         error_manager.append_error(error_msg);
         rc = -1;
     }
-    else {
+    else 
+    {
         kmsg("RAS converged,  %d iter, %f < %f", iter, dismax, eps);
         rc = 0;
     }
@@ -157,12 +165,12 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     std::vector<std::string> xvars;
     std::vector<std::string> yvars;
     char    cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1];
-    MAT     *A = NULL;
     double  *row = NULL;
     double  *col = NULL;
     double  var, fvar;
     KDBVariablesPtr kdb = global_ws_var;
 
+    Eigen::MatrixXd A;
     if(rper != NULL && cper != NULL) 
     {
         rt = rper->difference(kdb->get_sample()->start_period);
@@ -178,8 +186,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
 
         if(nrows == 0 || ncols == 0) goto cleanup;
 
-        A = M_alloc(nrows, ncols);
-        if(A == NULL) return -1;
+        A.setZero(nrows, ncols);
         row = (double *) SCR_malloc(sizeof(double) * nrows);
         col = (double *) SCR_malloc(sizeof(double) * ncols);
 
@@ -188,17 +195,21 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
             strcpy(rvar, pattern);
             SCR_replace((unsigned char*) rvar, (unsigned char*) "x", (unsigned char*) xvars[crow].c_str());
 
-            for(ccol = 0; ccol < ncols; ccol++) {
+            for(ccol = 0; ccol < ncols; ccol++) 
+            {
                 strcpy(cvar, rvar);
                 SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol].c_str());
 
                 var = RasGetVar(cvar, rt);
-                if(!IODE_IS_A_NUMBER(var)) goto cleanup;
+                if(!IODE_IS_A_NUMBER(var)) 
+                    goto cleanup;
 
                 fvar = RasGetVar(cvar, ct); // fixed var for current year
-                if(!IODE_IS_A_NUMBER(fvar))  MATE(A, crow, ccol) = var;
-                else {
-                    MATE(A, crow, ccol) = 0.0;
+                if(!IODE_IS_A_NUMBER(fvar)) 
+                    A(crow, ccol) = var;
+                else 
+                {
+                    A(crow, ccol) = 0.0;
                     row[crow] -= fvar;
                     col[ccol] -= fvar;
                 }
@@ -237,7 +248,7 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
                 SCR_replace((unsigned char*) cvar, (unsigned char*) "y", (unsigned char*) yvars[ccol].c_str());
                 // keep var if fixed
                 if(!IODE_IS_A_NUMBER(RasGetVar(cvar, ct)))
-                    if(RasSetVar(cvar, ct, MATE(A, crow, ccol)) < 0) goto cleanup;
+                    if(RasSetVar(cvar, ct, A(crow, ccol)) < 0) goto cleanup;
             }
         }
         rc = 0;
@@ -245,7 +256,6 @@ int RasExecute(char *pattern, char *xdim, char *ydim,
     }
 
 cleanup:
-    if(A != NULL) M_free(A);
     if(row != NULL) SCR_free((unsigned char**) row);
     if(col != NULL) SCR_free((unsigned char**) col);
     return rc;
