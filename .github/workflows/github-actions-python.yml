@@ -104,8 +104,6 @@ jobs:
             run: conda info
           - name: Install Python libraries
             shell: bash -el {0}
-            # fixed numpy<2.0 since newer versions make mypy to crash 
-            # (see mypy issue https://github.com/python/mypy/issues/17538)
             run: |
               pip install -r doc/requirements.txt
           - name: Uninstall optional dependencies (larray)
