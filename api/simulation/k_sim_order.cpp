@@ -53,7 +53,7 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
     {
         int i = -1;
         new_eq_added = false;
-        for(const auto& [eq_name, _] : sim_dbe->k_objs) 
+        for(const std::string& eq_name : sim_dbe->get_names()) 
         {
             i++;
 
@@ -156,10 +156,12 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
     int eq_pos;
     int i = 0, j = 0;
     bool exchange = false;
+    std::shared_ptr<Equation> eq_ptr;
     std::shared_ptr<CLEC> clec;
     std::string eq_name_resolved;
-    for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
+    for(const std::string& eq_name : sim_dbe->get_names()) 
     {
+        eq_ptr = sim_dbe->get_obj_ptr(eq_name);
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
         eq_predecessors.reserve(clec->v_obj_names.size());
@@ -240,7 +242,7 @@ void CSimulation::order(const std::vector<std::string>& eqs)
         v_ordered_eqs.reserve(nb);
         if(eqs.size() == 0)
         {
-            for(const auto& [eq_name, _] : sim_dbe->k_objs) 
+            for(const std::string& eq_name : sim_dbe->get_names()) 
                 v_ordered_eqs.push_back(eq_name);
         }
         else
@@ -251,7 +253,7 @@ void CSimulation::order(const std::vector<std::string>& eqs)
 
     int idx = 0;
     std::vector<std::string> v_eq_names(nb, "");
-    for(const auto& [name, _] : sim_dbe->k_objs) 
+    for(const std::string& name : sim_dbe->get_names()) 
     {
         v_eq_names[idx] = name;
         idx++;

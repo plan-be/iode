@@ -179,10 +179,11 @@ bool KDBComments::save_asc(const std::string& filename)
     Comment cmt_utf8;
     Comment cmt_oem;
     bool success = true;
-    for(auto& [name, cmt_ptr] : k_objs) 
+    for(const std::string& name : obj_names) 
     {
         try
         {
+            std::shared_ptr<Comment> cmt_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
             cmt_utf8 = Comment(*cmt_ptr);
             std::erase(cmt_utf8, '\n');

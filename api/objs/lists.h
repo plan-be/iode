@@ -79,16 +79,17 @@ inline std::array<KDBListsPtr, 5> global_ref_lst = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline std::size_t hash_value(KDBLists const& cpp_kdb)
+inline std::size_t hash_value(KDBLists const& kdb)
 {
-    if(cpp_kdb.size() == 0)
+    if(kdb.size() == 0)
         return 0;
 
     std::size_t seed = 0;
-    for(const auto& [name, list_ptr] : cpp_kdb.k_objs)
+    for(const std::string& name : kdb.get_names())
     {
+        std::shared_ptr<List> lst_ptr = kdb.get_obj_ptr(name);
         hash_combine<std::string>(seed, name);
-        hash_combine<std::string>(seed, *list_ptr);
+        hash_combine<std::string>(seed, *lst_ptr);
     }
 
     return seed;

@@ -6,6 +6,7 @@
 #include "api/objs/xdr.h"
 
 #include <unordered_set>
+#include <iterator>
 
 #ifndef SKBUILD
     #include "gtest/gtest.h"
@@ -417,9 +418,9 @@ template<class D, class T> struct KDBTemplate: public KDB, public std::enable_sh
 public:    
     // NOTE: if an IODE object is added/removed/updated from the current database,
     //       it must also done in all subset instances ('shallow copies')
-    std::map<std::string, std::shared_ptr<T>> k_objs;
-    // cache of k_objs keys kept in sync with k_objs (below) for fast lookups
-    std::unordered_set<std::string> obj_names;
+    std::unordered_map<std::string, std::shared_ptr<T>> k_objs;
+    // k_objs keys in alphabetical order and kept synchronized with k_objs 
+    std::set<std::string> obj_names;
 
 private:
     // only used by subsets ('shallow copies')
@@ -730,9 +731,7 @@ public:
      */
     bool contains(const std::string& name) const override
     {
-        // unordered_set (obj_names) -> fast O(1) lookup
-        // map<key, value> (k_objs) -> O(log n) lookup
-        return obj_names.contains(to_key(name));
+        return k_objs.contains(to_key(name));
     }
 
     bool parent_contains(const std::string& name) const
@@ -750,12 +749,10 @@ public:
     int index_of(const std::string& name) const override
     {
         std::string key = to_key(name);
-        // check_name(key, this->iode_type);
-        auto it = k_objs.find(key);
-        if (it != k_objs.end()) 
-            return (int) std::distance(k_objs.begin(), it);
-        else
+        auto it = obj_names.find(key);
+        if(it == obj_names.end())
             return -1;
+        return static_cast<int>(std::distance(obj_names.cbegin(), it));
     }
 
     // NOTE: - repeated calls to this function can be inefficient (O(n) each)
@@ -772,20 +769,20 @@ public:
             throw std::out_of_range(msg);
         }
 
-        auto it = k_objs.begin();
+        auto it = obj_names.begin();
         std::advance(it, index);
-        return const_cast<std::string&>(it->first);
+        return *it;
     }
 
     std::set<std::string> get_names() const override
     {
-        return std::set<std::string>(obj_names.begin(), obj_names.end());
+        return obj_names;
     }
 
     std::string get_names_as_string() const override
     {
         std::string names;
-        for(const auto& [name, _] : k_objs) 
+        for(const std::string& name : obj_names) 
             names += name + ";";
 
         // remove last ;

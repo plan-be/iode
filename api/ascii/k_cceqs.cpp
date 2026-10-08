@@ -504,10 +504,11 @@ bool KDBEquations::save_asc(const std::string& filename)
     }
 
     bool success = true;
-    for(auto& [name, eq_ptr] : k_objs) 
+    for(const std::string& name : obj_names)
     {
         try
         {
+            std::shared_ptr<Equation> eq_ptr = k_objs.at(name);
             fprintf(fd, "%s ", name.c_str());
             print_eq(fd, eq_ptr, name);
         }

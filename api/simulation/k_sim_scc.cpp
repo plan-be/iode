@@ -125,11 +125,10 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     v_nb_iterations.resize(sim_dbv->get_sample()->nb_periods, 0);
     v_cpu_time.resize(sim_dbv->get_sample()->nb_periods, 0);
 
-    /* LINK EQUATIONS + SAVE ENDO POSITIONS */
+    // link equations
     int rc = 0;
     bool success = true;
     std::string eq_name;
-    std::shared_ptr<Equation> eq_ptr = nullptr;
     kmsg("Linking equations ....");
     for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
     {

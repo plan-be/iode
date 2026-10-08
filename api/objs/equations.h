@@ -666,14 +666,15 @@ inline std::array<KDBEquationsPtr, 5> global_ref_eqs = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline std::size_t hash_value(KDBEquations const& cpp_kdb)
+inline std::size_t hash_value(KDBEquations const& kdb)
 {
-    if(cpp_kdb.size() == 0)
+    if(kdb.size() == 0)
         return 0;
 
     std::size_t seed = 0;
-    for(const auto& [name, eq_ptr] : cpp_kdb.k_objs)
+    for(const std::string& name : kdb.get_names())
     {
+        std::shared_ptr<Equation> eq_ptr = kdb.get_obj_ptr(name);
         hash_combine<std::string>(seed, name);
         hash_combine<Equation>(seed, *eq_ptr);
     }
