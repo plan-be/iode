@@ -61,6 +61,7 @@ TEST_F(KDBScalarsTest, Save)
 
     // save in ascii format
     global_ws_scl->save(str_output_test_dir + "fun.as");
+    compare_files(str_output_test_dir + "fun.as", str_input_test_dir + "fun.as");
 }
 
 TEST_F(KDBScalarsTest, Get)

@@ -58,6 +58,7 @@ TEST_F(KDBListsTest, Save)
 
     // save in ascii format
     global_ws_lst->save(str_output_test_dir + "fun.al");
+    compare_files(str_output_test_dir + "fun.al", str_input_test_dir + "fun.al");
 }
 
 TEST_F(KDBListsTest, Get)
