@@ -1,48 +1,59 @@
 # Requirements
 
-- Required tools:
-  - **Windows**:
-    - Compiler **MSVC >= 2022**.
-    - [CMake](https://cmake.org/download) (>= 3.30) (*) -> controls the software compilation process.
-    - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
-    <br> Can be installed using [winget](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages#windows) on Windows:
-      > winget install Ninja-build.Ninja
-    - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
-    - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
-    - SCR4 executables -> used to build the user documentation. 
-    <br> Ask maintainers to get access.
-  - **Linux (Ubuntu)**:
-    - Compiler **GCC and G++**: sudo apt install gcc g++ gdb build-essential
-    - **CMake**: sudo apt install cmake
-    - **Ninja**: sudo apt install ninja-build
-    - **LaTeX**: sudo apt install texlive-latex-extra
-    - [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
+Required tools:
 
- - Python libraries:
-   - cython == 3.1.4
-   - mypy
-   - scikit-build-core
-   - pyqt
-   - qtconsole
-   - ipython
-   - pytest
-   - numpy >= 2.4
-   - pandas >= 3.0
-   - larray
-   - sphinx 
-   - numpydoc
-   - nbsphinx
-   - sphinx_rtd_theme
-   - myst-parser
-   - build
-   - pkginfo >1.12
-   - setuptools >=77
-   - setuptools-scm
-   - twine
-   - conda-build
-   - conda-verify
-   - anaconda-client
-   - menuinst
+- **Windows**:
+  - Compiler **MSVC >= 2022**.
+  - [CMake](https://cmake.org/download) (*) -> controls the software compilation process.
+  - [Ninja](https://ninja-build.org/) -> build system used by CMake. 
+  <br> Can be installed using [winget](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages#windows) on Windows:
+    > winget install Ninja-build.Ninja
+  - LaTeX ([Tex Live](https://www.tug.org/texlive)) -> Scripting language used in the IODE user documentation.
+  - [miniconda](https://docs.conda.io/en/latest/miniconda.html) (*) -> Python package manager.
+
+- **Linux (Ubuntu)**:
+  - Compiler **GCC and G++**: sudo apt install gcc g++ gdb build-essential
+  - **CMake**: sudo apt install cmake
+  - **Ninja**: sudo apt install ninja-build
+  - **LaTeX**: sudo apt install texlive-latex-extra
+  - [Anaconda](https://docs.anaconda.com/anaconda/install/linux/)
+
+- **C++ libraries**:
+  - Eigen3 (installed automatically via CMake)
+  - Google Test (installed automatically via CMake)
+
+- **Python libraries**:
+  - For building the iode package:
+    - cython == 3.1.4
+    - mypy
+    - scikit-build-core
+  - For running the iode package:
+    - numpy >= 2.4
+    - pandas >= 3.0
+    - larray
+  - For testing: 
+    - pytest
+  - For running the iode-gui package:
+    - pyqt
+    - qtconsole
+    - ipython
+  - For building the user documentation:
+    - sphinx 
+    - numpydoc
+    - nbsphinx
+    - myst-parser
+    - sphinx_rtd_theme
+  - For publishing the iode and iode-gui packages:
+    - build
+    - pkginfo >1.12
+    - setuptools >=77
+    - setuptools-scm
+    - twine
+    - conda-build
+    - conda-verify
+    - menuinst
+    - anaconda-client
+
 
 **note**: To install `larray`, you have to run:
 ```bash
@@ -58,8 +69,10 @@ conda install <list of libraries>
 pip install build myst-parser
 ```
 
-Archived C++ targets (no longer compiled or used):
-- C++ libraries:
+Archived C/C++ targets (no longer compiled or used):
+- C/C++ libraries:
+  - SCR4 executables -> used to build the user documentation. 
+  <br> Ask maintainers to get access.
   - [Qt 6.4](https://www.qt.io/download)
   <br> Please install it in C:/Qt.
 - [NSIS](https://nsis.sourceforge.io/Download) (*) -> creates Windows installers
@@ -71,10 +84,8 @@ Archived C++ targets (no longer compiled or used):
 
 - **.github\workflows**: Script for Github Actions (Tests + Build GUI + Build LaTeX doc)
 - **api**: C API
-- **cpp_api**: C++ API
 - **doc**: User documentation
 - **gui**: Qt GUI
-- **nsis**: NSIS Windows installer
 - **pyiode**: Python module of IODE (Cython)
 - **scr4**: Utility functions required to compile the C API
 - **tests**: Testing directory
@@ -85,8 +96,9 @@ To prepare the building of Python IODE, please create the following conda enviro
 ```bash
 > conda config --add channels larray-project
 > conda config --add channels conda-forge
-> conda create --name py312 python=3.12 numpy pandas larray cython==3.1.4 pytest scikit-build-core
+> conda create --name py3xx python=3.xx numpy pandas larray cython==3.1.4 pytest scikit-build-core
 ```
+where xx are 12, 13 and 14.
 
 # Building Project
 
