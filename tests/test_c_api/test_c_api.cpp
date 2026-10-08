@@ -2515,7 +2515,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
     EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
-    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote  \n";
+    expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote \n";
     expected_cmt += "(gemiddelde 1954-94).";
     EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
 

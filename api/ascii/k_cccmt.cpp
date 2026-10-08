@@ -185,8 +185,8 @@ bool KDBComments::save_asc(const std::string& filename)
         {
             fprintf(fd, "%s ", (char*) name.c_str());
             cmt_utf8 = Comment(*cmt_ptr);
+            std::erase(cmt_utf8, '\n');
             cmt_oem = utf8_to_oem(cmt_utf8);
-            std::replace(cmt_oem.begin(), cmt_oem.end(), '\n', ' ');
             SCR_fprintf_esc(fd, (char*) cmt_oem.c_str(), 1);
             fprintf(fd, "\n");
         }
