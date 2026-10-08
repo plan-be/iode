@@ -61,6 +61,7 @@ TEST_F(KDBEquationsTest, Save)
 
     // save in ascii format
     global_ws_eqs->save(str_output_test_dir + "fun.ae");
+    compare_files(str_output_test_dir + "fun.ae", str_input_test_dir + "fun.ae");
 }
 
 TEST_F(KDBEquationsTest, GetLec)

@@ -99,6 +99,7 @@ TEST_F(KDBVariablesTest, Save)
 
     // save in ascii format
     global_ws_var->save(str_output_test_dir + "fun.av");
+    compare_files(str_output_test_dir + "fun.av", str_input_test_dir + "fun.av");
 }
 
 TEST_F(KDBVariablesTest, GetSetVar)

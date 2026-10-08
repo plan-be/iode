@@ -61,6 +61,7 @@ TEST_F(KDBTablesTest, Save)
 
     // save in ascii format
     global_ws_tbl->save(str_output_test_dir + "fun.at");
+    compare_files(str_output_test_dir + "fun.at", str_input_test_dir + "fun.at");
 }
 
 TEST_F(KDBTablesTest, Get)

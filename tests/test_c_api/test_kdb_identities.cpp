@@ -58,6 +58,7 @@ TEST_F(KDBIdentitiesTest, Save)
 
     // save in ascii format
     global_ws_idt->save(str_output_test_dir + "fun.ai");
+    compare_files(str_output_test_dir + "fun.ai", str_input_test_dir + "fun.ai");
 }
 
 TEST_F(KDBIdentitiesTest, Rename)

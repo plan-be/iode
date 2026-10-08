@@ -58,6 +58,7 @@ TEST_F(KDBCommentsTest, Save)
 
     // save in ascii format
     global_ws_cmt->save(str_output_test_dir + "fun.ac");
+    compare_files(str_output_test_dir + "fun.ac", str_input_test_dir + "fun.ac");
 }
 
 TEST_F(KDBCommentsTest, Filename)
