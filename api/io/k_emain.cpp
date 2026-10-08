@@ -221,7 +221,7 @@ int EXP_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPtr db
     ONAME iname;
     char oname[81];
     int dim = dbv_ptr->get_sample()->nb_periods;
-    for(const auto& [name, var_ptr] : dbv_ptr->k_objs) 
+    for(const std::string& name : dbv_ptr->get_names()) 
     {
         strcpy(iname, (char*) name.c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
@@ -273,7 +273,7 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPt
     char* code = NULL;
     ONAME iname;
     char oname[81];
-    for(const auto& [name, var_ptr] : dbv_ptr->k_objs)
+    for(const std::string& name : dbv_ptr->get_names())
     {
         strcpy(iname, (char*) name.c_str());
         if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
@@ -293,7 +293,7 @@ int EXP_Rev_Ws(const std::unique_ptr<ExportToFile>& expdef, const KDBVariablesPt
         sprintf(oname, "%s%s", (char*) per.to_string().c_str(), EXP_SEP);
         expdef->write_variable_and_comment(oname, 0, 0);
 
-        for(const auto& [name, var_ptr] : dbv_ptr->k_objs)
+        for(const std::string& name : dbv_ptr->get_names())
         {
             strcpy(iname, (char*) name.c_str());
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 

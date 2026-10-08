@@ -965,14 +965,15 @@ inline std::array<KDBTablesPtr, 5> global_ref_tbl = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline std::size_t hash_value(KDBTables const& cpp_kdb)
+inline std::size_t hash_value(KDBTables const& kdb)
 {
-    if(cpp_kdb.size() == 0)
+    if(kdb.size() == 0)
         return 0;
 
     std::size_t seed = 0;
-    for(const auto& [name, tbl_ptr] : cpp_kdb.k_objs)
+    for(const std::string& name : kdb.get_names())
     {
+        std::shared_ptr<Table> tbl_ptr = kdb.get_obj_ptr(name);
         hash_combine<std::string>(seed, name);
         hash_combine<Table>(seed, *tbl_ptr);
     }

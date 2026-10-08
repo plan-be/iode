@@ -150,10 +150,11 @@ bool KDBIdentities::save_asc(const std::string& filename)
     std::string lec_utf8;
     std::string lec_oem;
     bool success = true;
-    for(auto& [name, idt_ptr] : k_objs) 
+    for(const std::string& name : obj_names)
     {
         try
         {
+            std::shared_ptr<Identity> idt_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
             lec_utf8 = idt_ptr->get_lec();
             lec_oem = utf8_to_oem(lec_utf8);

@@ -687,10 +687,11 @@ bool KDBTables::save_asc(const std::string& filename)
     }
 
     bool success = true;
-    for(auto& [name, tbl_ptr] : k_objs) 
+    for(const std::string& name : obj_names)
     {
         try
         {
+            std::shared_ptr<Table> tbl_ptr = k_objs.at(name);
             fprintf(fd, "%s {", (char*) name.c_str());
             print_tbl(fd, tbl_ptr);
             fprintf(fd, "}\n");

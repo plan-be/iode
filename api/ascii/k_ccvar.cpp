@@ -278,10 +278,11 @@ bool KDBVariables::save_asc(const std::string& filename)
     fprintf(fd, "%s\n", (char*) smpl->end_period.to_string().c_str());
 
     bool success = true;
-    for(auto& [name, var_ptr] : k_objs) 
+    for(const std::string& name : obj_names) 
     {
         try
         {
+            std::shared_ptr<Variable> var_ptr = k_objs.at(name);
             fprintf(fd, "%s ", name.c_str());
             for(const double& value: *var_ptr) 
                 print_val(fd, value);

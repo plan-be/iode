@@ -304,7 +304,7 @@ private:
     
         int idx = 0;
         map_eq_name_index.clear();
-        for(const auto& [name, _] : sim_dbe->k_objs) 
+        for(const std::string& name : sim_dbe->get_names()) 
         {
             map_eq_name_index[name] = idx;
             idx++;

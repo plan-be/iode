@@ -191,10 +191,11 @@ bool KDBLists::save_asc(const std::string& filename)
     List lst_utf8;
     List lst_oem;
     bool success = true;
-    for(auto& [name, lst_ptr] : k_objs) 
+    for(const std::string& name : obj_names)
     {
         try
         {
+            std::shared_ptr<List> lst_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
             lst_utf8 = List(*lst_ptr);
             lst_oem = utf8_to_oem(lst_utf8);

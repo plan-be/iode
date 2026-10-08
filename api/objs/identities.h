@@ -237,16 +237,17 @@ inline std::array<KDBIdentitiesPtr, 5> global_ref_idt = { nullptr };
 
 /*----------------------- FUNCTIONS ----------------------------*/
 
-inline std::size_t hash_value(KDBIdentities const& cpp_kdb)
+inline std::size_t hash_value(KDBIdentities const& kdb)
 {
-    if(cpp_kdb.size() == 0)
+    if(kdb.size() == 0)
         return 0;
 
     std::string lec;
     std::size_t seed = 0;
-    for(const auto& [name, idt_ptr] : cpp_kdb.k_objs)
+    for(const std::string& name : kdb.get_names())
     {
         hash_combine<std::string>(seed, name);  
+        std::shared_ptr<Identity> idt_ptr = kdb.get_obj_ptr(name);
         lec = idt_ptr->get_lec();
         hash_combine<std::string>(seed, lec);
     }

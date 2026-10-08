@@ -392,12 +392,12 @@ inline std::array<KDBVariablesPtr, 5> global_ref_var = { nullptr };
 
 /*----------------------- FUNCS ----------------------------*/
 
-inline std::size_t hash_value(KDBVariables const& cpp_kdb)
+inline std::size_t hash_value(KDBVariables const& kdb)
 {
-    if(cpp_kdb.size() == 0)
+    if(kdb.size() == 0)
         return 0;
 
-	std::shared_ptr<Sample> smpl = cpp_kdb.get_sample();
+	std::shared_ptr<Sample> smpl = kdb.get_sample();
     if(!smpl)
         return 0;
     
@@ -406,8 +406,9 @@ inline std::size_t hash_value(KDBVariables const& cpp_kdb)
         return 0;
 
     std::size_t seed = 0;
-    for(const auto& [name, var_ptr] : cpp_kdb.k_objs)
+    for(const std::string& name : kdb.get_names())
     {
+        std::shared_ptr<Variable> var_ptr = kdb.get_obj_ptr(name);
         hash_combine<std::string>(seed, name);
 		for(const double &value : *var_ptr)
             hash_combine<double>(seed, value);

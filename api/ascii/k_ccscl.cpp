@@ -202,10 +202,11 @@ bool KDBScalars::save_asc(const std::string& filename)
     }
 
     bool success = true;
-    for(auto& [name, scl_ptr] : k_objs) 
+    for(const std::string& name : obj_names)
     {
         try
         {
+            std::shared_ptr<Scalar> scl_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
             print_scl(fd, scl_ptr);
             fprintf(fd, "\n");

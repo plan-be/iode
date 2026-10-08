@@ -1522,7 +1522,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         return -1;
     }
 
-    for(const auto& [name, _] : kdb2_ptr->k_objs) 
+    for(const std::string& name : kdb2_ptr->get_names()) 
     {
         c_name = (char*) name.c_str();
         SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
