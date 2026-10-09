@@ -189,7 +189,9 @@ int B_PrintObjDef_1(char* arg, int* type)
     try
     {
         KDB& kdb = get_global_db(*type);
+        
         std::string name = std::string(arg);
+        name = kdb.to_key(name);
         bool found = kdb.contains(name);
         if(!found) 
             goto err;

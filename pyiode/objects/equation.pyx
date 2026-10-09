@@ -87,7 +87,7 @@ cdef class Equation:
             
             # copy tests values and estimation date from the global equations workspace
             eqs_db = cpp_global_equations.get()
-            eq_ptr = eqs_db.get_obj_ptr(eq_name)
+            eq_ptr = eqs_db.get_and_check_obj_ptr(eq_name)
             c_eq = eq_ptr.get()
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_eq.date
@@ -124,7 +124,7 @@ cdef class Equation:
         # copy tests values and estimation date from the global equations workspace
         if res == 0:
             eqs_db = cpp_global_equations.get()
-            eq_ptr = eqs_db.get_obj_ptr(eq_name)
+            eq_ptr = eqs_db.get_and_check_obj_ptr(eq_name)
             c_eq = eq_ptr.get()
             self.c_equation.set_sample(from_period.encode(), to_period.encode())
             self.c_equation.date = c_eq.date

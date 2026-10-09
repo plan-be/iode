@@ -14,6 +14,7 @@
 static int RasSetVar(char* c_name, int t, double var)
 {
     std::string name = std::string(c_name);
+    name = global_ws_var->to_key(name);
 
     if(!global_ws_var->contains(name)) 
     {
@@ -30,6 +31,7 @@ static double RasGetVar(char* c_name, int t)
 {
     double  var;
     std::string name = std::string(c_name);
+    name = global_ws_var->to_key(name);
 
     if(!global_ws_var->contains(name)) 
     {

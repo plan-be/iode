@@ -608,8 +608,7 @@ char *RP_gmacro(char* str)
     if(str == NULL) 
         return NULL;
 
-    if(U_pos('%', (unsigned char*) str) >= 0 || 
-       U_pos('{', (unsigned char*) str) >= 0 || 
+    if(U_pos('%', (unsigned char*) str) >= 0 || U_pos('{', (unsigned char*) str) >= 0 || 
        U_pos('@', (unsigned char*) str) >= 0)
         RP_expand(&tmp, str);
     else
@@ -641,14 +640,16 @@ char *RP_gmacro(char* str)
             res = (char*) SCR_mtov(((unsigned char**) RP_ARGV) + RP_ARG0, ';');
         else 
         {
-            if(!RP_MACRO->contains(tmp)) 
+            std::string name(copy_char_array(tmp));
+            name = RP_MACRO->to_key(name);
+            if(!RP_MACRO->contains(name)) 
             {
-                std::string error_msg = "Report: Macro '" + std::string(tmp) + "' is not defined";
+                std::string error_msg = "Report: Macro '" + name + "' is not defined";
                 kwarning(error_msg.c_str());
                 SCR_free(tmp);
                 return NULL;
             }
-            std::string macro = RP_MACRO->get_macro(tmp);
+            std::string macro = RP_MACRO->get_macro(name);
             res = (char*) SCR_stracpy((unsigned char*) macro.c_str());
         }
     }

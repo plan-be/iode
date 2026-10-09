@@ -87,7 +87,8 @@ int RP_define(char* arg, int unused)
  */
 bool RP_macro_exists(const std::string& name)
 {
-    return RP_MACRO->contains(name);
+    std::string key = RP_MACRO->to_key(name);
+    return RP_MACRO->contains(key);
 }
 
 /**
@@ -99,14 +100,15 @@ bool RP_macro_exists(const std::string& name)
  */
 std::string RP_get_macro(const std::string& name)
 {
-    if(!RP_MACRO->contains(name))
+    std::string key = RP_MACRO->to_key(name);
+    if(!RP_MACRO->contains(key))
     {
-        std::string warning_msg = "Report: Macro '" + name + "' is not defined";
+        std::string warning_msg = "Report: Macro '" + key + "' is not defined";
         kwarning(warning_msg.c_str());
         return "";
     }
    
-    return RP_MACRO->get_macro(name);
+    return RP_MACRO->get_macro(key);
 }
 
 /**
@@ -117,10 +119,11 @@ std::string RP_get_macro(const std::string& name)
  */
 int RP_undef_1(char *name)
 {
-    if(!RP_MACRO->contains(name)) 
+    std::string key = RP_MACRO->to_key(name);
+    if(!RP_MACRO->contains(key)) 
         return 0;
     
-    bool success = RP_MACRO->remove(name);
+    bool success = RP_MACRO->remove(key);
     return (int) success;
 }
 
@@ -203,6 +206,7 @@ int RP_define_calcdepth(char* c_name)
 int RP_define_save(char* c_name)
 {
     std::string name(c_name);
+    name = RP_MACRO->to_key(name);
 
     // if the macro "name" does not yet exist, no need to push its definition
     if(!RP_MACRO->contains(name)) 

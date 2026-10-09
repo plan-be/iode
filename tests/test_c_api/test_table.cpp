@@ -9,7 +9,7 @@ protected:
     void SetUp() override
     {
         global_ws_tbl->load(str_input_test_dir + "fun.at");
-        tbl_ptr = global_ws_tbl->get_obj_ptr("GFRPC");
+        tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("GFRPC");
     }
 
     void TearDown() override 
@@ -21,7 +21,7 @@ protected:
 
 
 // Test that a Table* 'tbl' object added to global_ws_tbl using add() and a Table* 'extracted_tbl' object 
-// extracted using get_obj_ptr() are exactly the same
+// extracted using get_and_check_obj_ptr() are exactly the same
 TEST_F(TablesTest, AddGetTable)
 {
     global_ws_cmt->load(str_input_test_dir + "fun.ac");
@@ -107,7 +107,7 @@ TEST_F(TablesTest, AddGetTable)
     global_ws_tbl->add(name, *tbl);
 
     // --- extract the table from the Table KDB
-    std::shared_ptr<Table> extracted_tbl = global_ws_tbl->get_obj_ptr(name);
+    std::shared_ptr<Table> extracted_tbl = global_ws_tbl->get_and_check_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine 

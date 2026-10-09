@@ -56,7 +56,7 @@ cdef class Tables(CythonIodeDatabase):
     def _get_object(self, name: str) -> Table:
         cdef shared_ptr[CTable] tbl_ptr
         name = name.strip()
-        tbl_ptr = self.database.get_obj_ptr(name.encode())
+        tbl_ptr = self.database.get_and_check_obj_ptr(name.encode())
         table = Table._from_ptr(tbl_ptr, name.encode())
         return table
 

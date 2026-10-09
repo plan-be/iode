@@ -191,6 +191,7 @@ int B_PrintGr(char* arg, int unused)
 int B_ViewPrintTbl_1(char* c_name, char* smpl)
 {
     std::string name = std::string(c_name);
+    name = global_ws_tbl->to_key(name);
     if(!global_ws_tbl->contains(name)) 
     {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
@@ -254,6 +255,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
             W_InitDisplay();
 
         name = std::string(tbls[i]);
+        name = global_ws_tbl->to_key(name);
         if(!global_ws_tbl->contains(name)) 
         {
             error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");

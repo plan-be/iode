@@ -49,7 +49,7 @@ cdef class Identities(CythonIodeDatabase):
     def _get_object(self, name: str) -> Identity:
         cdef shared_ptr[CIdentity] idt_ptr
         name  = name.strip()
-        idt_ptr = self.database.get_obj_ptr(name.encode())
+        idt_ptr = self.database.get_and_check_obj_ptr(name.encode())
         identity = Identity._from_ptr(idt_ptr)
         return identity
 

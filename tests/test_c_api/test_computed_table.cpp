@@ -168,7 +168,7 @@ TEST_F(ComputedTableTest, BuildFromTable)
     std::string sample;
     std::vector<double> values;
     
-    std::shared_ptr<Table> ref_table = global_ws_tbl->get_obj_ptr(table_name);
+    std::shared_ptr<Table> ref_table = global_ws_tbl->get_and_check_obj_ptr(table_name);
 
     // simple time series (current workspace) - 10 observations
     gsample = "2000:10";
@@ -741,7 +741,7 @@ TEST_F(ComputedTableTest, PrintToFile)
                                           "Productivité totale des facteurs" };
     std::vector<std::string> v_lecs = { "Q_F+Q_I", "KNFF[-1]", "KLFHP", "TFPFHP_" };
 
-    std::shared_ptr<Table> ref_table = global_ws_tbl->get_obj_ptr(table_name); 
+    std::shared_ptr<Table> ref_table = global_ws_tbl->get_and_check_obj_ptr(table_name); 
 
     int i = 0;
     TableLine* line;
@@ -879,7 +879,7 @@ TEST_F(ComputedTableTest, PrintToFile)
     KDBTablesPtr bin_kdb_tables = KDBTables::Create(false);
     bin_kdb_tables->load(str_input_test_dir + "fun.tbl");
     
-    std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_obj_ptr(table_name);
+    std::shared_ptr<Table> bin_ref_table = bin_kdb_tables->get_and_check_obj_ptr(table_name);
 
     TableCell* bin_cell;
     

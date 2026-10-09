@@ -619,7 +619,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     bool files = true;
     bool date = true;
 
-    print_test_title("Tests Table: Table(...) constructor vs get_obj_ptr()");
+    print_test_title("Tests Table: Table(...) constructor vs get_and_check_obj_ptr()");
 
     // --- create an instance of Table;
     tbl = new Table(nb_columns, title, v_lecs, mode, files, date);
@@ -691,7 +691,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     global_ws_tbl->set_obj_ptr(name, tbl_ptr);
 
     // --- extract the table from the Table KDB
-    std::shared_ptr<Table> extracted_tbl_ptr = global_ws_tbl->get_obj_ptr(name);
+    std::shared_ptr<Table> extracted_tbl_ptr = global_ws_tbl->get_and_check_obj_ptr(name);
 
     // --- check that both table are exactly the same
     // ----- check all attributes that are not of type TableLine
@@ -891,7 +891,7 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Select a table
-    std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr("C8_1");
+    std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("C8_1");
     EXPECT_NE(tbl_ptr.get(), nullptr);
 
     // Select Print destination
@@ -996,7 +996,7 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     EXPECT_EQ(rc, 0);
 
     EXPECT_DOUBLE_EQ(round(calculate_lec("_YRES0[1980Y1]", 0) * 1e8) / 1e8, -0.00115008);
-    EXPECT_DOUBLE_EQ(round(global_ws_eqs->get_obj_ptr("ACAF")->get_test_r2() * 1e6) / 1e6, 0.821815);
+    EXPECT_DOUBLE_EQ(round(global_ws_eqs->get_and_check_obj_ptr("ACAF")->get_test_r2() * 1e6) / 1e6, 0.821815);
     //TODO : add some tests with other estimation methods / on blocks / with instruments
 
     //W_flush();
@@ -1012,32 +1012,32 @@ TEST_F(LegacyAPITest, Tests_Estimation)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1082,32 +1082,32 @@ TEST_F(LegacyAPITest, Tests_Estimation_Step_Wise)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF 1 fstat");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" r2");
     EXPECT_EQ(rc, 0);
 
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 1995Y1 ACAF \"acaf2 > 0\" fstat");
     EXPECT_EQ(rc, 0);
@@ -1140,21 +1140,21 @@ TEST_F(LegacyAPITest, Tests_B_EqsStepWise)
     // B_EqsStepWise
     for(const std::string& name : coef_names)
     {
-        global_ws_scl->get_obj_ptr(name)->value = 0.9;
-        global_ws_scl->get_obj_ptr(name)->relax = 1.0;
+        global_ws_scl->get_and_check_obj_ptr(name)->value = 0.9;
+        global_ws_scl->get_and_check_obj_ptr(name)->relax = 1.0;
     }
     rc = B_EqsStepWise("1980Y1 2000Y1 ACAF \"1\" r2");
     EXPECT_EQ(rc, 0);
 
-    std::shared_ptr<Equation> eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_ACAF = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     r2 = eq_ACAF->get_test_r2();
     EXPECT_DOUBLE_EQ(r2, 0.7938754558563232);
     
-    std::shared_ptr<Scalar> acaf1 = global_ws_scl->get_obj_ptr("acaf1");
+    std::shared_ptr<Scalar> acaf1 = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(acaf1->value * 1e6) / 1e6, 0.015065);
-    std::shared_ptr<Scalar> acaf2 = global_ws_scl->get_obj_ptr("acaf2");
+    std::shared_ptr<Scalar> acaf2 = global_ws_scl->get_and_check_obj_ptr("acaf2");
     EXPECT_DOUBLE_EQ(round(acaf2->value * 1e6) / 1e6, -7.0e-06);
-    std::shared_ptr<Scalar> acaf4 = global_ws_scl->get_obj_ptr("acaf4");
+    std::shared_ptr<Scalar> acaf4 = global_ws_scl->get_and_check_obj_ptr("acaf4");
     EXPECT_DOUBLE_EQ(round(acaf4->value * 1e6) / 1e6, -0.009157);
 
     // Reset initial kmsg fn
@@ -1366,7 +1366,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_idt->get_obj_ptr("U")->get_lec(), "2 * A");
+    EXPECT_EQ(global_ws_idt->get_and_check_obj_ptr("U")->get_lec(), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
@@ -1374,7 +1374,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataUpdate("u  1.2 1"             , SCALARS);
     EXPECT_EQ(rc, 0);
-    val = global_ws_scl->get_obj_ptr("u")->value;
+    val = global_ws_scl->get_and_check_obj_ptr("u")->value;
     EXPECT_DOUBLE_EQ(val, 1.2);
 
     rc = B_DataUpdate("U  Title of U;U;2*U"  , TABLES);
@@ -1474,7 +1474,7 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     U_test_load_fun_esv("fun");
 
     KDBEquationsPtr kdb_eqs = global_ws_eqs;
-    std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_ptr = kdb_eqs->get_and_check_obj_ptr("ACAF");
     eq_ptr->reset_tests();
     EXPECT_DOUBLE_EQ(eq_ptr->get_test_r2(), 0.0);
     EXPECT_DOUBLE_EQ(eq_ptr->get_test_fstat(), 0.0);
@@ -1483,13 +1483,13 @@ TEST_F(LegacyAPITest, Tests_B_EQS)
     rc = B_EqsEstimate("1980Y1 1996Y1 ACAF");
     EXPECT_EQ(rc, 0);
 
-    eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ptr = kdb_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_r2() * 1e8) / 1e8, 0.82181543);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e8) / 1e8, 32.28510666);
 
     // B_EqsSetSample()
     rc = B_EqsSetSample("1981Y1 1995Y1 ACAF");
-    eq_ptr = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ptr = kdb_eqs->get_and_check_obj_ptr("ACAF");
     Sample smpl = eq_ptr->sample;
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(smpl.start_period.year, 1981);
@@ -1966,7 +1966,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_eqs->size(), 274);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->endo, "ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
@@ -1974,7 +1974,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e3) / 1e3, 32.273);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_dw() * 1e3) / 1e3, 2.329);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_loglik() * 1e3) / 1e3, 83.808);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ZZF_");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ZZF_");
     EXPECT_EQ(eq_ptr->endo, "ZZF_");
     EXPECT_EQ(eq_ptr->lec, "ZZF_ := ZZF_[-1]");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
@@ -1987,11 +1987,11 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), IDENTITIES);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_idt->size(), 48);
-    idt_ptr = global_ws_idt->get_obj_ptr("AOUC");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
-    idt_ptr = global_ws_idt->get_obj_ptr("YSFICR");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
 
@@ -2018,11 +2018,11 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), SCALARS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_scl->size(), 161);
-    scl_ptr = global_ws_scl->get_obj_ptr("acaf1");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, 0.015768);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 0.001369);
-    scl_ptr = global_ws_scl->get_obj_ptr("zkf3");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("zkf3");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, -7.271244);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 2.676398);
@@ -2032,7 +2032,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_tbl->size(), 46);
     // **** Check table ANAKNFF ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("ANAKNFF");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 8);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2057,7 +2057,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("YDH");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 19);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2128,7 +2128,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_eqs->size(), 274);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->endo, "ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
@@ -2136,7 +2136,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e3) / 1e3, 32.273);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_dw() * 1e3) / 1e3, 2.329);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_loglik() * 1e3) / 1e3, 83.808);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ZZF_");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ZZF_");
     EXPECT_EQ(eq_ptr->endo, "ZZF_");
     EXPECT_EQ(eq_ptr->lec, "ZZF_ := ZZF_[-1]");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
@@ -2149,11 +2149,11 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), IDENTITIES);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_idt->size(), 48);
-    idt_ptr = global_ws_idt->get_obj_ptr("AOUC");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
     expected_lec += "(VM+VAFF))[-1]";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
-    idt_ptr = global_ws_idt->get_obj_ptr("YSFICR");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
 
@@ -2180,11 +2180,11 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     rc = B_WsLoad((char*) filepath.c_str(), SCALARS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_scl->size(), 161);
-    scl_ptr = global_ws_scl->get_obj_ptr("acaf1");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, 0.015768);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 0.001369);
-    scl_ptr = global_ws_scl->get_obj_ptr("zkf3");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("zkf3");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, -7.271244);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 2.676398);
@@ -2194,7 +2194,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_tbl->size(), 46);
     // **** Check table ANAKNFF ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("ANAKNFF");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 8);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2219,7 +2219,7 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("YDH");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 19);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2325,7 +2325,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_eqs->size(), 274);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->endo, "ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
@@ -2333,7 +2333,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e3) / 1e3, 32.273);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_dw() * 1e3) / 1e3, 2.329);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_loglik() * 1e3) / 1e3, 83.808);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ZZF_");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ZZF_");
     EXPECT_EQ(eq_ptr->endo, "ZZF_");
     EXPECT_EQ(eq_ptr->lec, "ZZF_ := ZZF_[-1]");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
@@ -2352,11 +2352,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_idt->size(), 48);
-    idt_ptr = global_ws_idt->get_obj_ptr("AOUC");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
-    idt_ptr = global_ws_idt->get_obj_ptr("YSFICR");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
 
@@ -2395,11 +2395,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_scl->size(), 161);
-    scl_ptr = global_ws_scl->get_obj_ptr("acaf1");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, 0.015768);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 0.001369);
-    scl_ptr = global_ws_scl->get_obj_ptr("zkf3");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("zkf3");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, -7.271244);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 2.676398);
@@ -2415,7 +2415,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_tbl->size(), 46);
     // **** Check table ANAKNFF ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("ANAKNFF");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 8);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2440,7 +2440,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("YDH");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 19);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2530,7 +2530,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_eqs->size(), 274);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->endo, "ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
@@ -2538,7 +2538,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e3) / 1e3, 32.273);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_dw() * 1e3) / 1e3, 2.329);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_loglik() * 1e3) / 1e3, 83.808);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ZZF_");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ZZF_");
     EXPECT_EQ(eq_ptr->endo, "ZZF_");
     EXPECT_EQ(eq_ptr->lec, "ZZF_ := ZZF_[-1]");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
@@ -2557,11 +2557,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_idt->size(), 48);
-    idt_ptr = global_ws_idt->get_obj_ptr("AOUC");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
     expected_lec += "(VM+VAFF))[-1]";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
-    idt_ptr = global_ws_idt->get_obj_ptr("YSFICR");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
 
@@ -2600,11 +2600,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_scl->size(), 161);
-    scl_ptr = global_ws_scl->get_obj_ptr("acaf1");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, 0.015768);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 0.001369);
-    scl_ptr = global_ws_scl->get_obj_ptr("zkf3");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("zkf3");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, -7.271244);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 2.676398);
@@ -2620,7 +2620,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_tbl->size(), 46);
     // **** Check table ANAKNFF ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("ANAKNFF");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 8);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2645,7 +2645,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("YDH");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 19);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2756,7 +2756,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     rc = B_WsLoad((char*) out_filepath.c_str(), EQUATIONS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_eqs->size(), 274);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->endo, "ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
@@ -2764,7 +2764,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_fstat() * 1e3) / 1e3, 32.273);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_dw() * 1e3) / 1e3, 2.329);
     EXPECT_DOUBLE_EQ(round(eq_ptr->get_test_loglik() * 1e3) / 1e3, 83.808);
-    eq_ptr = global_ws_eqs->get_obj_ptr("ZZF_");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ZZF_");
     EXPECT_EQ(eq_ptr->endo, "ZZF_");
     EXPECT_EQ(eq_ptr->lec, "ZZF_ := ZZF_[-1]");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
@@ -2783,11 +2783,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     rc = B_WsLoad((char*) out_filepath.c_str(), IDENTITIES);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_idt->size(), 48);
-    idt_ptr = global_ws_idt->get_obj_ptr("AOUC");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
-    idt_ptr = global_ws_idt->get_obj_ptr("YSFICR");
+    idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
     EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
 
@@ -2826,11 +2826,11 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     rc = B_WsLoad((char*) out_filepath.c_str(), SCALARS);
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_scl->size(), 161);
-    scl_ptr = global_ws_scl->get_obj_ptr("acaf1");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("acaf1");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, 0.015768);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 0.001369);
-    scl_ptr = global_ws_scl->get_obj_ptr("zkf3");
+    scl_ptr = global_ws_scl->get_and_check_obj_ptr("zkf3");
     EXPECT_DOUBLE_EQ(round(scl_ptr->value * 1e6) / 1e6, -7.271244);
     EXPECT_DOUBLE_EQ(round(scl_ptr->relax * 1e6) / 1e6, 1.0);
     EXPECT_DOUBLE_EQ(round(scl_ptr->std * 1e6) / 1e6, 2.676398);
@@ -2846,7 +2846,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_tbl->size(), 46);
     // **** Check table ANAKNFF ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("ANAKNFF");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("ANAKNFF");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 8);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
@@ -2871,7 +2871,7 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
-    tbl_ptr = global_ws_tbl->get_obj_ptr("YDH");
+    tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
     EXPECT_EQ(tbl_ptr->nb_columns, 2);
     EXPECT_EQ(tbl_ptr->lines.size(), 19);
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");

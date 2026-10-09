@@ -49,7 +49,7 @@ cdef class Scalars(CythonIodeDatabase):
     def _get_object(self, name: str) -> Scalar:
         cdef shared_ptr[CScalar] scl_ptr
         name = name.strip()
-        scl_ptr = self.database.get_obj_ptr(name.encode())
+        scl_ptr = self.database.get_and_check_obj_ptr(name.encode())
         scalar = Scalar._from_ptr(scl_ptr) 
         return scalar
 

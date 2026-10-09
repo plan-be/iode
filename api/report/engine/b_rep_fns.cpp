@@ -645,6 +645,7 @@ U_ch *RPF_sstderr(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
+        name = global_ws_scl->to_key(name);
         if(!global_ws_scl->contains(name))
             strcpy((char*) buf, "--");
         else 
@@ -680,6 +681,7 @@ U_ch *RPF_srelax(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) " ");
         name = std::string((char*) args[i]);
+        name = global_ws_scl->to_key(name);
         if(!global_ws_scl->contains(name))
             strcpy((char*) buf, "--");
         else 
@@ -717,6 +719,7 @@ U_ch *RPF_ttitle(U_ch** args)
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) "\n");
         name = std::string((char*) args[i]);
+        name = global_ws_tbl->to_key(name);
         if(!global_ws_tbl->contains(name)) 
         {
             sprintf((char*) buf, "Table %s not found", args[i]);
@@ -759,6 +762,7 @@ U_ch *RPF_cvalue(U_ch** args)
     for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
+        name = kdb->to_key(name);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
         if(!kdb->contains(name)) 
@@ -806,6 +810,7 @@ U_ch *RPF_vvalue(U_ch** args)
     for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
+        name = kdb->to_key(name);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
         if(!kdb->contains(name)) 
@@ -852,6 +857,7 @@ U_ch *RPF_lvalue(U_ch** args)
     for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
+        name = kdb->to_key(name);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ",");
         if(!kdb->contains(name)) 
@@ -895,6 +901,7 @@ U_ch *RPF_ivalue(U_ch** args)
     for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
+        name = kdb->to_key(name);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
         if(!kdb->contains(name)) 
@@ -940,6 +947,7 @@ U_ch *RPF_evalue(U_ch** args)
     for(int i = 0 ; args[i] ; i++) 
     {
         name = std::string((char*) args[i]);
+        name = kdb->to_key(name);
         if(i > 0) 
             res = SCR_strafcat(res, (unsigned char*) ";");
         
@@ -985,6 +993,7 @@ U_ch *RPF_eqsample(U_ch** args)
     res = (unsigned char*) SCR_malloc(80);
 
     std::string name = std::string((char*) args[0]); 
+    name = kdb->to_key(name);
     if(!kdb->contains(name)) 
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else
@@ -1023,6 +1032,7 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
     res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
 
     std::string name = std::string((char*) args[0]);
+    name = kdb->to_key(name);
     if(!kdb->contains(name)) 
         sprintf((char*) res, "[Eqs %s not found]", args[0]);
     else 
@@ -1094,6 +1104,7 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
         return(eq);
 
     std::string name = std::string((char*) args[0]);
+    name = kdb->to_key(name);
     if(!kdb->contains(name)) 
     {
         eq = (unsigned char*) SCR_malloc(80);
@@ -1256,6 +1267,7 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     for(int i = 0; args[i]; i++) 
     {
         name = std::string((char*) args[i]);
+        name = global_ws_eqs->to_key(name);
         if(!global_ws_eqs->contains(name)) 
             continue;
         eq_ptr = global_ws_eqs->get_obj_ptr(name) ;

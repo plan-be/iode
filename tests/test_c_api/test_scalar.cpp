@@ -29,7 +29,7 @@ TEST_F(ScalarTest, AddGetScalar)
     bool found = global_ws_scl->contains(name);
     ASSERT_TRUE(found);
 
-    std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+    std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_and_check_obj_ptr(name);
     ASSERT_EQ(scl_ptr->value, val);
     ASSERT_EQ(scl_ptr->relax, relax);
     ASSERT_EQ(scl_ptr->std, std);

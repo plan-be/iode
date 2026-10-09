@@ -152,11 +152,11 @@ cdef class Variables(CythonIodeDatabase):
             values = [self.database.get_var(c_name, <int>p, self.mode_) for p in key_periods]
             return [value if IODE_IS_A_NUMBER(value) else np.nan for value in values]
 
-    def __add_var(self, name: str, value: Variables):
-        cdef string c_name = name.encode()
+    def __add_var(self, source_name: str, dest_name: str, value: Variables):
+        cdef string c_source_name = source_name.encode()
+        cdef string c_dest_name = dest_name.encode()
         t_first, t_last = value._get_periods_bounds()
-        # NOTE: 'value' can contains more than one variable as long as the variable named 'name' is present
-        _c_add_var_from_other(c_name, self.database, value.database, t_first, t_last)
+        _c_add_var_from_other(c_dest_name, self.database, c_source_name, value.database, t_first, t_last)
 
     def _add(self, name: str, values: Union[str, float, np.ndarray, Iterable[float], Variables]):
         cdef bint success
@@ -181,9 +181,9 @@ cdef class Variables(CythonIodeDatabase):
             if not success:
                 raise RuntimeError(f"Cannot add variable '{name}' to the IODE Variables database")
         # values is a Variables object
-        # NOTE: 'values' can contains more than one variable as long as the variable named 'name' is present
         elif isinstance(values, Variables):
-            self.__add_var(name, values)
+            source_name = name if values.size() > 1 else values.property_names()[0]
+            self.__add_var(source_name, name, values)
         # values is an iterable of float
         elif isinstance(values, Iterable):
             cpp_values = values

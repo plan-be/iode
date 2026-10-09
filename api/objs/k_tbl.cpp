@@ -947,8 +947,8 @@ std::string KDBTables::get_title(const std::string& name) const
 {
 	// throw exception if table with passed position is not valid
 	if(!this->contains(name))
-		throw std::out_of_range("Cannot get title of table with name '" + name + "'.\n" +
-			                    "The table with name '" + name + "' does not exist in the database.");
+		throw std::runtime_error("Cannot get title of table with name '" + name + "'.\n" +
+			                     "The table with name '" + name + "' does not exist in the database.");
     std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
     std::string title = tbl_ptr->get_title();
     return title;

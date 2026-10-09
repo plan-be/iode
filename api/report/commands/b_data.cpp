@@ -260,6 +260,7 @@ int B_DataCalcVar(char* arg, int unused)
     SCR_strip((unsigned char*) lec);
 
     std::string var_name(name);
+    var_name = kdb->to_key(var_name);
     if(!kdb->contains(var_name))
     {
         try
@@ -327,6 +328,7 @@ int B_DataCreate_1(char* arg, int* ptype)
         KDB& kdb = get_global_db(*ptype);
 
         std::string name = std::string(arg);
+        name = kdb.to_key(name);
         if(kdb.contains(name)) 
             return -1;
 
@@ -425,11 +427,12 @@ int B_DataCreate(char* arg, int type)
  */
 int B_DataDelete_1(char* arg, int* ptype)
 {
-    std::string name = std::string(arg);
     try
     {
         KDB& kdb = get_global_db(*ptype);
-    
+        
+        std::string name = std::string(arg);
+        name = kdb.to_key(name);
         if(!kdb.contains(name)) 
             return -1;
         
@@ -594,17 +597,20 @@ int B_DataRename(char* arg, int type)
 
 int B_DataUpdate(char* arg, int type)
 {
-    char name[K_MAX_NAME + 1];
+    char c_name[K_MAX_NAME + 1];
     char **args = NULL;
-    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
+    int lg = get_next_arg(c_name, arg, K_MAX_NAME + 1);
     
     bool success = true;
     try
     {
         KDB& kdb = get_global_db(type);
-        if(!kdb.contains(std::string(name))) 
+        
+        std::string name(c_name);
+        name = kdb.to_key(name);
+        if(!kdb.contains(name)) 
         {
-            if(B_DataCreate(name, type)) 
+            if(B_DataCreate((char*) name.c_str(), type)) 
                 return -1;
         }
         
@@ -913,6 +919,7 @@ int B_DataListSort(char* arg, int unused)
     std::string out = v_args[1];
 
     char* lst;
+    in = global_ws_lst->to_key(in);
     if(!global_ws_lst->contains(in)) 
     {
         error_manager.append_error("List '" + in + "' not found in the Lists workspace");
@@ -1092,7 +1099,9 @@ int B_DataExist(char* arg, int type)
     try
     {
         KDB& kdb = get_global_db(type);
-        return kdb.contains(std::string(arg)) ? 1 : -1;
+        std::string name(arg);
+        name = kdb.to_key(name);
+        return kdb.contains(name) ? 1 : -1;
     }
     catch (const std::runtime_error& e) 
     {
@@ -1133,14 +1142,16 @@ int B_DataAppend(char* arg, int type)
         return -1;
     }
 
-    char name[K_MAX_NAME + 1];
-    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
+    char c_name[K_MAX_NAME + 1];
+    int lg = get_next_arg(c_name, arg, K_MAX_NAME + 1);
     std::string text_to_append = std::string(arg + lg + 1);
 
+    std::string name(c_name);
     try
     {    
         if(type == COMMENTS)
         {
+            name = global_ws_cmt->to_key(name);
             if(!global_ws_cmt->contains(name))
                 global_ws_cmt->add(name, text_to_append);
             else
@@ -1152,6 +1163,7 @@ int B_DataAppend(char* arg, int type)
         }
         else
         {
+            name = global_ws_lst->to_key(name);
             if(!global_ws_lst->contains(name))
                 global_ws_lst->add(name, text_to_append);
             else
@@ -1367,6 +1379,7 @@ int B_DataCalcLst(char* arg, int unused)
     std::string op    = v_args[2];
     std::string list2 = v_args[3];
 
+    list1 = global_ws_lst->to_key(list1); 
     if(!global_ws_lst->contains(list1))
     {
         std::string error_msg = "List '" + list1;
@@ -1376,6 +1389,7 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
 
+    list2 = global_ws_lst->to_key(list2); 
     if(!global_ws_lst->contains(list2))
     {
         std::string error_msg = "List '" + list2;
@@ -1431,7 +1445,7 @@ done :
  */
 int B_DataListCount(char* name, int unused)
 {
-    std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(name);
+    std::shared_ptr<List> lst_ptr = global_ws_lst->get_and_check_obj_ptr(name);
     if(!lst_ptr) 
         return -1;
 
