@@ -151,7 +151,7 @@ int B_EqsSetSample(char* arg, int unused)
     std::shared_ptr<Equation> eq_ptr;
     for(const std::string& eq_name : eq_names) 
     {
-        eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
+        eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
         if(!eq_ptr)
         {
             rc = -1;
@@ -194,7 +194,7 @@ int B_EqsSetMethod(char* arg, int unused)
     std::shared_ptr<Equation> eq_ptr;
     for(const std::string eq_name : v_eqs)
     {
-        eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
+        eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
         if(!eq_ptr)
         {
             rc = -1;
@@ -227,7 +227,7 @@ int B_EqsSetBloc(char* arg, int unused)
     std::shared_ptr<Equation> eq_ptr;
     for(const std::string& eq_name : v_eqs)
     {
-        eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
+        eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
         if(!eq_ptr)
         {
             rc = -1;
@@ -261,7 +261,7 @@ int B_EqsSetCmt(char* arg, int unused)
     Comment cmt(arg + lg1 + 1);
 
     std::string eq_name(name);
-    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
+    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
     if(!eq_ptr)
         return -1;
     eq_ptr->comment = cmt;
@@ -290,7 +290,7 @@ int B_EqsSetInstrs(char* arg, int unused)
     std::string instrs(arg + lg1 + 1);
 
     std::string eq_name(name);
-    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(eq_name);
+    std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
     if(!eq_ptr)
         return -1;
     eq_ptr->instruments = instrs;

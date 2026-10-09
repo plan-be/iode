@@ -210,15 +210,14 @@ char* KDBIdentities::dde_create_obj_by_name(const std::string& name, int* nc, in
 }
 
 bool KDBIdentities::print_obj_def(const std::string& name)
-{
-    if(!this->contains(name)) 
-        return false;
+{   
+    std::shared_ptr<Identity> idt_ptr = this->get_obj_ptr(name);
+    std::string lec = idt_ptr->get_lec();
+    std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
     
-    std::string lec = this->get_obj_ptr(name)->get_lec();
     // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
     std::string lec_oem = utf8_to_oem(lec);
     std::string tmp = name + " : " + lec_oem;
-    std::shared_ptr<CLEC> clec = this->get_obj_ptr(name)->get_compiled_lec();
 
     W_printf((char*) ".par1 enum_1\n");
     clec->print_definition(name, tmp, B_EQS_LEC);

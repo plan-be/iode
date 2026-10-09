@@ -726,12 +726,12 @@ public:
 
     /**
      * @brief Checks if a name exists in the database
-     * @param name The name to search for
+     * @param key The name to search for
      * @return true if the name exists in the database, false otherwise
      */
-    bool contains(const std::string& name) const override
+    bool contains(const std::string& key) const override
     {
-        return k_objs.contains(to_key(name));
+        return k_objs.contains(key);
     }
 
     bool parent_contains(const std::string& name) const
@@ -873,7 +873,7 @@ public:
     void copy_obj_to(std::shared_ptr<D> dest_ptr, const std::string& source_key,
         const std::string& dest_key) const
     {
-        std::shared_ptr<T> obj_ptr = this->get_obj_ptr(source_key);
+        std::shared_ptr<T> obj_ptr = k_objs[source_key];
         dest_ptr->set_obj_ptr(dest_key, obj_ptr);
     }
 
@@ -1046,10 +1046,25 @@ public:
         this->merge(from_ptr, true, true);
     }
 
-    // NOTE: get_obj_ptr() and set_obj_ptr() methods to be replaced by operator[] when
+    // NOTE: Fast but unsafe: To be used when iterating over obj_names (via get_names()) 
+    // and need to get the shared pointer associated with the name in the loop
+    std::shared_ptr<T> get_obj_ptr(const std::string& key) const
+    {
+        try
+        {
+            return k_objs.at(key);
+        }
+        catch(const std::out_of_range&)
+        {
+            std::string error_msg = type_name + " with name '" + key + "' not found";
+            throw std::invalid_argument(error_msg);
+        }
+    }
+
+    // NOTE: get_and_check_obj_ptr() and set_obj_ptr() methods to be replaced by operator[] when
     //       k_objs will be changed to std::map<std::string, T>
     //       T& operator[](const std::string& name)
-    std::shared_ptr<T> get_obj_ptr(const std::string& name) const
+    std::shared_ptr<T> get_and_check_obj_ptr(const std::string& name) const
     {
         std::string key = to_key(name);
         if(!this->contains(key))
@@ -1132,7 +1147,7 @@ public:
 
     virtual T get(const std::string& name) const
     {
-        std::shared_ptr<T> obj_ptr = this->get_obj_ptr(name);
+        std::shared_ptr<T> obj_ptr = this->get_and_check_obj_ptr(name);
         if(obj_ptr.get() == nullptr)
         {
             std::string error_msg = "Cannot get a null " + type_name + " with name '" + name + "'";

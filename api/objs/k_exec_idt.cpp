@@ -311,7 +311,7 @@ int KDBIdentities::read_vars_db(KDBVariablesPtr dbv_ptr, KDBVariablesPtr dbv_tmp
 
     // get list of VARs to be read (from dbv_tmp)
     std::set<std::string> vars_to_copy;
-    for(const auto& [name, var_ptr] : dbv_ptr->k_objs)
+    for(const std::string& name : dbv_ptr->get_names())
     {
         // series already present
         if(idt_exec_loaded_vars.contains(name))

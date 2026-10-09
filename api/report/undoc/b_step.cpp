@@ -99,7 +99,8 @@ int B_EqsStepWise(char* arg, int unused)
         return 1;
     }
 
-    std::string eq_name = v_args[2];                                               
+    std::string eq_name = v_args[2]; 
+    eq_name = global_ws_eqs->to_key(eq_name);                                         
     if(!global_ws_eqs->contains(eq_name)) 
     {                            
         kerror(0, "Eqs %s not found", eq_name.c_str());

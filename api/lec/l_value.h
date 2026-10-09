@@ -72,6 +72,14 @@ public:
         if(!exec_dbs)
             return false;
         
+        if(!exec_dbs->contains(name))
+        {
+            std::string error_msg = "LEC compilation: Could not retrieve the value ";
+            error_msg += "of the coefficient '" + representation + "'.";
+            kwarning(error_msg.c_str());
+            return false;
+        }
+
         std::shared_ptr<Scalar> scl = exec_dbs->get_obj_ptr(name);
         if(!scl)
         {

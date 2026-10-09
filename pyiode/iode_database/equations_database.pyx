@@ -57,7 +57,7 @@ cdef class Equations(CythonIodeDatabase):
     def _get_object(self, name: str) -> Equation:
         cdef shared_ptr[CEquation] eq_ptr
         name = name.strip()
-        eq_ptr = self.database.get_obj_ptr(name.encode())
+        eq_ptr = self.database.get_and_check_obj_ptr(name.encode())
         eq = Equation._from_ptr(eq_ptr)
         return eq
 

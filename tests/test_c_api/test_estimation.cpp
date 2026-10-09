@@ -27,8 +27,8 @@ TEST_F(EstimationTest, SetBlock)
     std::string to = "1996Y1";
     EditAndEstimateEquations est(from, to);
 
-    std::shared_ptr<Equation> eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
-    std::shared_ptr<Equation> eq_DPUH = global_ws_eqs->get_obj_ptr("DPUH");
+    std::shared_ptr<Equation> eq_ACAF = global_ws_eqs->get_and_check_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_DPUH = global_ws_eqs->get_and_check_obj_ptr("DPUH");
 
     // ---- block = ACAF;DPUH ----
     // set_block("new_block", "currently_displayed_equation")
@@ -192,11 +192,11 @@ TEST_F(EstimationTest, Estimate)
 
     KDBEquationsPtr kdb_eqs = est.get_equations();
     
-    eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = kdb_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");
     EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_DPUH = kdb_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = kdb_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), "1972Y1:1996Y1");
 
@@ -209,19 +209,19 @@ TEST_F(EstimationTest, Estimate)
     c_estimation = est.get_estimation();
 
     // block updated after calling save()
-    eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = kdb_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
     EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_DPUH = kdb_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = kdb_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
     EXPECT_EQ(eq_ACAF->sample.to_string(), from + ":" + to);
 
-    eq_DPUH = global_ws_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = global_ws_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), from + ":" + to);
 
@@ -312,7 +312,7 @@ TEST_F(EstimationTest, Estimate)
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("e0_dw").value) / 1e6, 2.33007);
     EXPECT_DOUBLE_EQ(round(1e6 * global_ws_scl->get("e0_loglik").value) / 1e6, 83.810104);
 
-    std::shared_ptr<Equation> eq_est = global_ws_eqs->get_obj_ptr("ACAF");
+    std::shared_ptr<Equation> eq_est = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     std::array<float, EQS_NBTESTS> tests = eq_est->tests;
     EXPECT_DOUBLE_EQ(round(1e6 * tests[0]) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * tests[EQ_STDEV]) / 1e6, 0.00427);
@@ -434,11 +434,11 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
 
     KDBEquationsPtr kdb_eqs = est.get_equations();
     
-    eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = kdb_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF");
     EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_DPUH = kdb_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = kdb_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), "1972Y1:1996Y1");
 
@@ -453,19 +453,19 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
     est.save();
 
     // block updated after calling save()
-    eq_ACAF = kdb_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = kdb_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
     EXPECT_EQ(eq_ACAF->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_DPUH = kdb_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = kdb_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), "1980Y1:1996Y1");
 
-    eq_ACAF = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ACAF = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ACAF->block, "ACAF;DPUH");
     EXPECT_EQ(eq_ACAF->sample.to_string(), from + ":" + to);
 
-    eq_DPUH = global_ws_eqs->get_obj_ptr("DPUH");
+    eq_DPUH = global_ws_eqs->get_and_check_obj_ptr("DPUH");
     EXPECT_EQ(eq_DPUH->block, "ACAF;DPUH");
     EXPECT_EQ(eq_DPUH->sample.to_string(), from + ":" + to);
 
@@ -579,7 +579,7 @@ TEST_F(EstimationTest, DickeyFullerTest)
 
     std::set<std::string> names = kdb_res->get_names();
 
-    scl_order_0 = kdb_res->get_obj_ptr("df_");
+    scl_order_0 = kdb_res->get_and_check_obj_ptr("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->value) / 1e6, 0.051603);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.053847);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.053847);
@@ -592,12 +592,12 @@ TEST_F(EstimationTest, DickeyFullerTest)
     trend = false;
     kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
-    scl_order_0 = kdb_res->get_obj_ptr("df_");
+    scl_order_0 = kdb_res->get_and_check_obj_ptr("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->value) / 1e6, 0.05969);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.053414);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.053414);
 
-    scl_drift = kdb_res->get_obj_ptr("df_d");
+    scl_drift = kdb_res->get_and_check_obj_ptr("df_d");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->value) / 1e6, -2.351039);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 1.588698);
@@ -610,17 +610,17 @@ TEST_F(EstimationTest, DickeyFullerTest)
     trend = true;
     kdb_res = dickey_fuller_test(var_name, drift, trend, order);
 
-    scl_order_0 = kdb_res->get_obj_ptr("df_");
+    scl_order_0 = kdb_res->get_and_check_obj_ptr("df_");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->value) / 1e6, -0.055952);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->relax) / 1e6, 0.070056);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_order_0->std) / 1e6, 0.070056);
 
-    scl_drift = kdb_res->get_obj_ptr("df_d");
+    scl_drift = kdb_res->get_and_check_obj_ptr("df_d");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->value) / 1e6, 10.599557);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->relax) / 1e6, 1.);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_drift->std) / 1e6, 5.620008);
 
-    scl_trend = kdb_res->get_obj_ptr("df_t");
+    scl_trend = kdb_res->get_and_check_obj_ptr("df_t");
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->value) / 1e6, -0.381779);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->relax) / 1e6, 0.1596);
     EXPECT_DOUBLE_EQ(round(1e6 * scl_trend->std) / 1e6, 0.1596);

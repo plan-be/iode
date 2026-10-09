@@ -315,7 +315,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
         r_niv = get_niv(name1);
         if(niv == r_niv) 
         {
-            std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_obj_ptr(name);
+            std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_and_check_obj_ptr(name);
             str = (char*) cmt_ptr->c_str();
             SCR_strfacpy((unsigned char**) p_cmt + niv - 1, (unsigned char*) str);
 
@@ -333,7 +333,7 @@ int ImportCommentsBST::read_comment(char* name, char** cmt)
             r_niv = get_niv(name2);
             if(niv == r_niv) 
             {
-                std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_obj_ptr(name2);
+                std::shared_ptr<Comment> cmt_ptr = kdb_cmt->get_and_check_obj_ptr(name2);
                 str = (char*) cmt_ptr->c_str();
                 SCR_strfacpy((unsigned char**) p_cmt + niv + shift - 1, (unsigned char*) str);
                 niv--;

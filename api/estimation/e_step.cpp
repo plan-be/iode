@@ -160,7 +160,7 @@ static double estimate_step_wise_1(int i, const std::vector<std::string>& v_scal
         delete est;
 
         scl_name = "e0_" + std::string(test);
-        scl_ptr = global_ws_scl->get_obj_ptr(scl_name);
+        scl_ptr = global_ws_scl->get_and_check_obj_ptr(scl_name);
         if(!scl_ptr) 
         {
             std::string error_msg = "Error: scalar " + scl_name + " not found after estimation.";

@@ -10,7 +10,7 @@ protected:
     void SetUp() override
     {
         global_ws_eqs->load(str_input_test_dir + "fun.ae");
-        eq_ptr = global_ws_eqs->get_obj_ptr(name);
+        eq_ptr = global_ws_eqs->get_and_check_obj_ptr(name);
     }
 
     void TearDown() override 

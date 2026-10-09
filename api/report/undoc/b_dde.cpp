@@ -402,6 +402,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                         }
                         else 
                         {
+                            name = global_ws_var->to_key(name);
                             if(!global_ws_var->contains(name)) 
                                 continue;
     
@@ -434,6 +435,7 @@ char *IodeDdeGetXObj(char *szItem, int type)
                     for(i = 0; i < v_lst.size(); i++)
                     {
                         name = v_lst[i];
+                        name = kdb.to_key(name);
                         if(!kdb.contains(name)) 
                             continue;
                         
@@ -489,6 +491,7 @@ char *IodeDdeGetItem(char *szTopic, char *szItem)
             SCR_lower((unsigned char*) szItem);
         
         name = std::string((char*) szItem);
+        name = kdb.to_key(name);
         if(!kdb.contains(name)) 
             return (char *) 0;
     
@@ -931,6 +934,7 @@ int B_ExcelSet(char *arg, int type)
     {
         case COMMENTS :
         {
+            name = global_ws_cmt->to_key(name);
             found = global_ws_cmt->contains(name);
             if(!found)
                 goto the_end;
@@ -941,6 +945,7 @@ int B_ExcelSet(char *arg, int type)
         }
         case IDENTITIES :
         {
+            name = global_ws_idt->to_key(name);
             found = global_ws_idt->contains(name);
             if(!found)
                 goto the_end;
@@ -951,6 +956,7 @@ int B_ExcelSet(char *arg, int type)
         }
         case LISTS :
         {
+            name = global_ws_lst->to_key(name);
             found = global_ws_lst->contains(name);
             if(!found)
                 goto the_end;
@@ -961,6 +967,7 @@ int B_ExcelSet(char *arg, int type)
         }
         case EQUATIONS :
         {
+            name = global_ws_eqs->to_key(name);
             found = global_ws_eqs->contains(name);
             if(!found)
                 goto the_end;
@@ -971,6 +978,7 @@ int B_ExcelSet(char *arg, int type)
         }
         case SCALARS :
         {
+            name = global_ws_scl->to_key(name);
             found = global_ws_scl->contains(name);
             if(!found)
                 goto the_end;
@@ -983,6 +991,7 @@ int B_ExcelSet(char *arg, int type)
         }
         case TABLES :
         {
+            name = global_ws_tbl->to_key(name);
             found = global_ws_tbl->contains(name);
             if(!found)
                 goto the_end;
@@ -998,6 +1007,7 @@ int B_ExcelSet(char *arg, int type)
 
         case VARIABLES : 
         {
+            name = global_ws_var->to_key(name);
             found = global_ws_var->contains(name);
             if(!found)
                 goto the_end;

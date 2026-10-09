@@ -137,8 +137,8 @@ cdef extern from "api/simulation/simulation.h":
                       const int maxit, const double eps) except +
 
 cdef extern from "pyiode/iode_database/variables_database.cpp":
-    void _c_add_var_from_other(const string& name, KDBVariables* dest, KDBVariables* source, 
-                               const int source_t_first, const int source_t_last) except +
+    void _c_add_var_from_other(const string& dest_name, KDBVariables* dest, const string& source_name, 
+                                KDBVariables* source, const int source_t_first, const int source_t_last) except +
     void _c_copy_var_content(const string& dest_name, KDBVariables* dest, const int dest_t_first, const int dest_t_last,
                              const string& source_name, KDBVariables* source, const int source_t_first, const int source_t_last) except +
 
@@ -199,7 +199,7 @@ cdef extern from "api/objs/equations.h":
 
         # Public methods
         CEquation get(string& name) except +
-        shared_ptr[CEquation] get_obj_ptr(string& name) except +
+        shared_ptr[CEquation] get_and_check_obj_ptr(string& name) except +
         shared_ptr[CEquation] set_obj_ptr(string& name, shared_ptr[CEquation] eq) except +
         void set(string& name, CEquation& eq) except +
 
@@ -226,7 +226,7 @@ cdef extern from "api/objs/identities.h":
 
         # Public methods
         CIdentity get(string& name) except +
-        shared_ptr[CIdentity] get_obj_ptr(string& name) except +
+        shared_ptr[CIdentity] get_and_check_obj_ptr(string& name) except +
         shared_ptr[CIdentity] set_obj_ptr(string& name, shared_ptr[CIdentity] idt) except +
         void set(string& name, CIdentity& idt) except +
 
@@ -276,7 +276,7 @@ cdef extern from "api/objs/scalars.h":
 
         # Public methods
         CScalar get(string& name) except +
-        shared_ptr[CScalar] get_obj_ptr(string& name) except +
+        shared_ptr[CScalar] get_and_check_obj_ptr(string& name) except +
         shared_ptr[CScalar] set_obj_ptr(string& name, shared_ptr[CScalar] scl) except +
         void set(string& name, CScalar& scl) except +
 
@@ -299,7 +299,7 @@ cdef extern from "api/objs/tables.h":
 
         # Public methods
         CTable get(string& name) except +
-        shared_ptr[CTable] get_obj_ptr(string& name) except +
+        shared_ptr[CTable] get_and_check_obj_ptr(string& name) except +
         shared_ptr[CTable] set_obj_ptr(string& name, shared_ptr[CTable] tbl) except +
         void set(string& name, CTable& tbl) except +
 
@@ -333,7 +333,7 @@ cdef extern from "api/objs/variables.h":
         shared_ptr[KDBVariables] get_subset(string pattern, bool copy, string first_period, string last_period) except +
 
         # Public methods
-        vector[double]* get_obj_ptr(string& name) except +
+        vector[double]* get_and_check_obj_ptr(string& name) except +
         void set(string& name, vector[double]& values) except +
 
         bool add(string& name, string& lec) except +

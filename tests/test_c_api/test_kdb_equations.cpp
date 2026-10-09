@@ -75,19 +75,19 @@ TEST_F(KDBEquationsTest, Get)
     std::shared_ptr<Equation> eq_ptr;
     std::string expected_lec;
 
-    eq_ptr = global_ws_eqs->get_obj_ptr("ACAF");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("ACAF");
     EXPECT_EQ(eq_ptr->lec, "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     EXPECT_EQ(eq_ptr->get_date_as_string(), "12-06-1998");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1980Y1:1996Y1");
     EXPECT_EQ(eq_ptr->get_method(), "LSQ");
 
-    eq_ptr = global_ws_eqs->get_obj_ptr("BVY");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("BVY");
     EXPECT_EQ(eq_ptr->lec, "BVY:=YN+YK");
     EXPECT_EQ(eq_ptr->get_date_as_string(), "");
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
     EXPECT_EQ(eq_ptr->get_method(), "LSQ");
 
-    eq_ptr = global_ws_eqs->get_obj_ptr("W");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("W");
     expected_lec = "dln (W/WO) := dln ZJ +gamma1*dln PROD + gamma_ *ln ((NATY-UY)/NATY)[-1]+gamma2\n";
     expected_lec += "+gamma3*(- ln(WCF/(PAF_*WO))[-1]+gamma4*ln (WMIN/ZJ)\n";
     expected_lec += "+gamma5*ln PROD[-1])+(XW)+XWC";
@@ -100,7 +100,7 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_ptr->get_date_as_string(), "");
 
     // other
-    eq_ptr = global_ws_eqs->get_obj_ptr("DTH1");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("DTH1");
     EXPECT_EQ(eq_ptr->endo, "DTH1");
     EXPECT_EQ(eq_ptr->lec, "DTH1:=DTH1C");
     EXPECT_EQ(eq_ptr->solved, 0);
@@ -111,7 +111,7 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_ptr->instruments, "");
 
     // with non-ASCII characters
-    eq_ptr = global_ws_eqs->get_obj_ptr("COEFON");
+    eq_ptr = global_ws_eqs->get_and_check_obj_ptr("COEFON");
     expected_lec = "COEFON :=(ITON/(VBBP_P-VAG-VAH))[1990Y1]\n";
     expected_lec += "/* Coëfficiënt voor berekening indirecte\n"; 
     expected_lec += "belastingen in constante prijzen */";

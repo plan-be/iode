@@ -230,7 +230,6 @@ double KV_get(const KDBVariablesPtr kdb, const std::string& name, int t, int mod
     
     int pernb = get_nb_periods_per_year((smpl->start_period).periodicity);
 
-
     std::shared_ptr<Variable> var_ptr = kdb->get_obj_ptr(name);
     Variable& var = *var_ptr;
 

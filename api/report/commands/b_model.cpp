@@ -275,7 +275,11 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
-    if(!(global_ws_lst->contains(v_lst[0]) && global_ws_lst->contains(v_lst[1]) && global_ws_lst->contains(v_lst[2]))) 
+    std::string pre_list_name = global_ws_lst->to_key(v_lst[0]);
+    std::string inter_list_name = global_ws_lst->to_key(v_lst[1]);
+    std::string post_list_name = global_ws_lst->to_key(v_lst[2]);
+    if(!(global_ws_lst->contains(pre_list_name) && global_ws_lst->contains(inter_list_name) 
+        && global_ws_lst->contains(post_list_name))) 
     {
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
         SCR_free(arg);
@@ -285,7 +289,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 
     int nb;
 
-    std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(v_lst[0]);
+    std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(pre_list_name);
     char** c_pre = (char**) KL_expand((char*) pre_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> pre;
@@ -294,7 +298,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         pre.push_back(std::string(c_pre[i]));
     SCR_free_tbl((unsigned char**) c_pre);
 
-    std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(v_lst[1]);
+    std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(inter_list_name);
     char** c_inter = (char**) KL_expand((char*) inter_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> inter;
@@ -303,7 +307,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         inter.push_back(std::string(c_inter[i]));
     SCR_free_tbl((unsigned char**) c_inter);
 
-    std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(v_lst[2]);
+    std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(post_list_name);
     char** c_post = (char**) KL_expand((char*) post_lst->c_str());
     // convert to std::vector<std::string>
     std::vector<std::string> post;
@@ -357,8 +361,7 @@ static int B_CreateEmptyVar(char *name)
 static double *B_GetVarPtr(char* c_name)
 {
     std::string name = std::string(c_name);
-    name = trim(name);
-    name = to_upper(name);
+    name = global_ws_var->to_key(name);
     if(!global_ws_var->contains(name))
         return NULL;
     else

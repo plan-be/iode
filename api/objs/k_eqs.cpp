@@ -365,6 +365,12 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
 
 std::string KDBEquations::get_lec(const std::string& name) const
 {
+    if(!this->contains(name))
+    {
+        std::string error_msg = "Cannot get LEC of equation '" + name + "': ";
+        error_msg += "equation not found";
+        throw std::runtime_error(error_msg);
+    }
     std::shared_ptr<Equation> c_eq = this->get_obj_ptr(name);
     std::string lec = c_eq->lec;
     return lec; 

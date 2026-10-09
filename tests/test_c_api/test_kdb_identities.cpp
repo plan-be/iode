@@ -96,7 +96,7 @@ TEST_F(KDBIdentitiesTest, Get)
     EXPECT_EQ(identity.get_lec(), expected_lec);
     
     clec = identity.get_compiled_lec();
-    expected_clec = global_ws_idt->get_obj_ptr(name)->get_compiled_lec();
+    expected_clec = global_ws_idt->get_and_check_obj_ptr(name)->get_compiled_lec();
 
     EXPECT_EQ(clec->duplicated_endo, expected_clec->duplicated_endo);
     EXPECT_EQ(clec->v_expression.size(), expected_clec->v_expression.size());

@@ -340,17 +340,19 @@ int Estimation::E_prep_coefs()
  */
 void Estimation::E_get_C()
 {
-    double c;
+    double value;
     int i = 0;
+    std::shared_ptr<Scalar> scl_ptr;
     for(const std::string& scl_name : v_coef_names) 
     {
-        c = E_DBS->get_obj_ptr(scl_name)->value;
-        if(E_DBS->get_obj_ptr(scl_name)->relax != 0.0 && fabs(c) < 1e-15) 
+        scl_ptr = E_DBS->get_obj_ptr(scl_name);
+        value = scl_ptr->value;
+        if(scl_ptr->relax != 0.0 && fabs(value) < 1e-15) 
         {
-            c = 0.1;
-            E_DBS->get_obj_ptr(scl_name)->value = c;
+            value = 0.1;
+            scl_ptr->value = value;
         }
-        COEFS(i) = c;
+        COEFS(i) = value;
         i++;
     }
 }
