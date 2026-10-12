@@ -16,6 +16,7 @@
 #include "api/objs/objs.h"
 #include "api/objs/equations.h"
 #include "api/simulation/simulation.h"
+#include <unordered_map>
 
 
 /**
@@ -51,12 +52,9 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
     bool new_eq_added = true;
     while(new_eq_added) 
     {
-        int i = -1;
         new_eq_added = false;
-        for(const std::string& eq_name : sim_dbe->get_names()) 
+        for(int i = 0; i < sim_dbe->size(); i++) 
         {
-            i++;
-
             // Equation already ordered (i.e. in the PRE or POST list)
             if(v_ordered[i]) 
                 continue;
@@ -67,10 +65,11 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
             {
                 for(const int var: v_vars) 
                 {
-                    // 'var' = endogenous of the current equation
+                    // 'var' = endogenous of the current equation (see method pre_order())
+                    // -> OK so move to next name
                     if(var < 0) 
                         continue;
-                    // 'var' already ordered
+                    // 'var' already ordered -> OK so move to next name
                     if(v_ordered[var]) 
                         continue;
                     // 'var' not endogenous and not ordered 
@@ -86,7 +85,7 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
             {
                 new_eq_added = true;
                 v_ordered[i] = true;
-                v_ordered_eqs_pos[from + nb] = i;
+                v_ordered_eqs[from + nb] = i;
                 nb++;
             }
         }
@@ -117,7 +116,7 @@ int CSimulation::build_inter_list(std::vector<std::vector<int>>& predecessors)
     {
         if(v_ordered[i]) 
             continue;
-        v_ordered_eqs_pos[nb_pre + nb_post + nb] = i;
+        v_ordered_eqs[nb_pre + nb_post + nb] = i;
         nb++;
     }
     return nb;
@@ -145,44 +144,61 @@ int CSimulation::build_inter_list(std::vector<std::vector<int>>& predecessors)
  */
 int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors)
 {
-    int nb = sim_dbe->size();
+    int nb_eqs = sim_dbe->size();
     
-    v_ordered_eqs_pos.clear();
-    v_ordered_eqs_pos.resize(nb, -1);
+    v_ordered_eqs.clear();
+    v_ordered_eqs.resize(nb_eqs, -1);
 
     v_ordered.clear();
-    v_ordered.resize(nb, false);
+    v_ordered.resize(nb_eqs, false);
     
     int eq_pos;
     int i = 0, j = 0;
+    std::string eq_name;
+    std::string endo_name;
     bool exchange = false;
-    std::shared_ptr<Equation> eq_ptr;
     std::shared_ptr<CLEC> clec;
-    std::string eq_name_resolved;
-    for(const std::string& eq_name : sim_dbe->get_names()) 
+    std::unordered_map<std::string, int> cache_eq_pos;
+    for(std::shared_ptr<Equation>& eq_ptr : v_eqs_ptr) 
     {
-        eq_ptr = sim_dbe->get_obj_ptr(eq_name);
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
         eq_predecessors.reserve(clec->v_clec_vars.size());
 
-        eq_pos = -1;
-        for(const std::string& name : clec->v_clec_vars)
-        {
-            eq_name_resolved = find_eq_name(name);
-            
-            // 'name' is not an endogenous variable of any equation
-            if(eq_name_resolved.empty())
-                eq_pos = -1;
-            // 'name' is the endogenous variable of the current equation
-            else if(eq_name_resolved == eq_name)
-                eq_pos = -1;
-            else
-                eq_pos = map_eq_name_index[eq_name_resolved];
+        eq_name = v_eq_names[i];
 
+        for(const std::string& name : clec->v_clec_vars) 
+        {
+            // try to find the position of the equation whose endogenous 
+            // variable is 'name'
+            if(cache_eq_pos.contains(name))
+                eq_pos = cache_eq_pos[name];
+            else
+            {
+                eq_pos = find_eq_pos(name);
+                cache_eq_pos[name] = eq_pos;
+            }
+            
+            // 'name' is not an endogenous variable of any equation 
+            // -> check next name is CLEC
+            if(eq_pos < 0)
+                continue;
+            
+            // 'name' is the endogenous variable of the current equation
+            // -> put tag '-1' as predecessor and move to next name is CLEC
+            endo_name = v_eq_names[eq_pos];
+            if(eq_name == endo_name)
+            {
+                eq_predecessors.push_back(-1);
+                continue;
+            }
+
+            // push the position of the equation corresponding to 'name' 
             eq_predecessors.push_back(eq_pos);
-            if(eq_pos >= 0)
-                successors[eq_pos].push_back(i);
+
+            // push the position of the equation corresponding to 'eq_name'
+            // (current equation) in the vector of successors
+            successors[eq_pos].push_back(i);
         }
 
         i++;
@@ -227,29 +243,37 @@ void CSimulation::order(const std::vector<std::string>& eqs)
     cpu_time_sorting = 0;
     cpu_time_scc = 0;
 
-    int nb = sim_dbe->size();
+    int nb_eqs = sim_dbe->size();
     
     // No reordering : we keep the order of eqs and so everything is interdep
     if(sorting_algo == SORT_NONE) 
     {
         nb_pre = nb_post = 0;
-        nb_inter = nb;
+        nb_inter = nb_eqs;
 
         v_ordered_eqs.clear();
-        v_ordered_eqs.reserve(nb);
         if(eqs.size() == 0)
         {
-            for(const std::string& eq_name : sim_dbe->get_names()) 
-                v_ordered_eqs.push_back(eq_name);
+            v_ordered_eqs.reserve(nb_eqs);
+            for(int i = 0; i < nb_eqs; i++) 
+                v_ordered_eqs.push_back(i);
         }
         else
-            v_ordered_eqs = eqs;
+        {
+            int eq_pos;
+            v_ordered_eqs.reserve(eqs.size());
+            for(const std::string& eq_name : eqs)
+            {
+                eq_pos = map_eq_name_index[eq_name];
+                v_ordered_eqs.push_back(eq_pos);
+            }
+        }
 
         return;
     }
 
     int idx = 0;
-    std::vector<std::string> v_eq_names(nb, "");
+    std::vector<std::string> v_eq_names(nb_eqs, "");
     for(const std::string& name : sim_dbe->get_names()) 
     {
         v_eq_names[idx] = name;
@@ -261,8 +285,8 @@ void CSimulation::order(const std::vector<std::string>& eqs)
 
     // predecessors = liste de pointeur vers des vecteurs contenant la pos de toutes les vars de l'eq i
     // voir preorder
-    std::vector<std::vector<int>> predecessors(nb);
-    std::vector<std::vector<int>> successors(nb);
+    std::vector<std::vector<int>> predecessors(nb_eqs);
+    std::vector<std::vector<int>> successors(nb_eqs);
     pre_order(predecessors, successors);
     nb_pre = build_pre_post_list(predecessors, 0);
     nb_post = build_pre_post_list(successors, nb_pre);
@@ -271,9 +295,9 @@ void CSimulation::order(const std::vector<std::string>& eqs)
     int k;
     for(int i = 0; i < nb_post / 2; i++) 
     {
-        k = v_ordered_eqs_pos[nb_pre + i];
-        v_ordered_eqs_pos[nb_pre + i] = v_ordered_eqs_pos[nb_pre + (nb_post - 1) - i];
-        v_ordered_eqs_pos[nb_pre + (nb_post - 1) - i] = k;
+        k = v_ordered_eqs[nb_pre + i];
+        v_ordered_eqs[nb_pre + i] = v_ordered_eqs[nb_pre + (nb_post - 1) - i];
+        v_ordered_eqs[nb_pre + (nb_post - 1) - i] = k;
     }
 
     nb_inter = build_inter_list(predecessors);
@@ -287,9 +311,9 @@ void CSimulation::order(const std::vector<std::string>& eqs)
 
     // NOTE: currently, v_ordered_eqs contains lists in the order *pre*, *post*, *inter*.
     // Rotate the [post, inter] subrange left by nb_post to obtain *pre*, *inter*, *post*.
-    std::rotate(v_ordered_eqs_pos.begin() + nb_pre,
-                v_ordered_eqs_pos.begin() + nb_pre + nb_post,
-                v_ordered_eqs_pos.begin() + nb_pre + nb_post + nb_inter);
+    std::rotate(v_ordered_eqs.begin() + nb_pre,
+                v_ordered_eqs.begin() + nb_pre + nb_post,
+                v_ordered_eqs.begin() + nb_pre + nb_post + nb_inter);
 
     if(sorting_algo == SORT_BOTH) 
     {
@@ -299,16 +323,6 @@ void CSimulation::order(const std::vector<std::string>& eqs)
     }
 
     v_ordered.clear();
-
-    std::string eq_name;
-    v_ordered_eqs.clear();
-    v_ordered_eqs.reserve(v_ordered_eqs_pos.size());
-    for(int eq_pos : v_ordered_eqs_pos)
-    {
-        eq_name = v_eq_names[eq_pos];
-        v_ordered_eqs.push_back(eq_name);
-    }
-    v_ordered_eqs_pos.clear();
 }
 
 
@@ -318,21 +332,20 @@ void CSimulation::order(const std::vector<std::string>& eqs)
  *  endogenous variable 'var' after the first endo-exo exchanges.
  *  
  *  @param  [in]    string   var    variable to search for
- *  @return         string          name of the equation whose endogenous is 'var'
+ *  @return         int             position of the equation whose endogenous is 'var'
  */
-std::string CSimulation::find_eq_name(const std::string& var)
+int CSimulation::find_eq_pos(const std::string& var)
 {   
-    // exchange for this variable -> the endogenous of the equation 
-    // is the exchanged variable
-    if(map_exchange_rev.contains(var))
-        return map_exchange_rev[var];
+    // check if an exchange 'endo <-> exo' exist for the variable 'var'.
+    // Otherwise, assume 'var' is the endogenous variable of the equation to be found
+    std::string endo = map_exchange_rev.contains(var) ? map_exchange_rev[var] : var;
     
     // no exchange for this variable -> endogenous of the equation 
     // is the variable itself 
-    if(map_eq_name_index.contains(var))
-        return var;
+    if(map_eq_name_index.contains(endo))
+        return map_eq_name_index[endo];
     else
-        return "";
+        return -1;
 }
 
 
@@ -341,12 +354,13 @@ std::string CSimulation::find_eq_name(const std::string& var)
  */
 int CSimulation::compute_tri_begin()
 {
-    int nb = sim_dbe->size();
+    int nb_eqs = sim_dbe->size();
+
     v_permut.clear();
-    v_permut.resize(nb, -1);
+    v_permut.resize(nb_eqs, -1);
     
     for(int i = 0 ; i < nb_inter ; i++)
-        v_permut[v_ordered_eqs_pos[nb_pre + i]] = i;
+        v_permut[v_ordered_eqs[nb_pre + i]] = i;
 
     return 0;
 }
@@ -359,7 +373,7 @@ int CSimulation::compute_tri_end()
 {
     for(int i = 0 ; i < sim_dbe->size() ; i++)
         if(v_permut[i] >= 0)
-            v_ordered_eqs_pos[nb_pre + v_permut[i]] = i;
+            v_ordered_eqs[nb_pre + v_permut[i]] = i;
 
     v_permut.clear();
     return 0;
@@ -400,8 +414,7 @@ void CSimulation::compute_tri_perm1(int i, std::vector<int>& v_vars)
     if(m < ksim_permi) 
         return;
 
-    int nbe = sim_dbe->size();
-    for(int j = 0 ; j < nbe ; j++)
+    for(int j = 0; j < sim_dbe->size(); j++)
         if(v_permut[j] > ksim_permi && v_permut[j] <= m)
             v_permut[j]--;
 
@@ -427,7 +440,7 @@ void CSimulation::compute_tri(std::vector<std::vector<int>>& predecessors, int p
     {
         for(int i = 0 ; i < nb_inter ; i++) 
         {
-            eq_pos = v_ordered_eqs_pos[nb_pre + i];
+            eq_pos = v_ordered_eqs[nb_pre + i];
             compute_tri_perm1(eq_pos, predecessors[eq_pos]);
         }
     }

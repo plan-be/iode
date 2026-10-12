@@ -38,16 +38,20 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     int opasses = nb_passes;
     int osort = sorting_algo;
 
-    bool success = set_sim_dbe(dbe);
-    if(!success)
-        return false;
-
     nb_passes = tris;
 
     // to build the PRE, INTER and POST lists in build_lists_order()
-    sim_dbv = KDBVariables::Create(false);
-    for(const auto& [var_name, _] : dbe->k_objs)
-        sim_dbv->add_obj_ptr(var_name, std::shared_ptr<Variable>());
+    KDBVariablesPtr dbv = KDBVariables::Create(false);
+    dbv->set_sample("2000Y1", "2000Y1");
+    for(const std::string& name : dbe->get_names())
+        dbv->add_obj_ptr(name, std::make_shared<Variable>(1, IODE_NAN));
+    
+    bool success = set_simulation_workspaces(dbe, global_ws_scl, dbv);
+    if(!success)
+    {
+        clear();
+        return false;
+    }
 
     if(tris > 0) 
         sorting_algo = SORT_BOTH;
@@ -67,6 +71,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
         {
             std::string error_msg = "'" + eq_name + "': cannot find equation";
             error_manager.append_error(error_msg);
+            clear();
             return false;
         }
 
@@ -78,20 +83,32 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
             error_manager.append_error(error_msg);
+            clear();
             return false;
         }
     }
+
+    // Because the simulation Variables workspace is not passed 
+    // to the method calculate_SCC()
+    if(!v_endo_exo.empty())
+    {
+        clear();
+        std::string msg = "Exchange between endogenous and exogenous variables is ";
+        msg += "not allowed when using calculate_SCC() and simulate_SCC().";
+        kwarning((char*) msg.c_str());
+        return false;
+    }
+    map_exchange.clear();
+    map_exchange_rev.clear();
 
     /* ORDERING EQUATIONS */
     order();
     build_lists_order(pre, inter, post);
 
-    v_ordered_eqs.clear();
-    map_exchange.clear();
-    map_exchange_rev.clear();
-
     nb_passes = opasses;
     sorting_algo = osort;
+
+    clear();
     return true;
 }
 
@@ -112,6 +129,7 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     {
         std::string error_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(error_msg);
+        clear();
         return false;
     }
 
@@ -130,12 +148,14 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     bool success = true;
     std::string eq_name;
     kmsg("Linking equations ....");
-    for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
+    for(const std::shared_ptr<Equation>& eq_ptr : v_eqs_ptr) 
     {
+        eq_name = eq_ptr->endo;
         if(!sim_dbv->contains(eq_name)) 
         {
             std::string error_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(error_msg);
+            clear();
             return false;
         }
         
@@ -145,6 +165,7 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
         {
             std::string error_msg = "'" + eq_name + "': cannot link equation";
             error_manager.append_error(error_msg);
+            clear();
             return false;
         }
     }
@@ -153,6 +174,7 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     v_endo_values_1.clear();
     v_endo_values.resize(nb_inter, 0.0);
     v_endo_values_1.resize(nb_inter, 0.0);
+
     return true;
 }
 
@@ -177,42 +199,72 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
     nb_inter = (int) inter.size();
     nb_post = (int) post.size();
 
-    bool success = set_sim_dbe(dbe);
+    bool success = set_simulation_workspaces(dbe, dbs, dbv);
     if(!success)
+    {
+        clear();
         return false;
+    }
 
-    sim_dbv = dbv;
-    sim_dbs = dbs;
-
+    // Because the simulation Variables workspace is not passed 
+    // to the method calculate_SCC()
+    if(!v_endo_exo.empty())
+    {
+        clear();
+        std::string msg = "Exchange between endogenous and exogenous variables is ";
+        msg += "not allowed when using calculate_SCC() and simulate_SCC().";
+        kwarning((char*) msg.c_str());
+        return false;
+    }
     map_exchange.clear();
     map_exchange_rev.clear();
 
     success = simulate_SCC_init(*smpl);
-    if(!success) 
+    if(!success)
+    {
+        clear();
         return false;
+    } 
 
-    // Fixe l'ordre d'exécution dans v_order
+    int eq_pos;
     v_ordered_eqs.clear();
     v_ordered_eqs.reserve(nb_pre + nb_inter + nb_post);
-    for(int i = 0; i < nb_pre; i++)   
-        v_ordered_eqs.push_back(pre[i]);
-    for(int i = 0; i < nb_inter; i++) 
-        v_ordered_eqs.push_back(inter[i]);
-    for(int i = 0; i < nb_post; i++)  
-        v_ordered_eqs.push_back(post[i]);
+    for(int i = 0; i < nb_pre; i++)
+    {
+        eq_pos = map_eq_name_index[pre[i]];
+        v_ordered_eqs.push_back(eq_pos);
+    }   
+    for(int i = 0; i < nb_inter; i++)
+    {
+        eq_pos = map_eq_name_index[inter[i]];
+        v_ordered_eqs.push_back(eq_pos);
+    }
+    for(int i = 0; i < nb_post; i++)
+    {
+        eq_pos = map_eq_name_index[post[i]];
+        v_ordered_eqs.push_back(eq_pos);
+    }  
+    build_ordered_variable_positions();
 
     // Simulation
     int t = smpl->start_period.difference(dbv->get_sample()->start_period);
 
     int rc = 0;
-    for(int i = 0; i < smpl->nb_periods; i++, t++)
+    int cpu_iter;
+    success = false;
+    for(int i = 0; i < smpl->nb_periods; i++, t++) 
     {
+        cpu_iter = WscrGetMS();
+
         rc = sub_simulate(t);
-        if(rc > 0)
+        success = (rc == 0) ? true : false;
+        if(!success)
         {
             clear();
             return false;
         } 
+        
+        v_cpu_time[t] = WscrGetMS() - cpu_iter;
     }
 
     clear();
@@ -252,6 +304,7 @@ bool CSimulation::calculate_SCC(const int nb_iterations, const std::string& pre_
     }
     if(!lists_ok)
     {
+        clear();
         kwarning(error_msg.c_str());
         return false;
     }
@@ -260,34 +313,40 @@ bool CSimulation::calculate_SCC(const int nb_iterations, const std::string& pre_
     char* c_inter = to_char_array(inter_name);
     char* c_post = to_char_array(post_name);
 
-    int rc = -1;
+    bool success = true;
     KDBEquationsPtr tdbe = nullptr;
     if(list_eqs.empty())
     {
         tdbe = global_ws_eqs;
-        rc = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
+        success = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
     }
     else
     {
         try
         {
             tdbe = global_ws_eqs->get_subset(list_eqs, false);
-            if(tdbe->size() > 0)
-                rc = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
+            if(tdbe->size() == 0)
+            {
+                clear();
+                return false;
+            }
+            success = calculate_SCC(tdbe, nb_iterations, c_pre, c_inter, c_post);
         }
         catch(const std::exception& e)
         {
             error_msg += "\t" + std::string(e.what());
             kwarning(error_msg.c_str());
+            clear();
             return false;
         }
     }
     
-    if(rc < 0)
+    if(!success)
     {
         std::string error_msg = "Could not calculate SCC for the model";
         error_manager.prepend_error(error_msg);
         kwarning(error_manager.get_all_errors().c_str());
+        clear();
         return false;
     }
 
@@ -319,6 +378,7 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     {
         error_msg += "\t" + std::string(e.what());
         kwarning(error_msg.c_str());
+        clear();
         return false;
     }
 
@@ -342,6 +402,7 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     if(!lists_ok)
     {
         kwarning(error_msg.c_str());
+        clear();
         if (sample) delete sample;
         return false;
     }
@@ -385,6 +446,7 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     {
         error_msg += "\tEmpty list of equations";
         kwarning(error_msg.c_str());
+        clear();
         if (sample) delete sample;
         return false;
     }
@@ -393,13 +455,18 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     try
     {
         KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
-        if(tdbe->size() > 0)
-            success = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, pre, inter, post);
+        if(tdbe->size() == 0)
+        {
+            clear();
+            return false;
+        }
+        success = simulate_SCC(tdbe, global_ws_var, global_ws_scl, sample, pre, inter, post);
     }
     catch(const std::exception& e)
     {
         error_msg += "\t" + std::string(e.what());
         kwarning(error_msg.c_str());
+        clear();
         if(sample) delete sample;
         return false;
     }
@@ -411,6 +478,7 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
         std::string error_msg = "Could not simulate SCC for the model"; 
         error_manager.prepend_error(error_msg);
         kwarning(error_manager.get_all_errors().c_str());
+        clear();
         return false;
     }
 

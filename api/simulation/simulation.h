@@ -52,7 +52,7 @@ public:
 	int     sorting_algo;           // reordering option : SORT_NONE, SORT_CONNEX or SORT_BOTH
 	int     init_algo;              // endogenous initial values
 	
-    std::set<std::string> path_examined;
+    std::set<int> path_examined;
 	std::vector<std::string> v_endo_exo;    // Allow exchange exogenous <-> endogenous roles in equations
     std::vector<double> v_norm;             // Convergence threshold reached at the end of each simulation period
     std::vector<int> v_nb_iterations;       // Numbers of iterations needed for each simulation period
@@ -66,29 +66,37 @@ public:
     int     newton_max_iter;                // Newton-Raphson convergence threshold
 
 private:
-	KDBVariablesPtr  sim_dbv;               // KDB of variables used for the simulation. Normally global_ws_var
-	KDBScalarsPtr    sim_dbs;               // KDB of scalars used for the simulation. Normally global_ws_scl
-	KDBEquationsPtr  sim_dbe; 	            // KDB of equations defining the model to simulation. Can global_ws_eqs or a subset.
+    std::vector<std::shared_ptr<Equation>> v_eqs_ptr;   // vector of equations defining the model to simulation. 
+                                                        // Can be global_ws_eqs or a subset.
+    std::vector<std::shared_ptr<Variable>> v_var_ptr;   // vector of variables' pointers. 
+    
+    KDBEquationsPtr  sim_dbe;               // KDB of equations used for the simulation. Normally global_ws_eqs
+    KDBScalarsPtr    sim_dbs;               // KDB of scalars used for the simulation. Normally global_ws_scl
+    KDBVariablesPtr  sim_dbv;               // KDB of variables used for the simulation. Normally global_ws_var
 
 	double  norm = 0.0;                     // Error measure: maximum difference between 2 iterations 
 
-    std::unordered_map<std::string, int> map_eq_name_index;   // Cache of equation name to index mapping for fast lookups
+    std::vector<std::string> v_eq_names;    // vector of equations names
+    std::vector<std::string> v_var_names;   // vector of variables names
+
+    std::unordered_map<std::string, int> map_eq_name_index;     // Cache of equation name to index mapping for fast lookups
+    std::unordered_map<std::string, int> map_var_name_index;    // Cache of variable name to index mapping for fast lookups
 
 	// EQUATION ORDERING
 	int nb_pre = 0;                         // number of equations in the "prolog" block
 	int nb_inter = 0;                       // number of equations in the "interdep" block
 	int nb_post = 0;                        // number of equations in the "epilog"
-    std::vector<std::string> v_ordered_eqs; // names of the equations (to simulate) in the execution order.
+    std::vector<int> v_ordered_eqs;         // positions of the equations in sim_dbe stored in the execution order.
+    std::vector<int> v_ordered_vars;        // variable position in sim_dbv for each equation in execution order
     
-    std::unordered_map<std::string, std::string> map_exchange;          // pairs <endo, exo> for which the exchanges are defined
-    std::unordered_map<std::string, std::string> map_exchange_rev;      // reverse of map_exchange
+    std::unordered_map<std::string, std::string> map_exchange;      // pairs <endo, exo> for which the exchanges are defined
+    std::unordered_map<std::string, std::string> map_exchange_rev;  // reverse of map_exchange
 
     std::vector<double> v_endo_values;      // Values of the endogenous variables (in the interdep block) at the end of the previous iteration
     std::vector<double> v_endo_values_1;    // Values of the endogenous variables (in the interdep block) during the current iteration
 
     std::vector<int> v_permut;              // vector of permutation   
     std::vector<bool> v_ordered;            // indicates if equation i is already in a block
-    std::vector<int> v_ordered_eqs_pos;     // positions of the equations (to simulate) in the execution order.
 
 private:
     void clear()
@@ -100,17 +108,30 @@ private:
         cpu_time_scc = 0;    
         cpu_time_sorting = 0;
 
+        sim_dbe.reset();
+        sim_dbs.reset();
+        sim_dbv.reset();
+
         path_examined.clear();
-        v_endo_exo.clear();
         v_endo_values.clear();
         v_endo_values_1.clear();
-        map_exchange.clear();
-        map_exchange_rev.clear();
+
         map_eq_name_index.clear();
+        map_var_name_index.clear();
+
         v_ordered_eqs.clear();
-        v_ordered_eqs_pos.clear();
+        v_ordered_vars.clear();
         v_permut.clear();
         v_ordered.clear();
+
+        v_eq_names.clear();
+        v_var_names.clear();
+        v_eqs_ptr.clear();
+        v_var_ptr.clear();
+
+        v_endo_exo.clear();
+        map_exchange.clear();
+        map_exchange_rev.clear();
     }
 
     // Constructors are private - use Create() factory method instead
@@ -218,7 +239,7 @@ public:
     // ==== MODEL SIMULATION ====
 
 	/* k_sim_main.c */
-    bool exchange(const std::string& list_exo = "");
+    bool set_exchange(const std::string& list_exo = "");
 
     bool compile(const std::string& list_eqs = "");
 
@@ -241,18 +262,18 @@ public:
 
 protected:
 	/* k_sim_main.c */
-	double calculate_CLEC(const std::string& eq_name, const std::string& var_name, int t, int msg);
+	double calculate_CLEC(const int eq_pos, const int var_pos, int t, int msg);
 	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */
-	std::string find_eq_name(const std::string& var);
+	int find_eq_pos(const std::string& var);
 	void order(const std::vector<std::string>& eqs = std::vector<std::string>());
 	void compute_tri(std::vector<std::vector<int>>& predecessors, int passes);
 
 	/* k_sim_exo2endo.c */
 	bool exo_to_endo(const std::string& endo, const std::string& exo);
 
-    std::vector<std::string> eqs_to_vector(const std::string& list_eqs)
+    std::vector<std::string> eqs_to_vector(KDBEquationsPtr dbe, const std::string& list_eqs)
     {
         std::vector<std::string> v_eqs;
         if(list_eqs.empty())
@@ -266,11 +287,11 @@ protected:
         }
 
         std::string eq_name;
-        v_eqs.reserve(sim_dbe->size());
+        v_eqs.reserve(dbe->size());
         for(const std::string& item : v_tmp_eqs)
         {
             eq_name = item;
-            if(!sim_dbe->contains(eq_name))
+            if(!dbe->contains(eq_name))
             {
                 std::string error_msg = "Equation '" + eq_name + "' not found in the model\n";
                 throw std::invalid_argument(error_msg);
@@ -282,32 +303,98 @@ protected:
     }
 
 private:
-    std::string get_var(const int i)
+    void build_ordered_variable_positions()
     {
-        std::string eq_name = v_ordered_eqs[i];
-        if(map_exchange.contains(eq_name))
-            return map_exchange[eq_name];
-        else
-            return eq_name;
+        int var_pos;
+        v_ordered_vars.clear();
+        v_ordered_vars.reserve(v_ordered_eqs.size());
+        for(const int eq_pos : v_ordered_eqs)
+        {
+            const std::string& eq_name = v_eq_names[eq_pos];
+            // check if endogenous variable (= eq_name) has been exchanged with an exogenous variable
+            auto exchange_it = map_exchange.find(eq_name);
+            const std::string& var_name = exchange_it != map_exchange.end() ? exchange_it->second : eq_name;
+            // push the position of the corresponding variable in sim_dbv into the vector
+            var_pos = map_var_name_index.at(var_name);
+            // ordered equation 'i' points to 'var_pos'
+            v_ordered_vars.push_back(var_pos);
+        }
     }
 
-    bool set_sim_dbe(KDBEquationsPtr dbe)
+    double* get_variable_values(const int var_pos)
     {
+        return v_var_ptr[var_pos]->data();
+    }
+
+    double get_variable_value(const int var_pos, const int t)
+    {
+        return (*v_var_ptr[var_pos])[t];
+    }
+
+    void set_variable_value(const int var_pos, const int t, const double value)
+    {
+        (*v_var_ptr[var_pos])[t] = value;
+    }
+
+    bool set_simulation_workspaces(KDBEquationsPtr dbe, KDBScalarsPtr dbs, KDBVariablesPtr dbv)
+    {
+        std::string error_msg = "Simulation (initialization): ";
+
         if(dbe->size() == 0) 
         {
-            std::string error_msg = "Empty set of equations";
+            error_msg += "Empty workspace of equations";
             error_manager.append_error(error_msg);
             return false;
         }
-    
-        sim_dbe = dbe;
-    
-        int idx = 0;
-        map_eq_name_index.clear();
-        for(const std::string& name : sim_dbe->get_names()) 
+
+        if(dbs->size() == 0) 
         {
-            map_eq_name_index[name] = idx;
-            idx++;
+            error_msg += "Empty workspace of scalars";
+            error_manager.append_error(error_msg);
+            return false;
+        }
+
+        if(dbv->size() == 0) 
+        {
+            error_msg += "Empty workspace of variables";
+            error_manager.append_error(error_msg);
+            return false;
+        }
+
+        sim_dbe = dbe;
+        sim_dbs = dbs;
+        sim_dbv = dbv;
+
+        int eq_pos = 0;
+        map_eq_name_index.clear();
+        v_eqs_ptr.reserve(dbe->size());
+        v_eq_names.reserve(dbe->size());
+        std::shared_ptr<Equation> eq_ptr = nullptr;
+        for(const std::string& name : dbe->get_names()) 
+        {
+            eq_ptr = dbe->get_obj_ptr(name);
+            if(!eq_ptr)
+                throw std::runtime_error(error_msg + "Equation '" + name + "' is null");
+            v_eqs_ptr.push_back(eq_ptr);
+            v_eq_names.push_back(name);
+            map_eq_name_index[name] = eq_pos;
+            eq_pos++;
+        }
+
+        int var_pos = 0;
+        map_var_name_index.clear();
+        v_var_ptr.reserve(sim_dbv->size());
+        v_var_names.reserve(sim_dbv->size());
+        std::shared_ptr<Variable> var_ptr = nullptr;
+        for(const std::string& name : sim_dbv->get_names())
+        {
+            var_ptr = sim_dbv->get_obj_ptr(name);
+            if(!var_ptr)
+                throw std::runtime_error(error_msg + "Variable '" + name + "' is null");
+            v_var_ptr.push_back(var_ptr);
+            v_var_names.push_back(name);
+            map_var_name_index[name] = var_pos;
+            var_pos++;
         }
 
         return true;
@@ -334,6 +421,7 @@ private:
 	int compute_tri_end();
 
 	/* k_sim_exo2endo.c */
+    bool prepare_exchanges();
 	bool find_path(const std::string& endo, const std::string& exo, int& depth);
 
 	/* k_sim_scc.c */

@@ -65,8 +65,8 @@
  *  
  *  See more explanation at the top of this module.
  *  
- *  @param [in] int     posendo     position of the endogenous variable in sim_dbe
- *  @param [in] int     posexo      position of the exogenous variable in sim_dbe
+ *  @param [in] string  endo        name of the endogenous variable in v_eqs_ptr
+ *  @param [in] string  exo         name of the exogenous variable in v_eqs_ptr
  *  @param [in] int*    depth       current level of recursivity (starts at 0 and increase each time KE)
  *  
  */
@@ -89,25 +89,24 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
 
     // Endo and exo *not* in the same equation
     // => try to find a path between endo and exo and change endo / exo at each step
-    int poseq = -1;
     bool success = false;
-    std::string eq_name_resolved;
-    for(const std::string& name: clec->v_clec_vars)
+    int eq_pos = -1;
+    for(const std::string& name: clec->v_clec_vars) 
     {   
         if(name == endo)
             continue;
 
-        eq_name_resolved = find_eq_name(name);
+        eq_pos = find_eq_pos(name);
 
         // current variable is not an endogenous of any equation
-        if(eq_name_resolved.empty()) 
+        if(eq_pos < 0) 
             continue;
 
         // if path already examined --> continue
-        if(path_examined.contains(eq_name_resolved)) 
+        if(path_examined.contains(eq_pos)) 
             continue;
         
-        path_examined.insert(eq_name_resolved);
+        path_examined.insert(eq_pos);
 
         depth++;
         success = find_path(name, exo, depth);
@@ -133,13 +132,10 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
 
 /**
  *  Modify the model to solve it with respect to another set of variables, 
- *  the variable posendo becoming exogenous and the variable posexo becoming endogenous.
+ *  the variable 'endo' becoming exogenous and the variable 'exo' becoming endogenous.
  *  
- *  If the function succeeds, the vector v_endo is modified to reflect the new endogenous 
- *  for each equation.
- *  
- *  @param [in] int     posendo     position of the endogenous variable in sim_dbv
- *  @param [in] int     posexo      position of the exogenous variable in sim_dbv
+ *  @param [in] string  endo        name of the endogenous variable in sim_dbv
+ *  @param [in] string  exo         name of the exogenous variable in sim_dbv
  *  @return     int                 0 if the exchange is possible, 
  *                                  -1 otherwise: 
  *                                      endo or exo not found in equations, 
@@ -177,4 +173,56 @@ bool CSimulation::exo_to_endo(const std::string& endo, const std::string& exo)
     }
 
     return true;
+}
+
+bool CSimulation::prepare_exchanges()
+{
+    // Optional goal seeking = exchange exo and endo roles in equations
+    if(v_endo_exo.empty()) 
+        return true;
+
+    bool success = false;
+    std::string endo, exo;
+    path_examined.clear();
+    for(const std::string& endo_exo : v_endo_exo) 
+    {
+        std::vector<std::string> pair_endo_exo = split(endo_exo, '-');
+        if(pair_endo_exo.size() != 2) 
+        {
+            std::string err_msg = "'" + endo_exo + "': syntax error in goal ";
+            err_msg += "seeking parameter";
+            error_manager.append_error(err_msg);
+            clear();
+            return false;
+        }
+
+        endo = pair_endo_exo[0];
+        if(!sim_dbe->contains(endo)) 
+        {
+            std::string err_msg = "Goal Seeking - '" + endo + "': ";
+            err_msg += "no such equation in the Equations workspace";
+            error_manager.append_error(err_msg);
+            clear();
+            return false;
+        }
+
+        exo = pair_endo_exo[1];
+        if(!sim_dbv->contains(exo)) 
+        {
+            std::string err_msg = "Goal Seeking - '" + exo + "': ";
+            err_msg += "cannot find the variable";
+            error_manager.append_error(err_msg);
+            clear();
+            return false;
+        }
+        
+        success = exo_to_endo(endo, exo);
+        if(!success) 
+        {
+            clear();
+            return false;
+        }
+    }
+
+    return success;
 }

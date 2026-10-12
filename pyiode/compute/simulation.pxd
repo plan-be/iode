@@ -53,7 +53,7 @@ cdef extern from "api/simulation/simulation.h":
         void set_debug_newton(bint debug) except +
 
         # Model simulation methods
-        bool exchange(const string& list_exo) except +
+        bool set_exchange(const string& list_exo) except +
         bool compile(const string& list_eqs) except +
         bool simulate(const string& from_period, const string& to_period, const string& list_eqs) except +
         bool calculate_SCC(const int nb_iterations, const string& pre_name, const string& inter_name, 

@@ -109,11 +109,11 @@ void CSimulation::init_values(int t)
         return;
 
     double* values;
-    std::string var_name;
+    int var_pos;
     for(int i = 0 ; i < nb_pre + nb_inter + nb_post; i++) 
     {
-        var_name = get_var(i);
-        values = sim_dbv->get_var_ptr(var_name);
+        var_pos = v_ordered_vars[i];
+        values = get_variable_values(var_pos);
         KV_init_values_1(values, t, init_algo);
     }
 }
@@ -129,9 +129,12 @@ void CSimulation::init_values(int t)
  */
 void CSimulation::restore_values(int t)
 {
-    int i, j;
-    for(i = nb_pre, j = 0; j < nb_inter; i++, j++)
-        sim_dbv->set_var(get_var(i), t, v_endo_values[j]);
+    int var_pos;
+    for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)
+    {
+        var_pos = v_ordered_vars[i];
+        set_variable_value(var_pos, t, v_endo_values[j]);
+    }
 }
 
 /**
@@ -145,12 +148,12 @@ void CSimulation::restore_values(int t)
 int CSimulation::prolog(int t)
 {
     double x;
-    std::string var_name;
+    int var_pos;
     for(int i = 0; i < nb_pre; i++)  
     {
-        var_name = get_var(i);
-        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 0);
-        sim_dbv->set_var(var_name, t, x);
+        var_pos = v_ordered_vars[i];
+        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
+        set_variable_value(var_pos, t, x);
     }
 
     return 0;
@@ -175,21 +178,21 @@ int CSimulation::prolog(int t)
  */
 int CSimulation::sub_interdep_1(int t)
 {
-    int     i, j;
     double  x;
     double  d, pd;
+    double  new_value;
 
     norm = 0.0;
-    std::string var_name;
-    for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
+    int var_pos;
+    for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        var_name = get_var(i);
+        var_pos = v_ordered_vars[i];
 
         /* save XK first */
-        v_endo_values[j] = sim_dbv->get_value(var_name, t);
+        v_endo_values[j] = get_variable_value(var_pos, t);
 
         /* execute lec */
-        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
+        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
 
@@ -206,13 +209,14 @@ int CSimulation::sub_interdep_1(int t)
             if(pd > norm) norm = pd;
 
             // Stores the new endo value and "relaxes" it 
-            sim_dbv->set_var(var_name, t, relax * (x - v_endo_values[j]) + v_endo_values[j]);
+            new_value = relax * (x - v_endo_values[j]) + v_endo_values[j];
+            set_variable_value(var_pos, t, new_value);
         }
         else 
         {
             // if NaN, set norm to a huge value 
             norm = 10;
-            sim_dbv->set_var(var_name, t, x);
+            set_variable_value(var_pos, t, x);
         }
     }
 
@@ -235,20 +239,20 @@ int CSimulation::sub_interdep_1(int t)
  */
 int CSimulation::sub_interdep_2(int t)
 {
-    int     i, j;
     double  d, pd;
+    double  new_value;
 
     // Stage 1
-    std::string var_name;
-    for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
+    int var_pos;
+    for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        var_name = get_var(i);
+        var_pos = v_ordered_vars[i];
 
         /* save XK for further use */
-        v_endo_values[j] = sim_dbv->get_value(var_name, t);
+        v_endo_values[j] = get_variable_value(var_pos, t);
 
         /* execute lec and save in v_endo_values_1 */
-        v_endo_values_1[j] = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
+        v_endo_values_1[j] = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(v_endo_values_1[j])) 
             return -1;
@@ -256,9 +260,9 @@ int CSimulation::sub_interdep_2(int t)
 
     // Stage 2
     norm = 0.0;
-    for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
+    for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        var_name = get_var(i);
+        var_pos = v_ordered_vars[i];
 
         // Valeur précédente définie
         if(IODE_IS_A_NUMBER(v_endo_values[j])) 
@@ -278,13 +282,14 @@ int CSimulation::sub_interdep_2(int t)
                 norm = pd;
 
             /* Store new value and relax it */
-            sim_dbv->set_var(var_name, t, relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j]);
+            new_value = relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j];
+            set_variable_value(var_pos, t, new_value);
         }
         // If previous iteation value is L-NAN, set norm to 10 and assing new calc value to endo
         else 
         {
             norm = 10;
-            sim_dbv->set_var(var_name, t, v_endo_values_1[j]);
+            set_variable_value(var_pos, t, v_endo_values_1[j]);
         }
     }
 
@@ -329,14 +334,13 @@ int CSimulation::interdep(int t)
  */
 int CSimulation::epilog(int t)
 {
-    int i, j;
     double x;
-    std::string var_name;
-    for(i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
+    int var_pos;
+    for(int i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
-        var_name = get_var(i);
-        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 0);
-        sim_dbv->set_var(var_name, t, x);  
+        var_pos = v_ordered_vars[i];
+        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
+        set_variable_value(var_pos, t, x);
     }
 
     return 0;
@@ -359,35 +363,30 @@ int CSimulation::epilog(int t)
  */
 int CSimulation::diverge(int t, char* c_name, double eps)
 {
-    char        *diverg = NULL;
-    int         i, j;
-    double      x;
-    double      d, pd;
+    char*   diverg = NULL;
+    double  x;
+    double  d, pd;
 
     // Delete name 
     std::string name(c_name);
     if(global_ws_lst->contains(name))
         global_ws_lst->remove(name);
     
-    std::string var_name;
-    for(i = nb_pre, j = 0; j < nb_inter; i++, j++)  
+    int var_pos;
+    for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)  
     {
-        var_name = get_var(i);
+        var_pos = v_ordered_vars[i];
 
         /* save XK first */
-        v_endo_values[j] = sim_dbv->get_value(var_name, t);
+        v_endo_values[j] = get_variable_value(var_pos, t);
 
         /* execute lec */
-        x = calculate_CLEC(v_ordered_eqs[i], var_name, t, 1);
+        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
         if(IODE_IS_A_NUMBER(v_endo_values[j])) 
         {
-            /* ?????????????
-            d = (v_endo_values[j] - x) * relax;
-            */
-
             d = (v_endo_values[j] - x);
             if(!IODE_IS_0(v_endo_values[j]))
                 pd = std::min(fabs(1 - x / v_endo_values[j]), fabs(d));
@@ -396,6 +395,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
             pd *= relax;
             if(pd > eps)  
             {
+                std::string var_name = v_var_names[var_pos];
                 if(diverg) 
                     diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
                 diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) var_name.c_str());
@@ -439,7 +439,7 @@ int CSimulation::sub_simulate(int t)
     v_nb_iterations[t] = 0; 
     v_norm[t] = 0;  
     v_cpu_time[t] = 0;  
-    if(prolog(t)) 
+    if(prolog(t))
         return -1;
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
@@ -476,7 +476,7 @@ int CSimulation::sub_simulate(int t)
     if(conv) 
     {
         restore_values(t);
-        if(epilog(t)) 
+        if(epilog(t))
             return -1;
         return 0;
     }
@@ -528,12 +528,12 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     const std::vector<std::string>& eqs)
 {
     // Assign static global variables to avoid passing to many parameters to sub functions
-    bool success = set_sim_dbe(dbe);
+    bool success = set_simulation_workspaces(dbe, dbs, dbv);
     if(!success)
+    {
+        clear();
         return false;
-    
-    sim_dbv = dbv;
-    sim_dbs = dbs;
+    }
 
     // Find in the sim_dbv sample the position t of the first period to simulate
     // and check that the simulation sample is included in sim_dbv sample
@@ -543,6 +543,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
         error_manager.append_error(err_msg);
+        clear();
         return false;
     }
     int t = at; // t = index of the first period to simulate
@@ -585,58 +586,26 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         }
     }
 
-    // Optional goal seeking = exchange exo and endo roles in equations
+    success = prepare_exchanges();
+    if(!success)
+    {
+        clear();
+        return false;
+    }
+
     std::vector<std::string> v_exo;
     if(!v_endo_exo.empty()) 
     {
-        success = false;
-        std::string endo, exo;
-        path_examined.clear();
-        for(const std::string& endo_exo : v_endo_exo) 
+        for(const std::string& endo_exo : v_endo_exo)
         {
             std::vector<std::string> pair_endo_exo = split(endo_exo, '-');
-            if(pair_endo_exo.size() != 2) 
-            {
-                std::string err_msg = "'" + endo_exo + "': syntax error in goal ";
-                err_msg += "seeking parameter";
-                error_manager.append_error(err_msg);
-                clear();
-                return false;
-            }
-
-            endo = pair_endo_exo[0];
-            if(!sim_dbe->contains(endo)) 
-            {
-                std::string err_msg = "Goal Seeking - '" + endo + "': ";
-                err_msg += "no such equation in the Equations workspace";
-                error_manager.append_error(err_msg);
-                clear();
-                return false;
-            }
-
-            exo = pair_endo_exo[1];
-            if(!sim_dbv->contains(exo)) 
-            {
-                std::string err_msg = "Goal Seeking - '" + exo + "': ";
-                err_msg += "cannot find the variable";
-                error_manager.append_error(err_msg);
-                clear();
-                return false;
-            }
-            
-            success = exo_to_endo(endo, exo);
-            if(!success) 
-            {
-                clear();
-                return false;
-            }
-
-            v_exo.push_back(exo);
-        }
+            v_exo.push_back(pair_endo_exo[1]);
+        } 
     }
 
     // ORDERING EQUATIONS 
     order(eqs);
+    build_ordered_variable_positions();
     if(debug) 
         build_lists_order("_PRE", "_INTER", "_POST");
 
@@ -675,6 +644,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         }
     }
 
+    clear();
     return true;
 }
 
@@ -689,26 +659,28 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
  *  
  *  If no solution can be found, the function kerror() is called to display an error message
  *  
- *  @param [in] int         eqnb    position of the equation in sim_dbe (the model KDB = subset of global_ws_eqs)
- *  @param [in] int         t       index of the period to be calculated
+ *  @param [in] int         eqnb    position of the equation in v_eqs_ptr (the model KDB = subset of global_ws_eqs)
  *  @param [in] int         varnb   position of the variable to calculate in the global KV_DB
+ *  @param [in] int         t       index of the period to be calculated
  *  @param [in] int         msg     indicated if the function kerror() must be called on error (no solution found)
- *  @return     double           on succes: the equation solution
+ *  @return     double              on succes: the equation solution
  *                                  on error of if no solution can be found: IODE_NAN 
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
-double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string& var_name, int t, int msg)
+double CSimulation::calculate_CLEC(const int eq_pos, const int var_pos, int t, int msg)
 {
-    std::shared_ptr<Equation> eq = sim_dbe->get_obj_ptr(eq_name);
-    if(!eq)
+    std::shared_ptr<Equation> eq_ptr = v_eqs_ptr[eq_pos];
+    if(!eq_ptr)
         return IODE_NAN;
     
-    std::shared_ptr<CLEC> eq_clec = eq->clec;
+    std::shared_ptr<CLEC> eq_clec = eq_ptr->clec;
     if(!eq_clec)
         return IODE_NAN;
     
     double x = IODE_NAN;
+    std::string eq_name = eq_ptr->endo;
+    std::string var_name = v_var_names[var_pos];
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
 
     if(clec->duplicated_endo || var_name != eq_name)
@@ -754,18 +726,25 @@ void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int
     }
     
     // Creates a table of strings containing all the name to set in the list
-    std::string var_name;
+    int eq_pos;
+    std::string eq_name;
     int nb = eqn - eq1 + 1;
-    std::vector<std::string> v_vars;
+    std::vector<std::string> v_eqs;
     for(int i = 0; i < nb; i++)
     {
-        var_name = get_var(i + eq1);
-        v_vars.push_back(var_name);
+        eq_pos = v_ordered_eqs[i + eq1];
+        // check if the endogenous variable of the equation has 
+        // been exchanged with an exogenous variable 
+        std::string eq_name = v_eq_names[eq_pos];
+        if(map_exchange.contains(eq_name)) 
+            eq_name = map_exchange[eq_name];
+        // add equation name to the list
+        v_eqs.push_back(eq_name);
     }
 
     // Creates the list lstname (and possibly sub-lists lstname1,...) 
     int maxl = 1000;
-    char** c_lst = vector_to_double_char(v_vars);
+    char** c_lst = vector_to_double_char(v_eqs);
     KL_lst((char*) lstname.c_str(), c_lst, maxl);
     SCR_free_tbl((unsigned char**) c_lst);
 }
@@ -793,7 +772,7 @@ void CSimulation::build_lists_order(const std::string& pre, const std::string& i
  * 
  * This "exchange" bw endos and exos variables allows to solve the model with respect to an alternate set of variables (some endos being replaced by exos).
  */
-bool CSimulation::exchange(const std::string& list_endo_exo)
+bool CSimulation::set_exchange(const std::string& list_endo_exo)
 {
     v_endo_exo.clear();
 
@@ -852,6 +831,7 @@ bool CSimulation::compile(const std::string& list_eqs)
             {
                 error_msg += "\t" + std::string(e.what());
                 kwarning(error_msg.c_str());
+                clear();
                 return false;
             }
 
@@ -860,6 +840,7 @@ bool CSimulation::compile(const std::string& list_eqs)
                 std::string error_msg = "Could not compile the model";
                 error_manager.prepend_error(error_msg);
                 kwarning(error_manager.get_all_errors().c_str());
+                clear();
                 return false;
             }
         }
@@ -889,6 +870,7 @@ bool CSimulation::simulate(const std::string& from, const std::string& to,
     {
         error_msg += ":\n" + std::string(e.what());
         kwarning(error_msg.c_str());
+        clear();
         return false;
     }
 
@@ -908,8 +890,7 @@ bool CSimulation::simulate(const std::string& from, const std::string& to,
             KDBEquationsPtr tdbe = global_ws_eqs->get_subset(list_eqs, false);
             if(tdbe->size() > 0)
             {
-                sim_dbe = tdbe;
-                std::vector<std::string> v_eqs = eqs_to_vector(list_eqs);
+                std::vector<std::string> v_eqs = eqs_to_vector(tdbe, list_eqs);
                 success = simulate(tdbe, global_ws_var, global_ws_scl, sample, v_eqs);
             }
         }
@@ -917,6 +898,7 @@ bool CSimulation::simulate(const std::string& from, const std::string& to,
         {
             error_msg += "\n\t" + std::string(e.what());
             kwarning(error_msg.c_str());
+            clear();
             if(sample) delete sample;
             return false;
         }
@@ -929,6 +911,7 @@ bool CSimulation::simulate(const std::string& from, const std::string& to,
     {
         error_manager.prepend_error(error_msg);
         kwarning(error_manager.get_all_errors().c_str());
+        clear();
         return false;
     }
 

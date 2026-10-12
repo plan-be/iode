@@ -36,13 +36,13 @@ TEST_F(SimulationTest, ModelExchange)
 {
     bool success;
 
-    success = global_simu->exchange(endo_exo);
+    success = global_simu->set_exchange(endo_exo);
     EXPECT_TRUE(success);
     EXPECT_EQ(global_simu->v_endo_exo.size(), 1);
     EXPECT_EQ(std::string(global_simu->v_endo_exo[0]), "UY-XNATY");
 
     // reset v_endo_exo
-    success = global_simu->exchange();
+    success = global_simu->set_exchange();
     EXPECT_FALSE(success);
     EXPECT_TRUE(global_simu->v_endo_exo.empty());
 }
@@ -136,7 +136,7 @@ TEST_F(SimulationTest, Simulation)
 
     global_simu->reset();
     global_simu->set_debug(true);
-    success = global_simu->exchange(endo_exo);
+    success = global_simu->set_exchange(endo_exo);
     EXPECT_TRUE(success);
     success = global_simu->simulate(from, to);
     EXPECT_TRUE(success);
@@ -171,6 +171,7 @@ TEST_F(SimulationTest, Simulation)
     EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2000Y1"), 650.0);
     EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2001Y1"), 670.0);
     EXPECT_DOUBLE_EQ(global_ws_var->get_var("UY", "2002Y1"), 680.0);
+
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e5) / 10e5, 0.801325);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e5) / 10e5, 0.633894);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2002Y1") * 10e5) / 10e5, 0.395619);
@@ -307,20 +308,21 @@ TEST_F(SimulationTest, SimulateSCC)
     global_ws_lst->remove("_POST");
     global_simu->reset();
 
-    // set exchange --> not taken into account in calculate_SCC() or simulate_SCC() !
-    success = global_simu->exchange(endo_exo);
+    // set exchange --> not allowed with calculate_SCC() and simulate_SCC().
+    // Because the Variables workspace is not passed to the method calculate_SCC()
+    success = global_simu->set_exchange(endo_exo);
     EXPECT_TRUE(success);
     // SCC decomposition
     success = global_simu->calculate_SCC(10);
-    EXPECT_TRUE(success);
+    EXPECT_FALSE(success);
     // SCC simulation
     success = global_simu->simulate_SCC(from, to);
-    EXPECT_TRUE(success);
+    EXPECT_FALSE(success);
 
     // Check result
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 624.18396);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 645.047397);
-    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 661.585134);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2000Y1") * 10e5) / 10e5, 650.0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2001Y1") * 10e5) / 10e5, 670.0);
+    EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("UY", "2002Y1") * 10e5) / 10e5, 680.0);
 
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2000Y1") * 10e3) / 10e3, 0.22);
     EXPECT_DOUBLE_EQ(round(global_ws_var->get_var("XNATY", "2001Y1") * 10e3) / 10e3, 0.70);
