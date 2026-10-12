@@ -152,21 +152,13 @@ fin :
  *  Syntax: $ModelExchange eqname1-varname1,eqname2-varname2,...
  *           where eqname1, eqname2 are equation names (thus also endogenous vars)
  *                 varname1, varname2 are exogenous variables
- *  
- *
  */
 int B_ModelExchange(char* const_arg, int unused)
 {
-    // Copy for C++ strings = read only (const)
-    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
-    
-    global_simu->v_endo_exo.clear();
-    if(arg && SCR_strip((unsigned char*) arg)[0])
-    {
-        global_simu->v_endo_exo = expand_args(arg, 0);
-    } 
-    
-    SCR_free(arg);
+    char* arg = copy_char_array(const_arg);
+    std::string list_exo(arg);
+    global_simu->set_exchange(list_exo);
+    free(arg);
     return 0;
 }
 

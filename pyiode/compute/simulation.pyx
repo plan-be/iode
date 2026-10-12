@@ -110,7 +110,7 @@ cdef class CythonSimulation:
         return res == 0
 
     def model_exchange(self, list_exo: str) -> bool:
-        return self.c_simulation.exchange(list_exo.encode())
+        return self.c_simulation.set_exchange(list_exo.encode())
 
     def model_compile(self, list_eqs: str) -> bool:
         return self.c_simulation.compile(list_eqs.encode())
