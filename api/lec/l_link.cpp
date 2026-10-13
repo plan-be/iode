@@ -18,15 +18,20 @@
 */
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    bool found = false;
-    for(const std::string& name : this->v_obj_names) 
+    for(const std::string& name : this->v_clec_vars)
     {
-        if(is_coefficient(name))
-            found = dbs->contains(name);
-        else
-            found = dbv->contains(name);
-        
-        if(!found) 
+        if(!dbv->contains(name))
+        {
+            std::string msg = "linking LEC failed: '" + name + "' not found";
+            error_manager.append_error(msg);
+            L_errno = L_NOT_FOUND_ERR;
+            return L_errno;
+        }
+    }
+    
+    for(const std::string& name : this->v_clec_coeff)
+    {
+        if(!dbs->contains(name))
         {
             std::string msg = "linking LEC failed: '" + name + "' not found";
             error_manager.append_error(msg);

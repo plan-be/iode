@@ -28,17 +28,20 @@ TEST_F(LecTest, Tests_CLEC_Compile)
     clec = std::make_shared<CLEC>(lec);
     EXPECT_EQ(clec->duplicated_endo, false);
     EXPECT_EQ(clec->v_expression.size(), 3);
-    EXPECT_EQ(clec->v_obj_names.size(), 1);
+    EXPECT_EQ(clec->v_clec_vars.size(), 1);
+    EXPECT_TRUE(clec->v_clec_coeff.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     
     // Using macros in LEC
     clec = std::make_shared<CLEC>("1 + vmax($LST1)");
-    EXPECT_EQ(clec->v_obj_names.size(), 2);
+    EXPECT_EQ(clec->v_clec_vars.size(), 2);
+    EXPECT_TRUE(clec->v_clec_coeff.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 
     clec = std::make_shared<CLEC>("1 + vmax($LST2)");
-    EXPECT_EQ(clec->v_obj_names.size(), 2);
+    EXPECT_EQ(clec->v_clec_vars.size(), 2);
+    EXPECT_TRUE(clec->v_clec_coeff.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 }
@@ -54,8 +57,24 @@ TEST_F(LecTest, Tests_CLEC_Copy)
     EXPECT_TRUE(copy_clec != nullptr);
     EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
     EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
-    EXPECT_EQ(copy_clec->v_obj_names.size(), clec->v_obj_names.size());
-    EXPECT_EQ(copy_clec->v_obj_names, clec->v_obj_names);
+    EXPECT_EQ(copy_clec->v_clec_vars.size(), clec->v_clec_vars.size());
+    EXPECT_EQ(copy_clec->v_clec_vars, clec->v_clec_vars);
+    EXPECT_EQ(copy_clec->v_clec_coeff.size(), clec->v_clec_coeff.size());
+    EXPECT_EQ(copy_clec->v_clec_coeff, clec->v_clec_coeff);
+}
+
+TEST_F(LecTest, Tests_CLEC_NameTypes)
+{
+    CLEC clec("A + alpha * B + alpha + beta + A");
+    EXPECT_EQ(clec.v_clec_vars, (std::vector<std::string>{"A", "B"}));
+    EXPECT_EQ(clec.v_clec_coeff, (std::vector<std::string>{"alpha", "beta"}));
+    EXPECT_EQ(clec.get_variables(), clec.v_clec_vars);
+    EXPECT_EQ(clec.get_scalars(), clec.v_clec_coeff);
+
+    CLEC copy(clec);
+    EXPECT_EQ(copy, clec);
+    EXPECT_EQ(copy.v_clec_vars, clec.v_clec_vars);
+    EXPECT_EQ(copy.v_clec_coeff, clec.v_clec_coeff);
 }
 
 TEST_F(LecTest, Tests_LEC)

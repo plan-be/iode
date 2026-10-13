@@ -38,24 +38,21 @@ static int check_scl_var(const std::string& name)
     
     char buf[1024];
     std::shared_ptr<CLEC> cl = eq_ptr->clec;
-    for(const std::string& cl_name : cl->v_obj_names) 
+    for(const std::string& cl_name : cl->v_clec_coeff)
     {
-        if(is_coefficient(cl_name)) 
+        // create scalar with default value 0.9 if not existing
+        if(!global_ws_scl->contains(cl_name))
         {
-            // create scalar with default value 0.9 if not existing
-            if(!global_ws_scl->contains(cl_name))
-            {
-                sprintf(buf, "%s 0.9 1", cl_name.c_str());
-                B_DataUpdate(buf, SCALARS);
-            }
+            sprintf(buf, "%s 0.9 1", cl_name.c_str());
+            B_DataUpdate(buf, SCALARS);
         }
-        else 
+    }
+    for(const std::string& cl_name : cl->v_clec_vars)
+    {
+        if(!global_ws_var->contains(cl_name))
         {
-            if(!global_ws_var->contains(cl_name))
-            {
-                kerror(0, "Var %s from %s not found", cl_name.c_str(), name.c_str());
-                return -1;
-            }
+            kerror(0, "Var %s from %s not found", cl_name.c_str(), name.c_str());
+            return -1;
         }
     }
     

@@ -224,10 +224,8 @@ bool Equation::print_definition() const
         W_printf((char*) ".par1 enum_2\nCoefficient values %ci(relax, stderr, t-stat)%cI :\n\n", A2M_ESCCH, A2M_ESCCH);
         
         CLEC* copy_clec = new CLEC(*clec);
-        for(const std::string& sname : copy_clec->v_obj_names) 
+        for(const std::string& sname : copy_clec->v_clec_coeff)
         {
-            if(is_coefficient(sname)) 
-            {
                 if(!global_ws_scl->contains(sname))
                 {
                     W_printfReplEsc((char*) ".par1 enum_%d\n~b%s~B : ", 3, (char*) sname.c_str());
@@ -245,7 +243,6 @@ bool Equation::print_definition() const
                     }
                     success = scl->print_definition();
                 }
-            }
         }
         delete copy_clec;
     }

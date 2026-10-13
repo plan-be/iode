@@ -56,12 +56,12 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
                     (unsigned char*) buf, (unsigned char*) "_\\");
     
     std::string sname;
-    std::shared_ptr<Scalar> scl = nullptr;
     std::string tcoef, ttest;
-    for(const std::string& sname : clec->v_obj_names) 
+    std::shared_ptr<Scalar> scl = nullptr;
+    for(const std::string& sname : clec->v_clec_coeff)
     {
         buf[0] = 0;
-        if(coefs && is_coefficient(sname)) 
+        if(coefs)
         {
             if(global_ws_scl->contains(sname)) 
             {
@@ -74,8 +74,17 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
                     sprintf(buf, "%ci%s(%s)%cI", A2M_ESCCH, tcoef.c_str(), ttest.c_str(), A2M_ESCCH);
             }
         }
+
         if(buf[0] == 0) 
             sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname.c_str(), A2M_ESCCH);
+        SCR_replace_gnl((unsigned char*) c_lec, (unsigned char*) sname.c_str(), 
+                        (unsigned char*) buf, (unsigned char*) "_\\");
+    };
+
+    for(const std::string& sname : clec->v_clec_vars)
+    {
+        buf[0] = 0;
+        sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname.c_str(), A2M_ESCCH);
         SCR_replace_gnl((unsigned char*) c_lec, (unsigned char*) sname.c_str(), 
                         (unsigned char*) buf, (unsigned char*) "_\\");
     }

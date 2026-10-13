@@ -164,14 +164,11 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
         eq_ptr = sim_dbe->get_obj_ptr(eq_name);
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.reserve(clec->v_obj_names.size());
+        eq_predecessors.reserve(clec->v_clec_vars.size());
 
         eq_pos = -1;
-        for(const std::string& name : clec->v_obj_names) 
+        for(const std::string& name : clec->v_clec_vars)
         {
-            if(is_coefficient(name)) 
-                continue;
-
             eq_name_resolved = find_eq_name(name);
             
             // 'name' is not an endogenous variable of any equation

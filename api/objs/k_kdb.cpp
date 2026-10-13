@@ -199,21 +199,19 @@ void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr
     if(!clec) 
         return;
 
-    for(const std::string& name : clec->v_obj_names) 
+    // add dummy value for the scalar. The value is not relevant 
+    // as only the name will be used in the list of scalars.
+    for(const std::string& name : clec->v_clec_coeff)
+        scal_ptr->set(name, Scalar());
+
+    for(const std::string& name : clec->v_clec_vars)
     {
-        if(is_coefficient(name))
-            // add dummy value for the scalar. The value is not relevant 
-            // as only the name will be used in the list of scalars.
-            scal_ptr->set(name, Scalar());
-        else 
-        {
-            // if endogenous -> skip
-            if(kdb.contains(name)) 
-                continue;
-            // add dummy value for the variable. The value is not relevant 
-            // as only the name will be used in the list of variables.
-            exo_ptr->set(name, Variable());
-        }
+        // if endogenous -> skip
+        if(kdb.contains(name))
+            continue;
+        // add dummy value for the variable. The value is not relevant 
+        // as only the name will be used in the list of variables.
+        exo_ptr->set(name, Variable());
     }
 }
 
