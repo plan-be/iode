@@ -170,9 +170,9 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 {
     std::string name;
     Scalar scl(0.9, 1.0);
-    for(const std::string& name: clec->v_obj_names) 
+    for(const std::string& name: clec->v_clec_coeff)
     {
-        if(is_coefficient(name) && !dbs.contains(name))
+        if(!dbs.contains(name))
             dbs.add(name, scl);
     }
     
@@ -285,27 +285,24 @@ int Estimation::E_prep_coefs()
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = v_block_rhs[i];
-        for(const std::string& name: clec->v_obj_names) 
+        for(const std::string& name: clec->v_clec_coeff)
         {
-            if(is_coefficient(name)) 
+            if(!E_DBS->contains(name))
+                continue;
+                
+            // Coef already found in v_coef_names
+            if(coef_set.contains(name))
+                continue;
+                
+            // Add a coefficient in v_coef_names
+            v_coef_names.push_back(name);
+            coef_set.insert(name);
+                
+            // relax > 0 => estimation coef
+            if(E_DBS->get_obj_ptr(name)->relax > 0)
             {
-                if(!E_DBS->contains(name))
-                    continue;
-                
-                // Coef already found in v_coef_names
-                if(coef_set.contains(name))
-                    continue;
-                
-                // Add a coefficient in v_coef_names
-                v_coef_names.push_back(name);
-                coef_set.insert(name);
-                
-                // relax > 0 => estimation coef
-                if(E_DBS->get_obj_ptr(name)->relax > 0)
-                {
-                    E_NCE++;
-                    NB_COEFS_EQ(i)++;
-                } 
+                E_NCE++;
+                NB_COEFS_EQ(i)++;
             }
         }
     }

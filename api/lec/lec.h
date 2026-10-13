@@ -43,15 +43,14 @@ struct CLEC: public AbstractCLEC
     // (for execution purposes)
     std::vector<ATOMIC_LEC> v_expression;
 
-    // vector of scalar and variable names in order of appearance in the LEC expression
-    // NOTE: we need this to fulfill the *RULE 4* when editing the cell of 
-    //       an IODE computed table -> (rule = only the first variable found 
-    //       in the LEC expression is updated)
-    std::vector<std::string> v_obj_names;
+    // Names in order of appearance within each type. Variable order is used
+    // when editing a computed table cell (only the first variable is updated).
+    std::vector<std::string> v_clec_vars;
+    std::vector<std::string> v_clec_coeff;
     
 private:
     /**
-     * Adds a series or scalar name in v_obj_names.
+     * Adds a series or scalar name to its corresponding vector.
      * 
      * @param [in]     name    std::string   VAR or Scalar name
      */
@@ -189,15 +188,13 @@ private:
 
     /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
-     *  At the end of this function, 2 tables are created: v_expression and v_obj_names:
-     *      - v_expression contains atomic expressions in the execution order including references to v_obj_names 
-     *      - v_obj_names contains the names included in the lec expression
+     *  At the end of this function, v_expression, v_clec_vars and v_clec_coeff are filled.
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
     int parse(const bool side_of_eq);
 
-    // WARNING: to be run AFTER parse() in order to fill v_expression and v_obj_names first
+    // WARNING: to be run AFTER parse() in order to fill v_expression and the name vectors first
     void reorder_expression();
 
 public:
@@ -210,7 +207,8 @@ public:
         this->lec = other.lec;
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
-        this->v_obj_names = other.v_obj_names;
+        this->v_clec_vars = other.v_clec_vars;
+        this->v_clec_coeff = other.v_clec_coeff;
     }
 
     ~CLEC() 
@@ -227,7 +225,8 @@ public:
         this->lec = other.lec;
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
-        this->v_obj_names = other.v_obj_names;
+        this->v_clec_vars = other.v_clec_vars;
+        this->v_clec_coeff = other.v_clec_coeff;
 
         return *this;
     }
@@ -248,10 +247,10 @@ public:
                 return false;
         }
 
-        if(this->v_obj_names.size() != other.v_obj_names.size())
+        if(this->v_clec_vars != other.v_clec_vars)
             return false;
 
-        if(this->v_obj_names != other.v_obj_names)
+        if(this->v_clec_coeff != other.v_clec_coeff)
             return false;
 
         return true;
@@ -267,24 +266,12 @@ public:
 
     std::vector<std::string> get_scalars() const
     {
-        std::vector<std::string> list;
-        for(const std::string& name : this->v_obj_names)
-        {
-            if(is_coefficient(name))
-                list.push_back(name);
-        }
-        return list;
+        return v_clec_coeff;
     }
 
     std::vector<std::string> get_variables() const
     {
-        std::vector<std::string> list;
-        for(const std::string& name : this->v_obj_names)
-        {
-            if(!is_coefficient(name))
-                list.push_back(name);
-        }
-        return list;
+        return v_clec_vars;
     }
 
     /**

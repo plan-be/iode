@@ -36,9 +36,9 @@ static std::vector<std::string> E_GetScls(const std::shared_ptr<CLEC> clec)
     std::vector<std::string> v_scalar_names;
     if(clec) 
     {
-        for(const std::string& name: clec->v_obj_names) 
+        for(const std::string& name: clec->v_clec_coeff)
         {
-            if(is_coefficient(name) && global_ws_scl->get_obj_ptr(name)->relax != 0)
+            if(global_ws_scl->get_obj_ptr(name)->relax != 0)
                 v_scalar_names.push_back(name);
         }
     }

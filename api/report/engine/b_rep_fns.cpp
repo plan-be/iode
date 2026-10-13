@@ -1211,16 +1211,14 @@ U_ch *RPF_sample(U_ch** args)
  */
 int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const int type)
 {
+    if(type != 'S' && type != 'V')
+        return 0;
+
     int k = 0;
     std::string tbl_name;
-    for(const std::string& name: clec->v_obj_names) 
+    const std::vector<std::string>& names = type == 'S' ? clec->v_clec_coeff : clec->v_clec_vars;
+    for(const std::string& name: names)
     {
-        if(is_coefficient(name) && type != 'S') 
-            continue;
-        
-        if(!is_coefficient(name) && type != 'V') 
-            continue;
-        
         for(k = 0 ; k < *nb ; k++)
         {
             tbl_name = std::string((char*) (*tbl)[k]);

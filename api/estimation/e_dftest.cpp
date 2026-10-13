@@ -84,18 +84,14 @@ int E_GetLecName(char* lec, char* name)
         return -1;
     }
 
-    for(const std::string& obj_name: clec->v_obj_names) 
+    for(const std::string& obj_name: clec->v_clec_vars)
     {   
         // skip "_DF" 
         if(obj_name == "_DF")
             continue;
         
-        // if variable -> set name and exit loop
-        if(!is_coefficient(obj_name))
-        {
-            strcpy(name, obj_name.c_str());
-            break;
-        } 
+        strcpy(name, obj_name.c_str());
+        break;
     }
 
     return 0;

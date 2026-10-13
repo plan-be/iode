@@ -157,10 +157,15 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(clec)
     {
         std::cout << "lec: " << clec->lec << std::endl;
-        std::cout << " , nb_names: " << clec->v_obj_names.size() << ", v_names: ";
-        for(const std::string& name: clec->v_obj_names)
+        std::cout << "  nb_vars: " << clec->v_clec_vars.size() << ", v_vars: ";
+        for(const std::string& name: clec->v_clec_vars)
             std::cout << name << ", ";
-        std::cout << ", duplicated_endo: " << clec->duplicated_endo << std::endl;
+        std::cout << std::endl;
+        std::cout << "  nb_coeff: " << clec->v_clec_coeff.size() << ", v_coeff: ";
+        for(const std::string& name: clec->v_clec_coeff)
+            std::cout << name << ", ";
+        std::cout << std::endl;
+        std::cout << "  duplicated_endo: " << clec->duplicated_endo << std::endl;
     }
     else
         std::cout << "NULL" << std::endl;
@@ -169,10 +174,15 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
     if(dclec)
     {
         std::cout << "lec: " << dclec->lec << std::endl;
-        std::cout << " , nb_names: " << dclec->v_obj_names.size() << ", v_names: ";
-        for(const std::string& name : dclec->v_obj_names)
+        std::cout << "  nb_vars: " << dclec->v_clec_vars.size() << ", v_vars: ";
+        for(const std::string& name : dclec->v_clec_vars)
             std::cout << name << ", ";
-        std::cout << ", duplicated_endo: " << dclec->duplicated_endo << std::endl;
+        std::cout << std::endl;
+        std::cout << "  nb_coeff: " << dclec->v_clec_coeff.size() << ", v_coeff: ";
+        for(const std::string& name : dclec->v_clec_coeff)
+            std::cout << name << ", ";
+        std::cout << std::endl;
+        std::cout << "  duplicated_endo: " << dclec->duplicated_endo << std::endl;
     }
     else
         std::cout << "NULL" << std::endl;

@@ -15,13 +15,14 @@ std::vector<LSTACK> L_OPS;      // Stack of operators and functions
 
 void CLEC::add_coef_or_var_name(const std::string& name)
 {
-    // check if the name is already in v_obj_names
-    for(const auto& obj_name : v_obj_names)
+    std::vector<std::string>& names = is_coefficient(name) ? v_clec_coeff : v_clec_vars;
+    for(const auto& obj_name : names)
     {
+        // name already exists, do not add it again
         if (obj_name == name)
-            return; // name already exists, do not add it again
+            return;
     }
-    v_obj_names.push_back(name);
+    names.push_back(name);
 }
 
 int CLEC::save_var(TOKEN& token)
@@ -505,9 +506,7 @@ int CLEC::analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
- *  At the end of this function, 2 tables are created: v_expression and v_obj_names:
- *      - v_expression contains atomic expressions in the execution order including references to v_obj_names 
- *      - v_obj_names contains the names included in the lec expression
+ *  At the end of this function, v_expression, v_clec_vars and v_clec_coeff are filled.
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
@@ -523,9 +522,12 @@ int CLEC::parse(const bool side_of_eq)
     this->v_expression.clear();
 
     // NOTE: if the LEC expression is the left or right side of an equation, 
-    //       we don't reset v_obj_names
+    //       we don't reset the name vectors
     if(!side_of_eq)
-        v_obj_names.clear();
+    {
+        v_clec_vars.clear();
+        v_clec_coeff.clear();
+    }
 
     /* LOOP ON TOKEN */
     TOKEN token;
