@@ -29,19 +29,19 @@ TEST_F(LecTest, Tests_CLEC_Compile)
     EXPECT_EQ(clec->duplicated_endo, false);
     EXPECT_EQ(clec->v_expression.size(), 3);
     EXPECT_EQ(clec->v_clec_vars.size(), 1);
-    EXPECT_TRUE(clec->v_clec_coeff.empty());
+    EXPECT_TRUE(clec->v_clec_coeffs.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     
     // Using macros in LEC
     clec = std::make_shared<CLEC>("1 + vmax($LST1)");
     EXPECT_EQ(clec->v_clec_vars.size(), 2);
-    EXPECT_TRUE(clec->v_clec_coeff.empty());
+    EXPECT_TRUE(clec->v_clec_coeffs.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 
     clec = std::make_shared<CLEC>("1 + vmax($LST2)");
     EXPECT_EQ(clec->v_clec_vars.size(), 2);
-    EXPECT_TRUE(clec->v_clec_coeff.empty());
+    EXPECT_TRUE(clec->v_clec_coeffs.empty());
     EXPECT_TRUE(lec_contains(clec, "A"));
     EXPECT_TRUE(lec_contains(clec, "B"));
 }
@@ -59,22 +59,40 @@ TEST_F(LecTest, Tests_CLEC_Copy)
     EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
     EXPECT_EQ(copy_clec->v_clec_vars.size(), clec->v_clec_vars.size());
     EXPECT_EQ(copy_clec->v_clec_vars, clec->v_clec_vars);
-    EXPECT_EQ(copy_clec->v_clec_coeff.size(), clec->v_clec_coeff.size());
-    EXPECT_EQ(copy_clec->v_clec_coeff, clec->v_clec_coeff);
+    EXPECT_EQ(copy_clec->v_clec_coeffs.size(), clec->v_clec_coeffs.size());
+    EXPECT_EQ(copy_clec->v_clec_coeffs, clec->v_clec_coeffs);
 }
 
 TEST_F(LecTest, Tests_CLEC_NameTypes)
 {
     CLEC clec("A + alpha * B + alpha + beta + A");
     EXPECT_EQ(clec.v_clec_vars, (std::vector<std::string>{"A", "B"}));
-    EXPECT_EQ(clec.v_clec_coeff, (std::vector<std::string>{"alpha", "beta"}));
+    EXPECT_EQ(clec.v_clec_coeffs, (std::vector<std::string>{"alpha", "beta"}));
     EXPECT_EQ(clec.get_variables(), clec.v_clec_vars);
-    EXPECT_EQ(clec.get_scalars(), clec.v_clec_coeff);
+    EXPECT_EQ(clec.get_scalars(), clec.v_clec_coeffs);
 
     CLEC copy(clec);
     EXPECT_EQ(copy, clec);
     EXPECT_EQ(copy.v_clec_vars, clec.v_clec_vars);
-    EXPECT_EQ(copy.v_clec_coeff, clec.v_clec_coeff);
+    EXPECT_EQ(copy.v_clec_coeffs, clec.v_clec_coeffs);
+}
+
+TEST_F(LecTest, Tests_CLEC_EqualityWithOptionalSample)
+{
+    CLEC first("A + 1");
+    CLEC second("A + 1");
+
+    EXPECT_EQ(first, second);
+
+    first.smpl_ptr = std::make_shared<Sample>("2000Y1", "2001Y1");
+    EXPECT_FALSE(first == second);
+    EXPECT_FALSE(second == first);
+
+    second.smpl_ptr = std::make_shared<Sample>("2000Y1", "2001Y1");
+    EXPECT_EQ(first, second);
+
+    second.smpl_ptr = std::make_shared<Sample>("2000Y1", "2002Y1");
+    EXPECT_FALSE(first == second);
 }
 
 TEST_F(LecTest, Tests_LEC)

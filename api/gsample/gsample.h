@@ -161,8 +161,8 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
         for(const std::string& name: clec->v_clec_vars)
             std::cout << name << ", ";
         std::cout << std::endl;
-        std::cout << "  nb_coeff: " << clec->v_clec_coeff.size() << ", v_coeff: ";
-        for(const std::string& name: clec->v_clec_coeff)
+        std::cout << "  nb_coeff: " << clec->v_clec_coeffs.size() << ", v_coeff: ";
+        for(const std::string& name: clec->v_clec_coeffs)
             std::cout << name << ", ";
         std::cout << std::endl;
         std::cout << "  duplicated_endo: " << clec->duplicated_endo << std::endl;
@@ -178,8 +178,8 @@ inline void debug_calc_table(const COL* cl, const std::string& lec, const std::s
         for(const std::string& name : dclec->v_clec_vars)
             std::cout << name << ", ";
         std::cout << std::endl;
-        std::cout << "  nb_coeff: " << dclec->v_clec_coeff.size() << ", v_coeff: ";
-        for(const std::string& name : dclec->v_clec_coeff)
+        std::cout << "  nb_coeff: " << dclec->v_clec_coeffs.size() << ", v_coeff: ";
+        for(const std::string& name : dclec->v_clec_coeffs)
             std::cout << name << ", ";
         std::cout << std::endl;
         std::cout << "  duplicated_endo: " << dclec->duplicated_endo << std::endl;

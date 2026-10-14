@@ -36,7 +36,7 @@ static std::vector<std::string> E_GetScls(const std::shared_ptr<CLEC> clec)
     std::vector<std::string> v_scalar_names;
     if(clec) 
     {
-        for(const std::string& name: clec->v_clec_coeff)
+        for(const std::string& name: clec->v_clec_coeffs)
         {
             if(global_ws_scl->get_obj_ptr(name)->relax != 0)
                 v_scalar_names.push_back(name);
@@ -99,8 +99,9 @@ double C_evallec(char* lec, int t)
             return x;
         }
 
-        if(!clec->link(global_ws_var, global_ws_scl))
-            x = clec->execute(global_ws_var, global_ws_scl, t);
+        int rc = clec->link(global_ws_var, global_ws_scl); 
+        if(rc == 0)
+            x = clec->execute(t);
     }
 
     return x;

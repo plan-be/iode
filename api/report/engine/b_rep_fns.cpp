@@ -1227,7 +1227,7 @@ int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const i
 
     int k = 0;
     std::string tbl_name;
-    const std::vector<std::string>& names = type == 'S' ? clec->v_clec_coeff : clec->v_clec_vars;
+    const std::vector<std::string>& names = type == 'S' ? clec->v_clec_coeffs : clec->v_clec_vars;
     for(const std::string& name: names)
     {
         for(k = 0 ; k < *nb ; k++)

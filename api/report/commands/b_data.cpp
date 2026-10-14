@@ -292,12 +292,13 @@ int B_DataCalcVar(char* arg, int unused)
             return -1;
         }
 
-        if(!clec->link(kdb, global_ws_scl)) 
+        int rc = clec->link(kdb, global_ws_scl); 
+        if(rc == 0) 
         {
             double d;
-            for(int t = 0 ; t < kdb->get_sample()->nb_periods ; t++) 
+            for(int t = 0; t < clec->get_nb_obs(); t++) 
             {
-                d = clec->execute(kdb, global_ws_scl, t);
+                d = clec->execute(t);
                 kdb->get_var_ptr(name)[t] = d;
             }
         }

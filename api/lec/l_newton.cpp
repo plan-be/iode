@@ -120,21 +120,18 @@
  *  Solves numerically this LEC equation for one period of time with respect to a given variable.
  *  If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
  *  
- *  
- *  @param [in] KDBVariablesPtr dbv         KDB of VAR with which the equation has been linked
- *  @param [in] KDBScalarsPtr   dbs         KDB of Scalar with which the equation has been linked
  *  @param [in] int             t           time of calculation (index in dbv Sample)
  *  @param [in] std::string&    var_name    name of the endogenous variable in dbv
  *  @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
  *  @return     double                      root of the equation (var_name value that solves the equation)
  *  
  */
-double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, const int t, 
-    const std::string& var_name, const std::string& eq_var_name)
+double CLEC::zero(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
+    const std::string& eq_var_name)
 {
-    double x = this->newton(dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
+    double x = this->newton(h, eps, nb_max_iter, t, var_name, eq_var_name);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = this->secant(dbv, dbs, t, var_name, eq_var_name);
+        x = this->secant(t, var_name, eq_var_name);
     return x;
 }
 
@@ -153,11 +150,14 @@ double CLEC::zero(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, 
  *  
  *  See zero() for the description of the other parameters.
  */
-double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, 
-    const int t, const std::string& var_name, const std::string& eq_var_name)
+double CLEC::newton_sub(const int algo, double h, double eps, int nb_max_iter, const int t, 
+    const std::string& var_name, const std::string& eq_var_name)
 {
-    double* d_ptr = dbv->get_var_ptr(var_name, t);
-    double x = d_ptr[0];
+    if(!check_var(var_name))
+        return IODE_NAN;
+
+    Variable& var = *(map_clec_vars[var_name]);
+    double x = var[t];
     double oldx = x;
     if(!IODE_IS_A_NUMBER(x)) 
     {
@@ -174,9 +174,12 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
     // Case 2: 0 := f(X,Y) 
     else 
     {
-        shift = dbv->get_value(eq_var_name, t);
+        if(!map_clec_vars.contains(eq_var_name))
+            return IODE_NAN;
+        Variable& eq_var = *(map_clec_vars[eq_var_name]);
+        shift = eq_var[t];
         if(!IODE_IS_A_NUMBER(shift)) 
-            return (double) IODE_NAN; 
+            return IODE_NAN; 
         ax = fabs(shift);
     }
 
@@ -194,11 +197,10 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
     double ox = 0.0;
     while(it < nb_max_iter) 
     {
-        d_ptr = dbv->get_var_ptr(var_name, t);
-        d_ptr[0] = x;
+        var[t] = x;
         ax = fabs(x);
 
-        fx = this->execute(dbv, dbs, t);
+        fx = this->execute(t);
         if(newton_debug) 
             L_debug("   - f(%lg) = %lg\n", x, fx);
 
@@ -210,7 +212,8 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
                 L_debug("   - f(%lg) = %lg\n", x, fx);
                 L_debug("   -> cannot compute f(%lg)\n", x);
             }
-            goto err;
+            var[t] = oldx;
+            return IODE_NAN;
         }
 
         fx -= shift;
@@ -227,13 +230,14 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         else         
             h = 1e-4;
 
-        d_ptr = dbv->get_var_ptr(var_name, t);
-        d_ptr[0] = x + h;
-        fxh = this->execute(dbv, dbs, t);
-        if(!IODE_IS_A_NUMBER(fxh)) {
+        var[t] = x + h;
+        fxh = this->execute(t);
+        if(!IODE_IS_A_NUMBER(fxh)) 
+        {
             if(newton_debug) 
                 L_debug("   -> cannot compute f(%lf+%ld)\n", x, h);
-            goto err;
+            var[t] = oldx;
+            return IODE_NAN;
         }
 
         fxh -= shift;
@@ -241,15 +245,16 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
         {
             if(newton_debug) 
                 L_debug("   -> f(x)=%lf == f(x+h)=%lf", fx, fxh);
-            goto err;
+            var[t] = oldx;
+            return IODE_NAN;
         }
         if(newton_debug) 
             L_debug("     h = %lg; fx=%lg; fxh=%lg\n", h, fx, fxh);
         dx = h * fx / (fxh - fx);
         ox = x;
         x -= dx;
-        d_ptr[0] = x;
-        fx = this->execute(dbv, dbs, t);
+        var[t] = x;
+        fx = this->execute(t);
         if(!IODE_IS_A_NUMBER(fx)) 
             x = ox - dx / 4;
         it++;
@@ -257,10 +262,8 @@ double CLEC::newton_sub(const int algo, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
 
     if(newton_debug) 
         L_debug("    #it > %d\n", it);
-
-err:
-    d_ptr[0] = oldx;
-    return (double) IODE_NAN;
+    var[t] = oldx;
+    return IODE_NAN;
 }
 
 
@@ -270,14 +273,13 @@ err:
  *  Calls first newton_sub() with the algo param fixed to 0 (convergence criterion set to 1e-6).
  *  If no solution is found, calls newton_sub() with algo = 1 to multiply eps by the endogenous value.
  *  
- *  See zero() for the parameter description.
- *    
+ *  See zero() for the parameter description.  
  */
-double CLEC::newton(KDBVariablesPtr dbv, KDBScalarsPtr dbs, double h, double eps, int nb_max_iter, 
-    const int t, const std::string& var_name, const std::string& eq_var_name)
+double CLEC::newton(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
+    const std::string& eq_var_name)
 {
-    double x = this->newton_sub(0, dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
+    double x = this->newton_sub(0, h, eps, nb_max_iter, t, var_name, eq_var_name);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = this->newton_sub(1, dbv, dbs, h, eps, nb_max_iter, t, var_name, eq_var_name);
+        x = this->newton_sub(1, h, eps, nb_max_iter, t, var_name, eq_var_name);
     return x;
 }

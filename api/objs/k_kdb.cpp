@@ -201,7 +201,7 @@ void clec_scan(const KDB& kdb, const std::shared_ptr<CLEC> clec, KDBVariablesPtr
 
     // add dummy value for the scalar. The value is not relevant 
     // as only the name will be used in the list of scalars.
-    for(const std::string& name : clec->v_clec_coeff)
+    for(const std::string& name : clec->v_clec_coeffs)
         scal_ptr->set(name, Scalar());
 
     for(const std::string& name : clec->v_clec_vars)

@@ -134,9 +134,10 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_COEF>(al))
         {
             const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            bool ok = al_coef.add_to_stack(stack, exec_dbs);
-            if(!ok) 
-                return (double) IODE_NAN;
+            if(!check_coeff(al_coef.name))
+                return IODE_NAN;
+            std::shared_ptr<Scalar>& scl_ptr = map_clec_coeffs[al_coef.name];
+            al_coef.add_to_stack(stack, scl_ptr->value);
         }
         else if(std::holds_alternative<LEC_PERIOD>(al))
         {
@@ -146,9 +147,15 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_VAR>(al))
         {
             const LEC_VAR& al_var = std::get<LEC_VAR>(al);
-            bool ok = al_var.add_to_stack(stack, exec_dbv, t);
-            if(!ok) 
-                return (double) IODE_NAN;
+            if(!smpl_ptr)
+            {
+                kwarning("LEC: No attached sample");
+                return IODE_NAN;
+            }
+            if(!check_var(al_var.name))
+                return IODE_NAN;
+            Variable& var = *(map_clec_vars[al_var.name]);
+            al_var.add_to_stack(stack, var, smpl_ptr->nb_periods, t);
         }
 
         // ---- atomic LEC of type executable ----
@@ -198,20 +205,16 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
  *  - initiate the exception handling on floating point errors
  *  - call execute_sub_expression() which is the real (recursive) calculator
  *  
- *  @param [in] dbv  KDBVariablesPtr  input variable KDB
- *  @param [in] dbs  KDBScalarsPtr    input scalars KDB
  *  @param [in] t    int              time of calculation (index in dbv sample)
  *  @return          double           result of the calculation, IODE_NAN on error (L_errno is set)
  */
-double CLEC::execute(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t)
+double CLEC::execute(const int t)
 {
     // leave if empty CLEC expression
     if(this->v_expression.size() == 0)
         return IODE_NAN;
 
     exec_t = t;
-    this->exec_dbv = dbv;
-    this->exec_dbs = dbs;
     
     // Reset _errno
     L_errno = 0;
@@ -278,13 +281,14 @@ double* L_cc_link_exec(char* lec, KDBVariablesPtr dbv, KDBScalarsPtr dbs)
         return vec;
     }
 
-    if(!clec->link(dbv, dbs)) 
-    {
-        int nb = dbv->get_sample()->nb_periods;
-        vec = (double*) SW_nalloc(nb * sizeof(double));
-        for(int t = 0 ; t < nb ; t++)
-            vec[t] = clec->execute(dbv, dbs, t);
-    }
+    int rc = clec->link(dbv, dbs);
+    if(rc > 0)
+        return vec;
+
+    int nb = dbv->get_sample()->nb_periods;
+    vec = (double*) SW_nalloc(nb * sizeof(double));
+    for(int t = 0 ; t < nb ; t++)
+        vec[t] = clec->execute(t);
 
     return vec;
 }

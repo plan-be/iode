@@ -76,6 +76,7 @@ int Estimation::E_prep_lecs()
     v_block_rhs.clear();
     v_block_rhs.resize(E_NEQ, nullptr);
 
+    int rc;
     double x;
     int i = 0;
     size_t pos = 0;
@@ -107,10 +108,11 @@ int Estimation::E_prep_lecs()
         if(E_add_scls(clec, *E_DBS))
         {
             error_manager.append_error("Estimation: Link Error");
-            return -1; // JMP 13/11/2012
+            return -1;
         }
 
-        if(clec->link(E_DBV, E_DBS) != 0) 
+        rc = clec->link(E_DBV, E_DBS);
+        if(rc != 0) 
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
@@ -118,7 +120,7 @@ int Estimation::E_prep_lecs()
 
         for(int t = 0 ; t < E_T ; t++) 
         {
-            x = clec->execute(E_DBV, E_DBS, t + E_FROM);
+            x = clec->execute(t + E_FROM);
             if(!IODE_IS_A_NUMBER(x)) 
             {
                 error_manager.append_error("Estimation: NaN Generated");
@@ -144,7 +146,8 @@ int Estimation::E_prep_lecs()
             return -1;
         } 
 
-        if(clec->link(E_DBV, E_DBS) != 0)
+        rc = clec->link(E_DBV, E_DBS);
+        if(rc != 0)
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
@@ -170,7 +173,7 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 {
     std::string name;
     Scalar scl(0.9, 1.0);
-    for(const std::string& name: clec->v_clec_coeff)
+    for(const std::string& name: clec->v_clec_coeffs)
     {
         if(!dbs.contains(name))
             dbs.add(name, scl);
@@ -208,6 +211,7 @@ int Estimation::E_prep_instrs()
     for(int i = 0; i < E_T; i++) 
         m(i, 0) = 1.0;
    
+    int rc;
     double x;
     for(const std::string& instr : v_block_instrs) 
     {
@@ -221,7 +225,8 @@ int Estimation::E_prep_instrs()
             return -1;
         }
 
-        if(clec->link(E_DBV, E_DBS) != 0) 
+        rc = clec->link(E_DBV, E_DBS);
+        if(rc != 0) 
         {
             error_manager.append_error("Estimation: Link Error");
             return -1;
@@ -229,7 +234,7 @@ int Estimation::E_prep_instrs()
 
         for(int t = 0 ; t < E_T ; t++) 
         {
-            x = clec->execute(E_DBV, E_DBS, t + E_FROM);
+            x = clec->execute(t + E_FROM);
         }
     }
 
@@ -285,7 +290,7 @@ int Estimation::E_prep_coefs()
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = v_block_rhs[i];
-        for(const std::string& name: clec->v_clec_coeff)
+        for(const std::string& name: clec->v_clec_coeffs)
         {
             if(!E_DBS->contains(name))
                 continue;

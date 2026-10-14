@@ -164,7 +164,7 @@ KDBScalarsPtr KDBIdentities::scalar_list() const
     {
         clec = idt->get_compiled_lec();
         CLEC clec_copy(*clec);
-        for(const std::string& name : clec_copy.v_clec_coeff)
+        for(const std::string& name : clec_copy.v_clec_coeffs)
         {
             dbs->set(name, new_scl);
         }
@@ -736,6 +736,7 @@ int KDBIdentities::execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr,
     if(start < 0) 
         start = 0;
 
+    int rc;
     double d;
     std::shared_ptr<Identity> idt_ptr = nullptr;
     std::shared_ptr<CLEC> idt_clec = nullptr;
@@ -748,12 +749,13 @@ int KDBIdentities::execute(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr,
             return -1;
         
         clec_copy = std::make_shared<CLEC>(*idt_clec);
-        if(clec_copy->link(dbv_ptr, dbs_ptr)) 
+        rc = clec_copy->link(dbv_ptr, dbs_ptr);
+        if(rc != 0) 
             return -1;
         
         for(int t = start ; t < start + smpl->nb_periods ; t++) 
         {
-            d = clec_copy->execute(dbv_ptr, dbs_ptr, t);
+            d = clec_copy->execute(t);
             dbv_ptr->get_var_ptr(idt_name)[t] = d;
         }
     }
