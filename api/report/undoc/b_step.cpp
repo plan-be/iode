@@ -38,7 +38,7 @@ static int check_scl_var(const std::string& name)
     
     char buf[1024];
     std::shared_ptr<CLEC> cl = eq_ptr->clec;
-    for(const std::string& cl_name : cl->v_clec_coeff)
+    for(const std::string& cl_name : cl->v_clec_coeffs)
     {
         // create scalar with default value 0.9 if not existing
         if(!global_ws_scl->contains(cl_name))

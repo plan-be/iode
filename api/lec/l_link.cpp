@@ -18,6 +18,7 @@
 */
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
+    this->map_clec_vars.clear();
     for(const std::string& name : this->v_clec_vars)
     {
         if(!dbv->contains(name))
@@ -27,9 +28,12 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             L_errno = L_NOT_FOUND_ERR;
             return L_errno;
         }
+
+        this->map_clec_vars[name] = dbv->get_obj_ptr(name);
     }
     
-    for(const std::string& name : this->v_clec_coeff)
+    this->map_clec_coeffs.clear();
+    for(const std::string& name : this->v_clec_coeffs)
     {
         if(!dbs->contains(name))
         {
@@ -38,6 +42,8 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             L_errno = L_NOT_FOUND_ERR;
             return L_errno;
         }
+
+        this->map_clec_coeffs[name] = dbs->get_obj_ptr(name);
     }
 
     return 0;
@@ -74,7 +80,7 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         return;
     }
     
-    std::shared_ptr<Sample> smpl_ptr = dbv->get_sample();
+    smpl_ptr = dbv->get_sample();
     if(!smpl_ptr)
     {
         std::string msg = "Cannot link a LEC sub-expression because the sample ";

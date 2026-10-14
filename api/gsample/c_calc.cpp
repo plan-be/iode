@@ -134,7 +134,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 break;
             }
             t[j]  = cl->cl_per[j].difference(kdb->get_sample()->start_period);
-            vy[j] = clec->execute(kdb, global_ws_scl, t[j]);
+            vy[j] = clec->execute(t[j]);
             if(!IODE_IS_A_NUMBER(vy[j]))
             {
                 cl->cl_res = IODE_NAN;
@@ -142,7 +142,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
             }
             div = 1.0;
             if(dclec)
-                div = dclec->execute(kdb, global_ws_scl, t[j]);
+                div = dclec->execute(t[j]);
             if(!IODE_IS_A_NUMBER(div) || div == 0)
             {
                 cl->cl_res = IODE_NAN;
@@ -216,7 +216,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                 vf[i] = 0.0;
                 for(j = t[0]; j <= t[1] ; j++)
                 {
-                    vy[0] = clec->execute(kdb, global_ws_scl, j);
+                    vy[0] = clec->execute(j);
                     if(!IODE_IS_A_NUMBER(vy[0]))
                     {
                         cl->cl_res = IODE_NAN;
@@ -224,7 +224,7 @@ static int COL_calc(COL* cl, std::shared_ptr<CLEC>& clec, std::shared_ptr<CLEC>&
                     }
                     div = 1.0;
                     if(dclec)
-                        div = dclec->execute(kdb, global_ws_scl, j);
+                        div = dclec->execute(j);
                     if(!IODE_IS_A_NUMBER(div) || div == 0)
                     {
                         cl->cl_res = IODE_NAN;

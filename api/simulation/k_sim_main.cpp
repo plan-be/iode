@@ -710,11 +710,11 @@ double CSimulation::calculate_CLEC(const std::string& eq_name, const std::string
     
     double x = IODE_NAN;
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
+
     if(clec->duplicated_endo || var_name != eq_name)
-        x = clec->zero(sim_dbv, sim_dbs, newton_step, newton_epsilon, newton_max_iter, 
-                       t, var_name, eq_name);
+        x = clec->zero(newton_step, newton_epsilon, newton_max_iter, t, var_name, eq_name);
     else
-        x = clec->execute(sim_dbv, sim_dbs, t);
+        x = clec->execute(t);
     
     if(!IODE_IS_A_NUMBER(x) && msg)
     {

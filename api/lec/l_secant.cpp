@@ -14,23 +14,18 @@
  *  
  *  @param [in]  x         double              value for which the expression must be calculated
  *  @param [in]  t         int                 index in the variable for which the expression must be calculated
- *  @param [in]  dbv       KDBVariablesPtr     KDB of variables
- *  @param [in]  dbs       KDBScalarsPtr       KDB of scalars
- *  @param [in]  var_name  string              name of the variable in the KDB of variables
+ *  @param [in]  var       Variable&           variable to modify
  *  @param [in]  shift     double              shift value (endo[t] or 0)
  *  @return                double              value of f(x, t)
  */
-double CLEC::fx(double x, int t, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const std::string& var_name, double shift)
+double CLEC::fx(double x, int t, Variable& var, double shift)
 {
-    if(!dbv || !dbs)
-        return IODE_NAN;
+    double oldx = var[t];
 
-    double* d_ptr = dbv->get_var_ptr(var_name);
-    double oldx = d_ptr[t];
-    d_ptr[t] = x;
+    var[t] = x;
+    double fx = this->execute(t);
 
-    double fx = this->execute(dbv, dbs, t);
-    d_ptr[t] = oldx;
+    var[t] = oldx;
     return fx - shift;
 }
 
@@ -52,16 +47,13 @@ double CLEC::fx(double x, int t, KDBVariablesPtr dbv, KDBScalarsPtr dbs, const s
  *  @param [in,out]  x1        double*             left bound of the segment
  *  @param [out]     x2        double*             right bound of the segment
  *  @param [in]      t         int                 current period of execution
- *  @param [in]      dbv       KDBVariablesPtr     KDB of variables
- *  @param [in]      dbs       KDBScalarsPtr       KDB of scalars
- *  @param [in]      var_name  string              name of the variable in the KDB
+ *  @param [in]      var       Variable&           variable to modify
  *  @param [in]      shift     double              shift value (endo[t] or 0)
  *  @return                    int                 0 if a solution is found, -1 otherwise
  *  
  *  TODO: replace LN_MAXIT and LN_FACTOR by global variables.
  */
-int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalarsPtr dbs, 
-    const std::string& var_name, double shift)
+int CLEC::bracket(double* x1, double* x2, int t, Variable& var, double shift)
 {
     double ox1 = *x1;
     double ox2 = *x2;
@@ -72,8 +64,8 @@ int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalars
     *x1 = ox1 * 0.5;
     *x2 = ox1 * 1.5;
 
-    double f1 = fx(*x1, t, dbv, dbs, var_name, shift);
-    double f2 = fx(*x2, t, dbv, dbs, var_name, shift);
+    double f1 = fx(*x1, t, var, shift);
+    double f2 = fx(*x2, t, var, shift);
 
     for(int i = 0; i < LN_MAXIT; i++) 
     {
@@ -81,9 +73,9 @@ int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalars
             return 0;
 
         if(fabs(f1) < fabs(f2))
-            f1 = fx(*x1 += LN_FACTOR*(*x1 - *x2), t, dbv, dbs, var_name, shift);
+            f1 = fx(*x1 += LN_FACTOR*(*x1 - *x2), t, var, shift);
         else
-            f2 = fx(*x2 += LN_FACTOR*(*x2 - *x1), t, dbv, dbs, var_name, shift);
+            f2 = fx(*x2 += LN_FACTOR*(*x2 - *x1), t, var, shift);
     }
 
     return -1;
@@ -101,11 +93,7 @@ int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalars
  *      xr = xl + (xr - xl) * f(xl) / (f(xl) -f(xh))
  *      If the sign of f(xr) has changed, switch xr and xl. 
  *      Continue until |xl - xr| is << eps
- *   
- *      
  *  
- *  @param [in] KDBVariablesPtr dbv     KDB of VAR with which the equation has been linked
- *  @param [in] KDBScalarsPtr   dbs     KDB of Scalar with which the equation has been linked
  *  @param [in] int             t       time of calculation (index in dbv Sample)
  *  @param [in] int             varnb   position of the endogenous variable in dbv
  *  @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
@@ -113,14 +101,13 @@ int CLEC::bracket(double* x1, double* x2, int t, KDBVariablesPtr dbv, KDBScalars
  *  @return     double                  root of the equation (var_name value that solves the equation)
  *
  */
-double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const std::string& var_name, 
-    const std::string& eq_var_name)
+double CLEC::secant(const int t, const std::string& var_name, const std::string& eq_var_name)
 {
-    if(!dbv || !dbs)
+    if(!check_var(var_name))
         return IODE_NAN;
 
-    double* d_ptr = dbv->get_var_ptr(var_name);
-    double x1 = d_ptr[t];
+    Variable& var = *(map_clec_vars[var_name]);
+    double x1 = var[t];
     if(!IODE_IS_A_NUMBER(x1)) 
         x1 = 0.9;
 
@@ -131,26 +118,29 @@ double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const s
         x1 = fabs(x1);
     else 
     {
-        shift = dbv->get_value(eq_var_name, t);
+        if(!map_clec_vars.contains(eq_var_name))
+            return IODE_NAN;
+        Variable& eq_var = *(map_clec_vars[eq_var_name]);
+        shift = eq_var[t];
         if(!IODE_IS_A_NUMBER(shift))
             return (double) IODE_NAN;
         x1 = fabs(shift);
     }
 
     // Solution 0.0 reached
-    if(fabs(fx(0.0, t, dbv, dbs, var_name, shift)) < 1.0e-6) 
+    if(fabs(fx(0.0, t, var, shift)) < 1.0e-6) 
         return 0.0;
 
     double x2 = 0.0;
-    if(bracket(&x1, &x2, t, dbv, dbs, var_name, shift) < 0) 
+    if(bracket(&x1, &x2, t, var, shift) < 0) 
         return (double) IODE_NAN;
 
     double xl = 0.0;
     double xh = 0.0; 
     double dx = 0.0; 
     double tmp = 0.0;
-    double fxl = fx(x1, t, dbv, dbs, var_name, shift);
-    double fxh = fx(x2, t, dbv, dbs, var_name, shift);
+    double fxl = fx(x1, t, var, shift);
+    double fxh = fx(x2, t, var, shift);
     if(fxl < 0) 
     {
         xl = x1;
@@ -172,7 +162,7 @@ double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const s
     while(it < LN_MAXIT) 
     {
         xr = xl + dx * fxl / (fxl - fxh);
-        fxr = fx(xr, t, dbv, dbs, var_name, shift);
+        fxr = fx(xr, t, var, shift);
         if(fxr < 0.0) 
         {
             tmp = xl - xr;
@@ -193,5 +183,5 @@ double CLEC::secant(KDBVariablesPtr dbv, KDBScalarsPtr dbs, const int t, const s
         it++;
     }
 
-    return (double) IODE_NAN;
+    return IODE_NAN;
 }

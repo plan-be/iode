@@ -74,14 +74,10 @@ struct AbstractCLEC
     // current time of execution (t) of the LEC
     int exec_t = 0;
 
-    // pointers to the KDBs of scalars and variables used for execution 
-    // of the compiled LEC
-    KDBScalarsPtr exec_dbs = nullptr; 
-    KDBVariablesPtr exec_dbv = nullptr; 
-
 public:
     AbstractCLEC() {}
 
+    virtual int get_nb_obs() = 0;
     virtual void link_sample(KDBVariablesPtr dbv, const int start, const int length) = 0;
     virtual double execute_sub_expression(const int start, const int length, const int t) = 0;
 };

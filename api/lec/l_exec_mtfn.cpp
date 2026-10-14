@@ -29,19 +29,6 @@
 
 /* =============================== MTFN ============================== */
 
-static int get_nb_obs(AbstractCLEC& clec)
-{
-    KDBVariablesPtr dbv = clec.exec_dbv;
-    if(!dbv)
-        return 0;
-    
-    std::shared_ptr<Sample> smpl_ptr = dbv->get_sample();
-    if(!smpl_ptr)
-        return 0;
-    
-    return smpl_ptr->nb_periods;
-}
-
 /**
  *  Sub function of L_corr() that calculates the correlation between 2 series defined the CLEC sub-expressions 
  *  expr1 and expr2.
@@ -449,7 +436,7 @@ int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>
     int* vt, double* vy, int notnul)
 {
     vy[0] = vy[1] = IODE_NAN;
-    int nb_obs = get_nb_obs(clec);
+    int nb_obs = clec.get_nb_obs();
 
     // 1. Calculate value after t
     for(vt[1] = t + 1; vt[1] < nb_obs; vt[1]++) 
@@ -540,7 +527,7 @@ double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>&
         return IODE_NAN;
     
     // 3. Calculate result
-    int nb_obs = get_nb_obs(clec);
+    int nb_obs = clec.get_nb_obs();
     if(vt[0] < 0) 
         return vy[1];
     if(vt[1] >= nb_obs) 
@@ -584,7 +571,7 @@ double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
         return IODE_NAN;
     
     double ay[2];
-    int nb_obs = get_nb_obs(clec);
+    int nb_obs = clec.get_nb_obs();
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
         ay[0] = clec.execute_sub_expression(pos2, length2, vt[0]);
@@ -675,7 +662,7 @@ double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_l
         return IODE_NAN;
     
     double ay[2];
-    int nb_obs = get_nb_obs(clec);
+    int nb_obs = clec.get_nb_obs();
     ay[0] = ay[1] = IODE_NAN;
     if(vt[0] >= 0)   
         ay[0] = clec.execute_sub_expression(pos2, length2, vt[0]);

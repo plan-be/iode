@@ -20,7 +20,7 @@
 
 inline bool lec_contains(const std::shared_ptr<CLEC> clec, const std::string& name)
 {
-    std::vector<std::string>& names = is_coefficient(name) ? clec->v_clec_coeff : clec->v_clec_vars;
+    std::vector<std::string>& names = is_coefficient(name) ? clec->v_clec_coeffs : clec->v_clec_vars;
     return std::find(names.begin(), names.end(), name) != names.end();
 } 
 
@@ -178,11 +178,12 @@ protected:
         {
             return IODE_NAN;
         }
-        
-	    if(clec->link(global_ws_var, global_ws_scl) != 0) 
+
+        int rc = clec->link(global_ws_var, global_ws_scl);
+	    if(rc != 0) 
             return IODE_NAN;
         
-	    double res = clec->execute(global_ws_var, global_ws_scl, t);
+	    double res = clec->execute(t);
 	    return res;
 	}
 
@@ -201,7 +202,7 @@ protected:
 	    EXPECT_EQ(rc, 0);
 
 		std::cout << "computing LEC expression for the period '" << per.to_string() << "'" << std::endl;
-	    double calc_val = clec->execute(global_ws_var, global_ws_scl, t);
+	    double calc_val = clec->execute(t);
 	    EXPECT_DOUBLE_EQ(round(expected_val * 1e6) / 1e6, round(calc_val * 1e6) / 1e6);
 	}
 
