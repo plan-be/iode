@@ -25,7 +25,7 @@
  *  Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.
  *  
  *  @param [in] KDB*    dbe     KDB of equations defining the model
- *  @param [in] int     tris    nombre of pseudo-triangulation passes
+ *  @param [in] int     tris    number of pseudo-triangulation passes
  *  @param [in] char*   pre     name of the prolog list 
  *  @param [in] char*   inter   name of the interdependent list 
  *  @param [in] char*   post    name of the epilog list 
@@ -63,9 +63,11 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     map_exchange_rev.clear();
     
     // PSEUDO LINK EQUATIONS ie set num endo = num eq
+    kmsg("--- Linking equations ---");
+    auto start_time = std::chrono::steady_clock::now();
+
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
-    kmsg("Pseudo-linking equations ....");
     for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
     {
         if(!eq_ptr)
@@ -88,6 +90,10 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
             return false;
         }
     }
+    auto end_time = std::chrono::steady_clock::now();
+    double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "Linking equations done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
 
     // Because the simulation Variables workspace is not passed 
     // to the method calculate_SCC()
@@ -102,7 +108,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     map_exchange.clear();
     map_exchange_rev.clear();
 
-    /* ORDERING EQUATIONS */
+    // ORDERING EQUATIONS 
     order();
     build_lists_order(pre, inter, post);
 
@@ -145,10 +151,12 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     v_cpu_time.resize(sim_dbv->get_sample()->nb_periods, 0);
 
     // link equations
+    kmsg("--- Linking equations ---");
+    auto start_time = std::chrono::steady_clock::now();
+    
     int rc = 0;
     bool success = true;
     std::string eq_name;
-    kmsg("Linking equations ....");
     for(const std::shared_ptr<Equation>& eq_ptr : v_eqs_ptr) 
     {
         eq_name = eq_ptr->endo;
@@ -170,6 +178,11 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
             return false;
         }
     }
+
+    auto end_time = std::chrono::steady_clock::now();
+    double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "Linking equations done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
 
     v_endo_values.clear();
     v_endo_values_1.clear();
@@ -250,12 +263,17 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
     // Simulation
     int t = smpl->start_period.difference(dbv->get_sample()->start_period);
 
+    std::chrono::steady_clock::time_point start_time;
+    std::chrono::steady_clock::time_point end_time;
+
+    kmsg("--- Simulating SCC ---");
+
     int rc = 0;
-    int cpu_iter;
+    int ms_iter;
     success = false;
     for(int i = 0; i < smpl->nb_periods; i++, t++) 
     {
-        cpu_iter = WscrGetMS();
+        start_time = std::chrono::steady_clock::now();
 
         rc = sub_simulate(t);
         success = (rc == 0) ? true : false;
@@ -265,7 +283,9 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
             return false;
         } 
         
-        v_cpu_time[t] = WscrGetMS() - cpu_iter;
+        end_time = std::chrono::steady_clock::now();
+        ms_iter = (int) std::chrono::duration<double>(end_time - start_time).count() * 1000;
+        v_cpu_time[t] = ms_iter;
     }
 
     clear();
