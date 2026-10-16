@@ -365,6 +365,7 @@ private:
         sim_dbs = dbs;
         sim_dbv = dbv;
 
+        auto start_time = std::chrono::steady_clock::now();
         int eq_pos = 0;
         map_eq_name_index.clear();
         v_eqs_ptr.reserve(dbe->size());
@@ -380,7 +381,12 @@ private:
             map_eq_name_index[name] = eq_pos;
             eq_pos++;
         }
+        auto end_time = std::chrono::steady_clock::now();
+        double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+        std::string msg = "Initialized Equations workspace done in " + std::to_string(cpu_time) + " sec";
+        kmsg((char*) msg.c_str());
 
+        start_time = std::chrono::steady_clock::now();
         int var_pos = 0;
         map_var_name_index.clear();
         v_var_ptr.reserve(sim_dbv->size());
@@ -396,6 +402,10 @@ private:
             map_var_name_index[name] = var_pos;
             var_pos++;
         }
+        end_time = std::chrono::steady_clock::now();
+        cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+        msg = "Initialized Variables workspace done in " + std::to_string(cpu_time) + " sec";
+        kmsg((char*) msg.c_str());
 
         return true;
     }
@@ -414,7 +424,7 @@ private:
 
 	/* k_sim_order.c */
 	int pre_order(std::vector<std::vector<int>>& predecessors, std::vector<std::vector<int>>& successors);
-	int build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, int from);
+	int build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, const int from, const bool pre);
 	int build_inter_list(std::vector<std::vector<int>>& predecessors);
 	void compute_tri_perm1(int i, std::vector<int>& v_vars);
 	int compute_tri_begin();
