@@ -440,3 +440,69 @@ TEST_F(SimulationTest, B_MODEL)
     // B_ModelSimulateSaveNIters(char *arg)                    
     // $ModelSimulateSaveNiters varname
 }
+
+TEST_F(SimulationTest, ERASME_MODEL)
+{
+    std::filesystem::path data_dir = "C:\\usr\\Documents\\IODE\\ERASME\\slow_simulation";
+    std::filesystem::path idt_path = data_dir / "Base_all_v1.1.idt";
+    std::filesystem::path eqs_path = data_dir / "Base_all_v1.1.eqs";
+    std::filesystem::path scl_path = data_dir / "Base_all_v1.1.scl";
+    std::filesystem::path var_path = data_dir / "Base_all_v1.1.var";
+
+    global_ws_idt->clear();
+    auto load_start = std::chrono::steady_clock::now();
+    global_ws_idt->load(idt_path.string());
+    auto load_end = std::chrono::steady_clock::now();
+    std::cout << "global_ws_idt load: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    global_ws_eqs->clear();
+    load_start = std::chrono::steady_clock::now();
+    global_ws_eqs->load(eqs_path.string());
+    load_end = std::chrono::steady_clock::now();
+    std::cout << "global_ws_eqs load: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    global_ws_scl->clear();
+    load_start = std::chrono::steady_clock::now();
+    global_ws_scl->load(scl_path.string());
+    load_end = std::chrono::steady_clock::now();
+    std::cout << "global_ws_scl load: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    global_ws_var->clear();
+    load_start = std::chrono::steady_clock::now();
+    global_ws_var->load(var_path.string());
+    load_end = std::chrono::steady_clock::now();
+    std::cout << "global_ws_var load: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    // sort_algorithm = 'CONNEX', initialization_method = 'TM1')
+
+    global_simu->epsilon = 0.0001;
+    global_simu->relax = 0.9;
+    global_simu->max_iter = 100000;
+    global_simu->nb_passes = 5;
+    global_simu->set_sort(SORT_CONNEX);
+    global_simu->set_initialization_method(VAR_INIT_TM1);
+    global_simu->set_debug(false);
+    global_simu->set_debug_newton(false);
+
+    bool success = true;
+
+    skip_message(false);
+    // SCC decomposition
+    load_start = std::chrono::steady_clock::now();
+    success = global_simu->calculate_SCC(1);
+    EXPECT_TRUE(success);
+    load_end = std::chrono::steady_clock::now();
+    std::cout << "calculate_SCC: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    std::string SIMSTRY = "2020Y1";
+    std::string SIMENDY = "2060Y1";
+
+    // simulate model
+    load_start = std::chrono::steady_clock::now();
+    // success = global_simu->simulate_SCC(SIMSTRY, SIMENDY);
+    // EXPECT_TRUE(success);
+    load_end = std::chrono::steady_clock::now();
+    std::cout << "simulate_SCC: " << std::chrono::duration<double>(load_end - load_start).count() << " sec\n";
+
+    skip_message(true);
+}
