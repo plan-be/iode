@@ -43,8 +43,12 @@
  *  @param [in]         int     from            first available place in v_order
  *  @return             int                     number of equations in the computed block  
  */
-int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, int from)
+int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, const int from, const bool pre)
 {
+    auto start_time = std::chrono::steady_clock::now();
+
+    std::string list_name = pre ? "PRE" : "POST";
+
     // We restart as long as we added an equation to the PRE or POST list (new_eq_added = true)
     // because we may have a new equation that only depended on those just added and which 
     // therefore is also part of the PRE or POST list
@@ -91,6 +95,11 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
         }
     }
 
+    auto end_time = std::chrono::steady_clock::now();
+    double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "\tBuilding " + list_name + " list done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
+
     return nb;
 }
 
@@ -111,6 +120,8 @@ int CSimulation::build_pre_post_list(std::vector<std::vector<int>>& v_eq_vars, i
  */
 int CSimulation::build_inter_list(std::vector<std::vector<int>>& predecessors)
 {
+    auto start_time = std::chrono::steady_clock::now();
+
     int nb = 0;
     for(int i = 0; i < sim_dbe->size(); i++) 
     {
@@ -119,6 +130,12 @@ int CSimulation::build_inter_list(std::vector<std::vector<int>>& predecessors)
         v_ordered_eqs[nb_pre + nb_post + nb] = i;
         nb++;
     }
+
+    auto end_time = std::chrono::steady_clock::now();
+    double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "\tBuilding INTER list done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
+
     return nb;
 }
 
@@ -151,6 +168,8 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
 
     v_ordered.clear();
     v_ordered.resize(nb_eqs, false);
+
+    auto start_time = std::chrono::steady_clock::now();
     
     int eq_pos;
     int i = 0, j = 0;
@@ -204,6 +223,11 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
         i++;
     }
 
+    auto end_time = std::chrono::steady_clock::now();
+    double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "\tBuild predecessors and successors vectors done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
+
     return 0;
 }
 
@@ -239,15 +263,15 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
  */
 void CSimulation::order(const std::vector<std::string>& eqs)
 {
-    long cpu_order = 0; 
-    cpu_time_sorting = 0;
-    cpu_time_scc = 0;
-
+    std::string msg;
+    double cpu_time = 0.0;
     int nb_eqs = sim_dbe->size();
-    
+
     // No reordering : we keep the order of eqs and so everything is interdep
     if(sorting_algo == SORT_NONE) 
     {
+        auto start_time = std::chrono::steady_clock::now();
+
         nb_pre = nb_post = 0;
         nb_inter = nb_eqs;
 
@@ -269,29 +293,26 @@ void CSimulation::order(const std::vector<std::string>& eqs)
             }
         }
 
+        auto end_time = std::chrono::steady_clock::now();
+        cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+        std::string msg = "Ordering done in " + std::to_string(cpu_time) + " sec";
+        kmsg((char*) msg.c_str());
+
         return;
     }
-
-    int idx = 0;
-    std::vector<std::string> v_eq_names(nb_eqs, "");
-    for(const std::string& name : sim_dbe->get_names()) 
-    {
-        v_eq_names[idx] = name;
-        idx++;
-    }
-
-    cpu_order = WscrGetMS();
-    kmsg("Calculating SCC...");
+    
+    auto start_time = std::chrono::steady_clock::now();
+    kmsg("--- Calculating SCC ---");
 
     // predecessors = liste de pointeur vers des vecteurs contenant la pos de toutes les vars de l'eq i
     // voir preorder
     std::vector<std::vector<int>> predecessors(nb_eqs);
     std::vector<std::vector<int>> successors(nb_eqs);
     pre_order(predecessors, successors);
-    nb_pre = build_pre_post_list(predecessors, 0);
-    nb_post = build_pre_post_list(successors, nb_pre);
+    nb_pre = build_pre_post_list(predecessors, 0, true);
+    nb_post = build_pre_post_list(successors, nb_pre, false);
 
-    /* REVERSE FOR EXECUTION PURPOSE */
+    // REVERSE FOR EXECUTION PURPOSE
     int k;
     for(int i = 0; i < nb_post / 2; i++) 
     {
@@ -302,12 +323,13 @@ void CSimulation::order(const std::vector<std::string>& eqs)
 
     nb_inter = build_inter_list(predecessors);
 
-    cpu_time_scc = WscrGetMS() - cpu_order;
-    kmsg("Calculating SCC... %ld ms -> #PRE %d - #INTER %d - #POST %d", 
-            cpu_time_scc, 
-            nb_pre, 
-            nb_inter, 
-            nb_post);
+    auto end_time = std::chrono::steady_clock::now();
+    cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    msg = "Calculating SCC done in " + std::to_string(cpu_time) + " sec -> ";
+    msg += "#PRE " + std::to_string(nb_pre) + " - #INTER " + std::to_string(nb_inter); 
+    msg += " - #POST " + std::to_string(nb_post);
+    kmsg((char*) msg.c_str());
+    cpu_time_scc = (int) cpu_time * 1000;
 
     // NOTE: currently, v_ordered_eqs contains lists in the order *pre*, *post*, *inter*.
     // Rotate the [post, inter] subrange left by nb_post to obtain *pre*, *inter*, *post*.
@@ -316,11 +338,12 @@ void CSimulation::order(const std::vector<std::string>& eqs)
                 v_ordered_eqs.begin() + nb_pre + nb_post + nb_inter);
 
     if(sorting_algo == SORT_BOTH) 
-    {
-        kmsg("Reordering interdependent block...");
         compute_tri(predecessors, nb_passes);
-        kmsg("Reordering interdependent block... %ld ms", cpu_time_sorting);
-    }
+
+    end_time = std::chrono::steady_clock::now();
+    cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    msg = "Ordering done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
 
     v_ordered.clear();
 }
@@ -384,17 +407,19 @@ int CSimulation::compute_tri_end()
  *  For each explanatory variable in equation i, we look for the equation calculated the latest
  *  in the order of the model (after permutation as defined in the current state of v_permut).
  *
- *    Let m be this position.
- *    If m < v_permut[i], ok, the explanatory var is calculated before equation i => no change in v_permut
- *    Otherwise, move everything forward from the current position of eqi to m and place eqi in place of m.
+ *    Let last_pos be this position.
+ *    If last_pos < v_permut[i], ok, the explanatory var is calculated before equation i => no change in v_permut
+ *    Otherwise, move everything forward from the current position of eqi to last_pos and place eqi in place of last_pos.
  *  
  *  @param [in]         int     i       equation position in the dbe
  *  @param [in]         int*    v_vars  list of explanatory variables in equation i
  */
 void CSimulation::compute_tri_perm1(int i, std::vector<int>& v_vars)
 {
-    // calcul de l'eq jm dont le numéro d'ordre de calcul est le plus grand
-    int m = -1;
+    int last_pos = -1;
+    int current_pos = v_permut[i];
+
+    // look for the equation calculated the latest in the order of the model
     int posj = -1;
     for(const int var: v_vars) 
     {
@@ -405,20 +430,24 @@ void CSimulation::compute_tri_perm1(int i, std::vector<int>& v_vars)
         // permuted position of var
         posj = v_permut[var];
 
-        if(posj > m)
-            m = posj;
+        if(posj > last_pos)
+            last_pos = posj;
     }
 
-    // Si le numéro d'ordre max des eq dont dépend la courante est < numéro d'ordre de la courante : ok
-    int ksim_permi = v_permut[i];
-    if(m < ksim_permi) 
+    // all equations associated with the explanatory variables of 
+    // the current equation are calculated BEFORE the current equation
+    if(last_pos < current_pos) 
         return;
 
+    // move all equation positions calculated between the current equation + 1 
+    // and the last equation position associated with the explanatory variables
     for(int j = 0; j < sim_dbe->size(); j++)
-        if(v_permut[j] > ksim_permi && v_permut[j] <= m)
+        if(v_permut[j] > current_pos && v_permut[j] <= last_pos)
             v_permut[j]--;
 
-    v_permut[i] = m;
+    // current equation is permuted with the equation associated with the 
+    // explanatory variable which is the latest computed
+    v_permut[i] = last_pos;
 }
 
 
@@ -430,22 +459,36 @@ void CSimulation::compute_tri_perm1(int i, std::vector<int>& v_vars)
  *  @param [in]         int     passes          how many times the heuristic algorithm must be run 
  */
 void CSimulation::compute_tri(std::vector<std::vector<int>>& predecessors, int passes)
-{   
-    int cpu_sort = WscrGetMS();
+{
+    std::string msg;
+    double cpu_time = 0.0;
 
+    msg = "--- Reordering interdependent block (" + std::to_string(nb_inter) + " equations) ---";
+    kmsg((char*) msg.c_str());
+
+    auto start_time = std::chrono::steady_clock::now();
     compute_tri_begin();
 
     int eq_pos;
     for(int j = 0 ; j < passes ; j++) 
-    {
+    {   
+        auto start_tri = std::chrono::steady_clock::now();
         for(int i = 0 ; i < nb_inter ; i++) 
         {
             eq_pos = v_ordered_eqs[nb_pre + i];
             compute_tri_perm1(eq_pos, predecessors[eq_pos]);
         }
+        auto end_tri = std::chrono::steady_clock::now();
+        cpu_time = std::chrono::duration<double>(end_tri - start_tri).count();
+        msg = "\tPass " + std::to_string(j) + " : " + std::to_string(cpu_time) + " sec";
+        kmsg((char*) msg.c_str());
     }
 
     compute_tri_end();
-    
-    cpu_time_sorting = WscrGetMS() - cpu_sort;
+
+    auto end_time = std::chrono::steady_clock::now();
+    cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    msg = "Reordering interdependent block done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
+    cpu_time_sorting = (int) cpu_time * 1000;
 }

@@ -433,7 +433,7 @@ int CSimulation::sub_simulate(int t)
 {
     int     it = 0, rc, conv = 0, ovtime = SCR_vtime;
     char    msg[80];
-    long    ms_iter;
+    int     ms_iter;
 
     init_values(t);
     v_nb_iterations[t] = 0; 
@@ -441,11 +441,14 @@ int CSimulation::sub_simulate(int t)
     v_cpu_time[t] = 0;  
     if(prolog(t))
         return -1;
+
+    std::chrono::steady_clock::time_point start_time;
+    std::chrono::steady_clock::time_point end_time;
     
     ktermvkey(0); // Force the interval between 2 keyboard readings to 0 ms
     while(conv == 0 && it++ < max_iter) 
     {
-        ms_iter = WscrGetMS();
+        start_time = std::chrono::steady_clock::now();
         rc = interdep(t);
         v_nb_iterations[t]++; 			
         v_norm[t] = norm;	
@@ -455,9 +458,11 @@ int CSimulation::sub_simulate(int t)
             return -1;
         }
         Period period = sim_dbv->get_sample()->start_period.shift(t);
+        end_time = std::chrono::steady_clock::now();
+        ms_iter = (int) (std::chrono::duration<double>(end_time - start_time).count() * 1000);
         sprintf(msg, "%s: %d iters - error = %8.4lg - cpu=%ldms", 
                       (char*) period.to_string().c_str(), it, norm, 
-                      WscrGetMS() - ms_iter);
+                      ms_iter);
         kmsg("%.80s", msg);
         conv = (norm <= epsilon) ? 1 : 0;
         if(khitkey() != 0) 
@@ -527,6 +532,10 @@ int CSimulation::sub_simulate(int t)
 bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
     const std::vector<std::string>& eqs)
 {
+    double cpu_time = 0.0;
+    std::chrono::steady_clock::time_point start_time;
+    std::chrono::steady_clock::time_point end_time;
+
     // Assign static global variables to avoid passing to many parameters to sub functions
     bool success = set_simulation_workspaces(dbe, dbs, dbv);
     if(!success)
@@ -534,6 +543,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         clear();
         return false;
     }
+
+    kmsg("--- Preparing simulation ---");
+    start_time = std::chrono::steady_clock::now();
 
     // Find in the sim_dbv sample the position t of the first period to simulate
     // and check that the simulation sample is included in sim_dbv sample
@@ -559,8 +571,14 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     v_nb_iterations.resize(dbv->get_sample()->nb_periods, 0);
     v_cpu_time.resize(dbv->get_sample()->nb_periods, 0);
 
+    end_time = std::chrono::steady_clock::now();
+    cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    std::string msg = "Preparing simulation done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
+
     // LINK EQUATIONS + SAVE ENDO POSITIONS 
-    kmsg("Linking equations ....");
+    kmsg("--- Linking equations ---");
+    start_time = std::chrono::steady_clock::now();
     
     int rc = -1;
     std::string eq_name;
@@ -575,7 +593,10 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             return false;
         }
         
-        eq_ptr->compile();
+        // try to compile the equation if it has not been compiled yet
+        if(!eq_ptr->clec)
+            eq_ptr->compile();
+        
         rc = eq_ptr->clec->link(dbv, dbs);
         if(rc) 
         {
@@ -585,6 +606,11 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             return false;
         }
     }
+
+    end_time = std::chrono::steady_clock::now();
+    cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+    msg = "Linking equations done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
 
     success = prepare_exchanges();
     if(!success)
@@ -615,11 +641,14 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     v_endo_values.resize(nb_inter, 0.0);
     v_endo_values_1.resize(nb_inter, 0.0);
 
-    int cpu_iter;
+    kmsg("--- Simulating ---");
+    auto start_simu_time = std::chrono::steady_clock::now();
+
+    int ms_iter;
     success = false;
     for(int i = 0; i < smpl->nb_periods; i++, t++) 
     {
-        cpu_iter = WscrGetMS();
+        start_time = std::chrono::steady_clock::now();
 
         rc = sub_simulate(t);
         success = (rc == 0) ? true : false;
@@ -629,8 +658,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             return false;
         } 
         
-        v_cpu_time[t] = WscrGetMS() - cpu_iter;
-
+        end_time = std::chrono::steady_clock::now();
+        ms_iter = (int) (std::chrono::duration<double>(end_time - start_time).count() * 1000);
+        v_cpu_time[t] = ms_iter;
         // In case of exchange ENDO-EXO, initialises the future EXO's => exo[t+i] = exo[t] i=t+1..end of sample
         if(!v_exo.empty()) 
         {
@@ -643,6 +673,11 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             }
         }
     }
+
+    auto end_simu_time = std::chrono::steady_clock::now(); 
+    cpu_time = std::chrono::duration<double>(end_simu_time - start_simu_time).count();
+    msg = "Simulation done in " + std::to_string(cpu_time) + " sec";
+    kmsg((char*) msg.c_str());
 
     clear();
     return true;

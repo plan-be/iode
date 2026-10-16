@@ -781,11 +781,27 @@ class Simulation:
         >>> simulation.debug = True
 
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
         2000Y1: 2 iters - error =   0.1684 - cpu=...ms
         2000Y1: 3 iters - error =   0.5237 - cpu=...ms
@@ -793,6 +809,7 @@ class Simulation:
         2015Y1: 19 iters - error = 0.002907 - cpu=...ms
         2015Y1: 20 iters - error = 0.001537 - cpu=...ms
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        Simulation done in ... sec
         
         >>> lists["_PRE"]           # doctest: +ELLIPSIS
         ['BRUGP', 'DTH1C', 'EX', 'ITCEE', ..., 'DTH1', 'PMAB', 'PME', 'PMS', 'PMT']
@@ -906,11 +923,27 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
         2000Y1: 2 iters - error =   0.1684 - cpu=...ms
         2000Y1: 3 iters - error =   0.5237 - cpu=...ms
@@ -918,6 +951,7 @@ class Simulation:
         2015Y1: 19 iters - error = 0.002907 - cpu=...ms
         2015Y1: 20 iters - error = 0.001537 - cpu=...ms
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> # get the number of iterations for the period 2000Y1
@@ -967,11 +1001,27 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
         2000Y1: 2 iters - error =   0.1684 - cpu=...ms
         2000Y1: 3 iters - error =   0.5237 - cpu=...ms
@@ -979,6 +1029,7 @@ class Simulation:
         2015Y1: 19 iters - error = 0.002907 - cpu=...ms
         2015Y1: 20 iters - error = 0.001537 - cpu=...ms
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> # save the number of iterations for each period in a new variable
@@ -1033,11 +1084,27 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
         2000Y1: 2 iters - error =   0.1684 - cpu=...ms
         2000Y1: 3 iters - error =   0.5237 - cpu=...ms
@@ -1045,6 +1112,7 @@ class Simulation:
         2015Y1: 19 iters - error = 0.002907 - cpu=...ms
         2015Y1: 20 iters - error = 0.001537 - cpu=...ms
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> # get the norm value for the period 2000Y1
@@ -1092,11 +1160,27 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =   0.6558 - cpu=...ms
         2000Y1: 2 iters - error =   0.1684 - cpu=...ms
         2000Y1: 3 iters - error =   0.5237 - cpu=...ms
@@ -1104,6 +1188,7 @@ class Simulation:
         2015Y1: 19 iters - error = 0.002907 - cpu=...ms
         2015Y1: 20 iters - error = 0.001537 - cpu=...ms
         2015Y1: 21 iters - error = 0.0005893 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> # save the lowest norm value for each period in a new variable
@@ -1197,11 +1282,27 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =    1.342 - cpu=...ms
         2000Y1: 2 iters - error =   0.4115 - cpu=...ms
         2000Y1: 3 iters - error =   0.5272 - cpu=...ms
@@ -1209,6 +1310,7 @@ class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
 
@@ -1246,11 +1348,27 @@ class Simulation:
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 32 - #INTER 202 - #POST 40
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 32 - #INTER 202 - #POST 40
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =  0.09305 - cpu=...ms
         2000Y1: 2 iters - error = 0.001205 - cpu=...ms
         2000Y1: 3 iters - error =  0.00138 - cpu=...ms
@@ -1258,6 +1376,7 @@ class Simulation:
         2015Y1: 23 iters - error = 0.001306 - cpu=...ms
         2015Y1: 24 iters - error = 0.001463 - cpu=...ms
         2015Y1: 25 iters - error = 0.0007763 - cpu=...ms
+        Simulation done in ... sec
         >>> # exogeneous variable (now XNATY)
         >>> variables["XNATY", "2000Y1:2015Y1"]     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Workspace: Variables
@@ -1428,11 +1547,27 @@ class Simulation:
         
         >>> # simulate the model
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
         2000Y1: 1 iters - error =    1.342 - cpu=...ms
         2000Y1: 2 iters - error =   0.4115 - cpu=...ms
         2000Y1: 3 iters - error =   0.5272 - cpu=...ms
@@ -1440,6 +1575,7 @@ class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> variables["UY", "2000Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1479,11 +1615,35 @@ class Simulation:
         <BLANKLINE>  
 
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation ---
+        Preparing simulation done in ... sec
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
+        --- Simulating ---
+        2000Y1: 1 iters - error = 0.0009331 - cpu=...ms
+        2001Y1: 1 iters - error = 0.0005994 - cpu=...ms
+        2002Y1: 1 iters - error = 0.0006305 - cpu=...ms
+        ...
+        2013Y1: 1 iters - error = 0.0009004 - cpu=...ms
+        2014Y1: 1 iters - error = 0.0009068 - cpu=...ms
+        2015Y1: 1 iters - error = 0.0006749 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
         >>> variables[list_eqs, "1998Y1:2015Y1"]            # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
@@ -1592,11 +1752,24 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_calculate_SCC()          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Pseudo-linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Compiling equations ---
+        Compiling equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
         >>> success
         True
 
@@ -1709,11 +1882,24 @@ class Simulation:
         >>> simulation.reset()
 
         >>> success = simulation.model_calculate_SCC()      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Pseudo-linking equations ....
-        Calculating SCC...
-        Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
-        Reordering interdependent block...
-        Reordering interdependent block...
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Compiling equations ---
+        Compiling equations done in ... sec
+        --- Calculating SCC ---
+           Build predecessors and successors vectors done in ... sec
+           Building PRE list done in ... sec
+           Building POST list done in ... sec
+           Building INTER list done in ... sec
+        Calculating SCC done in ... sec -> #PRE 33 - #INTER 202 - #POST 39
+        --- Reordering interdependent block (202 equations) ---
+           Pass 0 : ... sec
+           Pass 1 : ... sec
+           Pass 2 : ... sec
+           Pass 3 : ... sec
+           Pass 4 : ... sec
+        Reordering interdependent block done in ... sec
+        Ordering done in ... sec
         >>> success
         True
 
@@ -1764,7 +1950,14 @@ class Simulation:
         <BLANKLINE>
         
         >>> success = simulation.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Linking equations ....
+        Initialized Equations workspace done in ... sec
+        Initialized Variables workspace done in ... sec
+        --- Preparing simulation (SCC) ---
+        --- Linking equations ---
+        Linking equations done in ... sec
+        --- Extracting PRE - INTER - POST blocks ---
+        Extracting PRE - INTER - POST blocks done in ... sec
+        --- Simulating SCC ---
         2000Y1: 1 iters - error =    1.342 - cpu=...ms
         2000Y1: 2 iters - error =   0.4115 - cpu=...ms
         2000Y1: 3 iters - error =   0.5272 - cpu=...ms
@@ -1772,6 +1965,7 @@ class Simulation:
         2015Y1: 19 iters - error =  0.00267 - cpu=...ms
         2015Y1: 20 iters - error =  0.00141 - cpu=...ms
         2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
+        Simulation done in ... sec
         >>> success
         True
 
