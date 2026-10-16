@@ -38,7 +38,8 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
     int opasses = nb_passes;
     int osort = sorting_algo;
 
-    nb_passes = tris;
+    if(tris > 0)
+        nb_passes = tris;
 
     // to build the PRE, INTER and POST lists in build_lists_order()
     KDBVariablesPtr dbv = KDBVariables::Create(false);

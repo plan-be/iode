@@ -251,7 +251,7 @@ public:
 	/* k_sim_scc.c */
 	bool calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string& pre, const std::string& inter, const std::string& post);
 
-    bool calculate_SCC(const int nb_iterations, const std::string& pre_name = "_PRE", const std::string& inter_name = "_INTER", 
+    bool calculate_SCC(const int nb_iterations = 5, const std::string& pre_name = "_PRE", const std::string& inter_name = "_INTER", 
         const std::string& post_name = "_POST", const std::string& list_eqs = "");
 
     bool simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 

@@ -1535,7 +1535,7 @@ class Simulation:
             skip_message(False)
         return success
 
-    def model_calculate_SCC(self, nb_iterations: int, pre_name: str='_PRE', inter_name: str='_INTER', 
+    def model_calculate_SCC(self, nb_iterations: int=5, pre_name: str='_PRE', inter_name: str='_INTER', 
                             post_name: str='_POST', list_eqs: Union[str, List[str]]=None, quiet: bool=False) -> bool:
         r"""
         Decompose the model into Strongly Connex Components (SCC) and reorder it. 
@@ -1547,8 +1547,9 @@ class Simulation:
 
         Parameters
         ----------
-        nb_iterations : int
+        nb_iterations : int, optional
             Number of triangulation iterations to be performed. 
+            Default to 5.
         pre_name : str, optional
             Name of the list representing the pre-recursive equations.
             Default to "_PRE".
@@ -1590,7 +1591,7 @@ class Simulation:
         >>> # reset to default values for the simulation parameters
         >>> simulation.reset()
         
-        >>> success = simulation.model_calculate_SCC(10)        # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simulation.model_calculate_SCC()          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
@@ -1605,7 +1606,7 @@ class Simulation:
         33
 
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        ['ULCP', 'SSH3P', 'WBG', 'ITF', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
+        ['ITFGO', 'ITFGI', 'CGU', 'SSH3O', ..., 'FLG', 'VBNP', 'VBNP_P', 'VBBP_P']
         >>> len(lists["_INTER"])
         202
 
@@ -1707,7 +1708,7 @@ class Simulation:
         >>> # reset to default values for the simulation parameters
         >>> simulation.reset()
 
-        >>> success = simulation.model_calculate_SCC(10)    # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+        >>> success = simulation.model_calculate_SCC()      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Pseudo-linking equations ....
         Calculating SCC...
         Calculating SCC... -> #PRE 33 - #INTER 202 - #POST 39
@@ -1721,7 +1722,7 @@ class Simulation:
         >>> len(lists["_PRE"])
         33
         >>> lists["_INTER"]         # doctest: +ELLIPSIS
-        ['ULCP', 'SSH3P', 'WBG', 'ITF', ..., 'YSSG', 'WCF_', 'ITEP', 'EXC', 'ITT']
+        ['ITFGO', 'ITFGI', 'CGU', 'SSH3O', ..., 'FLG', 'VBNP', 'VBNP_P', 'VBBP_P']
         >>> len(lists["_INTER"])
         202
         >>> lists["_POST"]          # doctest: +ELLIPSIS
@@ -1764,13 +1765,13 @@ class Simulation:
         
         >>> success = simulation.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
         Linking equations ....
-        2000Y1: 1 iters - error =   0.3155 - cpu=...ms
-        2000Y1: 2 iters - error =    1.953 - cpu=...ms
-        2000Y1: 3 iters - error =   0.2335 - cpu=...ms
+        2000Y1: 1 iters - error =    1.342 - cpu=...ms
+        2000Y1: 2 iters - error =   0.4115 - cpu=...ms
+        2000Y1: 3 iters - error =   0.5272 - cpu=...ms
         ...
-        2015Y1: 10 iters - error =  0.01144 - cpu=...ms
-        2015Y1: 11 iters - error = 0.006679 - cpu=...ms
-        2015Y1: 12 iters - error = 0.0003485 - cpu=...ms
+        2015Y1: 19 iters - error =  0.00267 - cpu=...ms
+        2015Y1: 20 iters - error =  0.00141 - cpu=...ms
+        2015Y1: 21 iters - error = 0.0006749 - cpu=...ms
         >>> success
         True
 
@@ -1783,7 +1784,7 @@ class Simulation:
         mode: LEVEL
         <BLANKLINE>
         name        2000Y1  2001Y1  2002Y1  ...  2013Y1  2014Y1  2015Y1
-        UY          624.18  645.05  661.58  ...  549.26  533.49  525.29
+        UY          624.18  645.05  661.61  ...  549.24  533.37  525.13
         <BLANKLINE>
         """
         if isinstance(from_period, Period):
