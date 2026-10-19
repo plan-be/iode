@@ -77,7 +77,7 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
 
     // Endo and exo are in same equation 
     // => add entry in map_exchange and map_exchange_rev and return 
-    for(const std::string& name: clec->v_clec_vars)
+    for(const std::string& name: clec->v_clec_var_names)
     {
         if(name == exo) 
         {
@@ -91,7 +91,7 @@ bool CSimulation::find_path(const std::string& endo, const std::string& exo, int
     // => try to find a path between endo and exo and change endo / exo at each step
     bool success = false;
     int eq_pos = -1;
-    for(const std::string& name: clec->v_clec_vars) 
+    for(const std::string& name: clec->v_clec_var_names) 
     {   
         if(name == endo)
             continue;

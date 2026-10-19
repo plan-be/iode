@@ -173,7 +173,7 @@ int Estimation::E_add_scls(const std::shared_ptr<CLEC> clec, KDBScalars& dbs)
 {
     std::string name;
     Scalar scl(0.9, 1.0);
-    for(const std::string& name: clec->v_clec_coeffs)
+    for(const std::string& name: clec->v_clec_coeff_names)
     {
         if(!dbs.contains(name))
             dbs.add(name, scl);
@@ -290,7 +290,7 @@ int Estimation::E_prep_coefs()
     for(int i = 0 ; i < E_NEQ ; i++) 
     {
         clec = v_block_rhs[i];
-        for(const std::string& name: clec->v_clec_coeffs)
+        for(const std::string& name: clec->v_clec_coeff_names)
         {
             if(!E_DBS->contains(name))
                 continue;

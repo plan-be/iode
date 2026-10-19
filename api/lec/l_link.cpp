@@ -19,7 +19,7 @@
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
     this->map_clec_vars.clear();
-    for(const std::string& name : this->v_clec_vars)
+    for(const std::string& name : this->v_clec_var_names)
     {
         try
         {
@@ -35,7 +35,7 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     }
     
     this->map_clec_coeffs.clear();
-    for(const std::string& name : this->v_clec_coeffs)
+    for(const std::string& name : this->v_clec_coeff_names)
     {
         try
         {
