@@ -20,8 +20,24 @@
 
 inline bool lec_contains(const std::shared_ptr<CLEC> clec, const std::string& name)
 {
-    std::vector<std::string>& names = is_coefficient(name) ? clec->v_clec_coeff_names : clec->v_clec_var_names;
-    return std::find(names.begin(), names.end(), name) != names.end();
+    if(is_coefficient(name))
+	{
+		for(auto& coeff : clec->v_clec_coeffs)
+		{
+			if(coeff.name == name)
+				return true;
+		}
+	}
+	else
+	{
+		for(auto& var: clec->v_clec_vars)
+		{
+			if(var.name == name)
+				return true;
+		}
+	}
+
+	return false;
 } 
 
 

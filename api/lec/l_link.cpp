@@ -18,35 +18,94 @@
 */
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
-    this->map_clec_vars.clear();
-    for(const std::string& name : this->v_clec_var_names)
+    std::string name;
+    int nb_vars = (int) this->v_clec_vars.size();
+    int nb_coeffs = (int) this->v_clec_coeffs.size();
+
+    std::shared_ptr<Variable> var_ptr;
+    std::unordered_map<std::string, int> map_var_name_position;
+    for(int i = 0; i < nb_vars; i++)
     {
+        name = this->v_clec_vars[i].name;
+        map_var_name_position[name] = i;
+
         try
         {
-            this->map_clec_vars[name] = dbv->get_obj_ptr(name);
+            var_ptr = dbv->get_obj_ptr(name);
         }
         catch(const std::invalid_argument&)
         {
-            std::string msg = "linking LEC failed: '" + name + "' not found";
+            std::string msg = "linking LEC failed: Variable '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
+            reset_coeff_var_ptr();
             return L_errno;
         }
+
+        if(!var_ptr)
+        {
+            std::string msg = "linking LEC failed: Variable '" + name + "' empty";
+            error_manager.append_error(msg);
+            L_errno = L_LINK_ERR;
+            reset_coeff_var_ptr();
+            return L_errno;   
+        }
+
+        this->v_clec_vars[i].ptr = var_ptr;
     }
     
-    this->map_clec_coeffs.clear();
-    for(const std::string& name : this->v_clec_coeff_names)
+    std::shared_ptr<Scalar> scl_ptr;
+    std::unordered_map<std::string, int> map_coeff_name_position;
+    for(int i = 0; i < nb_coeffs; i++)
     {
+        name = this->v_clec_coeffs[i].name;
+        map_coeff_name_position[name] = i;
+
         try
         {
-            this->map_clec_coeffs[name] = dbs->get_obj_ptr(name);
+            scl_ptr = dbs->get_obj_ptr(name);
         }
         catch(const std::invalid_argument&)
         {
-            std::string msg = "linking LEC failed: '" + name + "' not found";
+            std::string msg = "linking LEC failed: Scalar '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
+            reset_coeff_var_ptr();
             return L_errno;
+        }
+
+        if(!scl_ptr)
+        {
+            std::string msg = "linking LEC failed: Scalar '" + name + "' empty";
+            error_manager.append_error(msg);
+            L_errno = L_LINK_ERR;
+            reset_coeff_var_ptr();
+            return L_errno;   
+        }
+
+        this->v_clec_coeffs[i].ptr = scl_ptr;
+    }
+
+    int pos_in_clec;
+    for(ATOMIC_LEC& al : this->v_expression)
+    {
+        if(std::holds_alternative<LEC_COEF>(al))
+        {
+            LEC_COEF& al_coef = std::get<LEC_COEF>(al);
+            // set position of the coefficient in the 
+            // v_clec_coeffs vector
+            name = al_coef.name;
+            pos_in_clec = map_coeff_name_position[name];
+            al_coef.set_position(pos_in_clec);
+        }
+        else if(std::holds_alternative<LEC_VAR>(al))
+        {
+            LEC_VAR& al_var = std::get<LEC_VAR>(al);
+            // set position of the variable in the 
+            // v_clec_vars vector
+            name = al_var.name;
+            pos_in_clec = map_var_name_position[name];
+            al_var.set_position(pos_in_clec);
         }
     }
 

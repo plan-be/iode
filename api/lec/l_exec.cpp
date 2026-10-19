@@ -134,9 +134,10 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_COEF>(al))
         {
             const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            if(!check_coeff(al_coef.name))
+            int coeff_pos = al_coef.pos_in_clec;
+            if(!check_coeff(coeff_pos))
                 return IODE_NAN;
-            std::shared_ptr<Scalar>& scl_ptr = map_clec_coeffs[al_coef.name];
+            std::shared_ptr<Scalar>& scl_ptr = v_clec_coeffs[coeff_pos].ptr;
             al_coef.add_to_stack(stack, scl_ptr->value);
         }
         else if(std::holds_alternative<LEC_PERIOD>(al))
@@ -152,10 +153,11 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
                 kwarning("LEC: No attached sample");
                 return IODE_NAN;
             }
-            if(!check_var(al_var.name))
+            int var_pos = al_var.pos_in_clec;
+            if(!check_var(var_pos))
                 return IODE_NAN;
-            Variable& var = *(map_clec_vars[al_var.name]);
-            al_var.add_to_stack(stack, var, smpl_ptr->nb_periods, t);
+            std::shared_ptr<Variable>& var_ptr = v_clec_vars[var_pos].ptr;
+            al_var.add_to_stack(stack, *var_ptr, smpl_ptr->nb_periods, t);
         }
 
         // ---- atomic LEC of type executable ----

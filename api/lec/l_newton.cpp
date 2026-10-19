@@ -117,51 +117,58 @@
 #include "api/simulation/simulation.h"
 
 /**
- *  Solves numerically this LEC equation for one period of time with respect to a given variable.
- *  If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method. 
- *  
- *  @param [in] int             t           time of calculation (index in dbv Sample)
- *  @param [in] std::string&    var_name    name of the endogenous variable in dbv
- *  @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
- *  @return     double                      root of the equation (var_name value that solves the equation)
- *  
+ * Solves numerically this LEC equation for one period of time with respect to a given variable.
+ * If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method.
+ * 
+ * @param [in] int     t            time of calculation (index in dbv Sample)
+ * @param [in] KDB     dbv_ptr      Variables database.      
+ * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+ * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+ * @return     double               root of the equation (var_name value that solves the equation)
  */
-double CLEC::zero(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
-    const std::string& eq_var_name)
+double CLEC::zero(double h, double eps, int nb_max_iter, const int t, KDBVariablesPtr dbv_ptr, 
+    const int var_pos, const int eq_var_pos)
 {
-    double x = this->newton(h, eps, nb_max_iter, t, var_name, eq_var_name);
+    double x = this->newton(h, eps, nb_max_iter, t, dbv_ptr, var_pos, eq_var_pos);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = this->secant(t, var_name, eq_var_name);
+        x = this->secant(t, dbv_ptr, var_pos, eq_var_pos);
     return x;
 }
 
 
 /**
- *  Tries to solve a LEC equation by the Newton-Raphson method.
- *  
- *  Subfunction of newton().
- *  
- *  The convergence threshold eps is set to 1e-6 by default. However, if algo is set to 1 and 
- *  the absolute value of the endogenous variable before the first iteration is > 1.0, 
- *  then eps is multiplied by the endogenous value. 
- *  
- *  @param  [in]    int  algo         if not null, the convergence criteria eps is multiplied by the 
- *                                    value of f(x) if ||f(x)|| > 1.0.
- *  
- *  See zero() for the description of the other parameters.
+ * Tries to solve this LEC equation by the Newton-Raphson method (internal helper).
+ * 
+ * Subfunction used by newton() method. The convergence threshold eps is set to 1e-6 by default.
+ * However, if algo is set to 1 and the absolute value of the endogenous variable before the 
+ * first iteration is > 1.0, then eps is multiplied by the endogenous value.
+ *
+ * @param [in] int     algo         if not null, the convergence criteria eps is multiplied by the 
+ *                                  value of f(x) if ||f(x)|| > 1.0.
+ * @param [in] int     t            time of calculation (index in dbv Sample)
+ * @param [in] KDB     dbv_ptr      Variables database.      
+ * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+ * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+ * @return     double               approximated root or NaN if no solution found
  */
 double CLEC::newton_sub(const int algo, double h, double eps, int nb_max_iter, const int t, 
-    const std::string& var_name, const std::string& eq_var_name)
+    KDBVariablesPtr dbv_ptr, const int var_pos, const int eq_var_pos)
 {
-    if(!check_var(var_name))
-        return IODE_NAN;
+    std::string var_name;
+    std::string eq_var_name;
+    if(newton_debug)
+    {
+        var_name = dbv_ptr->get_name_from_vector(var_pos);
+        eq_var_name = dbv_ptr->get_name_from_vector(eq_var_pos);
+    }
 
-    Variable& var = *(map_clec_vars[var_name]);
+    Variable& var = dbv_ptr->vec_get_var_values(var_pos);
     double x = var[t];
     double oldx = x;
     if(!IODE_IS_A_NUMBER(x)) 
     {
-        if(newton_debug) L_debug("Eq %s - Endo %s -> x is NA\n", eq_var_name.c_str(), var_name.c_str());
+        if(newton_debug)
+            L_debug("Eq %s - Endo %s -> x is NA\n", eq_var_name.c_str(), var_name.c_str());
         return IODE_NAN;
     }
 
@@ -169,14 +176,12 @@ double CLEC::newton_sub(const int algo, double h, double eps, int nb_max_iter, c
     double shift = 0.0;
     // Case 1: equation Y : = f(X) analytically solved
     // or Case 3 (endo-exo)
-    if(var_name == eq_var_name || this->duplicated_endo) 
+    if(var_pos == eq_var_pos || this->duplicated_endo) 
         ax = fabs(x);
     // Case 2: 0 := f(X,Y) 
     else 
     {
-        if(!map_clec_vars.contains(eq_var_name))
-            return IODE_NAN;
-        Variable& eq_var = *(map_clec_vars[eq_var_name]);
+        Variable& eq_var = dbv_ptr->vec_get_var_values(eq_var_pos);
         shift = eq_var[t];
         if(!IODE_IS_A_NUMBER(shift)) 
             return IODE_NAN; 
@@ -268,18 +273,22 @@ double CLEC::newton_sub(const int algo, double h, double eps, int nb_max_iter, c
 
 
 /**
- *  Tries to solve this LEC equation by the Newton-Raphson method. 
- *  
- *  Calls first newton_sub() with the algo param fixed to 0 (convergence criterion set to 1e-6).
- *  If no solution is found, calls newton_sub() with algo = 1 to multiply eps by the endogenous value.
- *  
- *  See zero() for the parameter description.  
+ * Tries to solve this LEC equation by the Newton-Raphson method.
+ *
+ * Calls first the Newton-Raphson method with convergence criterion set to 1e-6.
+ * If no solution is found, calls again with a multiplied epsilon by the endogenous value.
+ *
+ * @param [in] int     t            time of calculation (index in dbv Sample)
+ * @param [in] KDB     dbv_ptr      Variables database.      
+ * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+ * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+ * @return     double               approximated root of the equation
  */
-double CLEC::newton(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
-    const std::string& eq_var_name)
+double CLEC::newton(double h, double eps, int nb_max_iter, const int t, KDBVariablesPtr dbv_ptr, 
+    const int var_pos, const int eq_var_pos)
 {
-    double x = this->newton_sub(0, h, eps, nb_max_iter, t, var_name, eq_var_name);
+    double x = this->newton_sub(0, h, eps, nb_max_iter, t, dbv_ptr, var_pos, eq_var_pos);
     if(!IODE_IS_A_NUMBER(x)) 
-        x = this->newton_sub(1, h, eps, nb_max_iter, t, var_name, eq_var_name);
+        x = this->newton_sub(1, h, eps, nb_max_iter, t, dbv_ptr, var_pos, eq_var_pos);
     return x;
 }

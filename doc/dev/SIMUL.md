@@ -280,32 +280,15 @@ Continue until \|xl \- xr\| is < eps
 
 Main functions for model simulations.
 
-|Syntax|Description|
-|:---|:---|
-|`int simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, char** endo_exo, char** eqs)`|Simulates a model defined by a set of equations and optional replacements endo\-exo.|
-|`void clear()`|Frees all temporary allocated memory for the simulation.|
-|`double calculate_CLEC(const std::string& eq_name, int t, const std::string& var_name, int msg)`|Tries to find a value for varnb\[t\] that satifies the equality in the equation eqnb.|
-
 #### k\_sim\_order.c {#T12}
 
 Functions to reorder a model to optimize the Gauss\-Seidel simulation algorithm.
-
-|Syntax|Description|
-|:---|:---|
-|`int order(KDBEquationsPtr dbe, char** eqs)`|Reorders a model before the simulation to optimise the execution order of the set of equations.|
-|`std::string find_eq_name(const std::string& endo)`|Searches the equation whose endogenous is the variable posendo.|
-|`void compute_tri(KDBEquationsPtr dbe, int** tmp, int passes)`|Sort the equations by making successive 'pseudo\-triangulation' passes.|
 
 #### k\_sim\_scc.c {#T13}
 
 Alternative functions to reorder and simulate very large models.
 
 The reordering algorithm being CPU intensive for very large models, it is better to first reorder the model and save that order in such a way as to be able to run several simulations with the same order later on.
-
-|Syntax|Description|
-|:---|:---|
-|`int calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string& pre, const std::string& inter, const std::string& post)`|Reorders the model defined by dbe and saves 3 lists with prolog, epilog and interdependent blocks.|
-|`int simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, const std::vector<std::string>& pre, const std::vector<std::string>& inter, const std::vector<std::string>& post)`|Simulates a model in the order given by 3 lists of tables of equation names: pre, inter and post.|
 
 #### k\_sim\_exo2endo.c {#T14}
 

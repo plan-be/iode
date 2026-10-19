@@ -182,11 +182,11 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
     {
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
-        eq_predecessors.reserve(clec->v_clec_var_names.size());
+        eq_predecessors.reserve(clec->v_clec_vars.size());
 
         eq_name = sim_dbe->get_name_from_vector(i);
 
-        for(const std::string& name : clec->v_clec_var_names) 
+        for(const auto& [name, _] : clec->v_clec_vars)
         {
             // try to find the position of the equation whose endogenous 
             // variable is 'name'

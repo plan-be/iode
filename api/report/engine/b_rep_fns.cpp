@@ -1224,21 +1224,23 @@ int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const i
 {
     if(type != 'S' && type != 'V')
         return 0;
-
+    
     int k = 0;
+    std::string obj_name;
     std::string tbl_name;
-    const std::vector<std::string>& names = type == 'S' ? clec->v_clec_coeff_names : clec->v_clec_var_names;
-    for(const std::string& name: names)
+    size_t nb_names = (type == 'S') ? clec->v_clec_coeffs.size() : clec->v_clec_vars.size();
+    for(int i = 0; i < nb_names; i++)
     {
+        obj_name = (type == 'S') ? clec->v_clec_coeffs[i].name : clec->v_clec_vars[i].name;
         for(k = 0 ; k < *nb ; k++)
         {
             tbl_name = std::string((char*) (*tbl)[k]);
-            if(name == tbl_name) 
+            if(obj_name == tbl_name) 
                 break;
         }
         
         if(*nb == 0 || k == *nb) 
-            SCR_add_ptr(tbl, nb, (unsigned char*) name.c_str());
+            SCR_add_ptr(tbl, nb, (unsigned char*) obj_name.c_str());
     }
 
     return 0;

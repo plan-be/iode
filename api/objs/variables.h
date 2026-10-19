@@ -252,7 +252,7 @@ public:
     void update(const std::string& name, const std::string& lec, const int t_first, const int t_last);
     void update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period);
 
-    double* vec_get_var_values(const int var_pos)
+    Variable& vec_get_var_values(const int var_pos)
     {
         if(var_pos < 0 || var_pos >= v_obj_ptr.size())
         {
@@ -261,7 +261,14 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        return v_obj_ptr[var_pos]->data();
+        std::shared_ptr<Variable>& var_ptr = v_obj_ptr[var_pos];
+        if(!var_ptr)
+        {
+            std::string var_name = this->get_name_from_vector(var_pos);
+            throw std::runtime_error("Variable '" + var_name + "' is empty");
+        }
+
+        return *var_ptr;
     }
 
     double vec_get_var_value(const int var_pos, const int t)
@@ -273,7 +280,10 @@ public:
             throw std::invalid_argument(error_msg);
         }
 
-        return (*v_obj_ptr[var_pos])[t];
+        std::shared_ptr<Variable>& var_ptr = v_obj_ptr[var_pos];
+        if(!var_ptr)
+            return IODE_NAN;
+        return (*var_ptr)[t];
     }
 
     void vec_set_var_value(const int var_pos, const int t, const double value)
@@ -285,7 +295,14 @@ public:
             throw std::invalid_argument(error_msg);
         }
         
-        (*v_obj_ptr[var_pos])[t] = value;
+        std::shared_ptr<Variable>& var_ptr = v_obj_ptr[var_pos];
+        if(!var_ptr)
+        {
+            std::string var_name = this->get_name_from_vector(var_pos);
+            throw std::runtime_error("Variable '" + var_name + "' is empty");
+        }
+
+        (*var_ptr)[t] = value;
     }
 
     std::shared_ptr<Sample> get_sample() const;

@@ -284,8 +284,9 @@ bool ComputedTable::propagate_new_value(const std::string& lec, const std::strin
             return false;
 
         // Newton-Raphson method
+        int var_pos = global_ws_var->get_vector_position(var_name);
         res = clec->zero(newton_step, newton_epsilon, newton_max_iter, 
-                         period_pos, var_name, var_name);
+                         period_pos, global_ws_var, var_pos, var_pos);
     }
     else
     {

@@ -93,20 +93,16 @@ int CLEC::bracket(double* x1, double* x2, int t, Variable& var, double shift)
  *      xr = xl + (xr - xl) * f(xl) / (f(xl) -f(xh))
  *      If the sign of f(xr) has changed, switch xr and xl. 
  *      Continue until |xl - xr| is << eps
- *  
- *  @param [in] int             t       time of calculation (index in dbv Sample)
- *  @param [in] int             varnb   position of the endogenous variable in dbv
- *  @param [in] int             eqvarnb position of the initial endogenous variable (i.e. equation name) in dbv
- *  
- *  @return     double                  root of the equation (var_name value that solves the equation)
- *
+ * 
+ * @param [in] int     t            time of calculation (index in dbv Sample)
+ * @param [in] KDB     dbv_ptr      Variables database.      
+ * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+ * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+ * @return     double               root of the equation (var_name value that solves the equation)
  */
-double CLEC::secant(const int t, const std::string& var_name, const std::string& eq_var_name)
+double CLEC::secant(const int t, KDBVariablesPtr dbv_ptr, const int var_pos, const int eq_var_pos)
 {
-    if(!check_var(var_name))
-        return IODE_NAN;
-
-    Variable& var = *(map_clec_vars[var_name]);
+    Variable& var = dbv_ptr->vec_get_var_values(var_pos);
     double x1 = var[t];
     if(!IODE_IS_A_NUMBER(x1)) 
         x1 = 0.9;
@@ -114,13 +110,11 @@ double CLEC::secant(const int t, const std::string& var_name, const std::string&
     // if endogenous is not changed and endo appears more than once in clec,
     // clec is of the form 0 := lhx - rhs. Hence, shift = 0 instead of endo(t)
     double shift = 0.0;
-    if(var_name == eq_var_name || this->duplicated_endo) 
+    if(var_pos == eq_var_pos || this->duplicated_endo) 
         x1 = fabs(x1);
     else 
     {
-        if(!map_clec_vars.contains(eq_var_name))
-            return IODE_NAN;
-        Variable& eq_var = *(map_clec_vars[eq_var_name]);
+        Variable& eq_var = dbv_ptr->vec_get_var_values(eq_var_pos);
         shift = eq_var[t];
         if(!IODE_IS_A_NUMBER(shift))
             return (double) IODE_NAN;
