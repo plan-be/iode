@@ -84,13 +84,13 @@ int E_GetLecName(char* lec, char* name)
         return -1;
     }
 
-    for(const std::string& obj_name: clec->v_clec_var_names)
+    for(const auto& [var_name, _] : clec->v_clec_vars)
     {   
         // skip "_DF" 
-        if(obj_name == "_DF")
+        if(var_name == "_DF")
             continue;
         
-        strcpy(name, obj_name.c_str());
+        strcpy(name, var_name.c_str());
         break;
     }
 

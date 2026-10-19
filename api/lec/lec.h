@@ -27,6 +27,34 @@ inline int newton_debug = 0;
 
 /*---------------- STRUCTS ------------------------*/
 
+struct ClecCoeff
+{
+    std::string name;
+    std::shared_ptr<Scalar> ptr;
+
+    ClecCoeff(const std::string& name, std::shared_ptr<Scalar> scl_ptr = nullptr)
+    {
+        this->name = name;
+        this->ptr = scl_ptr;
+    }
+
+    bool operator==(const ClecCoeff& other) const = default;
+};
+
+struct ClecVar
+{
+    std::string name;
+    std::shared_ptr<Variable> ptr;
+
+    ClecVar(const std::string& name, std::shared_ptr<Variable> var_ptr = nullptr)
+    {
+        this->name = name;
+        this->ptr = var_ptr;
+    }
+
+    bool operator==(const ClecVar& other) const = default;
+};
+
 
 struct CLEC: public AbstractCLEC
 {
@@ -47,13 +75,9 @@ struct CLEC: public AbstractCLEC
 
     // Names in order of appearance within each type. Variable order is used
     // when editing a computed table cell (only the first variable is updated).
-    std::vector<std::string> v_clec_coeff_names;
-    std::vector<std::string> v_clec_var_names;
-
-    // initialized in the link_names method and used for fast lookup in zero() 
-    // secant() and newton() methods
-    std::unordered_map<std::string, std::shared_ptr<Scalar>> map_clec_coeffs; 
-    std::unordered_map<std::string, std::shared_ptr<Variable>> map_clec_vars; 
+    // Pointers are initialized by link_names for execution and solving.
+    std::vector<ClecCoeff> v_clec_coeffs;
+    std::vector<ClecVar> v_clec_vars;
     
 private:
     /**
@@ -62,6 +86,15 @@ private:
      * @param [in]     name    std::string   VAR or Scalar name
      */
     void add_coef_or_var_name(const std::string& name);
+
+    void reset_coeff_var_ptr()
+    {
+        for(auto& coeff : v_clec_coeffs)
+            coeff.ptr.reset();
+        
+        for(auto& var : v_clec_vars)
+            var.ptr.reset();
+    }
 
     /**
      * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
@@ -84,12 +117,22 @@ private:
      */
     void link_sample(KDBVariablesPtr dbv, const int start, const int length);
 
-    bool check_var(const std::string& var_name)
+    bool check_var(const int& var_pos)
     {
-        if(!map_clec_vars.contains(var_name))
+        std::string msg = "LEC: ";
+        if(var_pos < 0 || var_pos >= v_clec_vars.size())
         {
-            std::string msg = "LEC: Variable '" + var_name + "' not found.\n";
-            msg += "Maybe the LEC expression has not been linked";
+            msg += "Variable's position '" + std::to_string(var_pos) + "' "; 
+            msg += "out of range.\n";
+            kwarning((char*) msg.c_str());
+            return false;
+        }
+
+        if(!v_clec_vars[var_pos].ptr)
+        {
+            msg += "Missing value for the Variable at position ";
+            msg += std::to_string(var_pos) + "\n";
+            msg += "Missing or failed linkage of LEC expression";
             kwarning((char*) msg.c_str());
             return false;
         }
@@ -97,12 +140,22 @@ private:
         return true;
     }
 
-    bool check_coeff(const std::string& coeff_name)
+    bool check_coeff(const int& coeff_pos)
     {
-        if(!map_clec_coeffs.contains(coeff_name))
+        std::string msg = "LEC: ";
+        if(coeff_pos < 0 || coeff_pos >= v_clec_coeffs.size())
         {
-            std::string msg = "LEC: Scalar '" + coeff_name + "' not found.\n";
-            msg += "Maybe the LEC expression has not been linked";
+            msg += "Coefficient's position '" + std::to_string(coeff_pos) + "' "; 
+            msg += "out of range.\n";
+            kwarning((char*) msg.c_str());
+            return false;
+        }
+
+        if(!v_clec_coeffs[coeff_pos].ptr)
+        {
+            msg += "Missing value for the coefficient at position ";
+            msg += std::to_string(coeff_pos) + "\n";
+            msg += "Missing or failed linkage of LEC expression";
             kwarning((char*) msg.c_str());
             return false;
         }
@@ -117,15 +170,16 @@ private:
      * However, if algo is set to 1 and the absolute value of the endogenous variable before the 
      * first iteration is > 1.0, then eps is multiplied by the endogenous value.
      *
-     * @param  [in]   int  algo                   if not null, the convergence criteria eps is multiplied by the 
-     *                                            value of f(x) if ||f(x)|| > 1.0.
-     * @param [in]    int             t           time of calculation (index in dbv Sample)
-     * @param [in]    std::string&    var_name    name of the endogenous variable in dbv
-     * @param [in]    std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
-     * @return        double                      approximated root or NaN if no solution found
+     * @param [in] int     algo         if not null, the convergence criteria eps is multiplied by the 
+     *                                  value of f(x) if ||f(x)|| > 1.0.
+     * @param [in] int     t            time of calculation (index in dbv Sample)
+     * @param [in] KDB     dbv_ptr      Variables database.      
+     * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+     * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+     * @return     double               approximated root or NaN if no solution found
      */
-    double newton_sub(const int algo, double h, double eps, int nb_max_iter, const int t, 
-        const std::string& var_name, const std::string& eq_var_name);
+    double newton_sub(const int algo, double h, double eps, int nb_max_iter, const int t, KDBVariablesPtr dbv_ptr, 
+        const int var_pos, const int eq_var_pos);
 
     /**
      * Computes the value of f(x) in time t where f is this LEC expression.
@@ -215,7 +269,7 @@ private:
 
     /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
-     *  At the end of this function, v_expression, v_clec_var_names and v_clec_coeff_names are filled.
+     *  At the end of this function, v_expression, v_clec_vars and v_clec_coeffs are filled.
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
@@ -235,10 +289,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_var_names = other.v_clec_var_names;
-        this->v_clec_coeff_names = other.v_clec_coeff_names;
-        this->map_clec_coeffs = other.map_clec_coeffs;
-        this->map_clec_vars = other.map_clec_vars;
+        this->v_clec_vars = other.v_clec_vars;
+        this->v_clec_coeffs = other.v_clec_coeffs;
     }
 
     // assignment operator (deep copy)
@@ -251,10 +303,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_var_names = other.v_clec_var_names;
-        this->v_clec_coeff_names = other.v_clec_coeff_names;
-        this->map_clec_coeffs = other.map_clec_coeffs;
-        this->map_clec_vars = other.map_clec_vars;
+        this->v_clec_vars = other.v_clec_vars;
+        this->v_clec_coeffs = other.v_clec_coeffs;
 
         return *this;
     }
@@ -282,16 +332,10 @@ public:
         if(this_smpl_ok && *(this->smpl_ptr) != *(other.smpl_ptr))
             return false;
 
-        if(this->v_clec_var_names != other.v_clec_var_names)
+        if(this->v_clec_coeffs != other.v_clec_coeffs)
             return false;
 
-        if(this->v_clec_coeff_names != other.v_clec_coeff_names)
-            return false;
-
-        if(this->map_clec_coeffs != other.map_clec_coeffs)
-            return false;
-
-        if(this->map_clec_vars != other.map_clec_vars)
+        if(this->v_clec_vars != other.v_clec_vars)
             return false;
 
         return true;
@@ -307,12 +351,20 @@ public:
 
     std::vector<std::string> get_scalars() const
     {
-        return v_clec_coeff_names;
+        std::vector<std::string> names;
+        names.reserve(v_clec_coeffs.size());
+        for(const auto& coeff : v_clec_coeffs)
+            names.push_back(coeff.name);
+        return names;
     }
 
     std::vector<std::string> get_variables() const
     {
-        return v_clec_var_names;
+        std::vector<std::string> names;
+        names.reserve(v_clec_vars.size());
+        for(const auto& var : v_clec_vars)
+            names.push_back(var.name);
+        return names;
     }
 
     int get_nb_obs() override
@@ -323,16 +375,83 @@ public:
     }
 
     /**
+     * @brief return the shared pointer of type Scalar associated with 'coeff_name' 
+     * 
+     * @param coeff_name            name of the coefficient
+     * @return shared_ptr<Scalar>   shared_ptr of the coefficient
+     */
+    std::shared_ptr<Scalar> get_coeff_ptr(const std::string& coeff_name)
+    {
+        bool found = false;
+        std::shared_ptr<Scalar> scl_ptr = nullptr;
+
+        int coeff_pos = 0;
+        for(auto& coeff : v_clec_coeffs)
+        {
+            if(coeff.name == coeff_name)
+            {
+                found = true;
+                break;
+            }
+            coeff_pos++;
+        }
+
+        if(!found)
+            return scl_ptr;
+
+        // check if shared pointer exists
+        if(!check_coeff((int) coeff_pos))
+            return scl_ptr;
+
+        // return shared pointer
+        return v_clec_coeffs[coeff_pos].ptr;
+    }
+
+    /**
+     * @brief return the shared pointer of type Variable associated with 'var_name'
+     * 
+     * @param var_name                  name of the variable
+     * @return shared_ptr<Variable>     shared_ptr of the variable
+     */
+    std::shared_ptr<Variable> get_var_ptr(const std::string& var_name)
+    {
+        bool found = false;
+        std::shared_ptr<Variable> var_ptr = nullptr;
+
+        int var_pos = 0;
+        for(auto& var : v_clec_vars)
+        {
+            if(var.name == var_name)
+            {
+                found = true;
+                break;
+            }
+            var_pos++;
+        }
+
+        if(!found)
+            return var_ptr;
+
+        // check if shared pointer exists
+        if(!check_var((int) var_pos))
+            return var_ptr;
+
+        // return shared pointer
+        return v_clec_vars[var_pos].ptr;
+    }
+
+    /**
      * Solves numerically this LEC equation for one period of time with respect to a given variable.
      * If the Newton-Raphson method does not reach a solution, tries a bisection (secant) method.
      * 
-     * @param [in] int             t           time of calculation (index in dbv Sample)
-     * @param [in] std::string&    var_name    name of the endogenous variable in dbv
-     * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
-     * @return     double                      root of the equation (var_name value that solves the equation)
+     * @param [in] int     t            time of calculation (index in dbv Sample)
+     * @param [in] KDB     dbv_ptr      Variables database.      
+     * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+     * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+     * @return     double               root of the equation (var_name value that solves the equation)
      */
-    double zero(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
-        const std::string& eq_var_name);
+    double zero(double h, double eps, int nb_max_iter, const int t, KDBVariablesPtr dbv_ptr, 
+        const int var_pos, const int eq_var_pos);
 
     /**
      * Tries to solve this LEC equation by the Newton-Raphson method.
@@ -340,13 +459,14 @@ public:
      * Calls first the Newton-Raphson method with convergence criterion set to 1e-6.
      * If no solution is found, calls again with a multiplied epsilon by the endogenous value.
      *
-     * @param [in] int             t           time of calculation (index in dbv Sample)
-     * @param [in] std::string&    var_name    name of the endogenous variable in dbv
-     * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
-     * @return     double                      approximated root of the equation
+     * @param [in] int     t            time of calculation (index in dbv Sample)
+     * @param [in] KDB     dbv_ptr      Variables database.      
+     * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+     * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+     * @return     double               approximated root of the equation
      */
-    double newton(double h, double eps, int nb_max_iter, const int t, const std::string& var_name, 
-        const std::string& eq_var_name);
+    double newton(double h, double eps, int nb_max_iter, const int t, KDBVariablesPtr dbv_ptr, 
+        const int var_pos, const int eq_var_pos);
 
     /**
      * Tries to find a solution to this LEC equation by a secant (bisection) method.
@@ -355,12 +475,18 @@ public:
      * the equation (xl/xr stands for x-left/right). Then the size of that interval is decreased
      * until convergence.
      * 
-     * @param [in] int             t           time of calculation (index in dbv Sample)
-     * @param [in] std::string&    var_name    name of the endogenous variable in dbv
-     * @param [in] std::string&    eq_var_name name of the initial endogenous variable (i.e. equation name) in dbv
-     * @return     double                      root of the equation (var_name value that solves the equation)
+     * Then the size of that interval is decreased until |xl - xr| becomes << eps by applying the formula below:
+     *      xr = xl + (xr - xl) * f(xl) / (f(xl) -f(xh))
+     *      If the sign of f(xr) has changed, switch xr and xl. 
+     *      Continue until |xl - xr| is << eps
+     * 
+     * @param [in] int     t            time of calculation (index in dbv Sample)
+     * @param [in] KDB     dbv_ptr      Variables database.      
+     * @param [in] int     var_pos      position of the endogenous variable in dbv_ptr
+     * @param [in] int     eq_var_pos   position of the initial endogenous variable (i.e. equation name) in dbv_ptr
+     * @return     double               root of the equation (var_name value that solves the equation)
      */
-    double secant(const int t, const std::string& var_name, const std::string& eq_var_name);
+    double secant(const int t, KDBVariablesPtr dbv_ptr, const int var_pos, const int eq_var_pos);
 
     /**
      * Prints this LEC expression. Sets the endogenous variable (name) in bold.

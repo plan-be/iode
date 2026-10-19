@@ -108,13 +108,12 @@ void CSimulation::init_values(int t)
     if(init_algo == VAR_INIT_ASIS) 
         return;
 
-    double* values;
     int var_pos;
     for(int i = 0 ; i < nb_pre + nb_inter + nb_post; i++) 
     {
         var_pos = v_ordered_vars[i];
-        values = sim_dbv->vec_get_var_values(var_pos);
-        KV_init_values_1(values, t, init_algo);
+        Variable& var = sim_dbv->vec_get_var_values(var_pos);
+        KV_init_values_1(var.data(), t, init_algo);
     }
 }
 
@@ -152,7 +151,7 @@ int CSimulation::prolog(int t)
     for(int i = 0; i < nb_pre; i++)  
     {
         var_pos = v_ordered_vars[i];
-        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
+        x = calculate_CLEC(i, t, 0);
         sim_dbv->vec_set_var_value(var_pos, t, x);
     }
 
@@ -192,7 +191,7 @@ int CSimulation::sub_interdep_1(int t)
         v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec */
-        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
+        x = calculate_CLEC(i, t, 1);
         if(!IODE_IS_A_NUMBER(x)) 
             return -1;
 
@@ -252,7 +251,7 @@ int CSimulation::sub_interdep_2(int t)
         v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec and save in v_endo_values_1 */
-        v_endo_values_1[j] = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
+        v_endo_values_1[j] = calculate_CLEC(i, t, 1);
         // NaN value --> stop simulation
         if(!IODE_IS_A_NUMBER(v_endo_values_1[j])) 
             return -1;
@@ -339,7 +338,7 @@ int CSimulation::epilog(int t)
     for(int i = nb_pre + nb_inter, j = 0; j < nb_post; i++, j++)  
     {
         var_pos = v_ordered_vars[i];
-        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
+        x = calculate_CLEC(i, t, 0);
         sim_dbv->vec_set_var_value(var_pos, t, x);
     }
 
@@ -381,7 +380,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
         v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec */
-        x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
+        x = calculate_CLEC(i, t, 1);
         if(!IODE_IS_A_NUMBER(x)) return -1; // TODO: Add to _DIVER instead ?
 
         /* Check convergence */
@@ -694,17 +693,18 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
  *  
  *  If no solution can be found, the function kerror() is called to display an error message
  *  
- *  @param [in] int         eqnb    position of the equation in v_eqs_ptr (the model KDB = subset of global_ws_eqs)
- *  @param [in] int         varnb   position of the variable to calculate in the global KV_DB
- *  @param [in] int         t       index of the period to be calculated
- *  @param [in] int         msg     indicated if the function kerror() must be called on error (no solution found)
- *  @return     double              on succes: the equation solution
- *                                  on error of if no solution can be found: IODE_NAN 
+ *  @param [in] int         i           position in v_ordered_eqs of the equation to compute
+ *  @param [in] int         t           index of the period to be calculated
+ *  @param [in] int         msg         indicated if the function kerror() must be called on error (no solution found)
+ *  @return     double                  on success: the equation solution
+ *                                      on error of if no solution can be found: IODE_NAN 
  *  
  *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
-double CSimulation::calculate_CLEC(const int eq_pos, const int var_pos, int t, int msg)
+double CSimulation::calculate_CLEC(const int i, int t, int msg)
 {
+    // position of the equation in sim_dbe
+    int eq_pos = v_ordered_eqs[i];
     std::shared_ptr<Equation> eq_ptr = sim_dbe->get_obj_ptr_from_vector(eq_pos);
     if(!eq_ptr)
         return IODE_NAN;
@@ -713,23 +713,35 @@ double CSimulation::calculate_CLEC(const int eq_pos, const int var_pos, int t, i
     if(!eq_clec)
         return IODE_NAN;
     
-    double x = IODE_NAN;
-    std::string eq_name = eq_ptr->endo;
-    std::string var_name = sim_dbv->get_name_from_vector(var_pos);
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
 
-    if(clec->duplicated_endo || var_name != eq_name)
-        x = clec->zero(newton_step, newton_epsilon, newton_max_iter, t, var_name, eq_name);
+    // position of the variable to calculate in sim_dbv
+    int var_pos = v_ordered_vars[i];
+    if(var_pos < 0)
+        return IODE_NAN;
+     
+    std::string eq_name = eq_ptr->endo;
+    std::string var_name = sim_dbv->get_name_from_vector(var_pos);
+    bool newton = clec->duplicated_endo || var_name != eq_name;
+
+    double x = IODE_NAN;
+    if(newton)
+    {
+        int eq_var_pos = sim_dbv->get_vector_position(eq_name); 
+        if(var_pos > 0 && eq_var_pos > 0)
+            x = clec->zero(newton_step, newton_epsilon, newton_max_iter, t, 
+                           sim_dbv, var_pos, eq_var_pos);
+    }
     else
         x = clec->execute(t);
     
     if(!IODE_IS_A_NUMBER(x) && msg)
     {
         Period period = sim_dbv->get_sample()->start_period.shift(t);
-        kerror(0, "%s : becomes unavailable at %s%s",
+        kerror(0, "Could not compute variable '%s' at period %s %s",
                (char*) var_name.c_str(),
                (char*) period.to_string().c_str(),
-               ((clec->duplicated_endo || var_name != eq_name) ? "(Newton)" : ""));
+               (newton ? "(Newton)" : ""));
     }
     
     return x;

@@ -250,7 +250,7 @@ public:
 
 protected:
 	/* k_sim_main.c */
-	double calculate_CLEC(const int eq_pos, const int var_pos, int t, int msg);
+	double calculate_CLEC(const int i, int t, int msg);
 	void build_lists_order(const std::string& pre, const std::string& inter, const std::string& post);
 
 	/* k_sim_order.c */

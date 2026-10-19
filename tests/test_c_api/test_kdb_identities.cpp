@@ -100,10 +100,8 @@ TEST_F(KDBIdentitiesTest, Get)
 
     EXPECT_EQ(clec->duplicated_endo, expected_clec->duplicated_endo);
     EXPECT_EQ(clec->v_expression.size(), expected_clec->v_expression.size());
-    EXPECT_EQ(clec->v_clec_var_names.size(), expected_clec->v_clec_var_names.size());
-    EXPECT_EQ(clec->v_clec_var_names, expected_clec->v_clec_var_names);
-    EXPECT_EQ(clec->v_clec_coeff_names.size(), expected_clec->v_clec_coeff_names.size());
-    EXPECT_EQ(clec->v_clec_coeff_names, expected_clec->v_clec_coeff_names);
+    EXPECT_EQ(clec->get_variables(), expected_clec->get_variables());
+    EXPECT_EQ(clec->get_scalars(), expected_clec->get_scalars());
     EXPECT_TRUE(*clec == *expected_clec);
 
     // with non-ASCII characters

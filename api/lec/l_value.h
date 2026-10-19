@@ -53,18 +53,34 @@ public:
 struct LEC_COEF: public TP_LEC_VALUE<const double>
 {
     std::string name;   // name of the coefficient (IODE Scalar)
+    int pos_in_clec;    // position in the vector v_clec_coeffs
 
 public:
     LEC_COEF(const std::string& name) : TP_LEC_VALUE<const double>(L_COEF), name(name) 
     {
         representation = name;
+        pos_in_clec = -1;
     }
 
     LEC_COEF(const LEC_COEF& other) = default;
 
     bool operator==(const LEC_COEF& other) const
     {
-        return is_same_type(other) && this->name == other.name;
+        if(!is_same_type(other))
+            return false;
+        
+        if(this->name != other.name)
+            return false;
+
+        if(this->pos_in_clec != other.pos_in_clec)
+            return false;
+
+        return true;
+    }
+
+    void set_position(const int pos_in_clec)
+    {
+        this->pos_in_clec = pos_in_clec;
     }
 
     bool add_to_stack(std::deque<double>& stack, const double value) const override
@@ -77,6 +93,7 @@ public:
 struct LEC_VAR: public TP_LEC_VALUE<Variable&, const int, const int>
 {
     std::string name;   // name of the variable (IODE Variable)
+    int pos_in_clec;    // position in the vector v_clec_vars
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
     short ref;          
     Period per;         // period of the variable (if any)
@@ -89,6 +106,7 @@ public:
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
         representation = name;
+        pos_in_clec = -1;
     }
 
     LEC_VAR(const LEC_VAR& other) = default;
@@ -100,6 +118,9 @@ public:
         
         if(this->name != other.name)
             return false;
+
+        if(this->pos_in_clec != other.pos_in_clec)
+            return false;
         
         if(this->lag != other.lag)
             return false;
@@ -108,6 +129,11 @@ public:
             return false;
         
         return this->per == other.per;
+    }
+
+    void set_position(const int pos_in_clec)
+    {
+        this->pos_in_clec = pos_in_clec;
     }
 
     void calculate_ref(const Sample& sample)
