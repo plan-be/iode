@@ -1761,11 +1761,11 @@ U_ch *RPF_SimCpuSCC(U_ch** unused)
 }
 
 /**
- *  Syntax: @SimCpuReorder()
+ *  Syntax: @SimCpuSort()
  *  
  *  Examples
  *  --------
- *        @SimCpuReorder()        =>  "1234"
+ *        @SimCpuSort()        =>  "1234"
  */
 U_ch *RPF_SimCpuSort(U_ch** unused)
 {
