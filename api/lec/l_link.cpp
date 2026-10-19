@@ -21,29 +21,33 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     this->map_clec_vars.clear();
     for(const std::string& name : this->v_clec_vars)
     {
-        if(!dbv->contains(name))
+        try
+        {
+            this->map_clec_vars[name] = dbv->get_obj_ptr(name);
+        }
+        catch(const std::invalid_argument&)
         {
             std::string msg = "linking LEC failed: '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
             return L_errno;
         }
-
-        this->map_clec_vars[name] = dbv->get_obj_ptr(name);
     }
     
     this->map_clec_coeffs.clear();
     for(const std::string& name : this->v_clec_coeffs)
     {
-        if(!dbs->contains(name))
+        try
+        {
+            this->map_clec_coeffs[name] = dbs->get_obj_ptr(name);
+        }
+        catch(const std::invalid_argument&)
         {
             std::string msg = "linking LEC failed: '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
             return L_errno;
         }
-
-        this->map_clec_coeffs[name] = dbs->get_obj_ptr(name);
     }
 
     return 0;
