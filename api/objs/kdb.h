@@ -1050,6 +1050,12 @@ public:
     // and need to get the shared pointer associated with the name in the loop
     std::shared_ptr<T> get_obj_ptr(const std::string& key) const
     {
+        if(key.empty())
+        {
+            std::string error_msg = "Cannot get a(n) " + type_name + " with an empty name";
+            throw std::invalid_argument(error_msg);
+        }
+
         try
         {
             return k_objs.at(key);
@@ -1066,8 +1072,7 @@ public:
     //       T& operator[](const std::string& name)
     std::shared_ptr<T> get_and_check_obj_ptr(const std::string& name) const
     {
-        std::string key = to_key(name);
-        if(!this->contains(key))
+        if(name.empty())
         {
             std::string error_msg = "Cannot get a(n) " + type_name + " with an empty name";
             throw std::invalid_argument(error_msg);
@@ -1075,6 +1080,7 @@ public:
 
         try
         {
+            std::string key = to_key(name);
             return k_objs.at(key);
         }
         catch(const std::out_of_range&)
