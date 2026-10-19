@@ -47,8 +47,8 @@ struct CLEC: public AbstractCLEC
 
     // Names in order of appearance within each type. Variable order is used
     // when editing a computed table cell (only the first variable is updated).
-    std::vector<std::string> v_clec_coeffs;
-    std::vector<std::string> v_clec_vars;
+    std::vector<std::string> v_clec_coeff_names;
+    std::vector<std::string> v_clec_var_names;
 
     // initialized in the link_names method and used for fast lookup in zero() 
     // secant() and newton() methods
@@ -215,7 +215,7 @@ private:
 
     /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
-     *  At the end of this function, v_expression, v_clec_vars and v_clec_coeffs are filled.
+     *  At the end of this function, v_expression, v_clec_var_names and v_clec_coeff_names are filled.
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
@@ -235,8 +235,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_vars = other.v_clec_vars;
-        this->v_clec_coeffs = other.v_clec_coeffs;
+        this->v_clec_var_names = other.v_clec_var_names;
+        this->v_clec_coeff_names = other.v_clec_coeff_names;
         this->map_clec_coeffs = other.map_clec_coeffs;
         this->map_clec_vars = other.map_clec_vars;
     }
@@ -251,8 +251,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_vars = other.v_clec_vars;
-        this->v_clec_coeffs = other.v_clec_coeffs;
+        this->v_clec_var_names = other.v_clec_var_names;
+        this->v_clec_coeff_names = other.v_clec_coeff_names;
         this->map_clec_coeffs = other.map_clec_coeffs;
         this->map_clec_vars = other.map_clec_vars;
 
@@ -282,10 +282,10 @@ public:
         if(this_smpl_ok && *(this->smpl_ptr) != *(other.smpl_ptr))
             return false;
 
-        if(this->v_clec_vars != other.v_clec_vars)
+        if(this->v_clec_var_names != other.v_clec_var_names)
             return false;
 
-        if(this->v_clec_coeffs != other.v_clec_coeffs)
+        if(this->v_clec_coeff_names != other.v_clec_coeff_names)
             return false;
 
         if(this->map_clec_coeffs != other.map_clec_coeffs)
@@ -307,12 +307,12 @@ public:
 
     std::vector<std::string> get_scalars() const
     {
-        return v_clec_coeffs;
+        return v_clec_coeff_names;
     }
 
     std::vector<std::string> get_variables() const
     {
-        return v_clec_vars;
+        return v_clec_var_names;
     }
 
     int get_nb_obs() override

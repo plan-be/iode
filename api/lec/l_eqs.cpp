@@ -545,34 +545,34 @@ void SLEC::merge_names(CLEC& clec)
     if(!left_clec || !right_clec)
         return;
 
-    clec.v_clec_coeffs.clear();
-    clec.v_clec_vars.clear();
+    clec.v_clec_coeff_names.clear();
+    clec.v_clec_var_names.clear();
     clec.map_clec_coeffs.clear();
     clec.map_clec_vars.clear();
 
     // Copy from left_clec
-    clec.v_clec_coeffs = left_clec->v_clec_coeffs;
-    clec.v_clec_vars = left_clec->v_clec_vars;
+    clec.v_clec_coeff_names = left_clec->v_clec_coeff_names;
+    clec.v_clec_var_names = left_clec->v_clec_var_names;
     clec.map_clec_coeffs = left_clec->map_clec_coeffs;
     clec.map_clec_vars = left_clec->map_clec_vars;
 
     // Copy from right_clec (skip duplicates)
-    std::set<std::string> s_coeffs(clec.v_clec_coeffs.begin(), clec.v_clec_coeffs.end());
-    for(const std::string& name : right_clec->v_clec_coeffs)
+    std::set<std::string> s_coeffs(clec.v_clec_coeff_names.begin(), clec.v_clec_coeff_names.end());
+    for(const std::string& name : right_clec->v_clec_coeff_names)
     {
         if(!s_coeffs.contains(name))
         {
-            clec.v_clec_coeffs.push_back(name);
+            clec.v_clec_coeff_names.push_back(name);
             clec.map_clec_coeffs[name] = right_clec->map_clec_coeffs[name];
         }
     }
     
-    std::set<std::string> s_vars(clec.v_clec_vars.begin(), clec.v_clec_vars.end());
-    for(const std::string& name : right_clec->v_clec_vars)
+    std::set<std::string> s_vars(clec.v_clec_var_names.begin(), clec.v_clec_var_names.end());
+    for(const std::string& name : right_clec->v_clec_var_names)
     {
         if(!s_vars.contains(name))
         {
-            clec.v_clec_vars.push_back(name);
+            clec.v_clec_var_names.push_back(name);
             clec.map_clec_vars[name] = right_clec->map_clec_vars[name];
         }
     }

@@ -134,7 +134,7 @@ KDBVariablesPtr KDBIdentities::series_list() const
     {
         vars_to_compute.insert(idt_name);
         clec = idt->get_compiled_lec();
-        for(const std::string& name : clec->v_clec_vars)
+        for(const std::string& name : clec->v_clec_var_names)
         {
             vars_to_compute.insert(name);
         }
@@ -164,7 +164,7 @@ KDBScalarsPtr KDBIdentities::scalar_list() const
     {
         clec = idt->get_compiled_lec();
         CLEC clec_copy(*clec);
-        for(const std::string& name : clec_copy.v_clec_coeffs)
+        for(const std::string& name : clec_copy.v_clec_coeff_names)
         {
             dbs->set(name, new_scl);
         }
@@ -237,7 +237,7 @@ std::vector<std::string> KDBIdentities::reorder() const
             clec = idt->get_compiled_lec();
 
             bool break_reached = false;
-            for(const std::string& name : clec->v_clec_vars)
+            for(const std::string& name : clec->v_clec_var_names)
             {
                 // identity name == variable name -> continue looping
                 if(idt_name == name) 
