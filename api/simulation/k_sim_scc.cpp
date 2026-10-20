@@ -68,7 +68,7 @@ bool CSimulation::calculate_SCC(KDBEquationsPtr dbe, int tris, const std::string
 
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
-    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
+    for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
     {
         if(!eq_ptr)
         {
@@ -159,7 +159,7 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
     int rc = 0;
     bool success = true;
     std::string eq_name;
-    for(const std::shared_ptr<Equation>& eq_ptr : v_eqs_ptr) 
+    for(const std::shared_ptr<Equation>& eq_ptr : sim_dbe->v_obj_ptr) 
     {
         eq_name = eq_ptr->endo;
         if(!sim_dbv->contains(eq_name)) 
@@ -214,6 +214,7 @@ bool CSimulation::simulate_SCC_init(Sample& smpl)
 bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsPtr dbs, Sample* smpl, 
     const std::vector<std::string>& pre, const std::vector<std::string>& inter, const std::vector<std::string>& post)
 {
+    std::string msg;
     double cpu_time = 0.0;
     std::chrono::steady_clock::time_point start_time;
     std::chrono::steady_clock::time_point end_time;
@@ -257,28 +258,52 @@ bool CSimulation::simulate_SCC(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScal
     v_ordered_eqs.reserve(nb_pre + nb_inter + nb_post);
     for(int i = 0; i < nb_pre; i++)
     {
-        eq_pos = map_eq_name_index[pre[i]];
+        eq_pos = sim_dbe->get_vector_position(pre[i]);
+        if(eq_pos < 0)
+        {
+            msg = "simulate_SCC: equation '" + pre[i] + "' not found in the ";
+            msg += "simulation Equations workspace";
+            kwarning((char*) msg.c_str());
+            clear();
+            return false;
+        }
         v_ordered_eqs.push_back(eq_pos);
     }   
     for(int i = 0; i < nb_inter; i++)
     {
-        eq_pos = map_eq_name_index[inter[i]];
+        eq_pos = sim_dbe->get_vector_position(inter[i]);
+        if(eq_pos < 0)
+        {
+            msg = "simulate_SCC: equation '" + inter[i] + "' not found in the ";
+            msg += "simulation Equations workspace";
+            kwarning((char*) msg.c_str());
+            clear();
+            return false;
+        }
         v_ordered_eqs.push_back(eq_pos);
     }
     for(int i = 0; i < nb_post; i++)
     {
-        eq_pos = map_eq_name_index[post[i]];
+        eq_pos = sim_dbe->get_vector_position(post[i]);
+        if(eq_pos < 0)
+        {
+            msg = "simulate_SCC: equation '" + post[i] + "' not found in the ";
+            msg += "simulation Equations workspace";
+            kwarning((char*) msg.c_str());
+            clear();
+            return false;
+        }
         v_ordered_eqs.push_back(eq_pos);
-    }  
+    }
     build_ordered_variable_positions();
 
     end_time = std::chrono::steady_clock::now();
     cpu_time = std::chrono::duration<double>(end_time - start_time).count();
-    std::string msg = "Extracting PRE - INTER - POST blocks done in " + std::to_string(cpu_time) + " sec";
+    msg = "Extracting PRE - INTER - POST blocks done in " + std::to_string(cpu_time) + " sec";
     kmsg((char*) msg.c_str());
 
     // Simulation
-    int t = smpl->start_period.difference(dbv->get_sample()->start_period);
+    int t = smpl->start_period.difference(sim_dbv->get_sample()->start_period);
 
     kmsg("--- Simulating SCC ---");
     auto start_simu_time = std::chrono::steady_clock::now();
