@@ -113,7 +113,7 @@ void CSimulation::init_values(int t)
     for(int i = 0 ; i < nb_pre + nb_inter + nb_post; i++) 
     {
         var_pos = v_ordered_vars[i];
-        values = get_variable_values(var_pos);
+        values = sim_dbv->vec_get_var_values(var_pos);
         KV_init_values_1(values, t, init_algo);
     }
 }
@@ -133,7 +133,7 @@ void CSimulation::restore_values(int t)
     for(int i = nb_pre, j = 0; j < nb_inter; i++, j++)
     {
         var_pos = v_ordered_vars[i];
-        set_variable_value(var_pos, t, v_endo_values[j]);
+        sim_dbv->vec_set_var_value(var_pos, t, v_endo_values[j]);
     }
 }
 
@@ -153,7 +153,7 @@ int CSimulation::prolog(int t)
     {
         var_pos = v_ordered_vars[i];
         x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
-        set_variable_value(var_pos, t, x);
+        sim_dbv->vec_set_var_value(var_pos, t, x);
     }
 
     return 0;
@@ -189,7 +189,7 @@ int CSimulation::sub_interdep_1(int t)
         var_pos = v_ordered_vars[i];
 
         /* save XK first */
-        v_endo_values[j] = get_variable_value(var_pos, t);
+        v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec */
         x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
@@ -210,13 +210,13 @@ int CSimulation::sub_interdep_1(int t)
 
             // Stores the new endo value and "relaxes" it 
             new_value = relax * (x - v_endo_values[j]) + v_endo_values[j];
-            set_variable_value(var_pos, t, new_value);
+            sim_dbv->vec_set_var_value(var_pos, t, new_value);
         }
         else 
         {
             // if NaN, set norm to a huge value 
             norm = 10;
-            set_variable_value(var_pos, t, x);
+            sim_dbv->vec_set_var_value(var_pos, t, x);
         }
     }
 
@@ -249,7 +249,7 @@ int CSimulation::sub_interdep_2(int t)
         var_pos = v_ordered_vars[i];
 
         /* save XK for further use */
-        v_endo_values[j] = get_variable_value(var_pos, t);
+        v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec and save in v_endo_values_1 */
         v_endo_values_1[j] = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
@@ -283,13 +283,13 @@ int CSimulation::sub_interdep_2(int t)
 
             /* Store new value and relax it */
             new_value = relax * v_endo_values_1[j] + (1 - relax) * v_endo_values[j];
-            set_variable_value(var_pos, t, new_value);
+            sim_dbv->vec_set_var_value(var_pos, t, new_value);
         }
         // If previous iteation value is L-NAN, set norm to 10 and assing new calc value to endo
         else 
         {
             norm = 10;
-            set_variable_value(var_pos, t, v_endo_values_1[j]);
+            sim_dbv->vec_set_var_value(var_pos, t, v_endo_values_1[j]);
         }
     }
 
@@ -340,7 +340,7 @@ int CSimulation::epilog(int t)
     {
         var_pos = v_ordered_vars[i];
         x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 0);
-        set_variable_value(var_pos, t, x);
+        sim_dbv->vec_set_var_value(var_pos, t, x);
     }
 
     return 0;
@@ -378,7 +378,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
         var_pos = v_ordered_vars[i];
 
         /* save XK first */
-        v_endo_values[j] = get_variable_value(var_pos, t);
+        v_endo_values[j] = sim_dbv->vec_get_var_value(var_pos, t);
 
         /* execute lec */
         x = calculate_CLEC(v_ordered_eqs[i], var_pos, t, 1);
@@ -395,7 +395,7 @@ int CSimulation::diverge(int t, char* c_name, double eps)
             pd *= relax;
             if(pd > eps)  
             {
-                std::string var_name = v_var_names[var_pos];
+                std::string var_name = sim_dbv->get_name_from_vector(var_pos);
                 if(diverg) 
                     diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) ",");
                 diverg = (char*) SCR_strafcat((unsigned char*) diverg, (unsigned char*) var_name.c_str());
@@ -549,8 +549,8 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
 
     // Find in the sim_dbv sample the position t of the first period to simulate
     // and check that the simulation sample is included in sim_dbv sample
-    int at = smpl->start_period.difference(dbv->get_sample()->start_period);
-    int bt = dbv->get_sample()->end_period.difference(smpl->end_period);
+    int at = smpl->start_period.difference(sim_dbv->get_sample()->start_period);
+    int bt = sim_dbv->get_sample()->end_period.difference(smpl->end_period);
     if(bt < 0 || at < 0) 
     {
         std::string err_msg = "Simulation sample out of the Variables sample boundaries";
@@ -567,9 +567,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     v_norm.clear();
     v_nb_iterations.clear();
     v_cpu_time.clear();
-    v_norm.resize(dbv->get_sample()->nb_periods, 0.0);
-    v_nb_iterations.resize(dbv->get_sample()->nb_periods, 0);
-    v_cpu_time.resize(dbv->get_sample()->nb_periods, 0);
+    v_norm.resize(sim_dbv->get_sample()->nb_periods, 0.0);
+    v_nb_iterations.resize(sim_dbv->get_sample()->nb_periods, 0);
+    v_cpu_time.resize(sim_dbv->get_sample()->nb_periods, 0);
 
     end_time = std::chrono::steady_clock::now();
     cpu_time = std::chrono::duration<double>(end_time - start_time).count();
@@ -583,9 +583,9 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
     int rc = -1;
     std::string eq_name;
     std::shared_ptr<Equation> eq_ptr;
-    for(const auto& [eq_name, eq_ptr] : dbe->k_objs) 
+    for(const auto& [eq_name, eq_ptr] : sim_dbe->k_objs) 
     { 
-        if(!dbv->contains(eq_name)) 
+        if(!sim_dbv->contains(eq_name)) 
         {
             std::string err_msg = "'" + eq_name + "': cannot find variable";
             error_manager.append_error(err_msg);
@@ -597,7 +597,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
         if(!eq_ptr->clec)
             eq_ptr->compile();
         
-        rc = eq_ptr->clec->link(dbv, dbs);
+        rc = eq_ptr->clec->link(sim_dbv, sim_dbs);
         if(rc) 
         {
             std::string err_msg = "'" + eq_name + "': cannot link equation";
@@ -668,7 +668,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
             for(const std::string& exo : v_exo) 
             {
                 x = sim_dbv->get_var_ptr(exo);
-                for(int j = t + 1; j < dbv->get_sample()->nb_periods; j++)  
+                for(int j = t + 1; j < sim_dbv->get_sample()->nb_periods; j++)  
                     x[j] = x[t];
             }
         }
@@ -705,7 +705,7 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
  */
 double CSimulation::calculate_CLEC(const int eq_pos, const int var_pos, int t, int msg)
 {
-    std::shared_ptr<Equation> eq_ptr = v_eqs_ptr[eq_pos];
+    std::shared_ptr<Equation> eq_ptr = sim_dbe->get_obj_ptr_from_vector(eq_pos);
     if(!eq_ptr)
         return IODE_NAN;
     
@@ -715,7 +715,7 @@ double CSimulation::calculate_CLEC(const int eq_pos, const int var_pos, int t, i
     
     double x = IODE_NAN;
     std::string eq_name = eq_ptr->endo;
-    std::string var_name = v_var_names[var_pos];
+    std::string var_name = sim_dbv->get_name_from_vector(var_pos);
     std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
 
     if(clec->duplicated_endo || var_name != eq_name)
@@ -770,7 +770,7 @@ void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int
         eq_pos = v_ordered_eqs[i + eq1];
         // check if the endogenous variable of the equation has 
         // been exchanged with an exogenous variable 
-        std::string eq_name = v_eq_names[eq_pos];
+        std::string eq_name = sim_dbe->get_name_from_vector(eq_pos);
         if(map_exchange.contains(eq_name)) 
             eq_name = map_exchange[eq_name];
         // add equation name to the list

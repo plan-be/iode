@@ -252,6 +252,42 @@ public:
     void update(const std::string& name, const std::string& lec, const int t_first, const int t_last);
     void update(const std::string& name, const std::string& lec, const std::string& first_period, const std::string& last_period);
 
+    double* vec_get_var_values(const int var_pos)
+    {
+        if(var_pos < 0 || var_pos >= v_obj_ptr.size())
+        {
+            std::string error_msg = "Index " + std::to_string(var_pos) + " out of range ";
+            error_msg += "[0, " + std::to_string(v_obj_ptr.size() - 1) + "]";
+            throw std::invalid_argument(error_msg);
+        }
+
+        return v_obj_ptr[var_pos]->data();
+    }
+
+    double vec_get_var_value(const int var_pos, const int t)
+    {
+        if(var_pos < 0 || var_pos >= v_obj_ptr.size())
+        {
+            std::string error_msg = "Index " + std::to_string(var_pos) + " out of range ";
+            error_msg += "[0, " + std::to_string(v_obj_ptr.size() - 1) + "]";
+            throw std::invalid_argument(error_msg);
+        }
+
+        return (*v_obj_ptr[var_pos])[t];
+    }
+
+    void vec_set_var_value(const int var_pos, const int t, const double value)
+    {
+        if(var_pos < 0 || var_pos >= v_obj_ptr.size())
+        {
+            std::string error_msg = "Index " + std::to_string(var_pos) + " out of range ";
+            error_msg += "[0, " + std::to_string(v_obj_ptr.size() - 1) + "]";
+            throw std::invalid_argument(error_msg);
+        }
+        
+        (*v_obj_ptr[var_pos])[t] = value;
+    }
+
     std::shared_ptr<Sample> get_sample() const;
     std::shared_ptr<Sample> get_visible_sample() const;
     bool is_subset_over_periods() const;

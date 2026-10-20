@@ -419,8 +419,22 @@ public:
     // NOTE: if an IODE object is added/removed/updated from the current database,
     //       it must also done in all subset instances ('shallow copies')
     std::unordered_map<std::string, std::shared_ptr<T>> k_objs;
+
     // k_objs keys in alphabetical order and kept synchronized with k_objs 
     std::set<std::string> obj_names;
+
+    // vector of shared pointers of the stored objects 
+    // -> for fast access in simulations
+    std::vector<std::shared_ptr<T>> v_obj_ptr; 
+
+protected:
+    // vector of objects' names
+    // -> for fast access in simulations
+    std::vector<std::string> v_obj_names;
+
+    // Cache of mapping name <-> index 
+    // -> for fast lookups in simulations
+    std::unordered_map<std::string, int> map_name_index;
 
 private:
     // only used by subsets ('shallow copies')
@@ -606,6 +620,44 @@ public:
         this->clear();
     }
 
+    /**
+     * @brief for fast access in during the simulation process
+     */
+    void build_obj_vectors()
+    {
+        auto start_time = std::chrono::steady_clock::now();
+        int obj_pos = 0;
+        map_name_index.clear();
+        v_obj_ptr.reserve(this->size());
+        v_obj_names.reserve(this->size());
+        std::shared_ptr<T> obj_ptr = nullptr;
+        for(const std::string& name : obj_names) 
+        {
+            obj_ptr = this->get_obj_ptr(name);
+            if(!obj_ptr)
+            {
+                std::string error_msg = "Simulation (initialization): " + type_name + " ";
+                error_msg += "'" + name + "' is null";
+                throw std::runtime_error(error_msg);
+            }
+            v_obj_ptr.push_back(obj_ptr);
+            v_obj_names.push_back(name);
+            map_name_index[name] = obj_pos;
+            obj_pos++;
+        }
+        auto end_time = std::chrono::steady_clock::now();
+        double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
+        std::string msg = "Initialized " + type_name + "s workspace done in " + std::to_string(cpu_time) + " sec";
+        kmsg((char*) msg.c_str());
+    }
+
+    void clear_obj_vectors()
+    {
+        v_obj_names.clear();
+        v_obj_ptr.clear();
+        map_name_index.clear();
+    }
+
     void clear() override
     {
         // NOTE: subset databases have no children, only top-level databases can have 
@@ -654,6 +706,7 @@ public:
 
         this->k_objs.clear();
         this->obj_names.clear();
+        clear_obj_vectors();
         KDBInfo::clear();
     }
 
@@ -1218,6 +1271,38 @@ public:
         }
 
         this->set(key, obj);
+    }
+
+    std::string& get_name_from_vector(const int pos)
+    {
+        if(pos < 0 || pos >= v_obj_names.size())
+        {
+            std::string error_msg = "Index " + std::to_string(pos) + " out of range ";
+            error_msg += "[0, " + std::to_string(v_obj_names.size() - 1) + "]";
+            throw std::invalid_argument(error_msg);
+        }
+
+        return v_obj_names[pos];
+    }
+
+    int get_vector_position(const std::string& name)
+    {
+        if(map_name_index.contains(name))
+            return map_name_index[name];
+        else
+            return -1;
+    }
+
+    std::shared_ptr<T> get_obj_ptr_from_vector(const int pos)
+    {
+        if(pos < 0 || pos >= v_obj_ptr.size())
+        {
+            std::string error_msg = "Index " + std::to_string(pos) + " out of range ";
+            error_msg += "[0, " + std::to_string(v_obj_ptr.size() - 1) + "]";
+            throw std::invalid_argument(error_msg);
+        }
+
+        return v_obj_ptr[pos];
     }
 };
 

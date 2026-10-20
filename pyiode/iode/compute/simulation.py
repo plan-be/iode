@@ -781,8 +781,8 @@ class Simulation:
         >>> simulation.debug = True
 
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")   # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -923,8 +923,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1001,8 +1001,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1084,8 +1084,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1160,8 +1160,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1282,8 +1282,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1348,8 +1348,8 @@ class Simulation:
         >>> variables["UY", "2000Y1:2002Y1"] = [630.0, 650.0, 670.0]
         >>> # rerun simulation
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1547,8 +1547,8 @@ class Simulation:
         
         >>> # simulate the model
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1615,8 +1615,8 @@ class Simulation:
         <BLANKLINE>  
 
         >>> success = simulation.model_simulate("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation ---
         Preparing simulation done in ... sec
         --- Linking equations ---
@@ -1752,8 +1752,8 @@ class Simulation:
         >>> simulation.reset()
         
         >>> success = simulation.model_calculate_SCC()          # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Compiling equations ---
         Compiling equations done in ... sec
         --- Calculating SCC ---
@@ -1882,8 +1882,8 @@ class Simulation:
         >>> simulation.reset()
 
         >>> success = simulation.model_calculate_SCC()      # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Compiling equations ---
         Compiling equations done in ... sec
         --- Calculating SCC ---
@@ -1950,8 +1950,8 @@ class Simulation:
         <BLANKLINE>
         
         >>> success = simulation.model_simulate_SCC("2000Y1", "2015Y1")     # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-        Initialized Equations workspace done in ... sec
-        Initialized Variables workspace done in ... sec
+        Initialized equations workspace done in ... sec
+        Initialized variables workspace done in ... sec
         --- Preparing simulation (SCC) ---
         --- Linking equations ---
         Linking equations done in ... sec

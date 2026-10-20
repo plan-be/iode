@@ -178,13 +178,13 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
     bool exchange = false;
     std::shared_ptr<CLEC> clec;
     std::unordered_map<std::string, int> cache_eq_pos;
-    for(std::shared_ptr<Equation>& eq_ptr : v_eqs_ptr) 
+    for(std::shared_ptr<Equation>& eq_ptr : sim_dbe->v_obj_ptr) 
     {
         clec = eq_ptr->clec;
         std::vector<int>& eq_predecessors = predecessors[i];
         eq_predecessors.reserve(clec->v_clec_vars.size());
 
-        eq_name = v_eq_names[i];
+        eq_name = sim_dbe->get_name_from_vector(i);
 
         for(const std::string& name : clec->v_clec_vars) 
         {
@@ -205,7 +205,7 @@ int CSimulation::pre_order(std::vector<std::vector<int>>& predecessors, std::vec
             
             // 'name' is the endogenous variable of the current equation
             // -> put tag '-1' as predecessor and move to next name is CLEC
-            endo_name = v_eq_names[eq_pos];
+            endo_name = sim_dbe->get_name_from_vector(eq_pos);
             if(eq_name == endo_name)
             {
                 eq_predecessors.push_back(-1);
@@ -265,7 +265,7 @@ void CSimulation::order(const std::vector<std::string>& eqs)
 {
     std::string msg;
     double cpu_time = 0.0;
-    int nb_eqs = sim_dbe->size();
+    int nb_eqs = (eqs.empty()) ? sim_dbe->size() : (int) eqs.size();
 
     // No reordering : we keep the order of eqs and so everything is interdep
     if(sorting_algo == SORT_NONE) 
@@ -285,10 +285,18 @@ void CSimulation::order(const std::vector<std::string>& eqs)
         else
         {
             int eq_pos;
-            v_ordered_eqs.reserve(eqs.size());
+            v_ordered_eqs.reserve(nb_eqs);
             for(const std::string& eq_name : eqs)
             {
-                eq_pos = map_eq_name_index[eq_name];
+                eq_pos = sim_dbe->get_vector_position(eq_name);
+                if(eq_pos < 0)
+                {
+                    msg = "Ordering: equation '" + eq_name + "' not found in the ";
+                    msg += "simulation Equations workspace";
+                    kwarning((char*) msg.c_str());
+                    clear();
+                    return;
+                }
                 v_ordered_eqs.push_back(eq_pos);
             }
         }
@@ -365,10 +373,7 @@ int CSimulation::find_eq_pos(const std::string& var)
     
     // no exchange for this variable -> endogenous of the equation 
     // is the variable itself 
-    if(map_eq_name_index.contains(endo))
-        return map_eq_name_index[endo];
-    else
-        return -1;
+    return sim_dbe->get_vector_position(endo);
 }
 
 

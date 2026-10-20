@@ -66,21 +66,11 @@ public:
     int     newton_max_iter;                // Newton-Raphson convergence threshold
 
 private:
-    std::vector<std::shared_ptr<Equation>> v_eqs_ptr;   // vector of equations defining the model to simulation. 
-                                                        // Can be global_ws_eqs or a subset.
-    std::vector<std::shared_ptr<Variable>> v_var_ptr;   // vector of variables' pointers. 
-    
     KDBEquationsPtr  sim_dbe;               // KDB of equations used for the simulation. Normally global_ws_eqs
     KDBScalarsPtr    sim_dbs;               // KDB of scalars used for the simulation. Normally global_ws_scl
     KDBVariablesPtr  sim_dbv;               // KDB of variables used for the simulation. Normally global_ws_var
 
 	double  norm = 0.0;                     // Error measure: maximum difference between 2 iterations 
-
-    std::vector<std::string> v_eq_names;    // vector of equations names
-    std::vector<std::string> v_var_names;   // vector of variables names
-
-    std::unordered_map<std::string, int> map_eq_name_index;     // Cache of equation name to index mapping for fast lookups
-    std::unordered_map<std::string, int> map_var_name_index;    // Cache of variable name to index mapping for fast lookups
 
 	// EQUATION ORDERING
 	int nb_pre = 0;                         // number of equations in the "prolog" block
@@ -108,6 +98,11 @@ private:
         cpu_time_scc = 0;    
         cpu_time_sorting = 0;
 
+        if(sim_dbe)
+            sim_dbe->clear_obj_vectors();
+        if(sim_dbv)
+            sim_dbv->clear_obj_vectors();
+
         sim_dbe.reset();
         sim_dbs.reset();
         sim_dbv.reset();
@@ -116,22 +111,15 @@ private:
         v_endo_values.clear();
         v_endo_values_1.clear();
 
-        map_eq_name_index.clear();
-        map_var_name_index.clear();
-
         v_ordered_eqs.clear();
         v_ordered_vars.clear();
         v_permut.clear();
         v_ordered.clear();
 
-        v_eq_names.clear();
-        v_var_names.clear();
-        v_eqs_ptr.clear();
-        v_var_ptr.clear();
-
         v_endo_exo.clear();
         map_exchange.clear();
         map_exchange_rev.clear();
+
     }
 
     // Constructors are private - use Create() factory method instead
@@ -310,30 +298,15 @@ private:
         v_ordered_vars.reserve(v_ordered_eqs.size());
         for(const int eq_pos : v_ordered_eqs)
         {
-            const std::string& eq_name = v_eq_names[eq_pos];
+            const std::string& eq_name = sim_dbe->get_name_from_vector(eq_pos);
             // check if endogenous variable (= eq_name) has been exchanged with an exogenous variable
             auto exchange_it = map_exchange.find(eq_name);
             const std::string& var_name = exchange_it != map_exchange.end() ? exchange_it->second : eq_name;
             // push the position of the corresponding variable in sim_dbv into the vector
-            var_pos = map_var_name_index.at(var_name);
+            var_pos = sim_dbv->get_vector_position(var_name);
             // ordered equation 'i' points to 'var_pos'
             v_ordered_vars.push_back(var_pos);
         }
-    }
-
-    double* get_variable_values(const int var_pos)
-    {
-        return v_var_ptr[var_pos]->data();
-    }
-
-    double get_variable_value(const int var_pos, const int t)
-    {
-        return (*v_var_ptr[var_pos])[t];
-    }
-
-    void set_variable_value(const int var_pos, const int t, const double value)
-    {
-        (*v_var_ptr[var_pos])[t] = value;
     }
 
     bool set_simulation_workspaces(KDBEquationsPtr dbe, KDBScalarsPtr dbs, KDBVariablesPtr dbv)
@@ -365,47 +338,8 @@ private:
         sim_dbs = dbs;
         sim_dbv = dbv;
 
-        auto start_time = std::chrono::steady_clock::now();
-        int eq_pos = 0;
-        map_eq_name_index.clear();
-        v_eqs_ptr.reserve(dbe->size());
-        v_eq_names.reserve(dbe->size());
-        std::shared_ptr<Equation> eq_ptr = nullptr;
-        for(const std::string& name : dbe->get_names()) 
-        {
-            eq_ptr = dbe->get_obj_ptr(name);
-            if(!eq_ptr)
-                throw std::runtime_error(error_msg + "Equation '" + name + "' is null");
-            v_eqs_ptr.push_back(eq_ptr);
-            v_eq_names.push_back(name);
-            map_eq_name_index[name] = eq_pos;
-            eq_pos++;
-        }
-        auto end_time = std::chrono::steady_clock::now();
-        double cpu_time = std::chrono::duration<double>(end_time - start_time).count();
-        std::string msg = "Initialized Equations workspace done in " + std::to_string(cpu_time) + " sec";
-        kmsg((char*) msg.c_str());
-
-        start_time = std::chrono::steady_clock::now();
-        int var_pos = 0;
-        map_var_name_index.clear();
-        v_var_ptr.reserve(sim_dbv->size());
-        v_var_names.reserve(sim_dbv->size());
-        std::shared_ptr<Variable> var_ptr = nullptr;
-        for(const std::string& name : sim_dbv->get_names())
-        {
-            var_ptr = sim_dbv->get_obj_ptr(name);
-            if(!var_ptr)
-                throw std::runtime_error(error_msg + "Variable '" + name + "' is null");
-            v_var_ptr.push_back(var_ptr);
-            v_var_names.push_back(name);
-            map_var_name_index[name] = var_pos;
-            var_pos++;
-        }
-        end_time = std::chrono::steady_clock::now();
-        cpu_time = std::chrono::duration<double>(end_time - start_time).count();
-        msg = "Initialized Variables workspace done in " + std::to_string(cpu_time) + " sec";
-        kmsg((char*) msg.c_str());
+        sim_dbe->build_obj_vectors();
+        sim_dbv->build_obj_vectors();
 
         return true;
     }
