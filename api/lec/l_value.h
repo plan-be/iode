@@ -2,12 +2,12 @@
 #include "api/lec/l_common.h"
 
 
-struct LEC_CONST_REAL: public TP_LEC_VALUE<>
+class LEC_CONST_REAL: public TP_LEC_VALUE
 {
     double value;
 
 public:
-    LEC_CONST_REAL(const double value) : TP_LEC_VALUE<>(L_DCONST), value(value) 
+    LEC_CONST_REAL(const double value) : TP_LEC_VALUE(L_DCONST), value(value)
     {
         representation = std::to_string(value);
     }
@@ -19,19 +19,18 @@ public:
         return is_same_type(other) && this->value == other.value;
     }
 
-    bool add_to_stack(std::deque<double>& stack) const override
+    double get_value() const
     {
-        stack.push_back(value);
-        return true;
+        return value;
     }
 };
 
-struct LEC_CONST_LONG: public TP_LEC_VALUE<>
-{ 
-    long value;
+class LEC_CONST_LONG: public TP_LEC_VALUE
+{
+    long value; 
 
 public:
-    LEC_CONST_LONG(const long value) : TP_LEC_VALUE<>(L_LCONST), value(value) 
+    LEC_CONST_LONG(const long value) : TP_LEC_VALUE(L_LCONST), value(value)
     {
         representation = std::to_string(value);
     }
@@ -43,23 +42,23 @@ public:
         return is_same_type(other) && this->value == other.value;
     }
 
-    bool add_to_stack(std::deque<double>& stack) const override
+    double get_value() const
     {
-        stack.push_back(static_cast<double>(value));
-        return true;
+        return (double) value;
     }
 };
 
-struct LEC_COEF: public TP_LEC_VALUE<const double>
+class LEC_COEF: public TP_LEC_VALUE
 {
-    std::string name;   // name of the coefficient (IODE Scalar)
-    int pos_in_clec;    // position in the vector v_clec_coeffs
+    std::shared_ptr<Scalar> scl_ptr;
 
 public:
-    LEC_COEF(const std::string& name) : TP_LEC_VALUE<const double>(L_COEF), name(name) 
+    std::string name;   // name of the coefficient (IODE Scalar)
+
+public:
+    LEC_COEF(const std::string& name) : TP_LEC_VALUE(L_COEF), name(name) 
     {
         representation = name;
-        pos_in_clec = -1;
     }
 
     LEC_COEF(const LEC_COEF& other) = default;
@@ -72,41 +71,46 @@ public:
         if(this->name != other.name)
             return false;
 
-        if(this->pos_in_clec != other.pos_in_clec)
-            return false;
-
         return true;
     }
 
-    void set_position(const int pos_in_clec)
+    void link(std::shared_ptr<Scalar>& scl_ptr)
     {
-        this->pos_in_clec = pos_in_clec;
+        this->scl_ptr = scl_ptr;
     }
 
-    bool add_to_stack(std::deque<double>& stack, const double value) const override
+    double get_value() const
     {
-        stack.push_back(value);
-        return true;
+        if(!scl_ptr)
+        {
+            std::string msg = "Missing value for the coefficient '" + name + "'\n";
+            msg += "Missing or failed linkage of LEC expression";
+            kwarning((char*) msg.c_str());
+            return IODE_NAN;
+        }
+
+        return scl_ptr->value;
     }
 };
 
-struct LEC_VAR: public TP_LEC_VALUE<Variable&, const int, const int>
+class LEC_VAR: public TP_LEC_VALUE
 {
+    std::shared_ptr<Variable> var_ptr;
+
+public:
     std::string name;   // name of the variable (IODE Variable)
-    int pos_in_clec;    // position in the vector v_clec_vars
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
-    short ref;          
+    short ref;
     Period per;         // period of the variable (if any)
 
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : TP_LEC_VALUE<Variable&, const int, const int>(type), name(name), lag(lag), ref(0), per(per) 
+        : TP_LEC_VALUE(type), name(name), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
         representation = name;
-        pos_in_clec = -1;
     }
 
     LEC_VAR(const LEC_VAR& other) = default;
@@ -118,9 +122,6 @@ public:
         
         if(this->name != other.name)
             return false;
-
-        if(this->pos_in_clec != other.pos_in_clec)
-            return false;
         
         if(this->lag != other.lag)
             return false;
@@ -131,9 +132,9 @@ public:
         return this->per == other.per;
     }
 
-    void set_position(const int pos_in_clec)
+    void link(std::shared_ptr<Variable>& var_ptr)
     {
-        this->pos_in_clec = pos_in_clec;
+        this->var_ptr = var_ptr;
     }
 
     void calculate_ref(const Sample& sample)
@@ -143,30 +144,35 @@ public:
             ref += per.difference(sample.start_period);
     }
 
-    bool add_to_stack(std::deque<double>& stack, Variable& var, 
-        const int nb_periods, const int t) const override
+    double get_value(const int nb_periods, const int t) const
     {
+        if(!var_ptr)
+        {
+            std::string msg = "Missing value for the Variable '" + name + "'\n";
+            msg += "Missing or failed linkage of LEC expression";
+            kwarning((char*) msg.c_str());
+            return IODE_NAN;
+        }
+
+        Variable& var = *var_ptr;
         int len = (int) ref;
         if(per.year == 0)  
             len += t;
-        
         double value = IODE_NAN;
         if(len >= 0 && len < nb_periods) 
             value = var[len];
-        stack.push_back(value);
-        return true;
+        return value;
     }
 };
 
-// NOTE: pos is set in function link_sample()
-struct LEC_PERIOD: public TP_LEC_VALUE<>
+class LEC_PERIOD: public TP_LEC_VALUE
 {
     Period period;
     short pos;
 
 public:
     LEC_PERIOD(const Period& period, const short pos) 
-        : TP_LEC_VALUE<>(L_PERIOD), pos(pos), period(period) 
+        : TP_LEC_VALUE(L_PERIOD), pos(pos), period(period) 
     {
         representation = period.to_string();
     }
@@ -184,14 +190,13 @@ public:
         return this->pos == other.pos;
     }
 
-    void calculate_pos(const Sample& sample)
+    void link(const Sample& sample)
     {
         pos = period.difference(sample.start_period);
     }
 
-    bool add_to_stack(std::deque<double>& stack) const override
+    double get_value() const
     {
-        stack.push_back(static_cast<double>(pos));
-        return true;
+        return (double) pos;
     }
 };

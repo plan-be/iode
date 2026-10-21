@@ -124,40 +124,33 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         if(std::holds_alternative<LEC_CONST_REAL>(al))
         {
             const LEC_CONST_REAL& al_dconst = std::get<LEC_CONST_REAL>(al);
-            al_dconst.add_to_stack(stack); 
+            stack.push_back(al_dconst.get_value()); 
         }
         else if(std::holds_alternative<LEC_CONST_LONG>(al))
         {
             const LEC_CONST_LONG& al_lconst = std::get<LEC_CONST_LONG>(al);
-            al_lconst.add_to_stack(stack);
+            stack.push_back(al_lconst.get_value()); 
         }
         else if(std::holds_alternative<LEC_COEF>(al))
         {
-            const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            int coeff_pos = al_coef.pos_in_clec;
-            if(!check_coeff(coeff_pos))
-                return IODE_NAN;
-            std::shared_ptr<Scalar>& scl_ptr = v_clec_coeffs[coeff_pos].ptr;
-            al_coef.add_to_stack(stack, scl_ptr->value);
+            LEC_COEF& al_coef = std::get<LEC_COEF>(al);
+            stack.push_back(al_coef.get_value()); 
         }
         else if(std::holds_alternative<LEC_PERIOD>(al))
         {
             const LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
-            al_period.add_to_stack(stack);
+            stack.push_back(al_period.get_value()); 
         }
         else if(std::holds_alternative<LEC_VAR>(al))
         {
-            const LEC_VAR& al_var = std::get<LEC_VAR>(al);
+            LEC_VAR& al_var = std::get<LEC_VAR>(al);
             if(!smpl_ptr)
             {
                 kwarning("LEC: No attached sample");
                 return IODE_NAN;
             }
-            int var_pos = al_var.pos_in_clec;
-            if(!check_var(var_pos))
-                return IODE_NAN;
-            std::shared_ptr<Variable>& var_ptr = v_clec_vars[var_pos].ptr;
-            al_var.add_to_stack(stack, *var_ptr, smpl_ptr->nb_periods, t);
+            double value = al_var.get_value(smpl_ptr->nb_periods, t);
+            stack.push_back(value); 
         }
 
         // ---- atomic LEC of type executable ----
