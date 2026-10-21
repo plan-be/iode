@@ -2,12 +2,12 @@
 #include "api/lec/l_common.h"
 
 
-class LEC_CONST_REAL: public TP_LEC_VALUE
+class LEC_CONST_REAL: public ABSTRACT_LEC_VALUE
 {
     double value;
 
 public:
-    LEC_CONST_REAL(const double value) : TP_LEC_VALUE(L_DCONST), value(value)
+    LEC_CONST_REAL(const double value) : ABSTRACT_LEC_VALUE(L_DCONST), value(value)
     {
         representation = std::to_string(value);
     }
@@ -25,12 +25,12 @@ public:
     }
 };
 
-class LEC_CONST_LONG: public TP_LEC_VALUE
+class LEC_CONST_LONG: public ABSTRACT_LEC_VALUE
 {
     long value; 
 
 public:
-    LEC_CONST_LONG(const long value) : TP_LEC_VALUE(L_LCONST), value(value)
+    LEC_CONST_LONG(const long value) : ABSTRACT_LEC_VALUE(L_LCONST), value(value)
     {
         representation = std::to_string(value);
     }
@@ -48,7 +48,7 @@ public:
     }
 };
 
-class LEC_COEF: public TP_LEC_VALUE
+class LEC_COEF: public ABSTRACT_LEC_VALUE
 {
     std::shared_ptr<Scalar> scl_ptr;
 
@@ -56,7 +56,7 @@ public:
     std::string name;   // name of the coefficient (IODE Scalar)
 
 public:
-    LEC_COEF(const std::string& name) : TP_LEC_VALUE(L_COEF), name(name) 
+    LEC_COEF(const std::string& name) : ABSTRACT_LEC_VALUE(L_COEF), name(name) 
     {
         representation = name;
     }
@@ -93,7 +93,7 @@ public:
     }
 };
 
-class LEC_VAR: public TP_LEC_VALUE
+class LEC_VAR: public ABSTRACT_LEC_VALUE
 {
     std::shared_ptr<Variable> var_ptr;
 
@@ -106,7 +106,7 @@ public:
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : TP_LEC_VALUE(type), name(name), lag(lag), ref(0), per(per) 
+        : ABSTRACT_LEC_VALUE(type), name(name), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -165,14 +165,14 @@ public:
     }
 };
 
-class LEC_PERIOD: public TP_LEC_VALUE
+class LEC_PERIOD: public ABSTRACT_LEC_VALUE
 {
     Period period;
     short pos;
 
 public:
     LEC_PERIOD(const Period& period, const short pos) 
-        : TP_LEC_VALUE(L_PERIOD), pos(pos), period(period) 
+        : ABSTRACT_LEC_VALUE(L_PERIOD), pos(pos), period(period) 
     {
         representation = period.to_string();
     }

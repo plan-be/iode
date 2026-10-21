@@ -53,10 +53,10 @@ inline std::vector<std::string> L_VAL_FN_NAMES =
     "euro"          // L_EURO      L_VAL + 4
 };
 
-struct LEC_VAL_FN: public TP_LEC_EXECUTABLE<int, int>
+struct LEC_VAL_FN: public ABSTRACT_LEC_EXECUTABLE
 {
 public:
-    LEC_VAL_FN(const int type) : TP_LEC_EXECUTABLE<int, int>(type, 1)
+    LEC_VAL_FN(const int type) : ABSTRACT_LEC_EXECUTABLE(type, 1)
     {
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
@@ -73,9 +73,9 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(std::deque<double>& stack, int t, int exec_t) override
+    double execute(int t, int exec_t)
     {
         double value = (L_VAL_FN[pos])(t, exec_t);
-        stack.push_back(value);
+        return value;
     }
 };

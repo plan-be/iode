@@ -79,10 +79,10 @@ inline std::vector<std::string> L_OPS_NAMES =
     "^"             // L_EXP       L_OP + 12
 };
 
-struct LEC_OP: public TP_LEC_EXECUTABLE<>
+struct LEC_OP: public ABSTRACT_LEC_EXECUTABLE
 {
 public:
-    LEC_OP(const int type) : TP_LEC_EXECUTABLE<>(type, 2)
+    LEC_OP(const int type) : ABSTRACT_LEC_EXECUTABLE(type, 2)
     {
         if(!is_op(type))
             throw std::invalid_argument("Invalid operator type for LEC OPERATOR: " + std::to_string(type));
@@ -99,7 +99,7 @@ public:
     }
 
     // executes the operator with the given arguments on the stack
-    void execute(std::deque<double>& stack) override
+    double execute(std::deque<double>& stack)
     {
         double b = stack.back();
         stack.pop_back();
@@ -111,6 +111,6 @@ public:
             result = IODE_NAN;
         else
             result = (L_OPS_FN[pos])(a, b);
-        stack.push_back(result);
+        return result;
     }
 };

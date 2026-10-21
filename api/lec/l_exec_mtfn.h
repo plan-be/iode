@@ -85,7 +85,7 @@ inline std::vector<std::string> L_MTFN_NAMES =
     "hpstd"         // L_HPSTD     L_M
 };
 
-struct LEC_MTFN: public TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>
+struct LEC_MTFN: public ABSTRACT_LEC_EXECUTABLE
 {
     // number of variables arguments (i.e. variadic arguments)
     int nv_args;
@@ -96,7 +96,7 @@ struct LEC_MTFN: public TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>
     
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
-        : TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>(type, nb_args), nv_args(nv_args)
+        : ABSTRACT_LEC_EXECUTABLE(type, nb_args), nv_args(nv_args)
     {
         if(!is_mtfn(type))
             throw std::invalid_argument("Invalid multi-time function type for LEC MULTI-TIME FUNC: " + std::to_string(type));
@@ -125,7 +125,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the first sub expression
-    void execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) override
+    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec)
     {
         int from = -1, to = -1;
         // NOTE: in function L_extract_time_range():
@@ -136,11 +136,12 @@ public:
             L_extract_time_range(t, stack, nb_args - 1, from, to);
 
         double result = (L_MTFN_FN[pos])(clec, expr_pos, v_length_expr, from, to, t, stack, nb_args);
-        stack.push_back(result);
 
         // update the position of the expression to the next atomic lec 
         // at the end of the function's arguments
         for(const int& length_expr : v_length_expr)
             expr_pos += length_expr;
+
+        return result;
     }
 };

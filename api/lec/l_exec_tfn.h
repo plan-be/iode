@@ -87,14 +87,14 @@ inline std::vector<std::string> L_TFN_NAMES =
     "lastobs"       // L_LASTOBS   L_TFN + 13 
 };
 
-struct LEC_TFN: public TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>
+struct LEC_TFN: public ABSTRACT_LEC_EXECUTABLE
 {
     // length as number of atomic lec elements of the sub-expression argument of the function
     int length_expr = 0;
     
 public:
     LEC_TFN(const int type, const int nb_args) 
-        : TP_LEC_EXECUTABLE<int, int&, AbstractCLEC&>(type, nb_args)
+        : ABSTRACT_LEC_EXECUTABLE(type, nb_args)
     {
         if(!is_tfn(type))
             throw std::invalid_argument("Invalid time function type for LEC TIME FUNC: " + std::to_string(type));
@@ -118,7 +118,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the sub expression
-    void execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) override
+    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec)
     {
         int from = -1, to = -1;
         // NOTE: for time functions:
@@ -130,10 +130,11 @@ public:
             L_extract_time_range(t, stack, nb_args, from, to);
 
         double result = (L_TFN_FN[pos])(clec, expr_pos, length_expr, from, to, t, stack, nb_args);
-        stack.push_back(result);
 
         // update the position of the expression to the next atomic lec 
         // at the end of the function's argument
         expr_pos += length_expr;
+
+        return result;
     }
 };
