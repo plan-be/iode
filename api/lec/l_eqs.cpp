@@ -547,26 +547,26 @@ void SLEC::merge_names(CLEC& clec)
         return;
 
     // Copy from left_clec
-    clec.v_clec_coeffs = left_clec->v_clec_coeffs;
-    clec.v_clec_vars = left_clec->v_clec_vars;
+    clec.v_coeff_names = left_clec->v_coeff_names;
+    clec.v_var_names = left_clec->v_var_names;
 
     // Copy from right_clec (skip duplicates)
     std::set<std::string> s_coeffs;
-    for(const auto& [coeff_name, _] : clec.v_clec_coeffs)
+    for(const auto& coeff_name : clec.v_coeff_names)
         s_coeffs.insert(coeff_name);
-    for(const auto& coeff : right_clec->v_clec_coeffs)
+    for(const auto& coeff_name : right_clec->v_coeff_names)
     {
-        if(s_coeffs.insert(coeff.name).second)
-            clec.v_clec_coeffs.push_back(coeff);
+        if(s_coeffs.insert(coeff_name).second)
+            clec.v_coeff_names.push_back(coeff_name);
     }
     
     std::set<std::string> s_vars;
-    for(const auto& [var_name, _] : clec.v_clec_vars)
+    for(const auto& var_name : clec.v_var_names)
         s_vars.insert(var_name);
-    for(const auto& var : right_clec->v_clec_vars)
+    for(const auto& var_name : right_clec->v_var_names)
     {
-        if(s_vars.insert(var.name).second)
-            clec.v_clec_vars.push_back(var);
+        if(s_vars.insert(var_name).second)
+            clec.v_var_names.push_back(var_name);
     }
 }
 

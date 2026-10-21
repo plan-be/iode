@@ -84,7 +84,7 @@ int E_GetLecName(char* lec, char* name)
         return -1;
     }
 
-    for(const auto& [var_name, _] : clec->v_clec_vars)
+    for(const auto& var_name : clec->v_var_names)
     {   
         // skip "_DF" 
         if(var_name == "_DF")

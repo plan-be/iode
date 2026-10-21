@@ -36,7 +36,7 @@ static std::vector<std::string> E_GetScls(const std::shared_ptr<CLEC> clec)
     std::vector<std::string> v_scalar_names;
     if(clec) 
     {
-        for(const auto& [name, _] : clec->v_clec_coeffs)
+        for(const auto& name : clec->v_coeff_names)
         {
             if(global_ws_scl->get_obj_ptr(name)->relax != 0)
                 v_scalar_names.push_back(name);

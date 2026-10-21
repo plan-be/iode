@@ -22,17 +22,17 @@ inline bool lec_contains(const std::shared_ptr<CLEC> clec, const std::string& na
 {
     if(is_coefficient(name))
 	{
-		for(auto& coeff : clec->v_clec_coeffs)
+		for(auto& coeff : clec->v_coeff_names)
 		{
-			if(coeff.name == name)
+			if(coeff == name)
 				return true;
 		}
 	}
 	else
 	{
-		for(auto& var: clec->v_clec_vars)
+		for(auto& var: clec->v_var_names)
 		{
-			if(var.name == name)
+			if(var == name)
 				return true;
 		}
 	}

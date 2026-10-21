@@ -19,14 +19,14 @@
 int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 {
     std::string name;
-    int nb_vars = (int) this->v_clec_vars.size();
-    int nb_coeffs = (int) this->v_clec_coeffs.size();
+    int nb_vars = (int) this->v_var_names.size();
+    int nb_coeffs = (int) this->v_coeff_names.size();
 
     std::shared_ptr<Variable> var_ptr;
     std::unordered_map<std::string, std::shared_ptr<Variable>> map_vars;
     for(int i = 0; i < nb_vars; i++)
     {
-        name = this->v_clec_vars[i].name;
+        name = this->v_var_names[i];
 
         try
         {
@@ -37,7 +37,6 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             std::string msg = "linking LEC failed: Variable '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
-            reset_coeff_var_ptr();
             return L_errno;
         }
 
@@ -46,11 +45,9 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             std::string msg = "linking LEC failed: Variable '" + name + "' empty";
             error_manager.append_error(msg);
             L_errno = L_LINK_ERR;
-            reset_coeff_var_ptr();
             return L_errno;   
         }
 
-        this->v_clec_vars[i].ptr = var_ptr;
         map_vars[name] = var_ptr;
     }
     
@@ -58,7 +55,7 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     std::unordered_map<std::string, std::shared_ptr<Scalar>> map_coeffs;
     for(int i = 0; i < nb_coeffs; i++)
     {
-        name = this->v_clec_coeffs[i].name;
+        name = this->v_coeff_names[i];
 
         try
         {
@@ -69,7 +66,6 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             std::string msg = "linking LEC failed: Scalar '" + name + "' not found";
             error_manager.append_error(msg);
             L_errno = L_NOT_FOUND_ERR;
-            reset_coeff_var_ptr();
             return L_errno;
         }
 
@@ -78,11 +74,9 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
             std::string msg = "linking LEC failed: Scalar '" + name + "' empty";
             error_manager.append_error(msg);
             L_errno = L_LINK_ERR;
-            reset_coeff_var_ptr();
             return L_errno;   
         }
 
-        this->v_clec_coeffs[i].ptr = scl_ptr;
         map_coeffs[name] = scl_ptr;
     }
 

@@ -1228,10 +1228,10 @@ int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const i
     int k = 0;
     std::string obj_name;
     std::string tbl_name;
-    size_t nb_names = (type == 'S') ? clec->v_clec_coeffs.size() : clec->v_clec_vars.size();
+    size_t nb_names = (type == 'S') ? clec->v_coeff_names.size() : clec->v_var_names.size();
     for(int i = 0; i < nb_names; i++)
     {
-        obj_name = (type == 'S') ? clec->v_clec_coeffs[i].name : clec->v_clec_vars[i].name;
+        obj_name = (type == 'S') ? clec->v_coeff_names[i] : clec->v_var_names[i];
         for(k = 0 ; k < *nb ; k++)
         {
             tbl_name = std::string((char*) (*tbl)[k]);
