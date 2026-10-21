@@ -239,7 +239,7 @@ int Estimation::E_scl_in_eq(const std::string& coef_name, int eq_nb)
     if(!clec)
         return 0;
 
-    for(const auto& [name, _] : clec->v_clec_coeffs)
+    for(const auto& name : clec->v_coeff_names)
     {
         if(name == coef_name)
             return 1;

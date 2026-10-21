@@ -17,17 +17,17 @@ void CLEC::add_coef_or_var_name(const std::string& name)
 {
     if(is_coefficient(name))
     {
-        for(const auto& [coeff_name, _] : v_clec_coeffs)
+        for(const auto& coeff_name : v_coeff_names)
             if(coeff_name == name)
                 return;
-        v_clec_coeffs.emplace_back(name, nullptr);
+        v_coeff_names.push_back(name);
     }
     else
     {
-        for(const auto& [var_name, _] : v_clec_vars)
+        for(const auto& var_name : v_var_names)
             if(var_name == name)
                 return;
-        v_clec_vars.emplace_back(name, nullptr);
+        v_var_names.push_back(name);
     }
 }
 
@@ -512,7 +512,7 @@ int CLEC::analyze_lag()
 /**
  *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
  *  
- *  At the end of this function, v_expression, v_clec_vars and v_clec_coeffs are filled.
+ *  At the end of this function, v_expression, v_var_names and v_coeff_names are filled.
  *  
  *  @return int     error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
  */
@@ -531,8 +531,8 @@ int CLEC::parse(const bool side_of_eq)
     //       we don't reset the name vectors
     if(!side_of_eq)
     {
-        v_clec_coeffs.clear();
-        v_clec_vars.clear();
+        v_coeff_names.clear();
+        v_var_names.clear();
     }
 
     /* LOOP ON TOKEN */

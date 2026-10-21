@@ -58,7 +58,7 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     std::string sname;
     std::string tcoef, ttest;
     std::shared_ptr<Scalar> scl = nullptr;
-    for(const auto& [sname, _] : clec->v_clec_coeffs)
+    for(const auto& sname : clec->v_coeff_names)
     {
         buf[0] = 0;
         if(coefs)
@@ -81,7 +81,7 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
                         (unsigned char*) buf, (unsigned char*) "_\\");
     };
 
-    for(const auto& [sname, _] : clec->v_clec_vars)
+    for(const auto& sname : clec->v_var_names)
     {
         buf[0] = 0;
         sprintf(buf, "%ci%s%cI", A2M_ESCCH, sname.c_str(), A2M_ESCCH);

@@ -38,7 +38,7 @@ static int check_scl_var(const std::string& name)
     
     char buf[1024];
     std::shared_ptr<CLEC> cl = eq_ptr->clec;
-    for(const auto& [cl_name, _] : cl->v_clec_coeffs)
+    for(const auto& cl_name : cl->v_coeff_names)
     {
         // create scalar with default value 0.9 if not existing
         if(!global_ws_scl->contains(cl_name))
@@ -47,7 +47,7 @@ static int check_scl_var(const std::string& name)
             B_DataUpdate(buf, SCALARS);
         }
     }
-    for(const auto& [cl_name, _] : cl->v_clec_vars)
+    for(const auto& cl_name : cl->v_var_names)
     {
         if(!global_ws_var->contains(cl_name))
         {

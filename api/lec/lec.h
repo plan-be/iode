@@ -27,35 +27,6 @@ inline int newton_debug = 0;
 
 /*---------------- STRUCTS ------------------------*/
 
-struct ClecCoeff
-{
-    std::string name;
-    std::shared_ptr<Scalar> ptr;
-
-    ClecCoeff(const std::string& name, std::shared_ptr<Scalar> scl_ptr = nullptr)
-    {
-        this->name = name;
-        this->ptr = scl_ptr;
-    }
-
-    bool operator==(const ClecCoeff& other) const = default;
-};
-
-struct ClecVar
-{
-    std::string name;
-    std::shared_ptr<Variable> ptr;
-
-    ClecVar(const std::string& name, std::shared_ptr<Variable> var_ptr = nullptr)
-    {
-        this->name = name;
-        this->ptr = var_ptr;
-    }
-
-    bool operator==(const ClecVar& other) const = default;
-};
-
-
 struct CLEC: public AbstractCLEC
 {
     // duplicate endogenous variable in the LEC expression
@@ -75,9 +46,8 @@ struct CLEC: public AbstractCLEC
 
     // Names in order of appearance within each type. Variable order is used
     // when editing a computed table cell (only the first variable is updated).
-    // Pointers are initialized by link_names for execution and solving.
-    std::vector<ClecCoeff> v_clec_coeffs;
-    std::vector<ClecVar> v_clec_vars;
+    std::vector<std::string> v_coeff_names;
+    std::vector<std::string> v_var_names;
     
 private:
     /**
@@ -86,15 +56,6 @@ private:
      * @param [in]     name    std::string   VAR or Scalar name
      */
     void add_coef_or_var_name(const std::string& name);
-
-    void reset_coeff_var_ptr()
-    {
-        for(auto& coeff : v_clec_coeffs)
-            coeff.ptr.reset();
-        
-        for(auto& var : v_clec_vars)
-            var.ptr.reset();
-    }
 
     /**
      * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
@@ -223,7 +184,7 @@ private:
 
     /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
-     *  At the end of this function, v_expression, v_clec_vars and v_clec_coeffs are filled.
+     *  At the end of this function, v_expression, v_var_names and v_coeff_names are filled.
      *  
      *  @return int error code: 0 on success or L_PAR_ERR, L_SYNTAX_ERR...
      */
@@ -243,8 +204,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_vars = other.v_clec_vars;
-        this->v_clec_coeffs = other.v_clec_coeffs;
+        this->v_var_names = other.v_var_names;
+        this->v_coeff_names = other.v_coeff_names;
     }
 
     // assignment operator (deep copy)
@@ -257,8 +218,8 @@ public:
         this->duplicated_endo = other.duplicated_endo;
         this->v_expression = other.v_expression;
         this->smpl_ptr = other.smpl_ptr;
-        this->v_clec_vars = other.v_clec_vars;
-        this->v_clec_coeffs = other.v_clec_coeffs;
+        this->v_var_names = other.v_var_names;
+        this->v_coeff_names = other.v_coeff_names;
 
         return *this;
     }
@@ -286,10 +247,10 @@ public:
         if(this_smpl_ok && *(this->smpl_ptr) != *(other.smpl_ptr))
             return false;
 
-        if(this->v_clec_coeffs != other.v_clec_coeffs)
+        if(this->v_coeff_names != other.v_coeff_names)
             return false;
 
-        if(this->v_clec_vars != other.v_clec_vars)
+        if(this->v_var_names != other.v_var_names)
             return false;
 
         return true;
@@ -303,23 +264,9 @@ public:
     // @return               int         0 on success, L_errno on error
     int link(KDBVariablesPtr dbv, KDBScalarsPtr dbs);
 
-    std::vector<std::string> get_scalars() const
-    {
-        std::vector<std::string> names;
-        names.reserve(v_clec_coeffs.size());
-        for(const auto& coeff : v_clec_coeffs)
-            names.push_back(coeff.name);
-        return names;
-    }
+    std::vector<std::string> get_scalars() const { return v_coeff_names; }
 
-    std::vector<std::string> get_variables() const
-    {
-        std::vector<std::string> names;
-        names.reserve(v_clec_vars.size());
-        for(const auto& var : v_clec_vars)
-            names.push_back(var.name);
-        return names;
-    }
+    std::vector<std::string> get_variables() const { return v_var_names; }
 
     int get_nb_obs() override
     {
