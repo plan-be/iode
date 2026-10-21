@@ -23,11 +23,10 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
     int nb_coeffs = (int) this->v_clec_coeffs.size();
 
     std::shared_ptr<Variable> var_ptr;
-    std::unordered_map<std::string, int> map_var_name_position;
+    std::unordered_map<std::string, std::shared_ptr<Variable>> map_vars;
     for(int i = 0; i < nb_vars; i++)
     {
         name = this->v_clec_vars[i].name;
-        map_var_name_position[name] = i;
 
         try
         {
@@ -52,14 +51,14 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
         }
 
         this->v_clec_vars[i].ptr = var_ptr;
+        map_vars[name] = var_ptr;
     }
     
     std::shared_ptr<Scalar> scl_ptr;
-    std::unordered_map<std::string, int> map_coeff_name_position;
+    std::unordered_map<std::string, std::shared_ptr<Scalar>> map_coeffs;
     for(int i = 0; i < nb_coeffs; i++)
     {
         name = this->v_clec_coeffs[i].name;
-        map_coeff_name_position[name] = i;
 
         try
         {
@@ -84,28 +83,22 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
         }
 
         this->v_clec_coeffs[i].ptr = scl_ptr;
+        map_coeffs[name] = scl_ptr;
     }
 
-    int pos_in_clec;
     for(ATOMIC_LEC& al : this->v_expression)
     {
         if(std::holds_alternative<LEC_COEF>(al))
         {
             LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            // set position of the coefficient in the 
-            // v_clec_coeffs vector
             name = al_coef.name;
-            pos_in_clec = map_coeff_name_position[name];
-            al_coef.set_position(pos_in_clec);
+            al_coef.link(map_coeffs[name]);
         }
         else if(std::holds_alternative<LEC_VAR>(al))
         {
             LEC_VAR& al_var = std::get<LEC_VAR>(al);
-            // set position of the variable in the 
-            // v_clec_vars vector
             name = al_var.name;
-            pos_in_clec = map_var_name_position[name];
-            al_var.set_position(pos_in_clec);
+            al_var.link(map_vars[name]);
         }
     }
 
@@ -167,7 +160,7 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         {
             LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
             // calculate the position of the period in the sample
-            al_period.calculate_pos(*smpl_ptr);
+            al_period.link(*smpl_ptr);
         }
         else if(std::holds_alternative<LEC_TFN>(al))
         {

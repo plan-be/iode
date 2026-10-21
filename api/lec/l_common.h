@@ -95,13 +95,10 @@ protected:
     }
 };
 
-template<typename... Args>
 struct TP_LEC_VALUE: public LEC_ABSTRACT
 {
     TP_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
     TP_LEC_VALUE(const TP_LEC_VALUE& other) = default;
-
-    virtual bool add_to_stack(std::deque<double>& stack, Args... args) const = 0;
 };
 
 struct LEC_EXECUTABLE: public LEC_ABSTRACT
