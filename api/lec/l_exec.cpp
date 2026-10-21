@@ -159,12 +159,12 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_FN>(al))
         {
             LEC_FN& al_fn = std::get<LEC_FN>(al);
-            value = al_fn.execute(stack);
+            value = al_fn.execute(stack, t, expr_pos, *this);
         }
         else if(std::holds_alternative<LEC_OP>(al))
         {
             LEC_OP& al_op = std::get<LEC_OP>(al);
-            value = al_op.execute(stack);
+            value = al_op.execute(stack, t, expr_pos, *this);
         }
         else if(std::holds_alternative<LEC_TFN>(al))
         {
@@ -174,7 +174,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_VAL_FN>(al))
         {
             LEC_VAL_FN& al_val = std::get<LEC_VAL_FN>(al);
-            value = al_val.execute(t, exec_t);
+            value = al_val.execute(stack, t, expr_pos, *this);
         }
         else if(std::holds_alternative<LEC_MTFN>(al))
         {
