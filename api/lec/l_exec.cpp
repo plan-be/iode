@@ -107,7 +107,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         kwarning(error_msg.c_str());
         return (double) IODE_NAN;
     }
-
+    
     double value;
     std::deque<double> stack;
     for(int expr_pos = start; expr_pos <= end;)
@@ -125,22 +125,22 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         if(std::holds_alternative<LEC_CONST_REAL>(al))
         {
             const LEC_CONST_REAL& al_dconst = std::get<LEC_CONST_REAL>(al);
-            value = al_dconst.get_value();
+            value = al_dconst.get_value(t);
         }
         else if(std::holds_alternative<LEC_CONST_LONG>(al))
         {
             const LEC_CONST_LONG& al_lconst = std::get<LEC_CONST_LONG>(al);
-            value = al_lconst.get_value();
+            value = al_lconst.get_value(t);
         }
         else if(std::holds_alternative<LEC_COEF>(al))
         {
             LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            value = al_coef.get_value(); 
+            value = al_coef.get_value(t); 
         }
         else if(std::holds_alternative<LEC_PERIOD>(al))
         {
             const LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
-            value = al_period.get_value();
+            value = al_period.get_value(t);
         }
         else if(std::holds_alternative<LEC_VAR>(al))
         {
@@ -150,7 +150,8 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
                 kwarning("LEC: No attached sample");
                 return IODE_NAN;
             }
-            value = al_var.get_value(smpl_ptr->nb_periods, t);
+            al_var.set_nb_periods(smpl_ptr->nb_periods);
+            value = al_var.get_value(t);
         }
 
         // ---- atomic LEC of type executable ----
