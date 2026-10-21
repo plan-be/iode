@@ -111,6 +111,9 @@ struct ABSTRACT_LEC_EXECUTABLE: public LEC_ABSTRACT
 protected:
     ABSTRACT_LEC_EXECUTABLE(const int type, const int nb_args) 
         : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
+
+    virtual double execute(std::deque<double>& stack, int t, int& expr_pos, 
+        AbstractCLEC& clec) const = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT

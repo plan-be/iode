@@ -125,7 +125,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the first sub expression
-    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec)
+    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
     {
         int from = -1, to = -1;
         // NOTE: in function L_extract_time_range():
