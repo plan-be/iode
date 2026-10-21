@@ -107,7 +107,8 @@ ag:
     if(type == L_VAR)
         return false;
 
-    if(!is_executable(type))
+    bool is_executable = std::visit([](auto&& arg) -> bool { return arg.is_executable; }, al);
+    if(!is_executable)
     {
         L_errno = L_DUP_ERR;
         return true; 
