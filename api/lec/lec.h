@@ -117,52 +117,6 @@ private:
      */
     void link_sample(KDBVariablesPtr dbv, const int start, const int length);
 
-    bool check_var(const int& var_pos)
-    {
-        std::string msg = "LEC: ";
-        if(var_pos < 0 || var_pos >= v_clec_vars.size())
-        {
-            msg += "Variable's position '" + std::to_string(var_pos) + "' "; 
-            msg += "out of range.\n";
-            kwarning((char*) msg.c_str());
-            return false;
-        }
-
-        if(!v_clec_vars[var_pos].ptr)
-        {
-            msg += "Missing value for the Variable at position ";
-            msg += std::to_string(var_pos) + "\n";
-            msg += "Missing or failed linkage of LEC expression";
-            kwarning((char*) msg.c_str());
-            return false;
-        }
-
-        return true;
-    }
-
-    bool check_coeff(const int& coeff_pos)
-    {
-        std::string msg = "LEC: ";
-        if(coeff_pos < 0 || coeff_pos >= v_clec_coeffs.size())
-        {
-            msg += "Coefficient's position '" + std::to_string(coeff_pos) + "' "; 
-            msg += "out of range.\n";
-            kwarning((char*) msg.c_str());
-            return false;
-        }
-
-        if(!v_clec_coeffs[coeff_pos].ptr)
-        {
-            msg += "Missing value for the coefficient at position ";
-            msg += std::to_string(coeff_pos) + "\n";
-            msg += "Missing or failed linkage of LEC expression";
-            kwarning((char*) msg.c_str());
-            return false;
-        }
-        
-        return true;
-    }
-
     /**
      * Tries to solve this LEC equation by the Newton-Raphson method (internal helper).
      * 
@@ -372,72 +326,6 @@ public:
         if(!smpl_ptr)
             return 0;
         return smpl_ptr->nb_periods;
-    }
-
-    /**
-     * @brief return the shared pointer of type Scalar associated with 'coeff_name' 
-     * 
-     * @param coeff_name            name of the coefficient
-     * @return shared_ptr<Scalar>   shared_ptr of the coefficient
-     */
-    std::shared_ptr<Scalar> get_coeff_ptr(const std::string& coeff_name)
-    {
-        bool found = false;
-        std::shared_ptr<Scalar> scl_ptr = nullptr;
-
-        int coeff_pos = 0;
-        for(auto& coeff : v_clec_coeffs)
-        {
-            if(coeff.name == coeff_name)
-            {
-                found = true;
-                break;
-            }
-            coeff_pos++;
-        }
-
-        if(!found)
-            return scl_ptr;
-
-        // check if shared pointer exists
-        if(!check_coeff((int) coeff_pos))
-            return scl_ptr;
-
-        // return shared pointer
-        return v_clec_coeffs[coeff_pos].ptr;
-    }
-
-    /**
-     * @brief return the shared pointer of type Variable associated with 'var_name'
-     * 
-     * @param var_name                  name of the variable
-     * @return shared_ptr<Variable>     shared_ptr of the variable
-     */
-    std::shared_ptr<Variable> get_var_ptr(const std::string& var_name)
-    {
-        bool found = false;
-        std::shared_ptr<Variable> var_ptr = nullptr;
-
-        int var_pos = 0;
-        for(auto& var : v_clec_vars)
-        {
-            if(var.name == var_name)
-            {
-                found = true;
-                break;
-            }
-            var_pos++;
-        }
-
-        if(!found)
-            return var_ptr;
-
-        // check if shared pointer exists
-        if(!check_var((int) var_pos))
-            return var_ptr;
-
-        // return shared pointer
-        return v_clec_vars[var_pos].ptr;
     }
 
     /**
