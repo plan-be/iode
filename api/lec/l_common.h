@@ -47,11 +47,6 @@ inline bool is_special_lec_elem(const int type)
 
 constexpr int L_FN = L_SPECIAL_LAST + 1;
 
-inline bool is_executable(const int type) 
-{
-    return type >= L_FN;
-}
-
 /* ---------------------- FUNCS ---------------------- */
 
 /* l_exec.cpp */
@@ -86,9 +81,12 @@ struct LEC_ABSTRACT
 {
     int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)    
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
+    bool is_executable;             // whether the current sub-class represents an executable class
 
 protected:
-    LEC_ABSTRACT(const int type) : type(type) {}
+    LEC_ABSTRACT(const int type, bool is_executable) 
+        : type(type), is_executable(is_executable) {}
+    
     LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
 
     bool is_same_type(const LEC_ABSTRACT& other) const
@@ -100,7 +98,7 @@ protected:
 template<typename... Args>
 struct TP_LEC_VALUE: public LEC_ABSTRACT
 {
-    TP_LEC_VALUE(const int type) : LEC_ABSTRACT(type) {}
+    TP_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
     TP_LEC_VALUE(const TP_LEC_VALUE& other) = default;
 
     virtual bool add_to_stack(std::deque<double>& stack, Args... args) const = 0;
@@ -114,7 +112,7 @@ struct LEC_EXECUTABLE: public LEC_ABSTRACT
 
 protected:
     LEC_EXECUTABLE(const int type, const int nb_args) 
-        : LEC_ABSTRACT(type), nb_args(nb_args), pos(-1) {}
+        : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
 };
 
 template<typename... Args>
@@ -129,7 +127,7 @@ protected:
 struct LEC_OTHER: public LEC_ABSTRACT
 {
 public:
-    LEC_OTHER(const int type) : LEC_ABSTRACT(type)
+    LEC_OTHER(const int type) : LEC_ABSTRACT(type, false)
     {
         switch(type)
         {
