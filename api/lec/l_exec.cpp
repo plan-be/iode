@@ -108,6 +108,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         return (double) IODE_NAN;
     }
 
+    double value;
     std::deque<double> stack;
     for(int expr_pos = start; expr_pos <= end;)
     {
@@ -124,22 +125,22 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         if(std::holds_alternative<LEC_CONST_REAL>(al))
         {
             const LEC_CONST_REAL& al_dconst = std::get<LEC_CONST_REAL>(al);
-            stack.push_back(al_dconst.get_value()); 
+            value = al_dconst.get_value();
         }
         else if(std::holds_alternative<LEC_CONST_LONG>(al))
         {
             const LEC_CONST_LONG& al_lconst = std::get<LEC_CONST_LONG>(al);
-            stack.push_back(al_lconst.get_value()); 
+            value = al_lconst.get_value();
         }
         else if(std::holds_alternative<LEC_COEF>(al))
         {
             LEC_COEF& al_coef = std::get<LEC_COEF>(al);
-            stack.push_back(al_coef.get_value()); 
+            value = al_coef.get_value(); 
         }
         else if(std::holds_alternative<LEC_PERIOD>(al))
         {
             const LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
-            stack.push_back(al_period.get_value()); 
+            value = al_period.get_value();
         }
         else if(std::holds_alternative<LEC_VAR>(al))
         {
@@ -149,8 +150,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
                 kwarning("LEC: No attached sample");
                 return IODE_NAN;
             }
-            double value = al_var.get_value(smpl_ptr->nb_periods, t);
-            stack.push_back(value); 
+            value = al_var.get_value(smpl_ptr->nb_periods, t);
         }
 
         // ---- atomic LEC of type executable ----
@@ -158,27 +158,27 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         else if(std::holds_alternative<LEC_FN>(al))
         {
             LEC_FN& al_fn = std::get<LEC_FN>(al);
-            al_fn.execute(stack);
+            value = al_fn.execute(stack);
         }
         else if(std::holds_alternative<LEC_OP>(al))
         {
             LEC_OP& al_op = std::get<LEC_OP>(al);
-            al_op.execute(stack);
+            value = al_op.execute(stack);
         }
         else if(std::holds_alternative<LEC_TFN>(al))
         {
             LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
-            al_tfn.execute(stack, t, expr_pos, *this);
+            value = al_tfn.execute(stack, t, expr_pos, *this);
         }
         else if(std::holds_alternative<LEC_VAL_FN>(al))
         {
             LEC_VAL_FN& al_val = std::get<LEC_VAL_FN>(al);
-            al_val.execute(stack, t, exec_t);
+            value = al_val.execute(t, exec_t);
         }
         else if(std::holds_alternative<LEC_MTFN>(al))
         {
             LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
-            al_mtfn.execute(stack, t, expr_pos, *this);
+            value = al_mtfn.execute(stack, t, expr_pos, *this);
         }
         else 
         {
@@ -188,6 +188,8 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
             kerror(0, (char*) error_msg.c_str());
             return (double) IODE_NAN;
         }
+
+        stack.push_back(value);
     }
 
     return stack.back();

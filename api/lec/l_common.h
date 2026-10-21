@@ -63,7 +63,7 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 
 /*----------------- STRUCTS ----------------------*/
 
-// Abstract class to be passed ot the execute() method of the sub-classes of TP_LEC_EXECUTABLE
+// Abstract class to be passed ot the execute() method of the sub-classes of ABSTRACT_LEC_EXECUTABLE
 struct AbstractCLEC
 {
     // current time of execution (t) of the LEC
@@ -95,30 +95,20 @@ protected:
     }
 };
 
-struct TP_LEC_VALUE: public LEC_ABSTRACT
+struct ABSTRACT_LEC_VALUE: public LEC_ABSTRACT
 {
-    TP_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
-    TP_LEC_VALUE(const TP_LEC_VALUE& other) = default;
+    ABSTRACT_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
 };
 
-struct LEC_EXECUTABLE: public LEC_ABSTRACT
+struct ABSTRACT_LEC_EXECUTABLE: public LEC_ABSTRACT
 {
     int nb_args;            // number of arguments of the function
     int pos;                // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
     std::string fn_name;    // name of the function (for debugging purposes)
 
 protected:
-    LEC_EXECUTABLE(const int type, const int nb_args) 
+    ABSTRACT_LEC_EXECUTABLE(const int type, const int nb_args) 
         : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
-};
-
-template<typename... Args>
-struct TP_LEC_EXECUTABLE: public LEC_EXECUTABLE
-{
-protected:
-    TP_LEC_EXECUTABLE(const int type, const int nb_args) : LEC_EXECUTABLE(type, nb_args) {}
-
-    virtual void execute(std::deque<double>& stack, Args... args) = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT
@@ -157,8 +147,6 @@ public:
                 break;
         }
     }
-
-    LEC_OTHER(const LEC_OTHER& other) = default;
 
     bool operator==(const LEC_OTHER& other) const
     {

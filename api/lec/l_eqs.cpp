@@ -114,8 +114,8 @@ ag:
         return true; 
     }
 
-    // cast to LEC_EXECUTABLE to get the number of arguments
-    const LEC_EXECUTABLE& al_exec = reinterpret_cast<const LEC_EXECUTABLE&>(al);
+    // cast to ABSTRACT_LEC_EXECUTABLE to get the number of arguments
+    const ABSTRACT_LEC_EXECUTABLE& al_exec = reinterpret_cast<const ABSTRACT_LEC_EXECUTABLE&>(al);
 
     func_index = type;
     nb_args = al_exec.nb_args;

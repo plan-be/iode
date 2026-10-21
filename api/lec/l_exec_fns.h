@@ -193,10 +193,10 @@ inline std::vector<std::string> L_FN_NAMES =
     "div0"          // L_DIV0      L_FN + 36
 };
 
-struct LEC_FN: public TP_LEC_EXECUTABLE<>
+struct LEC_FN: public ABSTRACT_LEC_EXECUTABLE
 {
 public:
-    LEC_FN(const int type, const int nb_args) : TP_LEC_EXECUTABLE<>(type, nb_args)
+    LEC_FN(const int type, const int nb_args) : ABSTRACT_LEC_EXECUTABLE(type, nb_args)
     {
         if(!is_fn(type))
             throw std::invalid_argument("Invalid function type for LEC FUNC: " + std::to_string(type));
@@ -213,7 +213,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    void execute(std::deque<double>& stack) override
+    double execute(std::deque<double>& stack)
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 
@@ -228,6 +228,7 @@ public:
         }
         else
             result = (L_FNS_FN[pos])(stack, nb_args);
-        stack.push_back(result);
+        
+        return result;
      }
 };
