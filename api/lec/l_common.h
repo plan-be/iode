@@ -98,6 +98,8 @@ protected:
 struct ABSTRACT_LEC_VALUE: public LEC_ABSTRACT
 {
     ABSTRACT_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
+
+    virtual double get_value(const int t) const = 0;
 };
 
 struct ABSTRACT_LEC_EXECUTABLE: public LEC_ABSTRACT

@@ -19,7 +19,7 @@ public:
         return is_same_type(other) && this->value == other.value;
     }
 
-    double get_value() const
+    double get_value(const int t) const override
     {
         return value;
     }
@@ -42,7 +42,7 @@ public:
         return is_same_type(other) && this->value == other.value;
     }
 
-    double get_value() const
+    double get_value(const int t) const override
     {
         return (double) value;
     }
@@ -79,7 +79,7 @@ public:
         this->scl_ptr = scl_ptr;
     }
 
-    double get_value() const
+    double get_value(const int t) const override
     {
         if(!scl_ptr)
         {
@@ -101,12 +101,13 @@ public:
     std::string name;   // name of the variable (IODE Variable)
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
     short ref;
+    int nb_periods;
     Period per;         // period of the variable (if any)
 
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : ABSTRACT_LEC_VALUE(type), name(name), lag(lag), ref(0), per(per) 
+        : ABSTRACT_LEC_VALUE(type), name(name), lag(lag), ref(0), nb_periods(-1), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -137,6 +138,11 @@ public:
         this->var_ptr = var_ptr;
     }
 
+    void set_nb_periods(const int nb_periods)
+    {
+        this->nb_periods = nb_periods;
+    }
+
     void calculate_ref(const Sample& sample)
     {
         ref = lag;
@@ -144,7 +150,7 @@ public:
             ref += per.difference(sample.start_period);
     }
 
-    double get_value(const int nb_periods, const int t) const
+    double get_value(const int t) const override
     {
         if(!var_ptr)
         {
@@ -195,7 +201,7 @@ public:
         pos = period.difference(sample.start_period);
     }
 
-    double get_value() const
+    double get_value(const int t) const override
     {
         return (double) pos;
     }
