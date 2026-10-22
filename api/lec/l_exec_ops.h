@@ -79,10 +79,10 @@ inline std::vector<std::string> L_OPS_NAMES =
     "^"             // L_EXP       L_OP + 12
 };
 
-struct LEC_OP: public ABSTRACT_LEC_EXECUTABLE
+struct LEC_OP: public LEC_ABSTRACT_EXECUTABLE
 {
 public:
-    LEC_OP(const int type) : ABSTRACT_LEC_EXECUTABLE(type, 2)
+    LEC_OP(const int type) : LEC_ABSTRACT_EXECUTABLE(type, 2)
     {
         if(!is_op(type))
             throw std::invalid_argument("Invalid operator type for LEC OPERATOR: " + std::to_string(type));
@@ -92,6 +92,19 @@ public:
     }
 
     LEC_OP(const LEC_OP& other) = default;
+
+    ~LEC_OP() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_OP>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_OP*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_OP& other) const
     {

@@ -193,10 +193,10 @@ inline std::vector<std::string> L_FN_NAMES =
     "div0"          // L_DIV0      L_FN + 36
 };
 
-struct LEC_FN: public ABSTRACT_LEC_EXECUTABLE
+struct LEC_FN: public LEC_ABSTRACT_EXECUTABLE
 {
 public:
-    LEC_FN(const int type, const int nb_args) : ABSTRACT_LEC_EXECUTABLE(type, nb_args)
+    LEC_FN(const int type, const int nb_args) : LEC_ABSTRACT_EXECUTABLE(type, nb_args)
     {
         if(!is_fn(type))
             throw std::invalid_argument("Invalid function type for LEC FUNC: " + std::to_string(type));
@@ -207,6 +207,19 @@ public:
 
     LEC_FN(const LEC_FN& other) = default;
 
+    ~LEC_FN() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_FN>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_FN*>(&other);
+        return rhs && *this == *rhs;
+    }
+    
     bool operator==(const LEC_FN& other) const
     {
         return is_same_type(other);

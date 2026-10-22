@@ -1,5 +1,6 @@
 #pragma once
 #include "api/iode_scr4.h"
+#include <memory>
 #include "scr4/yy/s_yy.h"      // YYKEYS
 
 #include "api/pch.h"
@@ -15,6 +16,13 @@
 /*----------------- GLOBALS ----------------------*/
 
 inline int KEXEC_TRACE = 0;
+
+enum LECGenericType
+{
+    L_VALUE,
+    L_EXECUTABLE,
+    L_OTHER
+};
 
 constexpr int L_SPECIAL = 10;
 
@@ -63,7 +71,7 @@ inline char *(*L_expand_super)(char* list_name) = nullptr;
 
 /*----------------- STRUCTS ----------------------*/
 
-// Abstract class to be passed ot the execute() method of the sub-classes of ABSTRACT_LEC_EXECUTABLE
+// Abstract class to be passed ot the execute() method of the sub-classes of LEC_ABSTRACT_EXECUTABLE
 struct AbstractCLEC
 {
     // current time of execution (t) of the LEC
@@ -81,11 +89,18 @@ struct LEC_ABSTRACT
 {
     int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)    
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
-    bool is_executable;             // whether the current sub-class represents an executable class
+    LECGenericType generic_type;    // whether the current sub-class represents a value, an executable 
+                                    // or neither a value or an executable 
+
+    virtual ~LEC_ABSTRACT() = default;
+
+    virtual std::unique_ptr<LEC_ABSTRACT> clone() const = 0;
+
+    virtual bool equals(const LEC_ABSTRACT& other) const = 0;
 
 protected:
-    LEC_ABSTRACT(const int type, bool is_executable) 
-        : type(type), is_executable(is_executable) {}
+    LEC_ABSTRACT(const int type, const LECGenericType generic_type) 
+        : type(type), generic_type(generic_type) {}
     
     LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
 
@@ -95,22 +110,33 @@ protected:
     }
 };
 
-struct ABSTRACT_LEC_VALUE: public LEC_ABSTRACT
+struct LEC_ABSTRACT_VALUE: public LEC_ABSTRACT
 {
-    ABSTRACT_LEC_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
+protected:
+    LEC_ABSTRACT_VALUE(const int type) : LEC_ABSTRACT(type, L_VALUE) {}
+
+    LEC_ABSTRACT_VALUE(const LEC_ABSTRACT_VALUE& other) = default;
+
+public:
+    ~LEC_ABSTRACT_VALUE() override = default;
 
     virtual double get_value(const int t) const = 0;
 };
 
-struct ABSTRACT_LEC_EXECUTABLE: public LEC_ABSTRACT
+struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
 {
     int nb_args;            // number of arguments of the function
     int pos;                // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
     std::string fn_name;    // name of the function (for debugging purposes)
 
 protected:
-    ABSTRACT_LEC_EXECUTABLE(const int type, const int nb_args) 
-        : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
+    LEC_ABSTRACT_EXECUTABLE(const int type, const int nb_args) 
+        : LEC_ABSTRACT(type, L_EXECUTABLE), nb_args(nb_args), pos(-1) {}
+    
+    LEC_ABSTRACT_EXECUTABLE(const LEC_ABSTRACT_EXECUTABLE& other) = default;
+
+public:
+    ~LEC_ABSTRACT_EXECUTABLE() override = default;
 
     virtual double execute(std::deque<double>& stack, int t, int& expr_pos, 
         AbstractCLEC& clec) const = 0;
@@ -119,7 +145,7 @@ protected:
 struct LEC_OTHER: public LEC_ABSTRACT
 {
 public:
-    LEC_OTHER(const int type) : LEC_ABSTRACT(type, false)
+    LEC_OTHER(const int type) : LEC_ABSTRACT(type, L_OTHER)
     {
         switch(type)
         {
@@ -151,6 +177,21 @@ public:
                 throw std::invalid_argument("Invalid type for LEC_OTHER: " + std::to_string(type));
                 break;
         }
+    }
+
+    LEC_OTHER(const LEC_OTHER& other) = default;
+
+    ~LEC_OTHER() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_OTHER>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_OTHER*>(&other);
+        return rhs && *this == *rhs;
     }
 
     bool operator==(const LEC_OTHER& other) const
