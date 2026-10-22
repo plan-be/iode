@@ -101,27 +101,23 @@ void CLEC::reorder_expression()
     if(this->v_expression.empty())
         return;
 
-    // create a copy of the expression vector to reorder
-    std::vector<ATOMIC_LEC> expr = this->v_expression;
+    // Move the elements while preserving the identity of each derived object.
+    std::vector<ATOMIC_LEC> expr = std::move(this->v_expression);
     this->v_expression.clear();
 
     // reorder the expression vector to ensure that the arguments of each function 
     // are placed after the function in the vector of atomic LEC elements
     for(ATOMIC_LEC& al : expr)
     {
-        if(std::holds_alternative<LEC_OTHER>(al))
-        {
-            LEC_OTHER& al_other = std::get<LEC_OTHER>(al);
-            // end of expression -> stop
-            if(al_other.type == L_EOE)
-                break;
-        }
+        LEC_ABSTRACT* element = al.get();
+        if(element->type == L_EOE)
+            break;
         
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::move(al));
 
-        if(std::holds_alternative<LEC_TFN>(al))
+        if(is_tfn(element->type))
         {
-            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            LEC_TFN& al_tfn = static_cast<LEC_TFN&>(*element);
 
             // compute the start and end positions of the arguments of the function 
             // NOTE: - 2 because the last element of v_expression is always (should be) 
@@ -137,13 +133,14 @@ void CLEC::reorder_expression()
             al_tfn.length_expr = args_end - args_start + 1;
 
             // insert current LEC_TFN element before its arguments in the vector
+            ATOMIC_LEC moved = std::move(this->v_expression.back());
             this->v_expression.pop_back();
-            this->v_expression.insert(this->v_expression.begin() + args_start, al);
+            this->v_expression.insert(this->v_expression.begin() + args_start, std::move(moved));
         }
 
-        if(std::holds_alternative<LEC_MTFN>(al))
+        if(is_mtfn(element->type))
         {
-            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+            LEC_MTFN& al_mtfn = static_cast<LEC_MTFN&>(*element);
 
             int nv_args = L_MIN_MTARGS[al_mtfn.pos];
             al_mtfn.nv_args = nv_args;
@@ -171,8 +168,9 @@ void CLEC::reorder_expression()
             }
 
             // insert current LEC_MTFN element before its arguments in the vector
+            ATOMIC_LEC moved = std::move(this->v_expression.back());
             this->v_expression.pop_back();
-            this->v_expression.insert(this->v_expression.begin() + args_start, al);
+            this->v_expression.insert(this->v_expression.begin() + args_start, std::move(moved));
         }
     }
 }

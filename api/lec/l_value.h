@@ -2,17 +2,30 @@
 #include "api/lec/l_common.h"
 
 
-class LEC_CONST_REAL: public ABSTRACT_LEC_VALUE
+class LEC_CONST_REAL: public LEC_ABSTRACT_VALUE
 {
     double value;
 
 public:
-    LEC_CONST_REAL(const double value) : ABSTRACT_LEC_VALUE(L_DCONST), value(value)
+    LEC_CONST_REAL(const double value) : LEC_ABSTRACT_VALUE(L_DCONST), value(value)
     {
         representation = std::to_string(value);
     }
 
     LEC_CONST_REAL(const LEC_CONST_REAL& other) = default;
+
+    ~LEC_CONST_REAL() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_CONST_REAL>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_CONST_REAL*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_CONST_REAL& other) const
     {
@@ -25,17 +38,30 @@ public:
     }
 };
 
-class LEC_CONST_LONG: public ABSTRACT_LEC_VALUE
+class LEC_CONST_LONG: public LEC_ABSTRACT_VALUE
 {
     long value; 
 
 public:
-    LEC_CONST_LONG(const long value) : ABSTRACT_LEC_VALUE(L_LCONST), value(value)
+    LEC_CONST_LONG(const long value) : LEC_ABSTRACT_VALUE(L_LCONST), value(value)
     {
         representation = std::to_string(value);
     }
 
     LEC_CONST_LONG(const LEC_CONST_LONG& other) = default;
+
+    ~LEC_CONST_LONG() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_CONST_LONG>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_CONST_LONG*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_CONST_LONG& other) const
     {
@@ -48,7 +74,7 @@ public:
     }
 };
 
-class LEC_COEF: public ABSTRACT_LEC_VALUE
+class LEC_COEF: public LEC_ABSTRACT_VALUE
 {
     std::shared_ptr<Scalar> scl_ptr;
 
@@ -56,12 +82,25 @@ public:
     std::string name;   // name of the coefficient (IODE Scalar)
 
 public:
-    LEC_COEF(const std::string& name) : ABSTRACT_LEC_VALUE(L_COEF), name(name) 
+    LEC_COEF(const std::string& name) : LEC_ABSTRACT_VALUE(L_COEF), name(name) 
     {
         representation = name;
     }
 
     LEC_COEF(const LEC_COEF& other) = default;
+
+    ~LEC_COEF() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_COEF>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_COEF*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_COEF& other) const
     {
@@ -93,7 +132,7 @@ public:
     }
 };
 
-class LEC_VAR: public ABSTRACT_LEC_VALUE
+class LEC_VAR: public LEC_ABSTRACT_VALUE
 {
     std::shared_ptr<Variable> var_ptr;
 
@@ -107,7 +146,7 @@ public:
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : ABSTRACT_LEC_VALUE(type), name(name), lag(lag), ref(0), nb_periods(-1), per(per) 
+        : LEC_ABSTRACT_VALUE(type), name(name), lag(lag), ref(0), nb_periods(-1), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -115,6 +154,19 @@ public:
     }
 
     LEC_VAR(const LEC_VAR& other) = default;
+
+    ~LEC_VAR() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_VAR>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_VAR*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_VAR& other) const
     {
@@ -171,19 +223,32 @@ public:
     }
 };
 
-class LEC_PERIOD: public ABSTRACT_LEC_VALUE
+class LEC_PERIOD: public LEC_ABSTRACT_VALUE
 {
     Period period;
     short pos;
 
 public:
     LEC_PERIOD(const Period& period, const short pos) 
-        : ABSTRACT_LEC_VALUE(L_PERIOD), pos(pos), period(period) 
+        : LEC_ABSTRACT_VALUE(L_PERIOD), pos(pos), period(period) 
     {
         representation = period.to_string();
     }
 
     LEC_PERIOD(const LEC_PERIOD& other) = default;
+
+    ~LEC_PERIOD() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_PERIOD>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_PERIOD*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_PERIOD& other) const
     {

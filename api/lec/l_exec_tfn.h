@@ -87,14 +87,14 @@ inline std::vector<std::string> L_TFN_NAMES =
     "lastobs"       // L_LASTOBS   L_TFN + 13 
 };
 
-struct LEC_TFN: public ABSTRACT_LEC_EXECUTABLE
+struct LEC_TFN: public LEC_ABSTRACT_EXECUTABLE
 {
     // length as number of atomic lec elements of the sub-expression argument of the function
     int length_expr = 0;
     
 public:
     LEC_TFN(const int type, const int nb_args) 
-        : ABSTRACT_LEC_EXECUTABLE(type, nb_args)
+        : LEC_ABSTRACT_EXECUTABLE(type, nb_args)
     {
         if(!is_tfn(type))
             throw std::invalid_argument("Invalid time function type for LEC TIME FUNC: " + std::to_string(type));
@@ -104,6 +104,19 @@ public:
     }
 
     LEC_TFN(const LEC_TFN& other) = default;
+
+    ~LEC_TFN() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_TFN>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_TFN*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_TFN& other) const
     {

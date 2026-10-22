@@ -20,8 +20,7 @@ enum EQ_HAND_SIDE
     EQ_RHS = 1
 };
 
-using ATOMIC_LEC = std::variant<LEC_CONST_REAL, LEC_CONST_LONG, LEC_COEF, LEC_VAR, LEC_PERIOD, 
-                                LEC_OTHER, LEC_OP, LEC_FN, LEC_TFN, LEC_VAL_FN, LEC_MTFN>;
+using ATOMIC_LEC = std::unique_ptr<LEC_ABSTRACT>;
 
 inline int newton_debug = 0;
 
@@ -202,7 +201,7 @@ public:
     {
         this->lec = other.lec;
         this->duplicated_endo = other.duplicated_endo;
-        this->v_expression = other.v_expression;
+        this->v_expression = other.copy_expression();
         this->smpl_ptr = other.smpl_ptr;
         this->v_var_names = other.v_var_names;
         this->v_coeff_names = other.v_coeff_names;
@@ -213,10 +212,10 @@ public:
     {
         if(this == &other)
             return *this;
-    
+        
         this->lec = other.lec;
         this->duplicated_endo = other.duplicated_endo;
-        this->v_expression = other.v_expression;
+        this->v_expression = other.copy_expression();
         this->smpl_ptr = other.smpl_ptr;
         this->v_var_names = other.v_var_names;
         this->v_coeff_names = other.v_coeff_names;
@@ -236,7 +235,9 @@ public:
 
         for(size_t i = 0; i < this->v_expression.size(); ++i)
         {
-            if(this->v_expression[i] != other.v_expression[i])
+            if(!this->v_expression[i] || !other.v_expression[i])
+                return false;
+            if(!this->v_expression[i]->equals(*other.v_expression[i]))
                 return false;
         }
 
@@ -254,6 +255,15 @@ public:
             return false;
 
         return true;
+    }
+
+    std::vector<ATOMIC_LEC> copy_expression() const
+    {
+        std::vector<ATOMIC_LEC> v_copy;
+        v_copy.reserve(v_expression.size());
+        for(const auto& element : v_expression)
+            v_copy.push_back(element->clone());
+        return v_copy;
     }
 
     // Links this CLEC expression to KDB's of variables and of scalars.

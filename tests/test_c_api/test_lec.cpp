@@ -13,7 +13,7 @@ protected:
 };
 
 
-TEST_F(LecTest, Tests_CLEC_Compile)
+TEST_F(LecTest, CLEC_Compile)
 {
     print_test_title("Tests CLEC compile");
 
@@ -46,7 +46,7 @@ TEST_F(LecTest, Tests_CLEC_Compile)
     EXPECT_TRUE(lec_contains(clec, "B"));
 }
 
-TEST_F(LecTest, Tests_CLEC_Copy)
+TEST_F(LecTest, CLEC_Copy)
 {
     print_test_title("Tests CLEC copy");
 
@@ -57,11 +57,38 @@ TEST_F(LecTest, Tests_CLEC_Copy)
     EXPECT_TRUE(copy_clec != nullptr);
     EXPECT_EQ(copy_clec->duplicated_endo, clec->duplicated_endo);
     EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
+    EXPECT_EQ(*copy_clec, *clec);
+    for(size_t i = 0; i < clec->v_expression.size(); ++i)
+    {
+        ASSERT_NE(copy_clec->v_expression[i], nullptr);
+        ASSERT_NE(clec->v_expression[i], nullptr);
+        EXPECT_NE(copy_clec->v_expression[i].get(), clec->v_expression[i].get());
+        EXPECT_EQ(copy_clec->v_expression[i]->type, clec->v_expression[i]->type);
+    }
+
+    CLEC assigned("B + 2");
+    assigned = *clec;
+    EXPECT_EQ(assigned, *clec);
+    for(size_t i = 0; i < clec->v_expression.size(); ++i)
+        EXPECT_NE(assigned.v_expression[i].get(), clec->v_expression[i].get());
     EXPECT_EQ(copy_clec->v_var_names, clec->v_var_names);
     EXPECT_EQ(copy_clec->v_coeff_names, clec->v_coeff_names);
 }
 
-TEST_F(LecTest, Tests_CLEC_NameTypes)
+TEST_F(LecTest, AtomicLEC_Equality)
+{
+    LEC_CONST_REAL one(1.0);
+    LEC_CONST_REAL same(1.0);
+    LEC_CONST_REAL different(2.0);
+    LEC_CONST_LONG other_type(1);
+
+    EXPECT_TRUE(one.equals(same));
+    EXPECT_FALSE(one.equals(different));
+    EXPECT_FALSE(one.equals(other_type));
+    EXPECT_FALSE(other_type.equals(one));
+}
+
+TEST_F(LecTest, CLEC_NameTypes)
 {
     CLEC clec("A + alpha * B + alpha + beta + A");
     EXPECT_EQ(clec.get_variables(), (std::vector<std::string>{"A", "B"}));
@@ -75,7 +102,7 @@ TEST_F(LecTest, Tests_CLEC_NameTypes)
     EXPECT_EQ(copy.v_coeff_names, clec.v_coeff_names);
 }
 
-TEST_F(LecTest, Tests_CLEC_EqualityWithOptionalSample)
+TEST_F(LecTest, CLEC_EqualityWithOptionalSample)
 {
     CLEC first("A + 1");
     CLEC second("A + 1");
@@ -93,7 +120,7 @@ TEST_F(LecTest, Tests_CLEC_EqualityWithOptionalSample)
     EXPECT_FALSE(first == second);
 }
 
-TEST_F(LecTest, Tests_LEC)
+TEST_F(LecTest, LEC)
 {
     int t = 2;
     double expected_value = 0.0;
@@ -198,7 +225,7 @@ TEST_F(LecTest, Tests_LEC)
     check_lec("1 + max($LST2)", t, 1.0 + max_value);
 }
 
-TEST_F(LecTest, LEC)
+TEST_F(LecTest, ExecuteLEC)
 {
     Variable var_A = global_ws_var->get("A");
 

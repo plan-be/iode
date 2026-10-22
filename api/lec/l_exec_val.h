@@ -53,10 +53,10 @@ inline std::vector<std::string> L_VAL_FN_NAMES =
     "euro"          // L_EURO      L_VAL + 4
 };
 
-struct LEC_VAL_FN: public ABSTRACT_LEC_EXECUTABLE
+struct LEC_VAL_FN: public LEC_ABSTRACT_EXECUTABLE
 {
 public:
-    LEC_VAL_FN(const int type) : ABSTRACT_LEC_EXECUTABLE(type, 1)
+    LEC_VAL_FN(const int type) : LEC_ABSTRACT_EXECUTABLE(type, 1)
     {
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
@@ -66,6 +66,19 @@ public:
     }
 
     LEC_VAL_FN(const LEC_VAL_FN& other) = default;
+
+    ~LEC_VAL_FN() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_VAL_FN>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_VAL_FN*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_VAL_FN& other) const
     {

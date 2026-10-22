@@ -38,10 +38,10 @@ int SLEC::count_endo(const EQ_HAND_SIDE mbr)
     int count = 0;
     for(const ATOMIC_LEC& al : clec_ptr->v_expression)
     {
-        if(!std::holds_alternative<LEC_VAR>(al))
+        if(al->type != L_VAR && al->type != L_VART)
             continue;
 
-        const LEC_VAR& al_var = std::get<LEC_VAR>(al);
+        const LEC_VAR& al_var = dynamic_cast<const LEC_VAR&>(*al);
 
         // the lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
         if(al_var.type != L_VAR || al_var.per.step != 0 || al_var.lag != 0)
@@ -79,7 +79,7 @@ bool SLEC::split_expr()
     // create a copy of the vector of atomic LEC elements from the equation's side 
     // containing the endogenous variable of the equation (LHS or RHS)
     std::shared_ptr<CLEC> clec_ptr = (side_with_endo == EQ_LHS) ? left_clec : right_clec;
-    std::vector<ATOMIC_LEC> v_al = clec_ptr->v_expression;
+    std::vector<ATOMIC_LEC> v_al = clec_ptr->copy_expression();
     
 ag:
     if(v_al.size() == 0)
@@ -90,7 +90,7 @@ ag:
 
     const ATOMIC_LEC& al = v_al.back();
 
-    int type = std::visit([](auto&& arg) -> int { return arg.type; }, al);
+    int type = al->type;
 
     if(type == L_CLOSEP)
     {
@@ -107,15 +107,15 @@ ag:
     if(type == L_VAR)
         return false;
 
-    bool is_executable = std::visit([](auto&& arg) -> bool { return arg.is_executable; }, al);
-    if(!is_executable)
+    LECGenericType generic_type = al->generic_type;
+    if(generic_type != L_EXECUTABLE)
     {
         L_errno = L_DUP_ERR;
         return true; 
     }
 
-    // cast to ABSTRACT_LEC_EXECUTABLE to get the number of arguments
-    const ABSTRACT_LEC_EXECUTABLE& al_exec = reinterpret_cast<const ABSTRACT_LEC_EXECUTABLE&>(al);
+    // cast to LEC_ABSTRACT_EXECUTABLE to get the number of arguments
+    const LEC_ABSTRACT_EXECUTABLE& al_exec = dynamic_cast<const LEC_ABSTRACT_EXECUTABLE&>(*al);
 
     func_index = type;
     nb_args = al_exec.nb_args;
@@ -138,12 +138,12 @@ ag:
     auto it_sub_expr = v_al.begin() + start_sub_expr;
 
     // We move the elements before the sub expression to left_clec
-    if(it_sub_expr != v_al.begin())
-        left_clec->v_expression.insert(left_clec->v_expression.end(), v_al.begin(), it_sub_expr);
+    for(auto it = v_al.begin(); it != it_sub_expr; ++it)
+        left_clec->v_expression.push_back(std::move(*it));
 
     // and the elements after the sub expression to right_clec
-    if(it_sub_expr != v_al.end())
-        right_clec->v_expression.insert(right_clec->v_expression.end(), it_sub_expr, v_al.end());
+    for(auto it = it_sub_expr; it != v_al.end(); ++it)
+        right_clec->v_expression.push_back(std::move(*it));
 
     v_al.clear(); // we clear v_al to avoid confusion (we won't use it anymore)
 
@@ -208,7 +208,8 @@ void SLEC::append_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr)
     std::shared_ptr<CLEC> clec_ptr = (mbr == EQ_LHS) ? left_clec : right_clec;
     if(!clec_ptr)
         return;
-    expr.insert(expr.end(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
+    for(const auto& element : clec_ptr->v_expression)
+        expr.push_back(element->clone());
 }
 
 
@@ -222,14 +223,16 @@ void SLEC::prepend_member(const EQ_HAND_SIDE mbr, std::vector<ATOMIC_LEC>& expr)
     std::shared_ptr<CLEC> clec_ptr = (mbr == EQ_LHS) ? left_clec : right_clec;
     if(!clec_ptr)
         return;
-    expr.insert(expr.begin(), clec_ptr->v_expression.begin(), clec_ptr->v_expression.end());
+    std::vector<ATOMIC_LEC> prefix = clec_ptr->copy_expression();
+    for(auto& element : expr)
+        prefix.push_back(std::move(element));
+    expr = std::move(prefix);
 }
 
 
 void SLEC::append_other(int type, std::vector<ATOMIC_LEC>& expr)
 {
-    LEC_OTHER al_other(type);
-    expr.push_back(al_other);
+    expr.push_back(std::make_unique<LEC_OTHER>(type));
 }
 
 
@@ -240,8 +243,7 @@ void SLEC::append_other(int type, std::vector<ATOMIC_LEC>& expr)
 */
 void SLEC::append_op(int op, std::vector<ATOMIC_LEC>& expr)
 {
-    LEC_OP al_op(op);
-    expr.push_back(al_op);
+    expr.push_back(std::make_unique<LEC_OP>(op));
 }
 
 
@@ -255,29 +257,25 @@ void SLEC::append_fn(int op, int nargs, std::vector<ATOMIC_LEC>& expr)
 {
     if(is_fn(op))
     {
-        LEC_FN al_fn(op, nargs);
-        expr.push_back(al_fn);
+        expr.push_back(std::make_unique<LEC_FN>(op, nargs));
         return;
     }
 
     if(is_tfn(op))
     {
-        LEC_TFN al_tfn(op, nargs);
-        expr.push_back(al_tfn);
+        expr.push_back(std::make_unique<LEC_TFN>(op, nargs));
         return;
     }
 
     if(is_val(op))
     {
-        LEC_VAL_FN al_val_fn(op);
-        expr.push_back(al_val_fn);
+        expr.push_back(std::make_unique<LEC_VAL_FN>(op));
         return;
     }
 
     if(is_mtfn(op))
     {
-        LEC_MTFN al_mtfn(op, nargs, 0);
-        expr.push_back(al_mtfn);
+        expr.push_back(std::make_unique<LEC_MTFN>(op, nargs, 0));
         return;
     }
 
@@ -292,8 +290,7 @@ void SLEC::append_fn(int op, int nargs, std::vector<ATOMIC_LEC>& expr)
 */
 void SLEC::append_const(int a, std::vector<ATOMIC_LEC>& expr)
 {
-    LEC_CONST_LONG al(a);
-    expr.push_back(al);
+    expr.push_back(std::make_unique<LEC_CONST_LONG>(a));
 }
 
 

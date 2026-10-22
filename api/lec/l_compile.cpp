@@ -42,27 +42,23 @@ int CLEC::save_var(TOKEN& token)
         case L_PERIOD :     // period
         {
             // the position of the period in the Variables sample will be set later
-            LEC_PERIOD al(token.period, -1);
-            this->v_expression.push_back(al);
+            this->v_expression.push_back(std::make_unique<LEC_PERIOD>(token.period, -1));
             break;
         }
         case L_DCONST:      // double constant
         {
-            LEC_CONST_REAL al(token.real_value);
-            this->v_expression.push_back(al);
+            this->v_expression.push_back(std::make_unique<LEC_CONST_REAL>(token.real_value));
             break;
         }
         case L_LCONST:      // long constant
         {
-            LEC_CONST_LONG al(token.long_value);
-            this->v_expression.push_back(al);
+            this->v_expression.push_back(std::make_unique<LEC_CONST_LONG>(token.long_value));
             break;
         }
         case L_COEF:         // coefficient
         {
             add_coef_or_var_name(name);
-            LEC_COEF al(name);
-            this->v_expression.push_back(al);
+            this->v_expression.push_back(std::make_unique<LEC_COEF>(name));
             break;
         }
         default :
@@ -70,8 +66,7 @@ int CLEC::save_var(TOKEN& token)
             // if special constant (pi, e, etc.)
             if(is_val(type))
             {
-                LEC_VAL_FN al(type);
-                this->v_expression.push_back(al);
+                this->v_expression.push_back(std::make_unique<LEC_VAL_FN>(type));
                 break;
             }
 
@@ -79,8 +74,7 @@ int CLEC::save_var(TOKEN& token)
             if(type == L_VAR || type == L_VART)
             {
                 add_coef_or_var_name(name);
-                LEC_VAR al(type, name, 0, Period());
-                this->v_expression.push_back(al);
+                this->v_expression.push_back(std::make_unique<LEC_VAR>(type, name, 0, Period()));
                 break;
             }
 
@@ -146,8 +140,7 @@ int CLEC::save_op()
 
     if(op == L_OPENP || op == L_CLOSEP)
     {
-        LEC_OTHER al(op);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_OTHER>(op));
         return 0;
     }
 
@@ -160,15 +153,13 @@ int CLEC::save_op()
             return L_errno;
         }
 
-        LEC_FN al(op, nb_args);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_FN>(op, nb_args));
         return 0;
     }
 
     if(is_op(op)) 
     {
-        LEC_OP al(op);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_OP>(op));
         return 0;
     }
 
@@ -181,15 +172,13 @@ int CLEC::save_op()
             return L_errno;
         }
 
-        LEC_TFN al(op, nb_args);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_TFN>(op, nb_args));
         return 0;
     }
 
     if(is_val(op)) 
     {
-        LEC_VAL_FN al(op);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_VAL_FN>(op));
         return 0;
     }
 
@@ -202,8 +191,7 @@ int CLEC::save_op()
             return L_errno;
         }
 
-        LEC_MTFN al(op, nb_args, 0);
-        this->v_expression.push_back(al);
+        this->v_expression.push_back(std::make_unique<LEC_MTFN>(op, nb_args, 0));
         return 0;
     }
 
@@ -342,8 +330,7 @@ int CLEC::empty_ops_stack()
             return L_errno;
     }
 
-    LEC_OTHER al(L_EOE);     // end of expression
-    this->v_expression.push_back(al);
+    this->v_expression.push_back(std::make_unique<LEC_OTHER>(L_EOE)); // end of expression
     return 0;
 }
 
@@ -366,16 +353,16 @@ int CLEC::lag_expr(int lag)
     if(start_sub_expr < 0) 
         return L_errno;
 
-    for(auto it = this->v_expression.begin() + start_sub_expr; it != this->v_expression.end(); it++)
+    for(int i = start_sub_expr; i < this->v_expression.size(); i++)
     {
-        ATOMIC_LEC& al = *it;
+        ATOMIC_LEC& al = this->v_expression[i];
 
         // check that the atomic lec represents a variable
-        if(!std::holds_alternative<LEC_VAR>(al)) 
+        if(al->type != L_VAR && al->type != L_VART)
             continue;
 
         // only applies lag to non-timed variables.
-        LEC_VAR& lvar = std::get<LEC_VAR>(al);
+        LEC_VAR& lvar = static_cast<LEC_VAR&>(*al);
         if(lvar.type != L_VAR) 
             continue;
 
@@ -409,16 +396,16 @@ int CLEC::time_expr(TOKEN& token)
     if(start_sub_expr < 0) 
         return L_errno;
 
-    for(auto it = this->v_expression.begin() + start_sub_expr; it != this->v_expression.end(); it++)
+    for(int i = start_sub_expr; i < this->v_expression.size(); i++)
     {
-        ATOMIC_LEC& al = *it;
+        ATOMIC_LEC& al = this->v_expression[i];
 
         // check that the atomic lec represents a variable
-        if(!std::holds_alternative<LEC_VAR>(al)) 
+        if(al->type != L_VAR && al->type != L_VART)
             continue;
 
         // only applies lag to non-timed variables.
-        LEC_VAR& lvar = std::get<LEC_VAR>(al);
+        LEC_VAR& lvar = static_cast<LEC_VAR&>(*al);
         if(lvar.type != L_VAR) 
             continue;
 
@@ -641,8 +628,7 @@ again:
             case L_EOE :        // End of expression
                 if(start) 
                 {
-                    LEC_OTHER al(L_EOE);
-                    this->v_expression.push_back(al);
+                    this->v_expression.push_back(std::make_unique<LEC_OTHER>(L_EOE));
                     return L_errno;
                 }
                 if(beg == 1) 
@@ -692,19 +678,20 @@ int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)
     int end = (close >= 0) ? close : (int) v_alec.size() - 1;
 
     // browse backwards all elements of the expression
+    int type;
     for(int pos = end; pos >= 0; pos--) 
     {
         const ATOMIC_LEC& al = v_alec[pos];
+        type = al->type;
 
         // if open or close parenthesis, update the number of parents
-        if(std::holds_alternative<LEC_OTHER>(al)) 
+        if(type == L_OPENP || type == L_CLOSEP)
         {
-            const LEC_OTHER& other = std::get<LEC_OTHER>(al);
             // open parenthesis -> decrease number of parents
-            if(other.type == L_OPENP)
+            if(type == L_OPENP)
                 nb_parents--;
             // close parenthesis -> increase number of parents
-            if(other.type == L_CLOSEP)
+            if(type == L_CLOSEP)
                 nb_parents++;
         }
         
@@ -712,7 +699,7 @@ int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)
             continue;
         
         // QUESTION: why calling sub_expr twice ?
-        if(std::holds_alternative<LEC_OP>(al))
+        if(is_op(type))
         {
             pos = find_sub_expr_start(v_alec, pos - 1);
             pos = find_sub_expr_start(v_alec, pos - 1);
@@ -720,9 +707,9 @@ int find_sub_expr_start(const std::vector<ATOMIC_LEC>& v_alec, int close)
         }
 
         // if not a function, we have reached the beginning of the expression
-        bool b_is_fn = std::holds_alternative<LEC_FN>(al);
-        bool b_is_tfn = std::holds_alternative<LEC_TFN>(al);
-        bool b_is_mtfn = std::holds_alternative<LEC_MTFN>(al);
+        bool b_is_fn = is_fn(type);
+        bool b_is_tfn = is_tfn(type);
+        bool b_is_mtfn = is_mtfn(type);
         if(!b_is_fn && !b_is_tfn && !b_is_mtfn) 
             return pos;
     }

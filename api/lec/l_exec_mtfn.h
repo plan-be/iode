@@ -85,7 +85,7 @@ inline std::vector<std::string> L_MTFN_NAMES =
     "hpstd"         // L_HPSTD     L_M
 };
 
-struct LEC_MTFN: public ABSTRACT_LEC_EXECUTABLE
+struct LEC_MTFN: public LEC_ABSTRACT_EXECUTABLE
 {
     // number of variables arguments (i.e. variadic arguments)
     int nv_args;
@@ -96,7 +96,7 @@ struct LEC_MTFN: public ABSTRACT_LEC_EXECUTABLE
     
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
-        : ABSTRACT_LEC_EXECUTABLE(type, nb_args), nv_args(nv_args)
+        : LEC_ABSTRACT_EXECUTABLE(type, nb_args), nv_args(nv_args)
     {
         if(!is_mtfn(type))
             throw std::invalid_argument("Invalid multi-time function type for LEC MULTI-TIME FUNC: " + std::to_string(type));
@@ -108,6 +108,19 @@ public:
     }
 
     LEC_MTFN(const LEC_MTFN& other) = default;
+
+    ~LEC_MTFN() override = default;
+
+    std::unique_ptr<LEC_ABSTRACT> clone() const override 
+    { 
+        return std::make_unique<LEC_MTFN>(*this); 
+    }
+
+    bool equals(const LEC_ABSTRACT& other) const override
+    {
+        const auto* rhs = dynamic_cast<const LEC_MTFN*>(&other);
+        return rhs && *this == *rhs;
+    }
 
     bool operator==(const LEC_MTFN& other) const
     {
