@@ -60,24 +60,6 @@ void L_fperror(int)
 }
 
 /**
- *  Checks if at least one of the last nargs values on the stack is IODE_NAN.
- *      
- *  @param [in, out] stack       double**    pointer to the pointer to the stack
- *  @return                      int         1 if IODE_NAN has been found and the stack is modified
- *                                           0 otherwise
- */
-bool L_stack_is_nan(const std::deque<double>& stack)
-{
-    for(const double& value : stack)
-    {
-        if(!IODE_IS_A_NUMBER(value)) 
-            return true;
-    }
-
-    return false;
-}
-
-/**
  *  Execution of a CLEC sub expression.
  * 
  *  The process iterates on the compiled LEC expression. 
@@ -110,7 +92,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
     
     int type;
     double value;
-    std::deque<double> stack;
+    LECStack stack;
     for(int expr_pos = start; expr_pos <= end;)
     {
         ATOMIC_LEC& al = this->v_expression[expr_pos];

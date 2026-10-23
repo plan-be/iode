@@ -22,21 +22,21 @@ double L_log10(const double v)
 
 /*------------- GROUP L_FNS_FN ---------------------*/
 
-double L_uminus(std::deque<double>& stack, int unused) 
+double L_uminus(LECStack& stack, int unused)
 {
     double value = stack.back();
     stack.pop_back();
     return -value;
 }
 
-double L_uplus (std::deque<double>& stack, int unused) 
+double L_uplus (LECStack& stack, int unused)
 {
     double value = stack.back();
     stack.pop_back();
     return value;
 }
 
-double L_log(std::deque<double>& stack, int nargs)
+double L_log(LECStack& stack, int nargs)
 {   
     if(nargs == 2)
     {
@@ -56,14 +56,14 @@ double L_log(std::deque<double>& stack, int nargs)
     }
 }
 
-double L_ln(std::deque<double>& stack, int unused)  
+double L_ln(LECStack& stack, int unused)
 {
     double value = stack.back();
     stack.pop_back();
     return L_log10(value);
 }
 
-double L_not(std::deque<double>& stack, int unused) 
+double L_not(LECStack& stack, int unused)
 {
     double value = stack.back();
     stack.pop_back();
@@ -75,7 +75,7 @@ double L_not(std::deque<double>& stack, int unused)
  *  If nargs == 1, it's the neperian exponential
  *  If nargs == 2, the mantissa is the second argument.
  */
-double L_expn(std::deque<double>& stack, int nargs)
+double L_expn(LECStack& stack, int nargs)
 {
     if(nargs == 1) 
     {
@@ -100,7 +100,7 @@ double L_expn(std::deque<double>& stack, int nargs)
     }
 }
 
-double L_max(std::deque<double>& stack, int nargs)
+double L_max(LECStack& stack, int nargs)
 {
     double max = stack.back();
     for(int j = 0; j < nargs; j++)
@@ -113,7 +113,7 @@ double L_max(std::deque<double>& stack, int nargs)
     return max;
 }
 
-double L_min(std::deque<double>& stack, int nargs)
+double L_min(LECStack& stack, int nargs)
 {
     double min = stack.back();
     for(int j = 0; j < nargs; j++)
@@ -126,98 +126,98 @@ double L_min(std::deque<double>& stack, int nargs)
     return min;
 }
 
-double L_sin(std::deque<double>& stack, int unused) 
+double L_sin(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return sin(x);
 }
 
-double L_cos(std::deque<double>& stack, int unused) 
+double L_cos(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return cos(x);
 }
 
-double L_acos(std::deque<double>& stack, int unused) 
+double L_acos(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return acos(x);
 }
 
-double L_asin(std::deque<double>& stack, int unused) 
+double L_asin(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return asin(x);
 }
 
-double L_tan(std::deque<double>& stack, int unused) 
+double L_tan(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return tan(x);
 }
 
-double L_atan(std::deque<double>& stack, int unused) 
+double L_atan(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return atan(x);
 }
 
-double L_tanh(std::deque<double>& stack, int unused) 
+double L_tanh(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return tanh(x);
 }
 
-double L_sinh(std::deque<double>& stack, int unused) 
+double L_sinh(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return sinh(x);
 }
 
-double L_cosh(std::deque<double>& stack, int unused) 
+double L_cosh(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return cosh(x);
 }
 
-double L_abs(std::deque<double>& stack, int unused) 
+double L_abs(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return fabs(x);
 }
 
-double L_sqrt(std::deque<double>& stack, int unused) 
+double L_sqrt(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return (x < 0) ? IODE_NAN: sqrt(x);
 }
 
-double L_int(std::deque<double>& stack, int unused) 
+double L_int(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return floor(0.5 + x);
 }
 
-double L_rad(std::deque<double>& stack, int unused) 
+double L_rad(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return (x * M_PI / 180.0);
 }
 
-double L_if(std::deque<double>& stack, int nargs)
+double L_if(LECStack& stack, int nargs)
 {
     double arg2 = stack.back();
     stack.pop_back();
@@ -232,7 +232,7 @@ double L_if(std::deque<double>& stack, int nargs)
         return arg1;
 }
 
-double L_lsum(std::deque<double>& stack, int nargs)
+double L_lsum(LECStack& stack, int nargs)
 {
     double sum = 0.0;
     for(int j = 0; j < nargs; j++)
@@ -244,7 +244,7 @@ double L_lsum(std::deque<double>& stack, int nargs)
     return sum;
 }
 
-double L_lmean(std::deque<double>& stack, int nargs)
+double L_lmean(LECStack& stack, int nargs)
 {
     int nb = 0;
     double mean = 0.0;
@@ -263,19 +263,19 @@ double L_lmean(std::deque<double>& stack, int nargs)
     return (nb > 0) ? mean / nb : IODE_NAN;
 }
 
-double L_fnisan(std::deque<double>& stack, int nargs) 
+double L_fnisan(LECStack& stack, int nargs)
 {
     double x = stack.back();
     stack.pop_back();
     return (double) IODE_IS_A_NUMBER(x);
 }
 
-double L_lcount(std::deque<double>& stack, int nargs) 
+double L_lcount(LECStack& stack, int nargs)
 {
     return (double) nargs;
 }
 
-double L_lprod(std::deque<double>& stack, int nargs)
+double L_lprod(LECStack& stack, int nargs)
 {
     double prod = 1.0;
     for(int j = 0; j < nargs; j++)
@@ -288,16 +288,16 @@ double L_lprod(std::deque<double>& stack, int nargs)
     return prod;
 }
 
-double L_sign(std::deque<double>& stack, int unused)
+double L_sign(LECStack& stack, int unused)
 { 
     double x = stack.back();
     stack.pop_back();
     return (x < 0) ? -1.0 : 1.0;
 }
 
-double L_lstderr(std::deque<double>& stack, int nargs)
+double L_lstderr(LECStack& stack, int nargs)
 {
-    std::deque<double> copy = stack;
+    LECStack copy = stack;
     double mean = L_lmean(copy, nargs);
 
     double x;
@@ -318,7 +318,7 @@ double L_lstderr(std::deque<double>& stack, int nargs)
     return (nb > 1) ? sqrt(sum / (nb - 1)) : IODE_NAN;
 }
 
-double L_random(std::deque<double>& stack, int unused)
+double L_random(LECStack& stack, int unused)
 {
     static bool init = false;
 
@@ -338,21 +338,21 @@ double L_random(std::deque<double>& stack, int unused)
     return factor * value;
 }
 
-double L_floor(std::deque<double>& stack, int unused) 
+double L_floor(LECStack& stack, int unused)
 {   
     double x = stack.back();
     stack.pop_back();
     return floor(x); 
 }
 
-double L_ceil(std::deque<double>& stack, int unused) 
+double L_ceil(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return 1.0 + floor(x);
 }
 
-double L_round(std::deque<double>& stack, int nargs)
+double L_round(LECStack& stack, int nargs)
 {
     double value = 0.0;
     int nb_digits = 0;
@@ -378,7 +378,7 @@ double L_round(std::deque<double>& stack, int nargs)
 /**
  * @brief urandom(max): randomly and uniformly distributed within the interval [0, max[ 
  */
-double L_urandom(std::deque<double>& stack, int unused)
+double L_urandom(LECStack& stack, int unused)
 {
     static bool init = false;
 
@@ -434,7 +434,7 @@ static double randBoxMuller(double rv_mean, double rv_sd)
  * @brief grandom(m, sd): random variable with a normal distribution 
  * with mean 'm' and standard deviation 'sd'.
  */
-double L_grandom(std::deque<double>& stack, int unused)
+double L_grandom(LECStack& stack, int unused)
 {
     double sd = stack.back();
     stack.pop_back();
@@ -480,14 +480,14 @@ static double dgamma(double x)
     return w / y;
 }
 
-double L_gamma(std::deque<double>& stack, int unused)
+double L_gamma(LECStack& stack, int unused)
 {
     double x = stack.back();
     stack.pop_back();
     return dgamma(x);
 }
 
-double L_div0(std::deque<double>& stack, int unused)
+double L_div0(LECStack& stack, int unused)
 {
     double b = stack.back();
     stack.pop_back();

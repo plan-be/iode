@@ -12,7 +12,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs)
+ *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -43,7 +43,7 @@
  *  
  */
 double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
-    int from, int to, int t, std::deque<double>& stack, int nargs) 
+    int from, int to, int t, LECStack& stack, int nargs)
 {
     double mean_x = L_mean(clec, pos1, length1, from, to, t, stack, nargs - 1);
     if(!IODE_IS_A_NUMBER(mean_x)) 
@@ -104,7 +104,7 @@ double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const i
  *  
  */
 double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
     {
@@ -140,7 +140,7 @@ double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_l
  *  
  */
 double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
-    int from, int to, int t, std::deque<double>& stack, int nargs, int orig) 
+    int from, int to, int t, LECStack& stack, int nargs, int orig)
 {   
     int nb = 1 + to - from;
     if(nb == 0) 
@@ -189,7 +189,7 @@ double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const 
  *  @see L_calccovar() for the formulas.
  */
 double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs) 
+    LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
     {
@@ -215,7 +215,7 @@ double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_
  *  
  */
 double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs) 
+    LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
     {
@@ -249,7 +249,7 @@ double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  *  
  */
 double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
     {
@@ -275,7 +275,7 @@ double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
  *  
  */
 double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {
     double var = L_var(clec, expr_pos, v_length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(var) || var < 0.0) 
@@ -313,7 +313,7 @@ double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  */  
 
  double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
     {
@@ -363,7 +363,7 @@ double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  *  @see L_corr() for the parameter definition
  */
 double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
     {
@@ -432,7 +432,7 @@ double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
  *  @return             double           computed correlation 
  *  
  */
-int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>& stack, 
+int L_calcvals(AbstractCLEC& clec, int start, int end, int t, LECStack& stack,
     int* vt, double* vy, int notnul)
 {
     vy[0] = vy[1] = IODE_NAN;
@@ -502,7 +502,7 @@ int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>
  *  
  */
 double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
     {
@@ -539,7 +539,7 @@ double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>&
 }
 
 double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
     {
@@ -630,7 +630,7 @@ double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
 }
 
 double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
-    std::deque<double>& stack, int nargs)
+    LECStack& stack, int nargs)
 {  
     if(v_length.size() == 0)
     {
@@ -693,7 +693,7 @@ double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_l
 }
 
 double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
-    int from, int to, int t, std::deque<double>& stack, int nargs, int std)
+    int from, int to, int t, LECStack& stack, int nargs, int std)
 {   
     double value = clec.execute_sub_expression(pos1, length1, t);
     if(!IODE_IS_A_NUMBER(value)) 
@@ -732,7 +732,7 @@ double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int 
 }
 
 double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
-    int from, int to, int t, std::deque<double>& stack, int nargs)
+    int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
     {
@@ -750,7 +750,7 @@ double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_len
 
 
 double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
-    int from, int to, int t, std::deque<double>& stack, int nargs)
+    int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
     {
