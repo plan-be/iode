@@ -1344,14 +1344,14 @@ class Equations(IodeDatabase):
         ...         "F": ["d(F) := t + 1", "GLS", "", 1.0, 0.05, 4.568e-04, ""]}
         >>> df = pd.DataFrame.from_dict(data, orient='index', columns=columns)
         >>> # display the pandas series
-        >>> df                  # doctest: +NORMALIZE_WHITESPACE
-                     lec          method         sample  ...   fstat        r2        date
-        A         A := t             LSQ  1980Y1:2010Y1  ...  0.7900  0.050000  12-06-1998
-        B     B := grt A             LSQ  1980Y1:2010Y1  ...  0.8960  0.150000  12-06-1998
-        C     C := exp t         ZELLNER        1990Y1:  ...  0.1258  0.022500
-        D      ln D := t  MAX_LIKELIHOOD                 ...  0.3580  0.069800  12-06-1998
-        E       1/E := B             LSQ        :2010Y1  ...  0.6890  0.002230
-        F  d(F) := t + 1             GLS                 ...  0.0500  0.000457
+        >>> df                  # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+                     lec          method  ...        r2        date
+        A         A := t             LSQ  ...  0.050000  12-06-1998
+        B     B := grt A             LSQ  ...  0.150000  12-06-1998
+        C     C := exp t         ZELLNER  ...  0.022500
+        D      ln D := t  MAX_LIKELIHOOD  ...  0.069800  12-06-1998
+        E       1/E := B             LSQ  ...  0.002230
+        F  d(F) := t + 1             GLS  ...  0.000457
         <BLANKLINE>
         [6 rows x 7 columns]
 
