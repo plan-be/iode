@@ -86,7 +86,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
     {
         double value = (L_VAL_FN[pos])(t, clec.exec_t);
         return value;

@@ -14,7 +14,7 @@
  *
  * Function signature:
  *
- *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+ *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
  *  
  *  where:
  *      - expr points to the current position in the CLEC expression (in "sum(A + B))", expr points to "A + B")
@@ -60,7 +60,7 @@
  *  @param [out] from   int*    position in the sample of the "from" arg
  *  @param [out] to     int*    position in the sample of the "to" arg
  */
-void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from, int& to)
+void L_extract_time_range(int t, LECStack& stack, int nargs, int& from, int& to)
 {
     from = 0;
     to = t;
@@ -102,7 +102,7 @@ void L_extract_time_range(int t, std::deque<double>& stack, int nargs, int& from
  *  @return             double          result of "expr in t"
  *  
  */
-double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -124,7 +124,7 @@ double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -152,7 +152,7 @@ double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -181,7 +181,7 @@ double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -209,7 +209,7 @@ double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     double v1 = L_rapp(clec, expr_pos, length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(v1)) 
@@ -224,7 +224,7 @@ double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from,
  *  
  *  @see L_lag() for more details on parameters.
  */
-double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     int lag = 1;
     if(nargs == 2)
@@ -263,7 +263,7 @@ double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  @return             double          the maximum of expr on the period [p1, p2]
  *  
  */
-double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     double value = clec.execute_sub_expression(expr_pos, length, from);
     if(!IODE_IS_A_NUMBER(value)) 
@@ -288,7 +288,7 @@ double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  
  *  @see L_vmax() for more details.
  */
-double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     double value = clec.execute_sub_expression(expr_pos, length, from);
     if(!IODE_IS_A_NUMBER(value)) 
@@ -313,7 +313,7 @@ double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  
  *  @see L_vmax() for more details.
  */
-double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {   
     double value;
     double sum = 0.0;
@@ -334,7 +334,7 @@ double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from,
  *  
  *  @see L_vmax() for more details.
  */
-double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {
     double value;
     double prod = 1.0;
@@ -358,7 +358,7 @@ double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  @note not a function because it is also used by MTFN functions
  */
 
-double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {   
     double sum = L_sum(clec, expr_pos, length, from, to, t, stack, nargs);
     if(!IODE_IS_A_NUMBER(sum)) 
@@ -375,7 +375,7 @@ double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from
  *  @see L_vmax() for more details.
  *  
  */
-double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {   
     double value;
     double sum = 0.0, sum2 = 0.0;
@@ -403,7 +403,7 @@ double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int fr
  *  @see L_vmax() for more details.
  *  
  */
-double L_lastobs(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, std::deque<double>& stack, int nargs)
+double L_lastobs(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs)
 {   
     double value;
     for(int j = to; j >= from; j--) 

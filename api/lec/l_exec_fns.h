@@ -73,45 +73,45 @@ inline double u_rand()
 
 double L_log10(const double v);
 
-double L_uminus(std::deque<double>& stack, int nbargs);
-double L_uplus(std::deque<double>& stack, int nbargs);
-double L_log(std::deque<double>& stack, int nbargs);
-double L_ln(std::deque<double>& stack, int nbargs);
-double L_not(std::deque<double>& stack, int nbargs);
-double L_expn(std::deque<double>& stack, int nargs);
-double L_max(std::deque<double>& stack, int nbargs);
-double L_min(std::deque<double>& stack, int nbargs);
-double L_sin(std::deque<double>& stack, int nbargs);
-double L_asin(std::deque<double>& stack, int nbargs);
-double L_cos(std::deque<double>& stack, int nbargs);
-double L_acos(std::deque<double>& stack, int nbargs);
-double L_tan(std::deque<double>& stack, int nbargs);
-double L_atan(std::deque<double>& stack, int nbargs);
-double L_sinh(std::deque<double>& stack, int nbargs);
-double L_cosh(std::deque<double>& stack, int nbargs);
-double L_tanh(std::deque<double>& stack, int nbargs);
-double L_sqrt(std::deque<double>& stack, int nbargs);
-double L_int(std::deque<double>& stack, int nbargs);
-double L_abs(std::deque<double>& stack, int nbargs);
-double L_sign(std::deque<double>& stack, int nbargs);
-double L_rad(std::deque<double>& stack, int nbargs);
-double L_if(std::deque<double>& stack, int nbargs);
-double L_fnisan(std::deque<double>& stack, int nbargs);
-double L_lcount(std::deque<double>& stack, int nbargs);
-double L_lprod(std::deque<double>& stack, int nbargs);
-double L_lsum(std::deque<double>& stack, int nbargs);
-double L_lstderr(std::deque<double>& stack, int nbargs);
-double L_lmean(std::deque<double>& stack, int nbargs);
-double L_random(std::deque<double>& stack, int nbargs);
-double L_floor(std::deque<double>& stack, int nbargs);
-double L_ceil (std::deque<double>& stack, int nbargs);
-double L_round(std::deque<double>& stack, int nbargs);
-double L_urandom(std::deque<double>& stack, int nbargs);
-double L_grandom(std::deque<double>& stack, int nbargs);
-double L_gamma(std::deque<double>& stack, int nbargs);
-double L_div0(std::deque<double>& stack, int nbargs);
+double L_uminus(LECStack& stack, int nbargs);
+double L_uplus(LECStack& stack, int nbargs);
+double L_log(LECStack& stack, int nbargs);
+double L_ln(LECStack& stack, int nbargs);
+double L_not(LECStack& stack, int nbargs);
+double L_expn(LECStack& stack, int nargs);
+double L_max(LECStack& stack, int nbargs);
+double L_min(LECStack& stack, int nbargs);
+double L_sin(LECStack& stack, int nbargs);
+double L_asin(LECStack& stack, int nbargs);
+double L_cos(LECStack& stack, int nbargs);
+double L_acos(LECStack& stack, int nbargs);
+double L_tan(LECStack& stack, int nbargs);
+double L_atan(LECStack& stack, int nbargs);
+double L_sinh(LECStack& stack, int nbargs);
+double L_cosh(LECStack& stack, int nbargs);
+double L_tanh(LECStack& stack, int nbargs);
+double L_sqrt(LECStack& stack, int nbargs);
+double L_int(LECStack& stack, int nbargs);
+double L_abs(LECStack& stack, int nbargs);
+double L_sign(LECStack& stack, int nbargs);
+double L_rad(LECStack& stack, int nbargs);
+double L_if(LECStack& stack, int nbargs);
+double L_fnisan(LECStack& stack, int nbargs);
+double L_lcount(LECStack& stack, int nbargs);
+double L_lprod(LECStack& stack, int nbargs);
+double L_lsum(LECStack& stack, int nbargs);
+double L_lstderr(LECStack& stack, int nbargs);
+double L_lmean(LECStack& stack, int nbargs);
+double L_random(LECStack& stack, int nbargs);
+double L_floor(LECStack& stack, int nbargs);
+double L_ceil (LECStack& stack, int nbargs);
+double L_round(LECStack& stack, int nbargs);
+double L_urandom(LECStack& stack, int nbargs);
+double L_grandom(LECStack& stack, int nbargs);
+double L_gamma(LECStack& stack, int nbargs);
+double L_div0(LECStack& stack, int nbargs);
 
-inline double(*L_FNS_FN[])(std::deque<double>& stack, int nbargs) = 
+inline double(*L_FNS_FN[])(LECStack& stack, int nbargs) =
 { 
     L_uminus,       // L_UMINUS    L_FN + 0
     L_uplus,        // L_UPLUS     L_FN + 1
@@ -225,15 +225,32 @@ public:
         return is_same_type(other);
     }
 
+    /**
+     *  Checks if at least one active value on the stack is IODE_NAN.
+     *
+     *  @param [in] stack       execution stack
+     *  @return true            if an active value is IODE_NAN, false otherwise
+     */
+    bool check_nan_in_stack(const LECStack& stack) const
+    {
+        for(int shift = 0; shift < nb_args; shift++)
+        {
+            if(!stack.is_nan(shift))
+                return true;
+        }
+    
+        return false;
+    }
+
     // executes the function with the given arguments on the stack
-    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 
                               type == L_LSTDERR || type == L_LCOUNT);
 
         double result;
-        if(!fn_accept_nan && L_stack_is_nan(stack))
+        if(!fn_accept_nan && check_nan_in_stack(stack))
         {
             for(int i = 0; i < nb_args; i++)
                 stack.pop_back();

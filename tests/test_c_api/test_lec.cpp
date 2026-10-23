@@ -88,6 +88,21 @@ TEST_F(LecTest, AtomicLEC_Equality)
     EXPECT_FALSE(other_type.equals(one));
 }
 
+TEST_F(LecTest, ExecutionStackCapacity)
+{
+    LECStack stack;
+    for(int i = 0; i < 1000; ++i)
+        stack.push_back(static_cast<double>(i));
+
+    EXPECT_DOUBLE_EQ(stack.back(), 999.0);
+    EXPECT_THROW(stack.push_back(1000.0), std::overflow_error);
+    EXPECT_DOUBLE_EQ(stack.back(), 999.0);
+
+    stack.pop_back();
+    EXPECT_NO_THROW(stack.push_back(1000.0));
+    EXPECT_DOUBLE_EQ(stack.back(), 1000.0);
+}
+
 TEST_F(LecTest, CLEC_NameTypes)
 {
     CLEC clec("A + alpha * B + alpha + beta + A");
@@ -161,6 +176,7 @@ TEST_F(LecTest, LEC)
     check_lec("if(t=2002Y1, A + B, A - B)", t-1, A[t-1] - B[t-1]);
     check_lec("div0(A, B)", t, A[t] / B[t]);
     check_lec("div0(A, B)", 0, 0.0);            // B[...] = 0.0
+    check_lec("lstderr(1, 2, 3)", t, 1.0);
     
     // ---- test time functions (LEC_TFN) ----
     expected_value = 0.0;
