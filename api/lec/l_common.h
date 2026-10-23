@@ -1,6 +1,9 @@
 #pragma once
 #include "api/iode_scr4.h"
+#include <algorithm>
+#include <array>
 #include <memory>
+#include <stdexcept>
 #include "scr4/yy/s_yy.h"      // YYKEYS
 
 #include "api/pch.h"
@@ -55,11 +58,93 @@ inline bool is_special_lec_elem(const int type)
 
 constexpr int L_FN = L_SPECIAL_LAST + 1;
 
+class LECStack
+{
+    static constexpr std::size_t capacity = 1000;
+
+    std::size_t last;
+    std::array<double, capacity> values;
+
+public:
+    LECStack() : last(-1)
+    { 
+        values.fill(IODE_NAN);
+    }
+
+    LECStack(const LECStack& other) : last(other.last)
+    {
+        if(last >= 0)
+            std::copy_n(other.values.begin(), last + 1, values.begin());
+        else
+            values.fill(IODE_NAN);
+    }
+
+    LECStack& operator=(const LECStack& other)
+    {
+        if(this != &other)
+        {
+            last = other.last;
+            if(last >= 0)
+                std::copy_n(other.values.begin(), last + 1, values.begin());
+            else
+                values.fill(IODE_NAN);
+        }
+        return *this;
+    }
+
+    void push_back(double value)
+    {
+        last++;
+        if(last == capacity)
+        {
+            last--;
+            throw std::overflow_error("LEC execution stack exceeded 1000 values");
+        }
+        values[last] = value;
+    }
+
+    void pop_back()
+    {
+        if(last < 0)
+            throw std::underflow_error("LEC execution stack is empty");
+        values[last] = 0.0;
+        last--;
+    }
+
+    double back() const
+    {
+        if(last < 0)
+            throw std::underflow_error("LEC execution stack is empty");
+        return values[last];
+    }
+
+    bool is_nan(int shift) const
+    { 
+        std::size_t index = last - shift;
+        if(index < 0)
+        {
+            std::string msg = "Cannot check if LEC execution stack is NaN: ";
+            msg += "negative index";
+            throw std::underflow_error(msg);
+        }
+        return !IODE_IS_A_NUMBER(values[index]);
+    }
+
+    auto begin() const 
+    { 
+        return values.begin(); 
+    }
+
+    auto end() const 
+    { 
+        return values.begin() + last + 1; 
+    }
+};
+
 /* ---------------------- FUNCS ---------------------- */
 
 /* l_exec.cpp */
 int L_intlag(double lag);
-bool L_stack_is_nan(const std::deque<double>& stack);
 
 /* l_debug.cpp */
 void L_debug(char*, ...);
@@ -138,7 +223,7 @@ protected:
 public:
     ~LEC_ABSTRACT_EXECUTABLE() override = default;
 
-    virtual double execute(std::deque<double>& stack, int t, int& expr_pos, 
+    virtual double execute(LECStack& stack, int t, int& expr_pos,
         AbstractCLEC& clec) const = 0;
 };
 

@@ -32,28 +32,28 @@ inline bool is_mtfn(const int op)
     return op >= L_MTFN; 
 }
 
-int L_calcvals(AbstractCLEC& clec, int start, int end, int t, std::deque<double>& stack, int* p_nargs, double* res, int nbvals);
+int L_calcvals(AbstractCLEC& clec, int start, int end, int t, LECStack& stack, int* p_nargs, double* res, int nbvals);
 double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
-    std::deque<double>& stack, int nargs);
+    LECStack& stack, int nargs);
 double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
-    std::deque<double>& stack, int nargs, int center);
+    LECStack& stack, int nargs, int center);
 double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
-    std::deque<double>& stack, int nargs, int std);
+    LECStack& stack, int nargs, int std);
 
-double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
-double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs);
+double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
 
-inline double(*L_MTFN_FN[])(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, std::deque<double>& stack, int nargs) = 
+inline double(*L_MTFN_FN[])(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs) =
 { 
     L_corr,         // L_CORR      L_M
     L_covar,        // L_COVAR     L_M
@@ -138,7 +138,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the first sub expression
-    double execute(std::deque<double>& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
     {
         int from = -1, to = -1;
         // NOTE: in function L_extract_time_range():
