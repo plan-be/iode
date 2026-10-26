@@ -37,21 +37,21 @@ inline bool is_tfn(const int op)
 
 void L_extract_time_range(int t, LECStack& stack, int nargs, int& from, int& to);
 
-double L_lag(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_diff(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_rapp(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_dln(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_grt(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_mavg(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_vmax(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_vmin(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_sum(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_prod(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_mean(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_stderr(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
-double L_lastobs(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_lag(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_diff(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_rapp(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_dln(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_grt(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_mavg(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_vmax(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_vmin(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_sum(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_prod(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_mean(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_stderr(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
+double L_lastobs(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs);
 
-inline double(*L_TFN_FN[])(AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs) =
+inline double(*L_TFN_FN[])(const AbstractCLEC& clec, const int expr_pos, const int length, int from, int to, int t, LECStack& stack, int nargs) =
 { 
     L_lag,          // L_LAG       L_TFN + 0 
     L_diff,         // L_DIFF      L_TFN + 1 
@@ -131,7 +131,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the sub expression
-    double execute(LECStack& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
     {
         int from = -1, to = -1;
         // NOTE: for time functions:

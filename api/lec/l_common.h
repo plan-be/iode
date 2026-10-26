@@ -165,9 +165,9 @@ struct AbstractCLEC
 public:
     AbstractCLEC() {}
 
-    virtual int get_nb_obs() = 0;
+    virtual int get_nb_obs() const = 0;
     virtual void link_sample(KDBVariablesPtr dbv, const int start, const int length) = 0;
-    virtual double execute_sub_expression(const int start, const int length, const int t) = 0;
+    virtual double execute_sub_expression(const int start, const int length, const int t) const = 0;
 };
 
 struct LEC_ABSTRACT
@@ -224,7 +224,7 @@ public:
     ~LEC_ABSTRACT_EXECUTABLE() override = default;
 
     virtual double execute(LECStack& stack, int t, int& expr_pos,
-        AbstractCLEC& clec) const = 0;
+        const AbstractCLEC& clec) const = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT

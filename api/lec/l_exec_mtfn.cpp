@@ -12,7 +12,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs)
+ *      double <fnname>(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -42,7 +42,7 @@
  *  @return         
  *  
  */
-double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
+double L_calccorr(const AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
     int from, int to, int t, LECStack& stack, int nargs)
 {
     double mean_x = L_mean(clec, pos1, length1, from, to, t, stack, nargs - 1);
@@ -103,7 +103,7 @@ double L_calccorr(AbstractCLEC& clec, const int pos1, const int length1, const i
  *  @return            double           computed correlation 
  *  
  */
-double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_corr(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -139,7 +139,7 @@ double L_corr(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_l
  *  @return             double          computed covariance.
  *  
  */
-double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
+double L_calccovar(const AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
     int from, int to, int t, LECStack& stack, int nargs, int orig)
 {   
     int nb = 1 + to - from;
@@ -188,7 +188,7 @@ double L_calccovar(AbstractCLEC& clec, const int pos1, const int length1, const 
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -214,7 +214,7 @@ double L_covar(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_
  *  @see L_calccovar() for the formulas.
  *  
  */
-double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -248,7 +248,7 @@ double L_covar0(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  *  @see L_covar() for more details.
  *  
  */
-double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_var(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
@@ -274,7 +274,7 @@ double L_var(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
  *  @see L_calccovar() for the formula.
  *  
  */
-double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     double var = L_var(clec, expr_pos, v_length, from, to, t, stack, nargs);
@@ -312,7 +312,7 @@ double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  *  @return            double           computed covariance
  */  
 
- double L_index(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+ double L_index(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -362,7 +362,7 @@ double L_stddev(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v
  *  
  *  @see L_corr() for the parameter definition
  */
-double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_acf(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -432,7 +432,7 @@ double L_acf(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
  *  @return             double           computed correlation 
  *  
  */
-int L_calcvals(AbstractCLEC& clec, int start, int end, int t, LECStack& stack,
+int L_calcvals(const AbstractCLEC& clec, int start, int end, int t, LECStack& stack,
     int* vt, double* vy, int notnul)
 {
     vy[0] = vy[1] = IODE_NAN;
@@ -501,7 +501,7 @@ int L_calcvals(AbstractCLEC& clec, int start, int end, int t, LECStack& stack,
  *  @return     double  value of expr[t] or interpolated value
  *  
  */
-double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
@@ -538,7 +538,7 @@ double L_interpol(AbstractCLEC& clec, const int expr_pos, const std::deque<int>&
     return interpol;
 }
 
-double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_app(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
@@ -629,7 +629,7 @@ double L_app(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_le
     return IODE_NAN;
 }
 
-double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_dapp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {  
     if(v_length.size() == 0)
@@ -692,7 +692,7 @@ double L_dapp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_l
     return IODE_NAN;
 }
 
-double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
+double L_hpall(const AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, 
     int from, int to, int t, LECStack& stack, int nargs, int std)
 {   
     double value = clec.execute_sub_expression(pos1, length1, t);
@@ -731,7 +731,7 @@ double L_hpall(AbstractCLEC& clec, const int pos1, const int length1, const int 
     return value;
 }
 
-double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
     int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
@@ -749,7 +749,7 @@ double L_hp(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_len
 }
 
 
-double L_hpstd(AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+double L_hpstd(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
     int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
