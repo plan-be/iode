@@ -257,6 +257,8 @@ public:
         return true;
     }
 
+    // TODO : copy_expression method and clone method sub-classes of ATOMIC_LEC 
+    // are slow. Find a way to speed up the copy of v_expression.
     std::vector<ATOMIC_LEC> copy_expression() const
     {
         std::vector<ATOMIC_LEC> v_copy;
