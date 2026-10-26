@@ -82,15 +82,15 @@ int CLEC::link_names(KDBVariablesPtr dbv, KDBScalarsPtr dbs)
 
     for(ATOMIC_LEC& al : this->v_expression)
     {
-        if(al->type == L_COEF)
+        if(std::holds_alternative<LEC_COEF>(al))
         {
-            LEC_COEF& al_coef = static_cast<LEC_COEF&>(*al);
+            LEC_COEF& al_coef = std::get<LEC_COEF>(al);
             name = al_coef.name;
             al_coef.link(map_coeffs[name]);
         }
-        else if(al->type == L_VAR || al->type == L_VART)
+        else if(std::holds_alternative<LEC_VAR>(al))
         {
-            LEC_VAR& al_var = static_cast<LEC_VAR&>(*al);
+            LEC_VAR& al_var = std::get<LEC_VAR>(al);
             name = al_var.name;
             al_var.link(map_vars[name]);
         }
@@ -144,23 +144,23 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         ATOMIC_LEC& al = this->v_expression[expr_pos];
         expr_pos++;
 
-        if(al->type == L_VAR || al->type == L_VART)
+        if(std::holds_alternative<LEC_VAR>(al))
         {
-            LEC_VAR& al_var = static_cast<LEC_VAR&>(*al);
-            // store the number of periods
-            al_var.set_nb_periods(smpl_ptr->nb_periods);
+            LEC_VAR& al_var = std::get<LEC_VAR>(al);
+            // check if the seize of Variable var equals the number of periods
+            al_var.check_nb_periods(smpl_ptr->nb_periods);
             // calculate the reference of the variable
             al_var.calculate_ref(*smpl_ptr);
         }
-        else if(al->type == L_PERIOD)
+        else if(std::holds_alternative<LEC_PERIOD>(al))
         {
-            LEC_PERIOD& al_period = static_cast<LEC_PERIOD&>(*al);
+            LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
             // calculate the position of the period in the sample
             al_period.link(*smpl_ptr);
         }
-        else if(is_tfn(al->type))
+        else if(std::holds_alternative<LEC_TFN>(al))
         {
-            LEC_TFN& al_tfn = static_cast<LEC_TFN&>(*al);
+            LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
             // recursive call to link_sample()
             int tfn_length = al_tfn.length_expr;
             if(tfn_length > 0)
@@ -169,9 +169,9 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
                 expr_pos += tfn_length;
             }
         }
-        else if(is_mtfn(al->type))
+        else if(std::holds_alternative<LEC_MTFN>(al))
         {
-            LEC_MTFN& al_mtfn = static_cast<LEC_MTFN&>(*al);
+            LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
             // recursive call to link_sample()
             for(const int& mtfn_length : al_mtfn.v_length_expr)
             {

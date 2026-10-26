@@ -95,24 +95,13 @@ public:
 
     ~LEC_OP() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_OP>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_OP*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_OP& other) const
     {
         return is_same_type(other);
     }
 
     // executes the operator with the given arguments on the stack
-    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
+    double execute(LECStack& stack) const
     {
         double b = stack.back();
         stack.pop_back();

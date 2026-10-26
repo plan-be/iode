@@ -107,17 +107,6 @@ public:
 
     ~LEC_TFN() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_TFN>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_TFN*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_TFN& other) const
     {
         if(!is_same_type(other))
@@ -131,7 +120,7 @@ public:
 
     // executes the function with the given arguments on the stack
     // NOTE: expr_pos is the position of the first atomic lec element of the sub expression
-    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const
     {
         int from = -1, to = -1;
         // NOTE: for time functions:

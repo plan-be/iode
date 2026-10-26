@@ -90,52 +90,101 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
         return (double) IODE_NAN;
     }
     
-    int type;
     double value;
     LECStack stack;
+    bool handled;
+    bool is_executable;
     for(int expr_pos = start; expr_pos <= end;)
     {
         const ATOMIC_LEC& al = this->v_expression[expr_pos];
         expr_pos++;
 
-        type = al->type;
+        // ---- atomic LEC of type other ----
+        if(std::holds_alternative<LEC_OTHER>(al))
+            continue;
 
-        switch(al->generic_type)
+        is_executable = is_atomic_lec_executable(al);
+
+        // ---- atomic LEC of type value ----
+        if(!is_executable)
         {
-            // ---- atomic LEC of type value ----
-            case L_VALUE:
+            handled = true;
+            if(std::holds_alternative<LEC_CONST_REAL>(al))
             {
-                if(al->type == L_VAR || al->type == L_VART)
-                {
-                    const LEC_VAR& al_var = static_cast<LEC_VAR&>(*al);
-                    if(!smpl_ptr)
-                    {
-                        kwarning("LEC: No attached sample");
-                        return IODE_NAN;
-                    }
-                    value = al_var.get_value(t);
-                }
-                else
-                {
-                    const LEC_ABSTRACT_VALUE& al_value = static_cast<LEC_ABSTRACT_VALUE&>(*al);
-                    value = al_value.get_value(t);
-                }
-                stack.push_back(value);
-                break;
+                const LEC_CONST_REAL& al_dconst = std::get<LEC_CONST_REAL>(al);
+                value = al_dconst.get_value();
             }
-            // ---- atomic LEC of type executable ----
-            case L_EXECUTABLE:
+            else if(std::holds_alternative<LEC_CONST_LONG>(al))
             {
-                const LEC_ABSTRACT_EXECUTABLE& al_exec = static_cast<LEC_ABSTRACT_EXECUTABLE&>(*al);
-                value = al_exec.execute(stack, t, expr_pos, *this);
-                stack.push_back(value);
-                break;
+                const LEC_CONST_LONG& al_lconst = std::get<LEC_CONST_LONG>(al);
+                value = al_lconst.get_value();
             }
-            // ---- atomic LEC of type other ----
-            case L_OTHER:
-            default:
-                break;
+            else if(std::holds_alternative<LEC_COEF>(al))
+            {
+                const LEC_COEF& al_coef = std::get<LEC_COEF>(al);
+                value = al_coef.get_value(); 
+            }
+            else if(std::holds_alternative<LEC_PERIOD>(al))
+            {
+                const LEC_PERIOD& al_period = std::get<LEC_PERIOD>(al);
+                value = al_period.get_value();
+            }
+            else if(std::holds_alternative<LEC_VAR>(al))
+            {
+                const LEC_VAR& al_var = std::get<LEC_VAR>(al);
+                if(!smpl_ptr)
+                {
+                    kwarning("LEC: No attached sample");
+                    return IODE_NAN;
+                }
+                value = al_var.get_value(t);
+            }
+            else
+                handled = false;
         }
+        // ---- atomic LEC of type executable ----
+        else
+        {
+            handled = true;
+            if(std::holds_alternative<LEC_FN>(al))
+            {
+                const LEC_FN& al_fn = std::get<LEC_FN>(al);
+                value = al_fn.execute(stack);
+            }
+            else if(std::holds_alternative<LEC_OP>(al))
+            {
+                const LEC_OP& al_op = std::get<LEC_OP>(al);
+                value = al_op.execute(stack);
+            }
+            else if(std::holds_alternative<LEC_TFN>(al))
+            {
+                const LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+                value = al_tfn.execute(stack, t, expr_pos, *this);
+            }
+            else if(std::holds_alternative<LEC_VAL_FN>(al))
+            {
+                const LEC_VAL_FN& al_val = std::get<LEC_VAL_FN>(al);
+                value = al_val.execute(t, exec_t);
+            }
+            else if(std::holds_alternative<LEC_MTFN>(al))
+            {
+                const LEC_MTFN& al_mtfn = std::get<LEC_MTFN>(al);
+                value = al_mtfn.execute(stack, t, expr_pos, *this);
+            }
+            else
+                handled = false;
+        }
+
+        if(!handled) 
+        {
+            int type = atomic_lec_type(al);
+            std::string error_msg = "Could not execute compiled LEC sub expression: ";
+            error_msg += "invalid atomic lec type " + std::to_string(type);
+            kerror(0, (char*) error_msg.c_str());
+            return (double) IODE_NAN;
+        }
+
+        stack.push_back(value);
     }
 
     return stack.back();

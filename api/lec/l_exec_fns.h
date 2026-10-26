@@ -208,17 +208,6 @@ public:
     LEC_FN(const LEC_FN& other) = default;
 
     ~LEC_FN() override = default;
-
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_FN>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_FN*>(&other);
-        return rhs && *this == *rhs;
-    }
     
     bool operator==(const LEC_FN& other) const
     {
@@ -243,7 +232,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
+    double execute(LECStack& stack) const
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 
