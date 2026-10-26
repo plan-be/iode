@@ -243,7 +243,7 @@ public:
     }
 
     // executes the function with the given arguments on the stack
-    double execute(LECStack& stack, int t, int& expr_pos, AbstractCLEC& clec) const override
+    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
      {
         // some functions (e.g. L_IF) can accept NaN as argument without returning NaN
         bool fn_accept_nan = (type == L_IF || type == L_FNISAN || type == L_LMEAN || 

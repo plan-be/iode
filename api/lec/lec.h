@@ -280,7 +280,7 @@ public:
 
     std::vector<std::string> get_variables() const { return v_var_names; }
 
-    int get_nb_obs() override
+    int get_nb_obs() const override
     {
         if(!smpl_ptr)
             return 0;
@@ -365,7 +365,7 @@ public:
      * @param t         time of calculation (index in dbv sample)
      * @return double 
      */
-    double execute_sub_expression(const int start, const int length, const int t);
+    double execute_sub_expression(const int start, const int length, const int t) const;
 };
 
 
