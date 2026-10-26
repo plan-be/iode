@@ -107,7 +107,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
             {
                 if(al->type == L_VAR || al->type == L_VART)
                 {
-                    const LEC_VAR& al_var = dynamic_cast<LEC_VAR&>(*al);
+                    const LEC_VAR& al_var = static_cast<LEC_VAR&>(*al);
                     if(!smpl_ptr)
                     {
                         kwarning("LEC: No attached sample");
@@ -117,7 +117,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
                 }
                 else
                 {
-                    const LEC_ABSTRACT_VALUE& al_value = dynamic_cast<LEC_ABSTRACT_VALUE&>(*al);
+                    const LEC_ABSTRACT_VALUE& al_value = static_cast<LEC_ABSTRACT_VALUE&>(*al);
                     value = al_value.get_value(t);
                 }
                 stack.push_back(value);
@@ -126,7 +126,7 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
             // ---- atomic LEC of type executable ----
             case L_EXECUTABLE:
             {
-                const LEC_ABSTRACT_EXECUTABLE& al_exec = dynamic_cast<LEC_ABSTRACT_EXECUTABLE&>(*al);
+                const LEC_ABSTRACT_EXECUTABLE& al_exec = static_cast<LEC_ABSTRACT_EXECUTABLE&>(*al);
                 value = al_exec.execute(stack, t, expr_pos, *this);
                 stack.push_back(value);
                 break;
