@@ -41,7 +41,7 @@ int SLEC::count_endo(const EQ_HAND_SIDE mbr)
         if(al->type != L_VAR && al->type != L_VART)
             continue;
 
-        const LEC_VAR& al_var = dynamic_cast<const LEC_VAR&>(*al);
+        const LEC_VAR& al_var = static_cast<const LEC_VAR&>(*al);
 
         // the lagged (A[-1]) and timed (A[2000Y1]) variables are not taken into account.
         if(al_var.type != L_VAR || al_var.per.step != 0 || al_var.lag != 0)
@@ -115,7 +115,7 @@ ag:
     }
 
     // cast to LEC_ABSTRACT_EXECUTABLE to get the number of arguments
-    const LEC_ABSTRACT_EXECUTABLE& al_exec = dynamic_cast<const LEC_ABSTRACT_EXECUTABLE&>(*al);
+    const LEC_ABSTRACT_EXECUTABLE& al_exec = static_cast<const LEC_ABSTRACT_EXECUTABLE&>(*al);
 
     func_index = type;
     nb_args = al_exec.nb_args;

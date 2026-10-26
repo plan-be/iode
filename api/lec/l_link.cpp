@@ -146,7 +146,7 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
 
         if(al->type == L_VAR || al->type == L_VART)
         {
-            LEC_VAR& al_var = dynamic_cast<LEC_VAR&>(*al);
+            LEC_VAR& al_var = static_cast<LEC_VAR&>(*al);
             // store the number of periods
             al_var.set_nb_periods(smpl_ptr->nb_periods);
             // calculate the reference of the variable
@@ -154,13 +154,13 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         }
         else if(al->type == L_PERIOD)
         {
-            LEC_PERIOD& al_period = dynamic_cast<LEC_PERIOD&>(*al);
+            LEC_PERIOD& al_period = static_cast<LEC_PERIOD&>(*al);
             // calculate the position of the period in the sample
             al_period.link(*smpl_ptr);
         }
         else if(is_tfn(al->type))
         {
-            LEC_TFN& al_tfn = dynamic_cast<LEC_TFN&>(*al);
+            LEC_TFN& al_tfn = static_cast<LEC_TFN&>(*al);
             // recursive call to link_sample()
             int tfn_length = al_tfn.length_expr;
             if(tfn_length > 0)
@@ -171,7 +171,7 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         }
         else if(is_mtfn(al->type))
         {
-            LEC_MTFN& al_mtfn = dynamic_cast<LEC_MTFN&>(*al);
+            LEC_MTFN& al_mtfn = static_cast<LEC_MTFN&>(*al);
             // recursive call to link_sample()
             for(const int& mtfn_length : al_mtfn.v_length_expr)
             {
