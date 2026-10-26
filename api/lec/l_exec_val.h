@@ -69,26 +69,15 @@ public:
 
     ~LEC_VAL_FN() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_VAL_FN>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_VAL_FN*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_VAL_FN& other) const
     {
         return is_same_type(other);
     }
 
     // executes the function with the given arguments on the stack
-    double execute(LECStack& stack, int t, int& expr_pos, const AbstractCLEC& clec) const override
+    double execute(int t, int exec_t) const
     {
-        double value = (L_VAL_FN[pos])(t, clec.exec_t);
+        double value = (L_VAL_FN[pos])(t, exec_t);
         return value;
     }
 };

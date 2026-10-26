@@ -20,13 +20,6 @@
 
 inline int KEXEC_TRACE = 0;
 
-enum LECGenericType
-{
-    L_VALUE,
-    L_EXECUTABLE,
-    L_OTHER
-};
-
 constexpr int L_SPECIAL = 10;
 
 /* LEC:SPECIAL */
@@ -173,19 +166,14 @@ public:
 struct LEC_ABSTRACT
 {
     int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)    
+    bool is_executable;
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
-    LECGenericType generic_type;    // whether the current sub-class represents a value, an executable 
-                                    // or neither a value or an executable 
 
     virtual ~LEC_ABSTRACT() = default;
 
-    virtual std::unique_ptr<LEC_ABSTRACT> clone() const = 0;
-
-    virtual bool equals(const LEC_ABSTRACT& other) const = 0;
-
 protected:
-    LEC_ABSTRACT(const int type, const LECGenericType generic_type) 
-        : type(type), generic_type(generic_type) {}
+    LEC_ABSTRACT(const int type, const bool is_executable) 
+        : type(type), is_executable(is_executable) {}
     
     LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
 
@@ -198,14 +186,12 @@ protected:
 struct LEC_ABSTRACT_VALUE: public LEC_ABSTRACT
 {
 protected:
-    LEC_ABSTRACT_VALUE(const int type) : LEC_ABSTRACT(type, L_VALUE) {}
+    LEC_ABSTRACT_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
 
     LEC_ABSTRACT_VALUE(const LEC_ABSTRACT_VALUE& other) = default;
 
 public:
     ~LEC_ABSTRACT_VALUE() override = default;
-
-    virtual double get_value(const int t) const = 0;
 };
 
 struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
@@ -216,21 +202,18 @@ struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
 
 protected:
     LEC_ABSTRACT_EXECUTABLE(const int type, const int nb_args) 
-        : LEC_ABSTRACT(type, L_EXECUTABLE), nb_args(nb_args), pos(-1) {}
+        : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
     
     LEC_ABSTRACT_EXECUTABLE(const LEC_ABSTRACT_EXECUTABLE& other) = default;
 
 public:
     ~LEC_ABSTRACT_EXECUTABLE() override = default;
-
-    virtual double execute(LECStack& stack, int t, int& expr_pos,
-        const AbstractCLEC& clec) const = 0;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT
 {
 public:
-    LEC_OTHER(const int type) : LEC_ABSTRACT(type, L_OTHER)
+    LEC_OTHER(const int type) : LEC_ABSTRACT(type, false)
     {
         switch(type)
         {
@@ -267,17 +250,6 @@ public:
     LEC_OTHER(const LEC_OTHER& other) = default;
 
     ~LEC_OTHER() override = default;
-
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_OTHER>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_OTHER*>(&other);
-        return rhs && *this == *rhs;
-    }
 
     bool operator==(const LEC_OTHER& other) const
     {

@@ -59,18 +59,13 @@ TEST_F(LecTest, CLEC_Copy)
     EXPECT_EQ(copy_clec->v_expression.size(), clec->v_expression.size());
     EXPECT_EQ(*copy_clec, *clec);
     for(size_t i = 0; i < clec->v_expression.size(); ++i)
-    {
-        ASSERT_NE(copy_clec->v_expression[i], nullptr);
-        ASSERT_NE(clec->v_expression[i], nullptr);
-        EXPECT_NE(copy_clec->v_expression[i].get(), clec->v_expression[i].get());
-        EXPECT_EQ(copy_clec->v_expression[i]->type, clec->v_expression[i]->type);
-    }
+        EXPECT_EQ(copy_clec->v_expression[i], clec->v_expression[i]);
 
     CLEC assigned("B + 2");
     assigned = *clec;
     EXPECT_EQ(assigned, *clec);
     for(size_t i = 0; i < clec->v_expression.size(); ++i)
-        EXPECT_NE(assigned.v_expression[i].get(), clec->v_expression[i].get());
+        EXPECT_EQ(assigned.v_expression[i], clec->v_expression[i]);
     EXPECT_EQ(copy_clec->v_var_names, clec->v_var_names);
     EXPECT_EQ(copy_clec->v_coeff_names, clec->v_coeff_names);
 }
@@ -80,12 +75,9 @@ TEST_F(LecTest, AtomicLEC_Equality)
     LEC_CONST_REAL one(1.0);
     LEC_CONST_REAL same(1.0);
     LEC_CONST_REAL different(2.0);
-    LEC_CONST_LONG other_type(1);
 
-    EXPECT_TRUE(one.equals(same));
-    EXPECT_FALSE(one.equals(different));
-    EXPECT_FALSE(one.equals(other_type));
-    EXPECT_FALSE(other_type.equals(one));
+    EXPECT_EQ(one, same);
+    EXPECT_NE(one, different);
 }
 
 TEST_F(LecTest, ExecutionStackCapacity)

@@ -16,23 +16,12 @@ public:
 
     ~LEC_CONST_REAL() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_CONST_REAL>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_CONST_REAL*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_CONST_REAL& other) const
     {
         return is_same_type(other) && this->value == other.value;
     }
 
-    double get_value(const int t) const override
+    double get_value() const
     {
         return value;
     }
@@ -40,11 +29,12 @@ public:
 
 class LEC_CONST_LONG: public LEC_ABSTRACT_VALUE
 {
-    long value; 
+    double value; 
 
 public:
-    LEC_CONST_LONG(const long value) : LEC_ABSTRACT_VALUE(L_LCONST), value(value)
+    LEC_CONST_LONG(const long value) : LEC_ABSTRACT_VALUE(L_LCONST)
     {
+        this->value = (double) value;
         representation = std::to_string(value);
     }
 
@@ -52,25 +42,14 @@ public:
 
     ~LEC_CONST_LONG() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_CONST_LONG>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_CONST_LONG*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_CONST_LONG& other) const
     {
         return is_same_type(other) && this->value == other.value;
     }
 
-    double get_value(const int t) const override
+    double get_value() const
     {
-        return (double) value;
+        return value;
     }
 };
 
@@ -91,17 +70,6 @@ public:
 
     ~LEC_COEF() override = default;
 
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_COEF>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_COEF*>(&other);
-        return rhs && *this == *rhs;
-    }
-
     bool operator==(const LEC_COEF& other) const
     {
         if(!is_same_type(other))
@@ -110,15 +78,29 @@ public:
         if(this->name != other.name)
             return false;
 
-        return true;
+        bool this_null = this->scl_ptr.get() == nullptr;
+        bool other_null = other.scl_ptr.get() == nullptr;
+        if(this_null && other_null)
+            return true;
+        if(this_null != other_null)
+            return false;
+        return this->scl_ptr->value == other.scl_ptr->value;
     }
 
-    void link(std::shared_ptr<Scalar>& scl_ptr)
+    void link(std::shared_ptr<Scalar> scl_ptr)
     {
+        if(!scl_ptr)
+        {
+            this->scl_ptr.reset();
+            std::string msg = "Missing value for the coefficient '" + name + "'\n";
+            msg += "Missing or failed linkage of LEC expression";
+            kwarning((char*) msg.c_str());
+        }
+
         this->scl_ptr = scl_ptr;
     }
 
-    double get_value(const int t) const override
+    double get_value() const
     {
         if(!scl_ptr)
         {
@@ -140,13 +122,12 @@ public:
     std::string name;   // name of the variable (IODE Variable)
     short lag;          // lag of the variable (0 if current value, 1 if t-1...)
     short ref;
-    int nb_periods;
     Period per;         // period of the variable (if any)
 
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : LEC_ABSTRACT_VALUE(type), name(name), lag(lag), ref(0), nb_periods(-1), per(per) 
+        : LEC_ABSTRACT_VALUE(type), name(name), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
@@ -156,17 +137,6 @@ public:
     LEC_VAR(const LEC_VAR& other) = default;
 
     ~LEC_VAR() override = default;
-
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_VAR>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_VAR*>(&other);
-        return rhs && *this == *rhs;
-    }
 
     bool operator==(const LEC_VAR& other) const
     {
@@ -187,12 +157,27 @@ public:
 
     void link(std::shared_ptr<Variable>& var_ptr)
     {
+        if(!var_ptr)
+        {
+            this->var_ptr.reset();
+            std::string msg = "Missing value for the Variable '" + name + "'\n";
+            msg += "Missing or failed linkage of LEC expression";
+            kwarning((char*) msg.c_str());
+        }
+
         this->var_ptr = var_ptr;
     }
 
-    void set_nb_periods(const int nb_periods)
+    void check_nb_periods(const int nb_periods)
     {
-        this->nb_periods = nb_periods;
+        if(nb_periods != var_ptr->size())
+        {
+            std::string msg = "Linking CLEC: size of linked sample ";
+            msg += "(" + std::to_string(nb_periods) + ") is different from the size of ";
+            msg += "the passed variable (" + std::to_string(var_ptr->size()) + ")";
+            kwarning((char*) msg.c_str());
+            var_ptr->clear();
+        }
     }
 
     void calculate_ref(const Sample& sample)
@@ -202,7 +187,7 @@ public:
             ref += per.difference(sample.start_period);
     }
 
-    double get_value(const int t) const override
+    double get_value(const int t) const
     {
         if(!var_ptr)
         {
@@ -212,13 +197,16 @@ public:
             return IODE_NAN;
         }
 
-        Variable& var = *var_ptr;
+        const Variable& var = *var_ptr;
+
         int len = (int) ref;
         if(per.year == 0)  
             len += t;
+        
         double value = IODE_NAN;
-        if(len >= 0 && len < nb_periods) 
+        if(len >= 0 && len < var.size()) 
             value = var[len];
+        
         return value;
     }
 };
@@ -226,11 +214,10 @@ public:
 class LEC_PERIOD: public LEC_ABSTRACT_VALUE
 {
     Period period;
-    short pos;
+    double value = IODE_NAN;
 
 public:
-    LEC_PERIOD(const Period& period, const short pos) 
-        : LEC_ABSTRACT_VALUE(L_PERIOD), pos(pos), period(period) 
+    LEC_PERIOD(const Period& period) : LEC_ABSTRACT_VALUE(L_PERIOD), period(period)
     {
         representation = period.to_string();
     }
@@ -238,17 +225,6 @@ public:
     LEC_PERIOD(const LEC_PERIOD& other) = default;
 
     ~LEC_PERIOD() override = default;
-
-    std::unique_ptr<LEC_ABSTRACT> clone() const override 
-    { 
-        return std::make_unique<LEC_PERIOD>(*this); 
-    }
-
-    bool equals(const LEC_ABSTRACT& other) const override
-    {
-        const auto* rhs = dynamic_cast<const LEC_PERIOD*>(&other);
-        return rhs && *this == *rhs;
-    }
 
     bool operator==(const LEC_PERIOD& other) const
     {
@@ -258,16 +234,17 @@ public:
         if(this->period != other.period)
             return false;
         
-        return this->pos == other.pos;
+        return this->value == other.value;
     }
 
     void link(const Sample& sample)
     {
-        pos = period.difference(sample.start_period);
+        int pos = period.difference(sample.start_period);
+        value = (double) pos;
     }
 
-    double get_value(const int t) const override
+    double get_value() const
     {
-        return (double) pos;
+        return value;
     }
 };
