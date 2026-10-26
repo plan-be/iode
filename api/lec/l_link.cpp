@@ -147,6 +147,8 @@ void CLEC::link_sample(KDBVariablesPtr dbv, const int start, const int length)
         if(al->type == L_VAR || al->type == L_VART)
         {
             LEC_VAR& al_var = dynamic_cast<LEC_VAR&>(*al);
+            // store the number of periods
+            al_var.set_nb_periods(smpl_ptr->nb_periods);
             // calculate the reference of the variable
             al_var.calculate_ref(*smpl_ptr);
         }

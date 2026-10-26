@@ -113,7 +113,6 @@ double CLEC::execute_sub_expression(const int start, const int length, const int
                         kwarning("LEC: No attached sample");
                         return IODE_NAN;
                     }
-                    al_var.set_nb_periods(smpl_ptr->nb_periods);
                     value = al_var.get_value(t);
                 }
                 else
