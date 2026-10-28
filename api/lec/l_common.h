@@ -167,7 +167,9 @@ struct LEC_ABSTRACT
 {
     int type;                       // type of the atomic lec (L_VAR, L_COEF, L_PERIOD, etc.)    
     bool is_executable;
+#if DEBUG
     std::string representation;     // string representation of the atomic lec (for debugging purposes)
+#endif
 
     virtual ~LEC_ABSTRACT() = default;
 
@@ -198,7 +200,9 @@ struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
 {
     int nb_args;            // number of arguments of the function
     int pos;                // position of the function in the corresponding table (L_FN, L_TFN or L_MTFN)
+#if DEBUG
     std::string fn_name;    // name of the function (for debugging purposes)
+#endif
 
 protected:
     LEC_ABSTRACT_EXECUTABLE(const int type, const int nb_args) 
@@ -218,28 +222,44 @@ public:
         switch(type)
         {
             case L_EOE: 
+#if DEBUG
                 representation = "EOE"; 
+#endif
                 break;
             case L_OPENP: 
+#if DEBUG
                 representation = "("; 
+#endif
                 break;
             case L_CLOSEP: 
+#if DEBUG
                 representation = ")"; 
+#endif
                 break;
             case L_COMMA: 
+#if DEBUG
                 representation = ","; 
+#endif
                 break;
             case L_OPENB: 
+#if DEBUG
                 representation = "["; 
+#endif
                 break;
             case L_CLOSEB: 
+#if DEBUG
                 representation = "]"; 
+#endif
                 break;
             case L_OCPAR: 
+#if DEBUG
                 representation = "()"; 
+#endif
                 break;
             case L_COLON: 
+#if DEBUG
                 representation = ":"; 
+#endif
                 break;
             default: 
                 throw std::invalid_argument("Invalid type for LEC_OTHER: " + std::to_string(type));

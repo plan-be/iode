@@ -61,8 +61,10 @@ public:
         if(!is_val(type))
             throw std::invalid_argument("Invalid operator type for LEC VALUE FUNCTION: " + std::to_string(type));
         pos = type - L_VAL;
+#if DEBUG
         fn_name = L_VAL_FN_NAMES[pos];
         representation = fn_name;
+#endif
     }
 
     LEC_VAL_FN(const LEC_VAL_FN& other) = default;

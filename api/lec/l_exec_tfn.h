@@ -99,8 +99,10 @@ public:
         if(!is_tfn(type))
             throw std::invalid_argument("Invalid time function type for LEC TIME FUNC: " + std::to_string(type));
         pos = type - L_TFN;
+#if DEBUG
         fn_name = L_TFN_NAMES[pos];
         representation = fn_name;
+#endif
     }
 
     LEC_TFN(const LEC_TFN& other) = default;

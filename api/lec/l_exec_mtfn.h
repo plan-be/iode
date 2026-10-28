@@ -102,8 +102,10 @@ public:
             throw std::invalid_argument("Invalid multi-time function type for LEC MULTI-TIME FUNC: " + std::to_string(type));
         
         pos = type - L_MTFN;
+#if DEBUG
         fn_name = L_MTFN_NAMES[pos];
         representation = fn_name;
+#endif
         v_length_expr.resize(nv_args, 0);
     }
 
