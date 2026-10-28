@@ -201,8 +201,10 @@ public:
         if(!is_fn(type))
             throw std::invalid_argument("Invalid function type for LEC FUNC: " + std::to_string(type));
         pos = type - L_FN;
+#if DEBUG
         fn_name = L_FN_NAMES[pos];
         representation = fn_name;
+#endif
     }
 
     LEC_FN(const LEC_FN& other) = default;

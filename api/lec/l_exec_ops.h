@@ -87,8 +87,10 @@ public:
         if(!is_op(type))
             throw std::invalid_argument("Invalid operator type for LEC OPERATOR: " + std::to_string(type));
         pos = type - L_OP;
+#if DEBUG
         fn_name = L_OPS_NAMES[pos];
         representation = fn_name;
+#endif
     }
 
     LEC_OP(const LEC_OP& other) = default;

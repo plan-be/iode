@@ -131,7 +131,7 @@ void CLEC::reorder_expression()
             if(args_start < 0 || args_end < args_start) 
             {
                 std::string error_msg = "CLEC constructor: Could not determine the start and end ";
-                error_msg += "positions of the arguments of function '" + al_tfn.representation + "'.";
+                error_msg += "positions of the arguments of function '" + L_TFN_NAMES[al_tfn.pos] + "'.";
                 throw std::runtime_error(error_msg);
             }
             al_tfn.length_expr = args_end - args_start + 1;
@@ -161,7 +161,7 @@ void CLEC::reorder_expression()
                 if(args_start < 0 || args_end < args_start) 
                 {
                     std::string error_msg = "CLEC constructor: Could not determine the start and end ";
-                    error_msg += "positions of the arguments of function '" + al_mtfn.representation + "'.";
+                    error_msg += "positions of the arguments of function '" + L_MTFN_NAMES[al_mtfn.pos] + "'.";
                     throw std::runtime_error(error_msg);
                 }
                 int length_expr = args_end - args_start + 1;

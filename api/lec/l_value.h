@@ -9,7 +9,9 @@ class LEC_CONST_REAL: public LEC_ABSTRACT_VALUE
 public:
     LEC_CONST_REAL(const double value) : LEC_ABSTRACT_VALUE(L_DCONST), value(value)
     {
+#if DEBUG
         representation = std::to_string(value);
+#endif
     }
 
     LEC_CONST_REAL(const LEC_CONST_REAL& other) = default;
@@ -35,7 +37,9 @@ public:
     LEC_CONST_LONG(const long value) : LEC_ABSTRACT_VALUE(L_LCONST)
     {
         this->value = (double) value;
+#if DEBUG
         representation = std::to_string(value);
+#endif
     }
 
     LEC_CONST_LONG(const LEC_CONST_LONG& other) = default;
@@ -63,7 +67,9 @@ public:
 public:
     LEC_COEF(const std::string& name) : LEC_ABSTRACT_VALUE(L_COEF), name(name) 
     {
+#if DEBUG
         representation = name;
+#endif
     }
 
     LEC_COEF(const LEC_COEF& other) = default;
@@ -131,7 +137,9 @@ public:
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
+#if DEBUG
         representation = name;
+#endif
     }
 
     LEC_VAR(const LEC_VAR& other) = default;
@@ -219,7 +227,9 @@ class LEC_PERIOD: public LEC_ABSTRACT_VALUE
 public:
     LEC_PERIOD(const Period& period) : LEC_ABSTRACT_VALUE(L_PERIOD), period(period)
     {
+#if DEBUG
         representation = period.to_string();
+#endif
     }
 
     LEC_PERIOD(const LEC_PERIOD& other) = default;
