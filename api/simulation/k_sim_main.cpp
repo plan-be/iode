@@ -698,8 +698,6 @@ bool CSimulation::simulate(KDBEquationsPtr dbe, KDBVariablesPtr dbv, KDBScalarsP
  *  @param [in] int         msg         indicated if the function kerror() must be called on error (no solution found)
  *  @return     double                  on success: the equation solution
  *                                      on error of if no solution can be found: IODE_NAN 
- *  
- *  TODO: find a quicker solution (avoid CLEC allocation for example)
  */
 double CSimulation::calculate_CLEC(const int i, int t, int msg)
 {
@@ -709,11 +707,9 @@ double CSimulation::calculate_CLEC(const int i, int t, int msg)
     if(!eq_ptr)
         return IODE_NAN;
     
-    std::shared_ptr<CLEC> eq_clec = eq_ptr->clec;
+    std::shared_ptr<CLEC>& eq_clec = eq_ptr->clec;
     if(!eq_clec)
         return IODE_NAN;
-    
-    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(*eq_clec);
 
     // position of the variable to calculate in sim_dbv
     int var_pos = v_ordered_vars[i];
@@ -722,18 +718,18 @@ double CSimulation::calculate_CLEC(const int i, int t, int msg)
      
     std::string eq_name = eq_ptr->endo;
     std::string var_name = sim_dbv->get_name_from_vector(var_pos);
-    bool newton = clec->duplicated_endo || var_name != eq_name;
+    bool newton = eq_clec->duplicated_endo || var_name != eq_name;
 
     double x = IODE_NAN;
     if(newton)
     {
         int eq_var_pos = sim_dbv->get_vector_position(eq_name); 
         if(var_pos > 0 && eq_var_pos > 0)
-            x = clec->zero(newton_step, newton_epsilon, newton_max_iter, t, 
+            x = eq_clec->zero(newton_step, newton_epsilon, newton_max_iter, t, 
                            sim_dbv, var_pos, eq_var_pos);
     }
     else
-        x = clec->execute(t);
+        x = eq_clec->execute(t);
     
     if(!IODE_IS_A_NUMBER(x) && msg)
     {
