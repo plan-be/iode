@@ -210,7 +210,7 @@ static char* K_repack_tbl(Table *tbl)
  *  @param [in]         vers    int     IODE objects version to convert to
  *  @return                     char*   packed IODE object in version 0 or 3 (current version)
  */
-char* KDB::convert_obj_version(const std::string& name, char* opack, const int vers)
+char* KDB::convert_obj_version(const std::string& name, char* opack, const int vers, const bool utf8)
 {
     // nothing to do
     if(vers == 0 || vers == 3) 
@@ -218,27 +218,27 @@ char* KDB::convert_obj_version(const std::string& name, char* opack, const int v
 
     char* npack = Pack16To32(opack);
 
-    npack = sub_convert_obj_version(npack, name, vers);
+    npack = sub_convert_obj_version(npack, name, vers, utf8);
     return npack;
 }
 
-char* KDBComments::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBComments::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     return npack;
 }
 
-char* KDBEquations::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBEquations::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     char *pack = NULL;
 
-    Equation* eq = binary_to_eqs(npack, name);
-    eq->to_binary(&pack);
+    Equation* eq = binary_to_eqs(npack, name, utf8);
+    eq->to_binary(&pack, utf8);
     delete eq;
 
     return pack;
 }
 
-char* KDBIdentities::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBIdentities::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     char *pack = NULL;
 
@@ -248,12 +248,12 @@ char* KDBIdentities::sub_convert_obj_version(char* npack, const std::string& nam
     return pack;
 }
 
-char* KDBLists::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBLists::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     return npack;
 }
 
-char* KDBScalars::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBScalars::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     char *pack = NULL;
 
@@ -286,18 +286,18 @@ char* KDBScalars::sub_convert_obj_version(char* npack, const std::string& name, 
     return pack;
 }
 
-char* KDBTables::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBTables::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {
     char *pack = NULL;
 
-    Table* tbl = binary_to_tbl(npack);
+    Table* tbl = binary_to_tbl(npack, utf8);
     pack = K_repack_tbl(tbl);
     delete tbl;
 
     return pack;
 }
 
-char* KDBVariables::sub_convert_obj_version(char* npack, const std::string& name, const int vers)
+char* KDBVariables::sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8)
 {   
     if(vers == 2) 
         return npack;

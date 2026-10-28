@@ -21,11 +21,11 @@ static std::string expand_list(const std::string& listname)
     if(!global_ws_lst->contains(listname))
         return "";
     
-    std::shared_ptr<List> lst = global_ws_lst->get_obj_ptr(listname);
-    if(!lst)
+    std::shared_ptr<List> lst_ptr = global_ws_lst->get_obj_ptr(listname);
+    if(!lst_ptr)
         return "";
     
-    return *lst;
+    return *lst_ptr;
 }
 
 

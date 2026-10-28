@@ -201,7 +201,7 @@ struct KDB: public KDBInfo
     static bool backup_enabled;
 
 protected:
-    virtual bool binary_to_obj(const std::string& name, char* pack) = 0;
+    virtual bool binary_to_obj(const std::string& name, char* pack, const bool utf8) = 0;
     virtual bool obj_to_binary(char** pack, const std::string& name) = 0;
 
     virtual bool grep_obj(const std::string& name, const std::string& pattern, 
@@ -211,8 +211,8 @@ protected:
 
     virtual void update_reference_db() = 0;
 
-    char* convert_obj_version(const std::string& name, char* opack, const int vers);
-    virtual char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) = 0;
+    char* convert_obj_version(const std::string& name, char* opack, const int vers, const bool utf8);
+    virtual char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) = 0;
 
     bool take_backup(const std::string& filepath);
 
@@ -238,21 +238,17 @@ public:
         return (IodeDatabaseType) this->k_db_type;
     }
 
-    std::string get_filename_utf8() const
+    std::string get_filename() const
     {
         if(!this->filepath.empty()) 
-        {
-            std::string filename = oem_to_utf8(this->filepath);
-            return filename;
-        }
+            return this->filepath;
         else
             return "ws";
     }
 
-    void set_filename_utf8(const std::string& filename)
-    { 
-        std::string filename_oem = utf8_to_oem(filename);
-        this->filepath = filename_oem; 
+    void set_filename(const std::string& filename)
+    {
+        this->filepath = filename; 
     }
 
     void set_fullpath(const std::string& filename)
@@ -267,17 +263,14 @@ public:
         this->filepath = p_filepath.string();
     }
 
-    std::string get_description_utf8() const
-    { 
-        std::string desc = this->description;
-        if(!desc.empty())
-            desc = oem_to_utf8(desc);
-        return desc;
+    std::string get_description() const
+    {
+        return this->description;
     }
 
-    void set_description_utf8(const std::string& description)
+    void set_description(const std::string& description)
     {
-        this->description = utf8_to_oem(description);
+        this->description = description;
     }
 
     // strip the name and set it to upper/lower/asis according to k_mode
@@ -385,11 +378,11 @@ public:
      */
     virtual bool scan(const std::string& list_var, const std::string& list_scal) = 0;
 
-    // load
+    // Set utf8 when the file's text is already UTF-8; otherwise convert OEM text on load.
 
-    virtual bool load_asc(const std::string& filename) = 0;
-    bool load_binary(const std::string& filename, const std::vector<std::string>& objs=std::vector<std::string>());
-    bool load(const std::string& filename);
+    virtual bool load_asc(const std::string& filename, const bool utf8=false) = 0;
+    bool load_binary(const std::string& filename, const std::vector<std::string>& objs=std::vector<std::string>(), const bool utf8=false);
+    bool load(const std::string& filename, const bool utf8=false);
 
     // save
 

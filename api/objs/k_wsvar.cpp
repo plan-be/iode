@@ -1402,7 +1402,7 @@ void KDBVariables::trend_correction(std::string& input_file, const double lambda
 	}
 }
 
-bool KDBVariables::binary_to_obj(const std::string& name, char* pack)
+bool KDBVariables::binary_to_obj(const std::string& name, char* pack, const bool utf8)
 {
     double* values = (double*) P_get_ptr(pack, 0);
     if(values == NULL) 

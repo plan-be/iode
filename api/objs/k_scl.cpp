@@ -28,7 +28,7 @@ std::size_t hash_value(const Scalar& scalar)
     return scl_hash(scalar);
 }
 
-bool KDBScalars::binary_to_obj(const std::string& name, char* pack)
+bool KDBScalars::binary_to_obj(const std::string& name, char* pack, const bool utf8)
 {
     Scalar* scl = (Scalar*) P_get_ptr(pack, 0);
     if(!scl) 

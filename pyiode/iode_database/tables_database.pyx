@@ -41,9 +41,9 @@ cdef class Tables(CythonIodeDatabase):
         wrapper.print_as = B_TABLE_TITLE
         return wrapper
 
-    def _load(self, filepath: str):
+    def _load(self, filepath: str, utf8: bool):
         if self.database is not NULL:
-            self.database.load(filepath.encode())
+        self.database.load(filepath.encode(), <bint>utf8)
 
     def initialize_subset(self, pattern: str, copy: bool) -> Tables:
         cdef shared_ptr[KDBTables] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)

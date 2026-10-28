@@ -73,10 +73,10 @@ cdef extern from "api/all.h":
         bool is_global_database() except +
         bool is_detached_database() except +
         bool is_subset_database() except +
-        string get_filename_utf8() except +
-        void set_filename_utf8(const string& filename) except +
-        string get_description_utf8() except +
-        void set_description_utf8(const string& description) except +
+        string get_filename() except +
+        void set_filename(const string& filename) except +
+        string get_description() except +
+        void set_description(const string& description) except +
         int index_of(const string& name) except +
         bool contains(const string& name) except +
 
@@ -99,7 +99,7 @@ cdef extern from "api/all.h":
             const bool in_name, const bool in_formula, const bool in_text, const string& list_result) except +
 
         # load - save - clear
-        bool load(const string& filepath) except +
+        bool load(const string& filepath, const bool utf8) except +
         bool save(const string& filepath, const bool compress) except +
         void clear() except +
 

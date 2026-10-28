@@ -64,7 +64,7 @@ TEST_F(KDBCommentsTest, Save)
 TEST_F(KDBCommentsTest, Filename)
 {
     std::string expected_filename = str_input_test_dir + "fun.ac";
-    std::string filename = global_ws_cmt->get_filename_utf8();
+    std::string filename = global_ws_cmt->get_filename();
     // WARNING: for a weird reason the filename is set to lower case when the present 
     // test is runned on Github Actions virtual machine (Windows Server)
     for(auto& c : expected_filename) c = tolower(c);
@@ -72,8 +72,8 @@ TEST_F(KDBCommentsTest, Filename)
     EXPECT_EQ(filename, expected_filename);
 
     std::string new_filename = str_output_test_dir + "fun.ac";
-    global_ws_cmt->set_filename_utf8(new_filename);
-    filename = global_ws_cmt->get_filename_utf8();
+    global_ws_cmt->set_filename(new_filename);
+    filename = global_ws_cmt->get_filename();
     
     for(auto& c : new_filename) c = tolower(c);
     for(auto& c : filename) c = tolower(c);

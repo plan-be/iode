@@ -36,7 +36,7 @@ public:
     std::string get_macro(const std::string& name) const;
     bool set_macro(const std::string& name, std::string& macro);
 
-    bool load_asc(const std::string& filename) override;
+    bool load_asc(const std::string& filename, const bool utf8=false) override;
     bool save_asc(const std::string& filename) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
@@ -48,7 +48,7 @@ public:
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
 private:
-    bool binary_to_obj(const std::string& name, char* pack) override
+    bool binary_to_obj(const std::string& name, char* pack, const bool utf8) override
     {
         return false;
     }
@@ -58,7 +58,7 @@ private:
         return false;
     }
 
-    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) override
     {
         return npack;
     }

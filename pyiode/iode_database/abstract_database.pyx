@@ -42,16 +42,16 @@ cdef class CythonIodeDatabase:
         return IodeType(int_iode_type)
 
     def get_filename(self) -> str:
-        return self.abstract_database.get_filename_utf8().decode()
+        return self.abstract_database.get_filename().decode()
 
     def set_filename(self, value: str):
-        self.abstract_database.set_filename_utf8(value.encode())
+        self.abstract_database.set_filename(value.encode())
 
     def get_description(self) -> str:
-        return self.abstract_database.get_description_utf8().decode()
+        return self.abstract_database.get_description().decode()
 
     def set_description(self, value: str):
-        self.abstract_database.set_description_utf8(value.encode())
+        self.abstract_database.set_description(value.encode())
 
     def _get_print_nb_decimals(self) -> int:
         return tbl_nb_decimals

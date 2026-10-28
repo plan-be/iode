@@ -109,7 +109,7 @@ public:
         return std::shared_ptr<KDBScalars>(new KDBScalars(is_global));
     }
 
-    bool load_asc(const std::string& filename) override;
+    bool load_asc(const std::string& filename, const bool utf8=false) override;
     bool save_asc(const std::string& filename) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
@@ -119,10 +119,10 @@ public:
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
 private:
-    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool binary_to_obj(const std::string& name, char* pack, const bool utf8) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
 
-    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) override;
 
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;

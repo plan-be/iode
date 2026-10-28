@@ -348,7 +348,7 @@ TEST_F(KDBIdentitiesTest, ExecuteIdentities)
     global_ws_var->clear();
     EXPECT_TRUE(global_ws_var->get_sample() == nullptr);
     EXPECT_EQ(global_ws_var->size(), 0);
-    EXPECT_EQ(global_ws_var->get_filename_utf8(), std::string(I_DEFAULT_FILENAME));
+    EXPECT_EQ(global_ws_var->get_filename(), std::string(I_DEFAULT_FILENAME));
     success = global_ws_idt->execute_identities(std::to_string(y_from) + "Y1", 
                          std::to_string(y_to) + "Y1", identities_list);
     EXPECT_FALSE(success);

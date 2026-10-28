@@ -91,7 +91,7 @@ static int read_scl(KDBScalars& kdb, YYFILE* yy, char* name)
  *  @return                  KDB*    new KDB of Scalar or NULL on error
  *  
  */
-bool KDBScalars::load_asc(const std::string& filename)
+bool KDBScalars::load_asc(const std::string& filename, const bool utf8)
 {
     int     cmpt = 0;
     YYFILE  *yy;

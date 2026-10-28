@@ -26,7 +26,7 @@
  *  @return          void
  *  
  */
-static TableCell* read_cell(YYFILE* yy, int mode)
+static TableCell* read_cell(YYFILE* yy, int mode, const bool utf8)
 {
     int keyw;
 
@@ -38,8 +38,7 @@ static TableCell* read_cell(YYFILE* yy, int mode)
     }
 
     int ok = 0;
-    std::string content_oem;
-    std::string content_utf8;
+    std::string content;
     TableCell* cell = new TableCell(TABLE_CELL_STRING);
     while(1) 
     {
@@ -80,9 +79,10 @@ static TableCell* read_cell(YYFILE* yy, int mode)
                     YY_unread(yy);
                     break;
                 }
-                content_oem = std::string((char*) yy->yy_text);
-                content_utf8 = oem_to_utf8(content_oem);
-                cell->set_lec(content_utf8);
+                content = std::string((char*) yy->yy_text);
+                if(!utf8)
+                    content = oem_to_utf8(content);
+                cell->set_lec(content);
                 cell->set_align(TABLE_CELL_DECIMAL);
                 break;
 
@@ -90,9 +90,10 @@ static TableCell* read_cell(YYFILE* yy, int mode)
                 if(ok == 1) 
                     goto ret;
                 ok = 1;
-                content_oem = std::string((char*) yy->yy_text);
-                content_utf8 = oem_to_utf8(content_oem);
-                cell->set_text(content_utf8);
+                content = std::string((char*) yy->yy_text);
+                if(!utf8)
+                    content = oem_to_utf8(content);
+                cell->set_text(content);
                 break;
 
             case YY_EOF   :
@@ -125,12 +126,12 @@ ret :
  *  @return          void
  *  
  */
-static void read_div(Table* tbl, YYFILE* yy)
+static void read_div(Table* tbl, YYFILE* yy, const bool utf8)
 {
     TableCell* cell;
     for(int i = 0; i < tbl->nb_columns; i++)
     {
-        cell = read_cell(yy, 0);
+        cell = read_cell(yy, 0, utf8);
         tbl->divider_line.cells[i] = *cell;
     }
 }
@@ -167,9 +168,9 @@ static void read_div(Table* tbl, YYFILE* yy)
  *                                      -1 if the Table cannot be created
  *  
  */
-static int read_line(Table* tbl, YYFILE* yy)
+static int read_line(Table* tbl, YYFILE* yy, const bool utf8)
 {
-    int     keyw;
+    int keyw;
     TableCell*  cell = nullptr;
     TableLine*  line = nullptr;
 
@@ -213,7 +214,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 }
                 tbl->lines.push_back(TableLine((TableLineType) keyw));
                 line = &(tbl->lines.back());
-                cell = read_cell(yy, YY_STRING);
+                cell = read_cell(yy, YY_STRING, utf8);
                 line->cells.push_back(*cell);
                 break;
             case TABLE_ASCII_BREAK :
@@ -260,7 +261,7 @@ static int read_line(Table* tbl, YYFILE* yy)
                 line->cells.clear();
                 for(int i = 0; i < tbl->nb_columns; i++)
                 {
-                    cell = read_cell(yy, 0);
+                    cell = read_cell(yy, 0, utf8);
                     line->cells.push_back(*cell);
                 }  
                 break;
@@ -277,7 +278,7 @@ static int read_line(Table* tbl, YYFILE* yy)
  *  @return             Table*        new allocated table
  *  
  */
-static Table* read_tbl(YYFILE* yy)
+static Table* read_tbl(YYFILE* yy, const bool utf8)
 {
     int     keyw, dim = 2;
     Table     *tbl = NULL;
@@ -324,7 +325,7 @@ static Table* read_tbl(YYFILE* yy)
                 kerror(0, "Double dim definition skipped : %s", YY_error(yy));
                 break;
             case TABLE_ASCII_DIVIDER     :
-                read_div(tbl, yy);
+                read_div(tbl, yy, utf8);
                 break;
             case TABLE_ASCII_BOX     :
                 tbl->chart_box = (char) K_read_long(yy);
@@ -354,7 +355,7 @@ static Table* read_tbl(YYFILE* yy)
                 tbl->set_text_alignment((TableTextAlign) K_read_align(yy));
                 break;
             case TABLE_ASCII_BREAK   :
-                if(read_line(tbl, yy) < 0) 
+                if(read_line(tbl, yy, utf8) < 0)
                 {
                     delete tbl;
                     return nullptr;
@@ -386,7 +387,7 @@ static Table* read_tbl(YYFILE* yy)
  *  @return                  KDB*    NULL or allocated KDB of Tables
  *  
  */
-bool KDBTables::load_asc(const std::string& filename)
+bool KDBTables::load_asc(const std::string& filename, const bool utf8)
 {
     static  int sorted;
 
@@ -436,7 +437,7 @@ bool KDBTables::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                tbl = read_tbl(yy);
+                tbl = read_tbl(yy, utf8);
                 if(!tbl) 
                 {
                     kwarning("%s : table defined", YY_error(yy));
@@ -569,15 +570,15 @@ static void print_attribute(FILE* fd, const TableCell* cell)
  */
 static void print_cell(FILE *fd, const TableCell* cell)
 { 
-    std::string content_utf8 = cell->get_content(false);
-    if(content_utf8.empty())
+    std::string content = cell->get_content(false);
+    if(content.empty())
     {
         fprintf(fd, "\"\" ");
         return;
     }
 
-    std::string content_oem = utf8_to_oem(content_utf8);
-    char* c_content = (char*) content_oem.c_str();
+    content = utf8_to_oem(content);
+    char* c_content = (char*) content.c_str();
     switch(cell->get_type()) 
     {
         case TABLE_CELL_STRING :

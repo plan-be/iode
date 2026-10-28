@@ -72,8 +72,8 @@ class Identities(IodeDatabase):
         instance._cy_database = obj
         return instance
 
-    def _load(self, filepath: str):
-        self._cy_database._load(filepath)
+    def _load(self, filepath: str, utf8: bool):
+        self._cy_database._load(filepath, utf8)
 
     def subset(self, pattern: str, copy: bool) -> Self:
         cy_self = self._cy_database

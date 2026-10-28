@@ -274,7 +274,7 @@ static int index_of_name(const std::vector<std::string>& vec, const std::string&
  *          - kmsg() for notifications
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)                                 
  */
-bool KDB::load_binary(const std::string& filename, const std::vector<std::string>& objs)
+bool KDB::load_binary(const std::string& filename, const std::vector<std::string>& objs, const bool utf8)
 {
     int     pos, nf;
     char    *ptr, *cptr, *aptr, label[512], fullpath[1024];
@@ -498,8 +498,8 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
                     goto error;
             }
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            ptr = convert_obj_version(name, ptr, version);
-            this->binary_to_obj(name, ptr);
+            ptr = convert_obj_version(name, ptr, version, utf8);
+            this->binary_to_obj(name, ptr, utf8);
             SW_nfree(ptr);
         }
     }
@@ -603,8 +603,8 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
             }
 
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
-            ptr = convert_obj_version(name, ptr, version);
-            this->binary_to_obj(name, ptr);
+            ptr = convert_obj_version(name, ptr, version, utf8);
+            this->binary_to_obj(name, ptr, utf8);
             SW_nfree(ptr);
 
             lpos = pos + 1;
@@ -714,6 +714,7 @@ int get_file_type_from_file(const std::string& filepath, int iode_type)
  *
  *  @param [in]   type       int     file type (FILE_COMMENTS,...ASCII_COMMENTS,..., FILE_CSV)
  *  @param [in]   filename   char*   file to load
+ *  @param [in]   utf8       bool    true if text in the file is already UTF-8
  *  @param [in]   db_global  int     1 for DB_GLOBAL, 0 for DB_STANDALONE
  *  @return                  KDB*    KDB with the content of filename on success
  *                                   NULL on error
@@ -723,7 +724,7 @@ int get_file_type_from_file(const std::string& filepath, int iode_type)
  *          - kmsg() for notifications
  *          - kerror() for error messages (TODO: check the use of ksmg on errors)                              
  */
-bool KDB::load(const std::string& filename)
+bool KDB::load(const std::string& filename, const bool utf8)
 {
     if(this->k_db_type == DB_SUBSET)
     {
@@ -743,7 +744,7 @@ bool KDB::load(const std::string& filename)
         std::string expected_ext = "." + std::string(k_ext[this->k_type + ASCII_COMMENTS]);
         std::string file_ext = get_file_extension(filename);
         if(!file_ext.empty() && file_ext == expected_ext) 
-            success = this->load_asc(filename);
+            success = this->load_asc(filename, utf8);
         
         if(success) 
             this->filepath = filename;
@@ -751,7 +752,7 @@ bool KDB::load(const std::string& filename)
     
     // NOTE: this->filepath updated in load_binary() 
     if(this->k_type == file_type) 
-        success = this->load_binary(filename);
+        success = this->load_binary(filename, {}, utf8);
 
     if(success)
     {

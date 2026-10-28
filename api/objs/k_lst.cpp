@@ -177,7 +177,7 @@ unsigned char **KL_expand(char *str)
     return(tbl);
 }
 
-bool KDBLists::binary_to_obj(const std::string& name, char* pack)
+bool KDBLists::binary_to_obj(const std::string& name, char* pack, const bool utf8)
 {
     size_t len = (size_t) P_get_len(pack, 0);
     char* value = new char[len];
@@ -185,9 +185,10 @@ bool KDBLists::binary_to_obj(const std::string& name, char* pack)
     // NOTE: in binary files, the value is in OEM encoding, we need to convert it from OEM  
     //       to UTF-8 after reading the List object (IODE lists may contain non-ASCII characters  
     //       in comments written as /* ... */)
-    std::string list_oem(value);
-    std::string list_utf8 = oem_to_utf8(list_oem);
-    std::shared_ptr<List> lst_ptr = std::make_shared<List>(list_utf8);
+    std::string list(value);
+    if(!utf8)
+        list = oem_to_utf8(list);
+    std::shared_ptr<List> lst_ptr = std::make_shared<List>(list);
     this->add_obj_ptr(name, lst_ptr);
     return true;
 }
@@ -205,9 +206,9 @@ bool KDBLists::obj_to_binary(char** pack, const std::string& name)
     // NOTE: in binary files, the value is in OEM encoding, we need to convert it from UTF-8 
     //       to OEM before writing the List object (IODE lists may contain non-ASCII characters in  
     //       comments written as /* ... */)
-    std::string list_utf8 = *list_ptr;
-    std::string list_oem = utf8_to_oem(list_utf8);
-    char* c_list = (char*) list_oem.c_str();
+    std::string list = *list_ptr;
+    list = utf8_to_oem(list);
+    char* c_list = (char*) list.c_str();
 
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, c_list, (int) strlen(c_list) + 1);
@@ -237,8 +238,8 @@ bool KDBLists::print_obj_def(const std::string& name)
 {
     std::shared_ptr<List> list_ptr = this->get_obj_ptr(name);
     // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
-    std::string list_oem = utf8_to_oem(*list_ptr);
-    char* c_list = (char*) list_oem.c_str();
+    std::string list = utf8_to_oem(*list_ptr);
+    char* c_list = (char*) list.c_str();
     print_definition_generic(name, c_list);
     return true;
 }

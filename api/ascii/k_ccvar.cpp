@@ -205,7 +205,7 @@ bool KDBVariables::load_asc_type_ask(const std::string& file_or_string, int type
  *  @return                 KDB*  NULL or new KDB of variables
  *  
  */
-bool KDBVariables::load_asc(const std::string& filename)
+bool KDBVariables::load_asc(const std::string& filename, const bool utf8)
 {
     std::string trim_filename = trim(filename);
     std::string asc_filename = set_file_extension(trim_filename, ASCII_VARIABLES);

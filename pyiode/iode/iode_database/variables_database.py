@@ -169,8 +169,8 @@ class Variables(IodeDatabase):
     def _get_periods_bounds(self) -> Tuple[int, int]:
         return self._cy_database._get_periods_bounds()
 
-    def _load(self, filepath: str):
-        self._cy_database._load(filepath)
+    def _load(self, filepath: str, utf8: bool):
+        self._cy_database._load(filepath, utf8)
 
     def clear(self):
         super().clear()

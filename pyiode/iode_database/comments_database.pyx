@@ -38,9 +38,9 @@ cdef class Comments(CythonIodeDatabase):
         wrapper.abstract_database = wrapper.database
         return wrapper
 
-    def _load(self, filepath: str):
+    def _load(self, filepath: str, utf8: bool):
         if self.database is not NULL:
-            self.database.load(filepath.encode())
+        self.database.load(filepath.encode(), <bint>utf8)
 
     def initialize_subset(self, pattern: str, copy: bool) -> Comments:
         cdef shared_ptr[KDBComments] subset_db_ptr = self.database.get_subset(pattern.encode(), <bint>copy)

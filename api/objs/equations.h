@@ -339,16 +339,13 @@ public:
 
     std::string get_comment() const
     {
-        std::string comment_oem = std::string(this->comment);
-        std::string comment = oem_to_utf8(comment_oem);
         return comment;
     }
 
     // we assume that comment string is in UTF8 format
     void set_comment(const std::string& comment)
     {
-        this->comment.clear();
-        this->comment = comment.empty() ? "" : utf8_to_oem(comment);
+        this->comment = comment;
     }
 
     // -- date --
@@ -512,7 +509,7 @@ public:
 
     bool print_definition() const;
 
-    bool to_binary(char** pack) const;
+    bool to_binary(char** pack, const bool utf8=false) const;
 
     // -- operators --
 
@@ -559,7 +556,7 @@ public:
     }
 };
 
-Equation* binary_to_eqs(char* pack, const std::string& name);
+Equation* binary_to_eqs(char* pack, const std::string& name, const bool utf8=false);
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
@@ -634,7 +631,7 @@ public:
     bool add(const std::string& name, const std::string& lec);
     void update(const std::string& name, const std::string& lec);
 
-    bool load_asc(const std::string& filename) override;
+    bool load_asc(const std::string& filename, const bool utf8=false) override;
     bool save_asc(const std::string& filename) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
@@ -644,10 +641,10 @@ public:
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
 private:
-    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool binary_to_obj(const std::string& name, char* pack, const bool utf8) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
 
-    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) override;
 
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;

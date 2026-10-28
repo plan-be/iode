@@ -53,7 +53,7 @@ void KDBMacros::update_reference_db()
     // not applicable for macros    
 }
 
-bool KDBMacros::load_asc(const std::string& filename)
+bool KDBMacros::load_asc(const std::string& filename, const bool utf8)
 {
     // not implemented for macros 
     return false;

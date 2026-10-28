@@ -359,7 +359,7 @@ public:
     bool convert_32_to_64bits(const TableCell32& cell32);
 
     char* to_binary(char *pack, int& p, int i, int j);
-    bool from_binary(char *pack, int& p, int i, int j);
+    bool from_binary(char *pack, int& p, int i, int j, const bool utf8=false);
 
     void sanitize_div(int j);
 
@@ -841,7 +841,7 @@ public:
     }
 };
 
-Table* binary_to_tbl(char* pack);
+Table* binary_to_tbl(char* pack, const bool utf8=false);
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
@@ -932,7 +932,7 @@ public:
     void print_to_file(const std::string& destination_file, const std::string& gsample, 
         const std::string& names, const int nb_decimals, const char format = '\0');
 
-    bool load_asc(const std::string& filename) override;
+    bool load_asc(const std::string& filename, const bool utf8=false) override;
     bool save_asc(const std::string& filename) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
@@ -943,10 +943,10 @@ public:
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
 private:
-    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool binary_to_obj(const std::string& name, char* pack, const bool utf8) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
 
-    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) override;
 
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;

@@ -88,12 +88,12 @@ cdef class Variables(CythonIodeDatabase):
             return 0, 0
         return self.database.get_first_period_position(), self.database.get_last_period_position()
 
-    def _load(self, filepath: str):
+    def _load(self, filepath: str, utf8: bool):
         if self.database is NULL:
             warnings.warn(f"Internal C++ database pointer is NULL. Cannot load the IODE "
                           f"Variables workspace from file {filepath}.")
             return
-        self.database.load(filepath.encode())
+        self.database.load(filepath.encode(), <bint>utf8)
         self.mode_ = IodeVarMode.VAR_MODE_LEVEL
 
     def finish_clear(self):

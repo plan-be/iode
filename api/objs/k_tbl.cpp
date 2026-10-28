@@ -157,11 +157,11 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
     }
 
     int attribute = (int) get_attribute();
-    std::string content = get_content(false);
+    std::string _content_ = get_content(false);
     // NOTE: W_Print(...) functions expect OEM encoding, so convert content
     //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
-    W_replace_line_break(content);
+    _content_ = utf8_to_oem(_content_);
+    W_replace_line_break(_content_);
 
     switch(get_type()) 
     {
@@ -170,16 +170,16 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
             start_print(nb_columns);
             print_start_attribute();
             if(title_line)
-                W_printf((char*) "%s", (char*) content.c_str());
+                W_printf((char*) "%s", (char*) _content_.c_str());
             else
-                W_printf((char*) "\"%s\"", (char*) content.c_str());
+                W_printf((char*) "\"%s\"", (char*) _content_.c_str());
             break;
         }
         case TABLE_CELL_LEC :
         {
             W_printfRepl((char*) "&%dL", nb_columns);
             print_start_attribute();
-            W_printf((char*) "%s", (char*) content.c_str());
+            W_printf((char*) "%s", (char*) _content_.c_str());
             break;
         }
     }
@@ -252,33 +252,34 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
     }
     else
     {
-        std::string text_utf8 = this->get_content(false);
+        std::string text = this->get_content(false);
         // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
         //       the text from UTF-8 to OEM before writing the IODE table 
-        std::string text_oem = utf8_to_oem(text_utf8);
-        char* c_text = (char*) text_oem.c_str();
+        text = utf8_to_oem(text);
+        char* c_text = (char*) text.c_str();
         len = (int) strlen(c_text) + 1;
         pack = (char*) P_add(pack, c_text, len);
         p++;
 
-        debug_packing("cell", "STR  ", p, i, j, text_utf8, len);
+        debug_packing("cell", "STR  ", p, i, j, text, len);
     }
 
     return pack;
 }
 
-bool TableCell::from_binary(char *pack, int& p, int i, int j)
+bool TableCell::from_binary(char *pack, int& p, int i, int j, const bool utf8)
 {
     char* value = (char*) P_get_ptr(pack, p);
 
     if(this->get_type() == TABLE_CELL_STRING)
     {
-        std::string content_oem = (value == NULL) ? "" : std::string(value);
+        std::string _content_ = (value == NULL) ? "" : std::string(value);
         // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
         //       the text from OEM to UTF-8 after reading the IODE table
-        std::string content_utf8 = oem_to_utf8(content_oem);
-        debug_unpacking("cell", "STR  ", p, i, j, content);
-        this->set_text(content_utf8);
+        if(!utf8)
+            _content_ = oem_to_utf8(_content_);
+        debug_unpacking("cell", "STR  ", p, i, j, _content_);
+        this->set_text(_content_);
         p++;
         return true;
     }
@@ -286,12 +287,13 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
     {   
         // NOTE: 'value' is a serialized Identity
         char* c_lec = (char*) P_get_ptr(value, 0);
-        std::string lec_oem = (c_lec == NULL) ? "" : std::string(c_lec);
+        std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
         // NOTE: in binary files, the lec of a cell is in OEM encoding, we need to convert 
         //       the lec from OEM to UTF-8 after reading the IODE table
-        std::string lec_utf8 = oem_to_utf8(lec_oem);
-        debug_unpacking("cell", "LEC  ", p, i, j, lec_utf8);
-        this->set_lec(lec_utf8);
+        if(!utf8)
+            lec = utf8 ? lec : oem_to_utf8(lec);
+        debug_unpacking("cell", "LEC  ", p, i, j, lec);
+        this->set_lec(lec);
         p++;
         return true;
     }
@@ -804,7 +806,7 @@ bool Table::convert_32_to_64bits(const Table32& table32)
     return true;
 }
 
-Table* binary_to_tbl(char* pack)
+Table* binary_to_tbl(char* pack, const bool utf8)
 {
     int p = 0;
 
@@ -828,7 +830,7 @@ Table* binary_to_tbl(char* pack)
         cell.convert_32_to_64bits(*cell32);
         debug_unpacking("cell", "DIV  ", p, 0, k, (cell32->content == 0) ? " NO" : " YES");
         if(cell32->content != 0)
-            cell.from_binary(pack, p, 0, k);
+            cell.from_binary(pack, p, 0, k, utf8);
         cell.set_attribute(cell32->attribute);
         cell.sanitize_div(k);
         k++;
@@ -869,7 +871,7 @@ Table* binary_to_tbl(char* pack)
                         cell = new TableCell(TABLE_CELL_LEC, "", j);
                     cell->convert_32_to_64bits(*cell32);
                     if(cell32->content != 0) 
-                        cell->from_binary(pack, p, i, j);
+                        cell->from_binary(pack, p, i, j, utf8);
                     cell->set_attribute(cell32->attribute);
                     line.cells.push_back(*cell);
                 }
@@ -889,7 +891,7 @@ Table* binary_to_tbl(char* pack)
                 cell = new TableCell(TABLE_CELL_STRING);
                 cell->convert_32_to_64bits(*cell32);
                 if(cell32->content != 0) 
-                    cell->from_binary(pack, p, i, 0);
+                    cell->from_binary(pack, p, i, 0, utf8);
                 cell->set_attribute(cell32->attribute);
                 line.cells.push_back(*cell);
 
@@ -1001,10 +1003,10 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 	ComputedTable::finalize_printing();
 }
 
-bool KDBTables::binary_to_obj(const std::string& name, char* pack)
+bool KDBTables::binary_to_obj(const std::string& name, char* pack, const bool utf8)
 {
     debug_unpacking("table " + name, "--------------------------------", -1);
-    Table* tbl = binary_to_tbl(pack);
+    Table* tbl = binary_to_tbl(pack, utf8);
     if(!tbl)
         return false;
 

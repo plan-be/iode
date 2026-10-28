@@ -57,12 +57,12 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
 
 bool Identity::to_binary(char** pack) const
 {
-    std::string lec_utf8 = this->get_lec();
+    std::string _lec_ = this->lec;
     // NOTE: in binary files, the value is in OEM encoding, we need to convert it from UTF-8 
     //       to OEM before writing the Identity object (LEC expressions may contain non-ASCII 
     //       characters in comments written as /* ... */)
-    std::string lec_oem = utf8_to_oem(lec_utf8);
-    char* c_lec = (char*) lec_oem.c_str();
+    _lec_ = utf8_to_oem(_lec_);
+    char* c_lec = (char*) _lec_.c_str();
 
     *pack = 0;
     if(lec.empty()) 
@@ -150,7 +150,7 @@ bool KDBIdentities::execute_identities(const std::string& from, const std::strin
     return execute_identities(period_from, period_to, identities_list, var_files, scalar_files, trace);
 }
 
-bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
+bool KDBIdentities::binary_to_obj(const std::string& name, char* pack, const bool utf8)
 {
     size_t len = (size_t) P_get_len(pack, 0);
     char* c_lec = new char[len];
@@ -159,9 +159,10 @@ bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
     // NOTE: in binary files, the value is in OEM encoding, we need to convert it from OEM to UTF-8 
     //       after reading the Identity object (LEC expressions may contain non-ASCII characters in  
     //       comments written as /* ... */)
-    std::string lec_oem(c_lec);
-    std::string lec_utf8 = oem_to_utf8(lec_oem);
-    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec_utf8);
+    std::string lec(c_lec);
+    if(!utf8)
+        lec = oem_to_utf8(lec);
+    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec);
     this->add_obj_ptr(name, idt_ptr);
     return true;
 }
@@ -213,13 +214,14 @@ bool KDBIdentities::print_obj_def(const std::string& name)
 {   
     std::shared_ptr<Identity> idt_ptr = this->get_obj_ptr(name);
     std::string lec = idt_ptr->get_lec();
-    std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
     
     // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
-    std::string lec_oem = utf8_to_oem(lec);
-    std::string tmp = name + " : " + lec_oem;
+    lec = utf8_to_oem(lec);
+    std::string tmp = name + " : " + lec;
 
     W_printf((char*) ".par1 enum_1\n");
+
+    std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
     clec->print_definition(name, tmp, B_EQS_LEC);
 
     return true;

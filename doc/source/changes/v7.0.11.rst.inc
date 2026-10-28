@@ -25,3 +25,7 @@ Fixed Bugs
 Miscellaneous 
 -------------
 
+- PYTHON: add boolean utf8 argument to load() and save() methods of workspaces 
+  comments, equations, identities, lists and tables to indicate if the IODE 
+  objects are encoded in utf8 encoding (iode version 7.0.11 or later) or in 
+  OEM850 encoding (iode version 7.0.10 or earlier) (closes :issue:`1335`)  

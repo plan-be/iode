@@ -400,7 +400,7 @@ public:
      */
     void trend_correction(std::string& input_file, const double lambda, const std::string& series, const bool log);
 
-    bool load_asc(const std::string& filename) override;
+    bool load_asc(const std::string& filename, const bool utf8=false) override;
     bool save_asc(const std::string& filename) override;
     bool save_csv(const std::string& filename, const std::vector<std::string>& 
         varlist=std::vector<std::string>(), std::shared_ptr<Sample> sample=nullptr) override;
@@ -423,10 +423,10 @@ public:
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
 private:
-    bool binary_to_obj(const std::string& name, char* pack) override;
+    bool binary_to_obj(const std::string& name, char* pack, const bool utf8) override;
     bool obj_to_binary(char** pack, const std::string& name) override;
 
-    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers) override;
+    char* sub_convert_obj_version(char* npack, const std::string& name, const int vers, const bool utf8) override;
 
     bool grep_obj(const std::string& name, const std::string& pattern, 
         const bool ecase, const bool forms, const bool texts, const char all) const override;

@@ -1231,10 +1231,10 @@ class IodeDatabase:
         names = ';'.join(self.get_names(names))
         self._cy_database.print_to_file(filepath, names, format)
 
-    def _load(self, filepath: str):
+    def _load(self, filepath: str, utf8: bool):
         raise NotImplementedError()
 
-    def load(self, filepath: str):
+    def load(self, filepath: str, utf8: bool=False):
         r"""
         Load objects stored in file 'filepath' into the current database.
         Erase the database before to load the file.
@@ -1243,6 +1243,9 @@ class IodeDatabase:
         ----------
         filepath: str
             path to the file to load
+        utf8: bool, optional
+            Set to True when text in the file is already UTF-8. By default,
+            text is converted from OEM to UTF-8.
         
         Examples
         --------
@@ -1280,7 +1283,7 @@ class IodeDatabase:
             raise RuntimeError("The 'load' method can only be called on the global workspace")
         if not isinstance(filepath, str):
             raise TypeError(f"'filepath': Expected value of type string. Got value of type {type(filepath).__name__}")
-        self._load(filepath)
+        self._load(filepath, utf8)
 
     def save(self, filepath: str, compress: bool=False):
         r"""
