@@ -628,12 +628,12 @@ int B_DataUpdate(char* arg, int type)
         case EQUATIONS :
         {
             std::shared_ptr<Equation> eq = global_ws_eqs->get_obj_ptr(name);
-            eq->set_lec(std::string(value));
+            eq->set_lec(value);
             break;
         }
         case IDENTITIES :
         {
-            std::string lec = std::string(value);
+            std::string lec = value;
             std::shared_ptr<Identity> idt = global_ws_idt->get_obj_ptr(name);
             idt->set_lec(lec);
             break;

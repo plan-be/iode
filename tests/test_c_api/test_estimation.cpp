@@ -527,7 +527,7 @@ TEST_F(EstimationTest, EstimateNoUpdateScalars)
 
 TEST_F(EstimationTest, DynamicAdjustment)
 {
-    std::string eqs = global_ws_eqs->get_lec("ACAF");
+    std::string eqs = global_ws_eqs->get_lec_utf8("ACAF");
     std::string c1 = "c1";
     std::string c2 = "";
     std::string adjusted_eqs;

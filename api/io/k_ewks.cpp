@@ -61,21 +61,20 @@ char* ExportObjsWKS::write_object_name(char* name, char** code)
     return(*code);
 }
 
-char* ExportObjsWKS::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt)
+char* ExportObjsWKS::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** code)
 {
     if(dbc_ptr->contains(name))
     {
         std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
-        Comment cmt_utf8 = *cmt_ptr;
-        Comment cmt_oem = utf8_to_oem(cmt_utf8);
-        wks_string((char*) cmt_oem.c_str(), WKS_COL, WKS_ROW);
+        Comment cmt = *cmt_ptr;
+        wks_string((char*) cmt.c_str(), WKS_COL, WKS_ROW);
     }
     else 
         wks_string(" ", WKS_COL, WKS_ROW);
     WKS_COL ++;
 
-    *cmt = NULL;
-    return *cmt;
+    *code = NULL;
+    return *code;
 }
 
 char* ExportObjsWKS::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)

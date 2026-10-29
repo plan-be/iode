@@ -26,7 +26,7 @@ TEST_F(KDBIdentitiesTest, Load)
 TEST_F(KDBIdentitiesTest, Subset)
 {
     std::string pattern = "A*";
-    std::string lec = global_ws_idt->get_lec("AOUC");
+    std::string lec = global_ws_idt->get_lec_utf8("AOUC");
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
 
     // GLOBAL KDB
@@ -39,16 +39,16 @@ TEST_F(KDBIdentitiesTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("AOUC", new_lec);
-    EXPECT_EQ(global_ws_idt->get_lec("AOUC"), lec);
-    EXPECT_EQ(kdb_subset_deep_copy->get_lec("AOUC"), new_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8("AOUC"), lec);
+    EXPECT_EQ(kdb_subset_deep_copy->get_lec_utf8("AOUC"), new_lec);
 
     // SHALLOW COPY SUBSET
     KDBIdentitiesPtr kdb_subset_shallow_copy = global_ws_idt->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("AOUC", new_lec);
-    EXPECT_EQ(global_ws_idt->get_lec("AOUC"), new_lec);
-    EXPECT_EQ(kdb_subset_shallow_copy->get_lec("AOUC"), new_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8("AOUC"), new_lec);
+    EXPECT_EQ(kdb_subset_shallow_copy->get_lec_utf8("AOUC"), new_lec);
 }
 
 TEST_F(KDBIdentitiesTest, Save)
@@ -78,7 +78,7 @@ TEST_F(KDBIdentitiesTest, Rename)
 TEST_F(KDBIdentitiesTest, GetLec)
 {
     std::string expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
-    std::string lec = global_ws_idt->get_lec("AOUC");
+    std::string lec = global_ws_idt->get_lec_utf8("AOUC");
     EXPECT_EQ(lec, expected_lec);
 }
 
@@ -93,7 +93,7 @@ TEST_F(KDBIdentitiesTest, Get)
     name = "AOUC";
     Identity identity = global_ws_idt->get(name);
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n(VM+VAFF))[-1]";
-    EXPECT_EQ(identity.get_lec(), expected_lec);
+    EXPECT_EQ(identity.get_lec_utf8(), expected_lec);
     
     clec = identity.get_compiled_lec();
     expected_clec = global_ws_idt->get_and_check_obj_ptr(name)->get_compiled_lec();
@@ -109,7 +109,7 @@ TEST_F(KDBIdentitiesTest, Get)
     Identity identity_prod = global_ws_idt->get(name);
     expected_lec = "QAF_/NFYH\n/* QAF_: Bruto toegevoegde waarde tegen factorkosten:\n";
     expected_lec += "ondernemingen, P.1985 (vóór statistische aanpassing) */";
-    EXPECT_EQ(identity_prod.get_lec(), expected_lec);
+    EXPECT_EQ(identity_prod.get_lec_utf8(), expected_lec);
 }
 
 TEST_F(KDBIdentitiesTest, GetNames)
@@ -130,7 +130,7 @@ TEST_F(KDBIdentitiesTest, CreateRemove)
     EXPECT_THROW(global_ws_idt->get(name), std::invalid_argument);
 
     global_ws_idt->add(name, lec);
-    EXPECT_EQ(global_ws_idt->get_lec(name), lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(name), lec);
 }
 
 TEST_F(KDBIdentitiesTest, Update)
@@ -139,7 +139,7 @@ TEST_F(KDBIdentitiesTest, Update)
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
 
     global_ws_idt->update(name, new_lec);
-    EXPECT_EQ(global_ws_idt->get_lec(name), new_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(name), new_lec);
 }
 
 TEST_F(KDBIdentitiesTest, Filter)
@@ -172,24 +172,24 @@ TEST_F(KDBIdentitiesTest, Filter)
     std::string name = "AOUC";
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
     kdb_subset->update(name, modified_lec);
-    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
-    EXPECT_EQ(global_ws_idt->get_lec(name), modified_lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(name), modified_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(name), modified_lec);
 
     // modify an element of the subset and check if it has also 
     // been added to the global KDB
     std::string new_name = "NEW_IDENTITY";
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
     kdb_subset->add(new_name, new_lec);
-    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
-    EXPECT_EQ(global_ws_idt->get_lec(new_name), new_lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(new_name), new_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(new_name), new_lec);
 
     // modify an element of the subset and check if the 
     // corresponding element has also been renamed in the global KDB
     std::string old_name = new_name;
     new_name = "IDENTITY_NEW";
     kdb_subset->rename(old_name, new_name);
-    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
-    EXPECT_EQ(global_ws_idt->get_lec(new_name), new_lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(new_name), new_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(new_name), new_lec);
 
     // delete an element from the subset and check if it has also 
     // been deleted from the global KDB
@@ -204,7 +204,7 @@ TEST_F(KDBIdentitiesTest, Filter)
     // delete subset
     kdb_subset->clear();
     EXPECT_EQ(global_ws_idt->size(), nb_total_identities);
-    EXPECT_EQ(global_ws_idt->get_lec(name), modified_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(name), modified_lec);
 
     // wrong pattern
     pattern = "anjfks";
@@ -248,11 +248,11 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
     // modify an element of the subset and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "AOUC";
-    std::string lec = global_ws_idt->get_lec(name);
+    std::string lec = global_ws_idt->get_lec_utf8(name);
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
     kdb_subset->update(name, modified_lec);
-    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
-    EXPECT_EQ(global_ws_idt->get_lec(name), lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(name), modified_lec);
+    EXPECT_EQ(global_ws_idt->get_lec_utf8(name), lec);
 
     // modify an element of the subset and check if it has not 
     // been added to the global KDB
@@ -260,7 +260,7 @@ TEST_F(KDBIdentitiesTest, DeepCopy)
     std::string new_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/(VM+VAFF))[-1]";
     kdb_subset->add(new_name, new_lec);
     EXPECT_TRUE(kdb_subset->contains(new_name));
-    EXPECT_EQ(kdb_subset->get_lec(new_name), new_lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(new_name), new_lec);
     EXPECT_FALSE(global_ws_idt->contains(new_name));
 
     // modify an element of the subset and check if the 
@@ -390,7 +390,7 @@ TEST_F(KDBIdentitiesTest, Merge)
 
     // modify an existing element of the KDB to be merge
     std::string name = "AOUC";
-    std::string unmodified_lec = kdb_to_merge->get_lec(name);
+    std::string unmodified_lec = kdb_to_merge->get_lec_utf8(name);
     std::string modified_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-2]+PM*(VM/(VM+VAFF))[-2]";
     kdb_to_merge->update(name, modified_lec);
 
@@ -398,14 +398,14 @@ TEST_F(KDBIdentitiesTest, Merge)
     kdb0->merge(kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
-    EXPECT_EQ(kdb0->get_lec(new_name), new_lec);
+    EXPECT_EQ(kdb0->get_lec_utf8(new_name), new_lec);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0->get_lec(name), modified_lec); 
+    EXPECT_EQ(kdb0->get_lec_utf8(name), modified_lec); 
 
     // merge (NOT overwrite)
     kdb1->merge(kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
+    EXPECT_EQ(kdb1->get_lec_utf8(name), unmodified_lec);
 }
 
 TEST_F(KDBIdentitiesTest, Search)

@@ -45,7 +45,7 @@ cdef class ComputedTable:
         return self.c_computed_table.get_nb_lines()
 
     def get_lines(self) -> List[str]:
-        return [self.c_computed_table.get_line_name(i).decode() 
+        return [self.c_computed_table.get_line_name_utf8(i).decode() 
                 for i in range(self.get_nb_lines())]
 
     def get_nb_columns(self) -> int:
@@ -77,7 +77,7 @@ cdef class ComputedTable:
         return Sample._from_ptr(sample_ptr)
 
     def get_title(self) -> str:
-        return self.c_computed_table.get_title().decode()
+        return self.c_computed_table.get_title_utf8().decode()
 
     def get_ymin(self) -> float:
         return self.c_computed_table.get_ymin()
@@ -103,7 +103,7 @@ cdef class ComputedTable:
         cdef bytes b_file_op_name
         
         # see function APIGraphLineTitle() (from api/k_graph.c)
-        name: str = self.c_computed_table.get_line_name(row).decode()
+        name: str = self.c_computed_table.get_line_name_utf8(row).decode()
         if self.get_nb_operations_between_files():
             col = self.c_computed_table.files_ops[op_files]
             if self.get_nb_files() > 1 or col.cl_opf != COL_NOP:

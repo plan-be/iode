@@ -192,7 +192,7 @@ void ComputedTable::compute_values()
         line = v_line_pos_in_ref_table[row];
         res = execute_tbl_columns(*ref_table, ref_table->lines[line], columns);
         if(res < 0)
-            throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name(row) + "'");
+            throw std::runtime_error("Cannot compute values corresponding to row '" + get_line_name_utf8(row) + "'");
 
         // store all values
         for(int col = 0; col < v_pos_in_columns_struct.size(); col++)
@@ -457,10 +457,8 @@ void ComputedTable::print_cell_left_column(const TableCell& cell) const
         return;
     }
 
-    std::string content = cell.get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
+    // W_Print(...) functions expect OEM encoding
+    std::string content = cell.get_content_oem();
     W_replace_line_break(content);
 
     cell.start_print(1);
@@ -482,6 +480,7 @@ void ComputedTable::print_cell_value(double value) const
 
 void ComputedTable::print_cell_string(const COL& column, const std::string& content) const
 {
+    // W_Print(...) functions expect OEM encoding
     std::string text = col_to_text(column, content, (int) v_tbl_filenames.size());
     if(!text.empty())
     {
@@ -498,15 +497,13 @@ void ComputedTable::print_cell_right_column(const TableCell& cell, const COL& co
         return;
     }
 
-    std::string content = cell.get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
+    // W_Print(...) functions expect OEM encoding
+    std::string content_oem = cell.get_content_oem();
 
     TableCell cell_copy(cell);
     TableCellType cell_type = cell_copy.get_type();
 
-    if(cell_type == TABLE_CELL_STRING && string_contains(content, '#'))
+    if(cell_type == TABLE_CELL_STRING && string_contains(content_oem, '#'))
         cell_copy.set_align(TABLE_CELL_RIGHT);
 
     if(cell_type == TABLE_CELL_LEC)
@@ -516,7 +513,7 @@ void ComputedTable::print_cell_right_column(const TableCell& cell, const COL& co
     cell_copy.print_start_attribute();
 
     if(cell_type == TABLE_CELL_STRING)
-        print_cell_string(column, content);
+        print_cell_string(column, content_oem);
     else
         print_cell_value(column.cl_res);
 
@@ -612,9 +609,9 @@ void ComputedTable::print_to_file(const bool global_nb_decimals, const bool glob
     A2M_SEPCH = '¿';
 
     std::shared_ptr<Table> ref_table_ptr(ref_table, [](Table*) {});
-    std::string title_utf8 = ref_table_ptr->get_title();
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing
-    std::string title_oem = utf8_to_oem(title_utf8);
+    
+    // W_Print(...) functions expect OEM encoding
+    std::string title_oem = ref_table_ptr->get_title_oem();
     W_replace_line_break(title_oem);
     if(title_oem.empty())
         title_oem = "No title";

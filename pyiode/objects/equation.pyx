@@ -26,7 +26,8 @@ cdef class Equation:
     def __init__(self, endogenous: str, lec: str, from_period: str, to_period: str, comment: str, 
                  instruments: str, block: str) -> Equation:
         self.eq_ptr = make_shared[CEquation](endogenous.encode(), lec.encode(), <IodeEquationMethod>(0), from_period.encode(), 
-                                             to_period.encode(), comment.encode(), instruments.encode(), block.encode(), <bint>False)
+                                             to_period.encode(), comment.encode(), instruments.encode(), block.encode(), 
+                                             <bint>False, <bint>True)
         self.c_equation = self.eq_ptr.get()
 
     def __dealloc__(self):
@@ -136,11 +137,11 @@ cdef class Equation:
         return self.c_equation.endo.decode()
 
     def get_lec(self) -> str:
-        return self.c_equation.lec.decode()
+        return self.c_equation.get_lec_utf8().decode()
 
     def set_lec(self, value: str):
         value = value.strip()
-        self.c_equation.set_lec(value.encode())
+        self.c_equation.set_lec_utf8(value.encode())
 
     def get_method(self) -> str:
         return EqMethod(<int>(self.c_equation.get_method_as_int())).name
@@ -159,17 +160,18 @@ cdef class Equation:
         self.c_equation.set_sample(from_period.encode(), to_period.encode())
 
     def get_comment(self) -> str:
-        return self.c_equation.get_comment().decode()
+        return self.c_equation.get_comment_utf8().decode()
 
     def set_comment(self, value: str):
-        self.c_equation.set_comment(value.encode())
+        self.c_equation.set_comment_utf8(value.encode())
 
     def get_instruments(self) -> Union[str, List[str]]:
-        _instruments = self.c_equation.instruments.decode().split(';')
-        return _instruments[0] if len(_instruments) == 1 else _instruments
+        instruments = self.c_equation.get_instruments_utf8().decode()
+        v_instruments = instruments.split(';')
+        return v_instruments[0] if len(v_instruments) == 1 else v_instruments
 
     def set_instruments(self, value: str):
-        self.c_equation.instruments = value.encode()
+        self.c_equation.set_instruments_utf8(value.encode())
 
     def get_block(self) -> str:
         return self.c_equation.block.decode()

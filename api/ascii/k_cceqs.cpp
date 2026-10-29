@@ -62,7 +62,6 @@ static Equation* read_eq(YYFILE* yy, char* name)
     int keyw;
     char* c_lec;
     std::string lec;
-    std::string lec_oem;
 
     std::string endo(name);
     IodeEquationMethod method = EQ_LSQ;
@@ -72,10 +71,9 @@ static Equation* read_eq(YYFILE* yy, char* name)
         YY_unread(yy);
         c_lec = K_read_str(yy);
         c_lec = K_wrap(c_lec, 60);  
-        lec_oem = std::string(c_lec);
+        lec = std::string(c_lec);
         SW_nfree(c_lec);
 
-        lec = oem_to_utf8(lec_oem);
         if(lec.empty()) 
         {
             kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
@@ -89,10 +87,9 @@ static Equation* read_eq(YYFILE* yy, char* name)
 
     c_lec = K_read_str(yy);
     c_lec = K_wrap(c_lec, 60);
-    lec_oem = std::string(c_lec);
+    lec = std::string(c_lec);
     SW_nfree(c_lec);
 
-    lec = oem_to_utf8(lec_oem);
     if(lec.empty()) 
     {
         kerror(0, "%s: Expected LEC definition for equation '%s', [%s]", 
@@ -163,8 +160,7 @@ static Equation* read_eq(YYFILE* yy, char* name)
 
             case EQ_ASCII_CMT  :
             {
-                std::string comment_oem = std::string(K_read_str(yy));
-                comment = oem_to_utf8(comment_oem);
+                comment = std::string(K_read_str(yy));
                 if(comment.empty()) 
                 {
                     kerror(0, "Missing comment value for equation '%s', [%s]", name, YY_error(yy));
@@ -175,8 +171,7 @@ static Equation* read_eq(YYFILE* yy, char* name)
 
             case EQ_ASCII_INSTR:
             {
-                std::string instruments_oem = std::string(K_read_str(yy));
-                instruments = oem_to_utf8(instruments_oem);
+                instruments = std::string(K_read_str(yy));
                 if(instruments.empty()) 
                 {
                     kerror(0, "Missing instruments value for equation '%s', [%s]", name, YY_error(yy));
@@ -403,8 +398,7 @@ static void print_test(FILE* fd, char* txt, double val)
  */
 static void print_eq(FILE* fd, std::shared_ptr<Equation> eq, const std::string& name)
 {
-    std::string lec_oem = utf8_to_oem(eq->lec);
-    fprintf(fd, "{\n\t\"%s\"\n", (char*) lec_oem.c_str());
+    fprintf(fd, "{\n\t\"%s\"\n", (char*) eq->lec.c_str());
 
     switch(eq->method) 
     {
@@ -433,21 +427,19 @@ static void print_eq(FILE* fd, std::shared_ptr<Equation> eq, const std::string& 
         block = name;
     fprintf(fd, "\tBLOCK \"%s\"\n", eq->block.c_str());
 
-    std::string comment = trim(eq->comment);
+    std::string comment = eq->get_comment_oem();
+    comment = trim(comment);
     if(!comment.empty())
     {
-        std::string comment_oem = utf8_to_oem(comment);
         fprintf(fd, "\tCOMMENT ");
-        SCR_fprintf_esc(fd, (char*) comment_oem.c_str(), 1);
+        SCR_fprintf_esc(fd, (char*) comment.c_str(), 1);
         fprintf(fd, "\n");
     }
 
-    std::string instruments = trim(eq->instruments);
+    std::string instruments = eq->get_instruments_oem();
+    instruments = trim(instruments);
     if(!instruments.empty())
-    {
-        std::string instruments_oem = utf8_to_oem(eq->instruments);
-        fprintf(fd, "\tINSTRUMENTS \"%s\"\n", instruments_oem.c_str());
-    }
+        fprintf(fd, "\tINSTRUMENTS \"%s\"\n", instruments.c_str());
 
     // Estimated equation => Sample not null 30/10/2023
     if(eq->sample.nb_periods != 0) 

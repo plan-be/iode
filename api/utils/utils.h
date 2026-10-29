@@ -92,6 +92,12 @@ const static std::vector<FileType> v_file_types =
 const static std::vector<std::string> vExportFormats = 
 	{ "CSV", "DIF", "WKS", "TSP", "Reverse CSV" };
 
+enum Encoding
+{
+    ENCODING_OEM850,
+    ENCODING_UTF8
+};
+
 
 /* ****************************** *
  *      UTILITY FUNCTIONS         *

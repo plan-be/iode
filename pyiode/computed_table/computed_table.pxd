@@ -53,11 +53,11 @@ cdef extern from "api/computed_table/computed_table.h":
         double get_ymax()
         shared_ptr[CSample] get_sample()
         vector[string] get_list_files()
-        string get_title() except +
+        string get_title_utf8() except +
 
         # Methods
         int find_file_op(const COL& col) except +
-        string get_line_name(const int line) except +
+        string get_line_name_utf8(const int line) except +
         string get_column_name(const int col) except +
         double get_value(const int line, const int col, const bint full_precision) except +
         bint is_editable(const int line, const int col) except +
