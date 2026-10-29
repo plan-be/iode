@@ -72,7 +72,7 @@ TEST_F(KDBListsTest, Get)
     name = "IDT";
     expected_list = "OCP;FLGR;KL;PROD;QL;RDEBT;RENT;RLBER;SBGX;WCRH;IUGR;SBGXR;\n";
     expected_list += "WBGR;YSFICR;YSEFPR /* liste des identités */";
-    list = global_ws_lst->get(name);
+    list = global_ws_lst->get_list_utf8(name);
     EXPECT_EQ(expected_list, list);
 }
 

@@ -30,16 +30,16 @@
 static int read_cmt(KDBComments& kdb, YYFILE* yy, char* name)
 {
     int keyw;
-    char* cmt;
+    char* c_cmt;
 
     /* READ A STRING */
     keyw = YY_lex(yy);
     if(keyw == YY_STRING)   
-        cmt = K_wrap((char*) yy->yy_text, 60);
+        c_cmt = K_wrap((char*) yy->yy_text, 60);
     else 
     {
-        cmt = SW_nalloc(1);
-        cmt[0] = '\0';
+        c_cmt = SW_nalloc(1);
+        c_cmt[0] = '\0';
         YY_unread(yy);
     }
 
@@ -53,18 +53,17 @@ static int read_cmt(KDBComments& kdb, YYFILE* yy, char* name)
 
     try
     {
-        Comment cmt_oem(cmt);
-        Comment cmt_utf8 = oem_to_utf8(cmt_oem);
-        kdb.set(name, cmt_utf8);
+        Comment cmt(c_cmt);
+        kdb.set(name, cmt);
     }
     catch(const std::exception&)
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        SW_nfree(cmt);
+        SW_nfree(c_cmt);
         return -1;
     }
 
-    SW_nfree(cmt);
+    SW_nfree(c_cmt);
     return 0;
 }
 
@@ -176,8 +175,7 @@ bool KDBComments::save_asc(const std::string& filename)
         }
     }
 
-    Comment cmt_utf8;
-    Comment cmt_oem;
+    Comment cmt;
     bool success = true;
     for(const std::string& name : obj_names) 
     {
@@ -185,10 +183,9 @@ bool KDBComments::save_asc(const std::string& filename)
         {
             std::shared_ptr<Comment> cmt_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
-            cmt_utf8 = Comment(*cmt_ptr);
-            std::erase(cmt_utf8, '\n');
-            cmt_oem = utf8_to_oem(cmt_utf8);
-            SCR_fprintf_esc(fd, (char*) cmt_oem.c_str(), 1);
+            cmt = Comment(*cmt_ptr);
+            std::erase(cmt, '\n');
+            SCR_fprintf_esc(fd, (char*) cmt.c_str(), 1);
             fprintf(fd, "\n");
         }
         catch(const std::exception& e) 

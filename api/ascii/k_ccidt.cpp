@@ -63,8 +63,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
 
     /* READ FILE */
     char* c_lec = NULL;
-    std::string lec_oem;
-    std::string lec_utf8;
+    std::string lec;
     this->set_fullpath(trim_filename);
     while(1) 
     {
@@ -88,11 +87,10 @@ bool KDBIdentities::load_asc(const std::string& filename)
                     break;
                 }
                 c_lec = K_wrap((char*) yy->yy_text, 60);
-                lec_oem = std::string(c_lec);
+                lec = std::string(c_lec);
                 try
                 {
-                    lec_utf8 = oem_to_utf8(lec_oem);
-                    Identity idt(lec_utf8);
+                    Identity idt(lec);
                     this->set(name, idt);
                     cmpt++;
                 }
@@ -147,8 +145,7 @@ bool KDBIdentities::save_asc(const std::string& filename)
         }
     }
 
-    std::string lec_utf8;
-    std::string lec_oem;
+    std::string lec;
     bool success = true;
     for(const std::string& name : obj_names)
     {
@@ -156,9 +153,8 @@ bool KDBIdentities::save_asc(const std::string& filename)
         {
             std::shared_ptr<Identity> idt_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
-            lec_utf8 = idt_ptr->get_lec();
-            lec_oem = utf8_to_oem(lec_utf8);
-            fprintf(fd, "\"%s\"\n", (char*) lec_oem.c_str());
+            lec = idt_ptr->get_lec();
+            fprintf(fd, "\"%s\"\n", (char*) lec.c_str());
         }
         catch(const std::exception& e) 
         {

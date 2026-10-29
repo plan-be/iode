@@ -309,7 +309,7 @@ void EditAndEstimateEquations::estimate(int maxit, double eps)
             eq_ptr = kdb_eqs->get_obj_ptr(eq_name);
             eq_ptr->set_method(method);
             eq_ptr->block = block;
-            eq_ptr->instruments = instruments;
+            eq_ptr->set_instruments(instruments);
         }
         catch(std::exception& e)
         {
@@ -382,7 +382,7 @@ std::vector<std::string> EditAndEstimateEquations::save(const std::string& from,
             Equation eq = kdb_eqs->get(eq_name);
             eq.set_method(method);
             eq.block = block;
-            eq.instruments = instruments;
+            eq.set_instruments(instruments);
     
             if(estimation_done)
             {

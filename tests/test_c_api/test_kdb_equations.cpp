@@ -29,7 +29,7 @@ TEST_F(KDBEquationsTest, Load)
 TEST_F(KDBEquationsTest, Subset)
 {
     std::string pattern = "A*";
-    std::string lec = global_ws_eqs->get_lec("ACAF");
+    std::string lec = global_ws_eqs->get_lec_utf8("ACAF");
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
 
     // GLOBAL KDB
@@ -42,16 +42,16 @@ TEST_F(KDBEquationsTest, Subset)
     EXPECT_EQ(kdb_subset_deep_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_deep_copy->is_detached_database());
     kdb_subset_deep_copy->update("ACAF", new_lec);
-    EXPECT_EQ(global_ws_eqs->get_lec("ACAF"), lec);
-    EXPECT_EQ(kdb_subset_deep_copy->get_lec("ACAF"), new_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8("ACAF"), lec);
+    EXPECT_EQ(kdb_subset_deep_copy->get_lec_utf8("ACAF"), new_lec);
 
     // SHALLOW COPY SUBSET
     KDBEquationsPtr kdb_subset_shallow_copy = global_ws_eqs->get_subset(pattern, false);
     EXPECT_EQ(kdb_subset_shallow_copy->size(), names.size());
     EXPECT_TRUE(kdb_subset_shallow_copy->is_subset_database());
     kdb_subset_shallow_copy->update("ACAF", new_lec);
-    EXPECT_EQ(global_ws_eqs->get_lec("ACAF"), new_lec);
-    EXPECT_EQ(kdb_subset_shallow_copy->get_lec("ACAF"), new_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8("ACAF"), new_lec);
+    EXPECT_EQ(kdb_subset_shallow_copy->get_lec_utf8("ACAF"), new_lec);
 }
 
 TEST_F(KDBEquationsTest, Save)
@@ -67,7 +67,7 @@ TEST_F(KDBEquationsTest, Save)
 TEST_F(KDBEquationsTest, GetLec)
 {
     std::string expected_lec = "(ACAF/VAF[-1]) :=acaf1+acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    EXPECT_EQ(global_ws_eqs->get_lec("ACAF"), expected_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8("ACAF"), expected_lec);
 }
 
 TEST_F(KDBEquationsTest, Get)
@@ -94,8 +94,8 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_ptr->lec, expected_lec);
     EXPECT_EQ(eq_ptr->get_method(), "LSQ");
     EXPECT_EQ(eq_ptr->sample.to_string(), "1975Y1:1997Y1");
-    EXPECT_EQ(eq_ptr->get_comment(), "");
-    EXPECT_EQ(eq_ptr->instruments, "");
+    EXPECT_EQ(eq_ptr->get_comment_utf8(), "");
+    EXPECT_EQ(eq_ptr->get_instruments_utf8(), "");
     EXPECT_EQ(eq_ptr->block, "W");
     EXPECT_EQ(eq_ptr->get_date_as_string(), "");
 
@@ -106,16 +106,16 @@ TEST_F(KDBEquationsTest, Get)
     EXPECT_EQ(eq_ptr->solved, 0);
     EXPECT_EQ(eq_ptr->method, EQ_LSQ);
     EXPECT_EQ(eq_ptr->sample.to_string(), ":");
-    EXPECT_EQ(eq_ptr->comment, "");
+    EXPECT_EQ(eq_ptr->get_comment_utf8(), "");
     EXPECT_EQ(eq_ptr->block, "DTH1");
-    EXPECT_EQ(eq_ptr->instruments, "");
+    EXPECT_EQ(eq_ptr->get_instruments_utf8(), "");
 
     // with non-ASCII characters
     eq_ptr = global_ws_eqs->get_and_check_obj_ptr("COEFON");
     expected_lec = "COEFON :=(ITON/(VBBP_P-VAG-VAH))[1990Y1]\n";
     expected_lec += "/* Coëfficiënt voor berekening indirecte\n"; 
     expected_lec += "belastingen in constante prijzen */";
-    EXPECT_EQ(eq_ptr->lec, expected_lec);
+    EXPECT_EQ(eq_ptr->get_lec_utf8(), expected_lec);
 }
 
 TEST_F(KDBEquationsTest, GetNames)
@@ -156,7 +156,7 @@ TEST_F(KDBEquationsTest, Update)
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
 
     global_ws_eqs->update(name, new_lec);
-    EXPECT_EQ(global_ws_eqs->get_lec(name), new_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8(name), new_lec);
 }
 
 TEST_F(KDBEquationsTest, Filter)
@@ -197,8 +197,8 @@ TEST_F(KDBEquationsTest, Filter)
     std::string name = "ACAF";
     std::string modified_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     kdb_subset->update(name, modified_lec);
-    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
-    EXPECT_EQ(global_ws_eqs->get_lec(name), modified_lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(name), modified_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8(name), modified_lec);
 
     // delete an element from the subset and check if it has also 
     // been deleted from the global KDB
@@ -218,8 +218,8 @@ TEST_F(KDBEquationsTest, Filter)
     bool date = true;
     Equation eq(name, lec, method, from, to, comment, instruments, block, date);
     kdb_subset->add(name, eq);
-    EXPECT_EQ(kdb_subset->get_lec(name), lec);
-    EXPECT_EQ(global_ws_eqs->get_lec(name), lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(name), lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8(name), lec);
 
     // try to add an element to the subset which is already present 
     // in the global KDB
@@ -228,7 +228,7 @@ TEST_F(KDBEquationsTest, Filter)
     // delete subset
     kdb_subset->clear();
     EXPECT_EQ(global_ws_eqs->size(), nb_total_equations);
-    EXPECT_EQ(global_ws_eqs->get_lec(name), lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8(name), lec);
 
     // wrong pattern
     pattern = "anjfks";
@@ -279,11 +279,11 @@ TEST_F(KDBEquationsTest, DeepCopy)
     // modify an element of the subset and check if the 
     // corresponding element of the global KDB didn't changed
     std::string name = "ACAF";
-    std::string lec = global_ws_eqs->get_lec(name);
+    std::string lec = global_ws_eqs->get_lec_utf8(name);
     std::string modified_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     kdb_subset->update(name, modified_lec);
-    EXPECT_EQ(kdb_subset->get_lec(name), modified_lec);
-    EXPECT_EQ(global_ws_eqs->get_lec(name), lec);
+    EXPECT_EQ(kdb_subset->get_lec_utf8(name), modified_lec);
+    EXPECT_EQ(global_ws_eqs->get_lec_utf8(name), lec);
 
     // delete an element from the subset and check if it has not 
     // been deleted from the global KDB
@@ -341,7 +341,7 @@ TEST_F(KDBEquationsTest, Merge)
 
     // modify an existing element of the KDB to be merge
     std::string name = "ACAF";
-    std::string unmodified_lec = kdb_to_merge->get_lec(name);
+    std::string unmodified_lec = kdb_to_merge->get_lec_utf8(name);
     std::string modified_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
     kdb_to_merge->update(name, modified_lec);
 
@@ -349,14 +349,14 @@ TEST_F(KDBEquationsTest, Merge)
     kdb0->merge(kdb_to_merge, true, false);
     // a) check kdb0 contains new item of KDB to be merged
     EXPECT_TRUE(kdb0->contains(new_name));
-    EXPECT_EQ(kdb0->get_lec(new_name), new_lec);
+    EXPECT_EQ(kdb0->get_lec_utf8(new_name), new_lec);
     // b) check already existing item has been overwritten
-    EXPECT_EQ(kdb0->get_lec(name), modified_lec); 
+    EXPECT_EQ(kdb0->get_lec_utf8(name), modified_lec); 
 
     // merge (NOT overwrite)
     kdb1->merge(kdb_to_merge, false, false);
     // b) check already existing item has NOT been overwritten
-    EXPECT_EQ(kdb1->get_lec(name), unmodified_lec);
+    EXPECT_EQ(kdb1->get_lec_utf8(name), unmodified_lec);
 }
 
 TEST_F(KDBEquationsTest, Search)
@@ -405,12 +405,12 @@ TEST_F(KDBEquationsTest, Hash)
     // modify an entry
     Equation eq = global_ws_eqs->get("ACAF");
     std::string lec = eq.lec;
-    eq.set_lec("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
+    eq.set_lec_utf8("(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)");
     global_ws_eqs->update("ACAF", eq);
     std::size_t hash_val_modified = hash_value(*global_ws_eqs);
     EXPECT_NE(hash_val, hash_val_modified);
     // restore original entry
-    eq.set_lec(lec);
+    eq.set_lec_utf8(lec);
     global_ws_eqs->update("ACAF", eq);
     Equation eq_restored = global_ws_eqs->get("ACAF");
     EXPECT_EQ(eq_restored, eq);

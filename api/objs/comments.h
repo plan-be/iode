@@ -39,6 +39,38 @@ public:
         return std::shared_ptr<KDBComments>(new KDBComments(is_global));
     }
 
+    std::string get_comment(const std::string& name) const
+    {
+        std::shared_ptr<Comment> cmt_ptr = this->get_and_check_obj_ptr(name);
+        return (!cmt_ptr) ? "" : *cmt_ptr;
+    }
+
+    std::string get_comment_oem(const std::string& name) const
+    {
+        return this->get_comment(name);
+    }
+
+    std::string get_comment_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_comment(name));
+    }
+
+    void set_comment(const std::string& name, const std::string& value)
+    {
+        this->set(name, value);
+    }
+
+    void set_comment_oem(const std::string& name, const std::string& value)
+    {
+        this->set_comment(name, value);
+    }
+
+    void set_comment_utf8(const std::string& name, const std::string& value)
+    {
+        std::string comment = utf8_to_oem(value);
+        this->set_comment(name, comment);
+    }
+
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
 

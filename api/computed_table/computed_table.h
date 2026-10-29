@@ -215,6 +215,11 @@ public:
         return ref_table->get_title();
     }
 
+    std::string get_title_utf8() const
+    {
+        return ref_table->get_title_utf8();
+    }
+
     TableGraphGrid get_grid_xaxis() const
     {
         return ref_table->get_gridx();
@@ -275,7 +280,14 @@ public:
         if(line >= line_names.size()) 
             throw std::runtime_error("Cannot access line " + std::to_string(line) + 
             " since the table has " + std::to_string(line_names.size()) + " lines");
-        return line_names.at(line);
+        std::string name = line_names.at(line);
+        return name;
+    }
+
+    std::string get_line_name_utf8(const int line) const
+    {
+        std::string name = this->get_line_name(line);
+        return oem_to_utf8(name);
     }
 
     std::string get_column_name(const int col) const

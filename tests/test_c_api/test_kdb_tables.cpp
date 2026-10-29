@@ -78,10 +78,10 @@ TEST_F(KDBTablesTest, Get)
     EXPECT_EQ(line.get_type(), TABLE_LINE_CELL);
     TableCell cell_title = line.cells[0];
     EXPECT_EQ(cell_title.get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(cell_title.get_content(false), "Ecart chômage classique et chômage");
+    EXPECT_EQ(cell_title.get_content_utf8(false), "Ecart chômage classique et chômage");
     TableCell cell_lec = line.cells[1];
     EXPECT_EQ(cell_lec.get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(cell_lec.get_content(false), "-100*(LCLASS-(NATY-UY))/NATY /* écart chômage */");
+    EXPECT_EQ(cell_lec.get_content_utf8(false), "-100*(LCLASS-(NATY-UY))/NATY /* écart chômage */");
 }
 
 TEST_F(KDBTablesTest, GetNames)
@@ -98,7 +98,7 @@ TEST_F(KDBTablesTest, GetTitle)
     std::string title;
     std::string expected_title = "Déterminants de la croissance de K";
 
-    title = global_ws_tbl->get_title("ANAKNFF");
+    title = global_ws_tbl->get_title_utf8("ANAKNFF");
     EXPECT_EQ(expected_title, title);
 }
 
@@ -107,6 +107,9 @@ TEST_F(KDBTablesTest, CreateRemove)
     int i;
     std::string name;
     TableLine* line;
+    bool search_comment = true;
+    bool utf8 = true;
+
     global_ws_var->load(str_input_test_dir + "fun.av");
     global_ws_lst->load(str_input_test_dir + "fun.al");
 
@@ -135,7 +138,8 @@ TEST_F(KDBTablesTest, CreateRemove)
     bool mode = true;
     bool files = true;
     bool date = true;
-    global_ws_tbl->add(name, 2, def, vars, mode, files, date);
+
+    global_ws_tbl->add(name, 2, def, vars, mode, files, date, search_comment, utf8);
 
     // check that list $ENVI has been expanded
     nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
@@ -192,7 +196,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     name = "TABLE3";
     std::vector<std::string> titles = {"GOSG:", "YDTG:", "DTH:", "DTF:", "IT:", "YSSG+COTRES:", "RIDG:", "OCUG:"};
     std::vector<std::string> lecs = {"GOSG", "YDTG", "DTH", "DTF", "IT", "YSSG+COTRES", "RIDG", "OCUG"};
-    global_ws_tbl->add(name, 2, def, titles, lecs, mode, files, date);
+    global_ws_tbl->add(name, 2, def, titles, lecs, mode, files, date, search_comment, utf8);
 
     // check lines
     nb_lines_vars = (int) lecs.size();
@@ -244,7 +248,7 @@ TEST_F(KDBTablesTest, CreateRemove)
     for(const std::string& lec: lecs) 
         lecs_list += lec + ";";
     lecs_list += list_name;
-    global_ws_tbl->add(name, 2, def, lecs_list, mode, files, date);
+    global_ws_tbl->add(name, 2, def, lecs_list, mode, files, date, search_comment, utf8);
 
     // check lines
     nb_lines_vars = (int) lecs.size() + (int) vars_envi_list.size();
@@ -299,6 +303,8 @@ TEST_F(KDBTablesTest, Filter)
     std::string pattern = "A*;*2";
     std::set<std::string> expected_names;
     KDBTablesPtr kdb_subset;
+    bool search_comment = true;
+    bool utf8 = true;
 
     global_ws_var->load(str_input_test_dir + "fun.av");
     global_ws_lst->load(str_input_test_dir + "fun.al");
@@ -330,7 +336,7 @@ TEST_F(KDBTablesTest, Filter)
     bool mode = true;
     bool files = true;
     bool date = true;
-    kdb_subset->add(new_name, 2, def, vars, mode, files, date);
+    kdb_subset->add(new_name, 2, def, vars, mode, files, date, search_comment, utf8);
     int nb_vars_envi = 10;
     int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
@@ -381,6 +387,8 @@ TEST_F(KDBTablesTest, DeepCopy)
     std::string pattern = "A*;*2";
     std::set<std::string> expected_names;
     KDBTablesPtr kdb_subset;
+    bool search_comment = true;
+    bool utf8 = true;
 
     global_ws_var->load(str_input_test_dir + "fun.av");
     global_ws_lst->load(str_input_test_dir + "fun.al");
@@ -412,7 +420,7 @@ TEST_F(KDBTablesTest, DeepCopy)
     bool mode = true;
     bool files = true;
     bool date = true;
-    kdb_subset->add(new_name, 2, def, vars, mode, files, date);
+    kdb_subset->add(new_name, 2, def, vars, mode, files, date, search_comment, utf8);
     int nb_vars_envi = 10;
     int nb_lines_header = 2 + 2; // title + sep line + "#S" + sep line
     int nb_lines_footnotes = (mode || files || date) ? 1 + mode + files + date : 0;   // 1 for sep line
@@ -465,6 +473,8 @@ TEST_F(KDBTablesTest, CopyFrom)
 TEST_F(KDBTablesTest, Merge)
 {
     std::string pattern = "A*";
+    bool search_comment = true;
+    bool utf8 = true;
 
     // create deep copies kdb
     KDBTablesPtr kdb0 = global_ws_tbl->get_subset(pattern, true);
@@ -478,7 +488,7 @@ TEST_F(KDBTablesTest, Merge)
     bool mode = true;
     bool files = true;
     bool date = true;
-    kdb_to_merge->add(new_name, 2, def, vars, mode, files, date);
+    kdb_to_merge->add(new_name, 2, def, vars, mode, files, date, search_comment, utf8);
     Table new_table = kdb_to_merge->get(new_name);
 
     // modify an existing element of the KDB to be merge
@@ -649,6 +659,9 @@ TEST_F(KDBTablesTest, PrintToFile)
 
 TEST_F(KDBTablesTest, Hash)
 {
+    bool search_comment = true;
+    bool utf8 = true;
+    
     std::size_t hash_val = hash_value(*global_ws_tbl);
     std::hash<Table> table_hasher;
 
@@ -680,7 +693,7 @@ TEST_F(KDBTablesTest, Hash)
     bool mode = true;
     bool files = true;
     bool date = true;
-    global_ws_tbl->add("NEW_ENTRY", 2, def, vars, mode, files, date);
+    global_ws_tbl->add("NEW_ENTRY", 2, def, vars, mode, files, date, search_comment, utf8);
     hash_val_modified = hash_value(*global_ws_tbl);
     EXPECT_NE(hash_val, hash_val_modified);   
     // remove the entry

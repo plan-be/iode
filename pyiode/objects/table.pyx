@@ -89,7 +89,7 @@ cdef class TableCell:
         if self.c_cell is NULL:
             return ''
         quotes = <int>(self.c_cell.get_type()) == TableCellType.STRING
-        content = self.c_cell.get_content(<bint>quotes).decode()
+        content = self.c_cell.get_content_utf8(<bint>quotes).decode()
         # remove newline characters
         return ''.join(content.splitlines())
 
@@ -161,7 +161,7 @@ cdef class TableLine:
         if self.c_line is NULL:
             return
         c_cell = &(self.c_line.cells[col])
-        c_cell.set_content(value.encode())
+        c_cell.set_content_utf8(value.encode())
 
     def _str_(self) -> str:
         cdef CTableCell* c_cell
@@ -172,7 +172,7 @@ cdef class TableLine:
         line_type = <int>(self.c_line.get_type())
         nb_columns = self.nb_columns
         if line_type == TableLineType.TITLE:
-            content = self.c_line.cells[0].get_content(<bint>False).decode()
+            content = self.c_line.cells[0].get_content_utf8(<bint>False).decode()
             # remove newline characters
             return ''.join(content.splitlines())
         elif line_type == TableLineType.CELL:
@@ -180,7 +180,7 @@ cdef class TableLine:
             for j in range(nb_columns):
                 c_cell = &(self.c_line.cells[j])
                 quotes = <int>(c_cell.get_type()) == TableCellType.STRING
-                content = c_cell.get_content(<bint>quotes).decode()
+                content = c_cell.get_content_utf8(<bint>quotes).decode()
                 # remove newline characters
                 cells_content += [''.join(content.splitlines())]
             return str(tuple(cells_content))
@@ -211,12 +211,13 @@ cdef class Table:
             if isinstance(variables, str):
                 self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), 
                                                    <string>variables.encode(), <bint>mode, <bint>files, 
-                                                   <bint>date, <bint>search_comment)
+                                                   <bint>date, <bint>search_comment, <bint>True)
             else:
                 for variable in variables:
                     cpp_variables.push_back(variable.encode())
                 self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_variables, 
-                                                   <bint>mode, <bint>files, <bint>date, <bint>search_comment)
+                                                   <bint>mode, <bint>files, <bint>date, <bint>search_comment, 
+                                                   <bint>True)
         else:            
             for line_title in lines_titles:
                 cpp_lines_titles.push_back(line_title.encode())
@@ -226,7 +227,8 @@ cdef class Table:
                 cpp_lecs.push_back(lec.encode())
 
             self.tbl_ptr = make_shared[CTable](<int>nb_columns, <string>table_title.encode(), cpp_lines_titles, 
-                                               cpp_lecs, <bint>mode, <bint>files, <bint>date, <bint>search_comment)
+                                               cpp_lecs, <bint>mode, <bint>files, <bint>date, <bint>search_comment, 
+                                               <bint>True)
         
         self.c_table_name = b''
         self.c_table = self.tbl_ptr.get()
@@ -269,7 +271,7 @@ cdef class Table:
             c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
-                c_title = self.c_table.get_title(i)
+                c_title = self.c_table.get_title_utf8(i)
                 return c_title.decode()
         return ""
 
@@ -285,7 +287,7 @@ cdef class Table:
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
                 c_title = value.encode()
-                self.c_table.set_title(i, c_title)
+                self.c_table.set_title_utf8(i, c_title)
 
     def get_language(self) -> str:
         if self.c_table is NULL:
@@ -447,7 +449,7 @@ cdef class Table:
         
         for j, cell_content in enumerate(value):
             c_cell = &c_line.cells[j]
-            c_cell.set_content(cell_content.encode())
+            c_cell.set_content_utf8(cell_content.encode())
 
     def index(self, key: str) -> int:
         cdef CTableLine* c_line
@@ -464,13 +466,13 @@ cdef class Table:
             c_line = &(self.c_table.lines[i])
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
-                content = c_line.cells[0].get_content(<bint>False).decode().strip()
+                content = c_line.cells[0].get_content_utf8(<bint>False).decode().strip()
                 if content == key:
                     return i
             elif line_type == TableLineType.CELL:
                 for j in range(nb_columns):
                     c_cell = &c_line.cells[j]
-                    content = c_cell.get_content(<bint>False).decode().strip()
+                    content = c_cell.get_content_utf8(<bint>False).decode().strip()
                     if content == key:
                         return i
             else:
@@ -501,7 +503,7 @@ cdef class Table:
             elif '|' in value:
                 self.insert(row, value.split('|'))
             else:
-                self.c_table.insert_title(row, value.encode(), <bint>False)
+                self.c_table.insert_title_utf8(row, value.encode(), <bint>False)
         elif isinstance(value, (list, tuple)):
             if not all(isinstance(item, str) for item in value):
                 raise TypeError(f"Cannot insert line with cells at position {row}.\nOne or more items "
@@ -511,7 +513,7 @@ cdef class Table:
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
-                c_line.cells[j].set_content(value[j].encode())
+                c_line.cells[j].set_content_utf8(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
@@ -547,7 +549,7 @@ cdef class Table:
             if not isinstance(value, str):
                 raise TypeError(f"Cannot update line {row}. Expected new content of type str. "
                                 f"Got new content of type {type(value).__name__} instead.")
-            c_line.cells[0].set_text(value.encode())
+            c_line.cells[0].set_text_utf8(value.encode())
         elif line_type == TableLineType.CELL:
             if not isinstance(value, (list, tuple)):
                 raise TypeError(f"Cannot update cells at line {row}. Expected new content of type list or tuple of str.\n"
@@ -560,7 +562,7 @@ cdef class Table:
                                  f"({len(value)}) must be the same of the number of cells ({nb_columns}) in the table")
             for j, cell_content in enumerate(value):
                 c_cell = &c_line.cells[j]
-                c_cell.set_content(cell_content.encode())
+                c_cell.set_content_utf8(cell_content.encode())
         else:
             warnings.warn(f"Line of type '{TableLineType(line_type).name}' cannot be updated")
 
@@ -592,14 +594,14 @@ cdef class Table:
             elif '|' in value:
                 self._iadd_(value.split('|'))
             else:
-                self.c_table.add_title(value.encode())
+                self.c_table.add_title_utf8(value.encode())
         elif isinstance(value, Iterable) and all(isinstance(item, str) for item in value):
             c_line = self.c_table.add_line_with_cells()
             nb_columns = self.c_table.nb_columns
             if len(value) != nb_columns:
                 raise ValueError(f"The length of 'value' {len(value)} must be equal to the number of columns {nb_columns}")
             for j in range(nb_columns):
-                c_line.cells[j].set_content(value[j].encode())
+                c_line.cells[j].set_content_utf8(value[j].encode())
         elif isinstance(value, TableLine):
             line_type = <int>(value.c_line.get_type())
             if line_type == TableLineType.TITLE or line_type == TableLineType.CELL:
@@ -634,7 +636,7 @@ cdef class Table:
             c_line = &(self.c_table.lines[i]) if i >= 0 else &(self.c_table.divider_line)
             line_type = <int>(c_line.get_type())
             if line_type == TableLineType.TITLE:
-                content = c_line.cells[0].get_content(<bint>True).decode()
+                content = c_line.cells[0].get_content_utf8(<bint>True).decode()
                 if len(content) > max_title_length:
                     max_title_length = <int>len(content)
                 lines += [[line_type, content]]
@@ -644,7 +646,7 @@ cdef class Table:
                     c_cell = &(c_line.cells[j])
                     quotes = <int>(c_cell.get_type()) == TableCellType.STRING
                     cell_align = <int>(c_cell.get_align())
-                    content = c_cell.get_content(<bint>quotes).decode()
+                    content = c_cell.get_content_utf8(<bint>quotes).decode()
                     if len(content) > max_cells_length[j]:
                         max_cells_length[j] = <int>len(content)
                     cells_content += [(cell_align, content)]

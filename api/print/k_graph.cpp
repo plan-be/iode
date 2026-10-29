@@ -45,7 +45,7 @@ int T_GraphTest(const std::shared_ptr<Table> tbl_ptr)
         return -1;
     }
 
-    std::string title = tbl_ptr->get_title();
+    std::string title = tbl_ptr->get_title(false);
     W_EndDisplay((char*) title.c_str(), -1, -1, -1, -1);
     return 0;
 }
@@ -146,10 +146,7 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
 
     if(mode != 0)
     {
-        std::string title = tbl_ptr->get_title();
-        // NOTE: W_Print(...) functions expect OEM encoding, so convert title 
-        //       from UTF-8 to OEM before printing 
-        title = utf8_to_oem(title);
+        std::string title = tbl_ptr->get_title(false);
         W_print_rtf_topic((char*) title.c_str());
     } 
     
@@ -181,9 +178,6 @@ int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl
 
             case TABLE_LINE_TITLE :
                 content = cells[0].get_content(false);
-                // NOTE: W_Print(...) functions expect OEM encoding, so convert content 
-                //       from UTF-8 to OEM before printing
-                content = utf8_to_oem(content);
                 T_GraphTitle((char*) content.c_str());
                 break;
 
@@ -252,8 +246,6 @@ static int T_GraphLineTitle(TableLine *line, const std::vector<COL>& file_column
     const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM 
-    content = utf8_to_oem(content);
 
     if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
         fileop = col_to_string(*column, 'f', 0, 2);
@@ -767,8 +759,6 @@ int APIGraphLineTitle(int hdl, TableLine *line, const std::vector<COL>& file_col
     const COL* column = &file_columns[i];
     TableCell   *cell = &(line->cells[0]);
     std::string content = cell->get_content();
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
-    content = utf8_to_oem(content);
 
     if(file_columns.size() > 1 || column->cl_opf != COL_NOP)
         fileop = col_to_string(*column, 'f', 0, 2);
@@ -946,9 +936,7 @@ int APIPrepareChart(Table *tbl, char *gsmpl)
                 break;
 
             case TABLE_LINE_TITLE :
-                content = line->cells[0].get_content();
-                // NOTE: W_Print(...) functions expect OEM encoding, so convert content from UTF-8 to OEM
-                content = utf8_to_oem(content);
+                content = line->cells[0].get_content(false);
                 APIGraphTitle(hdl, (char*) content.c_str(), x, smpl->nb_periods);
                 break;
 

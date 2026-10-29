@@ -15,9 +15,12 @@ class Identity
     std::shared_ptr<CLEC> clec;     // Compiled version of LEC
 
 public:
-    Identity(const std::string& lec)
+    Identity(const std::string& lec, const bool utf8=false)
     {
-        set_lec(lec);
+        if(utf8)
+            set_lec_utf8(lec);
+        else
+            set_lec(lec);
     }
 
     Identity(const Identity& other)
@@ -30,6 +33,16 @@ public:
     std::string get_lec() const 
     {
         return this->lec;
+    }
+
+    std::string get_lec_oem() const 
+    {
+        return this->lec;
+    }
+
+    std::string get_lec_utf8() const 
+    {
+        return oem_to_utf8(this->lec);
     }
 
     void set_lec(const std::string& lec) 
@@ -49,6 +62,11 @@ public:
         }
 
         this->lec = lec;
+    }
+
+    void set_lec_utf8(const std::string& lec) 
+    {
+        this->set_lec(utf8_to_oem(lec));
     }
 
     std::shared_ptr<CLEC> get_compiled_lec()
@@ -168,10 +186,15 @@ public:
         KDBTemplate::update(name, idt);
     }
 
-    bool add(const std::string& name, const std::string& lec);
-    void update(const std::string& name, const std::string& lec);
+    bool add(const std::string& name, const std::string& lec, const bool utf8);
+    void update(const std::string& name, const std::string& lec, const bool utf8);
 
     std::string get_lec(const std::string& name) const;
+
+    std::string get_lec_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_lec(name));
+    }
 
     bool execute_identities(const Period& from, const Period& to, const std::string& identities_list ="", 
                             const std::string& var_files = "", const std::string& scalar_files = "", const bool trace = false);

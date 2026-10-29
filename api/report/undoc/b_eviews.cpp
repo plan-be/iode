@@ -493,7 +493,7 @@ int EV_cc_file(char *filename)
                 break;
             }
 
-            eq->comment = std::string(lasteq);
+            eq->set_comment(std::string(lasteq));
             
             for(i = 0 ; i < nbcoefs ; i++) 
             {
@@ -559,7 +559,7 @@ int EV_cc_file(char *filename)
                 break;
             }
 
-            eq->comment = std::string(buf);
+            eq->set_comment(std::string(buf));
         }
 
         if(RP_DEBUG) kmsg("File '%s'[%d] : ok. LEC  => '%s'", filename, EV_LINENB, lec);

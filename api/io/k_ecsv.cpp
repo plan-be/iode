@@ -105,18 +105,17 @@ char* ExportObjsCSV::write_object_name(char* name, char** code)
  *  @param [out] char**  code    allocated string with the comment + sep
  *  @return      char*           pointer to *code
  */
-char* ExportObjsCSV::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char**cmt)
+char* ExportObjsCSV::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** code)
 {
     if(!dbc_ptr->contains(name)) 
-        return write_separator("", cmt);
+        return write_separator("", code);
     else
     {
         std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
-        Comment cmt_utf8 = *cmt_ptr;
-        Comment cmt_oem = utf8_to_oem(cmt_utf8);
-        U_ch* c_cmt = (unsigned char*) cmt_oem.c_str();
+        Comment cmt = *cmt_ptr;
+        U_ch* c_cmt = (unsigned char*) cmt.c_str();
         SCR_replace(c_cmt, (unsigned char*) "\n", (unsigned char*) "");
-        return write_separator((char*) c_cmt, cmt);
+        return write_separator((char*) c_cmt, code);
     }
 }
 
