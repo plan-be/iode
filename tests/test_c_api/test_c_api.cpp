@@ -656,7 +656,7 @@ TEST_F(LegacyAPITest, Tests_Table_ADD_GET)
     EXPECT_EQ(cells[0].get_type(), TABLE_CELL_LEC);
     EXPECT_EQ(cells[0].get_content(), "");
     EXPECT_EQ(cells[1].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(cells[1].get_content(), std::string("#S"));
+    EXPECT_EQ(cells[1].get_content(), "#S");
     cells.clear();
     // sep line
     EXPECT_EQ(tbl->lines[3].get_type(), TABLE_LINE_SEP);
@@ -1359,14 +1359,14 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
     // B_DataUpdate()
     rc = B_DataUpdate("U Comment of U"       , COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U");
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("U"), "Comment of U");
 
     rc = B_DataUpdate("U U := c1 + c2*Z"     , EQUATIONS);
     EXPECT_EQ(rc, 0);
 
     rc = B_DataUpdate("U 2 * A"              , IDENTITIES);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_idt->get_and_check_obj_ptr("U")->get_lec(), "2 * A");
+    EXPECT_EQ(global_ws_idt->get_and_check_obj_ptr("U")->get_lec_utf8(), "2 * A");
 
     rc = B_DataUpdate("U A,B,C"             , LISTS);
     EXPECT_EQ(rc, 0);
@@ -1404,7 +1404,7 @@ TEST_F(LegacyAPITest, Tests_B_DATA)
 
     rc = B_DataAppend("U - More comment on U", COMMENTS);
     EXPECT_EQ(rc, 0);
-    EXPECT_EQ(global_ws_cmt->get("U"), "Comment of U - More comment on U");
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("U"), "Comment of U - More comment on U");
 
     // B_DataList(char* arg, int type)
     rc = B_DataList("LC ac*", SCALARS);
@@ -1792,7 +1792,7 @@ TEST_F(LegacyAPITest, Tests_IMP_EXP)
         EXPECT_TRUE(success);
         global_ws_cmt = kdb_cmt;
         EXPECT_TRUE(global_ws_cmt != nullptr);
-        EXPECT_EQ(global_ws_cmt->get("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
+        EXPECT_EQ(global_ws_cmt->get_comment_utf8("KK_AF"), "Ondernemingen: ontvangen kapitaaloverdrachten.");
     }
 }
 
@@ -1957,10 +1957,10 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ACAF"), expected_cmt);
     expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
     expected_cmt += "(gemiddelde 1954-94).";
-    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ZZ_"), expected_cmt);
 
     filepath = str_input_test_dir + "fun.eqs";
     rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
@@ -1990,10 +1990,10 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
 
     filepath = str_input_test_dir + "fun.lst";
     rc = B_WsLoad((char*) filepath.c_str(), LISTS);
@@ -2038,23 +2038,23 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Déterminants de la croissance de K");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#s");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content_utf8(), "Croissance de K ");
     EXPECT_EQ(tbl_ptr->lines[4].cells[1].get_content(), "dln KNFF");
     EXPECT_EQ(tbl_ptr->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content_utf8(), "Output gap ");
     EXPECT_EQ(tbl_ptr->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
     EXPECT_EQ(tbl_ptr->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content_utf8(), "Rentabilité ");
     EXPECT_EQ(tbl_ptr->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
     EXPECT_EQ(tbl_ptr->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content_utf8(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
     tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
@@ -2063,19 +2063,19 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "PC_*40.34");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Tableau B-3. Revenu disponible des ménages à prix constant");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#S");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content_utf8(), "Revenus primaires");
     EXPECT_EQ(tbl_ptr->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
     EXPECT_EQ(tbl_ptr->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content_utf8(), "Cotisations sociales et impôts");
     EXPECT_EQ(tbl_ptr->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
     EXPECT_EQ(tbl_ptr->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content_utf8(), "Total");
     EXPECT_EQ(tbl_ptr->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
     EXPECT_EQ(tbl_ptr->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
@@ -2119,10 +2119,10 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ACAF"), expected_cmt);
     expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote \n";
     expected_cmt += "(gemiddelde 1954-94).";
-    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ZZ_"), expected_cmt);
 
     filepath = str_input_test_dir + "fun.ae";
     rc = B_WsLoad((char*) filepath.c_str(), EQUATIONS);
@@ -2152,10 +2152,10 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
     expected_lec += "(VM+VAFF))[-1]";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
 
     filepath = str_input_test_dir + "fun.al";
     rc = B_WsLoad((char*) filepath.c_str(), LISTS);
@@ -2200,23 +2200,23 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Déterminants de la croissance de K");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#s");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content_utf8(), "Croissance de K ");
     EXPECT_EQ(tbl_ptr->lines[4].cells[1].get_content(), "dln KNFF");
     EXPECT_EQ(tbl_ptr->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content_utf8(), "Output gap ");
     EXPECT_EQ(tbl_ptr->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
     EXPECT_EQ(tbl_ptr->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content_utf8(), "Rentabilité ");
     EXPECT_EQ(tbl_ptr->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
     EXPECT_EQ(tbl_ptr->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content_utf8(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
     tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
@@ -2225,19 +2225,19 @@ TEST_F(LegacyAPITest, Tests_B_WsLoad)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "PC_*40.34");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Tableau B-3. Revenu disponible des ménages à prix constant");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#S");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content_utf8(), "Revenus primaires");
     EXPECT_EQ(tbl_ptr->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
     EXPECT_EQ(tbl_ptr->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content_utf8(), "Cotisations sociales et impôts");
     EXPECT_EQ(tbl_ptr->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
     EXPECT_EQ(tbl_ptr->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content_utf8(), "Total");
     EXPECT_EQ(tbl_ptr->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
     EXPECT_EQ(tbl_ptr->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
@@ -2310,10 +2310,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ACAF"), expected_cmt);
     expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
     expected_cmt += "(gemiddelde 1954-94).";
-    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ZZ_"), expected_cmt);
 
     in_filepath = str_input_test_dir + "fun.eqs";
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
@@ -2355,10 +2355,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
 
     in_filepath = str_input_test_dir + "fun.lst";
     B_WsLoad((char*) in_filepath.c_str(), LISTS);
@@ -2421,23 +2421,23 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Déterminants de la croissance de K");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#s");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content_utf8(), "Croissance de K ");
     EXPECT_EQ(tbl_ptr->lines[4].cells[1].get_content(), "dln KNFF");
     EXPECT_EQ(tbl_ptr->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content_utf8(), "Output gap ");
     EXPECT_EQ(tbl_ptr->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
     EXPECT_EQ(tbl_ptr->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content_utf8(), "Rentabilité ");
     EXPECT_EQ(tbl_ptr->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
     EXPECT_EQ(tbl_ptr->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content_utf8(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
     tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
@@ -2446,19 +2446,19 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "PC_*40.34");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Tableau B-3. Revenu disponible des ménages à prix constant");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#S");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content_utf8(), "Revenus primaires");
     EXPECT_EQ(tbl_ptr->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
     EXPECT_EQ(tbl_ptr->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content_utf8(), "Cotisations sociales et impôts");
     EXPECT_EQ(tbl_ptr->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
     EXPECT_EQ(tbl_ptr->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content_utf8(), "Total");
     EXPECT_EQ(tbl_ptr->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
     EXPECT_EQ(tbl_ptr->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
@@ -2514,10 +2514,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ACAF"), expected_cmt);
     expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote \n";
     expected_cmt += "(gemiddelde 1954-94).";
-    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ZZ_"), expected_cmt);
 
     in_filepath = str_input_test_dir + "fun.ae";
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
@@ -2560,10 +2560,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]+PM*(VM/\n";
     expected_lec += "(VM+VAFF))[-1]";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
 
     in_filepath = str_input_test_dir + "fun.al";
     B_WsLoad((char*) in_filepath.c_str(), LISTS);
@@ -2626,23 +2626,23 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Déterminants de la croissance de K");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#s");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content_utf8(), "Croissance de K ");
     EXPECT_EQ(tbl_ptr->lines[4].cells[1].get_content(), "dln KNFF");
     EXPECT_EQ(tbl_ptr->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content_utf8(), "Output gap ");
     EXPECT_EQ(tbl_ptr->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
     EXPECT_EQ(tbl_ptr->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content_utf8(), "Rentabilité ");
     EXPECT_EQ(tbl_ptr->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
     EXPECT_EQ(tbl_ptr->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content_utf8(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
     tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
@@ -2651,19 +2651,19 @@ TEST_F(LegacyAPITest, Tests_B_WsSave)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "PC_*40.34");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Tableau B-3. Revenu disponible des ménages à prix constant");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#S");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content_utf8(), "Revenus primaires");
     EXPECT_EQ(tbl_ptr->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
     EXPECT_EQ(tbl_ptr->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content_utf8(), "Cotisations sociales et impôts");
     EXPECT_EQ(tbl_ptr->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
     EXPECT_EQ(tbl_ptr->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content_utf8(), "Total");
     EXPECT_EQ(tbl_ptr->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
     EXPECT_EQ(tbl_ptr->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);
@@ -2741,10 +2741,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_EQ(rc, 0);
     EXPECT_EQ(global_ws_cmt->size(), 317);
     expected_cmt = "Ondernemingen: ontvangen kapitaaloverdrachten.";
-    EXPECT_EQ(global_ws_cmt->get("ACAF"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ACAF"), expected_cmt);
     expected_cmt = "Marktsector (ondernemingen en zelfstandigen): loonquote\n";
     expected_cmt += "(gemiddelde 1954-94).";
-    EXPECT_EQ(global_ws_cmt->get("ZZ_"), expected_cmt);
+    EXPECT_EQ(global_ws_cmt->get_comment_utf8("ZZ_"), expected_cmt);
 
     in_filepath = str_input_test_dir + "fun.eqs";
     B_WsLoad((char*) in_filepath.c_str(), EQUATIONS);
@@ -2786,10 +2786,10 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("AOUC");
     expected_lec = "((WCRH/QL)/(WCRH/QL)[1990Y1])*(VAFF/(VM+VAFF))[-1]";
     expected_lec += "+PM*(VM/(VM+VAFF))[-1]";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
     idt_ptr = global_ws_idt->get_and_check_obj_ptr("YSFICR");
     expected_lec = "YSFIC/(TWGP*ZJ)";
-    EXPECT_EQ(idt_ptr->get_lec(), expected_lec);
+    EXPECT_EQ(idt_ptr->get_lec_utf8(), expected_lec);
 
     in_filepath = str_input_test_dir + "fun.lst";
     B_WsLoad((char*) in_filepath.c_str(), LISTS);
@@ -2852,23 +2852,23 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Déterminants de la croissance de K");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Déterminants de la croissance de K");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#s");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[4].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content(), "Croissance de K ");
+    EXPECT_EQ(tbl_ptr->lines[4].cells[0].get_content_utf8(), "Croissance de K ");
     EXPECT_EQ(tbl_ptr->lines[4].cells[1].get_content(), "dln KNFF");
     EXPECT_EQ(tbl_ptr->lines[5].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content(), "Output gap ");
+    EXPECT_EQ(tbl_ptr->lines[5].cells[0].get_content_utf8(), "Output gap ");
     EXPECT_EQ(tbl_ptr->lines[5].cells[1].get_content(), "knff1*ln (QAFF_/(Q_F+Q_I))");
     EXPECT_EQ(tbl_ptr->lines[6].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content(), "Rentabilité ");
+    EXPECT_EQ(tbl_ptr->lines[6].cells[0].get_content_utf8(), "Rentabilité ");
     EXPECT_EQ(tbl_ptr->lines[6].cells[1].get_content(), "knf2*ln mavg(3,RENT)");
     EXPECT_EQ(tbl_ptr->lines[7].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(), "Croissance anticipée de l'output");
+    EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content_utf8(), "Croissance anticipée de l'output");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(), "0.416*mavg(4,dln QAFF_)+0.023");
     // **** Check table YDH ****
     tbl_ptr = global_ws_tbl->get_and_check_obj_ptr("YDH");
@@ -2877,19 +2877,19 @@ TEST_F(LegacyAPITest, Tests_B_WsSaveCmp)
     EXPECT_EQ(tbl_ptr->divider_line.cells[0].get_content(), "1");
     EXPECT_EQ(tbl_ptr->divider_line.cells[1].get_content(), "PC_*40.34");
     EXPECT_EQ(tbl_ptr->lines[0].get_type(), TableLineType::TABLE_LINE_TITLE);
-    EXPECT_EQ(tbl_ptr->get_title(), "Tableau B-3. Revenu disponible des ménages à prix constant");
+    EXPECT_EQ(tbl_ptr->get_title_utf8(), "Tableau B-3. Revenu disponible des ménages à prix constant");
     EXPECT_EQ(tbl_ptr->lines[1].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[2].get_type(), TableLineType::TABLE_LINE_CELL);
     EXPECT_EQ(tbl_ptr->lines[2].cells[0].get_content(), "");
     EXPECT_EQ(tbl_ptr->lines[2].cells[1].get_content(), "#S");
     EXPECT_EQ(tbl_ptr->lines[3].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content(), "Revenus primaires");
+    EXPECT_EQ(tbl_ptr->lines[3].cells[0].get_content_utf8(), "Revenus primaires");
     EXPECT_EQ(tbl_ptr->lines[3].cells[1].get_content(), "WBU_+YN+GOSH_+IDH");
     EXPECT_EQ(tbl_ptr->lines[8].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content(), "Cotisations sociales et impôts");
+    EXPECT_EQ(tbl_ptr->lines[8].cells[0].get_content_utf8(), "Cotisations sociales et impôts");
     EXPECT_EQ(tbl_ptr->lines[8].cells[1].get_content(), "SSF+SSH+DTH");
     EXPECT_EQ(tbl_ptr->lines[15].get_type(), TableLineType::TABLE_LINE_CELL);
-    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content(), "Total");
+    EXPECT_EQ(tbl_ptr->lines[15].cells[0].get_content_utf8(), "Total");
     EXPECT_EQ(tbl_ptr->lines[15].cells[1].get_content(), "(WBU_+YN+GOSH_+IDH)-(SSF+SSH+DTH)+(SBH+OCUH)");
     EXPECT_EQ(tbl_ptr->lines[16].get_type(), TableLineType::TABLE_LINE_SEP);
     EXPECT_EQ(tbl_ptr->lines[17].get_type(), TableLineType::TABLE_LINE_FILES);

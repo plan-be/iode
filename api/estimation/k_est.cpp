@@ -235,7 +235,7 @@ int Estimation::estimate_sample(const std::shared_ptr<Sample> smpl)
         }
         E_T = E_SMPL->nb_periods;
 
-        std::string _instruments_ = eq_ptr->instruments;
+        std::string _instruments_ = eq_ptr->get_instruments();
         if(!_instruments_.empty()) 
             _v_block_instrs_ = split_multi(_instruments_, ",;");
 

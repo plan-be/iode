@@ -12,7 +12,12 @@ public:
 
     std::vector<Period> get_series_periods();
 
-    std::string get_series_name(const int row, const int fileop);
+    std::string get_series_name(const int row, const int fileop) const;
+
+    std::string get_series_name_utf8(const int row, const int fileop) const
+    {
+        return oem_to_utf8(this->get_series_name(row, fileop));
+    }
 
     std::vector<double> get_series_values(const int row, const int fileop);
 

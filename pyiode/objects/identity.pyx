@@ -15,7 +15,7 @@ cdef class Identity:
         self.c_identity = NULL
 
     def __init__(self, lec: str) -> Identity:
-        self.idt_ptr = make_shared[CIdentity](lec.encode("utf-8"))
+        self.idt_ptr = make_shared[CIdentity](lec.encode("utf-8"), <bint>True)
         self.c_identity = self.idt_ptr.get()
 
     def __dealloc__(self):
@@ -39,11 +39,11 @@ cdef class Identity:
         return wrapper
 
     def get_lec(self) -> str:
-        return self.c_identity.get_lec().decode()
+        return self.c_identity.get_lec_utf8().decode()
 
     def set_lec(self, value: str):
         value = value.strip()
-        self.c_identity.set_lec(value.encode())
+        self.c_identity.set_lec_utf8(value.encode())
 
     def get_coefficients(self) -> List[str]:
         return [coeff.decode() for coeff in self.c_identity.get_coefficients_list(<bint>False)]
@@ -55,4 +55,4 @@ cdef class Identity:
         return dereference(self.c_identity) == dereference(other.c_identity)
 
     def _str_(self) -> str:
-        return self.c_identity.get_lec().decode()
+        return self.c_identity.get_lec_utf8().decode()

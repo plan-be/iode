@@ -29,7 +29,7 @@ std::vector<Period> ComputedTableGraph::get_series_periods()
  * 
  * @note see function APIGraphLineTitle() (k_graph.c)
  */
-std::string ComputedTableGraph::get_series_name(const int row, const int fileop)
+std::string ComputedTableGraph::get_series_name(const int row, const int fileop) const
 {
     std::string name = line_names[row];
     if(files_ops.size() > 1 || files_ops[fileop].cl_opf != COL_NOP)

@@ -39,10 +39,10 @@ std::string TableCell::get_content(const bool quotes) const
     {
         if(content.empty())
             return "";
-        std::string _content = content;
+        std::string _content_ = content;
         if(quotes) 
-            _content = '\"' + _content + '\"';
-        return _content;
+            _content_ = '\"' + _content_ + '\"';
+        return _content_;
     }
 }
 
@@ -157,11 +157,9 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
     }
 
     int attribute = (int) get_attribute();
-    std::string content = get_content(false);
-    // NOTE: W_Print(...) functions expect OEM encoding, so convert content
-    //       from UTF-8 to OEM before printing
-    content = utf8_to_oem(content);
-    W_replace_line_break(content);
+    // W_Print(...) functions expect OEM encoding
+    std::string content_oem = get_content_oem();
+    W_replace_line_break(content_oem);
 
     switch(get_type()) 
     {
@@ -170,16 +168,16 @@ bool TableCell::print_definition(int nb_columns, const bool title_line) const
             start_print(nb_columns);
             print_start_attribute();
             if(title_line)
-                W_printf((char*) "%s", (char*) content.c_str());
+                W_printf((char*) "%s", (char*) content_oem.c_str());
             else
-                W_printf((char*) "\"%s\"", (char*) content.c_str());
+                W_printf((char*) "\"%s\"", (char*) content_oem.c_str());
             break;
         }
         case TABLE_CELL_LEC :
         {
             W_printfRepl((char*) "&%dL", nb_columns);
             print_start_attribute();
-            W_printf((char*) "%s", (char*) content.c_str());
+            W_printf((char*) "%s", (char*) content_oem.c_str());
             break;
         }
     }
@@ -252,16 +250,13 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
     }
     else
     {
-        std::string text_utf8 = this->get_content(false);
-        // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
-        //       the text from UTF-8 to OEM before writing the IODE table 
-        std::string text_oem = utf8_to_oem(text_utf8);
-        char* c_text = (char*) text_oem.c_str();
+        std::string text = this->get_content(false);
+        char* c_text = (char*) text.c_str();
         len = (int) strlen(c_text) + 1;
         pack = (char*) P_add(pack, c_text, len);
         p++;
 
-        debug_packing("cell", "STR  ", p, i, j, text_utf8, len);
+        debug_packing("cell", "STR  ", p, i, j, text, len);
     }
 
     return pack;
@@ -273,12 +268,9 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
 
     if(this->get_type() == TABLE_CELL_STRING)
     {
-        std::string content_oem = (value == NULL) ? "" : std::string(value);
-        // NOTE: in binary files, the text of a cell is in OEM encoding, we need to convert 
-        //       the text from OEM to UTF-8 after reading the IODE table
-        std::string content_utf8 = oem_to_utf8(content_oem);
+        std::string content = (value == NULL) ? "" : std::string(value);
         debug_unpacking("cell", "STR  ", p, i, j, content);
-        this->set_text(content_utf8);
+        this->set_text(content);
         p++;
         return true;
     }
@@ -286,12 +278,9 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
     {   
         // NOTE: 'value' is a serialized Identity
         char* c_lec = (char*) P_get_ptr(value, 0);
-        std::string lec_oem = (c_lec == NULL) ? "" : std::string(c_lec);
-        // NOTE: in binary files, the lec of a cell is in OEM encoding, we need to convert 
-        //       the lec from OEM to UTF-8 after reading the IODE table
-        std::string lec_utf8 = oem_to_utf8(lec_oem);
-        debug_unpacking("cell", "LEC  ", p, i, j, lec_utf8);
-        this->set_lec(lec_utf8);
+        std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
+        debug_unpacking("cell", "LEC  ", p, i, j, lec);
+        this->set_lec(lec);
         p++;
         return true;
     }
@@ -383,7 +372,7 @@ static void T_initialize_divider(TableLine& divider_line, const int nb_columns)
         divider_line.cells.push_back(TableCell(TABLE_CELL_LEC, "1.0", j));
 }
 
-static void T_initialize_title(TableLine& title_line, const std::string& def)
+static void T_initialize_title(TableLine& title_line, const std::string& def, const bool utf8)
 {
     std::string title;
     if(global_ws_cmt->contains(def))
@@ -391,7 +380,11 @@ static void T_initialize_title(TableLine& title_line, const std::string& def)
     else
         title = def;
     title = trim(title);
-    title_line.cells[0].set_text(title);
+
+    if(utf8)
+        title_line.cells[0].set_text_utf8(title);
+    else
+        title_line.cells[0].set_text(title);
 }
 
 static void T_initialize_col_names(TableLine& line, const int nb_columns)
@@ -434,12 +427,13 @@ Table::Table(const int nb_columns): nb_columns(nb_columns)
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& lecs, 
-	bool mode, bool files, bool date, const bool search_comment): nb_columns(nb_columns)
+	bool mode, bool files, bool date, const bool search_comment, const bool utf8)
+    : nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
-    T_initialize_title(this->lines.back(), def);
+    T_initialize_title(this->lines.back(), def, utf8);
     append_line(TABLE_LINE_SEP);
 
     append_line(TABLE_LINE_CELL);
@@ -466,11 +460,22 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         else
             line_title = lec;
 
-        line.cells[0].set_text(line_title);
-
-        // ---- LEC expression (right column) ----
-        for(int j = 1; j < nb_columns; j++)
-            line.cells[j].set_lec(lec);
+        if(utf8)
+        {
+            line.cells[0].set_text_utf8(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec_utf8(lec);
+        }
+        else
+        {
+            line.cells[0].set_text(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec(lec);
+        }
     }
     
     if(mode || files || date)
@@ -487,13 +492,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
-	const std::vector<std::string>& lecs, bool mode, bool files, bool date, const bool search_comment)
-    : nb_columns(nb_columns)
+	const std::vector<std::string>& lecs, bool mode, bool files, bool date, const bool search_comment, 
+    const bool utf8) : nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
-    T_initialize_title(this->lines.back(), def);
+    T_initialize_title(this->lines.back(), def, utf8);
     append_line(TABLE_LINE_SEP);
 
     append_line(TABLE_LINE_CELL);
@@ -532,11 +537,22 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
         else
             line_title = title;
 
-        line.cells[0].set_text(line_title);
-
-        // ---- LEC expression (right column) ----
-        for(int j = 1; j < nb_columns; j++)
-            line.cells[j].set_lec(lec);
+        if(utf8)
+        {
+            line.cells[0].set_text_utf8(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec_utf8(lec);
+        }
+        else
+        {
+            line.cells[0].set_text(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec(lec);
+        }
     }
     
     if(mode || files || date)
@@ -553,12 +569,13 @@ Table::Table(const int nb_columns, const std::string& def, const std::vector<std
 }
 
 Table::Table(const int nb_columns, const std::string& def, const std::string& lecs, 
-	bool mode, bool files, bool date, const bool search_comment): nb_columns(nb_columns)
+	bool mode, bool files, bool date, const bool search_comment, const bool utf8) 
+    : nb_columns(nb_columns)
 {
     T_initialize_divider(this->divider_line, nb_columns);
 
     append_line(TABLE_LINE_TITLE);
-    T_initialize_title(this->lines.back(), def);
+    T_initialize_title(this->lines.back(), def, utf8);
     append_line(TABLE_LINE_SEP);
 
     append_line(TABLE_LINE_CELL);
@@ -585,11 +602,22 @@ Table::Table(const int nb_columns, const std::string& def, const std::string& le
         else
             line_title = lec;
 
-        line.cells[0].set_text(line_title);
-
-        // ---- LEC expression (right column) ----
-        for(int j = 1; j < nb_columns; j++)
-            line.cells[j].set_lec(lec);
+        if(utf8)
+        {
+            line.cells[0].set_text_utf8(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec_utf8(lec);
+        }
+        else
+        {
+            line.cells[0].set_text(line_title);
+    
+            // ---- LEC expression (right column) ----
+            for(int j = 1; j < nb_columns; j++)
+                line.cells[j].set_lec(lec);
+        }
     }
     
     if(mode || files || date)
@@ -1350,19 +1378,18 @@ bool KDBTables::print_obj_def(const std::string& name)
     if(!tbl_ptr) 
         return false;
     
-    std::string title = tbl_ptr->get_title();
-    // W_Print(...) functions expect OEM encoding, so convert title from UTF-8 to OEM before printing 
-    title = utf8_to_oem(title);
+    // W_Print(...) functions expect OEM encoding
+    std::string title_oem = tbl_ptr->get_title_oem();
     if(B_TABLE_TITLE) 
     {
         if(B_TABLE_TITLE == 1) 
-            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), title.c_str());
+            W_printfReplEsc((char*) "\n~b%s~B : %s\n", name.c_str(), title_oem.c_str());
         else 
-            W_printf((char*) "\n%s\n", title.c_str());
+            W_printf((char*) "\n%s\n", title_oem.c_str());
         return true;
     }
 
-    B_PrintRtfTopic((char*) title.c_str());
+    B_PrintRtfTopic((char*) title_oem.c_str());
     W_printf((char*) ".tb %d\n", tbl_ptr->nb_columns);
     W_printfRepl((char*) ".sep &\n");
     W_printfRepl((char*) "&%dC%cb%s : definition%cB\n", tbl_ptr->nb_columns, 

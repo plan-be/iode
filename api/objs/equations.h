@@ -119,27 +119,41 @@ struct Equation
     char          solved;                   // Indicates if in clec, the equation is solved with respect to its endogenous (e.g.: "ln X := RHS" => "X := exp(RHS)")
     char          method;                   // Estimation method
     Sample        sample;                   // Estimation sample
-    std::string   comment;                  // Free comment
     std::string   block;                    // List of equations estimated simultaneously
-    std::string   instruments;              // List of instruments used to modify metric in the estimation process (INSTR method)
     long          date;                     // Estimation date
     std::array<float, EQS_NBTESTS> tests;   // Estimation tests
+    
+private:
+    std::string   comment;                  // Free comment
+    std::string   instruments;              // List of instruments used to modify metric in the estimation process (INSTR method)
 
 public:
     Equation(const std::string& name, const std::string& lec, const IodeEquationMethod method, const std::string& from, 
-        const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
+        const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, 
+        const bool date, const bool utf8=false)
     {
         this->clec = nullptr;
         this->date = 0L;
         this->solved = '\0';
-
         this->endo = name;
-        // set this->lec and this->clec in the same time
-        set_lec(lec);
+
+        if(utf8)
+        {
+            // set this->lec and this->clec in the same time
+            set_lec_utf8(lec);
+            set_comment_utf8(comment);
+            set_instruments_utf8(instruments);
+        }
+        else
+        {
+            // set this->lec and this->clec in the same time
+            set_lec(lec);
+            set_comment(comment);
+            set_instruments(instruments); 
+        }
+
         set_method(method);
         set_sample(from, to);
-        set_comment(comment);
-        this->instruments = instruments;
         this->block = block; 
         this->tests.fill(0.0f);
         if(date)
@@ -147,19 +161,31 @@ public:
     }
 
     Equation(const std::string& name, const std::string& lec, const std::string& method, const std::string& from, 
-        const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, const bool date)
+        const std::string& to, const std::string& comment, const std::string& instruments, const std::string& block, 
+        const bool date, const bool utf8=false)
     {
         this->clec = nullptr;
         this->date = 0L;
         this->solved = '\0';
-
         this->endo = name;
-        // set this->lec and this->clec in the same time
-        set_lec(lec);
+
+        if(utf8)
+        {
+            // set this->lec and this->clec in the same time
+            set_lec_utf8(lec);
+            set_comment_utf8(comment);
+            set_instruments_utf8(instruments);
+        }
+        else
+        {
+            // set this->lec and this->clec in the same time
+            set_lec(lec);
+            set_comment(comment);
+            set_instruments(instruments); 
+        }
+
         set_method(method);
         set_sample(from, to);
-        set_comment(comment);
-        this->instruments = instruments;
         this->block = block; 
         this->tests.fill(0.0f);
         if(date)
@@ -235,6 +261,21 @@ public:
 
     // -- lec --
 
+    std::string get_lec() const
+    {
+        return this->lec;
+    }
+
+    std::string get_lec_oem() const
+    {
+        return this->lec;
+    }
+
+    std::string get_lec_utf8() const
+    {
+        return oem_to_utf8(this->lec);
+    }
+
     void set_lec(const std::string& lec)
     {
         if(lec.empty())
@@ -249,6 +290,11 @@ public:
         // if compilation failed, revert to the previous LEC expression
         if(!success)
             this->lec = previous_lec;
+    }
+
+    void set_lec_utf8(const std::string& lec)
+    {
+        this->set_lec(utf8_to_oem(lec));
     }
 
     // -- method --
@@ -339,16 +385,54 @@ public:
 
     std::string get_comment() const
     {
-        std::string comment_oem = std::string(this->comment);
-        std::string comment = oem_to_utf8(comment_oem);
         return comment;
     }
 
-    // we assume that comment string is in UTF8 format
+    std::string get_comment_oem() const
+    {
+        return comment;
+    }
+
+    std::string get_comment_utf8() const
+    {
+        return oem_to_utf8(comment);
+    }
+
     void set_comment(const std::string& comment)
     {
-        this->comment.clear();
-        this->comment = comment.empty() ? "" : utf8_to_oem(comment);
+        this->comment = comment;
+    }
+
+    void set_comment_utf8(const std::string& comment)
+    {
+        this->comment = utf8_to_oem(comment);
+    }
+
+    // -- instruments --
+
+    std::string get_instruments() const
+    {
+        return instruments;
+    }
+
+    std::string get_instruments_oem() const
+    {
+        return instruments;
+    }
+
+    std::string get_instruments_utf8() const
+    {
+        return oem_to_utf8(instruments);
+    }
+
+    void set_instruments(const std::string& instruments)
+    {
+        this->instruments = instruments;
+    }
+
+    void set_instruments_utf8(const std::string& instruments)
+    {
+        this->instruments = utf8_to_oem(instruments);
     }
 
     // -- date --
@@ -573,9 +657,9 @@ struct std::hash<Equation>
         hash_combine<std::string>(seed, eq.lec);
         hash_combine<char>(seed, eq.method);
         hash_combine<Sample>(seed, eq.sample);
-        hash_combine<std::string>(seed, eq.comment);
+        hash_combine<std::string>(seed, eq.get_comment());
         hash_combine<std::string>(seed, eq.block);
-        hash_combine<std::string>(seed, eq.instruments);
+        hash_combine<std::string>(seed, eq.get_instruments());
 
         return seed;
     }
@@ -620,6 +704,11 @@ public:
     }
 
     std::string get_lec(const std::string& name) const;
+
+    std::string get_lec_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_lec(name));
+    }
 
     bool add(const std::string& name, const Equation& eq) override 
     { 

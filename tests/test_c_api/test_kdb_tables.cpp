@@ -78,10 +78,10 @@ TEST_F(KDBTablesTest, Get)
     EXPECT_EQ(line.get_type(), TABLE_LINE_CELL);
     TableCell cell_title = line.cells[0];
     EXPECT_EQ(cell_title.get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(cell_title.get_content(false), "Ecart chômage classique et chômage");
+    EXPECT_EQ(cell_title.get_content_utf8(false), "Ecart chômage classique et chômage");
     TableCell cell_lec = line.cells[1];
     EXPECT_EQ(cell_lec.get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(cell_lec.get_content(false), "-100*(LCLASS-(NATY-UY))/NATY /* écart chômage */");
+    EXPECT_EQ(cell_lec.get_content_utf8(false), "-100*(LCLASS-(NATY-UY))/NATY /* écart chômage */");
 }
 
 TEST_F(KDBTablesTest, GetNames)
@@ -98,7 +98,7 @@ TEST_F(KDBTablesTest, GetTitle)
     std::string title;
     std::string expected_title = "Déterminants de la croissance de K";
 
-    title = global_ws_tbl->get_title("ANAKNFF");
+    title = global_ws_tbl->get_title_utf8("ANAKNFF");
     EXPECT_EQ(expected_title, title);
 }
 

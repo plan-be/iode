@@ -268,7 +268,7 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
 
         if(view)
         {
-            std::string title = tbl_ptr->get_title();
+            std::string title = tbl_ptr->get_title(false);
             W_EndDisplay((char*) title.c_str(), -ng, -i, -1, -1);
         } 
 

@@ -169,8 +169,8 @@ bool Equation::print_definition() const
         B_PrintRtfTopic((char*) endo.c_str());
     W_printf((char*) ".par1 enum_1\n");
 
-    // W_Print(...) functions expect OEM encoding, so convert lec from UTF-8 to OEM before printing 
-    std::string lec_oem = utf8_to_oem(lec);
+    // W_Print(...) functions expect OEM encoding
+    std::string lec_oem = this->get_lec_oem();
     bool success = clec->print_definition(endo, lec_oem, B_EQS_LEC);
     if(B_EQS_INFOS < 1) 
         return true;
@@ -182,11 +182,11 @@ bool Equation::print_definition() const
         return false;
     }
     
+    // W_Print(...) functions expect OEM encoding
     char buf[256];
-    if(B_isdef((char*) comment.c_str())) 
+    std::string comment_oem = this->get_comment_oem();
+    if(B_isdef((char*) comment_oem.c_str())) 
     {
-        // W_Print(...) functions expect OEM encoding, so convert comment from UTF-8 to OEM before printing
-        std::string comment_oem = utf8_to_oem(comment);
         sprintf(buf, ".par1 par_1\n%ci ", A2M_ESCCH);
         dump_string(buf, (char*) comment_oem.c_str());
     }    
@@ -204,12 +204,9 @@ bool Equation::print_definition() const
                  (char*) from.c_str(), (char*) to.c_str());
         if(B_isdef((char*) block.c_str()))   
             dump_string((char*) "Block : ", (char*) block.c_str());
-        if(B_isdef((char*) instruments.c_str()))
-        {
-            // W_Print(...) functions expect OEM encoding, so convert instruments from UTF-8 to OEM before printing
-            std::string instruments_oem = utf8_to_oem(instruments);
+        std::string instruments_oem = this->get_instruments_oem();
+        if(B_isdef((char*) instruments_oem.c_str()))
             dump_string((char*) "Instruments : ", (char*) instruments_oem.c_str());
-        } 
         
         W_printf((char*) "\nTests :\n");
         W_printf((char*) ".par enum_3\n");
@@ -260,17 +257,17 @@ bool Equation::to_binary(char** pack) const
     if(this->lec.empty()) 
         return false;
 
-    std::string lec_oem = utf8_to_oem(this->lec);
-    std::string comment_oem = utf8_to_oem(this->comment);
-    std::string instruments_oem = utf8_to_oem(this->instruments);
+    std::string _lec_ = this->lec;
+    std::string _comment_ = this->comment;
+    std::string _instruments_ = this->instruments;
     
-    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(lec_oem, this->endo);
+    std::shared_ptr<CLEC> clec = std::make_shared<CLEC>(_lec_, this->endo);
     if(!clec)  
         return false;
 
     *pack = (char*) P_create();
 
-    char* c_lec = (char*) lec_oem.c_str();
+    char* c_lec = (char*) _lec_.c_str();
     *pack = (char*) P_add(*pack, c_lec, (int) this->lec.size() + 1);
     // for backward compatibility with old binary files
     *pack = (char*) P_add(*pack, NULL, 0);
@@ -278,20 +275,20 @@ bool Equation::to_binary(char** pack) const
     *pack = (char*) P_add(*pack, (char*) &(this->method), 1);
     *pack = (char*) P_add(*pack, (char*) &(this->sample), sizeof(Sample));
 
-    if(comment_oem.empty()) 
+    if(_comment_.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*) comment_oem.c_str(), (int) comment_oem.size() + 1);          /* cmt */
+        *pack = (char*) P_add(*pack, (char*) _comment_.c_str(), (int) _comment_.size() + 1);          /* cmt */
 
     if(this->block.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
         *pack = (char*) P_add(*pack, (char*) this->block.c_str(), (int) this->block.size() + 1);              /* blk */
 
-    if(instruments_oem.empty()) 
+    if(_instruments_.empty()) 
         *pack = (char*) P_add(*pack, NULL, 1);
     else 
-        *pack = (char*) P_add(*pack, (char*) instruments_oem.c_str(), (int) instruments_oem.size() + 1);  /* instr */
+        *pack = (char*) P_add(*pack, (char*) _instruments_.c_str(), (int) _instruments_.size() + 1);  /* instr */
 
     *pack = (char*) P_add(*pack, (char*)&(this->date), sizeof(long));                     /* date */
     *pack = (char*) P_add(*pack, (char*)&(this->tests), EQS_NBTESTS * sizeof(float));     /* tests*/ /* FLOAT 12-04-98 */
@@ -308,8 +305,7 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
     len = (size_t) P_get_len(pack, 0);
     char* c_lec = new char[len];
     strncpy(c_lec, (char*) P_get_ptr(pack, 0), len);
-    std::string lec_oem(c_lec);
-    std::string lec = oem_to_utf8(lec_oem);
+    std::string lec(c_lec);
 
     char char_method = *(char*)(P_get_ptr(pack, 3));
     int i_method = (int) char_method;
@@ -320,8 +316,7 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
     len = P_get_len(pack, 5);
     char* c_cmt = new char[len];
     strncpy(c_cmt, (char*) P_get_ptr(pack, 5), len);
-    std::string comment_oem(c_cmt);
-    std::string comment = oem_to_utf8(comment_oem);
+    std::string comment(c_cmt);
 
     len = P_get_len(pack, 6);
     char* c_block = new char[len];
@@ -331,8 +326,7 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
     len = P_get_len(pack, 7);
     char* c_instr = new char[len];
     strncpy(c_instr, (char*) P_get_ptr(pack, 7), len);
-    std::string instruments_oem(c_instr);
-    std::string instruments = oem_to_utf8(instruments_oem);
+    std::string instruments(c_instr);
 
     Sample* smpl = nullptr;
     char* c_smpl = (char*) P_get_ptr(pack, 4);
@@ -437,7 +431,7 @@ bool KDBEquations::grep_obj(const std::string& name, const std::string& pattern,
     if(forms) 
         found = wrap_grep_gnl(pattern, eq->lec, ecase, all);
     if(!found && texts)
-        found = wrap_grep_gnl(pattern, eq->comment, ecase, all);
+        found = wrap_grep_gnl(pattern, eq->get_comment(), ecase, all);
     return found;
 }
 

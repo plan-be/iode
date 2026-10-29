@@ -48,11 +48,11 @@ cdef class Lists(CythonIodeDatabase):
 
     def _get_object(self, name: str) -> str:
         name = name.strip()
-        return self.database.get(name.encode()).decode()
+        return self.database.get_list_utf8(name.encode()).decode()
 
     def _set_object(self, name: str, value: str):
         name = name.strip()
-        self.database.set(name.encode(), <string>(value.encode()))
+        self.database.set_list_utf8(name.encode(), <string>(value.encode()))
 
     def copy_from(self, input_files: str, names: str='*'):     
         self.database.copy_from(input_files.encode(), names.encode())

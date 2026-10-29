@@ -57,12 +57,8 @@ std::vector<std::string> Identity::get_variables_list(const bool create_if_not_e
 
 bool Identity::to_binary(char** pack) const
 {
-    std::string lec_utf8 = this->get_lec();
-    // NOTE: in binary files, the value is in OEM encoding, we need to convert it from UTF-8 
-    //       to OEM before writing the Identity object (LEC expressions may contain non-ASCII 
-    //       characters in comments written as /* ... */)
-    std::string lec_oem = utf8_to_oem(lec_utf8);
-    char* c_lec = (char*) lec_oem.c_str();
+    std::string lec = this->get_lec();
+    char* c_lec = (char*) lec.c_str();
 
     *pack = 0;
     if(lec.empty()) 
@@ -100,15 +96,15 @@ std::string KDBIdentities::get_lec(const std::string& name) const
     return lec;
 }
 
-bool KDBIdentities::add(const std::string& name, const std::string& lec)
+bool KDBIdentities::add(const std::string& name, const std::string& lec, const bool utf8)
 {
-    Identity idt(lec);
+    Identity idt(lec, utf8);
     return KDBTemplate::add(name, idt);
 }
 
-void KDBIdentities::update(const std::string& name, const std::string& lec)
+void KDBIdentities::update(const std::string& name, const std::string& lec, const bool utf8)
 {
-    Identity idt(lec);
+    Identity idt(lec, utf8);
     KDBTemplate::update(name, idt);
 }
 
@@ -156,12 +152,8 @@ bool KDBIdentities::binary_to_obj(const std::string& name, char* pack)
     char* c_lec = new char[len];
     strncpy(c_lec, (char*) P_get_ptr(pack, 0), len);
 
-    // NOTE: in binary files, the value is in OEM encoding, we need to convert it from OEM to UTF-8 
-    //       after reading the Identity object (LEC expressions may contain non-ASCII characters in  
-    //       comments written as /* ... */)
-    std::string lec_oem(c_lec);
-    std::string lec_utf8 = oem_to_utf8(lec_oem);
-    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec_utf8);
+    std::string lec(c_lec);
+    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec);
     this->add_obj_ptr(name, idt_ptr);
     return true;
 }
@@ -212,14 +204,14 @@ char* KDBIdentities::dde_create_obj_by_name(const std::string& name, int* nc, in
 bool KDBIdentities::print_obj_def(const std::string& name)
 {   
     std::shared_ptr<Identity> idt_ptr = this->get_obj_ptr(name);
-    std::string lec = idt_ptr->get_lec();
-    std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
-    
-    // W_Print(...) functions expect OEM encoding, so convert value from UTF-8 to OEM before printing 
-    std::string lec_oem = utf8_to_oem(lec);
+
+    // W_Print(...) functions expect OEM encoding
+    std::string lec_oem = idt_ptr->get_lec_oem();
     std::string tmp = name + " : " + lec_oem;
 
     W_printf((char*) ".par1 enum_1\n");
+
+    std::shared_ptr<CLEC> clec = idt_ptr->get_compiled_lec();
     clec->print_definition(name, tmp, B_EQS_LEC);
 
     return true;

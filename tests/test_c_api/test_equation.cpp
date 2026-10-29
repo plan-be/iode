@@ -33,7 +33,7 @@ TEST_F(EquationTest, Lec)
 
     // set
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    eq_ptr->set_lec(new_lec);
+    eq_ptr->set_lec_utf8(new_lec);
     EXPECT_EQ(eq_ptr->lec, new_lec);
 }
 
@@ -83,12 +83,12 @@ TEST_F(EquationTest, Sample)
 TEST_F(EquationTest, Comment)
 {
     // get
-    EXPECT_EQ(eq_ptr->get_comment(), "");
+    EXPECT_EQ(eq_ptr->get_comment_utf8(), "");
 
     // set
     std::string new_comment = "New Comment";
     eq_ptr->set_comment(new_comment);
-    EXPECT_EQ(eq_ptr->get_comment(), new_comment);
+    EXPECT_EQ(eq_ptr->get_comment_utf8(), new_comment);
 }
 
 TEST_F(EquationTest, Date)
@@ -200,7 +200,7 @@ TEST_F(EquationTest, Hash)
 
     // different lec
     std::string new_lec = "(ACAF/VAF[-1]) :=acaf2*GOSF[-1]+\nacaf4*(TIME=1995)";
-    eq_ptr->set_lec(new_lec); 
+    eq_ptr->set_lec_utf8(new_lec); 
     hash_after = equation_hasher(*eq_ptr);
     EXPECT_NE(hash_before, hash_after);
 
@@ -236,7 +236,7 @@ TEST_F(EquationTest, Hash)
     // different instrument
     hash_before = hash_after;
     std::string new_instruments = "random_text";
-    eq_ptr->instruments = new_instruments; 
+    eq_ptr->set_instruments(new_instruments); 
     hash_after = equation_hasher(*eq_ptr);
     EXPECT_NE(hash_before, hash_after);
 }

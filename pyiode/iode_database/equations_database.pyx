@@ -52,7 +52,7 @@ cdef class Equations(CythonIodeDatabase):
         return subset
 
     def get_lec(self, name: str) -> str:
-        return self.database.get_lec(name.encode()).decode()
+        return self.database.get_lec_utf8(name.encode()).decode()
 
     def _get_object(self, name: str) -> Equation:
         cdef shared_ptr[CEquation] eq_ptr

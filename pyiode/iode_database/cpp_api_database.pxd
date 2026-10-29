@@ -177,8 +177,8 @@ cdef extern from "api/objs/comments.h":
         shared_ptr[KDBComments] get_subset(string pattern, bool copy) except + 
 
         # Public methods
-        string get(string& name) except +
-        void set(string& name, string& value) except +
+        string get_comment_utf8(string& name) except +
+        void set_comment_utf8(string& name, string& value) except +
 
         void merge(shared_ptr[KDBComments] other_ptr, const bool overwrite, const bool clear_source) except +
 
@@ -203,9 +203,9 @@ cdef extern from "api/objs/equations.h":
         shared_ptr[CEquation] set_obj_ptr(string& name, shared_ptr[CEquation] eq) except +
         void set(string& name, CEquation& eq) except +
 
-        string get_lec(string& name) except +
-        bool add(string& name, string& lec) except +
-        void update(string& name, string& lec) except +
+        string get_lec_utf8(string& name) except +
+        bool add_utf8(string& name, string& lec) except +
+        void update_utf8(string& name, string& lec) except +
 
         void merge(shared_ptr[KDBEquations] other_ptr, const bool overwrite, const bool clear_source) except +
 
@@ -230,9 +230,9 @@ cdef extern from "api/objs/identities.h":
         shared_ptr[CIdentity] set_obj_ptr(string& name, shared_ptr[CIdentity] idt) except +
         void set(string& name, CIdentity& idt) except +
 
-        string get_lec(string& name) except +
-        bool add(string& name, string& lec) except +
-        void update(string& name, string& lec) except +
+        string get_lec_utf8(string& name) except +
+        bool add_utf8(string& name, string& lec) except +
+        void update_utf8(string& name, string& lec) except +
 
         bool execute_identities(string& from_period, string& to, string& identities_list, 
                                 string& var_files, string& scalar_files, bool trace) except +
@@ -254,8 +254,8 @@ cdef extern from "api/objs/lists.h":
         shared_ptr[KDBLists] get_subset(string pattern, bool copy) except + 
 
         # Public methods
-        string get(string& name) except +
-        void set(string& name, string& value) except +
+        string get_list_utf8(string& name) except +
+        void set_list_utf8(string& name, string& value) except +
 
         void merge(shared_ptr[KDBLists] other_ptr, const bool overwrite, const bool clear_source) except +
 
@@ -303,16 +303,16 @@ cdef extern from "api/objs/tables.h":
         shared_ptr[CTable] set_obj_ptr(string& name, shared_ptr[CTable] tbl) except +
         void set(string& name, CTable& tbl) except +
 
-        string get_title(string& name) except +
+        string get_title_utf8(string& name) except +
 
         bool add(string name, int nb_columns) except +
-        bool add(string name, int nbColumns, string def_, vector[string] vars, 
+        bool add_utf8(string name, int nbColumns, string def_, vector[string] vars, 
                  bool mode=False, bool files=False, bool date=False) except +
-        bool add(string name, int nbColumns, string def_, vector[string] titles, 
+        bool add_utf8(string name, int nbColumns, string def_, vector[string] titles, 
                  vector[string] lecs, bool mode=False, bool files=False, bool date=False) except +
-        bool add(string name, int nbColumns, string def_, string lecs, bool mode=False, 
+        bool add_utf8(string name, int nbColumns, string def_, string lecs, bool mode=False, 
                  bool files=False, bool date=False) except +
-            
+        
         void print_to_file(string& dest_file, string& gsample, string& names, int nb_decimals, 
                            char format_) except +
         void merge(shared_ptr[KDBTables] other_ptr, const bool overwrite, const bool clear_source) except +

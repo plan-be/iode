@@ -89,19 +89,18 @@ char* ExportObjsTSP::write_object_name(char* name, char** code)
     return(write_pre_post("LOAD ", " ;\n", name, code));
 }
 
-char* ExportObjsTSP::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** cmt)
+char* ExportObjsTSP::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** code)
 {
     if(dbc_ptr->contains(name))
     {
         std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
-        Comment cmt_utf8 = *cmt_ptr;
-        Comment cmt_oem = utf8_to_oem(cmt_utf8);
-        *cmt = (char*) SCR_stracpy((unsigned char*) cmt_oem.c_str());
+        Comment cmt = *cmt_ptr;
+        *code = (char*) SCR_stracpy((unsigned char*) cmt.c_str());
     }  
     else 
-        *cmt = (char*) SCR_stracpy((unsigned char*) " ");
+        *code = (char*) SCR_stracpy((unsigned char*) " ");
     
-    return(*cmt);
+    return(*code);
 }
 
 char* ExportObjsTSP::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)

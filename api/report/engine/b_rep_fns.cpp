@@ -728,10 +728,7 @@ U_ch *RPF_ttitle(U_ch** args)
         else 
         {
             tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-            std::string title = tbl_ptr->get_title();
-            // W_printf() called in RP_ReportExec_tbl() expects OEM encoding, so convert the title 
-            // from UTF-8 to OEM before printing
-            title = utf8_to_oem(title);
+            std::string title = tbl_ptr->get_title(false);
             res = SCR_strafcat(res, (unsigned char*) title.c_str());
         }
     }
@@ -773,9 +770,6 @@ U_ch *RPF_cvalue(U_ch** args)
         else 
         {
             Comment comment = kdb->get(name);
-            // W_printf() called in RP_ReportExec_tbl() expects OEM encoding, so convert the title 
-            // from UTF-8 to OEM before printing
-            comment = utf8_to_oem(comment);
             res = SCR_strafcat(res, (unsigned char*) comment.c_str());
             res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
         }

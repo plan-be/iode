@@ -428,8 +428,8 @@ TEST_F(TablesTest, LineCells)
     EXPECT_FALSE(first_cell->is_bold());
     EXPECT_TRUE(first_cell->is_italic());
     EXPECT_FALSE(first_cell->is_underline());
-    EXPECT_EQ(first_cell->get_content(false), "(divisé par les prix à la consommation)");
-    EXPECT_EQ(first_cell->get_content(true), "\"(divisé par les prix à la consommation)\"");
+    EXPECT_EQ(first_cell->get_content_utf8(false), "(divisé par les prix à la consommation)");
+    EXPECT_EQ(first_cell->get_content_utf8(true), "\"(divisé par les prix à la consommation)\"");
     // ---- column 1
     second_cell = &first_line.cells[1];
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_STRING);
@@ -473,7 +473,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_TRUE(first_cell->is_bold());
     EXPECT_FALSE(first_cell->is_italic());
     EXPECT_FALSE(first_cell->is_underline());
-    EXPECT_EQ(first_cell->get_content(false), "Recettes courantes");
+    EXPECT_EQ(first_cell->get_content_utf8(false), "Recettes courantes");
     // ---- column 1
     second_cell = &third_line.cells[1];
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_LEC);
@@ -495,7 +495,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_FALSE(first_cell->is_bold());
     EXPECT_FALSE(first_cell->is_italic());
     EXPECT_FALSE(first_cell->is_underline());
-    EXPECT_EQ(first_cell->get_content(false), "       1. Excédent brut d'exploitation");
+    EXPECT_EQ(first_cell->get_content_utf8(false), "       1. Excédent brut d'exploitation");
     // ---- column 1
     second_cell = &fifth_line.cells[1];
     EXPECT_EQ(second_cell->get_type(), TABLE_CELL_LEC);
@@ -524,7 +524,7 @@ TEST_F(TablesTest, LineCells)
     EXPECT_EQ(tbl_ptr->lines[7].cells[0].get_content(false), " -- DTH -- ");
     // ---- column 1
     second_cell = &updated_fifth_line.cells[1];
-    second_cell->set_lec("DTH");
+    second_cell->set_lec_utf8("DTH");
     EXPECT_EQ(second_cell->get_content(false), "DTH");
     EXPECT_EQ(tbl_ptr->lines[7].cells[1].get_content(false), "DTH");
 
@@ -542,12 +542,12 @@ TEST_F(TablesTest, LineCells)
     first_cell = &new_line->cells[0];
     first_cell->set_text(first_cell_content);
     EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content_utf8(true), "\"" + first_cell_content + "\"");
 
     second_cell = &new_line->cells[1];
-    second_cell->set_lec(second_cell_content);
+    second_cell->set_lec_utf8(second_cell_content);
     EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content(false), second_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content_utf8(false), second_cell_content);
 
     // ---- delete line
     tbl_ptr->remove_line(new_pos);
@@ -562,17 +562,17 @@ TEST_F(TablesTest, LineCells)
     //       Otherwise, it is a LEC cell.
     new_line_cell->cells[0].set_content("\"" + first_cell_content + "\"");
     EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(true), "\"" + first_cell_content + "\"");
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content_utf8(true), "\"" + first_cell_content + "\"");
 
     // set_text() forces the cell to become a string cell
     new_line_cell->cells[0].set_text(first_cell_content);
     EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_type(), TABLE_CELL_STRING);
-    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content(false),  first_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[0].get_content_utf8(false),  first_cell_content);
 
-    // set_lec forces the cell to become a LEC cell
-    new_line_cell->cells[1].set_lec(second_cell_content);
+    // set_lec_utf8 forces the cell to become a LEC cell
+    new_line_cell->cells[1].set_lec_utf8(second_cell_content);
     EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_type(), TABLE_CELL_LEC);
-    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content(false), second_cell_content);
+    EXPECT_EQ(tbl_ptr->lines[new_pos].cells[1].get_content_utf8(false), second_cell_content);
 }
 
 TEST_F(TablesTest, LineSeparator)
@@ -745,7 +745,7 @@ TEST_F(TablesTest, Hash)
     table_before = new Table(*tbl_ptr);
     hash_before = hash_after;
     std::string lec_content = line.cells[1].get_content(false);
-    line.cells[1].set_lec("GOSG+YDTG+IT+YSSG+COTRES+OCUG");
+    line.cells[1].set_lec_utf8("GOSG+YDTG+IT+YSSG+COTRES+OCUG");
     EXPECT_NE(*tbl_ptr, *table_before);
     hash_after = table_hasher(*tbl_ptr);
     EXPECT_NE(hash_before, hash_after);
@@ -754,7 +754,7 @@ TEST_F(TablesTest, Hash)
     // return to original title and cell content
     tbl_ptr->set_title(0, title);
     line.cells[0].set_text(cell_content);
-    line.cells[1].set_lec(lec_content);
+    line.cells[1].set_lec_utf8(lec_content);
     EXPECT_EQ(*tbl_ptr, same_table);
     hash_after = table_hasher(*tbl_ptr);
     EXPECT_EQ(hash_original, hash_after);

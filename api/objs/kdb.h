@@ -37,6 +37,7 @@ struct KDBInfo
     char        k_compressed = 0;           // are the objects compressed in the file ? (LZH method, slow)
     std::string filepath = std::string(I_DEFAULT_FILENAME);     // filepath to the database file
     std::string type_name = "";             // name of the type of objects in the database (e.g. "comment", "equation", etc.)
+    Encoding encoding = ENCODING_OEM850;    // internal encoding for text values
 
 protected:
     void set_mode(const short type)
@@ -100,6 +101,7 @@ public:
         this->k_compressed = other.k_compressed;
         this->filepath = other.filepath;
         this->type_name = other.type_name;
+        this->encoding = other.encoding;
     }
 
     ~KDBInfo() {}

@@ -166,12 +166,15 @@ private:
                             // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
 
 public:
-	TableCell(const TableCellType cell_type, const std::string& content = "", const int col=0)
-        : type((char) cell_type), idt(nullptr)
+	TableCell(const TableCellType cell_type, const std::string& content = "", const int col=0, 
+        const bool utf8=false) : type((char) cell_type), idt(nullptr)
     {
         if(this->type == TABLE_CELL_STRING)
         {
-            this->content = content;
+            if(utf8)
+                this->set_content_utf8(content);
+            else
+                this->set_content(content);
             this->attribute = TABLE_CELL_LEFT;
         }
         else
@@ -181,7 +184,7 @@ public:
             {
                 try
                 {
-                    this->idt = new Identity(content);
+                    this->idt = new Identity(content, utf8);
                 }
                 catch(std::exception& e)
                 {
@@ -300,13 +303,38 @@ public:
     // If quotes is true, the content is returned between double quotes.
     std::string get_content(const bool quotes=false) const;
 
+    std::string get_content_oem(const bool quotes=false) const
+    {
+        return this->get_content(quotes);
+    }
+
+    std::string get_content_utf8(const bool quotes=false) const
+    {
+        return oem_to_utf8(this->get_content(quotes));
+    }
+
     void set_text(const std::string& text);
 
+    void set_text_utf8(const std::string& text)
+    {
+        this->set_text(utf8_to_oem(text));
+    }
+
     void set_lec(const std::string& lec);
+
+    void set_lec_utf8(const std::string& lec)
+    {
+        this->set_lec(utf8_to_oem(lec));
+    }
 
     // Rule: If the content starts with a double quotes, we assume it is a string cell. 
     //       Otherwise, it is a LEC cell.
     void set_content(const std::string& content);
+
+    void set_content_utf8(const std::string& content)
+    {
+        this->set_content(utf8_to_oem(content));
+    }
 
 	std::shared_ptr<CLEC> get_compiled_lec() const
     {
@@ -422,7 +450,7 @@ class TableLine
 
 public:
     std::vector<TableCell> cells;   // empty if type is FILES, MODE, DATE or SEP
-    bool    right_axis;             // false if values are relative to the left axis, true to the right axis
+    bool right_axis;                // false if values are relative to the left axis, true to the right axis
 
 public:
 	TableLine(const TableLineType line_type, 
@@ -569,14 +597,16 @@ public:
     Table(const int nb_columns);
 
     Table(const int nb_columns, const std::string& def, const std::vector<std::string>& lecs, 
-		  bool mode = false, bool files = false, bool date = false, const bool search_comment = true);
+		  bool mode = false, bool files = false, bool date = false, const bool search_comment = true, 
+          const bool utf8=false);
 
     Table(const int nb_columns, const std::string& def, const std::vector<std::string>& titles, 
 		  const std::vector<std::string>& lecs, bool mode = false, bool files = false, 
-          bool date = false, const bool search_comment = true);
+          bool date = false, const bool search_comment = true, const bool utf8=false);
 
     Table(const int nb_columns, const std::string& def, const std::string& lecs, 
-		  bool mode = false, bool files = false, bool date = false, const bool search_comment = true);
+		  bool mode = false, bool files = false, bool date = false, const bool search_comment = true, 
+          const bool utf8=false);
 
 	Table(const Table& table);
 
@@ -649,12 +679,16 @@ public:
 
     // -------- TITLE --------
 
-    // we assume that title string is written in UTF8 format
     TableLine* insert_title(const int pos, const std::string& title, const bool after)
     {
         TableLine* title_line = insert_line(pos, TABLE_LINE_TITLE, after);
         title_line->cells[0].set_text(title);
         return title_line;
+    }
+
+    TableLine* insert_title_utf8(const int pos, const std::string& title, const bool after)
+    {
+        return this->insert_title(pos, utf8_to_oem(title), after);
     }
 
     TableLine* add_title(const std::string& title)
@@ -664,24 +698,34 @@ public:
         return title_line;
     }
 
-    std::string get_title(const int row)
+    TableLine* add_title_utf8(const std::string& title)
     {
-        TableLine& line = lines[row];
+        return this->add_title(utf8_to_oem(title));
+    }
+
+    std::string get_title(const int row) const
+    {
+        const TableLine& line = lines[row];
         if(line.get_type() != TableLineType::TABLE_LINE_TITLE) 
             throw std::invalid_argument("Cannot get title at line index " + std::to_string(row) + ".\n" +
                 "Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
                 get_line_type_as_string(line.get_type()) + ".");
-        return line.cells[0].get_content(false);
+        return line.cells[0].get_content();
     }
 
-    std::string get_title()
+    std::string get_title_utf8(const int row) const
+    {
+        return oem_to_utf8(this->get_title(row));
+    }
+
+    std::string get_title() const
     {
         std::string title;
-        for(TableLine& line : lines)
+        for(const TableLine& line : lines)
         {
             if(line.get_type() == TableLineType::TABLE_LINE_TITLE)
             {
-                title = line.cells[0].get_content(false);
+                title = line.cells[0].get_content();
                 return title;
             }
         }
@@ -689,7 +733,16 @@ public:
         return title;
     }
 
-    // we assume that title string is written in UTF8 format
+    std::string get_title_oem() const
+    {
+        return this->get_title();
+    }
+
+    std::string get_title_utf8() const
+    {
+        return oem_to_utf8(this->get_title());
+    }
+
     void set_title(const int row, const std::string title)
     {
         TableLine& line = lines[row];
@@ -698,6 +751,11 @@ public:
                 "Line at index " + std::to_string(row) + " is not a TITLE line but of type " + 
                 get_line_type_as_string(line.get_type()) + ".");
         line.cells[0].set_text(title);
+    }
+
+    void set_title_utf8(const int row, const std::string title)
+    {
+        this->set_title(row, utf8_to_oem(title));
     }
 
     // -------- CELLS --------
@@ -888,6 +946,16 @@ public:
     }
 
     std::string get_title(const std::string& name) const;
+
+    std::string get_title_oem(const std::string& name) const
+    {
+        return this->get_title(name);
+    }
+
+    std::string get_title_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_title(name));
+    }
 
     bool add(const std::string& name, const Table& tbl) override 
     { 

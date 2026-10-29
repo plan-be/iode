@@ -93,17 +93,16 @@ char* ExportObjsDIF::write_object_name(char* name, char** code)
     return(write_pre_post("-1,0\nBOT\n1,0\n\"", "\"\n", name, code));
 }
 
-char* ExportObjsDIF::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char **cmt)
+char* ExportObjsDIF::extract_comment(const KDBCommentsPtr dbc_ptr, char* name, char** code)
 {
     if(dbc_ptr->contains(name))
     {
         std::shared_ptr<Comment> cmt_ptr = dbc_ptr->get_obj_ptr(name);
-        Comment cmt_utf8 = *cmt_ptr;
-        Comment cmt_oem = utf8_to_oem(cmt_utf8);
-        return write_pre_post("1,0\n\"", "\"\n", (char*) cmt_oem.c_str(), cmt);
+        Comment cmt = *cmt_ptr;
+        return write_pre_post("1,0\n\"", "\"\n", (char*) cmt.c_str(), code);
     }
     else
-        return write_pre_post("1,0\n\"", "\"\n", "", cmt);
+        return write_pre_post("1,0\n\"", "\"\n", "", code);
 }
 
 char* ExportObjsDIF::get_variable_value(const KDBVariablesPtr dbv_ptr, const std::string& name, int t, char** vec)

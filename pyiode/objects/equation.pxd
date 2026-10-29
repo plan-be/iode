@@ -25,22 +25,20 @@ cdef extern from "api/objs/equations.h":
     # see https://cython.readthedocs.io/en/latest/src/userguide/wrapping_CPlusPlus.html#declaring-a-c-class-interface 
     cdef cppclass CEquation "Equation":
         string           endo
-        string           lec
         shared_ptr[CLEC] clec
         char             solved
         char             method
         CSample          sample
-        string           comment
         string           block
-        string           instruments
         long             date
         float            tests[20]
 
         CEquation(const string&, const string&, const IodeEquationMethod, const string&, const string&, 
-                  const string&, const string&, const string&, const bool date) except +
+                  const string&, const string&, const string&, const bool date, const bool utf8) except +
         CEquation(const CEquation& other) except +
         
-        void set_lec(const string&) except +
+        string get_lec_utf8() 
+        void set_lec_utf8(const string&) except +
 
         int get_method_as_int()
         string get_method()
@@ -48,8 +46,11 @@ cdef extern from "api/objs/equations.h":
 
         void set_sample(string, string) except +
 
-        string get_comment()
-        void set_comment(const string&) except +
+        string get_comment_utf8()
+        void set_comment_utf8(const string&) except +
+
+        string get_instruments_utf8()
+        void set_instruments_utf8(const string&) except +
 
         string get_date_as_string(const string&)
         void set_date(const long date) except +

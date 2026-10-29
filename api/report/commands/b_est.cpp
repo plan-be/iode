@@ -264,7 +264,7 @@ int B_EqsSetCmt(char* arg, int unused)
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
     if(!eq_ptr)
         return -1;
-    eq_ptr->comment = cmt;
+    eq_ptr->set_comment(cmt);
     return 0;
 }
 
@@ -293,6 +293,6 @@ int B_EqsSetInstrs(char* arg, int unused)
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
     if(!eq_ptr)
         return -1;
-    eq_ptr->instruments = instrs;
+    eq_ptr->set_instruments(instrs);
     return 0;
 }

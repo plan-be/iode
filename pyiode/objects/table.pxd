@@ -3,6 +3,8 @@
 from libcpp.string cimport string
 from libcpp.vector cimport vector
 
+from libcpp cimport bool
+
 from pyiode.common cimport (TableLang, TableCellType, TableCellAlign, TableCellFont, TableLineType, 
                             TableTextAlign, TableGraphAxis, TableGraphGrid, TableGraphType)
 
@@ -14,7 +16,8 @@ cdef extern from "api/objs/tables.h":
         # Constructor
         CTableCell(TableCellType cell_type, string content,
                    TableCellAlign align=TableCellAlign.TABLE_CELL_LEFT,
-                   bint bold=False, bint italic=False, bint underline=False) except +
+                   bint bold=False, bint italic=False, bint underline=False, 
+                   const bool utf8=True) except +
         # Copy constructor
         CTableCell(CTableCell& other) except +
 
@@ -23,11 +26,11 @@ cdef extern from "api/objs/tables.h":
 
         TableCellType get_type()
 
-        string get_content(bint quotes) except +
+        string get_content_utf8(bint quotes) except +
 
-        void set_text(string& text) except +
-        void set_lec(string& lec) except +
-        void set_content(string& content) except +
+        void set_text_utf8(string& text) except +
+        void set_lec_utf8(string& lec) except +
+        void set_content_utf8(string& content) except +
 
         TableCellAlign get_align()
         void set_align(TableCellAlign align) except +
@@ -84,11 +87,11 @@ cdef extern from "api/objs/tables.h":
 
         # Constructor
         CTable(int nb_columns, string& def_, vector[string]& variables, bint mode, bint files, 
-               bint date, bint search_comment) except +
+               bint date, bint search_comment, const bool utf8) except +
         CTable(int nb_columns, string& def_, vector[string]& titles, vector[string]& lecs, 
-               bint mode, bint files, bint date, bint search_comment) except +
+               bint mode, bint files, bint date, bint search_comment, const bool utf8) except +
         CTable(int nb_columns, string& def_, string& lecs, bint mode, bint files, bint date, 
-               bint search_comment) except +
+               bint search_comment, const bool utf8) except +
         # Copy constructor
         CTable(const CTable& table) except +
 
@@ -115,10 +118,10 @@ cdef extern from "api/objs/tables.h":
         void remove_line(int row) except +
 
         # Title
-        CTableLine* insert_title(int pos, string& title, bint after) except +
-        CTableLine* add_title(string& title) except +
-        string get_title(int row) except +
-        void set_title(int row, string& title) except +
+        CTableLine* insert_title_utf8(int pos, string& title, bint after) except +
+        CTableLine* add_title_utf8(string& title) except +
+        string get_title_utf8(int row) except +
+        void set_title_utf8(int row, string& title) except +
 
         # Cells
         CTableLine* insert_line_with_cells(int pos, bint after) except +

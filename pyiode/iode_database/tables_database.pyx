@@ -51,7 +51,7 @@ cdef class Tables(CythonIodeDatabase):
         return subset
 
     def get_title(self, name: str) -> str:
-        return self.database.get_title(name.encode()).decode()
+        return self.database.get_title_utf8(name.encode()).decode()
 
     def _get_object(self, name: str) -> Table:
         cdef shared_ptr[CTable] tbl_ptr

@@ -34,7 +34,24 @@ public:
     }
 
     std::string get_macro(const std::string& name) const;
+
+    std::string get_macro_oem(const std::string& name) const
+    {
+        return this->get_macro(name);
+    }
+
+    std::string get_macro_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_macro(name));
+    }
+
     bool set_macro(const std::string& name, std::string& macro);
+
+    bool set_macro_utf8(const std::string& name, std::string& macro)
+    {
+        std::string _macro_ = utf8_to_oem(macro);
+        this->set_macro(name, _macro_);
+    }
 
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;

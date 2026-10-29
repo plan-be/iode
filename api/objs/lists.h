@@ -47,6 +47,38 @@ public:
         return std::shared_ptr<KDBLists>(new KDBLists(is_global));
     }
 
+    std::string get_list(const std::string& name) const
+    {
+        std::shared_ptr<List> lst_ptr = this->get_and_check_obj_ptr(name);
+        return (!lst_ptr) ? "" : *lst_ptr;
+    }
+
+    std::string get_list_oem(const std::string& name) const
+    {
+        return this->get_list(name);
+    }
+
+    std::string get_list_utf8(const std::string& name) const
+    {
+        return oem_to_utf8(this->get_list(name));
+    }
+
+    void set_list(const std::string& name, const std::string& value)
+    {
+        this->set(name, value);
+    }
+
+    void set_list_oem(const std::string& name, const std::string& value)
+    {
+        this->set_list(name, value);
+    }
+
+    void set_list_utf8(const std::string& name, const std::string& value)
+    {
+        std::string list = utf8_to_oem(value);
+        this->set_list(name, list);
+    }
+
     bool load_asc(const std::string& filename) override;
     bool save_asc(const std::string& filename) override;
 

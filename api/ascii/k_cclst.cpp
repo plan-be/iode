@@ -34,16 +34,16 @@
 static int read_lst(KDBLists& kdb, YYFILE* yy, char* name)
 {
     int keyw;
-    char* lst;
+    char* c_lst;
 
     /* READ A STRING */
     keyw = YY_lex(yy);
     if(keyw == YY_STRING)  
-        lst = K_wrap((char*) yy->yy_text, 60);
+        c_lst = K_wrap((char*) yy->yy_text, 60);
     else 
     {
-        lst = SW_nalloc(1);
-        lst[0] = '\0';
+        c_lst = SW_nalloc(1);
+        c_lst[0] = '\0';
         YY_unread(yy);
     }
 
@@ -58,18 +58,17 @@ static int read_lst(KDBLists& kdb, YYFILE* yy, char* name)
 
     try
     {
-        List lst_oem(lst);
-        List lst_utf8 = oem_to_utf8(lst_oem);
-        kdb.set(name, lst_utf8);
+        List lst(c_lst);
+        kdb.set(name, lst);
     }
     catch(const std::exception&) 
     {
         kerror(0, "%s : unable to create %s", YY_error(yy), name);
-        SW_nfree(lst);
+        SW_nfree(c_lst);
         return -1;
     }
 
-    SW_nfree(lst);
+    SW_nfree(c_lst);
     return 0;
 }
 
@@ -188,8 +187,7 @@ bool KDBLists::save_asc(const std::string& filename)
         } 
     }
 
-    List lst_utf8;
-    List lst_oem;
+    List lst;
     bool success = true;
     for(const std::string& name : obj_names)
     {
@@ -197,9 +195,8 @@ bool KDBLists::save_asc(const std::string& filename)
         {
             std::shared_ptr<List> lst_ptr = k_objs.at(name);
             fprintf(fd, "%s ", (char*) name.c_str());
-            lst_utf8 = List(*lst_ptr);
-            lst_oem = utf8_to_oem(lst_utf8);
-            SCR_fprintf_esc(fd, (char*) lst_oem.c_str(), 1);
+            lst = List(*lst_ptr);
+            SCR_fprintf_esc(fd, (char*) lst.c_str(), 1);
             fprintf(fd, "\n");
         }
         catch(const std::exception& e) 
