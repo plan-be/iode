@@ -423,13 +423,25 @@ inline IodeRegexName get_regex_name(const int type)
     return nre;
 }
 
-inline bool is_coefficient(const std::string& name)
+// NOTE: Don't use std::regex as it may be rather slow when is_coefficient() is called 
+// many times
+inline bool is_coefficient(const std::string_view name)
 {
-    if(name.empty()) 
+    if(name.empty() || name.size() > K_MAX_NAME) 
         return false;
 
-    IodeRegexName nre = get_regex_name(SCALARS);
-    return regex_match(name, std::regex(nre.regex));
+    unsigned char ch = (unsigned char) name[0];
+    if(!((ch >= 'a' && ch <= 'z') || ch == '_'))
+        return false;
+
+    for(size_t i = 1; i < name.size(); i++)
+    {
+        ch = (unsigned char) name[i];
+        if(!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_' || ch == '#'))
+            return false;
+    }
+
+    return true;
 }
 
 inline void check_name(const std::string name, const int type)
