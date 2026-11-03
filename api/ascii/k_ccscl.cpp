@@ -31,16 +31,16 @@
 static int read_scl(KDBScalars& kdb, YYFILE* yy, char* name)
 {
     int keyw;
-    Scalar scl;
+    std::shared_ptr<Scalar> scl_ptr = std::make_shared<Scalar>();
 
     /* READ AT MOST 3 REALS */
-    scl.value = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl.value)) 
-        scl.value = 0.9;
-    scl.relax = K_read_real(yy);
-    if(!IODE_IS_A_NUMBER(scl.relax)) 
-        scl.relax = 1.0;
-    scl.std = K_read_real(yy);
+    scl_ptr->value = K_read_real(yy);
+    if(!IODE_IS_A_NUMBER(scl_ptr->value)) 
+        scl_ptr->value = 0.9;
+    scl_ptr->relax = K_read_real(yy);
+    if(!IODE_IS_A_NUMBER(scl_ptr->relax)) 
+        scl_ptr->relax = 1.0;
+    scl_ptr->std = K_read_real(yy);
 
     /* CONTINUE READING UNTIL END OF VALUES */
     while(1) 
@@ -51,13 +51,14 @@ static int read_scl(KDBScalars& kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
+    std::string key = kdb.to_key(name);
     try
     {
-        kdb.set(name, scl);
+        kdb.add_obj_ptr(key, scl_ptr);
     }
     catch(const std::exception&) 
     {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
+        kerror(0, "%s : unable to create %s", YY_error(yy), (char*) key.c_str());
         return -1;
     }
 
@@ -120,6 +121,7 @@ bool KDBScalars::load_asc(const std::string& filename)
         switch(YY_lex(yy)) 
         {
             case YY_EOF :
+            {
                 if(cmpt) 
                 {
                     std::string asc_filename = set_file_extension(trim_filename, ASCII_SCALARS);
@@ -127,23 +129,21 @@ bool KDBScalars::load_asc(const std::string& filename)
                 }            
                 YY_close(yy);
                 return true;
-
+            }
             case YY_WORD :
+            {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
+                kmsg("Reading object %d : %s", cmpt, name);
                 if(read_scl(*this, yy, name) == 0) 
                     cmpt++;
-                kmsg("Reading object %d : %s", cmpt, name);
                 break;
-
+            }
             default :
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
         }
     }
-
-    YY_close(yy);
-    return false;
 }
 
 /**

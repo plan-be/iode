@@ -70,6 +70,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
         switch(YY_lex(yy)) 
         {
             case YY_EOF :
+            {
                 if(cmpt) 
                 {
                     std::string asc_filename = set_file_extension(trim_filename, ASCII_IDENTITIES);
@@ -77,8 +78,9 @@ bool KDBIdentities::load_asc(const std::string& filename)
                 }
                 YY_close(yy);
                 return true;
-
+            }
             case YY_WORD :
+            {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
                 if(YY_lex(yy) != YY_STRING) 
@@ -88,31 +90,26 @@ bool KDBIdentities::load_asc(const std::string& filename)
                 }
                 c_lec = K_wrap((char*) yy->yy_text, 60);
                 lec = std::string(c_lec);
+                std::string key = this->to_key(name);
                 try
                 {
-                    Identity idt(lec);
-                    this->set(name, idt);
+                    kmsg("Reading object %d : %s", cmpt, (char*) key.c_str());
+                    std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec);
+                    this->add_obj_ptr(key, idt_ptr);
                     cmpt++;
                 }
                 catch(const std::exception& e) 
                 {
-                    SW_nfree(c_lec);
                     error_manager.append_error(std::string(e.what()));
-                    return false;
                 }
-
                 SW_nfree(c_lec);
-                kmsg("Reading object %d : %s", cmpt, name);
                 break;
-
+            }
             default :
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
         }
     }
-
-    YY_close(yy);
-    return false;
 }
 
 /**

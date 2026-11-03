@@ -56,15 +56,16 @@ static int read_lst(KDBLists& kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
+    std::string key = kdb.to_key(name);
     try
     {
-        List lst(c_lst);
-        kdb.set(name, lst);
+        std::shared_ptr<List> lst_ptr = std::make_shared<List>(c_lst);
+        kdb.add_obj_ptr(key, lst_ptr);
     }
     catch(const std::exception&) 
     {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(c_lst);
+        kerror(0, "%s : unable to create %s", YY_error(yy), (char*) key.c_str());
         return -1;
     }
 
@@ -131,6 +132,7 @@ bool KDBLists::load_asc(const std::string& filename)
         switch(YY_lex(yy)) 
         {
             case YY_EOF :
+            {
                 if(cmpt) 
                 {
                     std::string asc_filename = set_file_extension(trim_filename, ASCII_COMMENTS);
@@ -138,23 +140,21 @@ bool KDBLists::load_asc(const std::string& filename)
                 }
                 YY_close(yy);
                 return true;
-
+            }
             case YY_WORD :
+            {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
+                kmsg("Reading object %d : %s", cmpt, name);
                 if(read_lst(*this, yy, name) == 0) 
                     cmpt++;
-                kmsg("Reading object %d : %s", cmpt, name);
                 break;
-
+            }
             default :
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
         }
     }
-
-    YY_close(yy);
-    return false;
 }
 
 /**

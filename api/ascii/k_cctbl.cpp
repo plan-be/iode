@@ -117,18 +117,18 @@ ret :
  *  -----------------------------
  *  DIV LEC "1" LEC "PIB[2010]"
  *    
- *  @param [in, out] Table*       tbl    Table whose divisors (one by column) is to be read
+ *  @param [in, out] std::shared_ptr<Table> tbl_ptr Table whose divisors (one by column) is to be read
  *  @param [in, out] YYFILE*    yy     stream 
  *  @return          void
  *  
  */
-static void read_div(Table* tbl, YYFILE* yy)
+static void read_div(std::shared_ptr<Table> tbl_ptr, YYFILE* yy)
 {
     TableCell* cell;
-    for(int i = 0; i < tbl->nb_columns; i++)
+    for(int i = 0; i < tbl_ptr->nb_columns; i++)
     {
         cell = read_cell(yy, 0);
-        tbl->divider_line.cells[i] = *cell;
+        tbl_ptr->divider_line.cells[i] = *cell;
     }
 }
 
@@ -158,15 +158,15 @@ static void read_div(Table* tbl, YYFILE* yy)
  *  - "line B" LEFT LEC "B" DECIMAL  LAXIS GRLINE
  *  
  *    
- *  @param [in, out] Table*       tbl    Table where a new line will be added 
+ *  @param [in, out] std::shared_ptr<Table> tbl_ptr Table where a new line will be added
  *  @param [in, out] YYFILE*    yy     stream 
  *  @return          int                0 if success
  *                                      -1 if the Table cannot be created
  *  
  */
-static int read_line(Table* tbl, YYFILE* yy)
+static int read_line(std::shared_ptr<Table> tbl_ptr, YYFILE* yy)
 {
-    int     keyw;
+    int keyw;
     TableCell*  cell = nullptr;
     TableLine*  line = nullptr;
 
@@ -198,8 +198,8 @@ static int read_line(Table* tbl, YYFILE* yy)
                     YY_unread(yy);
                     return 0;
                 }
-                tbl->lines.push_back(TableLine((TableLineType) keyw));
-                line = &(tbl->lines.back());
+                tbl_ptr->lines.push_back(TableLine((TableLineType) keyw));
+                line = &(tbl_ptr->lines.back());
                 break;
             case TABLE_ASCII_LINE_TITLE :
                 // line already read
@@ -208,8 +208,8 @@ static int read_line(Table* tbl, YYFILE* yy)
                     YY_unread(yy);
                     return 0;
                 }
-                tbl->lines.push_back(TableLine((TableLineType) keyw));
-                line = &(tbl->lines.back());
+                tbl_ptr->lines.push_back(TableLine((TableLineType) keyw));
+                line = &(tbl_ptr->lines.back());
                 cell = read_cell(yy, YY_STRING);
                 line->cells.push_back(*cell);
                 break;
@@ -221,8 +221,8 @@ static int read_line(Table* tbl, YYFILE* yy)
                     return 0;
                 }
                 // empty string
-                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_TITLE));
-                line = &(tbl->lines.back());
+                tbl_ptr->lines.push_back(TableLine(TableLineType::TABLE_LINE_TITLE));
+                line = &(tbl_ptr->lines.back());
                 cell = new TableCell(TABLE_CELL_STRING);
                 line->cells.push_back(*cell);
                 YY_unread(yy);
@@ -251,11 +251,11 @@ static int read_line(Table* tbl, YYFILE* yy)
                 }
                 YY_unread(yy);
                 // Assume it is a line of type CELL
-                tbl->lines.push_back(TableLine(TableLineType::TABLE_LINE_CELL));
-                line = &(tbl->lines.back());
+                tbl_ptr->lines.push_back(TableLine(TableLineType::TABLE_LINE_CELL));
+                line = &(tbl_ptr->lines.back());
                 line->set_graph_type(T_GRAPHDEFAULT);
                 line->cells.clear();
-                for(int i = 0; i < tbl->nb_columns; i++)
+                for(int i = 0; i < tbl_ptr->nb_columns; i++)
                 {
                     cell = read_cell(yy, 0);
                     line->cells.push_back(*cell);
@@ -270,22 +270,20 @@ static int read_line(Table* tbl, YYFILE* yy)
  *  
  * for the full syntax.
  *  
- *  @param [in]     yy  YYFILE*     stream to be read
- *  @return             Table*        new allocated table
+ *  @param [in]  yy  YYFILE*        stream to be read
+ *  @return std::shared_ptr<Table>  new allocated table
  *  
  */
-static Table* read_tbl(YYFILE* yy)
+static std::shared_ptr<Table> read_tbl(YYFILE* yy)
 {
-    int     keyw, dim = 2;
-    Table     *tbl = NULL;
-
-    keyw = YY_lex(yy);
+    int keyw = YY_lex(yy);
     if(keyw != TABLE_ASCII_OPEN) 
     {
         kerror(0, "%s: Expected { - Got %s ", yy->yy_text, YY_error(yy));
-        return NULL;
+        return nullptr;
     }
-
+    
+    int dim = 2;
     keyw = YY_lex(yy);
     if(keyw != TABLE_ASCII_DIM) 
         YY_unread(yy);
@@ -297,8 +295,8 @@ static Table* read_tbl(YYFILE* yy)
             dim = yy->yy_long;
     }
 
-    tbl = new Table(dim);
-    if(!tbl) 
+    std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(dim);
+    if(!tbl_ptr) 
         return nullptr;
 
     while(1) 
@@ -307,64 +305,60 @@ static Table* read_tbl(YYFILE* yy)
         switch(keyw) 
         {
             case TABLE_ASCII_CLOSE   :
-                return tbl;
+                return tbl_ptr;
             case TABLE_ASCII_DUTCH   :
-                tbl->set_language(TableLang::TABLE_DUTCH);
+                tbl_ptr->set_language(TableLang::TABLE_DUTCH);
                 break;
             case TABLE_ASCII_FRENCH  :
-                tbl->set_language(TableLang::TABLE_FRENCH);
+                tbl_ptr->set_language(TableLang::TABLE_FRENCH);
                 break;
             case TABLE_ASCII_ENGLISH :
-                tbl->set_language(TableLang::TABLE_ENGLISH);
+                tbl_ptr->set_language(TableLang::TABLE_ENGLISH);
                 break;
             case TABLE_ASCII_DIM     :
                 kerror(0, "Double dim definition skipped : %s", YY_error(yy));
                 break;
             case TABLE_ASCII_DIVIDER     :
-                read_div(tbl, yy);
+                read_div(tbl_ptr, yy);
                 break;
             case TABLE_ASCII_BOX     :
-                tbl->chart_box = (char) K_read_long(yy);
+                tbl_ptr->chart_box = (char) K_read_long(yy);
                 break;
             case TABLE_ASCII_AXIS     :
-                tbl->set_graph_axis((TableGraphAxis) K_read_long(yy));
+                tbl_ptr->set_graph_axis((TableGraphAxis) K_read_long(yy));
                 break;
             case TABLE_ASCII_XGRID    :
-                tbl->set_gridx((TableGraphGrid) K_read_long(yy));
+                tbl_ptr->set_gridx((TableGraphGrid) K_read_long(yy));
                 break;
             case TABLE_ASCII_YGRID    :
-                tbl->set_gridy((TableGraphGrid) K_read_long(yy));
+                tbl_ptr->set_gridy((TableGraphGrid) K_read_long(yy));
                 break;
             case TABLE_ASCII_YMIN     :
-                tbl->y_min  = (float) K_read_real(yy);
+                tbl_ptr->y_min  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_YMAX     :
-                tbl->y_max  = (float) K_read_real(yy);
+                tbl_ptr->y_max  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMIN     :
-                tbl->z_min  = (float) K_read_real(yy);
+                tbl_ptr->z_min  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ZMAX     :
-                tbl->z_max  = (float) K_read_real(yy);
+                tbl_ptr->z_max  = (float) K_read_real(yy);
                 break;
             case TABLE_ASCII_ALIGN:
-                tbl->set_text_alignment((TableTextAlign) K_read_align(yy));
+                tbl_ptr->set_text_alignment((TableTextAlign) K_read_align(yy));
                 break;
             case TABLE_ASCII_BREAK   :
-                if(read_line(tbl, yy) < 0) 
-                {
-                    delete tbl;
+                if(read_line(tbl_ptr, yy) < 0) 
                     return nullptr;
-                }
                 break;
             default :
+            {
                 kerror(0, "Incorrect entry : %s", YY_error(yy));
-                break;
+                return nullptr;
+            }
         }
     }
-
-    delete tbl;
-    return nullptr;
 }
 
 /**
@@ -388,7 +382,6 @@ bool KDBTables::load_asc(const std::string& filename)
     static  int sorted;
 
     int     cmpt = 0;
-    Table   *tbl = NULL;
     YYFILE  *yy;
     ONAME   name;
 
@@ -422,47 +415,45 @@ bool KDBTables::load_asc(const std::string& filename)
         switch(YY_lex(yy)) 
         {
             case YY_EOF :
+            {
                 if(cmpt) 
                 {
                     std::string asc_filename = set_file_extension(trim_filename, ASCII_TABLES);
-                    this->set_fullpath(asc_filename); // JMP 03/12/2022
+                    this->set_fullpath(asc_filename);
                 }
                 YY_close(yy);
                 return true;
-
+            }
             case YY_WORD :
+            {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                tbl = read_tbl(yy);
-                if(!tbl) 
-                {
-                    kwarning("%s : table defined", YY_error(yy));
-                    goto err;
-                }
+                std::string key = this->to_key(name);
                 try
                 {
-                    this->set(name, *tbl); 
+                    kmsg("Reading object %d : %s", cmpt, (char*) key.c_str());
+                    std::shared_ptr<Table> tbl_ptr = read_tbl(yy);
+                    if(!tbl_ptr)
+                    {
+                        std::string error_msg = std::string(YY_error(yy)) + " : table defined";
+                        throw std::runtime_error(error_msg);
+                    } 
+                    this->add_obj_ptr(key, tbl_ptr); 
                     cmpt++;
-                    kmsg("Reading object %d : %s", cmpt, name);
                 }
                 catch(const std::exception& e)
                 {
-                    delete tbl;
-                    tbl = nullptr;
                     kwarning(e.what());
-                    goto err;
                 }
                 break;
-
+            }
             default :
+            {
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
+            }
         }
     }
-
-err:
-    YY_close(yy);
-    return false;
 }
 
 /*------- SAVE IN ASCII -------------------*/
