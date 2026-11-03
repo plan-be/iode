@@ -51,15 +51,16 @@ static int read_cmt(KDBComments& kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
+    std::string key = kdb.to_key(name);
     try
     {
-        Comment cmt(c_cmt);
-        kdb.set(name, cmt);
+        std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>(c_cmt);
+        kdb.add_obj_ptr(key, cmt_ptr);
     }
     catch(const std::exception&)
     {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
         SW_nfree(c_cmt);
+        kerror(0, "%s : unable to create %s", YY_error(yy), (char*) key.c_str());
         return -1;
     }
 
@@ -129,10 +130,10 @@ bool KDBComments::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
+                kmsg("Reading object %d : %s", cmpt, name);
                 rc = read_cmt(*this, yy, name);
                 if(rc == 0) 
                     cmpt++;
-                kmsg("Reading object %d : %s", cmpt, name);
                 break;
 
             default :
@@ -140,9 +141,6 @@ bool KDBComments::load_asc(const std::string& filename)
                 break;
         }
     }
-
-    YY_close(yy);
-    return false;
 }
 
 /**

@@ -35,12 +35,12 @@ static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
     }
     int nb_periods = smpl->nb_periods;
 
-    Variable var;
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>();
     
     /* READ AT MOST nobs OBSERVATIONS */
-    var.reserve(nb_periods);
+    var_ptr->reserve(nb_periods);
     for(int t = 0; t < nb_periods; t++)  
-        var.push_back(K_read_real(yy));
+        var_ptr->push_back(K_read_real(yy));
 
     /* CONTINUE READING UNTIL END OF VALUES */
     int keyw;
@@ -52,13 +52,14 @@ static int read_vec(KDBVariables& kdb, YYFILE* yy, char* name)
     }
     YY_unread(yy);
 
+    std::string key = kdb.to_key(name);
     try
     {
-        kdb.set(name, var);
+        kdb.add_obj_ptr(key, var_ptr);
     }
     catch(const std::exception&) 
     {
-        kerror(0, "%s : unable to create %s", YY_error(yy), name);
+        kerror(0, "%s : unable to create %s", YY_error(yy), (char*) key.c_str());
         return -1;
     }
 
@@ -111,9 +112,6 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
     
     kdb.set_sample(*smpl);
 
-    /* Loop on var definition 
-        NAME1 value ... NAME2 ...
-    */
     int cmpt = 0;
     ONAME name;
     while(1) 
@@ -122,8 +120,8 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
         {
             case YY_EOF :
                 return true;
-
             case YY_WORD :
+            {
                 if(smpl->nb_periods == 0) 
                 {
                     kwarning("%s : undefined sample", YY_error(yy));
@@ -132,17 +130,16 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                read_vec(kdb, yy, name);
-                kmsg("Reading object %d : %s", ++cmpt, name);
+                kmsg("Reading object %d : %s", cmpt, name);
+                if(read_vec(kdb, yy, name) == 0)
+                    cmpt++;
                 break;
-
+            }
             default :
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
         }
     }
-
-    return true;
 }
 
 /**

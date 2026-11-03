@@ -53,11 +53,10 @@ YYKEYS KE_TABLE[] = {
  *   
  *  Splits the LEC expression in multiple lines of max 60 chars.
  *  
- *  @param [in, out]    yy      YY*     YY stream to read data from
- *  @return                     Equation*     a new allocated EQ or NULL on error
- *  
+ *  @param [in, out]  yy  YY*           YY stream to read data from
+ *  @return std::shared_ptr<Equation>   a new allocated EQ or NULL on error
  */
-static Equation* read_eq(YYFILE* yy, char* name)
+static std::shared_ptr<Equation> read_eq(YYFILE* yy, char* name)
 {
     int keyw;
     char* c_lec;
@@ -81,8 +80,9 @@ static Equation* read_eq(YYFILE* yy, char* name)
             return nullptr;
         }
         
-        Equation* eq = new Equation(endo, lec, method, "", "", "", "", "", false);
-        return eq;
+        std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(endo, lec, 
+            method, "", "", "", "", "", false);
+        return eq_ptr;
     }
 
     c_lec = K_read_str(yy);
@@ -216,11 +216,12 @@ static Equation* read_eq(YYFILE* yy, char* name)
 
     Period from_period = (smpl.get() != nullptr) ? smpl->start_period : Period();
     Period to_period = (smpl.get() != nullptr) ? smpl->end_period : Period();
-    Equation* eq = new Equation(endo, lec, method, from_period.to_string(), 
-                                to_period.to_string(), comment, instruments, block, false);
-    memcpy(eq->tests.data(), tests, EQS_NBTESTS * sizeof(float));
-    eq->date = date;
-    return eq;
+    std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(endo, lec, 
+        method, from_period.to_string(), to_period.to_string(), comment, instruments, 
+        block, false);
+    memcpy(eq_ptr->tests.data(), tests, EQS_NBTESTS * sizeof(float));
+    eq_ptr->date = date;
+    return eq_ptr;
 }
 
 /**
@@ -291,10 +292,9 @@ static Equation* read_eq(YYFILE* yy, char* name)
  */
 bool KDBEquations::load_asc(const std::string& filename)
 {
-    Equation*  eq = NULL;
-    YYFILE*    yy;
-    char       name[K_MAX_NAME + 1];
-    int        cmpt = 0;
+    YYFILE* yy;
+    char name[K_MAX_NAME + 1];
+    int cmpt = 0;
 
     /* INIT YY READ */
     YY_CASE_SENSITIVE = 1;
@@ -321,52 +321,50 @@ bool KDBEquations::load_asc(const std::string& filename)
             case YY_COMMENT :
                 break;
             case YY_EOF :
+            {
                 if(cmpt) 
                 {
                     std::string asc_filename = set_file_extension(trim_filename, ASCII_EQUATIONS);
-                    this->set_fullpath(asc_filename); // JMP 03/12/2022
+                    this->set_fullpath(asc_filename);
                 }
                 YY_close(yy);
                 return true;
-
+            }
             case YY_WORD :
+            {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                eq = read_eq(yy, name);
-                if(eq == nullptr) 
+                std::shared_ptr<Equation> eq_ptr = read_eq(yy, name);
+                if(!eq_ptr) 
                 {
                     kwarning("%s : equation not defined", YY_error(yy));
-                    goto err;
+                    YY_close(yy);
+                    return false;
                 }
 
-                if(eq->block.empty()) 
-                    eq->block = std::string(name);
+                if(eq_ptr->block.empty()) 
+                    eq_ptr->block = std::string(name);
 
+                std::string key = this->to_key(name);
                 try
                 {
-                    this->set(name, *eq);
+                    kmsg("Reading object %d : %s", cmpt, (char*) key.c_str());
+                    this->add_obj_ptr(key, eq_ptr);
                     cmpt++;
                 }
                 catch(const std::exception&)
                 {
-                    delete eq;
-                    eq = nullptr;
                     kwarning("%s : %s", name, L_error());
-                    goto err;
-                }   
-                
-                kmsg("Reading object %d : %s", cmpt, name);
+                }
                 break;
-
+            }
             default :
+            {
                 kwarning("Incorrect entry : %s", YY_error(yy));
                 break;
+            }
         }
     }
-
-err:
-    YY_close(yy);
-    return false;
 }
 
 /**
