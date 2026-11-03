@@ -207,9 +207,6 @@ public:
 #endif
     }
 
-    LEC_FN(const LEC_FN& other) = default;
-
-    ~LEC_FN() override = default;
     
     bool operator==(const LEC_FN& other) const
     {

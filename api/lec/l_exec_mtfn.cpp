@@ -12,7 +12,7 @@
  * to these functions (#defines from L_LAG to L_LASTOBS (see iode.h)).
  *
  * Function signature:
- *      double <fnname>(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs)
+ *      double <fnname>(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs)
  *  
  *  where:
  *      expr   = pointer to the current position in the CLEC expression (ex.: in "X + corr(A, B)", expr points to "A")
@@ -103,7 +103,7 @@ double L_calccorr(const AbstractCLEC& clec, const int pos1, const int length1, c
  *  @return            double           computed correlation 
  *  
  */
-double L_corr(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_corr(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -188,7 +188,7 @@ double L_calccovar(const AbstractCLEC& clec, const int pos1, const int length1, 
  *  @see L_corr() for the parameter definition
  *  @see L_calccovar() for the formulas.
  */
-double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -214,7 +214,7 @@ double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::deque<in
  *  @see L_calccovar() for the formulas.
  *  
  */
-double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -248,7 +248,7 @@ double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::deque<i
  *  @see L_covar() for more details.
  *  
  */
-double L_var(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_var(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
@@ -274,7 +274,7 @@ double L_var(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>
  *  @see L_calccovar() for the formula.
  *  
  */
-double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     double var = L_var(clec, expr_pos, v_length, from, to, t, stack, nargs);
@@ -312,7 +312,7 @@ double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::deque<i
  *  @return            double           computed covariance
  */  
 
- double L_index(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+ double L_index(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -362,7 +362,7 @@ double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::deque<i
  *  
  *  @see L_corr() for the parameter definition
  */
-double L_acf(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_acf(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {
     if(v_length.size() < 2)
@@ -501,7 +501,7 @@ int L_calcvals(const AbstractCLEC& clec, int start, int end, int t, LECStack& st
  *  @return     double  value of expr[t] or interpolated value
  *  
  */
-double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
@@ -538,7 +538,7 @@ double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::deque
     return interpol;
 }
 
-double L_app(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_app(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {   
     if(v_length.size() == 0)
@@ -629,7 +629,7 @@ double L_app(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>
     return IODE_NAN;
 }
 
-double L_dapp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, 
+double L_dapp(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, 
     LECStack& stack, int nargs)
 {  
     if(v_length.size() == 0)
@@ -731,7 +731,7 @@ double L_hpall(const AbstractCLEC& clec, const int pos1, const int length1, cons
     return value;
 }
 
-double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, 
     int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)
@@ -749,7 +749,7 @@ double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>&
 }
 
 
-double L_hpstd(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, 
+double L_hpstd(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, 
     int from, int to, int t, LECStack& stack, int nargs)
 {
     if(v_length.size() == 0)

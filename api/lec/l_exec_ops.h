@@ -93,10 +93,6 @@ public:
 #endif
     }
 
-    LEC_OP(const LEC_OP& other) = default;
-
-    ~LEC_OP() override = default;
-
     bool operator==(const LEC_OP& other) const
     {
         return is_same_type(other);

@@ -165,10 +165,11 @@ void CLEC::reorder_expression()
                     throw std::runtime_error(error_msg);
                 }
                 int length_expr = args_end - args_start + 1;
-                // NOTE: push front because the arguments are processed in reverse order
-                al_mtfn.v_length_expr.push_front(length_expr);
+                al_mtfn.v_length_expr.push_back(length_expr);
                 args_end = args_start - 1;
             }
+            // NOTE: the arguments have been processed in reverse order
+            std::reverse(al_mtfn.v_length_expr.begin(), al_mtfn.v_length_expr.end());
 
             // insert current LEC_MTFN element before its arguments in the vector
             this->v_expression.pop_back();
