@@ -130,12 +130,13 @@ KDBVariablesPtr IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impde
 
             if(IMP_change(IMP_rule, IMP_pat, iname, oname) < 0) 
                 continue;
-            kmsg("Reading object %d : %s", ++cmpt, oname);
+            kmsg("Reading object %d : %s", cmpt+1, oname);
             try
             {
                 var_name = std::string(oname);
                 Variable var(vector, vector + nb);
                 kdb->set(var_name, var);
+                cmpt++;
             }
             catch(const std::exception&)
             {
@@ -161,11 +162,12 @@ KDBVariablesPtr IMP_InterpretVar(const std::unique_ptr<ImportVarFromFile>& impde
             found = kdb->contains(var_name);
             if(found) 
             {
-                kmsg("Reading object %d : %s", ++cmpt, oname);
+                kmsg("Reading object %d : %s", cmpt+1, oname);
                 try
                 {
                     Variable var(nb, IODE_NAN);
                     kdb->set(var_name, var);
+                    cmpt++;
                 }
                 catch(const std::exception& e) 
                 {
@@ -249,7 +251,7 @@ KDBCommentsPtr IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef
             continue;
         }
 
-        kmsg("Reading object %d : %s", ++cmpt, oname);
+        kmsg("Reading object %d : %s", cmpt+1, oname);
         SCR_strip((unsigned char*) cmt);
 
         try
@@ -258,6 +260,7 @@ KDBCommentsPtr IMP_InterpretCmt(const std::unique_ptr<ImportCmtFromFile>& impdef
             Comment comment(cmt);
             kdb->set(cmt_name, comment);
             SW_nfree(cmt);
+            cmpt++;
         }
         catch(const std::exception& e)
         {

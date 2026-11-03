@@ -134,7 +134,7 @@ bool KDBScalars::load_asc(const std::string& filename)
             {
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                kmsg("Reading object %d : %s", cmpt, name);
+                kmsg("Reading object %d : %s", cmpt+1, name);
                 if(read_scl(*this, yy, name) == 0) 
                     cmpt++;
                 break;

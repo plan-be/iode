@@ -813,14 +813,14 @@ bool Table::convert_32_to_64bits(const Table32& table32)
     return true;
 }
 
-Table* binary_to_tbl(char* pack)
+std::shared_ptr<Table> binary_to_tbl(char* pack)
 {
     int p = 0;
 
     /* table header */
     Table32* tbl32 = (Table32*) P_get_ptr(pack, 0);
-    Table* tbl = new Table(tbl32->nb_columns);
-    tbl->convert_32_to_64bits(*tbl32);
+    std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(tbl32->nb_columns);
+    tbl_ptr->convert_32_to_64bits(*tbl32);
     debug_unpacking("Table    ", "", 0);
 
     /* divider line */
@@ -831,7 +831,7 @@ Table* binary_to_tbl(char* pack)
     //       with nb_columns cells of type TABLE_CELL_LEC and content = ""
     p = 2;
     int k = 0;
-    for(TableCell& cell : tbl->divider_line.cells) 
+    for(TableCell& cell : tbl_ptr->divider_line.cells) 
     {
         TableCell32* cell32 = cells32 + k;
         cell.convert_32_to_64bits(*cell32);
@@ -865,7 +865,7 @@ Table* binary_to_tbl(char* pack)
                 debug_unpacking("line", "CELL ", p, i);
                 p++;
 
-                for(int j = 0; j < tbl->nb_columns; j++) 
+                for(int j = 0; j < tbl_ptr->nb_columns; j++) 
                 {
                     cell32 = cells32 + j;
                     // if cell type not properly set, assume it is a LEC cell
@@ -883,7 +883,7 @@ Table* binary_to_tbl(char* pack)
                     line.cells.push_back(*cell);
                 }
 
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             case TABLE_LINE_TITLE:
@@ -902,35 +902,35 @@ Table* binary_to_tbl(char* pack)
                 cell->set_attribute(cell32->attribute);
                 line.cells.push_back(*cell);
 
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             case TABLE_LINE_SEP:
             {
                 TableLine line(TableLineType::TABLE_LINE_SEP);
                 debug_unpacking("line", "SEP  ", p, i);
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             case TABLE_LINE_MODE:
             {
                 TableLine line(TableLineType::TABLE_LINE_MODE);
                 debug_unpacking("line", "MODE ", p, i);
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             case TABLE_LINE_FILES:
             {
                 TableLine line(TableLineType::TABLE_LINE_FILES);
                 debug_unpacking("line", "FILES", p, i);
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             case TABLE_LINE_DATE:
             {
                 TableLine line(TableLineType::TABLE_LINE_DATE);
                 debug_unpacking("line", "DATE ", p, i);
-                tbl->lines.push_back(line);
+                tbl_ptr->lines.push_back(line);
                 break;
             }
             default:
@@ -941,7 +941,7 @@ Table* binary_to_tbl(char* pack)
         }
     }
 
-    return tbl;
+    return tbl_ptr;
 }
 
 std::size_t hash_value(const Table& table)
@@ -1015,11 +1015,9 @@ void KDBTables::print_to_file(const std::string& destination_file, const std::st
 bool KDBTables::binary_to_obj(const std::string& name, char* pack)
 {
     debug_unpacking("table " + name, "--------------------------------", -1);
-    Table* tbl = binary_to_tbl(pack);
-    if(!tbl)
+    std::shared_ptr<Table> tbl_ptr = binary_to_tbl(pack);
+    if(!tbl_ptr)
         return false;
-
-    std::shared_ptr<Table> tbl_ptr = std::make_shared<Table>(*tbl);
     this->add_obj_ptr(name, tbl_ptr);
     return true;
 }
@@ -1036,8 +1034,8 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
     debug_packing("table " + std::string(name), "--------------------------------", -1);
     
     *pack = NULL;
-    std::shared_ptr<Table> tbl = this->get_obj_ptr(name);
-    if(!tbl)
+    std::shared_ptr<Table> tbl_ptr = this->get_obj_ptr(name);
+    if(!tbl_ptr)
         return false;
 
     int p = -1;
@@ -1045,7 +1043,7 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
 
     /* table header */
 
-    Table32 tbl32 = tbl->convert_64_to_32bits();
+    Table32 tbl32 = tbl_ptr->convert_64_to_32bits();
     *pack = (char*) P_add(*pack, (char*) &tbl32, sizeof(Table32));
     p++;
     debug_packing("Table      ", "", p);
@@ -1054,8 +1052,8 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
 
     // a) serialize cells except their content
     std::vector<TableCell32> cells32; 
-    cells32.reserve(tbl->nb_columns);
-    for(TableCell& cell : tbl->divider_line.cells)
+    cells32.reserve(tbl_ptr->nb_columns);
+    for(TableCell& cell : tbl_ptr->divider_line.cells)
     {
         TableCell32 cell32 = cell.convert_64_to_32bits();
         cells32.push_back(cell32);
@@ -1077,7 +1075,7 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
 
     // b) serialize cells content
     k = 0;
-    for(TableCell& cell : tbl->divider_line.cells)
+    for(TableCell& cell : tbl_ptr->divider_line.cells)
     {
         *pack = cell.to_binary(*pack,  p, 0, k);
         k++;
@@ -1087,9 +1085,9 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
 
     // a) serialize lines except their cells
     std::vector<TableLine32> lines32;
-    int nb_lines = (int) tbl->lines.size();
+    int nb_lines = (int) tbl_ptr->lines.size();
     lines32.reserve(nb_lines);
-    for(TableLine& line : tbl->lines)
+    for(TableLine& line : tbl_ptr->lines)
     {
         TableLine32 line32 = line.convert_64_to_32bits();
         lines32.push_back(line32);
@@ -1103,20 +1101,20 @@ bool KDBTables::obj_to_binary(char** pack, const std::string& name)
 
     // b) serialize cells of lines
     int i = 0;
-    for(TableLine& line: tbl->lines) 
+    for(TableLine& line: tbl_ptr->lines) 
     {
         switch(line.get_type()) 
         {
             case TABLE_LINE_CELL:
             {
                 // a) serialize cells except their content
-                cells32.reserve(tbl->nb_columns);
+                cells32.reserve(tbl_ptr->nb_columns);
                 for(TableCell& cell : line.cells) 
                 {
                     TableCell32 cell32 = cell.convert_64_to_32bits();
                     cells32.push_back(cell32);
                 }
-                *pack = (char*) P_add(*pack, (char*) cells32.data(), sizeof(TableCell32) * tbl->nb_columns);
+                *pack = (char*) P_add(*pack, (char*) cells32.data(), sizeof(TableCell32) * tbl_ptr->nb_columns);
                 p++;
 
                 debug_packing("line", "CELL ", p, i);

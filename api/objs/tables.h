@@ -899,7 +899,7 @@ public:
     }
 };
 
-Table* binary_to_tbl(char* pack);
+std::shared_ptr<Table> binary_to_tbl(char* pack);
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>

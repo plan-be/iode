@@ -459,6 +459,8 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
     }
 
     // -------- load values --------
+    this->reserve(nb_objs);
+
     // load all objects
     if(objs.size() == 0)
     {

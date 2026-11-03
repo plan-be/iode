@@ -15,7 +15,7 @@ Improvements
   (closes :issue:`1236`) 
 
 - PYTHON: speed up loading of *comments*, *equations*, *identities*, *lists* and 
-  *tables* workspaces if they contain IODE objects with special characters.
+  *tables* workspaces.
 
 Fixed Bugs 
 ----------

@@ -24,21 +24,11 @@ public:
         this->std = std;
     }
 
-    Scalar(const Scalar& scalar)
-    {
-        this->value = scalar.value;
-        this->relax = scalar.relax;
-        this->std = scalar.std;
-    }
+    // defaulted -> Scalar is trivially copyable (plain 24-byte copy, memcpy-safe)
+    Scalar(const Scalar&) = default;
 
     // required to be used in std::map
-    Scalar& operator=(const Scalar& scalar)
-    {
-        this->value = scalar.value;
-        this->relax = scalar.relax;
-        this->std = scalar.std;
-        return *this;
-    }
+    Scalar& operator=(const Scalar&) = default;
 
     // Return the t-test of a scalar or IODE_NAN if it cannot be determined
     double calculate_t_test() const
@@ -60,7 +50,6 @@ public:
         return eq;
     }
 };
-
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>

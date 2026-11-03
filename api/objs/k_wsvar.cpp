@@ -1409,8 +1409,7 @@ bool KDBVariables::binary_to_obj(const std::string& name, char* pack)
         return false;
 
     int nb_periods = this->get_nb_periods();
-    Variable var(values, values + nb_periods);
-    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(var);
+    std::shared_ptr<Variable> var_ptr = std::make_shared<Variable>(values, values + nb_periods);
     this->add_obj_ptr(name, var_ptr);
     return true;
 }

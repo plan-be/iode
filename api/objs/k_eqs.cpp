@@ -296,7 +296,7 @@ bool Equation::to_binary(char** pack) const
     return true;
 }
 
-Equation* binary_to_eqs(char* pack, const std::string& name)
+std::shared_ptr<Equation> binary_to_eqs(char* pack, const std::string& name)
 {
     size_t len;
 
@@ -344,13 +344,14 @@ Equation* binary_to_eqs(char* pack, const std::string& name)
         smpl = nullptr;
     }
 
-    Equation* eq = new Equation(endo, lec, method, from_period.to_string(), to_period.to_string(), 
-                                comment, instruments, block, false);
-    eq->solved = *((char*) (P_get_ptr(pack, 2)));
-    eq->date = *((long*) (P_get_ptr(pack, 8)));    
-    memcpy(eq->tests.data(), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float));
+    std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(endo, lec, 
+        method, from_period.to_string(), to_period.to_string(), comment, instruments, 
+        block, false);
+    eq_ptr->solved = *((char*) (P_get_ptr(pack, 2)));
+    eq_ptr->date = *((long*) (P_get_ptr(pack, 8)));    
+    memcpy(eq_ptr->tests.data(), P_get_ptr(pack, 9), EQS_NBTESTS * sizeof(float));
 
-    return eq;
+    return eq_ptr;
 }
 
 
@@ -398,11 +399,9 @@ void KDBEquations::update(const std::string& name, const std::string& lec)
 
 bool KDBEquations::binary_to_obj(const std::string& name, char* pack)
 {
-    Equation* eq = binary_to_eqs(pack, name);
-    if(!eq) 
+    std::shared_ptr<Equation> eq_ptr = binary_to_eqs(pack, name);
+    if(!eq_ptr) 
         return false;
-    
-    std::shared_ptr<Equation> eq_ptr = std::make_shared<Equation>(*eq);
     this->add_obj_ptr(name, eq_ptr);
     return true;
 }

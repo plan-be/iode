@@ -130,7 +130,7 @@ static bool load_yy(KDBVariables& kdb, YYFILE* yy, int ask)
                 }
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                kmsg("Reading object %d : %s", cmpt, name);
+                kmsg("Reading object %d : %s", cmpt+1, name);
                 if(read_vec(kdb, yy, name) == 0)
                     cmpt++;
                 break;
