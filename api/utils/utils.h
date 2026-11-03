@@ -1,7 +1,6 @@
 #pragma once
 #include "api/constants.h"
 
-#include <regex>
 #include <string>
 #include <vector>
 #include <cctype>
@@ -398,54 +397,75 @@ inline void hash_combine(std::size_t& seed, const T& value)
     seed ^= hasher(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
-inline IodeRegexName get_regex_name(const int type)
+/**
+ * Checks if name follows the IODE naming rules for the given type of IODE objects. 
+ * Same rule as the regex [<letters>_][<letters>0-9_#]{0,K_MAX_NAME-1} 
+ * where <letters> is:
+ *   - A-Za-z for Comments (and generic objects)
+ *   - a-z for Scalars
+ *   - A-Z for the other types
+ * 
+ * NOTE: Don't use std::regex as it may be rather slow when called many times
+ * 
+ * @param name  std::string_view  name to check
+ * @param type  int               IODE type (COMMENTS, SCALARS, VARIABLES, ...)
+ * @return      bool              true if name is a valid name for the given type
+ */
+inline bool is_valid_iode_name(const std::string_view name, const int type)
 {
-    IodeRegexName nre;
-    if (type == COMMENTS || type == OBJECTS)
+    if(name.empty() || name.size() > K_MAX_NAME) 
+        return false;
+
+    const bool allow_lower = (type == COMMENTS || type == OBJECTS || type == SCALARS);
+    const bool allow_upper = (type != SCALARS);
+
+    for(size_t i = 0; i < name.size(); i++)
     {
-        nre.regex = "A-Za-z";
-        nre.type = "capital or lowercase";
-    }
-    else if (type == SCALARS)
-    {
-        nre.regex = "a-z";
-        nre.type = "lowercase";
-    }
-    else
-    {
-        nre.regex = "A-Z";
-        nre.type = "capital";
+        const unsigned char ch = (unsigned char) name[i];
+        if(allow_lower && ch >= 'a' && ch <= 'z')
+            continue;
+        if(allow_upper && ch >= 'A' && ch <= 'Z')
+            continue;
+        if(ch == '_')
+            continue;
+        // digits and '#' are not allowed as first character
+        if(i > 0 && ((ch >= '0' && ch <= '9') || ch == '#'))
+            continue;
+        return false;
     }
 
-    // see https://www.cplusplus.com/reference/regex/ECMAScript for regex syntax
-    nre.regex = "[" + nre.regex + "_][" + nre.regex + "0-9_#]{0," + std::to_string(K_MAX_NAME - 1) + "}";
-
-    return nre;
+    return true;
 }
 
 // NOTE: Don't use std::regex as it may be rather slow when is_coefficient() is called 
 // many times
 inline bool is_coefficient(const std::string_view name)
 {
-    if(name.empty() || name.size() > K_MAX_NAME) 
-        return false;
-
-    unsigned char ch = (unsigned char) name[0];
-    if(!((ch >= 'a' && ch <= 'z') || ch == '_'))
-        return false;
-
-    for(size_t i = 1; i < name.size(); i++)
-    {
-        ch = (unsigned char) name[i];
-        if(!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_' || ch == '#'))
-            return false;
-    }
-
-    return true;
+    return is_valid_iode_name(name, SCALARS);
 }
 
-inline void check_name(const std::string name, const int type)
+/**
+ * Checks if name follows the IODE naming rules for the given type of IODE objects. 
+ * Same rule as the regex [<letters>_][<letters>0-9_#]{0,K_MAX_NAME-1} 
+ * where <letters> is:
+ *   - A-Za-z for Comments (and generic objects)
+ *   - a-z for Scalars
+ *   - A-Z for the other types
+ * 
+ * Throw an error if the name is not valid.
+ * 
+ * NOTE: Don't use std::regex as it may be rather slow when called many times
+ * 
+ * @param name  std::string     name to check
+ * @param type  int             IODE type (COMMENTS, SCALARS, VARIABLES, ...)
+ */
+inline void check_name(const std::string& name, const int type)
 {
+    // fast path: valid name -> no string allocation and no std::regex
+    if(is_valid_iode_name(name, type))
+        return;
+
+    // error messages are only built when the name is invalid
     std::string msg = "name \"" + name + "\" as " + v_iode_types[type];
 
     if(name.empty()) 
@@ -456,10 +476,22 @@ inline void check_name(const std::string name, const int type)
         "Iode names cannot exceed " + std::to_string(K_MAX_NAME) + " characters. " + name + 
         " = " + std::to_string(name.size()) + " characters");
 
-    IodeRegexName nre = get_regex_name(type);
-    if(!regex_match(name, std::regex(nre.regex))) 
-        throw std::invalid_argument("Cannot accept " + msg + ": " + 
-        v_iode_types[type] + " name must only contains " + nre.type + " letters, digits and underscore");
+    std::string string_case;
+    switch(type)
+    {
+        case COMMENTS:
+        case OBJECTS:
+            string_case = "capital or lowercase";
+            break;
+        case SCALARS:
+            string_case = "lowercase";
+            break;
+        default:
+            string_case = "capital";
+            break;
+    }
+    throw std::invalid_argument("Cannot accept " + msg + ": " + 
+        v_iode_types[type] + " name must only contains " + string_case + " letters, digits and underscore");
 }
 
 inline bool has_extension(const std::string& filepath)
