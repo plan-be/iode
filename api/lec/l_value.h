@@ -14,10 +14,6 @@ public:
 #endif
     }
 
-    LEC_CONST_REAL(const LEC_CONST_REAL& other) = default;
-
-    ~LEC_CONST_REAL() override = default;
-
     bool operator==(const LEC_CONST_REAL& other) const
     {
         return is_same_type(other) && this->value == other.value;
@@ -42,10 +38,6 @@ public:
 #endif
     }
 
-    LEC_CONST_LONG(const LEC_CONST_LONG& other) = default;
-
-    ~LEC_CONST_LONG() override = default;
-
     bool operator==(const LEC_CONST_LONG& other) const
     {
         return is_same_type(other) && this->value == other.value;
@@ -65,16 +57,12 @@ public:
     std::string name;   // name of the coefficient (IODE Scalar)
 
 public:
-    LEC_COEF(const std::string& name) : LEC_ABSTRACT_VALUE(L_COEF), name(name) 
+    LEC_COEF(std::string name) : LEC_ABSTRACT_VALUE(L_COEF), name(std::move(name)) 
     {
 #if DEBUG
-        representation = name;
+        representation = this->name;
 #endif
     }
-
-    LEC_COEF(const LEC_COEF& other) = default;
-
-    ~LEC_COEF() override = default;
 
     bool operator==(const LEC_COEF& other) const
     {
@@ -132,19 +120,15 @@ public:
 
 public:
     // type = L_VAR or L_VART (variable with time) 
-    LEC_VAR(const int type, const std::string& name, const short lag, const Period& per)
-        : LEC_ABSTRACT_VALUE(type), name(name), lag(lag), ref(0), per(per) 
+    LEC_VAR(const int type, std::string name, const short lag, const Period& per)
+        : LEC_ABSTRACT_VALUE(type), name(std::move(name)), lag(lag), ref(0), per(per) 
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
 #if DEBUG
-        representation = name;
+        representation = this->name;
 #endif
     }
-
-    LEC_VAR(const LEC_VAR& other) = default;
-
-    ~LEC_VAR() override = default;
 
     bool operator==(const LEC_VAR& other) const
     {
@@ -231,10 +215,6 @@ public:
         representation = period.to_string();
 #endif
     }
-
-    LEC_PERIOD(const LEC_PERIOD& other) = default;
-
-    ~LEC_PERIOD() override = default;
 
     bool operator==(const LEC_PERIOD& other) const
     {

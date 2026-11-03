@@ -105,10 +105,6 @@ public:
 #endif
     }
 
-    LEC_TFN(const LEC_TFN& other) = default;
-
-    ~LEC_TFN() override = default;
-
     bool operator==(const LEC_TFN& other) const
     {
         if(!is_same_type(other))

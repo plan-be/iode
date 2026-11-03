@@ -40,20 +40,20 @@ double L_calccovar(const AbstractCLEC& clec, const int pos1, const int length1, 
 double L_hpall(const AbstractCLEC& clec, const int pos1, const int length1, const int pos2, const int length2, int from, int to, int t, 
     LECStack& stack, int nargs, int std);
 
-double L_corr(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_var(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_index(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_acf(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_app(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_dapp(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
-double L_hpstd(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_corr(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_covar(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_covar0(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_var(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_stddev(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_index(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_acf(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_interpol(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_app(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_hp(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_dapp(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
+double L_hpstd(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs);
 
-inline double(*L_MTFN_FN[])(const AbstractCLEC& clec, const int expr_pos, const std::deque<int>& v_length, int from, int to, int t, LECStack& stack, int nargs) =
+inline double(*L_MTFN_FN[])(const AbstractCLEC& clec, const int expr_pos, const std::vector<int>& v_length, int from, int to, int t, LECStack& stack, int nargs) =
 { 
     L_corr,         // L_CORR      L_M
     L_covar,        // L_COVAR     L_M
@@ -92,7 +92,7 @@ struct LEC_MTFN: public LEC_ABSTRACT_EXECUTABLE
 
     // vector of lengths as number of atomic lec elements for each sub-expression 
     // argument of the function
-    std::deque<int> v_length_expr;
+    std::vector<int> v_length_expr;
     
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
@@ -108,10 +108,6 @@ public:
 #endif
         v_length_expr.resize(nv_args, 0);
     }
-
-    LEC_MTFN(const LEC_MTFN& other) = default;
-
-    ~LEC_MTFN() override = default;
 
     bool operator==(const LEC_MTFN& other) const
     {

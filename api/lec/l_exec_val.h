@@ -67,10 +67,6 @@ public:
 #endif
     }
 
-    LEC_VAL_FN(const LEC_VAL_FN& other) = default;
-
-    ~LEC_VAL_FN() override = default;
-
     bool operator==(const LEC_VAL_FN& other) const
     {
         return is_same_type(other);

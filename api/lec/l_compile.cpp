@@ -13,9 +13,9 @@ public:
 std::vector<LSTACK> L_OPS;      // Stack of operators and functions
 
 
-void CLEC::add_coef_or_var_name(const std::string& name)
+void CLEC::add_coef_or_var_name(const std::string& name, const bool is_coef)
 {
-    if(is_coefficient(name))
+    if(is_coef)
     {
         for(const auto& coeff_name : v_coeff_names)
             if(coeff_name == name)
@@ -34,7 +34,6 @@ void CLEC::add_coef_or_var_name(const std::string& name)
 int CLEC::save_var(TOKEN& token)
 {
     int type = token.type;
-    std::string name(token.name);
 
     bool success = true;
     switch(type) 
@@ -42,23 +41,25 @@ int CLEC::save_var(TOKEN& token)
         case L_PERIOD :     // period
         {
             // the position of the period in the Variables sample will be set later
-            this->v_expression.push_back(LEC_PERIOD(token.period));
+            this->v_expression.emplace_back(std::in_place_type<LEC_PERIOD>, token.period);
             break;
         }
         case L_DCONST:      // double constant
         {
-            this->v_expression.push_back(LEC_CONST_REAL(token.real_value));
+            this->v_expression.emplace_back(std::in_place_type<LEC_CONST_REAL>, token.real_value);
             break;
         }
         case L_LCONST:      // long constant
         {
-            this->v_expression.push_back(LEC_CONST_LONG(token.long_value));
+            this->v_expression.emplace_back(std::in_place_type<LEC_CONST_LONG>, token.long_value);
             break;
         }
         case L_COEF:         // coefficient
         {
-            add_coef_or_var_name(name);
-            this->v_expression.push_back(LEC_COEF(name));
+            // NOTE: the name string is only built for coefficients and variables
+            std::string name(token.name);
+            add_coef_or_var_name(name, true);
+            this->v_expression.emplace_back(std::in_place_type<LEC_COEF>, std::move(name));
             break;
         }
         default :
@@ -66,15 +67,16 @@ int CLEC::save_var(TOKEN& token)
             // if special constant (pi, e, etc.)
             if(is_val(type))
             {
-                this->v_expression.push_back(LEC_VAL_FN(type));
+                this->v_expression.emplace_back(std::in_place_type<LEC_VAL_FN>, type);
                 break;
             }
 
             // IODE Variable
             if(type == L_VAR || type == L_VART)
             {
-                add_coef_or_var_name(name);
-                this->v_expression.push_back(LEC_VAR(type, name, 0, Period()));
+                std::string name(token.name);
+                add_coef_or_var_name(name, false);
+                this->v_expression.emplace_back(std::in_place_type<LEC_VAR>, type, std::move(name), 0, Period());
                 break;
             }
 
@@ -513,6 +515,9 @@ int CLEC::parse(const bool side_of_eq)
     // reset global variables
     L_errno = 0;
     this->v_expression.clear();
+    // rough upper estimate of the number of atomic elements to limit reallocations 
+    // (without over-allocating: the CLEC objects are kept in memory)
+    this->v_expression.reserve(this->lec.size() / 3 + 4);
 
     // NOTE: if the LEC expression is the left or right side of an equation, 
     //       we don't reset the name vectors

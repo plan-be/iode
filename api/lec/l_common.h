@@ -178,6 +178,9 @@ protected:
         : type(type), is_executable(is_executable) {}
     
     LEC_ABSTRACT(const LEC_ABSTRACT& other) = default;
+    LEC_ABSTRACT(LEC_ABSTRACT&& other) noexcept = default;
+    LEC_ABSTRACT& operator=(const LEC_ABSTRACT& other) = default;
+    LEC_ABSTRACT& operator=(LEC_ABSTRACT&& other) noexcept = default;
 
     bool is_same_type(const LEC_ABSTRACT& other) const
     {
@@ -189,11 +192,6 @@ struct LEC_ABSTRACT_VALUE: public LEC_ABSTRACT
 {
 protected:
     LEC_ABSTRACT_VALUE(const int type) : LEC_ABSTRACT(type, false) {}
-
-    LEC_ABSTRACT_VALUE(const LEC_ABSTRACT_VALUE& other) = default;
-
-public:
-    ~LEC_ABSTRACT_VALUE() override = default;
 };
 
 struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
@@ -207,11 +205,6 @@ struct LEC_ABSTRACT_EXECUTABLE: public LEC_ABSTRACT
 protected:
     LEC_ABSTRACT_EXECUTABLE(const int type, const int nb_args) 
         : LEC_ABSTRACT(type, true), nb_args(nb_args), pos(-1) {}
-    
-    LEC_ABSTRACT_EXECUTABLE(const LEC_ABSTRACT_EXECUTABLE& other) = default;
-
-public:
-    ~LEC_ABSTRACT_EXECUTABLE() override = default;
 };
 
 struct LEC_OTHER: public LEC_ABSTRACT
@@ -266,10 +259,6 @@ public:
                 break;
         }
     }
-
-    LEC_OTHER(const LEC_OTHER& other) = default;
-
-    ~LEC_OTHER() override = default;
 
     bool operator==(const LEC_OTHER& other) const
     {

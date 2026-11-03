@@ -51,11 +51,12 @@ struct CLEC: public AbstractCLEC
     
 private:
     /**
-     * Adds a series or scalar name to its corresponding vector.
+     * Adds a series or scalar name to its corresponding vector (if not already present).
      * 
-     * @param [in]     name    std::string   VAR or Scalar name
+     * @param [in]     name     std::string   VAR or Scalar name
+     * @param [in]     is_coef  bool          true if name is a scalar name, false if it is a variable name
      */
-    void add_coef_or_var_name(const std::string& name);
+    void add_coef_or_var_name(const std::string& name, const bool is_coef);
 
     /**
      * First step of linking CLEC to KDBs: each variable and scalar name is searched in the KDB's
@@ -182,7 +183,8 @@ private:
      */
     int analyze_lag();
 
-    /**     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
+    /** 
+     *  First step of LEC compilation. L_YY (see l_token.c) is the open stream containing the analyzed LEC expression.
      *  
      *  At the end of this function, v_expression, v_var_names and v_coeff_names are filled.
      *  
