@@ -348,7 +348,7 @@ bool KDBEquations::load_asc(const std::string& filename)
                 std::string key = this->to_key(name);
                 try
                 {
-                    kmsg("Reading object %d : %s", cmpt, (char*) key.c_str());
+                    kmsg("Reading object %d : %s", cmpt+1, (char*) key.c_str());
                     this->add_obj_ptr(key, eq_ptr);
                     cmpt++;
                 }

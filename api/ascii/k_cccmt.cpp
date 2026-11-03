@@ -130,7 +130,7 @@ bool KDBComments::load_asc(const std::string& filename)
             case YY_WORD :
                 yy->yy_text[K_MAX_NAME] = 0;
                 strcpy(name, (char*) yy->yy_text);
-                kmsg("Reading object %d : %s", cmpt, name);
+                kmsg("Reading object %d : %s", cmpt+1, name);
                 rc = read_cmt(*this, yy, name);
                 if(rc == 0) 
                     cmpt++;

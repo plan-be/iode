@@ -218,6 +218,8 @@ protected:
 
     bool take_backup(const std::string& filepath);
 
+    virtual void reserve(const int nb_objs) = 0;
+
 public:
     // global or standalone database
     KDB(const IodeType type, const bool is_global) : KDBInfo(type, is_global) {}
@@ -515,6 +517,11 @@ private:
         return success;
     }
 
+    void reserve(const int nb_objs)
+    {
+        this->k_objs.reserve(nb_objs);
+    }
+
 protected:
     std::shared_ptr<D> get_top_level_db()
     {
@@ -764,7 +771,7 @@ public:
 
     void add_obj_ptr(const std::string& key, std::shared_ptr<T> obj_ptr)
     {
-        this->k_objs[key] = obj_ptr;
+        this->k_objs.insert_or_assign(key, std::move(obj_ptr));
         obj_names.insert(key);
     }
 

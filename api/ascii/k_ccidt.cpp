@@ -93,7 +93,7 @@ bool KDBIdentities::load_asc(const std::string& filename)
                 std::string key = this->to_key(name);
                 try
                 {
-                    kmsg("Reading object %d : %s", cmpt, (char*) key.c_str());
+                    kmsg("Reading object %d : %s", cmpt+1, (char*) key.c_str());
                     std::shared_ptr<Identity> idt_ptr = std::make_shared<Identity>(lec);
                     this->add_obj_ptr(key, idt_ptr);
                     cmpt++;

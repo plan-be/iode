@@ -231,9 +231,8 @@ char* KDBEquations::sub_convert_obj_version(char* npack, const std::string& name
 {
     char *pack = NULL;
 
-    Equation* eq = binary_to_eqs(npack, name);
-    eq->to_binary(&pack);
-    delete eq;
+    std::shared_ptr<Equation> eq_ptr = binary_to_eqs(npack, name);
+    eq_ptr->to_binary(&pack);
 
     return pack;
 }
@@ -259,8 +258,7 @@ char* KDBScalars::sub_convert_obj_version(char* npack, const std::string& name, 
 
     if(vers == 2) 
         return npack;
-            
-    int nb = 3;
+    
     float* f = (float*) P_get_ptr(npack, 0);
 
     Scalar scl;
@@ -290,9 +288,8 @@ char* KDBTables::sub_convert_obj_version(char* npack, const std::string& name, c
 {
     char *pack = NULL;
 
-    Table* tbl = binary_to_tbl(npack);
-    pack = K_repack_tbl(tbl);
-    delete tbl;
+    std::shared_ptr<Table> tbl_ptr = binary_to_tbl(npack);
+    pack = K_repack_tbl(tbl_ptr.get());
 
     return pack;
 }

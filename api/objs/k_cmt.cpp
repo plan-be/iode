@@ -7,8 +7,7 @@ bool KDBComments::binary_to_obj(const std::string& name, char* pack)
     size_t len = (size_t) P_get_len(pack, 0);
     char* value = new char[len];
     strncpy(value, (char*) P_get_ptr(pack, 0), len);
-    std::string cmt(value);
-    std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>(cmt);
+    std::shared_ptr<Comment> cmt_ptr = std::make_shared<Comment>(value);
     this->add_obj_ptr(name, cmt_ptr);
     return true;
 }

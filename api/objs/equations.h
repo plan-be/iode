@@ -643,7 +643,7 @@ public:
     }
 };
 
-Equation* binary_to_eqs(char* pack, const std::string& name);
+std::shared_ptr<Equation> binary_to_eqs(char* pack, const std::string& name);
 
 // Custom specialization of std::hash can be injected in namespace std.
 template<>
