@@ -112,12 +112,8 @@ public:
 		this->step = step;
 	}
 
-	Period(const Period& other)
-	{
-		this->year = other.year;
-		this->periodicity = other.periodicity;
-		this->step = other.step;
-	}
+	// NOTE: default -> Period is trivially copyable (memcpy-safe) and nothrow movable
+	Period(const Period& other) = default;
 
 	Period(const std::string& str_period)
 	{
