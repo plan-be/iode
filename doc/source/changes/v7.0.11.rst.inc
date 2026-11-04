@@ -26,6 +26,9 @@ Fixed Bugs
 - PYTHON: Speed up simulation process (loop over the years) after 
   a significant slowness introduced in version 7.0.5 (:issue:`1256`)
 
+- IODE REPORT + PYTHON: allowed to use empty IODE lists in Python script or 
+  IODE reports except when creating subsets of IODE workspaces (closes :issue:`1341`) 
+
 
 Miscellaneous 
 -------------

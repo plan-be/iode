@@ -316,13 +316,14 @@ public:
         if(pattern == "*")
             return get_names();
 
-        std::string error_msg = "No names found matching the pattern '" + pattern + "'";
-        
-        // Retrieves all object names matching one or more patterns in the 
+        // Retrieves all object names matching one or more patterns in the
         // global or standalone database (similar to grep)
         std::string lst = this->expand(pattern, '*');
         if(lst.empty())
+        {
+            std::string error_msg = "No names found matching the pattern '" + pattern + "'";
             throw std::runtime_error(error_msg);
+        }
         
         // Parses a string and replaces @filename and $listname by their contents
         std::vector<std::string> v_names = expand_args(lst, 0);
@@ -346,10 +347,7 @@ public:
                 names.insert(key);
         }
 
-        if(names.size() == 0)
-            throw std::runtime_error(error_msg);
-        
-        return names; 
+        return names;
     }
 
     virtual bool rename(const std::string& old_name, const std::string& new_name, 
@@ -736,7 +734,13 @@ public:
             error_msg += ":\n" + std::string(e.what()) + " in the parent database";
             throw std::runtime_error(error_msg);
         }
-    
+
+        if(!pattern.empty() && subset_keys.empty())
+        {
+            error_msg += ":\nNo names found matching the pattern '" + pattern + "' in the parent database";
+            throw std::runtime_error(error_msg);
+        }
+
         // NOTE : if the parent database is already a subset, we need to get 
         //        the top-level database
         std::shared_ptr<D> true_parent = this->get_top_level_db();
