@@ -178,6 +178,25 @@ TEST_F(KDBListsTest, Filter)
     kdb_subset->clear();
 }
 
+TEST_F(KDBListsTest, FilterEmptyList)
+{
+    // EMPTY represents an empty IODE list
+    global_ws_lst->add("EMPTY", "");
+    EXPECT_TRUE(global_ws_lst->contains("EMPTY"));
+    EXPECT_EQ(global_ws_lst->get("EMPTY"), "");
+
+    // filter_names() must not throw an error and return an empty set of names
+    std::set<std::string> names;
+    EXPECT_NO_THROW(names = global_ws_lst->filter_names("$EMPTY"));
+    EXPECT_TRUE(names.empty());
+
+    // get_subset() must throw an error if no names match the pattern
+    EXPECT_THROW(global_ws_lst->get_subset("$EMPTY", false), std::runtime_error);
+    EXPECT_THROW(global_ws_lst->get_subset("$EMPTY", true), std::runtime_error);
+
+    global_ws_lst->remove("EMPTY");
+}
+
 TEST_F(KDBListsTest, DeepCopy)
 {
     std::string pattern = "C*";
