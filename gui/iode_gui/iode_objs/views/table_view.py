@@ -505,9 +505,12 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
         nb_periods = len(columns)
         try:
             # columns = periods
-            periods = [Period(period.strip()) for period in columns]
+            columns = [period.strip() for period in columns]
+            # integer values (e.g. '2000') -> yearly periods (e.g. '2000Y1')
+            columns = [period + "Y1" if period.isdigit() else period for period in columns]
+            periods = [Period(period) for period in columns]
             # if range of contiguous periods -> tuple (from_period, to_period)
-            if columns == Sample(periods[0], periods[-1]).periods:
+            if periods == Sample(periods[0], periods[-1]).periods:
                 periods = slice(periods[0], periods[-1], 1)
         # columns = values of the first variable ?
         except:
@@ -517,10 +520,10 @@ class VariablesView(IodeAbstractTableView, NumericalTableView):
             from_period, to_period = sample
             paste_sample = Sample(from_period, to_period)
             # check that the passed sample has the size equal to len(cells) - 1
-            if len(periods) != nb_periods:
-                QMessageBox.warning(None, "WARNING", "Can't paste values.\n" + 
-                                    f"The sample '{str(paste_sample)}' of the values to paste does not " + 
-                                    f"correspond to the number of values per variable: '{len(nb_periods)}'")
+            if len(paste_sample) != nb_periods:
+                QMessageBox.warning(None, "WARNING", "Can't paste values.\n" +
+                                    f"The sample '{str(paste_sample)}' of the values to paste does not " +
+                                    f"correspond to the number of values per variable: '{nb_periods}'")
                 return
             periods = slice(from_period, to_period, 1)
         

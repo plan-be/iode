@@ -210,7 +210,19 @@ class VariablesModel(IodeAbstractTableModel, IodeNumericalTableModel):
     
     def paste(self, names: List[str], periods: Union[slice, List[Any]], 
               values: Union[np.ndarray, List[List[float]]]):
+        nb_variables_before = len(self._database)
         variables[names, periods] = values
+
+        # The values are pasted directly in the IODE Variables database (not via setData())
+        # -> the view must be notified explicitly that the displayed values have changed
+        if len(self._database) != nb_variables_before:
+            # new variables have been added -> the number of rows has changed
+            self.reset()
+            self.database_modified.emit()
+        elif self.rowCount() > 0 and self.columnCount() > 0:
+            top_left = self.index(0, 0)
+            bottom_right = self.index(self.rowCount() - 1, self.columnCount() - 1)
+            self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.DisplayRole])
 
     @Slot()
     def update_display_values(self):

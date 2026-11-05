@@ -17,6 +17,11 @@ Improvements
 - PYTHON: speed up loading of *comments*, *equations*, *identities*, *lists* and 
   *tables* workspaces.
 
+- GUI: when copy/pasting Variables values from an Excel file to the Variables view: 
+  1. accept periods to be passed as integers if they represent years 
+  2. accept to paste only names and values without periods (in that case, the GUI 
+  asks for the periods range) (closes :issue:`1343`)
+
 Fixed Bugs 
 ----------
 
@@ -29,6 +34,7 @@ Fixed Bugs
 - IODE REPORT + PYTHON: allowed to use empty IODE lists in Python script or 
   IODE reports except when creating subsets of IODE workspaces (closes :issue:`1341`) 
 
+- GUI: refresh the Variables view when copy/pasting values from an Excel file
 
 Miscellaneous 
 -------------
