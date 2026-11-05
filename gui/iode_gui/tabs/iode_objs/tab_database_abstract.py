@@ -396,3 +396,14 @@ class AbstractIodeObjectWidget(IodeAbstractWidget):
         Slot to handle the database modification.
         """
         self.set_modified(True)
+
+    @Slot()
+    def database_values_modified(self):
+        """
+        Slot to handle the modification of values of existing IODE objects (e.g. editing a cell).
+
+        The list of IODE objects is unchanged -> no need to filter and reset the model
+        (resetting the model makes the view scroll back to the top).
+        """
+        self.modified = True
+        self.tab_database_modified.emit(self.iode_type, True)
