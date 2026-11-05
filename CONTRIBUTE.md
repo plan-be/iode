@@ -31,12 +31,13 @@ Required tools:
     - numpy >= 2.4
     - pandas >= 3.0
     - larray
-  - For testing: 
-    - pytest
   - For running the iode-gui package:
     - pyqt
     - qtconsole
     - ipython
+  - For testing: 
+    - pytest
+    - pytest-qt
   - For building the user documentation:
     - sphinx 
     - numpydoc
@@ -138,11 +139,19 @@ To build the Python module for IODE (Cython), please:
 (py312) (...)iode> makepy.bat
 ```
 
+Before to work on any issue related to the GUI (Python), you have to convert the 
+Qt Designer files *.ui and the Qt resource files *.qrc to Python scripts.
+To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
+```bash
+root_dir_iode> cd gui
+gui> python convert_ui_files_to_py.py
+```
+
 # Testing Project
 
-## C And C++ API
+## C++ API
 
-To test the C++ API, you first have to build them as explain above:
+To test the C++ API, you have to first build them as explain above:
 ```bash
 > cmake --build --preset <preset_config> --target iode_c_api
 ```
@@ -159,30 +168,39 @@ The final and third step is to ask CMake to run the tests:
 ```
 
 ## Python API
-To test the Python API:
 
-You first have to build it and install it locally.
-In a console, go to *pyiode* directory and type:
+To test the Python API, you have to first build the C++ API and Cython 
+extension in the `RELEASE` mode:
 ```bash
-root_dir_iode> cd pyiode
-pyiode> pip install .
+> cmake --preset windows-release
+> cmake --build --preset windows-release --target iode_c_api
+> cmake --build --preset windows-release --target iode_cython
 ```
-Note: you must have cython, numpy, pandas, larray, scikit-build-core and pytest installed.
+Note: you must have cython, numpy, pandas, larray, scikit-build-core installed.
 
-Once `iode` is installed, run `pytest` from *pyiode* directory :
+The second step is to run `pytest` from the *pyiode* directory :
 ```bash
 root_dir_iode> cd pyiode
 pyiode> pytest
 ```
+Note: you must have pytest installed.
 
-**Note**: to only create the wheel file, type:
+## GUI
+
+Before testing the GUI, you have to regenerate the Python scripts associated 
+with the Qt Designer files *.ui and the Qt resource files *.qrc.
+To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
 ```bash
-pyiode> pip wheel .
+root_dir_iode> cd gui
+gui> python convert_ui_files_to_py.py
 ```
-The, to install the wheel file, type:
+
+To test the GUI, run `pytest` from the *gui* directory :
 ```bash
-pyiode> pip install <iode-wheel-file>.whl
+pyiode> pytest
 ```
+Note: you must have numpy, pandas, matplotlib, iode, pyqt (PyQt6), qtpy, 
+qtconsole, ipython, pytest and pytest-qt installed.
 
 # Python API
 

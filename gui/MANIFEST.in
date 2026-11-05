@@ -9,6 +9,7 @@ graft iode_gui/doc
 
 exclude CMakeLists.txt
 exclude *.py
+exclude iode_gui/tests
 global-exclude *.ui *.in *.cpp *.h
 prune legacy
 prune *.egg-info

@@ -99,7 +99,3 @@ addopts = ["--doctest-modules",
 testpaths = ["./iode"]
 log_cli = "True"
 log_cli_level = "INFO"
-
-# Run pytest to ensure that the package was correctly built
-test-command = "pytest"
-test-requires = "pytest"
