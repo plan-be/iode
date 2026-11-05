@@ -1670,8 +1670,13 @@ def test_to_frame_timeit():
 # MISC 
 # ----
 
-def test_super(capsys):
+def test_super(capsys, monkeypatch):
     from iode.super import register_super_function, backup_super_functions, restore_super_functions
+
+    # the default 'information' super function calls input() to wait for the user.
+    # Reading from stdin raises an OSError when pytest captures the output
+    # -> replace input() by a function which only prints the prompt
+    monkeypatch.setattr("builtins.input", lambda prompt="": print(prompt, end="") or "")
 
     comments.load(f"{SAMPLE_DATA_DIR}/fun.cmt")
     equations.load(f"{SAMPLE_DATA_DIR}/fun.eqs")
@@ -1732,6 +1737,8 @@ def test_super(capsys):
     @register_super_function('confirm')
     def confirm_super_test(msg: str) -> int:
         print(f"CONFIRM: {msg}")
+        # 0 = 'yes' -> $ask jumps to the label
+        return 0
 
     # $ask <label> <question> calls the super function 'confirm' 
     commands =  "$ask yes Is it true?\n"

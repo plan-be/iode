@@ -56,9 +56,14 @@ def test_iode_print_preferences():
     set_RTF_preferences()
     set_HTML_preferences()
 
-def test_iode_errors_warnings_messages_from_C_API(capsys):
-    from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm, 
+def test_iode_errors_warnings_messages_from_C_API(capsys, monkeypatch):
+    from iode.iode_cython import (iode_error, iode_warning, iode_msg, iode_confirm,
                                   iode_pause, iode_information)
+
+    # the default 'information' super function calls input() to wait for the user.
+    # Reading from stdin raises an OSError when pytest captures the output
+    # -> replace input() by a function which only prints the prompt
+    monkeypatch.setattr("builtins.input", lambda prompt="": print(prompt, end="") or "")
 
     with pytest.raises(RuntimeError) as excinfo:
         iode_error(message='test error')
