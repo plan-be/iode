@@ -56,9 +56,12 @@ iode_gui = ["tests/**/*"]
 find = {namespaces = false}
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 addopts = ["--doctest-continue-on-failure", 
            "--verbose"]
 testpaths = ["./iode_gui"]
+# add the 'gui' directory to sys.path so that the 'iode_gui' package 
+# can be imported by the tests
+pythonpath = ["."]
 log_cli = "True"
 log_cli_level = "INFO"

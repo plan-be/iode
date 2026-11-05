@@ -91,7 +91,7 @@ wheel.py-api = "cp312"
 build-verbosity = 1
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 addopts = ["--doctest-modules",
            "--doctest-continue-on-failure", 
            "--durations=0", 
