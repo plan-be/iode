@@ -220,7 +220,17 @@ class NumericalTableView:
         """
         if self.allow_to_paste:
             try:
-                start_index: QModelIndex = self.selectionModel().selectedIndexes()[0]
+                # paste from the top-left cell of the selection (or the current cell if nothing is selected).
+                # NOTE: the order of the indexes returned by selectedIndexes() is not guaranteed
+                selected_indexes: List[QModelIndex] = self.selectionModel().selectedIndexes()
+                if selected_indexes:
+                    start_row = min(index.row() for index in selected_indexes)
+                    start_column = min(index.column() for index in selected_indexes)
+                else:
+                    current_index: QModelIndex = self.currentIndex()
+                    if not current_index.isValid():
+                        return
+                    start_row, start_column = current_index.row(), current_index.column()
                 _model: IodeAbstractTableModel = self.model()
 
                 clipboard = QApplication.clipboard()
@@ -237,16 +247,16 @@ class NumericalTableView:
                 cells = [line.split("\t") for line in lines]
                 cells = [[_model.string_to_float(value) for value in row] for row in cells]
 
-                ok = True
-                for i, row in enumerate(cells):
-                    for j, value in enumerate(row):
-                        row = start_index.row() + i
-                        column = start_index.column() + j
+                for i, row_values in enumerate(cells):
+                    for j, value in enumerate(row_values):
+                        row = start_row + i
+                        column = start_column + j
                         index = _model.index(row, column)
                         if index.isValid():
-                            ok = _model.setData(index, value, Qt.EditRole)
-                            if not ok:
-                                return
+                            # NOTE: setData() returns False if the new value is equal to the current one
+                            #       (or if an error occurred, in which case a warning box is already shown)
+                            #       -> do not check the return boolean value by setData()
+                            _model.setData(index, value, Qt.ItemDataRole.EditRole)
                         else:
                             raise IndexError(f"Invalid index at row {row} and column {column}")
             except Exception as e:
