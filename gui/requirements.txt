@@ -1,0 +1,12 @@
+# runtime dependencies of the iode-gui package
+# (see 'dependencies' in gui/pyproject.toml.in)
+numpy>=2.4
+pandas>=3.0
+matplotlib
+iode
+PyQt6
+qtpy
+qtconsole
+ipython
+pytest
+pytest-qt

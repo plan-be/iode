@@ -36,12 +36,7 @@ classifiers = [
 
 
 # runtime dependency specification
-dependencies = [ "numpy>=2.4", "pandas>=3.0", "matplotlib", "iode", "qtpy", "qtconsole", "ipython" ]
-
-[project.optional-dependencies]
-test = ["pytest"]
-pyside6 = ["pyside6"]
-pyqt = ["pyqt"]
+dependencies = [ "numpy>=2.4", "pandas>=3.0", "matplotlib", "iode", "pyqt", "qtpy", "qtconsole", "ipython" ]
 
 [project.gui-scripts]
 iode-gui = "iode_gui.main:start"
@@ -50,9 +45,20 @@ iode-gui = "iode_gui.main:start"
 Homepage = "${CMAKE_PROJECT_HOMEPAGE_URL}"
 
 [tool.setuptools.package-data]
-iode_gui = ["resources/*"]
+iode_gui = ["resources/**/*", "doc/*"]
+
+[tool.setuptools.exclude-package-data]
+iode_gui = ["tests/**/*"]
 
 [tool.setuptools.packages]
 # Disable implicit namespaces -> This will prevent any folder without 
 # an __init__.py file from being scanned
 find = {namespaces = false}
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = ["--doctest-continue-on-failure", 
+           "--verbose"]
+testpaths = ["./iode_gui"]
+log_cli = "True"
+log_cli_level = "INFO"

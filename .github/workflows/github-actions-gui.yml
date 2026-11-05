@@ -1,0 +1,70 @@
+name: Test GUI
+
+on: 
+  # line below makes jobs defined in this script (workflow) reusable
+  # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  workflow_call
+
+jobs:
+    build_gui:
+        name: Test GUI for IODE
+        runs-on: windows-latest
+        env:
+            build-config: windows-release
+        
+        steps:
+          - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+          - run: echo "This job is now running on a ${{ runner.os }} server"
+          - run: echo "The name of the repository is ${{ github.repository }}."
+          - run: echo "The target branch of the current pull request is ${{ github.base_ref }}."
+          - run: echo "The source branch of the current pull request is ${{ github.head_ref }}."
+          - run: echo "The workspace directory is ${{ github.workspace }}."
+          - name: Checkout repository code
+            uses: actions/checkout@v2
+          - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+          - name: Install dependencies on windows
+            if: runner.os == 'Windows'
+            shell: bash
+            run: |
+              choco install ninja
+              ninja --version
+              cmake --version
+          - name: Add cl.exe to PATH
+            if: runner.os == 'Windows'
+            # See https://github.com/marketplace/actions/enable-developer-command-prompt
+            uses: ilammy/msvc-dev-cmd@v1
+            with:
+              arch: x64
+          - name: Print preset config
+            run: echo "${{ env.build-config }}"
+          - name: Configure CMake
+            # cmake --preset <configurePreset> where <configurePreset> is the name of the active Configure Preset.
+            # see CMakePresets.json file
+            # for more details about cmake preset:
+            #   - https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
+            #   - https://docs.microsoft.com/en-us/cpp/build/cmake-presets-vs?view=msvc-170
+            run: | 
+              cmake --version
+              cmake --preset ${{ env.build-config }}
+          - name: Configure Conda
+            uses: conda-incubator/setup-miniconda@v3
+            with:
+              # channels: conda-forge, defaults
+              python-version: "3.14"
+              auto-update-conda: true
+              auto-activate-base: true
+              activate-environment: true
+          - name: Check conda
+            shell: bash -el {0}
+            run: conda info
+          - name: Install Python libraries
+            shell: bash -el {0}
+            run: |
+                pip install -r gui/requirements.txt
+          - name: Test GUI
+            shell: bash -el {0}
+            run: |
+              cd gui 
+              python convert_ui_files_to_py.py
+              pytest
+        
