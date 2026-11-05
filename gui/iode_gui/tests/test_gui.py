@@ -1,7 +1,8 @@
 import pytest
 import pytestqt
 
-from qtpy.QtWidgets import QMessageBox
+from qtpy.QtCore import Qt, QItemSelection, QItemSelectionModel
+from qtpy.QtWidgets import QMessageBox, QApplication
 
 from iode import variables, VarsMode
 from iode_gui.iode_objs.models.table_model import VariablesModel
@@ -73,3 +74,31 @@ def test_variables_view_paste_special(variables_view, monkeypatch):
     assert len(warnings) == 1
     assert "2001Y1:2002Y1" in warnings[0][2]
     assert [variables["A", p] for p in ["2001Y1", "2002Y1", "2003Y1"]] == [21.0, 22.0, 23.0]
+
+
+def test_variables_view_paste(variables_view, qtbot, monkeypatch):
+    view: VariablesView = variables_view
+    model: VariablesModel = view.model()
+
+    warnings = []
+    monkeypatch.setattr(QMessageBox, "warning", lambda *args, **kwargs: warnings.append(args))
+
+    # select the block A[2001Y1:2002Y1] - B[2001Y1:2002Y1] (paste starts from the top-left cell)
+    selection = QItemSelection(model.index(0, 1), model.index(1, 2))
+    view.selectionModel().select(selection, QItemSelectionModel.SelectionFlag.Select)
+
+    # ---- values copied from Excel (tab-separated, '\r\n' line endings) ----
+    # NOTE: the first value is equal to the current value (0) -> the paste must not stop
+    QApplication.clipboard().setText("0\t2\r\n3\t4\r\n")
+    with qtbot.waitSignal(model.dataChanged, timeout=1000):
+        view.paste()
+    assert not warnings
+    assert [variables["A", p] for p in ["2000Y1", "2001Y1", "2002Y1", "2003Y1"]] == [0.0, 0.0, 2.0, 0.0]
+    assert [variables["B", p] for p in ["2000Y1", "2001Y1", "2002Y1", "2003Y1"]] == [0.0, 3.0, 4.0, 0.0]
+    assert model.data(model.index(1, 2), Qt.ItemDataRole.DisplayRole) == "4.00"
+
+    # ---- more values than available columns -> warning ----
+    QApplication.clipboard().setText("\t".join(["1"] * 10))
+    view.paste()
+    assert len(warnings) == 1
+    assert "Invalid index" in warnings[0][2]

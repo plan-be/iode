@@ -36,5 +36,9 @@ Fixed Bugs
 
 - GUI: refresh the Variables view when copy/pasting values from an Excel file
 
+- GUI: fixed pasting Variables values (CTRL + V) copied from an Excel file 
+  (which stopped silently as soon as a pasted value was equal to the value 
+  already in its cell)
+
 Miscellaneous 
 -------------
