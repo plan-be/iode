@@ -24,7 +24,9 @@ class CommentsWidget(AbstractIodeObjectWidget):
         """
         super().__init__(IodeType.COMMENTS, parent)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -39,7 +41,9 @@ class EquationsWidget(AbstractIodeObjectWidget):
     def __init__(self, parent):
         super().__init__(IodeType.EQUATIONS, parent)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -71,7 +75,9 @@ class IdentitiesWidget(AbstractIodeObjectWidget):
 
         self.lineEdit_idt_sample.textChanged.connect(self.database_view.set_execution_sample)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -109,7 +115,9 @@ class ListsWidget(AbstractIodeObjectWidget):
     def __init__(self, parent):
         super().__init__(IodeType.LISTS, parent)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -131,7 +139,9 @@ class ScalarsWidget(AbstractIodeObjectWidget, NumericalWidget):
 
         self.vertical_layout.addLayout(self.bottom_layout)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -160,7 +170,9 @@ class TablesWidget(AbstractIodeObjectWidget):
     def __init__(self, parent):
         super().__init__(IodeType.TABLES, parent)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
@@ -235,7 +247,9 @@ class VariablesWidget(AbstractIodeObjectWidget, NumericalWidget):
         self.shortcut_mode_plus.activated.connect(self.next_mode)
         self.shortcut_mode_minus.activated.connect(self.previous_mode)
 
-        self.database_model.dataChanged.connect(self.database_modified)
+        # NOTE: editing a cell does not add, rename or remove variables -> do not reset the model
+        #       (which would make the view scroll back to the top)
+        self.database_model.dataChanged.connect(self.database_values_modified)
         self.database_model.headerDataChanged.connect(self.database_modified)
         self.database_model.rowsInserted.connect(self.database_modified)
         self.database_model.rowsRemoved.connect(self.database_modified)
