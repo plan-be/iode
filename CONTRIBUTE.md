@@ -83,10 +83,11 @@ Archived C/C++ targets (no longer compiled or used):
 
 # Repository Structure
 
-- **.github\workflows**: Script for Github Actions (Tests + Build GUI + Build LaTeX doc)
-- **api**: C API
-- **doc**: User documentation
-- **gui**: Qt GUI
+- **.github\workflows**: Scripts for Github Actions (build and test the C/C++ API, the Python API and the GUI, build the user documentation, create a release)
+- **api**: C/C++ API
+- **archives**: Archived code (old C++ Qt GUI, nanobind binding, NSIS installer, ...) — no longer compiled or used
+- **doc**: User documentation (Sphinx) and change log files
+- **gui**: Qt GUI (Python)
 - **pyiode**: Python module of IODE (Cython)
 - **scr4**: Utility functions required to compile the C API
 - **tests**: Testing directory
@@ -123,7 +124,9 @@ where `<target>` is one the item in the list below:
 - `iode_scr4`          -> C library providing many of the utility functions used in the C API.
 - `iode_c_api`         -> Core API of IODE (in pure C).
 - `iode_cython`        -> Cython wrapper for the C/C++ API.
-- `test_c_api`         -> Builds the tests for the C API (based on Google Test).
+- `test_debug_c_api` / `test_release_c_api`     -> Builds the tests for the C/C++ API (based on Google Test).
+- `test_debug_big_files` / `test_release_big_files` -> Builds the tests on big databases.
+- `test_all`           -> Builds both test targets above (for the current build mode).
 - `iode_doc`           -> Builds the user documentation (using Python Sphinx)
 - `keyboard_shortcuts` -> Builds the PDF referencing all the keyboard shortcuts in the GUI (required LaTeX).
 
@@ -140,7 +143,7 @@ To build the Python module for IODE (Cython), please:
 ```
 
 Before to work on any issue related to the GUI (Python), you have to convert the 
-Qt Designer files *.ui and the Qt resource files *.qrc to Python scripts.
+Qt Designer files *.ui to Python scripts.
 To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
 ```bash
 root_dir_iode> cd gui
@@ -158,13 +161,23 @@ To test the C++ API, you have to first build them as explain above:
 
 The second step is to build the tests:
 ```bash
-> cmake --build --preset <preset_config> --target test_c_api
+> cmake --build --preset <preset_config> --target test_all
 ```
 
 The final and third step is to ask CMake to run the tests:
 ```bash
 > ctest --preset c-api-<preset_config>
-> ctest --preset cpp-api-<preset_config>
+```
+
+To run a single test or group of tests, call the test executable directly with a Google Test filter:
+```bash
+> out\build\<preset_config>\tests\test_c_api\test_<debug|release>_c_api.exe --gtest_filter=KDBVariablesTest.*
+```
+
+The tests on big databases require to first generate the big databases:
+```bash
+> python tests/test_big_files/generate_big_vars_ws.py
+> ctest --preset cpp-api-<preset_config>-big-databases
 ```
 
 ## Python API
@@ -188,7 +201,7 @@ Note: you must have pytest installed.
 ## GUI
 
 Before testing the GUI, you have to regenerate the Python scripts associated 
-with the Qt Designer files *.ui and the Qt resource files *.qrc.
+with the Qt Designer files *.ui.
 To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
 ```bash
 root_dir_iode> cd gui
@@ -197,7 +210,7 @@ gui> python convert_ui_files_to_py.py
 
 To test the GUI, run `pytest` from the *gui* directory :
 ```bash
-pyiode> pytest
+gui> pytest
 ```
 Note: you must have numpy, pandas, matplotlib, iode, pyqt (PyQt6), qtpy, 
 qtconsole, ipython, pytest and pytest-qt installed.
@@ -249,7 +262,7 @@ pyiode> python -m build --sdist --wheel
 Once the SDist tarfile and Wheel files have been generated, the `iode` package can be 
 tested by installing it locally:
 ```bash
-pyiode> pip install sdist/<iode-weel-file>.
+pyiode> pip install dist/<iode-wheel-file>
 ```
 
 Then, run *pytest* from the root directory:
@@ -342,7 +355,7 @@ Note: this trick has been found on StackOverflow [here](https://stackoverflow.co
 # GUI (Python)
 
 Before to work on any issue related to the GUI (Python), you have to convert the 
-Qt Designer files *.ui and the Qt resource files *.qrc to Python scripts.
+Qt Designer files *.ui to Python scripts.
 To do so, you have to run the Python script `convert_ui_files_to_py.py`: 
 ```bash
 root_dir_iode> cd gui
@@ -374,7 +387,7 @@ gui> python -m build --sdist --wheel
 Once the SDist tarfile and Wheel files have been generated, the `iode-gui` package can be 
 tested by installing it locally:
 ```bash
-gui> pip install sdist/<iode-gui-weel-file>.
+gui> pip install dist/<iode-gui-wheel-file>
 ```
 
 Then, run *iode-gui* from any terminal:
@@ -407,15 +420,14 @@ The name of the branch must follow the template: \<your initials\>\_\<keyword\>\
 where `keyword` is:
 - `gui` when working on the graphical user interface
 - `python` when working on the Python binding for IODE
-- `doc` when working on the user of dev documentation
-- `nsis` when working on the Windows Installer and Updater
+- `doc` when working on the user or dev documentation
 - `release` when preparing a new release 
 
 Each keyword triggers a specific job in the defined Github Actions workflows (see below).
 If none of the keywords above is used, the C and C++ API will be built and tested.
 
 **IMPORTANT**: Do not forget to update the change log file of the current version. 
-The change log files for each version are located in the directory doc/changes.
+The change log files for each version are located in the directory doc/source/changes.
 
 # Create A Release
 
@@ -426,15 +438,16 @@ The change log files for each version are located in the directory doc/changes.
 3. Rerun all Jupyter notebooks in the directory doc/source/tutorial (make sure that 
    the kernel is running with the version of *iode* to be released).
 4. Commit your changes. 
-5. Replace "In development" in the last change log file (directory doc/changelog/versions) by "Released on `<current date>`".
+5. Replace "In development" in the last change log file (directory doc/source/changes) by "Released on `<current date>`".
 6. Commit your changes (the commit message should be something like `RELEASE: released version <tag>`)
 7. Create an annotated tag on the new commit.
-   The name of the tag is the name of the last change log file in doc/changelog/versions (`v<major>.<minor>.<patch>(-beta.<beta>)`).
+   The name of the tag is the name of the last change log file in doc/source/changes (`v<major>.<minor>.<patch>(-beta.<beta>)`).
    The annotation should be something like `RELEASE: release <tag> on <current date>`.
 
 ## Push The New Tag To Github
 
 Push the tag to Github: git push origin <tag_name>.
+Pushing a tag matching `v*.*.*` triggers the workflow `github-actions-release.yml` which creates a new release on Github.
 
 ## Buid and Test the Python packages
 
@@ -480,7 +493,7 @@ root_dir_iode> python -m pytest --pyargs iode --doctest-modules --doctest-contin
 To test the new version of *iode-gui*, first reinstall from the new Wheel file:
 ```bash
 root_dir_iode> cd gui
-gui> pip uninstall iode
+gui> pip uninstall iode-gui
 gui> pip install dist\iode_gui-x.x.x-(...).whl
 gui> cd ..
 ```
@@ -546,8 +559,8 @@ root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noar
 ## After the release
 
 1. Update the version number in the root CMakeLists.txt file (in project(...)). Check that the version has been updated everywhere in the project.
-2. In the directory doc/changelog/versions, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
-3. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` to the changes.rst file in the directory doc/changelog.
+2. In the directory doc/source/changes, create a copy of the template.rst.inc file and named it as <next_version_tag>.rst.inc.
+3. Add the line `.. include:: ./changes/<next_version_tag>.rst.inc` at the top of the list in the changes.rst file in the directory doc/source.
 4. Commit the changes.
 5. Create a Pull Request and push to master.
 
@@ -555,14 +568,18 @@ root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noar
 
 The Github Actions workflows for IODE are defined in the directory ./.github/workflows.
 
-The jobs declared in ./.github/workflows/github-actions-debug.yml are triggered according to keywords present 
-in the name of the pushed branch:
-- `build_and_test_api`  -> NOT triggered if the branch name contains the word `gui`, `python`, `doc` or `nsis`
-- `test_sanitize`       -> NOT triggered if the branch name contains the word `gui`, `python`, `doc` or `nsis`
-- `build_gui`           -> triggered if the branch name contains the word `gui`
-- `build_python`        -> triggered if the branch name contains either the word `python` or `nsis`
-- `build_doc`           -> triggered if the branch name contains either the word `doc` or `nsis`
-- `build_nsis`          -> triggered if the branch name contains either the word `nsis` or `release`
+The workflow ./.github/workflows/github-actions-pull-request.yml is run on each pull request. 
+Its jobs call the reusable workflows below according to keywords present in the name of the 
+source branch of the pull request:
+- `build_and_test` (github-actions-build-and-test.yml) -> builds and tests the C/C++ API (Debug mode, 
+  plus a job with the sanitizer). NOT triggered if the branch name contains the word `gui`, `python`, `doc` or `release`
+- `build_python` (github-actions-python.yml) -> builds and tests the Python API (Release mode).
+  Triggered if the branch name contains the word `python`
+- `build_gui` (github-actions-gui.yml) -> tests the GUI. Triggered if the branch name contains the word `gui`
+- `build_doc` (github-actions-doc.yml) -> builds the user documentation. Triggered if the branch name contains the word `doc`
+
+The workflow ./.github/workflows/github-actions-release.yml is triggered when a tag `v*.*.*` 
+is pushed and creates a new release on Github.
 
 # Troubleshooting
 
