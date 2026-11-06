@@ -620,7 +620,7 @@ class TableLine:
     def _get_col_from_index(self, index: int) -> int:
         self_size = len(self)
         if not (-self_size < index < self_size):
-            raise ValueError(f"The index of the cell must be in range [{-self.nb_columns + 1, self.nb_columns - 1}].\n"
+            raise ValueError(f"The index of the cell must be in range [{-self_size + 1, self_size - 1}].\n"
                              f"Got value {index} instead.")
         if index < 0:
             index = self_size + index
