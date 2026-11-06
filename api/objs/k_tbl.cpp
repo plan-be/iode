@@ -240,7 +240,6 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
 
         char* pack_idt = NULL;
         Identity idt(lec);
-        // NOTE: the LEC expression is converted to OEM encoding by Identity::to_binary() 
         idt.to_binary(&pack_idt);
         len = P_len(pack_idt);
         pack = (char*) P_add(pack, pack_idt, len);
