@@ -529,6 +529,8 @@ generate_stub_files.py
 /tests/**/*.ini
 /tests/sandbox
 
+/tests/data/test*
+
 !/tests/data/test.a2m
 !/tests/data/*.rep
 
