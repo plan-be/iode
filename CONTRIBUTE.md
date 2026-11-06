@@ -429,7 +429,70 @@ If none of the keywords above is used, the C and C++ API will be built and teste
 **IMPORTANT**: Do not forget to update the change log file of the current version. 
 The change log files for each version are located in the directory doc/source/changes.
 
+# AI Coding Agents (Claude Code, ...)
+
+AI coding agents read the file `CLAUDE.md` at the root of the repository. It summarises the 
+architecture, the build and test commands and the conventions of the project.
+
+**AI agents must never perform a release autonomously** (see the section 
+*Releases are human-only* in `CLAUDE.md`). Releases are always done by a maintainer.
+
+## Blocking release commands for Claude Code
+
+The rule above is enforced for Claude Code by the project settings file `.claude/settings.json`, 
+which is committed in the repository. Its `permissions.deny` list contains patterns of commands 
+that Claude Code always refuses to run, whatever the permission mode. For example:
+```json
+{
+  "permissions": {
+    "deny": [
+      "Bash(git tag *)",
+      "Bash(git push --tags*)",
+      "Bash(twine *)",
+      "PowerShell(twine *)"
+    ]
+  }
+}
+```
+- Each rule has the form `<Tool>(<command pattern>)`, where `*` matches any sequence of characters.
+- Every pattern is declared twice, once for the `Bash` tool and once for the `PowerShell` tool. 
+  On Windows, Claude Code can run commands with either shell.
+- The list currently blocks:
+  - creating, deleting and pushing git tags;
+  - `gh release`;
+  - building packages: `python -m build`, `pip wheel`, `makepy.bat`, `conda build`;
+  - publishing packages: `twine`, `anaconda`;
+  - installing or upgrading Python packages: `pip install`, `python -m pip install`, 
+    `conda install`, `conda create`, `conda update`, `conda env create/update` 
+    (and the `mamba` equivalents). Developers install the required packages themselves 
+    (see *Requirements* and *Preparing Python IODE Build* above).
+
+### Adding or removing a rule
+
+- **Adding a rule**: add a new pattern for both tools (`Bash(...)` and `PowerShell(...)`) to the 
+  `deny` list in `.claude/settings.json`. Commit the change so it applies to every developer. 
+  Claude Code reloads the file automatically; if a new rule is not picked up, restart Claude Code.
+- **Removing a rule**: edit `.claude/settings.json`. A deny rule cannot be overridden by an `allow` 
+  rule, nor by a personal `.claude/settings.local.json` file (which is ignored by git), because 
+  deny rules always take precedence.
+- **Checking a rule**: ask Claude Code to run a harmless command matching the rule 
+  (e.g. `git tag --list`). It should answer that the permission has been denied.
+
+Note: `git tag --list` is blocked too. To list the tags from Claude Code, use 
+`git for-each-ref refs/tags` or `git describe --tags`.
+
+### Limits
+
+The deny rules match command patterns. They do not catch a release command hidden in a script or 
+spelled in an unexpected way, so they are a safety net and not a complete barrier. 
+Maintainers should also keep publishing credentials (PyPI/TestPyPI API tokens, `~/.pypirc`, 
+the Anaconda login) out of reach of AI agents, and type the release commands themselves in 
+their own terminal.
+
 # Create A Release
+
+**Releases are done by a maintainer only, never by an AI agent** (see *AI Coding Agents* above).
+Run the commands below yourself in a terminal: they are blocked inside Claude Code.
 
 ## Before the release
 

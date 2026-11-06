@@ -548,3 +548,6 @@ generate_stub_files.py
 /tests/cli/test*.csv
 /tests/cli/*.exe
 !/tests/cli/*.rep
+
+# Claude Code: personal settings (the shared .claude/settings.json is committed)
+.claude/settings.local.json
