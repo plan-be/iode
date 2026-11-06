@@ -15,6 +15,57 @@ from iode_gui.main_widgets.file_explorer.file_delegate import FileDelegate
 from iode_gui.main_widgets.tab_widget.tab_widget import IodeTabWidget
 
 
+def check_replace_allowed(src_path: Path, dst_path: Path):
+    """
+    Check that the destination (if it exists) can be replaced by the source.
+    Replacing a directory by a file or a file by a directory is not allowed.
+
+    :param src_path: path of the file or directory to move or copy.
+    :param dst_path: path of the destination file or directory.
+    :raises ValueError: if a directory would be replaced by a file or a file by a directory.
+    """
+    if dst_path.exists() and src_path.is_dir() != dst_path.is_dir():
+        src_kind = "directory" if src_path.is_dir() else "file"
+        dst_kind = "directory" if dst_path.is_dir() else "file"
+        raise ValueError(f"Cannot replace the {dst_kind} '{dst_path}' by the {src_kind} '{src_path}'")
+
+
+def move_file_or_dir(src_path: Path, dst_path: Path):
+    """
+    Move a file or a directory. If the destination already exists, it is overwritten.
+
+    If both the source and the destination are directories, the content of the source
+    directory is merged into the destination directory (same behavior as when copying
+    a directory with shutil.copytree(..., dirs_exist_ok=True)).
+
+    Replacing a directory by a file or a file by a directory is not allowed (raises a ValueError).
+
+    :param src_path: path of the file or directory to move.
+    :param dst_path: new path of the file or directory.
+    """
+    src_path = src_path.resolve()
+    dst_path = dst_path.resolve()
+    # moving an item onto itself -> nothing to do
+    if src_path == dst_path:
+        return
+    if src_path.is_dir() and src_path in dst_path.parents:
+        raise ValueError(f"Cannot move the directory '{src_path}' into one of its own sub-directories")
+
+    # do not replace a directory by a file or a file by a directory
+    check_replace_allowed(src_path, dst_path)
+
+    if dst_path.exists() and src_path.is_dir() and dst_path.is_dir():
+        # merge the content of the source directory into the destination directory
+        shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+        shutil.rmtree(src_path)
+        return
+
+    # Rename this file or directory to the given target. If target points to an
+    # existing file or empty directory, it will be unconditionally replaced.
+    # https://docs.python.org/3.14/library/pathlib.html#pathlib.Path.replace
+    src_path.replace(dst_path)
+
+
 class IodeFileExplorer(QTreeView):
     """
     The present class represents a File Explorer (i.e. File Tree) widget
@@ -473,12 +524,14 @@ class IodeFileExplorer(QTreeView):
                 for src_path in paths:
                     src_path = Path(src_path).resolve()
                     dst_path = drop_dir / src_path.name
+                    # check before asking to overwrite
+                    check_replace_allowed(src_path, dst_path)
                     if dst_path.exists():
                         answer = QMessageBox.question(self, "WARNING", f"File or directory "
                                                     f"'{dst_path}' already exists.\nWant to overwrite ?")
                         if answer == QMessageBox.StandardButton.No:
                             dst_path = dst_path.with_stem(dst_path.stem + "_copy")
-                    src_path.replace(dst_path)
+                    move_file_or_dir(src_path, dst_path)
                     self.fileMoved.emit(str(src_path), str(dst_path))
 
                 event.accept()
@@ -691,24 +744,25 @@ class IodeFileExplorer(QTreeView):
             for file_info, cut in self.items_to_past:
                 src_path = Path(file_info.absoluteFilePath())
                 dst_path = destination_dir / src_path.name
+                # do not replace a directory by a file or a file by a directory
+                # (check before asking to overwrite)
+                check_replace_allowed(src_path, dst_path)
                 if dst_path.exists():
                     answer = QMessageBox.question(self, "WARNING", f"File or directory "
                                                 f"'{dst_path}' already exists.\nWant to overwrite ?")
                     if answer == QMessageBox.StandardButton.No:
                         dst_path = dst_path.with_stem(dst_path.stem + "_copy")
                 if cut:
-                    # Rename this file or directory to the given target, and return 
-                    # a new Path instance pointing to target. If target points to an 
-                    # existing file or empty directory, it will be unconditionally replaced. 
-                    # https://docs.python.org/3.11/library/pathlib.html#pathlib.Path.replace
-                    src_path.replace(dst_path)
+                    move_file_or_dir(src_path, dst_path)
                 else:
+                    # the new destination (suffix '_copy') may also exist
+                    check_replace_allowed(src_path, dst_path)
                     if src_path.is_dir():
                         shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
                     else:
                         # If destination specifies a file that already exists, 
                         # it will be replaced. 
-                        # https://docs.python.org/3.11/library/shutil.html#shutil.copy
+                        # https://docs.python.org/3.14/library/shutil.html#shutil.copy
                         shutil.copy(src_path, dst_path)
                 self.fileMoved.emit(str(src_path), str(dst_path))
             
