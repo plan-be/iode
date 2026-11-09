@@ -5,6 +5,7 @@
 #include "api/objs/lists.h"
 #include "api/objs/scalars.h"
 #include "api/objs/variables.h"
+#include "api/objs/old_structs.h"
 #include "api/print/print.h"
 
 
@@ -95,6 +96,21 @@ bool CLEC::print_definition(const std::string& name, const std::string& eqlec, c
     return true;
 }
 
+short CLEC::calculate_binary_length(const std::vector<ATOMIC_LEC>& expr, const int from, const int to)
+{
+    if(expr.empty())
+        return 0;
+
+    short len = 0;
+    for(int i = from; i < to; i++)
+    {
+        const ATOMIC_LEC& al = expr[i];
+        len += std::visit([](auto& arg) { return arg.get_binary_length(); }, al);
+    }
+
+    return len;
+}
+
 void CLEC::reorder_expression()
 {
     // nothing to reorder
@@ -122,6 +138,7 @@ void CLEC::reorder_expression()
         if(std::holds_alternative<LEC_TFN>(al))
         {
             LEC_TFN& al_tfn = std::get<LEC_TFN>(al);
+            al_tfn.binary_length_args = -1;
 
             // compute the start and end positions of the arguments of the function 
             // NOTE: - 2 because the last element of v_expression is always (should be) 
@@ -135,6 +152,7 @@ void CLEC::reorder_expression()
                 throw std::runtime_error(error_msg);
             }
             al_tfn.length_expr = args_end - args_start + 1;
+            al_tfn.binary_length_args = this->calculate_binary_length(expr, args_start, args_end + 1);
 
             // insert current LEC_TFN element before its arguments in the vector
             this->v_expression.pop_back();
@@ -148,6 +166,11 @@ void CLEC::reorder_expression()
             int nv_args = L_MIN_MTARGS[al_mtfn.pos];
             al_mtfn.nv_args = nv_args;
             al_mtfn.v_length_expr.clear();
+            al_mtfn.v_length_expr.reserve(nv_args);
+            al_mtfn.v_binary_length_args.clear();
+            al_mtfn.v_binary_length_args.reserve(nv_args);
+
+            short arg_binary_length;
 
             // compute the start and end positions of the arguments of the function
             int args_start;
@@ -166,6 +189,9 @@ void CLEC::reorder_expression()
                 }
                 int length_expr = args_end - args_start + 1;
                 al_mtfn.v_length_expr.push_back(length_expr);
+                arg_binary_length = this->calculate_binary_length(expr, args_start, args_end + 1);
+                al_mtfn.v_binary_length_args.push_back(arg_binary_length);
+
                 args_end = args_start - 1;
             }
             // NOTE: the arguments have been processed in reverse order
@@ -177,6 +203,99 @@ void CLEC::reorder_expression()
         }
     }
 }
+
+/**
+ * Serializes a CLEC object.
+ *
+ * @param [out] pack    (char **)   placeholder for the pointer to the serialized object
+ * @return                          true if the serialization succeeded, false otherwise
+ */
+bool CLEC::to_binary(char** pack) const
+{
+    int pos_buffer = 0;             // position (in number of bytes) in the buffer
+    int pos_expr = 0;               // position in the vector of atomic lec elements
+    int allocated_len = 0;          // current allocated size of the buffer (in bytes)
+    unsigned char* buffer = NULL;   // buffer to save the "executable" expression (will be copied in the CLEC struct at the end)
+    CLEC_6_68* fake_clec = nullptr; // CLEC struct (IODE version 6.68 -> for backward compatibility)
+
+    for(const ATOMIC_LEC& al : this->v_expression)
+    {
+        // end of expression -> stop
+        if(std::holds_alternative<LEC_OTHER>(al) && std::get<LEC_OTHER>(al).type == L_EOE)
+            break;
+
+        // if the current size of the buffer is not sufficient to save the next element, 
+        // reallocate it by chunks of 512 bytes
+        if(pos_buffer + 30 >= allocated_len)
+        {
+            // NOTE: realloc(nullptr, size) behaves like malloc(size)
+            unsigned char* new_buffer = (unsigned char*) realloc(buffer, allocated_len + 512);
+            if(new_buffer == nullptr)
+            {
+                free(buffer);
+                std::string error_msg = "CLEC::to_binary(): could not allocate memory to serialize ";
+                error_msg += "the LEC expression '" + lec + "'.";
+                kwarning((char*) error_msg.c_str());
+                return false;
+            }
+            buffer = new_buffer;
+            // fill the newly allocated bytes with nulls (as SW_nrealloc did)
+            memset(buffer + allocated_len, 0, 512);
+            allocated_len += 512;
+        }
+
+        // for each variant type -> save the executable representation of the atomic lec in the buffer 
+        // and update the position in the buffer
+        std::visit([&buffer, &pos_buffer](auto& arg) { arg.append_to_buffer(buffer, pos_buffer); }, al);
+
+        pos_expr++;
+    }
+
+    long exec_lg = (long) pos_buffer;
+    if(exec_lg == 0)
+    {
+        free(buffer);
+        std::string error_msg = "CLEC constructor: Could not compile the LEC expression: ";
+        error_msg += "'" + lec + "'.";
+        kwarning((char*) error_msg.c_str());
+        return false;
+    }
+    
+    // NOTE: In binary files, compiled LEC are stored as a single memory block. 
+    //       This is the old C idiom called the "struct hack". 
+    //       C99 later made it official as the flexible array member ( LNAME lnames[]; ).
+    //       In binary files, a CLEC_6_68 object will be saved as as:
+    //       [ tot_lg | exec_lg | nb_names | dupendo | pad | lnames[0] ... lnames[nb_names-1] | exec bytecode (exec_lg bytes) ]
+    //       <------------------------------------------- tot_lg bytes ------------------------------------------------------->
+
+    int nb_names = (int) v_names.size();
+    long tot_lg = sizeof(CLEC_6_68) + (nb_names - 1) * sizeof(LNAME) + exec_lg;
+    // Allocates tot_lg bytes and fills them with nulls.
+    // NOTE: the memory returned by operator new[] is suitably aligned
+    //       for any fundamental type, hence for CLEC_6_68.
+    char* fake_clec_bytes = new char[tot_lg];
+    memset(fake_clec_bytes, 0, tot_lg);
+    fake_clec = reinterpret_cast<CLEC_6_68*>(fake_clec_bytes);
+    fake_clec->dupendo = this->duplicated_endo ? 1 : 0;
+    fake_clec->tot_lg  = tot_lg;
+    fake_clec->exec_lg  = exec_lg;
+    // copy the coefficients and variables names
+    fake_clec->nb_names = nb_names;
+    LNAME* _names_ = fake_clec->lnames;
+    for(int i = 0; i < nb_names; i++)
+        strcpy(_names_[i].name, v_names[i].c_str());
+    // copy the buffer
+    char* tmp = (char*) fake_clec;
+    memcpy(tmp + tot_lg - exec_lg, buffer, exec_lg);
+    free(buffer);
+
+    // Serializing
+    *pack = (char*) P_add(*pack, (char*) fake_clec_bytes, fake_clec->tot_lg);
+
+    delete[] fake_clec_bytes;
+    return true;
+}
+
 
 /**
  * @brief Construct a new CLEC object

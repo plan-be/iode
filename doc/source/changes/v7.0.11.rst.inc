@@ -34,6 +34,10 @@ Fixed Bugs
 - IODE REPORT + PYTHON: allowed to use empty IODE lists in Python script or 
   IODE reports except when creating subsets of IODE workspaces (closes :issue:`1341`) 
 
+- IODE REPORT + PYTHON: fixed broken backward compatibility with IODE 6.68 of 
+  generated binary files from saving *Equations*, *Identities* and *Tables* IODE 
+  workspaces (closes :issue:`1347`)
+
 - GUI: refresh the Variables view when copy/pasting values from an Excel file
 
 - GUI: fixed pasting Variables values (CTRL + V) copied from an Excel file 

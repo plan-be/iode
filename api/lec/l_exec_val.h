@@ -72,6 +72,12 @@ public:
         return is_same_type(other);
     }
 
+    short get_binary_length() const override
+    {
+        // 1 byte for type
+        return 1;
+    }
+
     // executes the function with the given arguments on the stack
     double execute(int t, int exec_t) const
     {
