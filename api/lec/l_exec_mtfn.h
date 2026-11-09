@@ -88,12 +88,16 @@ inline std::vector<std::string> L_MTFN_NAMES =
 struct LEC_MTFN: public LEC_ABSTRACT_EXECUTABLE
 {
     // number of variables arguments (i.e. variadic arguments)
-    int nv_args;
+    short nv_args;
 
     // vector of lengths as number of atomic lec elements for each sub-expression 
     // argument of the function
     std::vector<int> v_length_expr;
-    
+
+    // length in bytes of each function argument (i.e. the sub-expression in the buffer)
+    std::vector<short> v_binary_length_args;
+
+
 public:
     LEC_MTFN(const int type, const int nb_args, const int nv_args) 
         : LEC_ABSTRACT_EXECUTABLE(type, nb_args), nv_args(nv_args)
@@ -121,6 +125,40 @@ public:
             return false;
 
         return true;
+    }
+
+    short get_binary_length() const override
+    {
+        short len = 3;                      // 3 bytes for type, nb_args and nv_args
+        len += sizeof(short);               // total size in bytes of arguments (see append_to_buffer() below)
+        len += (short) (sizeof(short) * L_MIN_MTARGS[pos]);     // size in bytes of each argument (see append_to_buffer() below)
+        return len;
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+
+        if(v_binary_length_args.empty() || v_binary_length_args.size() != nv_args)
+        {
+            std::string error_msg = "LEC: Cannot save LEC expression -> ";
+            error_msg += "'v_binary_length_args' has not been calculated";
+            throw std::runtime_error(error_msg);
+        }
+
+        buffer[pos_buffer] = nb_args;
+        pos_buffer++;
+
+        int nvargs = L_MIN_MTARGS[pos];
+        buffer[pos_buffer] = nvargs;
+        pos_buffer++;
+
+        // total = bytes of all arguments + one short (length) per argument
+        short tot_len_args = (short) (nvargs * sizeof(short));
+        for(const short arg_len : v_binary_length_args)
+            tot_len_args += arg_len;
+        memcpy(buffer + pos_buffer, &tot_len_args, sizeof(short));
+        pos_buffer += sizeof(short);
     }
 
     // executes the function with the given arguments on the stack

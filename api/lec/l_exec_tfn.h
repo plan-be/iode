@@ -91,7 +91,10 @@ struct LEC_TFN: public LEC_ABSTRACT_EXECUTABLE
 {
     // length as number of atomic lec elements of the sub-expression argument of the function
     int length_expr = 0;
-    
+
+    // length in bytes of the function arguments (i.e. the sub-expression in the buffer)
+    short binary_length_args = -1;
+
 public:
     LEC_TFN(const int type, const int nb_args) 
         : LEC_ABSTRACT_EXECUTABLE(type, nb_args)
@@ -114,6 +117,31 @@ public:
             return false;
 
         return true;
+    }
+
+    short get_binary_length() const override
+    {
+        // - 2 bytes for type and nb_args 
+        // - sizeof(short) for binary_length_args (see append_to_buffer() below)
+        return 2 + sizeof(short);
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+
+        if(binary_length_args < 0)
+        {
+            std::string error_msg = "LEC: Cannot save LEC expression -> ";
+            error_msg += "'binary_length_args' has not been calculated";
+            throw std::runtime_error(error_msg);
+        }
+
+        buffer[pos_buffer] = nb_args;
+        pos_buffer++;
+
+        memcpy(buffer + pos_buffer, &binary_length_args, sizeof(short));
+        pos_buffer += sizeof(short);
     }
 
     // executes the function with the given arguments on the stack

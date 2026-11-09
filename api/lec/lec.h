@@ -48,6 +48,8 @@ struct CLEC: public AbstractCLEC
     // when editing a computed table cell (only the first variable is updated).
     std::vector<std::string> v_coeff_names;
     std::vector<std::string> v_var_names;
+    // for backward compatibility with IODE version < 7
+    std::vector<std::string> v_names;
     
 private:
     /**
@@ -78,6 +80,17 @@ private:
      * @param [in]      dbv     KDB*    KDB of variables
      */
     void link_sample(KDBVariablesPtr dbv, const int start, const int length);
+
+    /**
+     * Calculates the number of bytes required to save a sequence of atomic LEC items 
+     * into a CLEC struct by adding the size reclaimed by each atomic LEC items.
+     *
+     * @param [in] expr     vector<AL>  pointer to a vector of atomic LEC items
+     * @param [in] from     int         first atomic LEC item to take into account
+     * @param [in] to       int         last atomic LEC item to take into account + 1
+     * @return              short       size in bytes to save in the binary files
+    */
+    short calculate_binary_length(const std::vector<ATOMIC_LEC>& expr, const int from, const int to);
 
     /**
      * Tries to solve this LEC equation by the Newton-Raphson method (internal helper).
@@ -356,6 +369,8 @@ public:
      * @return double 
      */
     double execute_sub_expression(const int start, const int length, const int t) const;
+
+    bool to_binary(char** pack) const;
 };
 
 

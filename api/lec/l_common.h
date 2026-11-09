@@ -182,6 +182,19 @@ protected:
     LEC_ABSTRACT& operator=(const LEC_ABSTRACT& other) = default;
     LEC_ABSTRACT& operator=(LEC_ABSTRACT&& other) noexcept = default;
 
+public:
+    // length in bytes of the executable representation of the atomic lec
+    virtual short get_binary_length() const = 0;
+
+    // copies the executable representation of the atomic lec to the buffer 
+    // at the given position and updates the position in the buffer
+    virtual void append_to_buffer(unsigned char* buffer, int& pos_buffer) const 
+    {
+        // save the type of the expression element (1 byte)
+        buffer[pos_buffer] = type;
+        pos_buffer++;
+    }
+
     bool is_same_type(const LEC_ABSTRACT& other) const
     {
         return this->type == other.type;
@@ -263,5 +276,18 @@ public:
     bool operator==(const LEC_OTHER& other) const
     {
         return is_same_type(other);
+    }
+
+    short get_binary_length() const override
+    {
+        // we don't save open and close parentheses in the executable expression
+        return (type == L_OPENP || type == L_CLOSEP) ? 0 : 1;
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        // we don't save open and close parentheses in the executable expression
+        if(type != L_OPENP && type != L_CLOSEP)
+            LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
     }
 };

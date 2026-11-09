@@ -270,7 +270,7 @@ bool Equation::to_binary(char** pack) const
     char* c_lec = (char*) _lec_.c_str();
     *pack = (char*) P_add(*pack, c_lec, (int) this->lec.size() + 1);
     // for backward compatibility with old binary files
-    *pack = (char*) P_add(*pack, NULL, 0);
+    clec->to_binary(pack);
     *pack = (char*) P_add(*pack, (char*) &(this->solved), 1);
     *pack = (char*) P_add(*pack, (char*) &(this->method), 1);
     *pack = (char*) P_add(*pack, (char*) &(this->sample), sizeof(Sample));

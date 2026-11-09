@@ -213,6 +213,19 @@ public:
         return is_same_type(other);
     }
 
+    short get_binary_length() const override
+    {
+        // 1 byte for type and 1 byte for nb_args
+        return 2;
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        buffer[pos_buffer] = nb_args;
+        pos_buffer++;
+    }
+
     /**
      *  Checks if at least one active value on the stack is IODE_NAN.
      *
