@@ -106,7 +106,8 @@ static bool lec_repack(char** pack, char* lec)
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, lec, (int) strlen(lec) + 1);
     // for backward compatibility with old binary files
-    *pack = (char*) P_add(*pack, NULL, 0);
+    CLEC clec(std::string(lec), false);
+    clec.to_binary(pack);
 
     return true;
 }

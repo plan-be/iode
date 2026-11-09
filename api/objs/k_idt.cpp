@@ -80,7 +80,7 @@ bool Identity::to_binary(char** pack) const
     *pack = (char*) P_create();
     *pack = (char*) P_add(*pack, c_lec, (int) strlen(c_lec) + 1);
     // for backward compatibility with old binary files
-    *pack = (char*) P_add(*pack, NULL, 0);
+    clec->to_binary(pack);
 
     return true;
 }

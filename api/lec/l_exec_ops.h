@@ -98,6 +98,12 @@ public:
         return is_same_type(other);
     }
 
+    short get_binary_length() const override
+    {
+        // 1 byte for type
+        return 1;
+    }
+
     // executes the operator with the given arguments on the stack
     double execute(LECStack& stack) const
     {

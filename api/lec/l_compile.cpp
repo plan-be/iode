@@ -29,6 +29,9 @@ void CLEC::add_coef_or_var_name(const std::string& name, const bool is_coef)
                 return;
         v_var_names.push_back(name);
     }
+
+    // for compatibility with IODE version < 7
+    v_names.push_back(name);
 }
 
 int CLEC::save_var(TOKEN& token)
@@ -525,6 +528,7 @@ int CLEC::parse(const bool side_of_eq)
     {
         v_coeff_names.clear();
         v_var_names.clear();
+        v_names.clear();
     }
 
     /* LOOP ON TOKEN */

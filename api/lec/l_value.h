@@ -2,6 +2,35 @@
 #include "api/lec/l_common.h"
 
 
+// for backward compatibility with IODE 6.68
+struct CVAR 
+{
+    short pos = 0;
+	short lag = 0;      // lag of the variable (0 if current value, 1 if t-1...)
+	short ref = 0;
+	short pad = 0;
+    Period per;         // period of the variable (if any)
+
+    short get_binary_length() const
+    {
+        return sizeof(CVAR);
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const
+    {
+        memcpy(buffer + pos_buffer, &pos, sizeof(short));
+        pos_buffer += sizeof(short);
+        memcpy(buffer + pos_buffer, &lag, sizeof(short));
+        pos_buffer += sizeof(short);
+        memcpy(buffer + pos_buffer, &ref, sizeof(short));
+        pos_buffer += sizeof(short);
+        memcpy(buffer + pos_buffer, &pad, sizeof(short));
+        pos_buffer += sizeof(short);
+        memcpy(buffer + pos_buffer, &per, sizeof(Period));
+        pos_buffer += sizeof(Period);
+    }
+};
+
 class LEC_CONST_REAL: public LEC_ABSTRACT_VALUE
 {
     double value;
@@ -22,6 +51,21 @@ public:
     double get_value() const
     {
         return value;
+    }
+
+    short get_binary_length() const override
+    {
+        // 1 byte for type
+        return 1 + sizeof(float);
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        // float for backward compatibility with IODE 6.68
+        float f_value = (float) value;
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        memcpy(buffer + pos_buffer, &f_value, sizeof(float));
+        pos_buffer += sizeof(float);
     }
 };
 
@@ -47,9 +91,24 @@ public:
     {
         return value;
     }
+
+    short get_binary_length() const override
+    {
+        // 1 byte for type
+        return 1 + sizeof(long);
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        // long for backward compatibility with IODE 6.68
+        long l_value = (long) value;
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        memcpy(buffer + pos_buffer, &l_value, sizeof(long));
+        pos_buffer += sizeof(long);
+    }
 };
 
-class LEC_COEF: public LEC_ABSTRACT_VALUE
+class LEC_COEF: public LEC_ABSTRACT_VALUE, public CVAR
 {
     std::shared_ptr<Scalar> scl_ptr;
 
@@ -57,7 +116,8 @@ public:
     std::string name;   // name of the coefficient (IODE Scalar)
 
 public:
-    LEC_COEF(std::string name) : LEC_ABSTRACT_VALUE(L_COEF), name(std::move(name)) 
+    LEC_COEF(std::string name) 
+        : LEC_ABSTRACT_VALUE(L_COEF), name(std::move(name))
     {
 #if DEBUG
         representation = this->name;
@@ -106,25 +166,36 @@ public:
 
         return scl_ptr->value;
     }
+
+    short get_binary_length() const override
+    {
+        // 1 byte for the type
+        return 1 + CVAR::get_binary_length();
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        CVAR::append_to_buffer(buffer, pos_buffer);
+    }
 };
 
-class LEC_VAR: public LEC_ABSTRACT_VALUE
+class LEC_VAR: public LEC_ABSTRACT_VALUE, public CVAR
 {
     std::shared_ptr<Variable> var_ptr;
 
 public:
-    std::string name;   // name of the variable (IODE Variable)
-    short lag;          // lag of the variable (0 if current value, 1 if t-1...)
-    short ref;
-    Period per;         // period of the variable (if any)
+    std::string name;   // name of the variable (IODE Variable)      
 
 public:
     // type = L_VAR or L_VART (variable with time) 
     LEC_VAR(const int type, std::string name, const short lag, const Period& per)
-        : LEC_ABSTRACT_VALUE(type), name(std::move(name)), lag(lag), ref(0), per(per) 
+        : LEC_ABSTRACT_VALUE(type), name(std::move(name))
     {
         if(type != L_VAR && type != L_VART)
             throw std::invalid_argument("Invalid type for LEC_VAR: " + std::to_string(type));
+        this->lag = lag; 
+        this->per = per;
 #if DEBUG
         representation = this->name;
 #endif
@@ -198,8 +269,20 @@ public:
         double value = IODE_NAN;
         if(len >= 0 && len < var.size()) 
             value = var[len];
-        
+
         return value;
+    }
+
+    short get_binary_length() const override
+    {
+        // 1 byte for type
+        return 1 + CVAR::get_binary_length();
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        CVAR::append_to_buffer(buffer, pos_buffer);
     }
 };
 
@@ -207,6 +290,7 @@ class LEC_PERIOD: public LEC_ABSTRACT_VALUE
 {
     Period period;
     double value = IODE_NAN;
+    short pos = 0;
 
 public:
     LEC_PERIOD(const Period& period) : LEC_ABSTRACT_VALUE(L_PERIOD), period(period)
@@ -229,12 +313,27 @@ public:
 
     void link(const Sample& sample)
     {
-        int pos = period.difference(sample.start_period);
+        pos = period.difference(sample.start_period);
         value = (double) pos;
     }
 
     double get_value() const
     {
         return value;
+    }
+
+    short get_binary_length() const override
+    {
+        // 1 byte for type + sizeof(period) + sizeof(pos)
+        return 1 + sizeof(Period) + sizeof(short);
+    }
+
+    void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
+    {
+        LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+        memcpy(buffer + pos_buffer, &period, sizeof(Period));
+        pos_buffer += sizeof(Period);
+        memcpy(buffer + pos_buffer, &pos, sizeof(short));
+        pos_buffer += sizeof(short);
     }
 };
