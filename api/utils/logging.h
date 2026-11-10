@@ -17,6 +17,7 @@ class Logging
 {
     LogLevel level;
     std::ofstream log_file;
+    std::filesystem::path root_dir;
     std::string path_log_file_str;
 
 public:
@@ -26,23 +27,36 @@ public:
         std::filesystem::path current_path(current_file);
         std::filesystem::path utils_dir = current_path.parent_path();
         std::filesystem::path api_dir = utils_dir.parent_path();
-        std::filesystem::path root_dir = api_dir.parent_path();
-        std::filesystem::path path_log_file = root_dir / "debug.txt";
-        
-        // delete existing log file
-        if(std::filesystem::exists(path_log_file))
-            std::filesystem::remove(path_log_file);
-        
-        // open log file if level is not LOG_NONE 
-        path_log_file_str = path_log_file.string();
-        if(level != LOG_NONE)
-            log_file = std::ofstream(path_log_file_str, std::ios::out);
+        root_dir = api_dir.parent_path();
+        set_log_filename();
     }
 
     ~Logging() 
     {
         if(log_file.is_open())
             log_file.close();
+    }
+
+    void set_log_filename(const std::string& filename="debug.txt", const bool overwrite=true)
+    {
+        std::filesystem::path new_path_log_file = root_dir / filename;
+        if(new_path_log_file.string() == path_log_file_str)
+            return;
+
+        // delete log file if it already exists
+        if(overwrite && std::filesystem::exists(new_path_log_file))
+            std::filesystem::remove(new_path_log_file);
+
+        // update log filepath
+        path_log_file_str = new_path_log_file.string();
+
+        // close current log file
+        if(log_file.is_open())
+            log_file.close();
+
+        // open log file if level is not LOG_NONE 
+        if(level != LOG_NONE)
+            log_file = std::ofstream(path_log_file_str, std::ios::out);
     }
 
     void set_level(LogLevel new_level) 
