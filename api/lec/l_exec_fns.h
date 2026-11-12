@@ -224,6 +224,9 @@ public:
         LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
         buffer[pos_buffer] = nb_args;
         pos_buffer++;
+
+        std::string log = "\t\t\t -> funct: " + std::to_string((int) buffer[pos_buffer]);
+        logger.info(log);
     }
 
     /**

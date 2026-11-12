@@ -458,12 +458,20 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
         SW_nfree(k_objs);
     }
 
+    logger.set_level(LogLevel::LOG_INFO);
+    logger.info("NAMES:");
+    for(const std::string& name: v_names)
+        logger.info("\t- " + name);
+    logger.info("");
+    logger.set_level(LogLevel::LOG_NONE);
+
     // -------- load values --------
     this->reserve(nb_objs);
 
     // load all objects
     if(objs.size() == 0)
     {
+        logger.info("TABLE OBJECTS:");
         for(i = 0; i < nb_objs; i++) 
         {
             name = v_names[i];
@@ -501,7 +509,12 @@ bool KDB::load_binary(const std::string& filename, const std::vector<std::string
             }
             K_xdrobj[this->k_type]((unsigned char*) ptr, NULL);
             ptr = convert_obj_version(name, ptr, version);
+            if(name == "A0GMAAS")
+                logger.set_level(LogLevel::LOG_INFO);
+            else
+                logger.set_level(LogLevel::LOG_NONE);
             this->binary_to_obj(name, ptr);
+            logger.set_level(LogLevel::LOG_NONE);
             SW_nfree(ptr);
         }
     }
@@ -1191,7 +1204,13 @@ bool KDB::save_binary(const std::string& filename, const bool override_filepath)
     // dump object values as packed objects
     for(const std::string& name : this->get_names())
     {
+        logger.info("SAVE TABLES");
+        if(name == "A0GMAAS")
+            logger.set_level(LogLevel::LOG_INFO);
+        else
+            logger.set_level(LogLevel::LOG_NONE);
         success = this->obj_to_binary(&ptr, name);
+        logger.set_level(LogLevel::LOG_NONE);
         if(!success) 
         {
             error_msg += ":\nCannot write object '" + name + "'";

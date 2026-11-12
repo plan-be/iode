@@ -18,16 +18,39 @@ struct CVAR
 
     void append_to_buffer(unsigned char* buffer, int& pos_buffer) const
     {
+        std::string log = "\t\t\t -> cvar: ";
+
         memcpy(buffer + pos_buffer, &pos, sizeof(short));
+        log += "(pos) ";
+        for(int k=0; k < sizeof(short); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
         pos_buffer += sizeof(short);
+
         memcpy(buffer + pos_buffer, &lag, sizeof(short));
         pos_buffer += sizeof(short);
+        log += "(lag) ";
+        for(int k=0; k < sizeof(short); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
         memcpy(buffer + pos_buffer, &ref, sizeof(short));
         pos_buffer += sizeof(short);
+        log += "(ref) ";
+        for(int k=0; k < sizeof(short); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
         memcpy(buffer + pos_buffer, &pad, sizeof(short));
         pos_buffer += sizeof(short);
+        log += "(pad) ";
+        for(int k=0; k < sizeof(short); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
         memcpy(buffer + pos_buffer, &per, sizeof(Period));
         pos_buffer += sizeof(Period);
+        log += "(period) ";
+        for(int k=0; k < sizeof(Period); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
+        logger.info(log);
     }
 };
 
@@ -65,6 +88,12 @@ public:
         float f_value = (float) value;
         LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
         memcpy(buffer + pos_buffer, &f_value, sizeof(float));
+
+        std::string log = "\t\t\t -> real constant: ";
+        for(int k=0; k < sizeof(float); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+        logger.info(log);
+
         pos_buffer += sizeof(float);
     }
 };
@@ -104,6 +133,12 @@ public:
         long l_value = (long) value;
         LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
         memcpy(buffer + pos_buffer, &l_value, sizeof(long));
+
+        std::string log = "\t\t\t -> long constant: ";
+        for(int k=0; k < sizeof(long); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+        logger.info(log);
+
         pos_buffer += sizeof(long);
     }
 };
@@ -330,10 +365,24 @@ public:
 
     void append_to_buffer(unsigned char* buffer, int& pos_buffer) const override
     {
+        std::string log = "\t\t\t -> period: ";
+
         LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
         memcpy(buffer + pos_buffer, &period, sizeof(Period));
+
+        log += "(period) ";
+        for(int k=0; k < sizeof(Period); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
         pos_buffer += sizeof(Period);
         memcpy(buffer + pos_buffer, &pos, sizeof(short));
+
+        log += "(pos) ";
+        for(int k=0; k < sizeof(short); k++)
+            log += std::to_string((int) buffer[pos_buffer + k]) + " ";
+
         pos_buffer += sizeof(short);
+
+        logger.info(log);
     }
 };

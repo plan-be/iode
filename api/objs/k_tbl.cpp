@@ -231,12 +231,17 @@ bool TableCell::convert_32_to_64bits(const TableCell32& cell32)
  */
 char* TableCell::to_binary(char *pack, int& p, int i, int j)
 {
+    std::string log = "\t\t SAVE CELL ";
+
     int len;
     if(this->get_type() == TABLE_CELL_LEC)
     {
         std::string lec = this->get_content();
         if(lec.empty())
             return pack;
+
+        log += "(LEC): " + lec;
+        logger.info(log);
 
         char* pack_idt = NULL;
         Identity idt(lec);
@@ -265,11 +270,14 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
 {
     char* value = (char*) P_get_ptr(pack, p);
 
+    std::string log = "\t\t READ CELL ";
+
     if(this->get_type() == TABLE_CELL_STRING)
     {
         std::string content = (value == NULL) ? "" : std::string(value);
         debug_unpacking("cell", "STR  ", p, i, j, content);
         this->set_text(content);
+        log += "(STRING): " + content;
     }
     else
     {   
@@ -278,7 +286,20 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
         std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
         debug_unpacking("cell", "LEC  ", p, i, j, lec);
         this->set_lec(lec);
+        log += "(LEC): " + lec;
+
+        if(!lec.empty())
+        {
+            char* clec = (char*) P_get_ptr(value, 1);
+            int len = (int) clec[0];
+            
+            log += " (size = " + std::to_string(len) + ") -> ";
+            for(int k = 0; k < len; k++)
+                log += std::to_string((int) clec[k]) + " ";
+        }
     }
+
+    logger.info(log);
 
     p++;
     return true;

@@ -193,6 +193,7 @@ public:
         // save the type of the expression element (1 byte)
         buffer[pos_buffer] = type;
         pos_buffer++;
+        logger.info("\t\t\t -> type: " + std::to_string(type));
     }
 
     bool is_same_type(const LEC_ABSTRACT& other) const
@@ -289,5 +290,11 @@ public:
         // we don't save open and close parentheses in the executable expression
         if(type != L_OPENP && type != L_CLOSEP)
             LEC_ABSTRACT::append_to_buffer(buffer, pos_buffer);
+
+        if(type != L_OPENP && type != L_CLOSEP)
+        {
+            std::string log = "\t\t\t -> special char: " + std::to_string((int) buffer[pos_buffer]);
+            logger.info(log);
+        }
     }
 };

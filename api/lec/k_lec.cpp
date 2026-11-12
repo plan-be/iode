@@ -260,6 +260,11 @@ bool CLEC::to_binary(char** pack) const
         kwarning((char*) error_msg.c_str());
         return false;
     }
+
+    std::string log = "\t\t\t SAVE CLEC: ";
+    for(int k = 0; k < exec_lg; k++)
+        log += std::to_string((int) buffer[k]) + " ";
+    logger.info(log);
     
     // NOTE: In binary files, compiled LEC are stored as a single memory block. 
     //       This is the old C idiom called the "struct hack". 
@@ -288,6 +293,11 @@ bool CLEC::to_binary(char** pack) const
     char* tmp = (char*) fake_clec;
     memcpy(tmp + tot_lg - exec_lg, buffer, exec_lg);
     free(buffer);
+
+    log = "\t\t\t SAVE CLEC STRUCT: (size = " + std::to_string(fake_clec->tot_lg) + ") ";
+    for(int k = 0; k < fake_clec->tot_lg; k++)
+        log += std::to_string((int) tmp[k]) + " ";
+    logger.info(log);
 
     // Serializing
     *pack = (char*) P_add(*pack, (char*) fake_clec_bytes, fake_clec->tot_lg);

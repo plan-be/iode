@@ -701,3 +701,29 @@ TEST_F(KDBTablesTest, Hash)
     hash_val_restored = hash_value(*global_ws_tbl);
     EXPECT_EQ(hash_val, hash_val_restored);
 }
+
+TEST_F(KDBTablesTest, DVH_Load_Tables_6_68)
+{
+    std::filesystem::path data_dir = "C:/usr/Documents/IODE/DVH/backward_compatibility";
+    std::filesystem::path tbl_6_68 = data_dir / "pubfin_6_68.tbl";
+    std::filesystem::path tbl_7_11 = data_dir / "pubfin_7_11.tbl";
+
+    logger.set_level(LogLevel::LOG_INFO);
+
+    logger.set_log_filename("debug_6_68.txt");
+    global_ws_tbl->clear();
+    global_ws_tbl->load(tbl_6_68.string());
+    
+    logger.set_log_filename("debug_save_7_11.txt");
+    global_ws_tbl->save(tbl_7_11.string());
+
+    logger.set_log_filename("debug_7_11.txt");
+    global_ws_tbl->clear();
+    global_ws_tbl->load(tbl_7_11.string());
+
+    logger.set_level(LogLevel::LOG_NONE);
+
+    std::filesystem::path tbl_subset = data_dir / "pubfin_A0GMAAS.tbl";
+    KDBTablesPtr subset = global_ws_tbl->get_subset("A0GMAAS", true);
+    subset->save(tbl_subset.string());
+}
