@@ -270,8 +270,6 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
         std::string content = (value == NULL) ? "" : std::string(value);
         debug_unpacking("cell", "STR  ", p, i, j, content);
         this->set_text(content);
-        p++;
-        return true;
     }
     else
     {   
@@ -280,9 +278,10 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
         std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
         debug_unpacking("cell", "LEC  ", p, i, j, lec);
         this->set_lec(lec);
-        p++;
-        return true;
     }
+
+    p++;
+    return true;
 }
 
 // see the constructor Table(nb_columns) for the initialization of 
