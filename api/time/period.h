@@ -77,6 +77,7 @@ struct Period
     long    year;        	// year
     long    step;        	// position in the year (according to the periodicity)
     char    periodicity;	// periodicity (Y S Q M W D) 
+	char    pad[3] = {0, 0, 0};
 
 public:
 	Period()
