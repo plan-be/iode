@@ -71,7 +71,7 @@ struct OLDCLEC
 struct LNAME 
 {
     ONAME   name;       // scalar or variable name
-    char    pad[3];
+    char    pad[3] = {0, 0, 0};
     long    pos;
 };
 
@@ -83,6 +83,6 @@ struct CLEC_6_68
     long    exec_lg = 0;    // length of executable buffer (heterogenous container)    
     short   nb_names = 0;   // number of scalar and variables names
     char    dupendo = 0;    // duplicate endogenous variable in the LEC expression
-    char    pad;
+    char    pad = 0;
     LNAME   lnames[1];      // list of of scalar and variable names
 };
