@@ -105,6 +105,22 @@ A fresh checkout must run `cmake --preset <preset>` once before the Python packa
 
 The primary platform is Windows (MSVC 2022, Ninja); Linux (GCC) is also supported in CI. Run C++ builds from a *Developer Command Prompt* so that `cl.exe` is on PATH. Use a conda env with Python 3.12–3.14, numpy>=2.4, pandas>=3.0, cython==3.1.4, scikit-build-core, mypy and pytest; larray is optional.
 
+**Conda environment `iode_dev`**: when the conda environment `iode_dev` exists (check with
+`conda env list`), use it to run pytest and Jupyter notebooks, whatever environment the shell has active.
+- Run commands through `conda run -n iode_dev ...` (e.g. `conda run -n iode_dev python -m pytest`), or call
+  that env's `python.exe` directly. Do not rely on the `python` found on PATH: other envs may hold an older `iode`.
+  `conda run` neither forwards stdin (heredocs) nor accepts a multi-line `python -c` argument: write the code
+  to a script file and run that file.
+- Execute Jupyter notebooks (e.g. `doc/source/tutorial/*.ipynb`) with the Jupyter of `iode_dev`
+  (`conda run -n iode_dev python -m jupyter nbconvert --to notebook --execute ...`, or nbclient), so that the
+  `python3` kernel runs the `iode_dev` interpreter. Run them from the notebook's own directory: they write
+  (gitignored) files next to it. Do not overwrite the stored outputs of a notebook unless the user asks;
+  write the executed copy elsewhere (e.g. `--output-dir`).
+- Check which `iode` is imported (`iode.__file__`, `iode.__version__`): `python -c ...` or `python -m pytest`
+  started from `pyiode/` imports the source tree `pyiode/iode`, while a script started from elsewhere imports
+  the `iode` installed in the env's site-packages.
+- If `iode_dev` does not exist, use another env that meets the requirements above and tell the user which one.
+
 Configure presets (from [CMakePresets.json](CMakePresets.json)): `windows-debug`, `windows-debug-sanitize`, `windows-release`, `linux-debug`, `linux-debug-sanitize`, `linux-release`. Build dirs are `out/build/<preset>/`.
 
 ```bash
