@@ -217,6 +217,16 @@ class Identities(IodeDatabase):
         value: str, Identity, dict(str, str or Identity) or pd.Series(str) or Identities
             (new) identity(ies) value(s).
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateIdt name lec_identity
+
+            $DataCreateIdt name
+
+            $DataDuplicateIdt old_name new_name
+
         Examples
         --------
         >>> import pandas as pd
@@ -322,6 +332,12 @@ class Identities(IodeDatabase):
             (list of) name(s) of the identity(ies) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteIdt name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -386,6 +402,14 @@ class Identities(IodeDatabase):
         Return the list of coefficients (scalars) used in the identities of 
         (the subset of) the database.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
+            $DataScanIdt [name1,name2,...]
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -402,6 +426,14 @@ class Identities(IodeDatabase):
     def variables(self) -> List[str]:
         r"""
         Return the list of variables used in the identities of (the subset of) the database.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
+
+            $DataScanIdt [name1,name2,...]
 
         Examples
         --------
@@ -426,6 +458,13 @@ class Identities(IodeDatabase):
         names: str or list(str)
             list of identities to copy from the input file(s).
             Defaults to load all identities from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyIdt file;file;... {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
         self._cy_database.copy_from(input_files, names)
@@ -460,6 +499,18 @@ class Identities(IodeDatabase):
         Returns
         -------
         bool
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $IdtExecute period1 period2 [list_of_identities]
+
+            $IdtExecuteTrace  {Yes | No}
+
+            $IdtExecuteVarFiles file [list of files]
+
+            $IdtExecuteSclFiles file [list of files]
 
         Examples
         --------
@@ -885,6 +936,12 @@ class Identities(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the identities will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefIdt [list of parameters]
 
         Examples
         --------

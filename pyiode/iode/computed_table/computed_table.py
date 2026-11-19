@@ -696,6 +696,22 @@ class ComputedTable:
         ax: matplotlib.axes.Axes
             The matplotlib figure containing the plot of the computed table.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ViewGr gsample tbl1[+tbl2] tbl3 ...
+            where gsample is a generalized sample without spaces
+                  tbl1, tbl2, and tbl3 are table names
+
+            $DataPrintGraph   {Level | Diff | Grt}
+                              {Line | Scatter | Bar | Mixt}
+                              {NoXGrids | MinorXGrids | J(MajorXGrids)}
+                              {NoYGrids | MinorYGrids | J(MajorYGrids)}
+                              {Level | G(Log) | Semi-Log | Percent}
+                              {ymin | --} {ymax | --}
+                              perfrom perto varname1 varname2 ...
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -961,6 +977,14 @@ class ComputedTable:
             The format of the output file. Deduced from the extension if not provided.
             If destination_file has no extension and format is None, the A2M format is used.
             
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintGr gsample table_names
+
+            $PrintTbl sample table1 [other tables]
+
         Examples
         --------
         >>> from pathlib import Path

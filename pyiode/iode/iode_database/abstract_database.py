@@ -465,6 +465,13 @@ class IodeDatabase:
         value: str
             New description.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsDescr<...> text
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -562,6 +569,26 @@ class IodeDatabase:
         -------
         list(str)
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @cexpand(pattern1,pattern2,...)
+
+            @eexpand(pattern1,pattern2,...)
+
+            @iexpand(pattern1,pattern2,...)
+
+            @lexpand(pattern1,pattern2,...)
+
+            @sexpand(pattern1,pattern2,...)
+
+            @texpand(pattern1,pattern2,...)
+
+            @vexpand(pattern1,pattern2,...)
+
+            $DataList<...> listname pattern [filename]
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -649,6 +676,12 @@ class IodeDatabase:
         -------
         list(str)
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataPattern<...> list pattern X_dimension [Y_dimension]
+
         Examples
         --------
         >>> import numpy as np
@@ -755,6 +788,12 @@ class IodeDatabase:
         -------
         Renaming an Equation is not allowed.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataRenameVar name new_name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -856,6 +895,17 @@ class IodeDatabase:
         -------
         dict(str, list(str))
             dictionary containing the 4 lists of objects
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataCompare<...> filename ONE TWO THREE FOR
+
+            ONE    in workspace only
+            TWO    in file only
+            THREE  in both, equal
+            FOR    in both, different
 
         Examples
         --------
@@ -1030,6 +1080,13 @@ class IodeDatabase:
         input_file: str
             file from which the objects to merge are read.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsMerge<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -1109,6 +1166,16 @@ class IodeDatabase:
         Returns
         -------
         list(str)
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataSearch<...> mask word ecase in_name in_formula in_text list_result
+
+            (word, ecase, in_name, in_formula, in_text := 0 or 1)
+            (mask := characters and possibly ?, *, ...)
+            (list_result := the name of the result list)
 
         Examples
         --------
@@ -1244,6 +1311,16 @@ class IodeDatabase:
         filepath: str
             path to the file to load
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsLoad<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
+            $WsImport<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
         Examples
         --------
         >>> from iode import comments, equations, identities, lists, tables, scalars, variables
@@ -1296,6 +1373,19 @@ class IodeDatabase:
             This may slow down the writing process but will reduce the size of the saved file.
             Default to False.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsSave<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
+            $WsSaveCmp<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
+            $WsExport<...> filename
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
+
         Examples
         --------
         >>> from pathlib import Path
@@ -1329,6 +1419,13 @@ class IodeDatabase:
     def clear(self):
         r"""
         Delete all objects from the current database.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsClear<...>
+            where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
         Examples
         --------
@@ -1375,6 +1472,12 @@ class IodeDatabase:
         ----------
         item: str
             name of the IODE object. 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataExistVar name
 
         Examples
         --------

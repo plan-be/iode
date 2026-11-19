@@ -366,6 +366,14 @@ class Equations(IodeDatabase):
         --------
         iode.Equation
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateEqs name lec_equation
+
+            $DataCreateEqs name
+
         Examples
         --------
         >>> import pandas as pd
@@ -568,6 +576,12 @@ class Equations(IodeDatabase):
             (list of) name(s) of the equation(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteEqs name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -636,6 +650,14 @@ class Equations(IodeDatabase):
         Return the list of coefficients (scalars) used in the equations of 
         (the subset of) the database.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
+            $DataScanEqs [name1,name2,...]
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -652,6 +674,14 @@ class Equations(IodeDatabase):
     def variables(self) -> List[str]:
         r"""
         Return the list of variables used in the equations of (the subset of) the database.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
+
+            $DataScanEqs [name1,name2,...]
 
         Examples
         --------
@@ -726,6 +756,12 @@ class Equations(IodeDatabase):
         If some equations to be estimated belongs to a same block, the *block* (:meth:`Equation.block`), 
         *method* (:meth:`Equation.method`), and *instruments* (':meth:`Equation.instruments`) of each of 
         them must have been updated before.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsEstimate perfrom perto eqname1 ...
 
         Examples
         --------
@@ -1011,6 +1047,15 @@ class Equations(IodeDatabase):
         bool
             True if the estimation process has converged, False otherwise.
             
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsStepWise from to eqname leccond {r2|fstat}
+            where from to : estimation period
+                  eqname  : equation to estimate
+                  leccond : acceptance condition
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Scalar
@@ -1217,6 +1262,13 @@ class Equations(IodeDatabase):
         names: str or list(str)
             list of equations to copy from the input file(s).
             Defaults to load all equations from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyEqs file;file;... {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
         self._cy_database.copy_from(input_files, names)
@@ -1845,6 +1897,15 @@ class Equations(IodeDatabase):
             Possible values are: PrintEquationsAs.EQ_ONLY, PrintEquationsAs.EQ_COMMENTS, 
             PrintEquationsAs.EQ_COMMENTS_ESTIMATION
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjInfos 0, 1 or 2
+            0: equation only
+            1: equation + comment
+            2: equation + comment + estimation
+
         Examples
         --------
         >>> from iode import equations, PrintEquationsAs
@@ -1891,6 +1952,15 @@ class Equations(IodeDatabase):
             Possible values are: PrintEquationsLecAs.AS_IS, 
             PrintEquationsLecAs.COEFFS_TO_VALUES, 
             PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjLec 0, 1 or 2
+            0: normal LEC form
+            1: coefficients replaced by their value
+            2: coefficients replaced by their value + t-tests
 
         Examples
         --------
@@ -1966,6 +2036,12 @@ class Equations(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the equations will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefEqs [list of parameters]
 
         Examples
         --------

@@ -20,6 +20,13 @@ def set_t(time: Union[str, Period]):
     time: str or Period
         Period to set. If str, it must be a valid IODE period (e.g. "2000Y1", "2005Y1", etc.)
 
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $SetTime period
+        period := the period value to assign to t
+
     Examples
     --------
     >>> from iode.reports import set_t, execute_command
@@ -42,6 +49,13 @@ def increment_t(increment: int):
     increment: int
         Number of periods to increment *t* by. 
         For example, if *t* is "2000Y1" and increment is 1, then *t* will become "2001Y1".
+
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $IncrTime [step]
+        step := number of periods to add
 
     Examples
     --------
@@ -164,6 +178,10 @@ def execute_report(filepath: Union[str, Path], parameters: Union[str, List[str]]
     Notes
     -----
     Equivalent to the IODE command `$ReportExec`
+
+    Equivalent IODE report syntax::
+
+        $ReportExec report [arguments]
 
     Examples
     --------

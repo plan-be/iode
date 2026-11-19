@@ -655,6 +655,12 @@ class Variables(IodeDatabase):
             If `key` represents a list of non-contiguous periods, the returned object is a pandas DataFrame.
             Otherwise, a subset of the Variables workspace is returned.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vvalue(varname,varname,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -1243,6 +1249,22 @@ class Variables(IodeDatabase):
             If dict, the keys represents the names of the variables to be modified. 
             If numpy array or pandas Series/DataFrame, there must be a value for each variable and period to be set.
             If Variables, names and periods must match.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateVar name [L,l | D,d | G,g] period value1 value2 ...
+            where L,l := in value (default)
+               D, d := in difference
+               G, g := in growth rate
+               period := the period at the start of the update
+
+            $DataCreateVar name
+
+            $DataDuplicateVar old_name new_name
+
+            $DataCalcVar name formula
 
         Examples
         --------
@@ -1939,6 +1961,12 @@ class Variables(IodeDatabase):
         key: str or list(str)
             (list of) name(s) of the variable(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteVar name
 
         Examples
         --------
@@ -6076,6 +6104,15 @@ class Variables(IodeDatabase):
             New mode value.
             Possible modes are LEVEL, DIFF, GROWTH_RATE, Y0Y_DIFF or Y0Y_GROWTH_RATE.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataModeVar n
+            where n = 0 for level
+                  n = 1 for differences
+                  n = 2 for growth rates
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, variables, VarsMode
@@ -6145,6 +6182,17 @@ class Variables(IodeDatabase):
         Changing the sample on a subset of the Variables workspace is not allowed unless the 
         :py:meth:`~iode.Variables.copy` method has been used (in that case, any change made on the subset 
         will not be reflected in the global Variables workspace).
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsSample from to
+
+            @sample(B|E|)
+                 B : first period
+                 E : last period
+                 empty : first and last periods
 
         Examples
         --------
@@ -6412,6 +6460,12 @@ class Variables(IodeDatabase):
         --------
         iode.Variables.compare
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataCompareEps eps
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -6628,6 +6682,13 @@ class Variables(IodeDatabase):
         names: str or list(str), optional
             list of variables to copy from the input file(s).
             Defaults to load all variables from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyVar file;file;... [from to] {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
 
@@ -6699,6 +6760,22 @@ class Variables(IodeDatabase):
         Returns
         -------
         None
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsLtoHStock {L|C|S} Filename VarList
+
+            with L for linear interpolation
+                 C for Cubic Splines interpolation
+                 S for Steps interpolation
+
+            $WsLtoHFlow {L|C|S}  Filename VarList
+
+            with L for linear interpolation
+                 C for Cubic Splines interpolation
+                 S for Steps interpolation
 
         Examples
         --------
@@ -6925,6 +7002,16 @@ class Variables(IodeDatabase):
         var_list : str or list(str)
             List of variables to include in the transformation.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsHtoLSum Filename VarList
+
+            $WsHtoLMean Filename VarList
+
+            $WsHtoLLast Filename VarList
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, variables, HighToLowType
@@ -7069,6 +7156,14 @@ class Variables(IodeDatabase):
         variables_list: str or list(str), optional
             list of variables to extrapolate.
             Defaults to None (all variables).
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsExtrapolate [method] from to [list of variables]
+            where method: 0 ... 6
+                  from, to := IODE periods (yyyyPpp)
 
         Examples
         --------
@@ -7253,6 +7348,15 @@ class Variables(IodeDatabase):
         See Also
         --------
         Variables.trend_correction
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsSeasonAdj Filename VarList
+
+            $WsSeasAdj Filename Varname Varname ... Eps
+
         """
         if isinstance(input_file, str):
             input_file = Path(input_file)
@@ -7293,6 +7397,13 @@ class Variables(IodeDatabase):
         See Also
         --------
         Variables.seasonal_adjustment
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsTrend VarFilename Lambda series1 series2 ...
+
         """
         if isinstance(input_file, str):
             input_file = Path(input_file)
@@ -7350,6 +7461,12 @@ class Variables(IodeDatabase):
             Maximum number of iterations. Defaults to 100.
         epsilon: float, optional         
             Convergence threshold. Defaults to 0.001. 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataRasVar pattern X_dimension Y_dimension ref_year sum_year [maxit [eps]]
 
         Examples
         --------
@@ -7521,6 +7638,19 @@ class Variables(IodeDatabase):
         debug_file : str or Path, optional
             The path to the debug file where the debug information will be saved. 
             If not provided, the debug information will be printed to the console.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $FileImportVar format rule infile outfile from to  [trace]
+            where format = {A, R, D, N, G, P, T}
+               rule = rulefile to use to translate names
+               infile = file to import
+               outfile = IODE-file with imported series
+               from = begin of sample
+               to   = end of sample
+               trace = debug file (optional)
 
         Examples
         --------
@@ -8135,6 +8265,12 @@ class Variables(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the variables will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefVar [list of parameters]
 
         Examples
         --------
