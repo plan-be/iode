@@ -392,6 +392,16 @@ class Tables(IodeDatabase):
         --------
         iode.Table
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateTbl table_name title;lec1;lec2;...
+
+            $DataCreateTbl name
+
+            $DataDuplicateTbl old_name new_name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -745,6 +755,12 @@ class Tables(IodeDatabase):
             (list of) name(s) of the table(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteTbl name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -909,6 +925,14 @@ class Tables(IodeDatabase):
         Return the list of coefficients (scalars) used in the tables of 
         (the subset of) the database.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
+            $DataScanTbl [name1,name2,...]
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -925,6 +949,14 @@ class Tables(IodeDatabase):
     def variables(self) -> List[str]:
         r"""
         Return the list of variables used in the tables of (the subset of) the database.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
+
+            $DataScanTbl [name1,name2,...]
 
         Examples
         --------
@@ -949,6 +981,13 @@ class Tables(IodeDatabase):
         names: str or list(str)
             list of tables to copy from the input file(s).
             Defaults to load all tables from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyTbl file;file;... {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
         self._cy_database.copy_from(input_files, names)
@@ -993,6 +1032,14 @@ class Tables(IodeDatabase):
         value: PrintTablesAs
             Possible values are: PrintTablesAs.FULL, PrintTablesAs.TITLES, 
             PrintTablesAs.COMPUTED
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjTitle 0 or 1
+            0: full definition
+            1: titles only
 
         Examples
         --------
@@ -1075,6 +1122,15 @@ class Tables(IodeDatabase):
             number of decimals to use for computing the tables. 
             Only used if `print_tables_as` is `PrintTablesAs.COMPUTED`.
             Defaults to 4.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefTbl [list of parameters]
+
+            $PrintTblFile n varfilename
+            where n = 2, 3, 4, 5
 
         Examples
         --------

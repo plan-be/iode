@@ -153,6 +153,12 @@ class Comments(IodeDatabase):
         -------
         Single comment or a subset of the database.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @cvalue(cmtname,cmtname,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -209,6 +215,18 @@ class Comments(IodeDatabase):
             (e.g. "A*;*_").
         value: str or dict(str, str) or pandas.Series(str, str) or Comments
             (new) comment(s) value(s).
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateCmt name comment
+
+            $DataCreateCmt name
+
+            $DataAppendCmt name comment
+
+            $DataDuplicateCmt old_name new_name
 
         Examples
         --------
@@ -310,6 +328,12 @@ class Comments(IodeDatabase):
             (list of) name(s) of the comment(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteCmt name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -364,6 +388,12 @@ class Comments(IodeDatabase):
             list of comments to copy from the input file(s).
             Defaults to load all comments from the input file(s). 
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyCmt file;file;... {object | list of objects}
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -626,6 +656,18 @@ class Comments(IodeDatabase):
             The path to the debug file where the debug information will be saved. 
             If not provided, the debug information will be printed to the console.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $FileImportCmt format rule infile outfile language [trace]
+            where format = {Ascii, Rotated_Ascii, DIF, NIS, GEM, PRN, TXT_Belgostat}
+               rule = rulefile to use to translate names
+               infile = file to import
+               outfile = IODE-file with imported series
+               language =  {E,F,D}
+               trace = debug file (optional)
+
         Examples
         --------
         >>> from pathlib import Path
@@ -779,6 +821,12 @@ class Comments(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the comments will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefCmt [list of parameters]
 
         Examples
         --------

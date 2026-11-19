@@ -103,6 +103,12 @@ def dickey_fuller_test(lec: str, drift: bool, trend: bool, order: int) -> Scalar
     Scalars
         Scalars database containing the results of the Dickey-Fuller tests.
 
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $StatUnitRoot drift trend order expression
+
     Examples
     --------
     >>> from iode import SAMPLE_DATA_DIR, scalars, variables

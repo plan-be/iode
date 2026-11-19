@@ -72,6 +72,12 @@ class Identity:
         -------
         list(str)
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -98,6 +104,12 @@ class Identity:
         Returns
         -------
         list(str)
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
 
         Examples
         --------

@@ -259,6 +259,18 @@ class Lists(IodeDatabase):
         value: str or dict(str, str) or pd.Series or Lists
             (new) IODE list(s) value(s).
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateLst name list
+
+            $DataCreateLst name
+
+            $DataAppendLst name list
+
+            $DataDuplicateLst old_name new_name
+
         Examples
         --------
         >>> import pandas as pd
@@ -382,6 +394,12 @@ class Lists(IodeDatabase):
             (list of) name(s) of the IODE list(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteLst name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -435,6 +453,13 @@ class Lists(IodeDatabase):
         names: str or list(str)
             list of lists to copy from the input file(s).
             Defaults to load all lists from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyLst file;file;... {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
         self._cy_database.copy_from(input_files, names)
@@ -664,6 +689,12 @@ class Lists(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the IODE lists will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefLst [list of parameters]
 
         Examples
         --------

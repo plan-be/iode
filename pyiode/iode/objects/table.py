@@ -1080,6 +1080,12 @@ class Table:
         value: str
             Title of the table.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @ttitle(tbl1,tbl2,...)
+
         Examples
         --------
         >>> from iode import Table, tables, SAMPLE_DATA_DIR
@@ -1317,6 +1323,12 @@ class Table:
         -------
         list(str)
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -1361,6 +1373,12 @@ class Table:
         Returns
         -------
         list(str)
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
 
         Examples
         --------
@@ -1743,6 +1761,24 @@ class Table:
         Returns
         -------
         ComputedTable
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ViewTbl sample table [list of tables]
+
+            $PrintTbl sample table1 [other tables]
+
+            $PrintVar gsample var1;var2
+
+            $ViewVar gsample lec1 [lec2 ...]
+
+            where gsample is a generalized sample without spaces
+                  lec1 and lec2 are LEC forms without spaces
+
+            $ViewNdec n
+            n between -1 (variable) and 6
 
         Examples
         --------

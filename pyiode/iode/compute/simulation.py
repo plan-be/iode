@@ -215,6 +215,20 @@ class Simulation:
             Save a trace of the sub-iterations when the Newton-Raphson algorithm is used.
             Default to False.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelSimulateParms eps relax maxit
+                                {Connex | Triang | None }
+                                0 - 4 (starting values)
+                                {Yes | no }
+                                {yes | No }
+                                nbtri
+
+            where eps   = convergence threshold (real number)
+                  relax = real number between 0.1 and 1
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables 
@@ -315,6 +329,12 @@ class Simulation:
         value: float
             New convergence threshold value.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @SimEps()
+
         Examples
         --------
         >>> from iode import simulation
@@ -362,6 +382,12 @@ class Simulation:
         value: float
             New relaxation parameter value. Its value must be in the range [0.1, 1.0]. 
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @SimRelax()
+
         Examples
         --------
         >>> from iode import simulation
@@ -393,6 +419,12 @@ class Simulation:
         ----------
         value: int
             New maximum number of iterations allowed.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @SimMaxit()
 
         Examples
         --------
@@ -905,6 +937,12 @@ class Simulation:
         int
             The number of iterations to converge for the specified period.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @SimNiter(period)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
@@ -983,6 +1021,12 @@ class Simulation:
         var_name: str
             The name of the variable to save the number of iterations.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelSimulateSaveNiters varname
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
@@ -1066,6 +1110,12 @@ class Simulation:
         float
             The norm value for the specified period.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @SimNorm(period)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
@@ -1142,6 +1192,12 @@ class Simulation:
         var_name: str
             The name of the variable to save the lowest norm values.
         
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelSimulateSaveNorms varname
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables
@@ -1230,6 +1286,15 @@ class Simulation:
             Each pair must be written as `endogenous_name-exogenous_name`.
             If the passed list is empty, the internal list of endogenous-exogenous pairs is reset.
             Default to None (empty).
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelExchange eqname1-varname1,eqname2-varname2,...
+
+            where eqname1 and eqname2 are equation names (and thus endogenous variable names)
+                  varname1 and varname2 are exogenous variable names
 
         Examples
         --------
@@ -1433,6 +1498,15 @@ class Simulation:
         -------
         bool
             True if the compilation is successful, False otherwise.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelCompile  [eqname1, eqname2, ... ]
+
+            where eqname1 and eqname2 are equation names.
+
         """
         if list_eqs is None:
             list_eqs = ''
@@ -1487,6 +1561,12 @@ class Simulation:
         -------
         bool
             True if the simulation is successful, False otherwise.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $modelsimulate period1 period2 [list_of_equations]
 
         Examples
         --------
@@ -1731,6 +1811,12 @@ class Simulation:
         bool
             True if the model was successfully reordered.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelCalcSCC nbtri lstpre lstinter lstpost
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, lists, scalars, variables 
@@ -1855,6 +1941,12 @@ class Simulation:
         --------
         Simulation.model_calculate_SCC
         Simulation.model_simulate
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $ModelSimulateSCC from to pre inter post
 
         Examples
         --------

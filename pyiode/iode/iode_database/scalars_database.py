@@ -275,6 +275,16 @@ class Scalars(IodeDatabase):
         --------
         iode.Scalar
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataUpdateScl name value [relax]
+
+            $DataCreateScl name
+
+            $DataDuplicateScl old_name new_name
+
         Examples
         --------
         >>> import pandas as pd
@@ -419,6 +429,12 @@ class Scalars(IodeDatabase):
             (list of) name(s) of the scalar(s) to be removed.
             The list of names can be given as a string pattern (e.g. "A*;*_").
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $DataDeleteScl name
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -484,6 +500,13 @@ class Scalars(IodeDatabase):
         names: str or list(str)
             list of scalars to copy from the input file(s).
             Defaults to load all scalars from the input file(s). 
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $WsCopyScl file;file;... {object | list of objects}
+
         """
         input_files, names = self._copy_from(input_files, names)
         self._cy_database.copy_from(input_files, names)
@@ -853,6 +876,12 @@ class Scalars(IodeDatabase):
             format of the output file. Possible values are: 'H' (HTML file), 
             'M' (MIF file), 'R' (RTF file) or 'C' (CSV file).
             Defaults to None meaning that the scalars will be dumped in the *A2M* format.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $PrintObjDefScl [list of parameters]
 
         Examples
         --------

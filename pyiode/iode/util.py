@@ -69,6 +69,15 @@ def define(name: str, macro: str):
     --------
     macro
 
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $define name text
+        name := name used to refer to the content (text) of the
+                macro (the name must start with a letter and not
+                exceed 10 characters)
+
     Examples
     --------
     >>> from iode import define, macro
@@ -106,6 +115,15 @@ def macro(name: str) -> str:
     See Also
     --------
     define
+
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $define name text
+        name := name used to refer to the content (text) of the
+                macro (the name must start with a letter and not
+                exceed 10 characters)
 
     Examples
     --------

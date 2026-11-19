@@ -21,6 +21,13 @@ def load_extra_files(extra_files: Union[str, Path, List[Union[str, Path]]], quie
         If True, suppresses the log messages during the loading of files. 
         Default is False.
             
+    Notes
+    -----
+    Equivalent IODE report syntax::
+
+        $ViewTblFile n varfilename
+        where n = 2, 3, 4, 5
+
     Examples
     --------
     >>> from pathlib import Path

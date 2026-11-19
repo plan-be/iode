@@ -153,6 +153,12 @@ class Equation:
         -------
         list(str)
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @sliste(eq1,eq2,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -213,6 +219,12 @@ class Equation:
         -------
         list(str)
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @vliste(eq1,eq2,...)
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -272,6 +284,14 @@ class Equation:
         Returns
         -------
         tuple(str, str)
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @eqlhs(eqname)
+
+            @eqrhs(eqname)
 
         Examples
         --------
@@ -357,6 +377,12 @@ class Equation:
         Warnings
         --------
         If the present equation belongs to a block, you must use the :meth:`Equations.estimate` method instead.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsEstimate perfrom perto eqname1 ...
 
         Examples
         --------
@@ -527,6 +553,15 @@ class Equation:
         bool
             True if the estimation process has converged, False otherwise.
             
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsStepWise from to eqname leccond {r2|fstat}
+            where from to : estimation period
+                  eqname  : equation to estimate
+                  leccond : acceptance condition
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations, scalars, variables, Equation, Scalar
@@ -729,6 +764,12 @@ class Equation:
         value: str
             New LEC expression.
 
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @evalue(eqname,eqname,...)
+
         Examples
         --------
         >>> from iode import Equation
@@ -762,6 +803,20 @@ class Equation:
         ----------
         value: EqMethod or str
             Possible values are LSQ, ZELLNER, INSTRUMENTAL, GLS, MAX_LIKELIHOOD.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsSetMethod   {0|1|2|3} eqname1 eqname2 ...
+
+            where 0 indicates the LSQ method (least squares)
+                  1 indicates the Zellner method
+                  2 indicates the INF method (2-stage with instruments)
+                  3 indicates the GLS method (3-stage with instruments)
+                  4 indicates the MAXLIK method (Maximum likelihood - BHHH - from version 6.21)
+
+                  eqname1 .. are the names of existing equations
 
         Examples
         --------
@@ -805,6 +860,20 @@ class Equation:
         ----------
         value: str or Sample
             New estimation sample
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            @eqsample(eqname)
+
+            @eqsamplefrom(eqname)
+
+            @eqsampleto(eqname)
+
+            $EqsSetSample from to eqname1 eqname2 ...
+            where from and to are the sample period limits
+                  eqname1 .. are the names of existing equations
 
         Examples
         --------
@@ -865,6 +934,15 @@ class Equation:
     def comment(self) -> str:
         r"""
         Equation comment.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsSetCmt eqname comment
+            where eqname is the name of the equation
+                  comment is free text
+
         """
         return self._cy_equation.get_comment()
 
@@ -883,6 +961,16 @@ class Equation:
             If several instruments are required for the estimation, they can be passed either as 
             a unique string in which instruments are separated by a semi colon ';' or as a list of 
             strings.
+
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsSetInstrs eqname lec_instr_1;lec_instr_2;...
+
+            where eqname is the name of the equation
+                  lec_instr_1, ... are the LEC forms of the instruments
+
         """
         return self._cy_equation.get_instruments()
 
@@ -901,6 +989,14 @@ class Equation:
         ----------
         value: str or list(str)
            
+        Notes
+        -----
+        Equivalent IODE report syntax::
+
+            $EqsSetBloc eqname1 eqname2 ...
+
+            where eqname1 ... are the names of existing equations
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR, equations
