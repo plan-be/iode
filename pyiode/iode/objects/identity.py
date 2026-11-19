@@ -74,9 +74,9 @@ class Identity:
 
         Notes
         -----
-        Equivalent IODE report syntax::
+        Equivalent IODE report syntax (the scalars are stored in the list ``_SCAL``)::
 
-            @sliste(eq1,eq2,...)
+            $DataScanIdt name
 
         Examples
         --------
@@ -107,9 +107,9 @@ class Identity:
 
         Notes
         -----
-        Equivalent IODE report syntax::
+        Equivalent IODE report syntax (the variables are stored in the list ``_EXO``)::
 
-            @vliste(eq1,eq2,...)
+            $DataScanIdt name
 
         Examples
         --------

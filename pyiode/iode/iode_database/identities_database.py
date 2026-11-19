@@ -404,9 +404,7 @@ class Identities(IodeDatabase):
         
         Notes
         -----
-        Equivalent IODE report syntax::
-
-            @sliste(eq1,eq2,...)
+        Equivalent IODE report syntax (the scalars are stored in the list ``_SCAL``)::
 
             $DataScanIdt [name1,name2,...]
 
@@ -429,9 +427,8 @@ class Identities(IodeDatabase):
 
         Notes
         -----
-        Equivalent IODE report syntax::
-
-            @vliste(eq1,eq2,...)
+        Equivalent IODE report syntax (the variables, except the names of the
+        scanned identities, are stored in the list ``_EXO``)::
 
             $DataScanIdt [name1,name2,...]
 

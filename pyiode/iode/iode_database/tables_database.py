@@ -927,9 +927,7 @@ class Tables(IodeDatabase):
         
         Notes
         -----
-        Equivalent IODE report syntax::
-
-            @sliste(eq1,eq2,...)
+        Equivalent IODE report syntax (the scalars are stored in the list ``_SCAL``)::
 
             $DataScanTbl [name1,name2,...]
 
@@ -952,9 +950,7 @@ class Tables(IodeDatabase):
 
         Notes
         -----
-        Equivalent IODE report syntax::
-
-            @vliste(eq1,eq2,...)
+        Equivalent IODE report syntax (the variables are stored in the list ``_EXO``)::
 
             $DataScanTbl [name1,name2,...]
 
