@@ -55,3 +55,5 @@ Miscellaneous
   2. the docstrings of the methods and functions of the iode Python package now
   give, in their *Notes* section, the syntax of the equivalent IODE
   command(s) or function(s)
+  3. the *Getting Started* tutorial now shows, below most Python code cells,
+  the equivalent IODE report syntax
