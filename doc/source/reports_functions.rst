@@ -1,3 +1,5 @@
+.. currentmodule:: iode
+
 .. _reports_functions:
 
 Functions
@@ -129,6 +131,12 @@ Example::
 
      @upper("free text")
 
+Python equivalent: `txt.upper() <https://docs.python.org/3/library/stdtypes.html#str.upper>`_
+
+Python syntax::
+
+    text.upper()
+
 Result::
 
      FREE TEXT
@@ -147,6 +155,12 @@ Syntax::
 Example::
 
      @lower("Free Text")
+
+Python equivalent: `txt.lower() <https://docs.python.org/3/library/stdtypes.html#str.lower>`_
+
+Python syntax::
+
+    text.lower()
 
 Result::
 
@@ -167,6 +181,12 @@ Syntax::
 Example::
 
      @replace("free text",text,hugs)
+
+Python equivalent: `txt.replace(old, new) <https://docs.python.org/3/library/stdtypes.html#str.replace>`_
+
+Python syntax::
+
+    text.replace(replace_from, replace_by)
 
 Result::
 
@@ -196,6 +216,12 @@ Example::
      @fmt(123,0009)     ---> 0123  
      @fmt(123,A0000A)   ---> A00123A
 
+Python equivalent: see `printf-style String Formatting <https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting>`_
+
+Python syntax::
+
+    "%04d" % val          # @fmt(123,0009) ---> 0123
+
 .. warning:: 
       
      Whitespaces before and after the format are included in the result.
@@ -216,6 +242,13 @@ Example::
 
      @take(3,IODE)  
      @take(-3,IODE)
+
+Python equivalent: `txt[:n] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_
+
+Python syntax::
+
+    text[:n]     # n > 0: first n characters
+    text[n:]     # n < 0: last -n characters
 
 Result::
 
@@ -239,6 +272,13 @@ Example::
      @drop(2,IODE)  
      @drop(-2,IODE)
 
+Python equivalent: `txt[n:] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_
+
+Python syntax::
+
+    text[n:]     # n > 0: drop the first n characters
+    text[:n]     # n < 0: drop the last -n characters
+
 Result:: 
      
      DE  
@@ -261,6 +301,12 @@ Example::
      @count(A,B,C,E)  
      @count(ABC,,,B)
 
+Python equivalent: `len(txt.split(',')) <https://docs.python.org/3/library/stdtypes.html#str.split>`_
+
+Python syntax::
+
+    len(text.split(','))
+
 Result::
 
      4  
@@ -282,6 +328,12 @@ Example::
      @index(2,A,B,C,E)  
      @index(1,ABC,,,B)
 
+Python equivalent: `split_list(list_txt)[n-1] <https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range>`_
+
+Python syntax::
+
+    split_list(list_txt)[n-1]
+
 Result::
 
      B  
@@ -302,6 +354,12 @@ Example::
 
       @sqz(' ABC D  ')   ---> 'ABCD'
 
+Python equivalent: `txt.replace(' ', '') <https://docs.python.org/3/library/stdtypes.html#str.replace>`_
+
+Python syntax::
+
+    text.replace(' ', '')
+
 .. _strip:
 
 FUNCTION @strip
@@ -316,6 +374,12 @@ Syntax::
 Example::
 
       @strip(' ABC D  ')   ---> ' ABC D'
+
+Python equivalent: `txt.rstrip() <https://docs.python.org/3/library/stdtypes.html#str.rstrip>`_
+
+Python syntax::
+
+    text.rstrip()
 
 .. _ansi:
 
@@ -355,6 +419,12 @@ Example::
      @equal(123,123)    ---> 1 (True)
      @equal(123, 123)   ---> 0 (False because of the whitespace)
      @equal(%i%,10)     ---> 1 or 0 (True or False depending on the value of i)
+
+Python equivalent: `t1 == t2 <https://docs.python.org/3/library/stdtypes.html#comparisons>`_
+
+Python syntax::
+
+    t1 == t2
 
 .. warning:: 
      
@@ -418,12 +488,26 @@ Example::
      $define LIST @vdrop(1,%LIST%)  
      $goto next @vcount(%LIST%)
 
+Python equivalent: `list_txt.split(separators)[:n] <https://docs.python.org/3/library/stdtypes.html#str.split>`_
+
+Python syntax::
+
+    values.split(sep)[:n]    # n > 0
+    values.split(sep)[n:]    # n < 0
+
 .. _vdrop:
 
 FUNCTION @vdrop(n,values)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`@vtake <vtake>`.
+
+Python equivalent: `list_txt.split(separators)[n:] <https://docs.python.org/3/library/stdtypes.html#str.split>`_
+
+Python syntax::
+
+    values.split(sep)[n:]    # n > 0
+    values.split(sep)[:n]    # n < 0
 
 .. _vcount:
 
@@ -442,6 +526,12 @@ Example::
      $show @vcount(A B|C)   -> 2  
      $show @vcount(A;B;C)   -> 1
 
+Python equivalent: `len(list_txt.split(separators)) <https://docs.python.org/3/library/stdtypes.html#str.split>`_
+
+Python syntax::
+
+    len(values.split(sep))
+
 See also :ref:`@vtake <vtake>`.
 
 .. _fdelete:
@@ -458,6 +548,13 @@ Syntax::
 Example::
 
      @fdelete(test.htm)
+
+Python equivalent: `Path(filepath).unlink() <https://docs.python.org/3/library/pathlib.html#pathlib.Path.unlink>`_
+
+Python syntax::
+
+    from pathlib import Path
+    Path(filename).unlink()
 
 Result::
 
@@ -487,6 +584,13 @@ Example::
       -----  
       test A B C
 
+Python equivalent: `open(filepath, 'a') <https://docs.python.org/3/library/functions.html#open>`_
+
+Python syntax::
+
+    with open(filename, 'a') as f:
+        f.write(text)
+
 Result::
 
       File test.htm  
@@ -505,6 +609,13 @@ Example::
 
      Current directory: @getdir()
 
+Python equivalent: `os.getcwd() <https://docs.python.org/3/library/os.html#os.getcwd>`_
+
+Python syntax::
+
+    import os
+    os.getcwd()
+
 Result::
 
      Current directory: c:\usr\iode
@@ -520,6 +631,14 @@ Example::
 
      Current directory: @getdir()  
      New directory: @chdir(..)
+
+Python equivalent: `os.chdir(dirname) <https://docs.python.org/3/library/os.html#os.chdir>`_
+
+Python syntax::
+
+    import os
+    os.chdir(dirname)
+    os.getcwd()
 
 Result::
 
@@ -540,6 +659,13 @@ Example::
      Creating subdir:           @mkdir(subdir)
      New current directory:     @getdir()
 
+Python equivalent: `os.mkdir(dirname) <https://docs.python.org/3/library/os.html#os.mkdir>`_
+
+Python syntax::
+
+    import os
+    os.mkdir(dirname)
+
 Result::
 
      Current directory:         c:\usr\iode
@@ -559,6 +685,13 @@ Returns no value.
      - The directory must be empty before it can be deleted.
      - Use with caution...
 
+Python equivalent: `os.rmdir(dirname) <https://docs.python.org/3/library/os.html#os.rmdir>`_
+
+Python syntax::
+
+    import os
+    os.rmdir(dirname)
+
 .. _date:
 
 FUNCTION @date
@@ -576,6 +709,13 @@ Example::
 
      Today's date is @date()  
      Other format: @date("dd/mm/yy")
+
+Python equivalent: `datetime.now().strftime(format) <https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime>`_
+
+Python syntax::
+
+    from datetime import datetime
+    datetime.now().strftime("%d-%m-%Y")
 
 Result::
 
@@ -600,6 +740,13 @@ Example::
      The time is @time()  
      Other format: @time("hh hours mm minutes")
 
+Python equivalent: `datetime.now().strftime(format) <https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime>`_
+
+Python syntax::
+
+    from datetime import datetime
+    datetime.now().strftime("%H:%M:%S")
+
 Result::
 
      The time is 23:12:55  
@@ -623,6 +770,13 @@ Example::
      In French and uppercase: @upper(@month(3,F))  
      In Dutch and lowercase: @lower(@month(3,N))
 
+Python equivalent: `date.strftime("%B") <https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior>`_
+
+Python syntax::
+
+    import datetime
+    datetime.date(year, month, 1).strftime("%B")    # language given by the current locale
+
 Result::
 
      The name of month number 3 is: March  
@@ -638,6 +792,13 @@ A timer has been added to allow calculation of processing durations.
 `@ChronoReset()` resets the timer to 0.
 See example in the function :ref:`@SimEps <simeps>`.
 
+Python equivalent: `time.time_ns() <https://docs.python.org/3/library/time.html#time.time_ns>`_
+
+Python syntax::
+
+    import time
+    start = time.time_ns()
+
 .. _chronoget:
 
 FUNCTION @ChronoGet()
@@ -645,6 +806,13 @@ FUNCTION @ChronoGet()
 
 Returns the elapsed time (in milliseconds) since the last call to 
 :ref:`@ChronoReset <chronoreset>`. See example in the function :ref:`@SimEps <simeps>`.
+
+Python equivalent: `time.time_ns() <https://docs.python.org/3/library/time.html#time.time_ns>`_
+
+Python syntax::
+
+    import time
+    delta_t = (time.time_ns() - start) // 1_000_000    # in milliseconds
 
 .. _cexpand:
 
@@ -661,6 +829,12 @@ Syntax::
 Example::
 
      @cexpand(A*,B*,AE)
+
+Python equivalent: :meth:`Comments.get_names`
+
+Python syntax::
+
+    comments.get_names(pattern=None, filepath=None)
 
 Result::
 
@@ -692,6 +866,12 @@ Example::
 
      @eexpand(X*)
 
+Python equivalent: :meth:`Equations.get_names`
+
+Python syntax::
+
+    equations.get_names(pattern=None, filepath=None)
+
 Result::
 
      All equations whose name starts with X
@@ -714,6 +894,12 @@ Syntax::
 Example::
 
      @iexpand(*_1)
+
+Python equivalent: :meth:`Identities.get_names`
+
+Python syntax::
+
+    identities.get_names(pattern=None, filepath=None)
 
 Result::
 
@@ -738,6 +924,12 @@ Example::
 
      $DataUpdateLst list1 @lexpand(_*)
 
+Python equivalent: :meth:`Lists.get_names`
+
+Python syntax::
+
+    lists.get_names(pattern=None, filepath=None)
+
 creates an IODE list *list1* containing all lists starting with ``_``.
 
 See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <iexpand>`, 
@@ -758,6 +950,12 @@ Syntax::
 Example::
 
      @sexpand(*)
+
+Python equivalent: :meth:`Scalars.get_names`
+
+Python syntax::
+
+    scalars.get_names(pattern=None, filepath=None)
 
 returns the list of all IODE scalars in the workspace.
 
@@ -780,6 +978,12 @@ Example::
 
      $PrintTbl 1990:5 @texpand(*)
 
+Python equivalent: :meth:`Tables.get_names`
+
+Python syntax::
+
+    tables.get_names(pattern=None, filepath=None)
+
 prints all IODE tables in the workspace for the sample 1990 to 1994.
 
 See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <iexpand>`, 
@@ -800,6 +1004,12 @@ Syntax::
 Example::
 
       $DataUpdateTbl NEWTBL TITLE;@vexpand(BE*)
+
+Python equivalent: :meth:`Variables.get_names`
+
+Python syntax::
+
+    variables.get_names(pattern=None, filepath=None)
 
 creates a table *NEWTBL* containing all series starting with BE.
 
@@ -822,6 +1032,17 @@ Example::
 
      $DataUpdateLst VARLST @vliste(@eexpand(*))
 
+Python equivalent: :attr:`Equation.variables`, :attr:`Equations.variables`, :attr:`Identity.variables`, :attr:`Identities.variables`, :attr:`Table.variables` and :attr:`Tables.variables`
+
+Python syntax::
+
+    equations[name].variables
+    equations.variables
+    identities[name].variables
+    identities.variables
+    tables[name].variables
+    tables.variables
+
 creates the list *VARLST* containing all series used in the equations of the workspace.
 
 See also :ref:`@sliste <sliste>`.
@@ -842,6 +1063,17 @@ Example::
 
      $DataUpdateLst ScalarLST @sliste(@eexpand(*))
 
+Python equivalent: :attr:`Equation.coefficients`, :attr:`Equations.coefficients`, :attr:`Identity.coefficients`, :attr:`Identities.coefficients`, :attr:`Table.coefficients` and :attr:`Tables.coefficients`
+
+Python syntax::
+
+    equations[name].coefficients
+    equations.coefficients
+    identities[name].coefficients
+    identities.coefficients
+    tables[name].coefficients
+    tables.coefficients
+
 creates the list *ScalarLST* containing all IODE scalars used in the equations of the workspace.
 
 See also :ref:`@vliste <vliste>`.
@@ -861,6 +1093,12 @@ Example::
 
      @ttitle(tbl)
 
+Python equivalent: :attr:`Table.title`
+
+Python syntax::
+
+    tables[name].title
+
 Result::
 
      Table title
@@ -879,6 +1117,12 @@ Syntax::
 Example::
 
      @srelax(scl)
+
+Python equivalent: :attr:`Scalar.relax`
+
+Python syntax::
+
+    scalars[name].relax
 
 Result::
 
@@ -900,6 +1144,12 @@ Example::
 
      @sstderr(scl1)
 
+Python equivalent: :attr:`Scalar.std`
+
+Python syntax::
+
+    scalars[name].std
+
 Result::
 
      0.001
@@ -918,6 +1168,12 @@ Syntax::
 Example::
 
      @cvalue(CMT1,A)
+
+Python equivalent: :meth:`comments[names] <Comments.__getitem__>`
+
+Python syntax::
+
+    comments[names]
 
 Result::
 
@@ -938,6 +1194,12 @@ Syntax::
 Example::
 
      @vvalue(A,B)
+
+Python equivalent: :meth:`variables[names] <Variables.__getitem__>`
+
+Python syntax::
+
+    variables[names]
 
 Result::
 
@@ -963,6 +1225,14 @@ Example::
      @sample(B)  
      @sample(E)
 
+Python equivalent: :attr:`Variables.sample`
+
+Python syntax::
+
+    variables.sample
+    variables.sample.start
+    variables.sample.end
+
 Result::
 
      1960Y1 1990Y1  
@@ -984,6 +1254,12 @@ Example::
 
      @evalue(EQ1)
 
+Python equivalent: :attr:`Equation.lec`
+
+Python syntax::
+
+    equations[name].lec
+
 Result::
 
      log(EQ1) := c1 + c2 * V3 + c3 * X
@@ -994,6 +1270,12 @@ FUNCTION @eqsample(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the estimation sample of the equation *eqname*.
+
+Python equivalent: :attr:`Equation.sample`
+
+Python syntax::
+
+    equations[name].sample
 
 .. _eqsamplefrom:
 
@@ -1010,6 +1292,12 @@ Example::
 
      $EqsEstimate @eqsamplefrom(ENDO1) 2012Y1 ENDO1
 
+Python equivalent: :attr:`Equation.sample` and :attr:`Sample.start`
+
+Python syntax::
+
+    equations[name].sample.start
+
 .. _eqsampleto:
 
 FUNCTION @eqsampleto(eqname)
@@ -1019,6 +1307,12 @@ Returns the *TO* part of the estimation sample.
 
 See example in :ref:`@EqSampleFrom <eqsamplefrom>`.
 
+Python equivalent: :attr:`Equation.sample` and :attr:`Sample.end`
+
+Python syntax::
+
+    equations[name].sample.end
+
 .. _eqlhs:
 
 FUNCTION @eqlhs(eqname)
@@ -1026,12 +1320,24 @@ FUNCTION @eqlhs(eqname)
 
 Returns the left-hand side of an equation.
 
+Python equivalent: :meth:`Equation.split_equation`
+
+Python syntax::
+
+    lhs, rhs = equations[name].split_equation()
+
 .. _eqrhs:
 
 FUNCTION @eqrhs(eqname)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Returns the right-hand side of an equation.
+
+Python equivalent: :meth:`Equation.split_equation`
+
+Python syntax::
+
+    lhs, rhs = equations[name].split_equation()
 
 .. _sqlopen:
 
@@ -1351,6 +1657,12 @@ Example::
      $define i {%i% + 1}  
      $goto nexttri {%i% <= %nbtri%}
 
+Python equivalent: :attr:`Simulation.convergence_threshold`
+
+Python syntax::
+
+    simulation.convergence_threshold
+
 .. _simrelax:
 
 FUNCTION @simrelax()
@@ -1359,6 +1671,12 @@ FUNCTION @simrelax()
 Returns the value of the relaxation parameter used for the last simulation.
 
 See example in the function :ref:`@SimEps <simeps>`.
+
+Python equivalent: :attr:`Simulation.relax`
+
+Python syntax::
+
+    simulation.relax
 
 .. _simmaxit:
 
@@ -1369,6 +1687,12 @@ Returns the value of the maximum number of iterations used for the last simulati
 
 See example in the function :ref:`@SimEps <simeps>`.
 
+Python equivalent: :attr:`Simulation.max_nb_iterations`
+
+Python syntax::
+
+    simulation.max_nb_iterations
+
 .. _simniter:
 
 FUNCTION @simniter(period)
@@ -1377,6 +1701,12 @@ FUNCTION @simniter(period)
 Returns the number of iterations required to solve the model for year *period*.
 
 See example in the function :ref:`@SimEps <simeps>`.
+
+Python equivalent: :meth:`Simulation.nb_iterations`
+
+Python syntax::
+
+    simulation.nb_iterations(period)
 
 .. _simnorm:
 
@@ -1387,8 +1717,8 @@ Returns the convergence threshold reached when solving the model for year *perio
 
 See example in the function :ref:`@SimEps <simeps>`.
 
-Python equivalent functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python equivalent: :meth:`Simulation.norm`
 
-To get the Python equivalent of the above IODE commands, refers to the 
-:ref:`API Reference <start_api_reports>` tables.
+Python syntax::
+
+    simulation.norm(period)
