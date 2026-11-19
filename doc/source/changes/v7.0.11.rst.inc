@@ -44,5 +44,14 @@ Fixed Bugs
   (which stopped silently as soon as a pasted value was equal to the value 
   already in its cell)
 
-Miscellaneous 
+Miscellaneous
 -------------
+
+- DOC: cross-referenced the IODE report syntax and the Python API:
+  1. the documentation of each IODE command and function (pages *IODE Commands*,
+  *Execution Commands* and *Functions*) now shows its Python equivalent (link to
+  the method or function of the iode package, or to the built-in Python function)
+  and the corresponding Python syntax
+  2. the docstrings of the methods and functions of the iode Python package now
+  give, in their *Notes* section, the syntax of the equivalent IODE
+  command(s) or function(s)
