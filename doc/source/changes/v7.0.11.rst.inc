@@ -35,8 +35,8 @@ Fixed Bugs
   IODE reports except when creating subsets of IODE workspaces (closes :issue:`1341`) 
 
 - IODE REPORT + PYTHON: fixed broken backward compatibility with IODE 6.68 of 
-  generated binary files from saving *Equations*, *Identities* and *Tables* IODE 
-  workspaces (closes :issue:`1347`)
+  generated binary files from saving *Equations* and *Identities* IODE 
+  workspaces
 
 - GUI: refresh the Variables view when copy/pasting values from an Excel file
 
