@@ -226,18 +226,14 @@ Lists Of Objects
     | :ref:`@vexpand(pattern, ...) <vexpand>` | :meth:`Variables.get_names`       | returns the list of variables matching pattern   |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
     | :ref:`@vliste(objname, ...) <vliste>`   | | :attr:`Equation.variables`      | | returns the list of variables in the           |
-    |                                         | | :attr:`Equations.variables`     | | equation(s), identity(ies), table(s)           |
-    |                                         | | :attr:`Identity.variables`      |                                                  |
-    |                                         | | :attr:`Identities.variables`    |                                                  |
-    |                                         | | :attr:`Table.variables`         |                                                  |
-    |                                         | | :attr:`Tables.variables`        |                                                  |
+    |                                         | | :attr:`Equations.variables`     | | equation(s). For identities and tables, see    |
+    |                                         |                                   | | :ref:`$DataScanIdt <datascan>` and             |
+    |                                         |                                   | | :ref:`$DataScanTbl <datascan>`                 |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
     | :ref:`@sliste(objname, ...) <sliste>`   | | :attr:`Equation.coefficients`   | | returns the list of scalars in the             |
-    |                                         | | :attr:`Equations.coefficients`  | | equation(s), identity(ies), table(s)           |
-    |                                         | | :attr:`Identity.coefficients`   |                                                  |
-    |                                         | | :attr:`Identities.coefficients` |                                                  |
-    |                                         | | :attr:`Table.coefficients`      |                                                  |
-    |                                         | | :attr:`Tables.coefficients`     |                                                  |
+    |                                         | | :attr:`Equations.coefficients`  | | equation(s). For identities and tables, see    |
+    |                                         |                                   | | :ref:`$DataScanIdt <datascan>` and             |
+    |                                         |                                   | | :ref:`$DataScanTbl <datascan>`                 |
     +-----------------------------------------+-----------------------------------+--------------------------------------------------+
 
 ===============

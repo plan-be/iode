@@ -1021,7 +1021,7 @@ See also :ref:`@cexpand <cexpand>`, :ref:`@eexpand <eexpand>`, :ref:`@iexpand <i
 FUNCTION @vliste
 ~~~~~~~~~~~~~~~~
 
-This function returns the list of IODE variables used in the equations whose names are 
+This function returns the list of IODE variables used in the equations whose names are
 passed as arguments.
 
 Syntax::
@@ -1030,20 +1030,32 @@ Syntax::
 
 Example::
 
-     $DataUpdateLst VARLST @vliste(@eexpand(*))
+     $DataUpdateLst VARLST @vliste(ACAF,ACAG,AOUC)
 
-Python equivalent: :attr:`Equation.variables`, :attr:`Equations.variables`, :attr:`Identity.variables`, :attr:`Identities.variables`, :attr:`Table.variables` and :attr:`Tables.variables`
+creates the list *VARLST* containing all series used in the equations *ACAF*, *ACAG* and *AOUC*.
+
+.. note::
+
+    - The equation names must be separated by commas. A list of names separated by
+      semicolons, such as the result of :ref:`@eexpand <eexpand>` or the content of
+      an IODE list, is read as a single (unknown) name:
+      ``@vliste(@eexpand(*))`` returns an empty list.
+    - Only equations are analysed: names of identities or tables are ignored.
+      Use :ref:`$DataScanIdt or $DataScanTbl <datascan>` for identities and tables.
+
+To get the series used in all the equations of the workspace, use
+:ref:`$DataScanEqs <datascan>` and add the endogenous variables to the list ``_EXO``::
+
+     $DataScanEqs
+     $DataUpdateLst ENDO @eexpand(*)
+     $DataCalcLst VARLST _EXO + ENDO
+
+Python equivalent: :attr:`Equation.variables`, :attr:`Equations.variables`
 
 Python syntax::
 
     equations[name].variables
     equations.variables
-    identities[name].variables
-    identities.variables
-    tables[name].variables
-    tables.variables
-
-creates the list *VARLST* containing all series used in the equations of the workspace.
 
 See also :ref:`@sliste <sliste>`.
 
@@ -1061,20 +1073,32 @@ Syntax::
 
 Example::
 
-     $DataUpdateLst ScalarLST @sliste(@eexpand(*))
+     $DataUpdateLst ScalarLST @sliste(ACAF,ACAG,AOUC)
 
-Python equivalent: :attr:`Equation.coefficients`, :attr:`Equations.coefficients`, :attr:`Identity.coefficients`, :attr:`Identities.coefficients`, :attr:`Table.coefficients` and :attr:`Tables.coefficients`
+creates the list *ScalarLST* containing all IODE scalars used in the equations *ACAF*,
+*ACAG* and *AOUC*.
+
+.. note::
+
+    - The equation names must be separated by commas. A list of names separated by
+      semicolons, such as the result of :ref:`@eexpand <eexpand>` or the content of
+      an IODE list, is read as a single (unknown) name:
+      ``@sliste(@eexpand(*))`` returns an empty list.
+    - Only equations are analysed: names of identities or tables are ignored.
+      Use :ref:`$DataScanIdt or $DataScanTbl <datascan>` for identities and tables.
+
+To get the scalars used in all the equations of the workspace, use
+:ref:`$DataScanEqs <datascan>`, which stores them in the list ``_SCAL``::
+
+     $DataScanEqs
+     $DataDuplicateLst _SCAL ScalarLST
+
+Python equivalent: :attr:`Equation.coefficients` and :attr:`Equations.coefficients`
 
 Python syntax::
 
     equations[name].coefficients
     equations.coefficients
-    identities[name].coefficients
-    identities.coefficients
-    tables[name].coefficients
-    tables.coefficients
-
-creates the list *ScalarLST* containing all IODE scalars used in the equations of the workspace.
 
 See also :ref:`@vliste <vliste>`.
 

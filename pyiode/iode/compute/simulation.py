@@ -223,11 +223,13 @@ class Simulation:
                                 {Connex | Triang | None }
                                 0 - 4 (starting values)
                                 {Yes | no }
-                                {yes | No }
-                                nbtri
+                                [nbtri
+                                [{yes | No }]]
 
             where eps   = convergence threshold (real number)
                   relax = real number between 0.1 and 1
+                  nbtri = number of sorting iterations (nb_passes)
+                  the last {yes | No} = debug_newton
 
         Examples
         --------

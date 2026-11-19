@@ -658,6 +658,8 @@ class Equations(IodeDatabase):
 
             $DataScanEqs [name1,name2,...]
 
+        ``$DataScanEqs`` stores the scalars in the list ``_SCAL``.
+
         Examples
         --------
         >>> from iode import SAMPLE_DATA_DIR
@@ -682,6 +684,11 @@ class Equations(IodeDatabase):
             @vliste(eq1,eq2,...)
 
             $DataScanEqs [name1,name2,...]
+            $DataUpdateLst ENDO @eexpand(name1,name2,...)
+            $DataCalcLst VARLST _EXO + ENDO
+
+        ``$DataScanEqs`` stores in the list ``_EXO`` the variables used in the equations,
+        except their endogenous variables, which must be added to get the same result.
 
         Examples
         --------

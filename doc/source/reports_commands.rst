@@ -1574,6 +1574,17 @@ The result of this search is saved in two lists, containing on the one hand the 
 the scalars (list ``_SCAL``) and on the other hand those of the variables (list ``_EXO``).
 If no argument is passed to this function, the entire workspace is examined.
 
+.. note::
+
+    For equations and identities, the list ``_EXO`` only contains the *exogenous*
+    variables: a variable which is also the name of one of the scanned equations
+    (or identities) is left out. To get all the variables used in the equations,
+    add the equation names to ``_EXO``::
+
+        $DataScanEqs A*
+        $DataUpdateLst ENDO @eexpand(A*)
+        $DataCalcLst VARLST _EXO + ENDO
+
 Syntax:: 
 
     $DataScanEqs [name1,name2,...]  
@@ -3655,7 +3666,7 @@ After decomposition into SCC, the interdependent block is sorted to increase sim
 The number of passes of the sorting algorithm can be specified in several places:
 
 - As a parameter to the `$ModelCalcSCC` report command
-- As the last parameter to the :ref:`$ModelSimulateParms <modelsimulateparms>` report command
+- As the 7th parameter to the :ref:`$ModelSimulateParms <modelsimulateparms>` report command
 
 .. warning::
 
@@ -3683,24 +3694,26 @@ This function sets the following simulation parameters:
     - 3 = ``Y := extrapolation, always``
     - 4 = ``Y unchanged``
 - simulation with debugging
-- debugging of the Newton-Raphson sub-iteration
 - number of sorting iterations for the connected components
+- debugging of the Newton-Raphson sub-iteration
 
 Syntax::
 
-    $ModelSimulateParms eps relax maxit  
-                        {Connex | Triang | None }  
-                        0 - 4 (starting values)  
-                        {Yes | no }  
-                        {yes | No }  
-                        nbtri  
-    
-    where eps   = convergence threshold (real number)  
+    $ModelSimulateParms eps relax maxit
+                        {Connex | Triang | None }
+                        0 - 4 (starting values)
+                        {Yes | no }
+                        [nbtri
+                        [{yes | No }]]
+
+    where eps   = convergence threshold (real number)
           relax = real number between 0.1 and 1
-    
+          nbtri = number of sorting iterations (optional)
+          the last {yes | No} = debugging of the Newton-Raphson sub-iteration (optional, default No)
+
 Example::
 
-    $ModelSimulateParms 0.001 0.7 100 Connex 0 Yes No 2
+    $ModelSimulateParms 0.001 0.7 100 Connex 0 Yes 2 No
 
 Python equivalent: :meth:`Simulation.set_parameters`
 
