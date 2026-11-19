@@ -1,3 +1,5 @@
+.. currentmodule:: iode
+
 .. _reports_execution_commands:
 
 Execution Commands
@@ -77,6 +79,15 @@ Example::
     $show Variable %VAR% exists  
     $return  
     ...
+
+Python equivalent: :func:`define` and :func:`macro` or `my_variable = value <https://docs.python.org/3/tutorial/introduction.html#using-python-as-a-calculator>`_
+
+Python syntax::
+
+    define(name, macro)
+    macro(name)
+
+    my_variable = value
 
 If a report has arguments, these can be used as macros whose name is ``%n%``, where *n* is 
 the argument number. The special value ``%0%`` contains the number of arguments passed when 
@@ -293,6 +304,12 @@ Example::
     -----  
     $ExecRep createvar A
 
+Python equivalent: `return value <https://docs.python.org/3/tutorial/controlflow.html#defining-functions>`_
+
+Python syntax::
+
+    return value
+
 .. _abort:
 
 COMMAND $abort
@@ -314,6 +331,13 @@ Example::
     ....  
     $label continue  
     ...
+
+Python equivalent: `exit() <https://docs.python.org/3/library/sys.html#sys.exit>`_
+
+Python syntax::
+
+    import sys
+    sys.exit()
 
 .. _quitode:
 
@@ -340,6 +364,13 @@ Example::
     $WsSaveVar myws  
     $quit
 
+Python equivalent: `exit() <https://docs.python.org/3/library/sys.html#sys.exit>`_
+
+Python syntax::
+
+    import sys
+    sys.exit()
+
 This function is particularly useful when a report is launched from a command file 
 (*DOS* or *Unix*). By allowing IODE to exit, it returns control to the command file, 
 which can then proceed with another program (printing, another simulation, etc.).
@@ -356,6 +387,12 @@ Syntax::
 
     $show message  
     message := any text
+
+Python equivalent: `print(variable) <https://docs.python.org/3/library/functions.html#print>`_
+
+Python syntax::
+
+    print(message)
     
 .. _msg:
 
@@ -370,6 +407,12 @@ Syntax::
 
     $msg message  
     message := any text
+
+Python equivalent: `print(message) <https://docs.python.org/3/library/functions.html#print>`_
+
+Python syntax::
+
+    print(message)
 
 .. _beep:
 
@@ -409,6 +452,12 @@ Example::
     $ask loop,return to loop?  
     ...
 
+Python equivalent: `input(prompt) <https://docs.python.org/3/library/functions.html#input>`_
+
+Python syntax::
+
+    answer = input(question)
+
 .. _prompt:
 
 COMMAND $prompt
@@ -436,6 +485,12 @@ Example::
     #prompt BEGIN Start period?  
     $SetTime %BEGIN%
 
+Python equivalent: `input(prompt) <https://docs.python.org/3/library/functions.html#input>`_
+
+Python syntax::
+
+    varname = input(question)
+
 .. _settime:
 
 COMMAND $SetTime
@@ -449,6 +504,12 @@ Syntax::
 
     $SetTime period  
     period := the period value to assign to t
+
+Python equivalent: :func:`set_t`
+
+Python syntax::
+
+    set_t(time)
 
 The following report lines::
 
@@ -471,6 +532,12 @@ Syntax::
 
     $IncrTime [step]  
     step := number of periods to add
+
+Python equivalent: :func:`increment_t`
+
+Python syntax::
+
+    increment_t(increment)
 
 The following report lines::
 
@@ -518,6 +585,13 @@ Syntax::
 Example::
 
     $system qode -d qms result.a2m
+
+Python equivalent: `os.system(command) <https://docs.python.org/3/library/os.html#os.system>`_
+
+Python syntax::
+
+    import os
+    os.system(command)
 
 .. _shift:
 
@@ -584,6 +658,13 @@ Syntax::
 
     $sleep n
 
+Python equivalent: `time.sleep(seconds) <https://docs.python.org/3/library/time.html#time.sleep>`_
+
+Python syntax::
+
+    import time
+    time.sleep(n / 1000)    # time.sleep() takes seconds, $sleep milliseconds
+
 where ``n`` = number of milliseconds to pause.
 
 .. _debug:
@@ -633,6 +714,13 @@ from a workspace in a single operation::
 
     $repeat "$DataDuplicateVar _ _1" @vexpand(*)
 
+Python equivalent: `for item in iterable <https://docs.python.org/3/tutorial/controlflow.html#for-statements>`_
+
+Python syntax::
+
+    for arg in [arg1, arg2, arg3]:
+        command(arg)
+
 .. _repeatstring:
 
 COMMAND $RepeatString
@@ -670,6 +758,13 @@ Example::
     $chdir ..  
     $chdir c:\usr\iode
 
+Python equivalent: `os.chdir(path) <https://docs.python.org/3/library/os.html#os.chdir>`_
+
+Python syntax::
+
+    import os
+    os.chdir(path)
+
 .. _mkdir:
 
 COMMAND $mkdir
@@ -686,6 +781,13 @@ Example::
 
     $mkdir ..\test  
     $mkdir c:\usr\iode\test
+
+Python equivalent: `os.mkdir(path) <https://docs.python.org/3/library/os.html#os.mkdir>`_
+
+Python syntax::
+
+    import os
+    os.mkdir(path)
 
 .. _multiline:
 
@@ -744,6 +846,13 @@ Example::
     $rmdir ..\test  
     $rmdir c:\usr\iode\test
 
+Python equivalent: `os.rmdir(path) <https://docs.python.org/3/library/os.html#os.rmdir>`_
+
+Python syntax::
+
+    import os
+    os.rmdir(path)
+
 .. _vseps:
 
 COMMAND $vseps
@@ -759,6 +868,12 @@ Syntax::
 Example::
 
     $vseps ;|
+
+Python equivalent: `text.split(separators) <https://docs.python.org/3/library/stdtypes.html#str.split>`_
+
+Python syntax::
+
+    values = text.split(sep)
 
 See also :ref:`@vtake <vtake>`.
 
@@ -802,6 +917,13 @@ Example 2: using lists::
     $show Element %n% : [%I%]  
     $next I
 
+Python equivalent: `for item in iterable <https://docs.python.org/3/tutorial/controlflow.html#for-statements>`_
+
+Python syntax::
+
+    for index in values:
+        ...
+
 .. _next:
 
 COMMAND $next
@@ -838,6 +960,13 @@ where:
 
 - ``procname`` is the name of the procedure (case sensitive).
 - ``aparm1`` is the first actual parameter of the procedure
+
+Python equivalent: `def function_name(...) <https://docs.python.org/3/tutorial/controlflow.html#defining-functions>`_
+
+Python syntax::
+
+    def procname(fparm1, ...):
+        ...
 
 Parameters
 ^^^^^^^^^^
@@ -948,6 +1077,12 @@ This command allows the execution of a procedure.
 
 See :ref:`$procdef <procdef>` for more details.
 
+Python equivalent: `function_name(arguments) <https://docs.python.org/3/tutorial/controlflow.html#defining-functions>`_
+
+Python syntax::
+
+    procname(aparm1, ...)
+
 .. _indent:
 
 COMMAND $indent
@@ -992,9 +1127,3 @@ The result produced is as follows::
     print : 1  
     print : 2  
     print : 3
-
-Python equivalent functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To get the Python equivalent of the above IODE commands, refers to the 
-:ref:`API Reference <start_api_reports>` tables.

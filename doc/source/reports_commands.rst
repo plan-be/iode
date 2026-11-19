@@ -1,3 +1,5 @@
+.. currentmodule:: iode
+
 .. _reports_iode_commands:
 
 IODE Commands 
@@ -311,6 +313,12 @@ Example::
         $FileImportVar TXT bstrule.txt bf-06obs.txt bh\p6y.var 1980Y1 2000Y1 p6y.log  
         $FileImportVar GEM rule.gem infile.gem iode\test.var 1980Y1 1990Y1
 
+Python equivalent: :meth:`Variables.convert_file`
+
+Python syntax::
+
+    Variables.convert_file(input_file, input_format, save_file, rule_file, from_period, to_period, debug_file=None)
+
 .. _fileimportcmt:
 
 COMMAND FileImportCmt
@@ -333,6 +341,12 @@ Syntax::
 Example::
     
     $FileImportCmt TXT bstrule.txt bf-06ser.txt bh\p6d.cmt D p6d.log
+
+Python equivalent: :meth:`Comments.convert_file`
+
+Python syntax::
+
+    Comments.convert_file(input_file, input_format, save_file, rule_file, lang=TableLang.ENGLISH, debug_file=None)
 
 
 Workspace operations
@@ -393,6 +407,13 @@ Example::
 
     $WsLoadCmt maribel.cmt
 
+Python equivalent: :meth:`~Comments.load`
+
+Python syntax::
+
+    workspace.load(filepath)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 If you load a new variables file, the sampling period of the workspace is replaced by that 
 of the loaded file.
 
@@ -445,6 +466,15 @@ specified period are copied.
 Example::
 
     $WsCopyVar maribel.var;hermes.var A B C
+
+Python equivalent: :meth:`~Comments.copy_from` and :meth:`~Variables.copy_from`
+
+Python syntax::
+
+    workspace.copy_from(input_files, names='*')
+    where workspace = comments / equations / identities / lists / scalars / tables
+
+    variables.copy_from(input_files, from_period=None, to_period=None, names='*')
     
 same as above, but for the entire sample of the file *maribel.var*.
 
@@ -471,6 +501,13 @@ Example::
 
     $WsMergeCmt mycmts.cmt
 
+Python equivalent: :meth:`~Comments.merge_from`
+
+Python syntax::
+
+    workspace.merge_from(input_file)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _wsclear:
 
 COMMAND WsClear<...>
@@ -491,6 +528,13 @@ Syntax::
 Example::
 
     $WsClearEqs
+
+Python equivalent: :meth:`~Comments.clear`
+
+Python syntax::
+
+    workspace.clear()
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
 
 .. _wsclearall:
 
@@ -522,6 +566,13 @@ Example::
 
     $WsDescrCmt  The MIRABEL comments file
 
+Python equivalent: :attr:`~Comments.description`
+
+Python syntax::
+
+    workspace.description = text
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _wssave:
 
 COMMAND WsSave<...>
@@ -545,6 +596,13 @@ Example::
 
     $WsSaveCmt  current2.cmt
 
+Python equivalent: :meth:`~Comments.save`
+
+Python syntax::
+
+    workspace.save(filepath, compress=False)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _wssavecmp:
 
 COMMAND WsSaveCmp
@@ -565,6 +623,13 @@ Syntax::
     $WsSaveCmp<...> filename  
     where <...> = cmt / eqs / idt / lst / scl / tbl / var
 
+Python equivalent: :meth:`~Comments.save`
+
+Python syntax::
+
+    workspace.save(filepath, compress=True)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _wssample:
 
 COMMAND WsSample
@@ -582,6 +647,12 @@ Syntax::
 Example::
 
     $WsSample 1990Y1 2000Y1
+
+Python equivalent: :attr:`Variables.sample`
+
+Python syntax::
+
+    variables.sample = "from_period:to_period"
 
 .. _wsextrapolate:
 
@@ -614,6 +685,12 @@ Example::
     $WsExtrapolate 1993Y1 2000Y1 A B C
     or
     $WsExtrapolate 1993Y1 2000Y1
+
+Python equivalent: :meth:`Variables.extrapolate`
+
+Python syntax::
+
+    variables.extrapolate(method, from_period=None, to_period=None, variables_list=None)
 
 .. _wsltohstock:
 
@@ -651,6 +728,12 @@ Example::
 
     $WsLtoHStock C File1.var A B C
 
+Python equivalent: :meth:`Variables.low_to_high`
+
+Python syntax::
+
+    variables.low_to_high(LowToHighType.STOCK, method, filepath, var_list)
+
 .. _wsltohflow:
 
 COMMAND WsLtoHFlow
@@ -687,6 +770,12 @@ Example::
 
     $WsLtoHFlow S File1.var A B C
 
+Python equivalent: :meth:`Variables.low_to_high`
+
+Python syntax::
+
+    variables.low_to_high(LowToHighType.FLOW, method, filepath, var_list)
+
 .. _wshtolsum:
 
 COMMAND WsHtoLSum
@@ -718,6 +807,12 @@ Syntax::
 Example::
 
     $WsHtoLSum File1.var A B C
+
+Python equivalent: :meth:`Variables.high_to_low`
+
+Python syntax::
+
+    variables.high_to_low(HighToLowType.SUM, filepath, var_list)
 
 .. _wshtolmean:
 
@@ -752,6 +847,12 @@ Example::
 
     $WsHtoLMean File1.var A B C
 
+Python equivalent: :meth:`Variables.high_to_low`
+
+Python syntax::
+
+    variables.high_to_low(HighToLowType.MEAN, filepath, var_list)
+
 .. _wshtollast:
 
 COMMAND WsHtoLLast
@@ -785,6 +886,12 @@ Example::
 
     $WsHtoLLast File1.var A B C
 
+Python equivalent: :meth:`Variables.high_to_low`
+
+Python syntax::
+
+    variables.high_to_low(HighToLowType.LAST, filepath, var_list)
+
 .. _wsseasonadj:
 
 COMMAND WsSeasonAdj
@@ -815,6 +922,12 @@ Example::
 
     $WsSeasonAdj File1.var A B C
 
+Python equivalent: :meth:`Variables.seasonal_adjustment`
+
+Python syntax::
+
+    variables.seasonal_adjustment(input_file, eps_test=5.0, series=None)
+
 See also :ref:`$WsSeasAdj <wsseasadj>`. 
 
 .. _wsseasadj:
@@ -830,6 +943,12 @@ Syntax::
 
     $WsSeasAdj Filename Varname Varname ... Eps   
 
+Python equivalent: :meth:`Variables.seasonal_adjustment`
+
+Python syntax::
+
+    variables.seasonal_adjustment(input_file, eps_test=5.0, series=None)
+
 .. _wstrend:
 
 COMMAND WsTrend
@@ -842,6 +961,12 @@ are imported and transformed simultaneously.
 Syntax::
 
     $WsTrend VarFilename Lambda series1 series2 ...
+
+Python equivalent: :meth:`Variables.trend_correction`
+
+Python syntax::
+
+    variables.trend_correction(input_file, lambda_, series=None, log=False)
 
 .. _wsimport:
 
@@ -868,6 +993,13 @@ Example::
 
     $WsImportCmt myfile.ac
 
+Python equivalent: :meth:`~Comments.load`
+
+Python syntax::
+
+    workspace.load(filepath)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 If you load a new IODE variables file, the sampling period of the workspace is replaced 
 by that of the loaded file.
 
@@ -893,6 +1025,13 @@ Syntax::
 Example::
 
     $WsExportCmt mytest.ac
+
+Python equivalent: :meth:`~Comments.save`
+
+Python syntax::
+
+    workspace.save(filepath)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
 
 .. _wsimporteviews:
 
@@ -1062,6 +1201,14 @@ Syntax::
 
     $DataCreateVar name
 
+Python equivalent: :meth:`name in workspace <Comments.__contains__>` and ``workspace[name]`` for :meth:`comments <Comments.__setitem__>`, :meth:`equations <Equations.__setitem__>`, :meth:`identities <Identities.__setitem__>`, :meth:`lists <Lists.__setitem__>`, :meth:`scalars <Scalars.__setitem__>`, :meth:`tables <Tables.__setitem__>` and :meth:`variables <Variables.__setitem__>`
+
+Python syntax::
+
+    if name not in workspace:
+        workspace[name] = value
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _datadelete:
 
 COMMAND DataDelete<...>
@@ -1077,6 +1224,13 @@ If the object *name* does not exist, the function returns and signals an error.
 Syntax::
 
     $DataDeleteVar name
+
+Python equivalent: :meth:`del workspace[name] <Comments.__delitem__>`
+
+Python syntax::
+
+    del workspace[name]
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
 
 .. warning::
 
@@ -1097,6 +1251,13 @@ If the object *name* does not exist, the function returns and signals an error.
 Syntax::
 
     $DataExistVar name
+
+Python equivalent: :meth:`name in workspace <Comments.__contains__>`
+
+Python syntax::
+
+    name in workspace
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
 
 .. _dataedit:
 
@@ -1151,6 +1312,13 @@ If the object *name* does not exist, an object containing the new definition is 
 If the object exists, its content is replaced. The function takes several arguments.
 The arguments differ depending on the type of object to update.
 The first argument is always the name of the object to change.
+
+Python equivalent: ``workspace[name] = value`` for :meth:`comments <Comments.__setitem__>`, :meth:`equations <Equations.__setitem__>`, :meth:`identities <Identities.__setitem__>`, :meth:`lists <Lists.__setitem__>`, :meth:`scalars <Scalars.__setitem__>`, :meth:`tables <Tables.__setitem__>` and :meth:`variables <Variables.__setitem__>`
+
+Python syntax::
+
+    workspace[name] = value
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
 
 Comments
 """"""""
@@ -1241,6 +1409,13 @@ The function appends text to the definition of an object in the current workspac
 If the object *name* does not exist, an object containing the new definition is created.
 If the object exists, its content is appended.
 
+Python equivalent: ``workspace[name] = workspace[name] + value`` for :meth:`comments <Comments.__setitem__>` and :meth:`lists <Lists.__setitem__>`
+
+Python syntax::
+
+    workspace[name] = workspace[name] + value
+    where workspace = comments / lists
+
 Comments
 """"""""
 
@@ -1278,6 +1453,13 @@ Example::
 
     $DataDuplicateCmt A01 A02
 
+Python equivalent: ``workspace[new_name] = workspace[name]`` for :meth:`comments <Comments.__setitem__>`, :meth:`identities <Identities.__setitem__>`, :meth:`lists <Lists.__setitem__>`, :meth:`scalars <Scalars.__setitem__>`, :meth:`tables <Tables.__setitem__>` and :meth:`variables <Variables.__setitem__>`
+
+Python syntax::
+
+    workspace[new_name] = workspace[name]
+    where workspace = comments / identities / lists / scalars / tables / variables
+
 The `$DataDuplicateEqs` command is not implemented and, in fact, has no meaning.
 Indeed, an equation is named after its endogenous variable. 
 Changing its name therefore changes the name of the endogenous variable, 
@@ -1301,6 +1483,13 @@ If there is already an object with this new name, it is replaced.
 Syntax::
 
     $DataRenameVar name new_name
+
+Python equivalent: :meth:`~Comments.rename`
+
+Python syntax::
+
+    workspace.rename(old_name, new_name, overwrite=True)
+    where workspace = comments / identities / lists / scalars / tables / variables
 
 The `$DataRenameEqs` command is not implemented and, in fact, has no meaning.
 Indeed, an equation is named after its endogenous variable. 
@@ -1363,6 +1552,13 @@ Example::
     $datasearchCmt TE?T 0 0 1 0 1 NEW2  
     #DataEditCMT $NEW2
 
+Python equivalent: :meth:`~Comments.search`
+
+Python syntax::
+
+    workspace.search(pattern, word=True, case_sensitive=True, in_name=True, in_formula=True, in_text=True, list_result='_RES')
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _datascan:
 
 COMMAND DataScan<...>
@@ -1383,6 +1579,16 @@ Syntax::
     $DataScanEqs [name1,name2,...]  
     $DataScanIdt [name1,name2,...]  
     $DataScanTbl [name1,name2,...]
+
+Python equivalent: :attr:`~Equation.coefficients` and :attr:`~Equation.variables` (`Equation`, `Identity` and `Table`)
+
+Python syntax::
+
+    workspace[name].coefficients
+    workspace[name].variables
+    workspace.coefficients
+    workspace.variables
+    where workspace = equations / identities / tables
 
 .. _datalist:
 
@@ -1405,6 +1611,13 @@ Example::
 
     $DataListVar _BEL_ *BEL*
 
+Python equivalent: :meth:`~Comments.get_names`
+
+Python syntax::
+
+    lists[listname] = workspace.get_names(pattern=None, filepath=None)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 generates the IODE list `_BEL_` of all variables whose name contains the text *BEL*: 
 AX1BEL, BEL1, MIRABELLE, etc.
 
@@ -1422,6 +1635,12 @@ Syntax::
 
     $DataListSort list sorted_list
 
+Python equivalent: `sorted with Python lists <https://docs.python.org/3/library/functions.html#sorted>`_
+
+Python syntax::
+
+    sorted(iterable)
+
 .. _datacompareeps:
 
 COMMAND DataCompareEps
@@ -1438,6 +1657,12 @@ The comparison test is::
 Syntax::
 
     $DataCompareEps eps
+
+Python equivalent: :attr:`Variables.threshold`
+
+Python syntax::
+
+    variables.threshold = eps
 
 The comparison threshold is set to 1e-7 by default.
 
@@ -1469,6 +1694,13 @@ Example::
 
     $DataCompareVar myws.var WS FILE EQ DIFF
 
+Python equivalent: :meth:`~Comments.compare`
+
+Python syntax::
+
+    workspace.compare(filepath, only_in_workspace_list_name=None, only_in_file_list_name=None, equal_objects_list_name=None, different_objects_list_name=None)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _datacalclst:
 
 COMMAND DataCalcLst
@@ -1495,6 +1727,14 @@ Example::
 
     $DataCalcLst _RES LST1 * LST2
 
+Python equivalent: `union, intersection and difference with Python sets <https://docs.python.org/3/tutorial/datastructures.html#sets>`_
+
+Python syntax::
+
+    set(list1) | set(list2)    # union
+    set(list1) & set(list2)    # intersection
+    set(list1) - set(list2)    # difference
+
 generates the IODE list `_RES` of names present in both *LST1* and *LST2*.
 
 .. _datacalcvar:
@@ -1519,6 +1759,12 @@ Example::
 
     $DataCalcVar X  beta + gamma * ln B + alpha * ln C
 
+Python equivalent: :meth:`variables[name] = "LEC expression" <Variables.__setitem__>`
+
+Python syntax::
+
+    variables[name] = "LEC expression"
+
 .. _datadisplaygraph:
 
 COMMAND DataDisplayGraph
@@ -1531,6 +1777,13 @@ Syntax::
     $DataDisplayGraph mode chart_type gridX gridY scaling  
                       {ymin | --} {ymax | --} perfrom perto 
                       varname1 varname2 ...  
+
+Python equivalent: :meth:`Variables.to_frame` and `pandas visualization <https://pandas.pydata.org/docs/user_guide/visualization.html>`_
+
+Python syntax::
+
+    df = variables[names].to_frame()
+    df.T.plot()
  
 where:
 
@@ -1569,6 +1822,13 @@ Syntax::
     $DataSaveGraph  aglfilename mode chart_type gridX gridY scaling  
                     {ymin | --} {ymax | --} perfrom perto 
                     varname1 varname2 ...
+
+Python equivalent: :meth:`Variables.to_frame` and `pandas visualization <https://pandas.pydata.org/docs/user_guide/visualization.html>`_
+
+Python syntax::
+
+    df = variables[names].to_frame()
+    df.T.plot().get_figure().savefig(filepath)
 
 where:
 
@@ -1640,6 +1900,12 @@ Syntax::
     where n = 0 for level  
           n = 1 for differences  
           n = 2 for growth rates
+
+Python equivalent: :attr:`Variables.mode`
+
+Python syntax::
+
+    variables.mode = mode    # VarsMode.LEVEL, VarsMode.DIFF, VarsMode.GROWTH_RATE, ...
 
 .. _datastartvar:
 
@@ -1737,6 +2003,12 @@ Example::
     $DataUpdateLst Y C1;C2;C3;C4;C5;CT  
     $DataRasVar xy $X $Y 1980Y1 1981Y1 10 0.00001
 
+Python equivalent: :meth:`Variables.execute_RAS`
+
+Python syntax::
+
+    variables.execute_RAS(pattern, xdim, ydim, ref_year, sum_year, max_nb_iterations=100, epsilon=0.001)
+
 The RAS matrix then looks as follows::
 
     R1C1 R1C2 R1C3 R1C4 R1C5 R1C6 | R1CT  
@@ -1782,6 +2054,13 @@ Example::
     $DataUpdateLst Y C1;C2  
     $DataPatternVar RC xy $X $Y  
 
+Python equivalent: :meth:`~Comments.get_names_from_pattern`
+
+Python syntax::
+
+    workspace.get_names_from_pattern(list_name, pattern, xdim, ydim=None)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 Result::
 
     $RC=R1C1,R1C2,R2C1,R2C2,R3C1,R3C2  
@@ -1818,6 +2097,13 @@ Other functions allow you to modify the instruments, the method: these are the *
 Syntax::
 
     $EqsEstimate perfrom perto eqname1 ...
+
+Python equivalent: :meth:`Equation.estimate` and :meth:`Equations.estimate`
+
+Python syntax::
+
+    equations.estimate(from_period=None, to_period=None, list_eqs=None, quiet=False)
+    equations[name].estimate(from_period=None, to_period=None, maxit=100, epsilon=1e-06, quiet=False)
 
 At the end of estimation, certain variables and scalars are automatically created if the process has converged. These variables and scalars can be used for calculations and, as they are objects in the workspace, can be saved for future use.
 
@@ -1862,6 +2148,13 @@ Syntax::
           eqname  : equation to estimate  
           leccond : acceptance condition
 
+Python equivalent: :meth:`Equation.estimate_step_wise` and :meth:`Equations.estimate_step_wise`
+
+Python syntax::
+
+    equations.estimate_step_wise(eq_names, from_period=None, to_period=None, lec_condition=None, test='r2')
+    equations[name].estimate_step_wise(from_period=None, to_period=None, lec_condition=None, test='r2')
+
 .. _eqssetcmt:
 
 COMMAND EqsSetCmt
@@ -1883,6 +2176,12 @@ Example::
     $EqsSetMethod 1 B E  
     $EqsSetInstrs E instruments  
     $EqsSetBloc B E
+
+Python equivalent: :attr:`Equation.comment`
+
+Python syntax::
+
+    equations[name].comment = comment
 
 .. _eqssetsample:
 
@@ -1908,6 +2207,12 @@ Example::
     $EqsSetMethod 1 B E
     $EqsSetInstrs E instruments
     $EqsSetBloc B E
+
+Python equivalent: :attr:`Equation.sample`
+
+Python syntax::
+
+    equations[name].sample = "from_period:to_period"
 
 .. _eqssetmethod:
 
@@ -1940,6 +2245,12 @@ Example::
     $EqsSetInstrs E instruments  
     $EqsSetBloc B E
 
+Python equivalent: :attr:`Equation.method`
+
+Python syntax::
+
+    equations[name].method = method    # EqMethod.LSQ, EqMethod.ZELLNER, ...
+
 .. _eqssetinstrs:
 
 COMMAND EqsSetInstrs
@@ -1964,6 +2275,12 @@ Example::
     $EqsSetMethod 1 B E  
     $EqsSetInstrs E instruments  
     $EqsSetBloc B E
+
+Python equivalent: :attr:`Equation.instruments`
+
+Python syntax::
+
+    equations[name].instruments = instruments
 
 .. _eqssetbloc:
 
@@ -1990,6 +2307,12 @@ Example::
     $EqsSetMethod 1 B E  
     $EqsSetInstrs E instruments  
     $EqsSetBloc B E
+
+Python equivalent: :attr:`Equation.block`
+
+Python syntax::
+
+    equations[name].block = block
 
 
 Printer configuration
@@ -2785,6 +3108,13 @@ Example::
 
     $PrintObjDefCmt CMT1 CMT2
 
+Python equivalent: :meth:`Comments.print_to_file`
+
+Python syntax::
+
+    workspace.print_to_file(filepath, names=None, format=None)
+    where workspace = comments / equations / identities / lists / scalars / tables / variables
+
 .. _printobjtitle:
 
 COMMAND PrintObjTitle
@@ -2797,6 +3127,12 @@ Syntax
     $PrintObjTitle 0 or 1  
     0: full definition  
     1: titles only
+
+Python equivalent: :attr:`Tables.print_tables_as`
+
+Python syntax::
+
+    tables.print_tables_as = PrintTablesAs.FULL / PrintTablesAs.TITLES
 
 .. _printobjlec:
 
@@ -2812,6 +3148,12 @@ Syntax
     0: normal LEC form  
     1: coefficients replaced by their value  
     2: coefficients replaced by their value + t-tests
+
+Python equivalent: :attr:`Equations.print_equations_lec_as`
+
+Python syntax::
+
+    equations.print_equations_lec_as = PrintEquationsLecAs.AS_IS / PrintEquationsLecAs.COEFFS_TO_VALUES / PrintEquationsLecAs.COEFFS_TO_VALUES_TTEST
 
 .. _printobjinfos:
 
@@ -2831,6 +3173,12 @@ Syntax::
     0: equation only  
     1: equation + comment  
     2: equation + comment + estimation
+
+Python equivalent: :attr:`Equations.print_equations_as`
+
+Python syntax::
+
+    equations.print_equations_as = PrintEquationsAs.EQ_ONLY / PrintEquationsAs.EQ_COMMENTS / PrintEquationsAs.EQ_COMMENTS_ESTIMATION
 
 
 Table compilation and printing
@@ -2880,6 +3228,12 @@ Example::
     $PrintTblFile 2 variante  
     $PrintTbl 89:8[1;2] HYPEIR
 
+Python equivalent: :meth:`Tables.print_to_file`
+
+Python syntax::
+
+    tables.print_to_file(filepath, names=None, format=None, generalized_sample=None, nb_decimals=4)
+
 After a call to :ref:`$PrintTbl <printtbl>`, you must redefine the files to compare: 
 :ref:`$PrintTbl <printtbl>` "consumes" the file comparison definitions. 
 There can be no space in the sample statement.
@@ -2912,6 +3266,13 @@ Example::
     $PrintTbl 89:8 HYPEIR  
     $PrintTbl 89/88:8 HYPEIIR  
     $PrintTbl 89:8 RENAT01 RENAT0D RESL3R RESL31R RESL2
+
+Python equivalent: :meth:`Table.compute` and :meth:`ComputedTable.print_to_file`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
+    computed_table.print_to_file(destination_file, format=None)
 
 .. warning::
 
@@ -2961,6 +3322,12 @@ Example::
     $ViewTblFile 2 variante  
     $ViewTbl 89:8[1;2] HYPEIR
 
+Python equivalent: :func:`load_extra_files`
+
+Python syntax::
+
+    load_extra_files(extra_files, quiet=False)
+
 After a call to :ref:`$ViewTbl <viewtbl>`, you must redefine the files to compare: 
 :ref:`$ViewTbl <viewtbl>` "consumes" the file comparison definitions.
 
@@ -2978,6 +3345,12 @@ Syntax::
 
     $ViewTbl sample table [list of tables]
 
+Python equivalent: :meth:`Table.compute`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
+
 Example::
 
 $ViewTbl 90:6 CIIIR0 CIIR
@@ -2992,6 +3365,12 @@ COMMAND ViewByTbl
 ^^^^^^^^^^^^^^^^^
 
 Alias for the :ref:`$ViewTbl <viewtbl>` command.
+
+Python equivalent: :meth:`Table.compute`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
 
 .. _printvar:
 
@@ -3010,6 +3389,13 @@ Syntax::
 Example::
 
     $PrintVar (80Y1/79Y1):10 X+Y;Z;ln(X)
+
+Python equivalent: :class:`Table` and :meth:`Table.compute`
+
+Python syntax::
+
+    table = Table(nb_columns=2, table_title='', lecs_or_vars=None, lines_titles=None, mode=False, files=False, date=False, search_comment=True)
+    computed_table = table.compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
 
 .. warning::
 
@@ -3032,6 +3418,13 @@ Syntax::
 Example::
 
     $ViewVar (80Y1/79Y1):10  X+Y  Z  ln(X)
+
+Python equivalent: :class:`Table` and :meth:`Table.compute`
+
+Python syntax::
+
+    table = Table(nb_columns=2, table_title='', lecs_or_vars=None, lines_titles=None, mode=False, files=False, date=False, search_comment=True)
+    computed_table = table.compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
 
 .. warning::
 
@@ -3084,6 +3477,12 @@ Syntax::
     $ViewNdec n  
     n between -1 (variable) and 6
 
+Python equivalent: :meth:`Table.compute`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, nb_decimals=n)
+
 
 Graphs from tables
 ~~~~~~~~~~~~~~~~~~
@@ -3112,6 +3511,13 @@ Syntax::
     $ViewGr gsample tbl1[+tbl2] tbl3 ...  
     where gsample is a generalized sample without spaces  
           tbl1, tbl2, and tbl3 are table names
+
+Python equivalent: :meth:`ComputedTable.plot`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
+    computed_table.plot(title=None, plot_type=TableGraphType.LINE, grid=TableGraphGrid.MAJOR, y_log=False, y_min=None, y_max=None, legend=True, show=True)
 
 When two tables are joined by the ``+`` sign, they are displayed on the same screen 
 as two separate graphs.
@@ -3163,6 +3569,13 @@ Example::
 
     $PrintGr 80/79:15 T1 T2
 
+Python equivalent: :meth:`ComputedTable.print_to_file`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
+    computed_table.print_to_file(destination_file, format=None)
+
 .. _dataprintgraph:
 
 COMMAND DataPrintGraph
@@ -3183,6 +3596,13 @@ Syntax::
 Example::
 
     $DataPrintGraph  Level Line No No Level -- -- 1980Y1 1995Y1 X1 Y1 X1+Y1
+
+Python equivalent: :meth:`ComputedTable.plot`
+
+Python syntax::
+
+    computed_table = tables[name].compute(generalized_sample, extra_files=None, nb_decimals=2, quiet=True)
+    computed_table.plot(title=None, plot_type=TableGraphType.LINE, grid=TableGraphGrid.MAJOR, y_log=False, y_min=None, y_max=None, legend=True, show=True)
 
 
 Model operations
@@ -3215,6 +3635,12 @@ version of the model.
 Syntax::
 
     $ModelCalcSCC nbtri lstpre lstinter lstpost
+
+Python equivalent: :meth:`Simulation.model_calculate_SCC`
+
+Python syntax::
+
+    simulation.model_calculate_SCC(nb_iterations=5, pre_name='_PRE', inter_name='_INTER', post_name='_POST', list_eqs=None, quiet=False)
 
 where:
 
@@ -3276,6 +3702,12 @@ Example::
 
     $ModelSimulateParms 0.001 0.7 100 Connex 0 Yes No 2
 
+Python equivalent: :meth:`Simulation.set_parameters`
+
+Python syntax::
+
+    simulation.set_parameters(convergence_threshold=0.001, relax=1.0, max_nb_iterations=100, sort_algorithm=SimulationSort.BOTH, initialization_method=SimulationInitialization.TM1, debug=False, nb_passes=5, debug_newton=False)
+
 Debug Option
 """"""""""""
 
@@ -3335,6 +3767,12 @@ Example::
     $modelsimulate 1990Y1 1995Y1 $List  
     $show end of report
 
+Python equivalent: :meth:`Simulation.model_simulate`
+
+Python syntax::
+
+    simulation.model_simulate(from_period, to_period, list_eqs=None, quiet=False)
+
 .. _modelsimulatescc:
 
 COMMAND ModelSimulateSCC
@@ -3353,6 +3791,12 @@ The model simulation is based on three lists previously built by the
 Syntax::
 
     $ModelSimulateSCC from to pre inter post
+
+Python equivalent: :meth:`Simulation.model_simulate_SCC`
+
+Python syntax::
+
+    simulation.model_simulate_SCC(from_period, to_period, pre_name='_PRE', inter_name='_INTER', post_name='_POST', quiet=False)
 
 where:
 
@@ -3374,6 +3818,12 @@ Syntax::
     where eqname1 and eqname2 are equation names (and thus endogenous variable names)
           varname1 and varname2 are exogenous variable names
 
+Python equivalent: :meth:`Simulation.model_exchange`
+
+Python syntax::
+
+    simulation.model_exchange(list_exo=None)
+
 To cancel the ENDO-EXO exchange, simply call the command without parameters::
 
     $ModelExchange
@@ -3391,6 +3841,12 @@ Syntax::
     $ModelCompile  [eqname1, eqname2, ... ]
 
     where eqname1 and eqname2 are equation names.
+
+Python equivalent: :meth:`Simulation.model_compile`
+
+Python syntax::
+
+    simulation.model_compile(list_eqs=None, quiet=False)
 
 .. _modelsimulatesaveniters:
 
@@ -3413,6 +3869,12 @@ Example::
 
     $ModelSimulateSaveNiters SIM_NITERS
 
+Python equivalent: :meth:`Simulation.save_nb_iterations`
+
+Python syntax::
+
+    simulation.save_nb_iterations(var_name)
+
 .. _modelsimulatesavenorms:
 
 COMMAND ModelSimulateSaveNorms
@@ -3432,6 +3894,12 @@ Syntax::
 Example::
 
     $ModelSimulateSaveNiters SIM_NORMS
+
+Python equivalent: :meth:`Simulation.save_norms`
+
+Python syntax::
+
+    simulation.save_norms(var_name)
 
 
 Identities execution
@@ -3470,6 +3938,12 @@ Example::
     $IdtExecute 1953Y1 1996Y1 IDT1 IDT2  
     $IdtExecute 1953Y1 1996Y1 $IDTList
 
+Python equivalent: :meth:`Identities.execute`
+
+Python syntax::
+
+    identities.execute(identities=None, from_period=None, to_period=None, var_files=None, scalar_files=None, trace=False)
+
 .. _idtexecutetrace:
 
 COMMAND IdtExecuteTrace
@@ -3485,6 +3959,12 @@ the :ref:`$IdtExecute <idtexecute>` command.
 Syntax::
 
     $IdtExecuteTrace  {Yes | No}
+
+Python equivalent: :meth:`Identities.execute`
+
+Python syntax::
+
+    identities.execute(identities=None, from_period=None, to_period=None, var_files=None, scalar_files=None, trace=False)
 
 .. _idtexecutevarfiles:
 
@@ -3520,6 +4000,12 @@ Example::
 
     $IdtExecuteVarFiles maribel.var WS test.var
 
+Python equivalent: :meth:`Identities.execute`
+
+Python syntax::
+
+    identities.execute(identities=None, from_period=None, to_period=None, var_files=None, scalar_files=None, trace=False)
+
 .. _idtexecutesclfiles:
 
 COMMAND IdtExecuteSclFiles
@@ -3554,6 +4040,12 @@ Exemple::
 
     $IdtExecuteSclFiles WS maribel.scl test.scl
 
+Python equivalent: :meth:`Identities.execute`
+
+Python syntax::
+
+    identities.execute(identities=None, from_period=None, to_period=None, var_files=None, scalar_files=None, trace=False)
+
 
 Report operations
 ~~~~~~~~~~~~~~~~~
@@ -3583,6 +4075,12 @@ Syntax::
 Example::
 
     $ReportExec mysimul.rep 1990Y1 1992Y1
+
+Python equivalent: :func:`execute_report`
+
+Python syntax::
+
+    execute_report(filepath, parameters=None, encoding='cp850')
 
 The `$ReportExec` function accepts a list as an argument::
 
@@ -3761,6 +4259,12 @@ Example::
 
     $StatUnitRoot 1 1 3 A
 
+Python equivalent: :func:`dickey_fuller_test`
+
+Python syntax::
+
+    dickey_fuller_test(lec, drift, trend, order)
+
 Result::
 
     d(A) := df_ * A[-1]+  
@@ -3884,10 +4388,3 @@ COMMAND WsAggrProd
 
 Computes the product of series.
 See :ref:`$WsAggrSum <wsaggrsum>`.
-
-
-Python equivalent functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To get the Python equivalent of the above IODE commands, refers to the 
-:ref:`API Reference <start_api_reports>` tables.
