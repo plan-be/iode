@@ -38,7 +38,7 @@ if(NOT TARGET Eigen3::Eigen)
 endif()
 
 # ---- main project ----
-project ("iode" VERSION 7.0.11 HOMEPAGE_URL "https://iode.readthedocs.io/en/stable/" LANGUAGES C CXX)
+project ("iode" VERSION 7.0.12 HOMEPAGE_URL "https://iode.readthedocs.io/en/stable/" LANGUAGES C CXX)
 
 # previous homepage URL: https://iode.plan.be/doku.php
 
