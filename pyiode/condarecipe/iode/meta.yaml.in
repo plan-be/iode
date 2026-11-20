@@ -32,6 +32,15 @@ build:
     - {{ PYTHON }} -m pip install . -vv --no-deps
   # If this is a new build for the same version, increment the build number
   number: 0
+  # The extension module iode_cython.pyd is built against the Python stable ABI (abi3,
+  # see 'USE_SABI 3.12' in pyiode/CMakeLists.txt) -> one package for all Python versions >= 3.12.
+  # Build it once with the minimum supported Python version: conda build . --python=3.12
+  string: abi3_{{ PKG_BUILDNUM }}
+  # conda-build would otherwise pin python to the build minor version:
+  # - via 'pin_run_as_build' -> relaxed in conda_build_config.yaml (next to this file)
+  # - via the 'python_abi 3.xx.* *_cp3xx' run_export of the python >= 3.13 packages
+  ignore_run_exports:
+    - python_abi
   # Make sure that the iode package is only available for the Windows OS
   skip: True                                                                          # [not win]
 
@@ -42,7 +51,7 @@ requirements:
     - numpy >=2.4
     - pandas >=3.0
     - cython ==3.1.4
-    - mypy == 2.3.0
+    - mypy ==2.3.0
     - pip
 
   build:
@@ -55,7 +64,8 @@ requirements:
     - {{ compiler('cxx') }}                                                         # [not win]
 
   run:
-    - python ={{ PY_VER }}
+    # abi3 package: works with any Python version >= the one used to build it (see build/string)
+    - python >={{ PY_VER }}
     - numpy >=2.4
     - pandas >=3.0
     - matplotlib-base
