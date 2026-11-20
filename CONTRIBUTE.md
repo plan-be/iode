@@ -594,10 +594,12 @@ Then run the following commands:
 ```bash 
 C:\Program Files\Microsoft Visual Studio\2022\Community> cd <path-to-iode-repo>
 root_dir_iode> cd pyiode
-pyiode> conda build . --python=3.xx --no-anaconda-upload
+pyiode> conda build . --python=3.12 --no-anaconda-upload
 ```
-where `3.xx` is the Python version used during the build.
-Repeat the above commands for each supported Python version.
+The extension module `iode_cython.pyd` is built against the Python stable ABI (abi3), so a single 
+*iode* conda package works with all Python versions >= the one used during the build. 
+Build it once with the minimum supported Python version (3.12). The tests of the recipe only run with 
+that version: also check the package in a Python 3.13 and a Python 3.14 environment.
 Then, build the conda packages for the GUI:
 ```bash
 pyiode> cd ../gui
@@ -615,7 +617,7 @@ root_dir_iode> conda install --use-local iode-gui
 Then, to upload the conda packages to the Anaconda repository, you have to run:
 ```bash
 root_dir_iode> anaconda login
-root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-py*.conda
+root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-abi3_0.conda
 root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noarch/iode-gui-<version>-py*.conda
 ```
 

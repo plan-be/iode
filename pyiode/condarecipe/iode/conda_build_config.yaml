@@ -1,0 +1,11 @@
+# Recipe-local variant config, merged by conda-build with its default config.
+#
+# The extension module iode_cython.pyd is built against the Python stable ABI (abi3, see
+# 'USE_SABI 3.12' in pyiode/CMakeLists.txt), so one package works with every Python >= 3.12.
+# By default, conda-build pins 'python' in the run requirements to the minor version used for
+# the build (min_pin: x.x, max_pin: x.x -> 'python >=3.12,<3.13.0a0'), replacing the spec written
+# in meta.yaml. Relax the upper bound to the next major version -> 'python >=3.12,<4.0a0'.
+pin_run_as_build:
+  python:
+    min_pin: x.x
+    max_pin: x
