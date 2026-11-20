@@ -577,10 +577,14 @@ pyiode> twine upload dist/iode-<version>*
 gui> twine upload dist/iode_gui-<version>*
 ```
 
-## Build the conda packages
+## Build and upload the conda packages
 
 The script `meta.yaml` is used by conda-build to build the conda packages. 
-The are located in the sub-directories *condarecipe/<package>* from the top directories *pyiode* and *gui*. First, make sure you have the conda-build tool installed on your system (*conda install conda-build*). To build the conda packages for *iode* and *iode_gui*, you have to open a *Developer Command Prompt* (Windows) and see:
+The are located in the sub-directories *condarecipe/<package>* from the top directories *pyiode* and *gui*. First, make sure you have the conda-build tool installed on your system (*conda install conda-build*). 
+The *iode-gui* conda package requires the *iode* conda package of the same version: build and upload 
+the *iode* package first, then build and upload the *iode-gui* package.
+
+To build the conda packages for *iode* and *iode_gui*, you have to open a *Developer Command Prompt* (Windows) and see:
 ```bash
   **********************************************************************
   ** Visual Studio 2022 Developer Command Prompt v17.14.0
@@ -590,7 +594,9 @@ The are located in the sub-directories *condarecipe/<package>* from the top dire
   C:\Program Files\Microsoft Visual Studio\2022\Community>
 ```
 
-Then run the following commands:
+### Build the iode conda package
+
+Run the following commands:
 ```bash 
 C:\Program Files\Microsoft Visual Studio\2022\Community> cd <path-to-iode-repo>
 root_dir_iode> cd pyiode
@@ -600,24 +606,45 @@ The extension module `iode_cython.pyd` is built against the Python stable ABI (a
 *iode* conda package works with all Python versions >= the one used during the build. 
 Build it once with the minimum supported Python version (3.12). The tests of the recipe only run with 
 that version: also check the package in a Python 3.13 and a Python 3.14 environment.
-Then, build the conda packages for the GUI:
-```bash
-pyiode> cd ../gui
-gui> conda build . --no-anaconda-upload
-```
 
-To check that the conda packages have been built correctly, you can run the following command:
+To check that the conda package has been built correctly, you can run the following command:
 ```bash
 root_dir_iode> conda install --use-local iode
+```
+
+### Upload the iode conda package
+
+To upload the *iode* conda package to the Anaconda repository, run:
+```bash
+root_dir_iode> anaconda login
+root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-abi3_<build_number>.conda
+```
+where `<build_number>` is the value of `build/number` in pyiode/condarecipe/iode/meta.yaml.in.
+
+### Build the iode-gui conda package
+
+Once the *iode* conda package has been uploaded, build the conda package for the GUI:
+```bash
+root_dir_iode> cd gui
+gui> conda build . -c plan-be --no-anaconda-upload
+```
+The *iode-gui* package requires the *iode* package of the same version, which is not available on the 
+default channels: the `-c plan-be` option tells conda-build where to find it. 
+To test the GUI with the local *iode* package before uploading it, pass instead the folder in which 
+it has been built (see the `conda build` output of the *iode* package):
+```bash
+gui> conda build . -c <path-to-miniconda>/conda-bld --no-anaconda-upload
+```
+
+To check that the conda package has been built correctly, you can run the following command:
+```bash
 root_dir_iode> conda install --use-local iode-gui
 ```
 
-## Upload the conda packages
+### Upload the iode-gui conda package
 
-Then, to upload the conda packages to the Anaconda repository, you have to run:
+To upload the *iode-gui* conda package to the Anaconda repository, run:
 ```bash
-root_dir_iode> anaconda login
-root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/win-64/iode-<version>-abi3_0.conda
 root_dir_iode> anaconda upload --user plan-be <path-to-miniconda>/conda-bld/noarch/iode-gui-<version>-py*.conda
 ```
 

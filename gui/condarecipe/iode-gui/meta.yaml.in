@@ -19,7 +19,7 @@ build:
     - iode-gui = iode_gui.main:start
   noarch: python
   script: 
-    - mkdir -p "{{ PREFIX }}\Menu"                                                    # [win]
+    - mkdir "{{ PREFIX }}\Menu"                                                       # [win]
     - copy "{{ RECIPE_DIR }}\menu.json" "{{ PREFIX }}\Menu\{{ PKG_NAME }}-menu.json"  # [win]
     - copy "{{ RECIPE_DIR }}\iode_icon.ico" "{{ PREFIX }}\Menu"                       # [win]
     - copy "{{ RECIPE_DIR }}\iode_help.ico" "{{ PREFIX }}\Menu"                       # [win]
@@ -48,11 +48,14 @@ requirements:
     - cmake
 
   run:
-    - python
+    # same minimum Python version as the iode package (abi3, built with Python 3.12)
+    - python >=3.12
     - numpy >=2.4
     - pandas >=3.0
     - matplotlib-base
-    - iode
+    # the iode package is not on the default channels: pass its channel to conda build
+    # (-c plan-be, or -c <path-to-miniconda>/conda-bld to use a local iode package)
+    - iode =={{ version }}
     - qtpy
     - pyqt
     - qtconsole
