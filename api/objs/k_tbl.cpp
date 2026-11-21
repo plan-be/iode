@@ -28,15 +28,17 @@ bool debug_pack = false;
 // If quotes is true, the content is returned between double quotes.
 std::string TableCell::get_content(const bool quotes) const
 {
-    if(type == TABLE_CELL_LEC)
+    if(get_type() == TABLE_CELL_LEC)
     {
-        if(!idt) 
+        const Identity* idt = identity();
+        if(!idt)
             return "";
         else
             return idt->get_lec();
     }
     else
     {
+        const std::string& content = text();
         if(content.empty())
             return "";
         std::string _content_ = content;
@@ -47,11 +49,9 @@ std::string TableCell::get_content(const bool quotes) const
 }
 
 void TableCell::set_text(const std::string& text)
-{   
-    type = TABLE_CELL_STRING;
-    if(idt)
-        delete idt;
-    idt = nullptr;
+{
+    // the cell becomes a TABLE_CELL_STRING cell (deletes the Identity object of a LEC cell)
+    value = std::string("");
 
     // alignment rules:
     // - TABLE_CELL_LEFT if previously TABLE_CELL_DECIMAL
@@ -63,42 +63,35 @@ void TableCell::set_text(const std::string& text)
         set_align(TABLE_CELL_CENTER);
 
     if(text.empty())
-    {
-        content = "";
         return;
-    }
 
     std::string _text_ = text;
 
     // remove the leading and trailing double quotes
-    if(_text_.front() == '\"') 
+    if(_text_.front() == '\"')
         _text_.erase(0, 1);
-    if(_text_.back() == '\"')
+    if(!_text_.empty() && _text_.back() == '\"')
         _text_.pop_back();
 
-    content = _text_;
+    value = _text_;
 }
 
 void TableCell::set_lec(const std::string& lec)
 {
-    type = TABLE_CELL_LEC;
-    content = "";
-    
-    if(idt)
-        delete idt;
-    idt = nullptr;
+    // the cell becomes an empty TABLE_CELL_LEC cell
+    value = std::unique_ptr<Identity>(nullptr);
 
-    if(lec.empty()) 
+    if(lec.empty())
         return;
 
     try
     {
-        this->idt = new Identity(lec);
+        value = std::make_unique<Identity>(lec);
     }
     catch(std::exception& e)
     {
         kwarning(e.what());
-        this->idt = nullptr;
+        value = std::unique_ptr<Identity>(nullptr);
     }
 }
 
@@ -126,7 +119,7 @@ void TableCell::start_print(int straddle) const
 
     if(attribute & TABLE_CELL_CENTER) align = 'C';
     if(attribute & TABLE_CELL_RIGHT)  align = 'R';
-    if(type != TABLE_CELL_STRING && (attribute & TABLE_CELL_DECIMAL)) align = 'D';
+    if(get_type() != TABLE_CELL_STRING && (attribute & TABLE_CELL_DECIMAL)) align = 'D';
 
     W_printf((char*) "%c%d%c", A2M_SEPCH, straddle, align);
 }
@@ -263,11 +256,11 @@ char* TableCell::to_binary(char *pack, int& p, int i, int j)
 
 bool TableCell::from_binary(char *pack, int& p, int i, int j)
 {
-    char* value = (char*) P_get_ptr(pack, p);
+    char* packed_value = (char*) P_get_ptr(pack, p);
 
     if(this->get_type() == TABLE_CELL_STRING)
     {
-        std::string content = (value == NULL) ? "" : std::string(value);
+        std::string content = (packed_value == NULL) ? "" : std::string(packed_value);
         debug_unpacking("cell", "STR  ", p, i, j, content);
         this->set_text(content);
         p++;
@@ -275,8 +268,8 @@ bool TableCell::from_binary(char *pack, int& p, int i, int j)
     }
     else
     {   
-        // NOTE: 'value' is a serialized Identity
-        char* c_lec = (char*) P_get_ptr(value, 0);
+        // NOTE: 'packed_value' is a serialized Identity
+        char* c_lec = (char*) P_get_ptr(packed_value, 0);
         std::string lec = (c_lec == NULL) ? "" : std::string(c_lec);
         debug_unpacking("cell", "LEC  ", p, i, j, lec);
         this->set_lec(lec);

@@ -156,21 +156,51 @@ using bitset_8 = std::bitset<8>;
 //          This is currently not supported in Cython.
 
 
-class TableCell 
+class TableCell
 {
 private:
-    char        type;       // TABLE_CELL_STRING or TABLE_CELL_LEC
-    std::string content;    // if type == TABLE_CELL_STRING
-    Identity*   idt;        // if type == TABLE_CELL_LEC
-    char        attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD,
-                            // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
+    // The alternative held by 'value' gives the type of the cell:
+    // - TABLE_CELL_STRING -> std::string (text without the surrounding double quotes)
+    // - TABLE_CELL_LEC    -> std::unique_ptr<Identity> (nullptr if the cell is empty)
+    using TableCellValue = std::variant<std::string, std::unique_ptr<Identity>>;
+
+    TableCellValue value;
+    char           attribute;  // TABLE_CELL_LEFT, TABLE_CELL_CENTER, TABLE_CELL_RIGHT, TABLE_CELL_BOLD,
+                               // TABLE_CELL_ITALIC, TABLE_CELL_UNDERLINE, TABLE_CELL_NORMAL
+
+    // returns the text of a TABLE_CELL_STRING cell (throws for a TABLE_CELL_LEC cell)
+    const std::string& text() const
+    {
+        return std::get<std::string>(value);
+    }
+
+    // returns the identity of a TABLE_CELL_LEC cell (throws for a TABLE_CELL_STRING cell).
+    // NOTE: non-const pointee (as the previous raw pointer member) because
+    //       Identity::get_compiled_lec() is not const.
+    Identity* identity() const
+    {
+        return std::get<std::unique_ptr<Identity>>(value).get();
+    }
+
+    // deep copy of the value of another cell (the Identity object is duplicated)
+    static TableCellValue copy_value(const TableCellValue& other_value)
+    {
+        if(std::holds_alternative<std::string>(other_value))
+            return std::get<std::string>(other_value);
+
+        const std::unique_ptr<Identity>& other_idt = std::get<std::unique_ptr<Identity>>(other_value);
+        if(other_idt)
+            return std::make_unique<Identity>(*other_idt);
+        return std::unique_ptr<Identity>(nullptr);
+    }
 
 public:
-	TableCell(const TableCellType cell_type, const std::string& content = "", const int col=0, 
-        const bool utf8=false) : type((char) cell_type), idt(nullptr)
+	TableCell(const TableCellType cell_type, const std::string& content = "", const int col=0,
+        const bool utf8=false)
     {
-        if(this->type == TABLE_CELL_STRING)
+        if(cell_type == TABLE_CELL_STRING)
         {
+            this->value = std::string("");
             if(utf8)
                 this->set_content_utf8(content);
             else
@@ -179,66 +209,48 @@ public:
         }
         else
         {
-            this->content = "";
+            this->value = std::unique_ptr<Identity>(nullptr);
             if(!content.empty())
             {
                 try
                 {
-                    this->idt = new Identity(content, utf8);
+                    this->value = std::make_unique<Identity>(content, utf8);
                 }
                 catch(std::exception& e)
                 {
                     kwarning(e.what());
-                    this->idt = nullptr;
+                    this->value = std::unique_ptr<Identity>(nullptr);
                 }
             }
             this->attribute = (col > 0) ? TABLE_CELL_DECIMAL : TABLE_CELL_LEFT;
         }
     }
 
-    TableCell(const TableCell& other)
-    {
-        type = other.type;
-        attribute = other.attribute;
-        content = other.content;
-        if(other.idt)
-            idt = new Identity(*(other.idt));
-        else
-            idt = nullptr;
-    }
+    TableCell(const TableCell& other) : value(copy_value(other.value)), attribute(other.attribute) {}
 
-     ~TableCell()
-    {
-        if(idt)
-            delete idt;
-        idt = nullptr;
-    }
+    ~TableCell() = default;
 
     TableCell& operator=(const TableCell& other)
     {
-        type = other.type;
-        attribute = other.attribute;
-        content = other.content;
-        if(idt)
-            delete idt;
-        idt = nullptr;
-        if(other.idt)
-            idt = new Identity(*(other.idt));
+        if(this != &other)
+        {
+            value = copy_value(other.value);
+            attribute = other.attribute;
+        }
         return *this;
     }
 
     TableCellType get_type() const
     {
-        return (TableCellType) type;
+        return std::holds_alternative<std::string>(value) ? TABLE_CELL_STRING : TABLE_CELL_LEC;
     }
 
     bool is_null() const
     {
-        if (type == TABLE_CELL_LEC && idt == NULL)
-            return true;
-        if (type == TABLE_CELL_STRING && content.empty())
-            return true;
-        return false;
+        if(get_type() == TABLE_CELL_LEC)
+            return identity() == nullptr;
+        else
+            return text().empty();
     }
 
     TableCellAlign get_align() const
@@ -338,9 +350,10 @@ public:
 
 	std::shared_ptr<CLEC> get_compiled_lec() const
     {
-        if(type != TABLE_CELL_LEC)
+        if(get_type() != TABLE_CELL_LEC)
             throw std::runtime_error("Cannot get the compiled LEC. The table cell does not contain a LEC expression");
 
+        Identity* idt = identity();
         if(!idt)
             throw std::runtime_error("Cannot get the compiled LEC. The table cell is empty");
 
@@ -393,21 +406,23 @@ public:
 
 	bool operator==(const TableCell& other) const
     {	
-        if (type != other.type) 
+        if (get_type() != other.get_type())
             return false;
 
-        if (attribute != other.attribute) 
+        if (attribute != other.attribute)
             return false;
-        
-        if(type == TABLE_CELL_STRING)
-            return this->content == other.content;
+
+        if(get_type() == TABLE_CELL_STRING)
+            return this->text() == other.text();
         else
         {
-            if(idt == nullptr && other.idt == nullptr) 
+            const Identity* idt = identity();
+            const Identity* other_idt = other.identity();
+            if(idt == nullptr && other_idt == nullptr)
                 return true;
-            if(idt == nullptr || other.idt == nullptr) 
+            if(idt == nullptr || other_idt == nullptr)
                 return false;
-            return idt->get_lec() == other.idt->get_lec();
+            return idt->get_lec() == other_idt->get_lec();
         }
     }
 
@@ -415,11 +430,12 @@ public:
     {
 		std::size_t seed = 0;
 
-        hash_combine<char>(seed, type);
-        if(type == TABLE_CELL_STRING)
-		    hash_combine<std::string>(seed, content);
+        hash_combine<char>(seed, (char) get_type());
+        if(get_type() == TABLE_CELL_STRING)
+		    hash_combine<std::string>(seed, text());
         else
         {
+            const Identity* idt = identity();
             if(idt)
                 hash_combine<std::string>(seed, idt->get_lec());
         }
