@@ -121,60 +121,52 @@ done:
 
 
 /**
- *  Replaces recursively list names in a string. Returns a table containing all terms in the string after replacement.
- *  The lists are searched in the current LST KDB.
- *  
+ *  Replaces recursively list names in a string. Returns a vector containing all terms in the
+ *  string after replacement. The lists are searched in the present KDB of lists.
+ *
  *  Example:
- *      Suppose we have the lists below in the current KDB of lists:
+ *      Suppose we have the lists below in the KDB of lists:
  *          A = "$A1;$A2"
  *          A1 = "X;Y"
  *          A2 = "Z"
- *  
- *      KL_expand("$A B C") => "X", "Y", "Z", "B", "C"
- *  
- *  @param [in] char*   str     list of terms separated by one of the chars in " ,;\t\n\r\f" and 
- *                              containing IODE lists under the form of $LISTNAME.
- *  @return     char**          table containing all terms in str after replacement.
- *  
+ *
+ *      expand_lists("$A B C") => "X", "Y", "Z", "B", "C"
+ *
+ *  @param [in] lists   const std::string&          list of terms separated by one of the chars
+ *                                                      in " ,;\t\n\r\f" and containing IODE lists
+ *                                                      under the form of $LISTNAME.
+ *  @return                 std::vector<std::string>    all terms in lists after replacement.
+ *
  */
-unsigned char **KL_expand(char *str)
+std::vector<std::string> KDBLists::expand_lists(const std::string& lists) const
 {
-    unsigned char 	**tbl, **tbl2;
-    unsigned char*  seps = (unsigned char*) " ,;\t\n\r\f";
-    int				i, nb, nb2;
+    std::vector<std::string> v_expanded;
 
-    tbl = SCR_vtoms((unsigned char*) str, seps);
-    nb = SCR_tbl_size(tbl);
-    if(SCR_tbl_size(tbl) == 0) 
-        return(tbl);
-    
-    std::string list_name;
-    std::shared_ptr<List> list_ptr;
-    char* c_list = NULL;
-    for(i = 0 ; tbl[i] ; i++) 
+    const std::string seps = " ,;\t\n\r\f";
+    std::vector<std::string> v_terms = split_multi(lists, seps);
+    for(const std::string& term : v_terms)
     {
-        if(tbl[i][0] == '$') 
+        // skip empty terms (consecutive separators)
+        if(term.empty())
+            continue;
+
+        if(term[0] == '$')
         {
-            list_name = std::string((char*) tbl[i] + 1);
-            if(global_ws_lst->contains(list_name))
+            std::string list_name = term.substr(1);
+            if(this->contains(list_name))
             {
-                SCR_free(tbl[i]); // plus besoin car remplacé par sa valeur
-                list_ptr = global_ws_lst->get_obj_ptr(list_name);
-                c_list = (char*) list_ptr->c_str();
-                tbl2 = KL_expand(c_list);
-                nb2 = SCR_tbl_size(tbl2);
-                // Insertion dans tbl de la liste à la place de tbl[i]
-                tbl = (unsigned char **) SCR_realloc(tbl, sizeof(char *), nb + 1, (nb + 1 - 1) + nb2);
-                // décaler ceux qui suivent i (nb -i - 1 éléments) de nb2 places vers la droite
-                memcpy(tbl + i + nb2, tbl + i + 1, sizeof(char *) * (nb - i - 1));
-                // recopier tbl2 à la place de i et suivants
-                memcpy(tbl + i, tbl2, sizeof(char *) * nb2);
-                nb += nb2 - 1; // -1 car on remplace le courant
-                SCR_free(tbl2); // pas tbl_free car ptrs copiés dans tbl
+                // replace $LISTNAME by the (recursively expanded) content of the list
+                std::shared_ptr<List> list_ptr = this->get_obj_ptr(list_name);
+                std::vector<std::string> v_sub_terms = expand_lists(*list_ptr);
+                v_expanded.insert(v_expanded.end(), v_sub_terms.begin(), v_sub_terms.end());
+                continue;
             }
         }
+
+        v_expanded.push_back(term);
     }
-    return(tbl);
+
+    return v_expanded;
 }
 
 bool KDBLists::binary_to_obj(const std::string& name, char* pack)

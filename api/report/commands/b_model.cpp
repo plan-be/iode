@@ -279,34 +279,14 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         return -1;
     }
 
-    int nb;
-
     std::shared_ptr<List> pre_lst = global_ws_lst->get_obj_ptr(pre_list_name);
-    char** c_pre = (char**) KL_expand((char*) pre_lst->c_str());
-    // convert to std::vector<std::string>
-    std::vector<std::string> pre;
-    nb = SCR_tbl_size((unsigned char**) c_pre);
-    for(int i = 0; i < nb; i++) 
-        pre.push_back(std::string(c_pre[i]));
-    SCR_free_tbl((unsigned char**) c_pre);
+    std::vector<std::string> pre = global_ws_lst->expand_lists(*pre_lst);
 
     std::shared_ptr<List> inter_lst = global_ws_lst->get_obj_ptr(inter_list_name);
-    char** c_inter = (char**) KL_expand((char*) inter_lst->c_str());
-    // convert to std::vector<std::string>
-    std::vector<std::string> inter;
-    nb = SCR_tbl_size((unsigned char**) c_inter);
-    for(int i = 0; i < nb; i++) 
-        inter.push_back(std::string(c_inter[i]));
-    SCR_free_tbl((unsigned char**) c_inter);
+    std::vector<std::string> inter = global_ws_lst->expand_lists(*inter_lst);
 
     std::shared_ptr<List> post_lst = global_ws_lst->get_obj_ptr(post_list_name);
-    char** c_post = (char**) KL_expand((char*) post_lst->c_str());
-    // convert to std::vector<std::string>
-    std::vector<std::string> post;
-    nb = SCR_tbl_size((unsigned char**) c_post);
-    for(int i = 0; i < nb; i++) 
-        post.push_back(std::string(c_post[i]));
-    SCR_free_tbl((unsigned char**) c_post);
+    std::vector<std::string> post = global_ws_lst->expand_lists(*post_lst);
 
     // union of pre, inter and post -> to create a subset of global_ws_eqs to simulate
     std::set<std::string> v_eqs;

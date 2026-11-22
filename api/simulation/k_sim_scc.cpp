@@ -474,31 +474,13 @@ bool CSimulation::simulate_SCC(const std::string& from, const std::string& to,
     }
 
     std::string list_pre = global_ws_lst->get(pre_name);
-    char** c_pre = (char**) KL_expand(to_char_array(list_pre));
-    // convert to std::vector<std::string>
-    std::vector<std::string> pre;
-    int nb = SCR_tbl_size((unsigned char**) c_pre);
-    for(int i = 0; i < nb; i++) 
-        pre.push_back(std::string(c_pre[i]));
-    SCR_free_tbl((unsigned char**) c_pre); 
+    std::vector<std::string> pre = global_ws_lst->expand_lists(list_pre);
     
     std::string list_inter = global_ws_lst->get(inter_name);
-    char** c_inter = (char**) KL_expand(to_char_array(list_inter));
-    // convert to std::vector<std::string>
-    std::vector<std::string> inter;
-    nb = SCR_tbl_size((unsigned char**) c_inter);
-    for(int i = 0; i < nb; i++) 
-        inter.push_back(std::string(c_inter[i]));
-    SCR_free_tbl((unsigned char**) c_inter);
+    std::vector<std::string> inter = global_ws_lst->expand_lists(list_inter);
 
     std::string list_post = global_ws_lst->get(post_name);
-    char** c_post = (char**) KL_expand(to_char_array(list_post));
-    // convert to std::vector<std::string>
-    std::vector<std::string> post;
-    nb = SCR_tbl_size((unsigned char**) c_post);
-    for(int i = 0; i < nb; i++) 
-        post.push_back(std::string(c_post[i]));
-    SCR_free_tbl((unsigned char**) c_post);  
+    std::vector<std::string> post = global_ws_lst->expand_lists(list_post);
 
     // union of pre, inter and post -> to create a subset of global_ws_eqs to simulate
     std::set<std::string> v_eqs;
