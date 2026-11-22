@@ -179,9 +179,8 @@ TEST_F(KDBEquationsTest, Filter)
         if (name.front() == 'A') 
             expected_names.insert(name);
     // $ENVI
-    unsigned char** c_expanded_list = KL_expand(const_cast<char*>("$ENVI"));
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
-        expected_names.insert((char*) c_expanded_list[i]);
+    std::vector<std::string> expanded_list = global_ws_lst->expand_lists("$ENVI");
+    expected_names.insert(expanded_list.begin(), expanded_list.end());
     // *_
     for (const std::string& name : all_names) 
         if (name.back() == '_') 
@@ -263,9 +262,8 @@ TEST_F(KDBEquationsTest, DeepCopy)
     for (const std::string& name : all_names) 
         if (name.front() == 'A') expected_names.insert(name);
     // $ENVI
-    unsigned char** c_expanded_list = KL_expand(const_cast<char*>("$ENVI"));
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
-        expected_names.insert((char*) c_expanded_list[i]);
+    std::vector<std::string> expanded_list = global_ws_lst->expand_lists("$ENVI");
+    expected_names.insert(expanded_list.begin(), expanded_list.end());
     // *_
     for (const std::string& name : all_names) 
         if (name.back() == '_') 

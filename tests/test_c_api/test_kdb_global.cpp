@@ -41,10 +41,8 @@ TEST_F(KDBGlobalTest, Filter)
     std::string list = "$ENVI";
     list_names = global_ws_eqs->filter_names(list);
     expected_list_names.clear();
-    char* c_list = const_cast<char*>(list.c_str());
-    unsigned char** c_expanded_list = KL_expand(c_list);
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++) 
-        expected_list_names.insert((char*) c_expanded_list[i]);
+    std::vector<std::string> expanded_list = global_ws_lst->expand_lists(list);
+    expected_list_names.insert(expanded_list.begin(), expanded_list.end());
     EXPECT_EQ(list_names, expected_list_names);
 
     // complex pattern
@@ -53,8 +51,7 @@ TEST_F(KDBGlobalTest, Filter)
     for (const std::string& name : all_names) 
         if (name.front() == 'A') 
             expected_list_names.insert(name);
-    for (int i = 0; i < SCR_tbl_size(c_expanded_list); i++)     
-        expected_list_names.insert((char*) c_expanded_list[i]);
+    expected_list_names.insert(expanded_list.begin(), expanded_list.end());
     for (const std::string& name : all_names)   
         if (name.back() == '_') 
             expected_list_names.insert(name);
