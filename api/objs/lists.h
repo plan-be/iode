@@ -79,6 +79,9 @@ public:
         this->set_list(name, list);
     }
 
+    void set_list(const std::string& name, const std::vector<std::string>& values, 
+        const int chunck);
+
     std::vector<std::string> expand_lists(const std::string& lists) const;
 
     bool load_asc(const std::string& filename) override;
@@ -128,6 +131,3 @@ inline std::size_t hash_value(KDBLists const& kdb)
 
     return seed;
 }
-
-/* k_lst.c */
-int KL_lst(char* name, char** lst, int chunck);

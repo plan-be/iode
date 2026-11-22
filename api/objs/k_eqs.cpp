@@ -471,19 +471,20 @@ bool KDBEquations::scan(const std::string& list_var, const std::string& list_sca
         clec_scan(*this, clec, exo_ptr, scal_ptr);
     }
 
-    int rc = -1;
-    char** c_lst;
     std::vector<std::string> lst;
+    try
+    {
+        lst = scal_ptr->grep("*", true, true, false, false, '*');
+        global_ws_lst->set_list(list_scal, lst, 200);
 
-    lst = scal_ptr->grep("*", true, true, false, false, '*');
-    c_lst = vector_to_double_char(lst);
-    rc = KL_lst((char*) list_scal.c_str(), c_lst, 200);
-    SCR_free_tbl((unsigned char**) c_lst);
+        lst = exo_ptr->grep("*", true, true, false, false, '*');
+        global_ws_lst->set_list(list_var, lst, 200);
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+        return false;
+    }
 
-    lst = exo_ptr->grep("*", true, true, false, false, '*');
-    c_lst = vector_to_double_char(lst);
-    rc = KL_lst((char*) list_var.c_str(), c_lst, 200);
-    SCR_free_tbl((unsigned char**) c_lst);
-
-    return rc < 0 ? false : true;
+    return true;
 }

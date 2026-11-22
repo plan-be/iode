@@ -12,113 +12,52 @@
 
 
 /**
- *  Creates a list from a table of strings. The elements in the new list are separated by semi-colons.
- *  If the list exceeds chunck strings, it is split into sublists with each max chunck elements. The
- *  sublists have the same name with a numerical suffix.
- *  
- *  Example: 
- *      char** tbl;
- *      tbl = SCR_vtom("A,B,C,D,E,F,G,H", ',');
- *      KL_lst("MYLIST", tbl, 5); // Creates 3 lists : 
- *                                //     MYLIST  => "$MYLIST1;$MYLIST2"
- *                                //     MYLIST1 => "A,B,C,D,E"
- *                                //     MYLIST2 => "F,G,H"
- *    
- *  @param [in] char*   name    name or the resulting list
- *  @param [in] char**  lst     table of strings
- *  @param [in] int     chunck  max number of strings per (sub-)list
- *  @return     int             0 on success, < 0 on, error (rc from add())
- *  
+ *  Creates a list from a vector of strings. The elements in the new list are separated by semi-colons.
+ *  If the list contains chunck strings or more, it is split into sublists with each max chunck
+ *  elements. The sublists have the same name with a numerical suffix (starting at 0) and the
+ *  list 'name' then contains the references to the sublists.
+ *
+ *  Example:
+ *      set_list("MYLIST", {"A", "B", "C", "D", "E", "F", "G", "H"}, 5);
+ *      // Creates 3 lists :
+ *      //     MYLIST  => "$MYLIST0;$MYLIST1;"
+ *      //     MYLIST0 => "A;B;C;D;E"
+ *      //     MYLIST1 => "F;G;H"
+ *
+ *  @param [in] name    const std::string&                  name of the resulting list
+ *  @param [in] values  const std::vector<std::string>&     list elements
+ *  @param [in] chunck  int                                 max number of strings per (sub-)list.
+ *                                                          A value <= 0 means no limit.
+ *  @throw  std::invalid_argument if the name of the list (or of a sublist) is not valid
  */
-int KL_lst(char* name, char** lst, int chunck)
+void KDBLists::set_list(const std::string& name, const std::vector<std::string>& values,
+    const int chunck)
 {
-    int     rc = 0, i, j, nb;
-    char    *str, *ptr, buf[30];
-
-    nb = SCR_tbl_size((unsigned char**) lst);
-    if(nb == 0) 
+    const int nb = (int) values.size();
+    if(nb < chunck || chunck <= 0)
     {
-        try
-        {
-            global_ws_lst->set(name, List(""));    
-        }
-        catch(const std::exception& e)
-        {
-            kwarning(e.what());
-            rc = -1;
-        }
-        goto done;
+        this->set(name, join(values, ";"));
+        return;
     }
 
-    if(nb < chunck || chunck < 0) 
+    std::string list_of_sublists;
+    int j = 0;
+    for(int i = 0; i < nb; i += chunck, j++)
     {
-        str = (char*) SCR_mtov((unsigned char**) lst, (int) ';');
-        try
-        {
-            global_ws_lst->set(name, List(str)); 
-        }
-        catch(const std::exception& e)
-        {
-            kwarning(e.what());
-            rc = -1;
-        }
-        SCR_free(str);
-        return rc;
+        auto first = values.begin() + i;
+        auto last = (i + chunck < nb) ? first + chunck : values.end();
+        std::vector<std::string> sub_values(first, last);
+
+        std::string sub_name = name + std::to_string(j);
+        if(sub_name.size() > K_MAX_NAME)
+            sub_name = sub_name.substr(0, K_MAX_NAME);
+        this->set(sub_name, join(sub_values, ";"));
+
+        list_of_sublists += "$" + sub_name + ";";
     }
 
-    for(i = 0, j = 0; i < nb && !rc; i+= chunck, j++) 
-    {
-        if(i + chunck < nb) 
-        {
-            ptr = lst[i + chunck];
-            lst[i + chunck] = NULL;
-        }
-
-        str = (char*) SCR_mtov((unsigned char**) lst + i, ';');
-        sprintf(buf, "%s%d", name, j);
-        buf[K_MAX_NAME] = 0;
-        try
-        {
-            global_ws_lst->set(buf, List(str));
-        }
-        catch(const std::exception& e)
-        {
-            kwarning(e.what());
-            rc = -1;
-        }
-        SCR_free(str);
-
-        if(i + chunck < nb)  
-            lst[i + chunck] = ptr;
-    }
-    if(rc < 0) 
-        goto done;
-
-    str = (char *) SW_nalloc(j * (K_MAX_NAME + 2));
-    str[0] = 0;
-    for(i = 0; i < j; i++) 
-    {
-        sprintf(buf, "$%s%d;", name, i); /* GB 23/01/98 */
-        buf[K_MAX_NAME] = 0;
-        strcat(str, buf);
-    }
-
-    try
-    {
-        global_ws_lst->set(name, List(str));
-    }
-    catch(const std::exception& e)
-    {
-        kwarning(e.what());
-        rc = -1;
-    }
-
-    SW_nfree(str);
-
-done:
-    return rc;
+    this->set(name, list_of_sublists);
 }
-
 
 /**
  *  Replaces recursively list names in a string. Returns a vector containing all terms in the
