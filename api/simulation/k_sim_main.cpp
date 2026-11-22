@@ -785,11 +785,16 @@ void CSimulation::sub_build_lists_order(const std::string& lstname, int eq1, int
         v_eqs.push_back(eq_name);
     }
 
-    // Creates the list lstname (and possibly sub-lists lstname1,...) 
+    // Creates the list lstname (and possibly sub-lists lstname0, lstname1, ...)
     int maxl = 1000;
-    char** c_lst = vector_to_double_char(v_eqs);
-    KL_lst((char*) lstname.c_str(), c_lst, maxl);
-    SCR_free_tbl((unsigned char**) c_lst);
+    try
+    {
+        global_ws_lst->set_list(lstname, v_eqs, maxl);
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+    }
 }
 
 

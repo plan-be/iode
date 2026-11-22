@@ -764,6 +764,44 @@ int B_DataUpdate(char* arg, int type)
 
 
 /**
+ *  Converts a NULL terminated table of strings (SCR table) into a vector of strings.
+ *
+ *  @param [in] tbl     char**                      NULL terminated table of strings (may be NULL)
+ *  @return             std::vector<std::string>    copy of the strings in tbl
+ */
+static std::vector<std::string> tbl_to_vector(char** tbl)
+{
+    std::vector<std::string> values;
+    if(tbl == NULL)
+        return values;
+    for(int i = 0; tbl[i] != NULL; i++)
+        values.push_back(std::string(tbl[i]));
+    return values;
+}
+
+/**
+ *  Creates (or replaces) the list name in the global Lists workspace.
+ *  See KDBLists::set_list().
+ *
+ *  @return int     0 on success, -1 on error (a warning is displayed)
+ */
+static int set_global_list(const std::string& name, const std::vector<std::string>& values,
+    const int chunck)
+{
+    try
+    {
+        global_ws_lst->set_list(name, values, chunck);
+        return 0;
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+        return -1;
+    }
+}
+
+
+/**
  *  Searches all objects containing a given string in their names and/or definitions.
  *  
  *  Syntax
@@ -853,7 +891,7 @@ int B_DataSearch(char* arg, int type)
     std::string list_result = v_args[6];
 
     char** lst = B_DataSearchParms((char*) name.c_str(), word, ecase, names, forms, texts, type);
-    int rc = KL_lst((char*) list_result.c_str(), lst, 200);
+    int rc = set_global_list(list_result, tbl_to_vector(lst), 200);
     SCR_free_tbl((unsigned char**) lst);
 
     return rc;
@@ -1279,17 +1317,7 @@ int B_DataList(char* arg, int type)
         }
     }
 
-    int rc = -1;
-    if(lst.empty()) 
-        rc = KL_lst((char*) name.c_str(), NULL, 200);
-    else
-    {
-        char** c_lst = vector_to_double_char(lst);
-        rc = KL_lst((char*) name.c_str(), c_lst, 200);
-        SCR_free_tbl((unsigned char**) c_lst);
-    }
-
-    return rc;
+    return set_global_list(name, lst, 200);
 }
 
 /**
@@ -1431,7 +1459,7 @@ int B_DataCalcLst(char* arg, int unused)
         goto done;
     }
     
-    rc = KL_lst((char*) res.c_str(), (char**) lst, -1); 
+    rc = set_global_list(res, tbl_to_vector((char**) lst), -1);
 
 done :
     SCR_free_tbl(lst);
@@ -1548,10 +1576,10 @@ int template_data_compare(const std::string& filename, const std::string& one, c
     SCR_add_ptr((unsigned char***) &l3, &n3, NULL);
     SCR_add_ptr((unsigned char***) &l4, &n4, NULL);
 
-    rc = KL_lst((char*) one.c_str(),   l1, 10000);
-    rc = KL_lst((char*) two.c_str(),   l2, 10000);
-    rc = KL_lst((char*) three.c_str(), l3, 10000);
-    rc = KL_lst((char*) four.c_str(),  l4, 10000);
+    rc = set_global_list(one,   tbl_to_vector(l1), 10000);
+    rc = set_global_list(two,   tbl_to_vector(l2), 10000);
+    rc = set_global_list(three, tbl_to_vector(l3), 10000);
+    rc = set_global_list(four,  tbl_to_vector(l4), 10000);
 
     SCR_free_tbl((unsigned char**) l1);
     SCR_free_tbl((unsigned char**) l2);

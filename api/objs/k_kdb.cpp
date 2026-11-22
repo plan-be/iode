@@ -165,15 +165,22 @@ std::vector<std::string> KDB::search(const std::string& pattern, const bool word
     if(c_list == NULL || SCR_tbl_size((unsigned char**) c_list) == 0)
         return objs_list;
 
-    // save as IODE list (default to list _RES)
-    KL_lst(to_char_array(list_result), c_list, 200);
-    
     // convert C table as C++ vector
     for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
         objs_list.push_back(std::string(c_list[i]));
 
     // free allocated memory for the returned C table
     SCR_free_tbl((unsigned char**) c_list);
+
+    // save as IODE list (default to list _RES)
+    try
+    {
+        global_ws_lst->set_list(list_result, objs_list, 200);
+    }
+    catch(const std::exception& e)
+    {
+        kwarning(e.what());
+    }
 
     // return C++ vector
     return objs_list;
