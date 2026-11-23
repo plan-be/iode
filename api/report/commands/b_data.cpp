@@ -109,6 +109,7 @@
 #include "api/report/commands/commands.h"
 
 
+
 /**
  *  Creates an IODE list with all existing objects of a given type having the name constructed
  *  by the combinations of 2 lists.
@@ -1300,48 +1301,6 @@ int B_DataList(char* arg, int type)
 }
 
 /**
- *  Creates a new list of strings as the product of 2 lists of strings. ["A", "B"] x ["C", "D"] => ["AB", "AC", "BC", "BD"]
- *  
- *  @param [in] char**  l1  first list of strings
- *  @param [in] char**  l2  second list of strings
- *  @return     char**      l1 x l2
- */
-static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
-{
-    int             i, inb, j, jnb, nl, ll3, ll1, ll2;
-    unsigned char   **res = NULL;
-    unsigned char   *l3 = NULL;
-
-    inb = SCR_tbl_size(l1);
-    jnb = SCR_tbl_size(l2);
-
-    nl = 0;
-    ll3 = 0;
-    for(i = 0; i < inb; i++) 
-    {
-        ll1 = (int) strlen((char*) l1[i]);
-        for(j = 0; j < jnb; j++) 
-        {
-            ll2 = (int) strlen((char*) l2[j]);
-
-            if(ll3 < ll1 + ll2 + 1) 
-            {
-                ll3 = ll1 + ll2 + 1;
-                SCR_free(l3);
-                l3 = (unsigned char*) SCR_malloc(ll3);
-            }
-
-            if(l3 != NULL) sprintf((char*) l3, "%s%s", l1[i], l2[j]);
-            SCR_add_ptr(&res, &nl, l3);
-        }
-    }
-
-    SCR_free(l3);
-    SCR_add_ptr(&res, &nl, NULL);
-    return res;
-}
-
-/**
  *  List calculus: 4 operations between 2 lists. Union (+), Intersection (*), Difference (-) and Product (x).
  *
  *  Syntax
@@ -1360,15 +1319,6 @@ static unsigned char **Lst_times(unsigned char **l1, unsigned char **l2)
  */
 int B_DataCalcLst(char* arg, int unused)
 {
-    int rc = 0;
-    unsigned char **args = NULL, **lst = NULL;
-    std::vector<std::string> v_l1;
-    std::vector<std::string> v_l2;
-    std::vector<char*> l1;
-    std::vector<char*> l2;
-    std::shared_ptr<List> list1_ptr;
-    std::shared_ptr<List> list2_ptr;
-
     /* arg: res list1 op list2 */
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 
@@ -1393,56 +1343,45 @@ int B_DataCalcLst(char* arg, int unused)
         std::string error_msg = "List '" + list1;
         error_msg += "' not found in the Lists workspace";
         error_manager.append_error(error_msg);
-        rc = -1;
-        goto done;
+        return -1;
     }
 
-    list2 = global_ws_lst->to_key(list2); 
+    list2 = global_ws_lst->to_key(list2);
     if(!global_ws_lst->contains(list2))
     {
         std::string error_msg = "List '" + list2;
         error_msg += "' not found in the Lists workspace";
         error_manager.append_error(error_msg);
-        rc = -1;
-        goto done;
+        return -1;
     }
 
-    list1_ptr = global_ws_lst->get_obj_ptr(list1);
-    v_l1 = expand_args(*list1_ptr, 0);
-    for(std::string& item : v_l1)
-        l1.push_back(item.data());
-    l1.push_back(NULL);
+    std::shared_ptr<List> list1_ptr = global_ws_lst->get_obj_ptr(list1);
+    std::vector<std::string> v_l1 = expand_args(*list1_ptr, 0);
 
-    list2_ptr = global_ws_lst->get_obj_ptr(list2);
-    v_l2 = expand_args(*list2_ptr, 0);
-    for(std::string& item : v_l2)
-        l2.push_back(item.data());
-    l2.push_back(NULL);
+    std::shared_ptr<List> list2_ptr = global_ws_lst->get_obj_ptr(list2);
+    std::vector<std::string> v_l2 = expand_args(*list2_ptr, 0);
 
-    switch(op[0]) 
+    // NOTE: the order of the elements of the input lists is preserved in the result
+    std::vector<std::string> v_res;
+    switch(op[0])
     {
     case '+' :
-        lst = SCR_union((unsigned char**) l1.data(), (unsigned char**) l2.data());
+        v_res = vector_union(v_l1, v_l2);
         break;
     case '*' :
-        lst = SCR_inter((unsigned char**) l1.data(), (unsigned char**) l2.data());
+        v_res = vector_intersection(v_l1, v_l2);
         break;
     case '-' :
-        lst = SCR_dif((unsigned char**) l1.data(), (unsigned char**) l2.data());
+        v_res = vector_difference(v_l1, v_l2);
         break;
     case 'x' :
-        lst = Lst_times((unsigned char**) l1.data(), (unsigned char**) l2.data());
+        v_res = vector_product(v_l1, v_l2);
         break;
     default  :
-        rc = -1;
-        goto done;
+        return -1;
     }
-    
-    rc = set_global_list(res, tbl_to_vector((char**) lst), -1);
 
-done :
-    SCR_free_tbl(lst);
-    return rc;
+    return set_global_list(res, v_res, -1);
 }
 
 /**
