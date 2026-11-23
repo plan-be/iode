@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <stdexcept>
 #include <functional>   // for std::hash
-#include <filesystem>   // requires C++17 
+#include <iterator>     // for std::back_inserter
+#include <unordered_set>
+#include <filesystem>   // requires C++17
 #include <string_view>  // requires C++17
 
 
@@ -366,6 +368,86 @@ inline std::string trim(const std::string& str)
         return "";
 
     return str.substr(start, end - start + 1);
+}
+
+/**
+ *  Creates a new vector of strings as the union of 2 vectors of strings: the elements of v1
+ *  followed by the elements of v2, without duplicates.
+ *  ["A", "B", "C"] + ["C", "D"] => ["A", "B", "C", "D"]
+ *
+ *  @param [in] v1  const std::vector<std::string>&     first vector of strings
+ *  @param [in] v2  const std::vector<std::string>&     second vector of strings
+ *  @return         std::vector<std::string>            v1 + v2
+ */
+inline std::vector<std::string> vector_union(const std::vector<std::string>& v1,
+    const std::vector<std::string>& v2)
+{
+    std::vector<std::string> res;
+    std::unordered_set<std::string> already_added;
+    for(const std::vector<std::string>* v : {&v1, &v2})
+        std::copy_if(v->begin(), v->end(), std::back_inserter(res),
+            [&already_added](const std::string& s) { return already_added.insert(s).second; });
+    return res;
+}
+
+/**
+ *  Creates a new vector of strings as the intersection of 2 vectors of strings: the elements
+ *  of v1 also present in v2, without duplicates.
+ *  ["A", "B", "C"] * ["C", "D"] => ["C"]
+ *
+ *  @param [in] v1  const std::vector<std::string>&     first vector of strings
+ *  @param [in] v2  const std::vector<std::string>&     second vector of strings
+ *  @return         std::vector<std::string>            v1 * v2
+ */
+inline std::vector<std::string> vector_intersection(const std::vector<std::string>& v1,
+    const std::vector<std::string>& v2)
+{
+    std::vector<std::string> res;
+    const std::unordered_set<std::string> set_v2(v2.begin(), v2.end());
+    std::unordered_set<std::string> already_added;
+    std::copy_if(v1.begin(), v1.end(), std::back_inserter(res),
+        [&set_v2, &already_added](const std::string& s)
+        { return set_v2.contains(s) && already_added.insert(s).second; });
+    return res;
+}
+
+/**
+ *  Creates a new vector of strings as the difference of 2 vectors of strings: the elements
+ *  of v1 not present in v2 (duplicates of v1 are kept).
+ *  ["A", "B", "C"] - ["C", "D"] => ["A", "B"]
+ *
+ *  @param [in] v1  const std::vector<std::string>&     first vector of strings
+ *  @param [in] v2  const std::vector<std::string>&     second vector of strings
+ *  @return         std::vector<std::string>            v1 - v2
+ */
+inline std::vector<std::string> vector_difference(const std::vector<std::string>& v1,
+    const std::vector<std::string>& v2)
+{
+    std::vector<std::string> res;
+    const std::unordered_set<std::string> set_v2(v2.begin(), v2.end());
+    std::copy_if(v1.begin(), v1.end(), std::back_inserter(res),
+        [&set_v2](const std::string& s) { return !set_v2.contains(s); });
+    return res;
+}
+
+/**
+ *  Creates a new vector of strings as the product of 2 vectors of strings: each element
+ *  of v1 concatenated with each element of v2.
+ *  ["A", "B"] x ["C", "D"] => ["AC", "AD", "BC", "BD"]
+ *
+ *  @param [in] v1  const std::vector<std::string>&     first vector of strings
+ *  @param [in] v2  const std::vector<std::string>&     second vector of strings
+ *  @return         std::vector<std::string>            v1 x v2
+ */
+inline std::vector<std::string> vector_product(const std::vector<std::string>& v1,
+    const std::vector<std::string>& v2)
+{
+    std::vector<std::string> res;
+    res.reserve(v1.size() * v2.size());
+    for(const std::string& s1 : v1)
+        for(const std::string& s2 : v2)
+            res.push_back(s1 + s2);
+    return res;
 }
 
 /**
