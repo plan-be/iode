@@ -19,7 +19,8 @@ int B_DataDelete(char* arg, int type);
 int B_DataRename(char* arg, int type);
 int B_DataDuplicate(char* arg, int type);
 int B_DataUpdate(char* arg, int type);
-char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type);
+std::vector<std::string> B_DataSearchParms(const std::string& name, bool word, bool ecase,
+    bool names, bool forms, bool texts, int type);
 int B_DataSearch(char* arg, int type);
 int B_DataEditCnf(char* arg, int unused=-1);
 int B_DataListSort(char* arg, int unused=-1);
