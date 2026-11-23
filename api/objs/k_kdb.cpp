@@ -151,26 +151,12 @@ std::vector<std::string> KDB::search(const std::string& pattern, const bool word
     const bool case_sensitive, const bool in_name, const bool in_formula, 
     const bool in_text, const std::string& list_result)
 {
-    std::vector<std::string> objs_list;
+    std::vector<std::string> objs_list = B_DataSearchParms(pattern, word, case_sensitive,
+        in_name, in_formula, in_text, (int) this->k_type);
 
-    int c_word  = word ? 1 : 0;
-    int c_ecase = case_sensitive ? 1 : 0;
-    int c_names = in_name ? 1 : 0;
-    int c_forms = in_formula ? 1 : 0;
-    int c_texts = in_text ? 1 : 0;
-    char** c_list = B_DataSearchParms((char*) pattern.c_str(), c_word, c_ecase, 
-                                      c_names, c_forms, c_texts, (int) this->k_type);
-
-    // check if returned list of objects is not null
-    if(c_list == NULL || SCR_tbl_size((unsigned char**) c_list) == 0)
+    // nothing found (or error) -> the list list_result is not created
+    if(objs_list.empty())
         return objs_list;
-
-    // convert C table as C++ vector
-    for(int i=0; i < SCR_tbl_size((unsigned char**) c_list); i++)
-        objs_list.push_back(std::string(c_list[i]));
-
-    // free allocated memory for the returned C table
-    SCR_free_tbl((unsigned char**) c_list);
 
     // save as IODE list (default to list _RES)
     try

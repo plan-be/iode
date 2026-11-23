@@ -802,51 +802,33 @@ static int set_global_list(const std::string& name, const std::vector<std::strin
 
 
 /**
- *  Searches all objects containing a given string in their names and/or definitions.
- *  
- *  Syntax
- *  ------
- *      $DataSearch<type> mask word ecase in_name in_formula in_text list_result
- *        (word, ecase, in_name, in_formula, in_text := 0 ou 1)
- *        (mask := suite of chars or ?, *)
- *        (list_result := name of the resulting list
- *  
- * for details
- *  
- *  @params See file header 
- *  
- *  @return int     0 on success, 
- *                  -1 on error: object cannot be renamed
+ *  Searches all objects of the global workspace of the given type containing a given string
+ *  in their names and/or definitions.
+ *
+ *  @param [in] name    const std::string&          string to search for
+ *  @param [in] word    bool                        true if name must be a whole word
+ *  @param [in] ecase   bool                        true if the search is case sensitive
+ *  @param [in] names   bool                        true to search in the object names
+ *  @param [in] forms   bool                        true to search in the LEC formulas
+ *  @param [in] texts   bool                        true to search in the texts
+ *  @param [in] type    int                         IODE type of the objects to search in
+ *  @return             std::vector<std::string>    names of the objects found
+ *                                                  (empty on error, the error is added to error_manager)
  */
-char** B_DataSearchParms(char* name, int word, int ecase, int names, int forms, int texts, int type)
+std::vector<std::string> B_DataSearchParms(const std::string& name, bool word, bool ecase,
+    bool names, bool forms, bool texts, int type)
 {
-    int rc = 0;
-    char **args = NULL, buf[81];
-    
-    if(word == 1) 
-    {
-        strcpy(buf, "*!");
-        SCR_strlcpy(((unsigned char*) buf) + 2, (unsigned char*) name, 76);
-        strcat(buf, "!*");
-    }
-    else 
-    {
-        buf[0] = '*';
-        SCR_strlcpy(((unsigned char*) buf) + 1, (unsigned char*) name, 76);
-        strcat(buf, "*");
-    }
+    std::string pattern = word ? "*!" + name + "!*" : "*" + name + "*";
 
     try
     {
         KDB& kdb = get_global_db(type);
-        std::vector<std::string> lst = kdb.grep(buf, ecase, names, forms, texts, '*');
-        char** c_lst = vector_to_double_char(lst);
-        return c_lst;
+        return kdb.grep(pattern, ecase, names, forms, texts, '*');
     }
-    catch (const std::runtime_error& e) 
+    catch (const std::runtime_error& e)
     {
         error_manager.append_error("DataSearch: " + std::string(e.what()));
-        return NULL;
+        return std::vector<std::string>();
     }
 }
 
@@ -883,18 +865,15 @@ int B_DataSearch(char* arg, int type)
     }
     
     std::string name = v_args[0];
-    int word  = stoi(v_args[1]);
-    int ecase = stoi(v_args[2]);
-    int names = stoi(v_args[3]);
-    int forms = stoi(v_args[4]);
-    int texts = stoi(v_args[5]);
+    bool word  = stoi(v_args[1]) == 1;
+    bool ecase = stoi(v_args[2]) != 0;
+    bool names = stoi(v_args[3]) != 0;
+    bool forms = stoi(v_args[4]) != 0;
+    bool texts = stoi(v_args[5]) != 0;
     std::string list_result = v_args[6];
 
-    char** lst = B_DataSearchParms((char*) name.c_str(), word, ecase, names, forms, texts, type);
-    int rc = set_global_list(list_result, tbl_to_vector(lst), 200);
-    SCR_free_tbl((unsigned char**) lst);
-
-    return rc;
+    std::vector<std::string> lst = B_DataSearchParms(name, word, ecase, names, forms, texts, type);
+    return set_global_list(list_result, lst, 200);
 }
 
 /**
