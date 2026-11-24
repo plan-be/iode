@@ -19,7 +19,6 @@ struct REPFILE
                                                     // Proc name and position for procedures (PROCDEF)
     std::vector<std::string>    report_lines;       // Lines of the report
     int                         current_line = 0;   // Current line (during execution)
-    int                         nblines = 0;        // Total number of lines in the report
 
     /**
      *  Creates and initialises a REPFILE struct.
@@ -30,8 +29,7 @@ struct REPFILE
      *  @param [in]     const std::vector<std::string>&     report_lines    report lines
      */
     REPFILE(const std::string& filename, const std::vector<std::string>& report_lines)
-        : filename(filename), report_lines(report_lines), current_line(0),
-          nblines((int) report_lines.size()) {}
+        : filename(filename), report_lines(report_lines), current_line(0) {}
 };
 
 struct BFNS 

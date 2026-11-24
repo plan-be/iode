@@ -210,7 +210,7 @@ int RP_procdef(char* arg, int unused)
     line1 =  rf->current_line;
 
     // Reads CUR_REPFILE to the next $procend line (or EOF)
-    for(nblines = 0; rf->current_line < rf->nblines ; rf->current_line++, nblines++) {
+    for(nblines = 0; rf->current_line < (int) rf->report_lines.size() ; rf->current_line++, nblines++) {
         if(RP_proc_is_procend((char*) rf->report_lines[rf->current_line].c_str())) {                      // JMP 23/5/2019
             rf->current_line++; // To go to the next line in the report execution (if any)
 
@@ -225,7 +225,7 @@ int RP_procdef(char* arg, int unused)
     }
 
     // Checks that a $procend statement has  been found (if not -> error)
-    if(rf->current_line > rf->nblines)  {
+    if(rf->current_line > (int) rf->report_lines.size())  {
         std::string error_msg = "Procedure '" + std::string((char*) name) + "': missing $procend statement";
         error_manager.append_error(error_msg);
         //TODO: delete the REP_PROCS[proc_nb]

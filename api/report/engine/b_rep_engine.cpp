@@ -184,7 +184,7 @@ char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
     
     while(1) 
     {
-        if(rf->current_line >= rf->nblines) 
+        if(rf->current_line >= (int) rf->report_lines.size())
             return(multi_line);
         multi_line = (char*) SCR_strafcat((unsigned char*) multi_line,
                                           (unsigned char*) rf->report_lines[rf->current_line].c_str());
@@ -218,7 +218,7 @@ char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
  */
 int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode)
 {
-    if(rf->current_line >= rf->nblines)
+    if(rf->current_line >= (int) rf->report_lines.size())
         return EOF;
 
     char* multi_line = RP_read_multiline(rf);
