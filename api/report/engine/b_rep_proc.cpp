@@ -307,7 +307,7 @@ int RP_procexec(char* arg, int unused)
 
     // Executes the proc lines like a normal report
     proc->proc_rf->current_line = 0;
-    rc = RP_ReportExec_tbl(proc->proc_rf);
+    rc = proc->proc_rf->execute();
 
     // Restores (pops) the defines with the same name as the formal parameters
     RP_define_restore_list(proc->proc_parms);

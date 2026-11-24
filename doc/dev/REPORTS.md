@@ -127,11 +127,11 @@ B\_ReportExec and B\_ReportLine are the 2 top level functions. As shown below, s
 
 ```
 B_ReportExec calls
-    RP_ReportExec_1                     Reads a report file and creates a REPFILE structure, then calls RP_ReportExec_tbl()
-B_ReportLine                            Creates a REPFILE structure from a string (possibly containing multiple lines separated by '\n') then calls RP_ReportExec_tbl()
-    RP_ReportExec_tbl                   Executes a REPFILE structure, ie a table of report lines
-        RP_readline                     Expands a report line
-            RP_read_multiline           Groups lines ended by " \" into one single line
+    RP_ReportExec_1                     Reads a report file and creates a REPFILE structure, then calls REPFILE::execute()
+B_ReportLine                            Creates a REPFILE structure from a string (possibly containing multiple lines separated by '\n') then calls REPFILE::execute()
+    REPFILE::execute()                  Executes a REPFILE structure, ie a table of report lines
+        REPFILE::read_line()            Expands a report line
+            REPFILE::read_multiline()   Groups lines ended by " \" into one single line
             RP_expand (recursive)       Replaces %macro%, {lec}, @fn()
                 RP_extract              Extracts a string bw %% or {}
                 RP_gmacro               Replaces %macro% par its value

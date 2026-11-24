@@ -165,7 +165,7 @@ int RP_foreach_break(char *name)
  *                              0 if the line is found
  *  
  *  TODO: Create a sub-fn to ensure that a identical treatment is applied here and in 
- *  RP_ReportExec_tbl() to analyse line[0], line[1]... 
+ *  REPFILE::execute() to analyse line[0], line[1]... 
  */
 static int RP_foreach_goto_next(char* label)
 {
@@ -181,7 +181,7 @@ static int RP_foreach_goto_next(char* label)
         if(CUR_REPFILE->current_line <= 1) return(-3);
         CUR_REPFILE->current_line -= 2;
         line.clear();
-        rc = RP_readline(CUR_REPFILE, line, 0);
+        rc = CUR_REPFILE->read_line(line, 0);
 
         if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) {
             if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;

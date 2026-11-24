@@ -40,11 +40,11 @@
  *  B_ReportExec and B_ReportLine are the 2 top level functions.
  *  
  *  B_ReportExec calls 
- *      RP_ReportExec_1                     Reads a report file and creates a REPFILE structure, then calls RP_ReportExec_tbl()
- *  B_ReportLine                            Creates a REPFILE structure from a string (possibly containing multiple lines separated by '\n') then calls RP_ReportExec_tbl() 
- *      RP_ReportExec_tbl                   Executes a REPFILE structure, ie a table of report lines
- *          RP_readline                     Expands a report line 
- *              RP_read_multiline           Groups lines ended by " \" into one single line
+ *      RP_ReportExec_1                     Reads a report file and creates a REPFILE structure, then calls REPFILE::execute()
+ *  B_ReportLine                            Creates a REPFILE structure from a string (possibly containing multiple lines separated by '\n') then calls REPFILE::execute() 
+ *      REPFILE::execute()                  Executes a REPFILE structure, ie a table of report lines
+ *          REPFILE::read_line()            Expands a report line 
+ *              REPFILE::read_multiline()   Groups lines ended by " \" into one single line
  *              RP_expand (recursive)       Replaces %macro%, {lec}, @fn()
  *                  RP_extract              Extracts a string bw %% or {}
  *                  RP_gmacro               Replaces %macro% par its value
@@ -173,18 +173,17 @@ std::vector<std::string> RP_read_file(const std::string& filename)
  *  
  *  The 2 chars " \\" at the end of the line(s) are replaced by a single '\n'. 
  *  
- *  @param [in] const std::shared_ptr<REPFILE>&     rf  a report struct
- *  @return     std::string                             line(s) (empty string if the end of the report is reached)
+ *  @return     std::string     line(s) (empty string if the end of the report is reached)
  */
 
-std::string RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
+std::string REPFILE::read_multiline()
 {
     std::string multi_line;
 
-    while(rf->current_line < (int) rf->report_lines.size())
+    while(current_line < (int) report_lines.size())
     {
-        multi_line += rf->report_lines[rf->current_line];
-        rf->current_line++;
+        multi_line += report_lines[current_line];
+        current_line++;
 
         // replaces the final " \\" by '\n' and joins the next line
         size_t lg = multi_line.size();
@@ -202,23 +201,22 @@ std::string RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
 }
 
 /**
- *  Reads the current line from the REPFILE rf.
+ *  Reads the current line of the report.
  *  Expands the line (%define%, {lex expression}...) and stores the expanded line in line.
  *
- *  @param [in, out]    const std::shared_ptr<REPFILE>&     rf      REPFILE struct
- *  @param [out]        std::string&                        line    line (having been expanded or not)
- *  @param [in]         int                                 mode    1 to expand the line,
- *                                                                  0 to keep the line unchanged, for example when searching for $goto or $procend lines
- *  @return             int                                         EOF if the last line is reached
- *                                                                  rc of RP_expand() on error
- *                                                                  0 on success
+ *  @param [out]        std::string&    line    line (having been expanded or not)
+ *  @param [in]         int             mode    1 to expand the line,
+ *                                              0 to keep the line unchanged, for example when searching for $goto or $procend lines
+ *  @return             int                     EOF if the last line is reached
+ *                                              rc of RP_expand() on error
+ *                                              0 on success
  */
-int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode)
+int REPFILE::read_line(std::string& line, int mode)
 {
-    if(rf->current_line >= (int) rf->report_lines.size())
+    if(current_line >= (int) report_lines.size())
         return EOF;
 
-    std::string multi_line = RP_read_multiline(rf);
+    std::string multi_line = read_multiline();
 
     int rc = 0;
     if(mode)  // expand macros, {}, ...
@@ -976,7 +974,7 @@ U_ch *RP_gfn(U_ch* str)
  *  A report line is a text including some special sequences that can be interpreted 
  *  and possibly replaced by a calculated value. 
  *  
- *  The resulting (modified) text is then "executed" if it contains an IODE command (in RP_ReportExec_tbl). 
+ *  The resulting (modified) text is then "executed" if it contains an IODE command (in REPFILE::execute()). 
  *  If not, it is sent to the current printing destination.
  *  
  *  Each line is interpreted from left to right. 
@@ -1166,29 +1164,30 @@ int RP_expand(std::string& line, char* buf)
 
 
 /**
- *  Executes the report stored in the REPFILE struct rf.
- *  
+ *  Executes the report.
+ *
  *  The current Report Context (calling report and parameters) is restored at the end of the function.
- *  
+ *
  *    - saves the calling context CUR_REPFILE (calling report) in the local variable oldrf (for recursivity)
- *    - replaces the current context CUR_FILE by rf 
- *    - executes the REPFILE rf line by line
+ *    - replaces the current context CUR_REPFILE by this report
+ *    - executes the report line by line
  *    - flushes the output
  *    - resets the context to the calling context old_rf
- *  
- *  @param [in, out] std::shared_ptr<REPFILE>   rf  report to execute (passed by value to keep the report
- *                                                  alive during its execution)
+ *
+ *  @note the REPFILE object must be owned by a std::shared_ptr (created with std::make_shared).
+ *        A local std::shared_ptr (rf) keeps the report alive during its execution.
+ *
  *  @return          int            0:  success or error must be ignored (the 2d char of the line is '-')
  *                                  -1: error in one of the commands failed
  *                                  -3: expand failed or abort report(s) execution
- *                                  -4: quit iode 
+ *                                  -4: quit iode
  */
-int RP_ReportExec_tbl(std::shared_ptr<REPFILE> rf)
+int REPFILE::execute()
 {
+    std::shared_ptr<REPFILE> rf = shared_from_this();
     int     rc, rt = 0;
     int     ignore = 0; // ignore: 0 ignore code retour, 1 non
     char    name[31];
-    long    cline = 0L;
     std::shared_ptr<REPFILE> oldrf;
     char    debug_line[1024];
     std::string line;
@@ -1203,7 +1202,7 @@ int RP_ReportExec_tbl(std::shared_ptr<REPFILE> rf)
         line.clear();
 
         // Reads the next line and expands the %macros%, {lec}, @fns()
-        rc = RP_readline(rf, line, 1);
+        rc = rf->read_line(line, 1);
 
         // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
         if(RP_DEBUG || RP_STDOUT)
@@ -1307,12 +1306,12 @@ done:
  *  Executes a report file.
  *    - changes the extension to .rep
  *    - reads the file and stores its contents in a REPFILE struct
- *    - executes the REPFILE struct line / line (see RP_ReportExec_tbl)
+ *    - executes the REPFILE struct line / line (see REPFILE::execute())
  *    - resets the current report (CUR_REPFILE)
  *  
  *  @param [in] const std::string&   file   report file name
  *  @return     int                         -1 if file cannot be read or
- *                                          RP_ReportExec_tbl() return code
+ *                                          REPFILE::execute() return code
  */
 int RP_ReportExec_1(const std::string& file)
 {
@@ -1325,7 +1324,7 @@ int RP_ReportExec_1(const std::string& file)
     }
 
     std::shared_ptr<REPFILE> rf = std::make_shared<REPFILE>(filename, report_lines);
-    int rc = RP_ReportExec_tbl(rf);
+    int rc = rf->execute();
     CUR_REPFILE = nullptr;
     return rc;
 }
@@ -1453,7 +1452,7 @@ int B_ReportLine(char* line, int cleanup)
     rf = std::make_shared<REPFILE>("temp.rep", report_lines);
 
     // Exécute la ligne (non expandée à ce stade)
-    rc = RP_ReportExec_tbl(rf);
+    rc = rf->execute();
 
     // Remonte un niveau de profondeur d'exécution des rapports
     RP_DEPTH --;
