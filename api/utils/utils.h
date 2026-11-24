@@ -413,6 +413,62 @@ inline int replace_all(std::string& str, const std::string& repl, const std::str
 }
 
 /**
+ * @brief Wraps a text into lines of at most lg characters.
+ * Same behaviour as the scr4 function SCR_text().
+ *
+ * For each line:
+ *   - the leading white spaces (' ', '\t', '\n', '\r', '\v', '\f') are skipped;
+ *   - at most lg characters are read, stopping before a '\n';
+ *   - if the line is too long, it is cut after the last character of seps found at an index > 0
+ *     (the separator is kept, even if it is a space). Otherwise, the line ends before the '\n',
+ *     at the end of the text or after exactly lg characters (a longer word is cut).
+ *
+ * The trailing spaces of the lines are not removed.
+ *
+ * For example:
+ * text_to_lines("Jean, Marc, Pierre, Louis, Marie-Christine-Petit", ", ;", 15) returns
+ * {"Jean, Marc, ", "Pierre, Louis, ", "Marie-Christine", "-Petit"}.
+ *
+ * @param str   text to wrap
+ * @param seps  characters after which a line can be cut
+ * @param lg    max number of characters of a line (an empty vector is returned if lg <= 0)
+ * @return      lines of the text
+ */
+inline std::vector<std::string> text_to_lines(const std::string& str, const std::string& seps, const int lg)
+{
+    static const std::string spaces = " \t\n\r\v\f";   // same set as SCR_is_space()
+    std::vector<std::string> lines;
+    if(lg <= 0)                                         // SCR_text() loops forever
+        return lines;
+
+    const size_t n = str.size();
+    size_t pos = 0;
+    while(true)
+    {
+        // skip the leading white spaces
+        while(pos < n && spaces.find(str[pos]) != std::string::npos)
+            pos++;
+        if(pos >= n)
+            break;
+
+        // read at most lg chars (stop before '\n') and remember the last separator
+        size_t i = 0, prev = 0;
+        while(pos + i < n && str[pos + i] != '\n' && i < (size_t) lg)
+        {
+            if(seps.find(str[pos + i]) != std::string::npos)
+                prev = i;
+            i++;
+        }
+
+        // line too long: cut after the last separator (if any, at an index > 0)
+        size_t len = (pos + i < n && i >= (size_t) lg && prev > 0) ? prev + 1 : i;
+        lines.push_back(str.substr(pos, len));
+        pos += len;
+    }
+    return lines;
+}
+
+/**
  * @brief trim leading and trailing whitespace of a string
  * 
  * @param str 
