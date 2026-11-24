@@ -164,16 +164,18 @@ void RP_free_bufs()
 /**
  *  Checks that a report line is a command ($command or #command).
  *  
- *  @param [in] char*   line    report line
- *  @return     int             1 if line is a command, 0 otherwise    
+ *  @param [in] const std::string&  line    report line
+ *  @return     int                         1 if line is a command, 0 otherwise
  */
-int RP_is_cmd(char *line)
+int RP_is_cmd(const std::string& line)
 {
-    if(line == 0) return 0;
+    if(line.size() < 2)
+        return 0;
+
     if((line[0] == '#' || line[0] == '$') &&
-            line[1] != line[0] &&
-            line[1] != 0 &&
-            !U_is_in(line[1], " \n\r\t")
+        line[1] != line[0] &&
+        line[1] != 0 &&
+        !U_is_in(line[1], " \n\r\t")
       )
         return(1);
     else
