@@ -15,11 +15,11 @@
 // REPFILE contains a report to be interpreted and the current line during interpretation
 struct REPFILE 
 {
-    char                *filename;      // Source file for report file (*.rep) or
+    std::string         filename;       // Source file for report file (*.rep) or
                                         // Proc name and position for procedures (PROCDEF)
-    unsigned char       **tbl;          // Lines of the report
-    int                 curline,        // Current line (during execution)
-			            nblines;        // Total number of lines in the report
+    unsigned char       **tbl = NULL;   // Lines of the report
+    int                 curline = 0;    // Current line (during execution)
+    int                 nblines = 0;    // Total number of lines in the report
 };
 
 struct BFNS 
