@@ -141,7 +141,6 @@ B_ReportLine                            Creates a REPFILE structure from a strin
                 RP_extractpar           Extracts an @function
                 RP_gfn                  Executes @functions and put the result in the report line
                     RP_expand...
-                RP_add                  Util : concatenates a string to the current line and reallocates
         RP_exec_fn()                    Executes the report command (if any)
             RP_find_fn                  Finds the right function
             (*B_fns[i].fn)              Executes the no-GUI function

@@ -67,10 +67,11 @@ int RP_repeatstring(char* buf, int unused)   /* JMP 06-06-99 */
 // Nouvelle version améliorée pour les allocs JAN 2009
 int RP_repeat(char* buf, int unused)
 {    
-    unsigned char* line = NULL;
-    int rc = RP_expand((char**) &line, buf);
-    if(rc) 
+    std::string expanded;
+    int rc = RP_expand(expanded, buf);
+    if(rc)
         return rc;
+    unsigned char* line = SCR_stracpy((unsigned char*) expanded.c_str());
 
     int pos1 = U_pos('"', line); // Position du premier " dans line
     if(pos1 < 0) 
@@ -202,18 +203,18 @@ int RP_label(char* arg, int unused)
 int RP_goto_label(char *command, char *parm)
 {
     int     rc, beg = 1;
-    char    *line = NULL, name[128], *arg;
+    char    name[128];
+    std::string line;
+    std::string arg;
 
-    
     if(strcmp(command, "label") == 0)  // JMP 14/2/2013
         CUR_REPFILE->current_line = 0;
     SCR_sqz((unsigned char*) parm);
     SCR_lower((unsigned char*) parm);
 
     while(1) {
-        SW_nfree(line);
-        line = 0;
-        rc = RP_readline(CUR_REPFILE, &line, 0);
+        line.clear();
+        rc = RP_readline(CUR_REPFILE, line, 0);
         if(rc == EOF) {
             std::string error_msg = std::string(command) + " " + std::string(parm) + " not found";
             error_manager.append_error(error_msg);
@@ -223,23 +224,21 @@ int RP_goto_label(char *command, char *parm)
 
         //if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) {
         //    if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;
-        if(!RP_is_cmd(line)) continue;
-        if(RP_splitline(line + 1, name, &arg, 30) < 0) {
+        if(!RP_is_cmd(line.data())) continue;
+        if(RP_splitline(line.data() + 1, name, arg, 30) < 0) {
             rc = -1;
             goto done;
         }
 
         SCR_lower((unsigned char*) name);
-        SCR_lower((unsigned char*) arg);
-        if(strcmp(name, command) == 0 && strcmp(parm, arg) == 0) {
+        SCR_lower((unsigned char*) arg.data());
+        if(strcmp(name, command) == 0 && strcmp(parm, arg.c_str()) == 0) {
             rc = 0;
             goto done;
         }
     }
 
 done:
-    SW_nfree(line);
-    line = 0;
     return rc;
 }
 

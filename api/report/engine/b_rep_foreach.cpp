@@ -73,16 +73,14 @@
  */
 static int RP_foreach_next_index(char *name)
 {
-    unsigned char   buf[512], *line = 0;
+    unsigned char   buf[512];
+    std::string     line;
     int             n = 0;
 
     // compte le nb d'éléments restant dans la liste FOREACH__name
     sprintf((char*) buf, "@vcount(%%FOREACH__%s%%)", name);
-    RP_expand((char**) &line, (char*) buf);
-    if(line) {
-        n = atol((char*) line);
-        SW_nfree(line);
-    }
+    RP_expand(line, (char*) buf);
+    n = atol(line.c_str());
     if(n == 0) { // On a atteint la fin de la liste
         sprintf((char*) buf, "FOREACH__%s", name);
         RP_undef_1(name); // Needed ?
@@ -111,11 +109,12 @@ static int RP_foreach_next_index(char *name)
  */
 int RP_foreach(char* arg, int unused)
 {
-    unsigned char   name[128], buf[512], *list;
+    unsigned char   name[128], buf[512];
+    std::string     list;
     int             rc = 0;
 
     // Crée l'index (name) et la liste de valeurs à traiter (list)
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
+    if(RP_splitline(arg, (char*) name, list, 30) < 0) return -1;
     
     // Sauve la valeur avant la boucle de l'index de la boucle (name)
     RP_define_save((char*) name);
@@ -125,7 +124,7 @@ int RP_foreach(char* arg, int unused)
     RP_define_save((char*) buf);
     
     // Crée le define name avec la liste des indices de la boucle
-    RP_define_1((char*) name, (char*) list); 
+    RP_define_1((char*) name, list.data());
 
     // Crée un define identique avec comme nom FOREACH__<nom>
     sprintf((char*) buf, "$define FOREACH__%s %%%s%%", name, name);
@@ -171,7 +170,9 @@ int RP_foreach_break(char *name)
 static int RP_foreach_goto_next(char* label)
 {
     int     rc, beg = 1;
-    char    *line = NULL, name[128], *arg, **parms;
+    char    name[128], **parms;
+    std::string line;
+    std::string arg;
 
     SCR_sqz((unsigned char*) label);
 
@@ -179,20 +180,19 @@ static int RP_foreach_goto_next(char* label)
         // Stoppe si début du fichier atteint
         if(CUR_REPFILE->current_line <= 1) return(-3);
         CUR_REPFILE->current_line -= 2;
-        SW_nfree(line);
-        line = 0;
-        rc = RP_readline(CUR_REPFILE, &line, 0);
+        line.clear();
+        rc = RP_readline(CUR_REPFILE, line, 0);
 
         if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) {
             if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;
-            if(RP_splitline(line + 1, name, &arg, 30) < 0) {
+            if(RP_splitline(line.data() + 1, name, arg, 30) < 0) {
                 rc = -1;
                 goto done;
             }
 
             SCR_lower((unsigned char*) name);
             if(strcmp(name, "foreach") == 0) {
-                parms = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ");
+                parms = (char**) SCR_vtoms((unsigned char*) arg.data(), (unsigned char*) " ");
                 if(parms && parms[0] && strcmp(label, parms[0]) == 0) {
                     SCR_free_tbl((unsigned char**) parms);
                     // Place la première valeur dans name et supprime cette valeur de la liste
@@ -206,8 +206,6 @@ static int RP_foreach_goto_next(char* label)
     }
 
 done:
-    SW_nfree(line);
-    line = 0;
     return rc;
 }
 
