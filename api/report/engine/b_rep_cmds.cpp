@@ -206,7 +206,7 @@ int RP_goto_label(char *command, char *parm)
 
     
     if(strcmp(command, "label") == 0)  // JMP 14/2/2013
-        CUR_REPFILE->curline = 0;
+        CUR_REPFILE->current_line = 0;
     SCR_sqz((unsigned char*) parm);
     SCR_lower((unsigned char*) parm);
 

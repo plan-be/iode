@@ -220,12 +220,12 @@ int RP_procdef(char* arg, int unused)
     proc->proc_nb_parms = SCR_tbl_size((unsigned char**) proc->proc_parms);
 
     // Save the current position in CUR_REPFILE
-    line1 =  rf->curline;
+    line1 =  rf->current_line;
 
     // Reads CUR_REPFILE to the next $procend line (or EOF)
-    for(nblines = 0; rf->curline < rf->nblines ; rf->curline++, nblines++) {
-        if(RP_proc_is_procend((char*) rf->report_lines[rf->curline])) {                      // JMP 23/5/2019
-            rf->curline++; // To go to the next line in the report execution (if any)
+    for(nblines = 0; rf->current_line < rf->nblines ; rf->current_line++, nblines++) {
+        if(RP_proc_is_procend((char*) rf->report_lines[rf->current_line])) {                      // JMP 23/5/2019
+            rf->current_line++; // To go to the next line in the report execution (if any)
             
             // Creates a REPFILE in memory containing the PROC code 
             // REFILE filename is constructed as >>> proc <name> (in <file>[<line>])
@@ -239,7 +239,7 @@ int RP_procdef(char* arg, int unused)
     }
 
     // Checks that a $procend statement has  been found (if not -> error)
-    if(rf->curline > rf->nblines)  {
+    if(rf->current_line > rf->nblines)  {
         std::string error_msg = "Procedure '" + std::string((char*) name) + "': missing $procend statement";
         error_manager.append_error(error_msg);
         //TODO: delete the REP_PROCS[proc_nb]
@@ -319,7 +319,7 @@ int RP_procexec(char* arg, int unused)
     }
 
     // Executes the proc lines like a normal report
-    proc->proc_rf->curline = 0;
+    proc->proc_rf->current_line = 0;
     rc = RP_ReportExec_tbl(proc->proc_rf);
 
     // Restores (pops) the defines with the same name as the formal parameters

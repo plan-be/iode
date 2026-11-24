@@ -18,8 +18,8 @@ struct REPFILE
     std::string         filename;       // Source file for report file (*.rep) or
                                         // Proc name and position for procedures (PROCDEF)
     unsigned char       **report_lines = NULL;  // Lines of the report
-    int                 curline = 0;    // Current line (during execution)
-    int                 nblines = 0;    // Total number of lines in the report
+    int                 current_line = 0;   // Current line (during execution)
+    int                 nblines = 0;        // Total number of lines in the report
 };
 
 struct BFNS 
