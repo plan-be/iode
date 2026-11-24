@@ -69,11 +69,38 @@ scr4 function, its exact behaviour and its C++ replacement.
 | `SCR_mtov(tbl, sep)` | `join(vec, std::string(1, sep))` (utils.h) | `NULL` table -> `NULL`. |
 | `SCR_mtovs(tbl, seps)` | `join(vec, seps)` (utils.h) | |
 | `ScrStrIsIn(tbl, f)` | `std::find(vec.begin(), vec.end(), f) != vec.end()` | |
+| `SCR_text(str, seps, lg)` | `text_to_lines(str, seps, lg)` (utils.h) | Wraps a text into lines of at most `lg` chars, cut after the last char of `seps`. See the details below. |
 
 Do **not** use `split(str, sep)` or `split_multi(str, seps)` (utils.h) to replace `SCR_vtom` /
 `SCR_vtoms`: they **keep** the empty tokens and return `{""}` for an empty string.
 When the separators are exactly the white spaces (`" \t\n\r\v\f"`), `split_whitespace(str)`
 (utils.h) gives the same result as `split_skip_empty`.
+
+### `SCR_text(str, seps, lg)`: wrap a text into lines
+
+Behaviour of `SCR_text()` (`scr4/strs/s_sttext.c`), for each line:
+
+1. skip the leading white spaces (`SCR_is_space`: `' '`, `\t`, `\n`, `\r`, `\v`, `\f`);
+2. read at most `lg` chars, stopping before a `'\n'`, and remember the position of the last
+   char of `seps` found at an index `> 0`;
+3. if the line is too long (more chars follow) and a separator was found, the line ends
+   **after** that separator (the separator is kept, even if it is a space); otherwise it ends
+   before the `'\n'`, at the end of the text, or after exactly `lg` chars (a word longer than
+   `lg` is cut).
+
+Notes:
+- the trailing spaces of a line are **not** removed: with `seps = ", ;"` and `lg = 15`,
+  `"Jean, Marc, Pierre, Louis"` gives `"Jean, Marc, "` (with a trailing space; the example in
+  the scr4 comment is wrong) then `"Pierre, Louis"`;
+- a text containing only white spaces gives an empty table;
+- `SCR_text(NULL, ...)` crashes and `SCR_text(str, seps, lg <= 0)` **loops forever**.
+
+`text_to_lines(str, seps, lg)` (utils.h) has exactly the same behaviour (tested in
+`UtilsTest.textToLines`), except that it returns an empty vector if `lg <= 0`. It uses the
+fixed set of white spaces of `SCR_is_space` (not `std::isspace`, which depends on the locale).
+
+Typical use: `K_wrap()` (`api/utils/yy.cpp`) wraps with `SCR_text()` then joins the lines with
+`'\n'`: `join(text_to_lines(in, ";,*+-/) ", lg), "\n")`.
 
 To pass a `std::vector<std::string>` to a function still expecting a `char**`:
 `vector_to_double_char(vec)` (utils.h) allocates with `new[]`, so free each element with
@@ -116,17 +143,19 @@ To pass a `std::vector<std::string>` to a function still expecting a `char**`:
 
 | scr4 | C++ replacement | Notes |
 |------|-----------------|-------|
-| `SCR_lower(str)`, `SCR_lower_char(ch)` | `to_lower(str)` (utils.h) | Only `A-Z` are converted: same as `to_lower` in the "C" locale. |
+| `SCR_lower(str)`, `SCR_lower_char(ch)` | `to_lower(str)` (utils.h) **only in the "C" locale** | Only `A-Z` are converted. `std::tolower` (used by `to_lower`) depends on the current C locale, and the Python interpreter sets `LC_CTYPE` to the user locale at startup: in the `iode` Python package, it may also convert accented letters. To keep the exact behaviour, keep calling `SCR_lower` on `str.data()`. |
 | `SCR_upper(str)`, `SCR_upper_char(ch)` | `to_upper(str)` (utils.h) **only for ASCII text** | `SCR_upper_char` also converts the CP850 accented letters to the **unaccented** capital (`é`->`E`, `ç`->`C`, `Ä`->`A`...). For report text or object comments, keep `SCR_upper_char` (called per char on `str.data()`) or write a CP850-aware helper. |
 | `SCR_is_upper(ch)` | `ch >= 'A' && ch <= 'Z'` | ASCII only. |
 | `SCR_is_lower(ch)` | `SCR_upper_char(ch) != ch` | `a-z` **and** CP850 accented letters. |
 | `SCR_is_alpha(ch)` | no std equivalent (`std::isalpha` ignores CP850) | `A-Z`, `a-z` and CP850 accented letters. |
 | `SCR_is_num(ch)` | `ch >= '0' && ch <= '9'` (or `std::isdigit((unsigned char) ch)`) | |
 | `SCR_is_anum(ch)` | `SCR_is_num(ch) \|\| SCR_is_alpha(ch)` | Does **not** accept `'_'`. |
-| `SCR_is_space(ch)` | `std::isspace((unsigned char) ch)` | `' '`, `\t`, `\n`, `\r`, `\v`, `\f`: same set as `std::isspace` in the "C" locale. |
+| `SCR_is_space(ch)` | `std::string_view(" \t\n\r\v\f").find(ch) != std::string_view::npos` | `' '`, `\t`, `\n`, `\r`, `\v`, `\f`. Same set as `std::isspace` in the "C" locale only: in another locale (e.g. inside Python), `std::isspace` may also accept other chars (`0xA0`...). |
 
 Always cast to `unsigned char` before calling `std::isxxx`/`std::toupper`: CP850 chars are
-negative as `char`, which is undefined behaviour.
+negative as `char`, which is undefined behaviour. The `std::isxxx`/`std::toxxx` functions
+depend on the current C locale (see `SCR_lower` above): prefer explicit character sets or the
+scr4 functions when the exact behaviour matters.
 
 ## File names and files
 
