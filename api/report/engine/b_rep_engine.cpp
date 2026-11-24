@@ -103,7 +103,7 @@
  *  
  *  List of functions
  *  -----------------
- *      REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)  Creates and initialises a REPFILE struct. 
+ *      REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines)  Creates and initialises a REPFILE struct. 
  *      int RP_free_repfile(REPFILE *rf)                                    Frees a REPFILE struct.                   
  *      unsigned char **RP_read_file(const std::string& filename)           Reads a report file (with no line expansion).
  *      char* RP_read_multiline(REPFILE* rf)                                Reads the next line in a REPFILE struct. If the line ends with a " \\", joins the next line.
@@ -152,7 +152,7 @@ int             RP_DEPTH = 0;              // Level of the current report in the
 
 // Function declarations
 // ---------------------
-REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl);
+REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines);
 int RP_free_repfile(REPFILE *rf);
 unsigned char **RP_read_file(const std::string& filename);
 int RP_readline(REPFILE* rf, char** line, int mode);
@@ -185,16 +185,16 @@ int B_ReportLine(char* line, int cleanup);
  *  Other informations like the current line during execution are also stored in the REPFILE struct.
  *   
  *  @param [in]     const std::string&  filename    source filename (or PROC description)
- *  @param [in]     U_ch**              tbl         table of report lines
- *  @return         REPFILE*                        struct used to execute a report
+ *  @param [in]     U_ch**              report_lines    table of report lines
+ *  @return         REPFILE*                            struct used to execute a report
  */
-REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)
+REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines)
 {
     REPFILE *rf = new REPFILE();
     rf->filename = filename;
-    rf->report_lines = tbl;
+    rf->report_lines = report_lines;
     rf->curline = 0;
-    rf->nblines = SCR_tbl_size(tbl);
+    rf->nblines = SCR_tbl_size(report_lines);
     return(rf);
 }
 
