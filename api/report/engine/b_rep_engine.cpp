@@ -158,61 +158,44 @@ int RP_free_repfile(REPFILE *rf)
  *  Reads a report file (with no line expansion).
  *  The max line length is RP_LINELENGTH.
  *  
- *  @global [in, out]   int     SCR_ADD_PTR_CHUNCK  number of newly allocated lines in SCR_add_ptr() when new lines are added
- *                                                  (to limit the nb of allocations)
- *  @param [in]         const std::string&  filename    report file
- *  @return             char**                          content of the file
- *                                                      NULL if one of the line exceeds RP_LINELENGTH
+ *  @param [in]         const std::string&          filename    report file
+ *  @return             std::vector<std::string>                content of the file (at least one line,
+ *                                                              possibly empty, if the file can be read).
+ *                                                              Empty vector if the file cannot be opened or
+ *                                                              if one of the lines exceeds RP_LINELENGTH
  */
-unsigned char **RP_read_file(const std::string& filename)
+std::vector<std::string> RP_read_file(const std::string& filename)
 {
-    FILE            *fd;
-    unsigned char   **txt = 0,
-                    buffer[RP_LINELENGTH + 1];
-    int             len = 0, ch,
-                    nb_line = 0,
-                    o_add_ptr = SCR_ADD_PTR_CHUNCK;
+    std::vector<std::string> lines;
 
-    /* OPEN INFO FILE */
-    fd = fopen(filename.c_str(), "r");
-    if(fd == NULL) 
-        return(txt);
+    FILE* fd = fopen(filename.c_str(), "r");
+    if(fd == NULL)
+        return lines;
 
-    /* READ INFO */
-    SCR_ADD_PTR_CHUNCK = 1000;
-    while(1) 
+    std::string line;
+    int ch;
+    while((ch = getc(fd)) != EOF)
     {
-        ch = getc(fd);
-        switch(ch) 
+        if(ch == '\n')
         {
-            case EOF:
-                buffer[len] = 0;
-                SCR_add_ptr(&txt, &nb_line, buffer);
-                SCR_add_ptr(&txt, &nb_line, NULL);
-                fclose(fd);
-                SCR_ADD_PTR_CHUNCK = o_add_ptr;
-                return txt;
-            case '\n':
-                buffer[len] = 0;
-                SCR_add_ptr(&txt, &nb_line, buffer);
-                len = 0;
-                break;
-            default:
-                if(len < sizeof(buffer) - 1) 
-                    buffer[len++] = ch;
-                else 
-                {
-                    SCR_add_ptr(&txt, &nb_line, NULL);
-                    fclose(fd);
-                    SCR_free_tbl(txt);
-                    SCR_ADD_PTR_CHUNCK = o_add_ptr;
-                    std::string error_msg = "Report line exceeds " + std::to_string(RP_LINELENGTH) + " characters";
-                    error_manager.append_error(error_msg);
-                    return NULL;
-                }
-                break;
+            lines.push_back(line);
+            line.clear();
+        }
+        else if(line.size() < RP_LINELENGTH)
+            line.push_back((char) ch);
+        else
+        {
+            fclose(fd);
+            std::string error_msg = "Report line exceeds " + std::to_string(RP_LINELENGTH) + " characters";
+            error_manager.append_error(error_msg);
+            return std::vector<std::string>();
         }
     }
+    fclose(fd);
+
+    // last line (not terminated by '\n')
+    lines.push_back(line);
+    return lines;
 }
 
 
@@ -1403,17 +1386,12 @@ done:
 int RP_ReportExec_1(const std::string& file)
 {
     std::string filename = set_file_extension(file, FILE_REP);
-    unsigned char** tbl = RP_read_file(filename);
-    if(!tbl) 
+    std::vector<std::string> report_lines = RP_read_file(filename);
+    if(report_lines.empty())
     {
         error_manager.append_error("Cannot open file '" + filename + "'");
         return -1;
     }
-
-    std::vector<std::string> report_lines;
-    for(int i = 0; tbl[i]; i++)
-        report_lines.push_back(std::string((char*) tbl[i]));
-    SCR_free_tbl(tbl);
 
     REPFILE* rf = RP_create_repfile(filename, report_lines);
     int rc = RP_ReportExec_tbl(rf);
