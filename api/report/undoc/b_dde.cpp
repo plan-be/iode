@@ -331,7 +331,6 @@ char *IodeDdeGetReportRC(char *szItem)
 
 char *IodeDdeGetXObj(char *szItem, int type)
 {
-    U_ch    **tbl;
     char    *res = 0, *sheet, *item,
     *plst =  NULL;
     int     i, l, h;
@@ -341,23 +340,23 @@ char *IodeDdeGetXObj(char *szItem, int type)
 
     try
     {
-        tbl = SCR_vtom((unsigned char*) szItem, (int) '!');
-        if(SCR_tbl_size(tbl) >= 1)
+        std::vector<std::string> tbl = split_skip_empty(std::string(szItem), "!");
+        if(tbl.size() >= 1)
         {
-            plst = K_expand(type, NULL, (char*) tbl[0], '*');
+            plst = K_expand(type, NULL, tbl[0].data(), '*');
             if(plst != NULL)
                 v_lst = expand_args(plst, 0);
         }
-    
-        if(SCR_tbl_size(tbl) < 2) 
+
+        if(tbl.size() < 2)
             sheet = "Sheet1";
-        else                      
-            sheet = (char*) tbl[1];
-        
-        if(SCR_tbl_size(tbl) < 3) 
+        else
+            sheet = tbl[1].data();
+
+        if(tbl.size() < 3)
             item = "R1C1";
-        else                      
-            item = (char*) tbl[2];
+        else
+            item = tbl[2].data();
     
         hConv = WscrDdeConnect("EXCEL", sheet);
         if(hConv == 0) 
@@ -451,7 +450,6 @@ char *IodeDdeGetXObj(char *szItem, int type)
     
         SCR_free(plst);
         WscrDdeEnd(hConv) ;
-        SCR_free_tbl(tbl);
         return((char*) SCR_stracpy((unsigned char*) "Ok"));
     }
     catch(const std::runtime_error& e)
@@ -685,41 +683,38 @@ int IodeDdeSetItem(char *szTopic, char *szItem, char *szBuffer)
 */
 char    *B_ExcelGetItem(char *arg)
 {
-    char    *ddeptr = NULL,
-             **args = NULL;
+    char    *ddeptr = NULL;
     int     nb_args;
 
-    args = (char**) SCR_vtom((unsigned char*) arg, (int) '!');
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), "!");
+    nb_args = (int) args.size();
 
-    if(nb_args == 2) ddeptr = (char*) WscrDdeGet("Excel", args[0], args[1]);
+    if(nb_args == 2) ddeptr = (char*) WscrDdeGet("Excel", args[0].data(), args[1].data());
     IodeDdeUnLocale(ddeptr);
 
-    SCR_free_tbl((unsigned char**) args);
     return(ddeptr);
 }
 
 int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
 {
-    char    **args = NULL, *topic, *item;
+    char    *topic, *item;
     int     nb_args, rc = -1;
 
-    args = (char**) SCR_vtom((unsigned char*) ddeitem, (int) '!');
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(ddeitem), "!");
+    nb_args = (int) args.size();
 
     if(nb_args == 2) {
-        topic = args[0];
-        item = args[1];
+        topic = args[0].data();
+        item = args[1].data();
     }
     else {
         topic = "Sheet1";
-        if(nb_args == 1) item = args[0];
+        if(nb_args == 1) item = args[0].data();
         else item = "R1C1";
     }
 
     rc = WscrDdeSet("Excel", topic,
                     IodeDdeXlsCell(item, 0, 0, nc, nl), (unsigned char*) ptr);
-    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 
@@ -1069,14 +1064,12 @@ int B_ExcelCmd(char *cmd, char *arg)
 
 int B_DDEGet(char *arg, int unused)
 {
-    U_ch    **tbl, *ddeptr;
+    U_ch    *ddeptr;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    if(SCR_tbl_size(tbl) < 3) return -1;
-//    rc = WscrDdeExecute(tbl[0], tbl[1], tbl[2]);
-    ddeptr = WscrDdeGet((char*) tbl[0], (char*) tbl[1], (char*) tbl[2]);
+    std::vector<std::string> tbl = split_skip_empty(std::string(arg), " ");
+    if(tbl.size() < 3) return -1;
+    ddeptr = WscrDdeGet(tbl[0].data(), tbl[1].data(), tbl[2].data());
 
-    SCR_free_tbl(tbl);
     SCR_free(ddeptr);
     return 0;
 }
@@ -1084,7 +1077,7 @@ int B_DDEGet(char *arg, int unused)
 /* JMP 03-08-2004 */
 int B_ExcelWrite(char *ptr, int unused)
 {
-    char    **args = NULL, *topic, *item, *val, **tbl, **tbl2;
+    char    *topic, *item, *val;
     int     i, nb_args, rc = -1, pos, nl = 1, nc = 1, nc1;
 
 
@@ -1098,33 +1091,30 @@ int B_ExcelWrite(char *ptr, int unused)
         U_ljust_text((unsigned char*) val);
         SCR_replace((unsigned char*) val, (unsigned char*) "\\t", (unsigned char*) "\t");
         SCR_replace((unsigned char*) val, (unsigned char*) "\\n", (unsigned char*) "\n");
-        tbl = (char**) SCR_vtom((unsigned char*) val, (int) '\n');
-        nl = SCR_tbl_size((unsigned char**) tbl);
+        // nl = nb of lines, nc = max nb of columns (tab-separated) in a line
+        std::vector<std::string> lines = split_skip_empty(std::string(val), "\n");
+        nl = (int) lines.size();
         for(i = 0 ; i < nl ; i++) {
-            tbl2 = (char**) SCR_vtom((unsigned char*) tbl[i], (int) '\t');
-            nc1 = SCR_tbl_size((unsigned char**) tbl2);
+            nc1 = (int) split_skip_empty(lines[i], "\t").size();
             if(nc1 > nc) nc = nc1;
-            SCR_free_tbl((unsigned char**) tbl2);
         }
-        SCR_free_tbl((unsigned char**) tbl);
     }
 
-    args = (char**) SCR_vtom((unsigned char*) ptr, (int) '!');
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(ptr), "!");
+    nb_args = (int) args.size();
 
     if(nb_args == 2) {
-        topic = args[0];
-        item = args[1];
+        topic = args[0].data();
+        item = args[1].data();
     }
     else {
         topic = "Sheet1";
-        if(nb_args == 1) item = args[0];
+        if(nb_args == 1) item = args[0].data();
         else item = "R1C1";
     }
 
     rc = WscrDdeSet("Excel", topic,
                     IodeDdeXlsCell(item, 0, 0, nc, nl), (unsigned char*) val);
-    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 

@@ -91,43 +91,43 @@ long B_DSa2y(char* year)
 
 int B_DSDate2Period(Period *per, char *date, char freq)
 {
-    char    **tbl;
-
     per->periodicity = freq;
     per->step = 1L;
     per->year = 1970L;
 
     if(U_is_in('/', date)) { /* DD/MM/YY */
-        tbl = (char**) SCR_vtom((unsigned char*) date, (int) '/');
-        per->year = B_DSa2y(tbl[2]);
+        std::vector<std::string> tbl = split_skip_empty(std::string(date), "/");
+        if(tbl.size() < 3)
+            return -1;
+        per->year = B_DSa2y(tbl[2].data());
         switch(freq) {
             case 'Y' :
                 break;
             case 'Q' :
-                per->step = atol(tbl[1]) / 4;
+                per->step = atol(tbl[1].c_str()) / 4;
                 break;
             case 'M' :
-                per->step = atol(tbl[1]);
+                per->step = atol(tbl[1].c_str());
                 break;
         }
-        SCR_free_tbl((unsigned char**) tbl);
         return 0;
     }
 
     if(U_is_in('Q', date)) {    /* "Q1 70" */
-        tbl = (char**) SCR_vtom((unsigned char*) date, (int) ' ');
-        per->year = B_DSa2y(tbl[1]);
+        std::vector<std::string> tbl = split_skip_empty(std::string(date), " ");
+        if(tbl.size() < 2)
+            return -1;
+        per->year = B_DSa2y(tbl[1].data());
         switch(freq) {
             case 'Y' :
                 break;
             case 'Q' :
-                per->step = atol(tbl[0] + 1);
+                per->step = atol(tbl[0].c_str() + 1);
                 break;
             case 'M' :
-                per->step = atol(tbl[0] + 1) * 3;
+                per->step = atol(tbl[0].c_str() + 1) * 3;
                 break;
         }
-        SCR_free_tbl((unsigned char**) tbl);
         return 0;
     }
 
@@ -184,42 +184,48 @@ int B_DSUpdateVar(char *name, Period *per, char *val)
 
 int B_DSInterpret(char *code, char freq, char *contents)
 {
-    char    **line = NULL, **tbl = NULL;
     Period  stp;
     int     i, nl, rc = 0;
+    size_t  nb_required;
 
-    line = (char**) SCR_vtom((unsigned char*) contents, (int) '\n');
-    nl = SCR_tbl_size((unsigned char**) line);
+    std::vector<std::string> line = split_skip_empty(std::string(contents), "\n");
+    nl = (int) line.size();
     if(nl < 4) rc = -1;
 
     for(i = 0; i < nl - 1 && !rc; i++) {
-        tbl = (char**) SCR_vtom((unsigned char*) line[i], (int) '"');
+        std::vector<std::string> tbl = split_skip_empty(line[i], "\"");
+
+        // number of fields required by the line i
+        switch(i) {
+            case 1:  nb_required = 1; break;     /* End */
+            case 0:                              /* Start */
+            case 2:  nb_required = 3; break;     /* Freq */
+            default: nb_required = 2; break;     /* Cmt */
+        }
+        if(tbl.size() < nb_required) {
+            rc = -1;
+            break;
+        }
+
         switch(i) {
             case 0: /* Start */
-                if(strcmp(tbl[0], "Start")) rc = -1;
-                else B_DSDate2Period(&stp, tbl[2], freq);
+                if(tbl[0] != "Start") rc = -1;
+                else B_DSDate2Period(&stp, tbl[2].data(), freq);
                 break;
             case 1: /* End */
-                if(strcmp(tbl[0], "End")) rc = -1;
+                if(tbl[0] != "End") rc = -1;
                 break;
             case 2: /* Freq */
-                if(strcmp(tbl[0], "Frequency")
-                        || tbl[2][0] != freq) rc = -1;
+                if(tbl[0] != "Frequency" || tbl[2][0] != freq) rc = -1;
                 break;
             default: /* Cmt */
                 B_DSCode(code);
-                if(B_DSUpdateCmt(code, tbl[0]) < 0 ||
-                        B_DSUpdateVar(code, &stp, tbl[1]) < 0) rc = -1;
+                if(B_DSUpdateCmt(code, tbl[0].data()) < 0 ||
+                        B_DSUpdateVar(code, &stp, tbl[1].data()) < 0) rc = -1;
                 break;
 
         }
-
-        SCR_free_tbl((unsigned char**) tbl);
-        tbl = NULL;
     }
-
-    SCR_free_tbl((unsigned char**) line);
-    SCR_free_tbl((unsigned char**) tbl);
 
     if(rc < 0) B_DSLog(contents);
     return rc;

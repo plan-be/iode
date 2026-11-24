@@ -306,7 +306,6 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 {
     int     rc = 0;
     char    *smpl;
-    U_ch    **args;
 
     B_viewmode = mode;
         
@@ -317,17 +316,17 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
     }
     else 
     {
-        args = SCR_vtom((unsigned char*) arg, ' ');
-        if(args == NULL || args[0] == NULL) 
+        std::vector<std::string> args = split_skip_empty(std::string(arg), " ");
+        if(args.empty())
         {
             std::string error_msg = "Invalid argument '" + std::string(arg) + "'";
             kwarning(error_msg.c_str());
             return -1;
         }
 
-        smpl = (char*) SCR_stracpy(args[0]);
+        smpl = (char*) SCR_stracpy((unsigned char*) args[0].c_str());
 
-        if(mode == 1 || SCR_tbl_size(args) < 3) 
+        if(mode == 1 || args.size() < 3)
         {
             if(type == 0)
                 rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintTbl_1, smpl);
@@ -341,10 +340,13 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
             else 
                 ODE_VIEW = 2;
             SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
-            ODE_scroll(global_ws_tbl.get(), ((char**) args) + 1);
+            // ODE_scroll() expects a NULL terminated table of table names
+            std::vector<char*> names;
+            for(size_t i = 1; i < args.size(); i++)
+                names.push_back(args[i].data());
+            names.push_back(NULL);
+            ODE_scroll(global_ws_tbl.get(), names.data());
         }
-
-        SCR_free_tbl(args);
     }
 
     SCR_free(smpl);
@@ -372,7 +374,7 @@ int B_ViewTblFile(char* arg, int unused)
 {
     bool   success;
     int    ref, rc = 0;
-    U_ch   **args = NULL;
+    std::vector<std::string> args;
 
     if(arg == 0 || arg[0] == 0) 
     {
@@ -381,17 +383,10 @@ int B_ViewTblFile(char* arg, int unused)
     }
     else 
     {
-        args = SCR_vtom((unsigned char*) arg, ' ');
-        if(args == NULL)  
-        {
-            error_manager.append_error("Invalid argument");
-            rc = -1;
-            goto err;
-        }
+        args = split_skip_empty(std::string(arg), " ");
+        if(args.size() < 2) goto err;
 
-        if(SCR_tbl_size(args) < 2) goto err;
-
-        ref = atoi((char*) args[0]);
+        ref = atoi(args[0].c_str());
         if(ref < 2 || ref > 5) 
         {
             error_manager.append_error("Invalid Reference number");
@@ -402,13 +397,13 @@ int B_ViewTblFile(char* arg, int unused)
         if(global_ref_var[ref - 1])
             global_ref_var[ref - 1]->clear();
         global_ref_var[ref - 1] = KDBVariables::Create(false);
-        success = global_ref_var[ref - 1]->load(std::string((char*) args[1]));
+        success = global_ref_var[ref - 1]->load(args[1]);
         if(!success) 
         {
             global_ref_var[ref - 1]->clear();
             global_ref_var[ref - 1] = nullptr;
             std::string msg = "Error loading the variables file '";
-            msg += std::string((char*) args[1]) + "'";
+            msg += args[1] + "'";
             kwarning(msg.c_str());
             rc = -1;
             goto err;
@@ -416,7 +411,6 @@ int B_ViewTblFile(char* arg, int unused)
     }
 
 err:
-    SCR_free_tbl(args);
     return rc;
 }
 

@@ -1338,28 +1338,22 @@ U_ch *RPF_sliste(U_ch** args)
  */
 U_ch *RPF_expand(U_ch** args, int type)
 {
-    U_ch *res, *tmp, **tbl = 0, **tbl2;
-    int  nb = 0;
-
-    for(int i = 0; args[i]; i++) 
+    std::vector<std::string> names;
+    for(int i = 0; args[i]; i++)
     {
-        tmp = (unsigned char*) K_expand(type, 0L, (char*) args[i], (int) '*');
-        if(tmp) 
-            SCR_add_ptr(&tbl, &nb, tmp);
-        SCR_free(tmp);
+        char* tmp = K_expand(type, 0L, (char*) args[i], (int) '*');
+        if(tmp)
+        {
+            for(const std::string& name : split_skip_empty(std::string(tmp), ";"))
+                names.push_back(name);
+            SCR_free(tmp);
+        }
     }
-    SCR_add_ptr(&tbl, &nb, 0L);
-    res = SCR_mtov(tbl, ';');
-    SCR_free_tbl(tbl);
-    tbl = SCR_vtom(res, ';');
-    SCR_free(res);
-    tbl2 = RPF_unique(tbl);
-    SCR_free_tbl(tbl);
-    res = SCR_mtov(tbl2, ';');
-    SCR_free_tbl(tbl2);
-    if(res == 0) 
-        res = SCR_stracpy((unsigned char*) "");
-    return res;
+
+    // removes the duplicates (keeps the first occurrence, as RPF_unique())
+    names = vector_union(names, {});
+    std::string res = join(names, ";");
+    return SCR_stracpy((unsigned char*) res.c_str());
 }
 
 

@@ -673,9 +673,9 @@ double RP_evallec(char* c_lec)
 int RP_fmt(char* buf, char* format, double value)
 {
     int     t, lg = 20, nbdec = -1;
-    char    **fmt;
+    std::vector<std::string> fmt;
 
-    if(format == NULL) 
+    if(format == NULL)
         goto normal;
 
     U_ljust_text((unsigned char*) format);
@@ -692,25 +692,23 @@ int RP_fmt(char* buf, char* format, double value)
         return 0;
     }
 
-    fmt = (char**) SCR_vtom((unsigned char*) format, (int) '.');
-    if(fmt == NULL || fmt[0] == NULL) 
+    fmt = split_skip_empty(std::string(format), ".");
+    if(fmt.empty())
         goto normal;
 
-    lg = (int)strlen(fmt[0]);
-    if(fmt[1] != NULL) 
+    lg = (int) fmt[0].size();
+    if(fmt.size() > 1)
     {
-        nbdec = (int)strlen(fmt[1]);
+        nbdec = (int) fmt[1].size();
         lg += nbdec + 1;
     }
-    else if(format[0] == '.') 
+    else if(format[0] == '.')
     {
         lg = 30;
-        nbdec = (int)strlen(fmt[0]);
+        nbdec = (int) fmt[0].size();
     }
-    else 
+    else
         nbdec = 0;
-
-    SCR_free_tbl((unsigned char**) fmt);
 
 normal:
     if(value > 0) 
