@@ -1444,11 +1444,7 @@ int B_ReportLine(char* line, int cleanup)
 
     // Splits the line on '\n' and skips the empty lines
     if(line)
-    {
-        for(const std::string& report_line : split(std::string(line), '\n'))
-            if(!report_line.empty())
-                report_lines.push_back(report_line);
-    }
+        report_lines = split_skip_empty(std::string(line), "\n");
     rf = std::make_shared<REPFILE>("temp.rep", report_lines);
 
     // Exécute la ligne (non expandée à ce stade)
