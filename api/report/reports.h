@@ -48,7 +48,7 @@ struct RPFN
 extern std::map<std::string, BFNS> B_fns;  // Table of report command names and function pointers
 extern std::map<std::string, RPFN> RP_FNS; // Table of report @functions names and function pointers
 
-inline REPFILE* CUR_REPFILE = 0;            // Pointer to the current REPFILE during report execution
+inline std::shared_ptr<REPFILE> CUR_REPFILE = nullptr;  // Current REPFILE during report execution
 inline char*    RP_RPTSTR = 0;              // Repeat string used by the command $repeat. Default = '_'.
 inline char*    RP_VSEPS = 0;               // Separators allowed in report @functions
 inline int      RP_RT = 0;                  // Indicates what to do on error (0-ignore, -2=return, -3=ABORT, -4=QUITODE)

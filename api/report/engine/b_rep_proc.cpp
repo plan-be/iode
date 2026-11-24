@@ -81,10 +81,10 @@
 // REP_PROC: procedure parameters and code
 struct REP_PROC 
 {
-    char    proc_name[80];      // PROC name (case sensitive)
-    char    **proc_parms;       // List of parameter names
-    int     proc_nb_parms;      // Number of parameters
-    REPFILE *proc_rf;           // Procedure lines (= sub-report) including $procdef and $procend
+    char    proc_name[80] = { 0 };          // PROC name (case sensitive)
+    char    **proc_parms = NULL;            // List of parameter names
+    int     proc_nb_parms = 0;              // Number of parameters
+    std::shared_ptr<REPFILE> proc_rf;       // Procedure lines (= sub-report) including $procdef and $procend
 };
 
 // Global variables
@@ -143,9 +143,7 @@ static void RP_proc_delete(int proc_nb)
     proc = REP_PROCS[proc_nb];
     if(proc == 0) return;
     SCR_free_tbl((unsigned char**) proc->proc_parms);
-    RP_free_repfile(proc->proc_rf);
-    //SCR_free(proc->proc_filename);
-    SCR_free(proc);
+    delete proc;
     REP_PROCS[proc_nb] = 0;
 }
 
@@ -174,7 +172,7 @@ static int RP_proc_create(char *name)
         REP_NB_PROCS += 10;
     }
 
-    proc = REP_PROCS[proc_nb] = (REP_PROC *) SCR_malloc(sizeof(REP_PROC));
+    proc = REP_PROCS[proc_nb] = new REP_PROC();
     SCR_strlcpy((unsigned char*) proc->proc_name, (unsigned char*) name, sizeof(proc->proc_name) - 1);
     return(proc_nb);
 }
@@ -204,7 +202,7 @@ void RP_proc_free_all()
 int RP_procdef(char* arg, int unused)
 {
     REP_PROC        *proc;
-    REPFILE         *rf = CUR_REPFILE;
+    std::shared_ptr<REPFILE> rf = CUR_REPFILE;
     unsigned char   name[128], buf[1024]; // JMP 23/5/2019
     std::string     list;
     int             proc_nb, nblines = 0, line1;

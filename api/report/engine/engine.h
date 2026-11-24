@@ -18,11 +18,10 @@ int RP_is_cmd(const std::string& line);
 void RP_debug(char* txt);
 
 /* b_rep_engine.c */
-REPFILE *RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines);
-int RP_free_repfile(REPFILE* rf);
+std::shared_ptr<REPFILE> RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines);
 std::vector<std::string> RP_read_file(const std::string& filename);
-char* RP_read_multiline(REPFILE* rf);
-int RP_readline(REPFILE* rf, std::string& line, int mode);
+char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf);
+int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, std::string& arg, int lg);
 BFNS* RP_find_fn(char* c_name, int* type, int fs);
@@ -36,7 +35,7 @@ double RP_evallec(char* lec);
 int RP_fmt(char* buf, char* format, double value);
 int RP_eval(std::string& res, char* farg);
 int RP_expand(std::string& line, char* buf);
-int RP_ReportExec_tbl(REPFILE* rf);
+int RP_ReportExec_tbl(std::shared_ptr<REPFILE> rf);
 int RP_ReportExec_1(const std::string& file);
 int B_ReportExec(char* arg, int unused=-1);
 int B_ReportLine(char* line, int cleanup);

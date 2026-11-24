@@ -126,30 +126,16 @@ int RP_DEPTH = 0;           // Level of the current report in the report "stack"
  *   
  *  @param [in]     const std::string&                  filename        source filename (or PROC description)
  *  @param [in]     const std::vector<std::string>&     report_lines    report lines
- *  @return         REPFILE*                                            struct used to execute a report
+ *  @return         std::shared_ptr<REPFILE>                            struct used to execute a report
  */
-REPFILE *RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines)
+std::shared_ptr<REPFILE> RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines)
 {
-    REPFILE *rf = new REPFILE();
+    std::shared_ptr<REPFILE> rf = std::make_shared<REPFILE>();
     rf->filename = filename;
     rf->report_lines = report_lines;
     rf->current_line = 0;
     rf->nblines = (int) report_lines.size();
-    return(rf);
-}
-
-
-/**
- *  Frees a REPFILE struct.
- *  
- *  @param [in, out] REPFILE*   rf  REPFILE stuct
- *  @return          int            0 always
- */
-int RP_free_repfile(REPFILE *rf)
-{
-    if(rf)
-        delete rf;
-    return 0;
+    return rf;
 }
 
 
@@ -206,11 +192,11 @@ std::vector<std::string> RP_read_file(const std::string& filename)
  *  
  *  The 2 chars " \\" at the end of the line(s) are replaced by a single '\n'. 
  *  
- *  @param [in] REPFILE*    rf  a report struct
- *  @return     char*           allocated string containing the line(s)
+ *  @param [in] const std::shared_ptr<REPFILE>&     rf  a report struct
+ *  @return     char*                                   allocated string containing the line(s)
  */
 
-char* RP_read_multiline(REPFILE* rf)
+char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
 {
     char*   multi_line = 0;
     int     lg;
@@ -241,15 +227,15 @@ char* RP_read_multiline(REPFILE* rf)
  *  Reads the current line from the REPFILE rf.
  *  Expands the line (%define%, {lex expression}...) and stores the expanded line in line.
  *
- *  @param [in, out]    REPFILE*        rf      REPFILE struct
- *  @param [out]        std::string&    line    line (having been expanded or not)
- *  @param [in]         int             mode    1 to expand the line,
- *                                              0 to keep the line unchanged, for example when searching for $goto or $procend lines
- *  @return             int                     EOF if the last line is reached
- *                                              rc of RP_expand() on error
- *                                              0 on success
+ *  @param [in, out]    const std::shared_ptr<REPFILE>&     rf      REPFILE struct
+ *  @param [out]        std::string&                        line    line (having been expanded or not)
+ *  @param [in]         int                                 mode    1 to expand the line,
+ *                                                                  0 to keep the line unchanged, for example when searching for $goto or $procend lines
+ *  @return             int                                         EOF if the last line is reached
+ *                                                                  rc of RP_expand() on error
+ *                                                                  0 on success
  */
-int RP_readline(REPFILE* rf, std::string& line, int mode)
+int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode)
 {
     if(rf->current_line >= rf->nblines)
         return EOF;
@@ -1213,19 +1199,20 @@ int RP_expand(std::string& line, char* buf)
  *    - flushes the output
  *    - resets the context to the calling context old_rf
  *  
- *  @param [in, out] REPFILE*   rf  report to execute
+ *  @param [in, out] std::shared_ptr<REPFILE>   rf  report to execute (passed by value to keep the report
+ *                                                  alive during its execution)
  *  @return          int            0:  success or error must be ignored (the 2d char of the line is '-')
  *                                  -1: error in one of the commands failed
  *                                  -3: expand failed or abort report(s) execution
  *                                  -4: quit iode 
  */
-int RP_ReportExec_tbl(REPFILE *rf)
+int RP_ReportExec_tbl(std::shared_ptr<REPFILE> rf)
 {
     int     rc, rt = 0;
     int     ignore = 0; // ignore: 0 ignore code retour, 1 non
     char    name[31];
     long    cline = 0L;
-    REPFILE *oldrf;
+    std::shared_ptr<REPFILE> oldrf;
     char    debug_line[1024];
     std::string line;
     std::string arg;
@@ -1344,7 +1331,6 @@ done:
  *    - changes the extension to .rep
  *    - reads the file and stores its contents in a REPFILE struct
  *    - executes the REPFILE struct line / line (see RP_ReportExec_tbl)
- *    - frees the REPFILE 
  *    - resets the current report (CUR_REPFILE)
  *  
  *  @param [in] const std::string&   file   report file name
@@ -1361,10 +1347,9 @@ int RP_ReportExec_1(const std::string& file)
         return -1;
     }
 
-    REPFILE* rf = RP_create_repfile(filename, report_lines);
+    std::shared_ptr<REPFILE> rf = RP_create_repfile(filename, report_lines);
     int rc = RP_ReportExec_tbl(rf);
-    RP_free_repfile(rf);
-    CUR_REPFILE = 0;
+    CUR_REPFILE = nullptr;
     return rc;
 }
 
@@ -1448,7 +1433,7 @@ int B_ReportLine(char* line, int cleanup)
 {
     unsigned char       **o_argv;
     int                 rc = 0, o_arg0;
-    REPFILE             *rf;
+    std::shared_ptr<REPFILE> rf;
     std::vector<std::string> report_lines;
 
     // Save current report execution context: command o_arg0 and parameters o_argv
@@ -1492,9 +1477,6 @@ int B_ReportLine(char* line, int cleanup)
 
     // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);
-
-    // Libére : rf et remet CUR_REPFILE à 0
-    RP_free_repfile(rf);
 
     // Remonte un niveau de profondeur d'exécution des rapports
     RP_DEPTH --;
