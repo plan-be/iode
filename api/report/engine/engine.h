@@ -18,7 +18,6 @@ int RP_is_cmd(const std::string& line);
 void RP_debug(char* txt);
 
 /* b_rep_engine.c */
-std::shared_ptr<REPFILE> RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines);
 std::vector<std::string> RP_read_file(const std::string& filename);
 char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf);
 int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode);

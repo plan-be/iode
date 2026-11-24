@@ -20,6 +20,18 @@ struct REPFILE
     std::vector<std::string>    report_lines;       // Lines of the report
     int                         current_line = 0;   // Current line (during execution)
     int                         nblines = 0;        // Total number of lines in the report
+
+    /**
+     *  Creates and initialises a REPFILE struct.
+     *  REPFILEs contain the source filename (or the PROC name) and the contents (the lines) of the report.
+     *  Other informations like the current line during execution are also stored in the REPFILE struct.
+     *
+     *  @param [in]     const std::string&                  filename        source filename (or PROC description)
+     *  @param [in]     const std::vector<std::string>&     report_lines    report lines
+     */
+    REPFILE(const std::string& filename, const std::vector<std::string>& report_lines)
+        : filename(filename), report_lines(report_lines), current_line(0),
+          nblines((int) report_lines.size()) {}
 };
 
 struct BFNS 

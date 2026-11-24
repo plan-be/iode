@@ -219,7 +219,7 @@ int RP_procdef(char* arg, int unused)
             std::vector<std::string> lines(rf->report_lines.begin() + line1,
                                            rf->report_lines.begin() + line1 + nblines);
             sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename.c_str(), line1);
-            proc->proc_rf = RP_create_repfile(std::string((char*) buf), lines);
+            proc->proc_rf = std::make_shared<REPFILE>(std::string((char*) buf), lines);
             break;
         }
     }
