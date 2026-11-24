@@ -50,8 +50,8 @@ int RP_undef(char* arg, int unused=-1);
 int RP_define_calcdepth(char* name);
 int RP_define_save(char* name);
 int RP_define_restore(char* name);
-int RP_define_save_list(char** list);
-int RP_define_restore_list(char** list);
+int RP_define_save_list(const std::vector<std::string>& list);
+int RP_define_restore_list(const std::vector<std::string>& list);
 
 /* b_rep_cmds.c */
 int RP_vseps(char* seps, int unused=-1);
