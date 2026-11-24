@@ -232,7 +232,7 @@ int RP_procdef(char* arg, int unused)
             lines = (unsigned char **) SCR_malloc((nblines + 1) * sizeof(char *));
             for(i = 0 ; i < nblines ; i++)
                 lines[i] = SCR_stracpy(rf->tbl[line1 + i]);
-            sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename, line1);
+            sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename.c_str(), line1);
             proc->proc_rf = RP_create_repfile(std::string((char*) buf), lines);
             break;
         }

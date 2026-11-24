@@ -190,10 +190,8 @@ int B_ReportLine(char* line, int cleanup);
  */
 REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)
 {
-    REPFILE *rf;
-
-    rf = (REPFILE *) SCR_malloc(sizeof(REPFILE));
-    rf->filename = (char*) SCR_stracpy((unsigned char*) filename.c_str());
+    REPFILE *rf = new REPFILE();
+    rf->filename = filename;
     rf->tbl = tbl;
     rf->curline = 0;
     rf->nblines = SCR_tbl_size(tbl);
@@ -211,8 +209,7 @@ int RP_free_repfile(REPFILE *rf)
 {
     if(rf) { 
         SCR_free_tbl(rf->tbl);
-        SCR_free(rf->filename);
-        SCR_free(rf);
+        delete rf;
     }
     return 0;
 }
@@ -1337,7 +1334,7 @@ int RP_ReportExec_tbl(REPFILE *rf)
     char    *line = NULL, *arg, name[31];
     long    cline = 0L;
     REPFILE *oldrf;
-    char    filename[256], debug_line[1024];
+    char    debug_line[1024];
 
     oldrf = CUR_REPFILE;    // Save the current report context
     CUR_REPFILE = rf;       // change locally the current report context
@@ -1354,7 +1351,6 @@ int RP_ReportExec_tbl(REPFILE *rf)
         // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
         if(RP_DEBUG || RP_STDOUT) 
         {
-            SCR_strlcpy((unsigned char*) filename, (unsigned char*) rf->filename, 255);
             SCR_strlcpy((unsigned char*) debug_line, (unsigned char*) line, 1023);
             SCR_strip((unsigned char*) debug_line);
             if(debug_line[0]) 
@@ -1594,11 +1590,7 @@ int B_ReportLine(char* line, int cleanup)
     RP_DEPTH ++;
 
     // Crée une struct REPFILE
-    rf = (REPFILE *) RP_alloc(sizeof(REPFILE));
-    rf->filename = RP_stracpy("temp.rep"); // JMP 4/02/09
-    rf->tbl = RP_vtom((unsigned char*) line, '\n');
-    rf->curline = 0;
-    rf->nblines = RP_tbl_size(rf->tbl); // JMP 4/02/09
+    rf = RP_create_repfile("temp.rep", RP_vtom((unsigned char*) line, '\n'));
 
     // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);
