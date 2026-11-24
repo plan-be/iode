@@ -296,20 +296,13 @@ int K_compare(YYKEYS* yy1, YYKEYS* yy2)
  */
 char *K_wrap(char *in, int lg)
 {
-    unsigned char  *txt = NULL,
-                    **tbl = NULL;
+    if(in == 0)
+        return NULL;
 
-    if(in == 0) 
-        return((char*) txt);
-
-    if(U_is_in('\n', in))  
+    if(U_is_in('\n', in))
         return((char*) SCR_stracpy((unsigned char*) in));
 
-    tbl = SCR_text((unsigned char*) in, (unsigned char*) ";,*+-/) ", lg); /* JMP 09-03-95 */
-    if(tbl == 0) 
-        return (char*) txt;
-
-    txt = SCR_mtov(tbl, '\n');
-    SCR_free_tbl(tbl);
-    return (char*) txt;
+    std::vector<std::string> lines = text_to_lines(std::string(in), ";,*+-/) ", lg); /* JMP 09-03-95 */
+    std::string txt = join(lines, "\n");
+    return (char*) SCR_stracpy((unsigned char*) txt.c_str());
 }

@@ -124,22 +124,18 @@ char* ExportObjsTSP::get_variable_value(const KDBVariablesPtr dbv_ptr, const std
 
 int ExportObjsTSP::write_variable_and_comment(char* code, char* cmt, char* vec)
 {
-    int     i;
-    char    **text;
-
     file_descriptor <<  code << " \n";
-    if(cmt) 
+    if(cmt)
     {
-        text = (char**) SCR_text((unsigned char*) cmt, (unsigned char*) " ", 75);
-        for(i = 0; text[i]; i++)  
-            file_descriptor <<  "? " << text[i] << "\n";
-        SCR_free_tbl((unsigned char**) text);
+        for(const std::string& line : text_to_lines(std::string(cmt), " ", 75))
+            file_descriptor <<  "? " << line << "\n";
     }
 
-    text = (char**) SCR_text((unsigned char*) vec, (unsigned char*) " ", 80);
-    for(i = 0; text[i]; i++)  
-        file_descriptor << text[i] << "\n";
+    if(vec)
+    {
+        for(const std::string& line : text_to_lines(std::string(vec), " ", 80))
+            file_descriptor << line << "\n";
+    }
     file_descriptor <<  " ;\n";
-    SCR_free_tbl((unsigned char**) text);
     return 0;
 }
