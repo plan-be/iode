@@ -448,19 +448,19 @@ int T_prep_smpl(const std::vector<COL>& columns, std::vector<COL>& file_columns,
  *  @param [in] int     dt          shift from the sample beginning of the first observation to keep for the graph
  *  @param [in] int     nt          nb of obs to print
  *  @param [in] KDB*    kdb         KDB containing the variables to graph
- *  @param [in] char**  names       List of variable names or groups of names separated by + or -.
- *                                  "A+B" means a graph with the 2 vars A and B
- *  @param [in] int     mode        transformation of the variables (KLG_E_LEVEL, KLG_E_DIFF, KLG_E_GRT,  KLG_E_DIFFY or KLG_E_GRTY) 
- *  @return     int                 0 on success, -1 on error    
- *  
+ *  @param [in] const std::string&  names   Variable names separated by + or -.
+ *                                          "A+B" means a graph with the 2 vars A and B
+ *  @param [in] int     mode        transformation of the variables (KLG_E_LEVEL, KLG_E_DIFF, KLG_E_GRT,  KLG_E_DIFFY or KLG_E_GRTY)
+ *  @return     int                 0 on success, -1 on error
+ *
  */
-static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis, 
-           double ymin, double ymax, const std::shared_ptr<Sample> smpl, int dt, int nt, 
-           KDBVariablesPtr kdb, char* names, int mode)
+static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
+           double ymin, double ymax, const std::shared_ptr<Sample> smpl, int dt, int nt,
+           KDBVariablesPtr kdb, const std::string& names, int mode)
 {
-    char** vars = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
-    int ng = SCR_tbl_size((unsigned char**) vars);
-    if(ng == 0) 
+    std::vector<std::string> vars = split_skip_empty(names, "+-");
+    int ng = (int) vars.size();
+    if(ng == 0)
     {
         std::string err_msg = "No variable defined";
         error_manager.append_error(err_msg);
@@ -471,21 +471,18 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
 
     T_GraphInit(A2M_GWIDTH, A2M_GHEIGHT, xgrid, ygrid, ymin, ymax, IODE_NAN, IODE_NAN, 0, A2M_BOXWIDTH, A2M_BACKBRUSH);
     /* GB 10/08/98 */
-    char* buf = SCR_malloc((int)strlen(names) + 20);
-    //sprintf(buf, "%s (%s)", names, KLG_MODES[global_VM][0]);
-    sprintf(buf, "%s (%s)", names, KLG_MODES[mode][0]);
-    T_GraphTitle(buf);
-    SCR_free(buf);
+    std::string title = names + " (" + std::string(KLG_MODES[mode][0]) + ")";
+    T_GraphTitle(title.data());
 
     int rc = -1;
     std::string var_name;
-    for(int i = 0 ; i < ng ; i++) 
+    for(int i = 0 ; i < ng ; i++)
     {
-        var_name = std::string(vars[i]);
-        if(!kdb->contains(var_name)) 
+        var_name = vars[i];
+        if(!kdb->contains(var_name))
         {
             std::string err_msg = "DataDisplayGraph : '";
-            err_msg += std::string(vars[i]);
+            err_msg += vars[i];
             err_msg += "' undefined variable";
             error_manager.append_error(err_msg);
             rc = -1;
@@ -495,7 +492,7 @@ static int V_graph_vars_1(int gnb, int type, int xgrid, int ygrid, int axis,
         for(int t = 0; t < nt; t++) 
             y[t] = (double ) KV_get(kdb, var_name, dt + t, mode);
 
-        T_GraphLegend(0, "LSBL"[type], vars[i], NULL);
+        T_GraphLegend(0, "LSBL"[type], vars[i].data(), NULL);
         T_GraphTimeData(smpl, y);
     }
 
@@ -503,7 +500,6 @@ fin:
     T_GraphEnd();
 
     SW_nfree(y);
-    SCR_free_tbl((unsigned char**) vars);
     return rc;
 }
 
@@ -518,10 +514,10 @@ fin:
  */
  
 static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, const std::shared_ptr<Sample> smpl, KDBVariablesPtr kdb, 
-    char** names, int mode)
+    double ymin, double ymax, const std::shared_ptr<Sample> smpl, KDBVariablesPtr kdb,
+    const std::vector<std::string>& names, int mode)
 {
-    int ng = SCR_tbl_size((unsigned char**) names);
+    int ng = (int) names.size();
     if(ng == 0) 
     {
         std::string err_msg = "DataDisplayGraph : empty variable list";
@@ -566,7 +562,7 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
     {
         if(view) W_InitDisplay();
         V_graph_vars_1(i, type, xgrid, ygrid, axis, ymin, ymax, smpl, dt, nt, kdb, names[i], mode);
-        if(view) W_EndDisplay(names[i], -ng, -i, -1, -1);
+        if(view) W_EndDisplay((char*) names[i].c_str(), -ng, -i, -1, -1);
     }
 
     W_close();
@@ -579,8 +575,8 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
  *  
  *  Example
  *  -------
- *      varlist = (char**) SCR_vtoms((U_ch*)"ACAF,ACAG,ACAF+ACAG", ",;");
- *      smpl = new Sample("1990Y1", "2010Y1");
+ *      std::vector<std::string> varlist = {"ACAF", "ACAG", "ACAF+ACAG"};
+ *      smpl = std::make_shared<Sample>("1990Y1", "2010Y1");
  *      rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
  *  
  *  @param [in] int     view    0 for printing, 1 for displaying the graphs
@@ -592,11 +588,12 @@ static int V_graph_vars(int view, int type, int xgrid, int ygrid, int axis,
  *  @param [in] double  ymin    IODE_NAN or min value of the y axis
  *  @param [in] double  ymax    IODE_NAN or max value of the y axis
  *  @param [in] Sample* smpl    printing sample
- *  @param [in] char**  names   list of VARs to print
+ *  @param [in] const std::vector<std::string>& names   list of VARs to print (one graph per element,
+ *                                                      "A+B" for a graph with A and B)
  *  @return     int             0 on success, -1 on error
  */
-int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, 
-    double ymin, double ymax, const std::shared_ptr<Sample> smpl, char** names)
+int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis,
+    double ymin, double ymax, const std::shared_ptr<Sample> smpl, const std::vector<std::string>& names)
 {
     int rc = V_graph_vars(view, type, xgrid, ygrid, axis, ymin, ymax, smpl, global_ws_var, names, mode); // JMP 8/8//2022
     return rc;

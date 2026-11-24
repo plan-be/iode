@@ -1792,33 +1792,30 @@ U_ch *RPF_SimCpuSort(U_ch** unused)
  */
 U_ch *RPF_vtake(U_ch** args)
 {
-    U_ch    *res = 0, *tmp, *arg;
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
     if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
-    arg = SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms(arg, (unsigned char*) RP_VSEPS);
+    U_ch* arg = SCR_mtov(args, RP_VSEPS[0]);
+    std::vector<std::string> v_args = split_skip_empty(std::string((char*) arg), std::string(RP_VSEPS));
     SCR_free(arg);
-    lg = SCR_tbl_size(args) - 1;
-    if(lg == 0) {
-        SCR_free_tbl(args);
+    lg = (int) v_args.size() - 1;
+    if(lg <= 0)
         return((unsigned char*) SCR_malloc(1));
-    }
-    n = atol((char*) args[0]);
+
+    std::string sep(1, RP_VSEPS[0]);
+    std::vector<std::string> v_res;
+    n = atol(v_args[0].c_str());
     if(n > 0) {
         n = std::min(lg, n);
-        tmp = args[n + 1];
-        args[n + 1] = 0;
-        res = SCR_mtov(args + 1, RP_VSEPS[0]);
-        args[n + 1] = tmp;
+        v_res.assign(v_args.begin() + 1, v_args.begin() + 1 + n);
     }
     else {
         n = lg - std::min(lg, -n);
-        res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
+        v_res.assign(v_args.begin() + n + 1, v_args.end());
     }
-    SCR_free_tbl(args);
-    return res;
+    std::string res = join(v_res, sep);
+    return SCR_stracpy((unsigned char*) res.c_str());
 }
 
 
@@ -1840,33 +1837,30 @@ U_ch *RPF_vtake(U_ch** args)
  */
 U_ch *RPF_vdrop(U_ch** args)
 {
-    U_ch    *res = 0, *tmp, *arg;
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
     if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
-    arg = SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms(arg, (unsigned char*) RP_VSEPS);
+    U_ch* arg = SCR_mtov(args, RP_VSEPS[0]);
+    std::vector<std::string> v_args = split_skip_empty(std::string((char*) arg), std::string(RP_VSEPS));
     SCR_free(arg);
-    lg = SCR_tbl_size(args) - 1;
-    if(lg == 0) {
-        SCR_free_tbl(args);
+    lg = (int) v_args.size() - 1;
+    if(lg <= 0)
         return((unsigned char*) SCR_malloc(1));
-    }
-    n = atol((char*) args[0]);
+
+    std::string sep(1, RP_VSEPS[0]);
+    std::vector<std::string> v_res;
+    n = atol(v_args[0].c_str());
     if(n < 0) {
         n = std::max(lg + n, 0);
-        tmp = args[n + 1];
-        args[n + 1] = 0;
-        res = SCR_mtov(args + 1, RP_VSEPS[0]);
-        args[n + 1] = tmp;
+        v_res.assign(v_args.begin() + 1, v_args.begin() + 1 + n);
     }
     else {
         n = std::min(lg, n);
-        res = SCR_mtov(args + n + 1, RP_VSEPS[0]);
+        v_res.assign(v_args.begin() + n + 1, v_args.end());
     }
-    SCR_free_tbl(args);
-    return res;
+    std::string res = join(v_res, sep);
+    return SCR_stracpy((unsigned char*) res.c_str());
 }
 
 
@@ -1889,11 +1883,12 @@ U_ch *RPF_vcount(U_ch** args)
 
     if(RP_VSEPS == 0) RP_vseps(0);
     arg = (char*) SCR_mtov(args, RP_VSEPS[0]);
-    args = SCR_vtoms((unsigned char*) arg, (unsigned char*) RP_VSEPS);
+    std::vector<std::string> v_args;
+    if(arg)
+        v_args = split_skip_empty(std::string(arg), std::string(RP_VSEPS));
     SCR_free(arg);
 
-    sprintf((char*) buf,  "%d", SCR_tbl_size(args));
-    SCR_free_tbl(args);
+    sprintf((char*) buf,  "%d", (int) v_args.size());
     return(SCR_stracpy((unsigned char*) buf));
 }
 

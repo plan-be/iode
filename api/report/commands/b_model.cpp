@@ -114,35 +114,29 @@ err:
  */
 int B_ModelSimulateParms(char* arg, int unused)
 {
-    char    **args;
-    int     rc = 0, nargs;
-
-    args = (char **) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nargs = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    int nargs = (int) args.size();
     if(nargs < 6) {
         error_manager.append_error("ModelSimulateParms: incorrect number of parameters");
-        rc = -1;
-        goto fin;
+        return -1;
     }
 
-    global_simu->epsilon = atof(args[0]);
-    global_simu->relax = atof(args[1]);
-    global_simu->max_iter = atoi(args[2]);
-    if(U_is_in(args[3][0], "bB")) 
-        args[3][0] = 'T'; // JMP 20/02/2023 
+    global_simu->epsilon = atof(args[0].c_str());
+    global_simu->relax = atof(args[1].c_str());
+    global_simu->max_iter = atoi(args[2].c_str());
+    if(U_is_in(args[3][0], "bB"))
+        args[3][0] = 'T'; // JMP 20/02/2023
     global_simu->sorting_algo = B_argpos("CTN", args[3][0]);
     global_simu->init_algo = args[4][0] - '0';
     global_simu->debug = B_argpos("NY", args[5][0]);
-    if(nargs > 6) global_simu->nb_passes = atoi(args[6]); //JMP 14/3/2012
+    if(nargs > 6) global_simu->nb_passes = atoi(args[6].c_str()); //JMP 14/3/2012
 
     if(nargs > 7)
         newton_debug = B_argpos("NY", args[7][0]); // JMP 6/3/2012
     else
         newton_debug = 0;
 
-fin :
-    SCR_free_tbl((unsigned char**) args);
-    return rc;
+    return 0;
 }
 
 

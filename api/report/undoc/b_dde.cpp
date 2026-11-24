@@ -581,7 +581,6 @@ int IodeDdeSetWS(char *szItem, char *szBuffer)
 
 int IodeDdePlay(char *szItem, char *szBuffer)
 {
-    U_ch    **keys;
     int     key, i, n;
 
     SCR_upper((unsigned char*) szItem);
@@ -590,13 +589,12 @@ int IodeDdePlay(char *szItem, char *szBuffer)
         return 0;
     }
     else {
-        keys = SCR_vtoms((unsigned char*) szBuffer, (unsigned char*) ", ;");
-        n = SCR_tbl_size(keys);
+        std::vector<std::string> keys = split_skip_empty(std::string(szBuffer), ", ;");
+        n = (int) keys.size();
         for(i = n - 1 ; i >= 0 ; i--) {
-            key = DdeTsfKey((char*) keys[i]);
+            key = DdeTsfKey(keys[i].data());
             if(key) krecordkey(key);
         }
-        SCR_free_tbl(keys);
     }
     return 0;
 }
@@ -727,11 +725,10 @@ int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
 
 int B_ExcelDecimal(char *arg, int unused)
 {
-    char    **args;
     int     nb_args, rc= 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    nb_args = (int) args.size();
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -762,11 +759,10 @@ $ExcelSetThousand Period => skip periods when reading from excel sheet (! decima
 
 int B_ExcelThousand(char *arg, int unused)
 {
-    char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    nb_args = (int) args.size();
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -814,11 +810,10 @@ $ExcelSetCurrency [no arg] => no sep
 
 int B_ExcelCurrency(char *arg, int unused)
 {
-    char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    nb_args = (int) args.size();
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -850,11 +845,10 @@ int B_ExcelCurrency(char *arg, int unused)
 
 int B_ExcelLang(char *arg, int unused)
 {
-    char    **args;
     int     nb_args, rc = 0;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    nb_args = (int) args.size();
 
     if(nb_args == 1) {
         switch(args[0][0]) {
@@ -882,31 +876,22 @@ int B_ExcelLang(char *arg, int unused)
 
 int B_ExcelGet(char *arg, int type)
 {
-    char    *ddeptr = NULL, *argptr = NULL, /* GB 26/01/98 */
-             **args = NULL, **tbl = NULL;
-    int     nb_args, ntbl = 0,
-                     i, rc = -1;
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    if(args.empty())
+        return -1;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    // the last argument is the Excel item (Sheet!R1C1...)
+    char* ddeptr = B_ExcelGetItem(args.back().data());
+    if(ddeptr == NULL)
+        return -1;
 
-    ddeptr = B_ExcelGetItem(args[nb_args - 1]);
-    if(ddeptr == NULL) goto the_end;
-
-    for(i = 0; i < nb_args - 1; i++) 
-        SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) args[i]);
-    SCR_add_ptr((unsigned char***) &tbl, &ntbl, (unsigned char*) ddeptr);
-    SCR_add_ptr((unsigned char***) &tbl, &ntbl, NULL);
-
-    argptr = (char*) SCR_mtov((unsigned char**) tbl, (int) ' ');
-    rc = B_DataUpdate(argptr, type);
-
-the_end:
-    SCR_free_tbl((unsigned char**) args);
-    SCR_free_tbl((unsigned char**) tbl);
-    SCR_free(argptr);
+    // B_DataUpdate() arguments: all the arguments but the last one followed by the Excel values
+    std::vector<std::string> values(args.begin(), args.end() - 1);
+    values.push_back(std::string(ddeptr));
     SCR_free(ddeptr);
-    return rc;
+
+    std::string update_args = join(values, " ");
+    return B_DataUpdate(update_args.data(), type);
 }
 
 int B_ExcelSet(char *arg, int type)
@@ -915,21 +900,21 @@ int B_ExcelSet(char *arg, int type)
                 nb_args, nbr = 1, nc = 1, nl = 1;
     Period      *per = NULL;
     double      d;
-    char        **args = NULL,
-                *ptr = NULL,
+    char        *ptr = NULL,
                 *item, *smpl;
     bool        found = false;
     std::string name;
     std::string lec;
 
-    args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-    nb_args = SCR_tbl_size((unsigned char**) args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+    nb_args = (int) args.size();
 
-    name = std::string((char*) args[0]);
-    if(name.empty()) 
+    if(nb_args > 0)
+        name = args[0];
+    if(name.empty())
         goto the_end;
-    
-    item = args[nb_args - 1];
+
+    item = args[nb_args - 1].data();
     switch(type) 
     {
         case COMMENTS :
@@ -996,9 +981,9 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            if(nb_args == 3) 
-                smpl = args[1];
-            else 
+            if(nb_args == 3)
+                smpl = args[1].data();
+            else
                 smpl = NULL;
 
             ptr = global_ws_tbl->dde_create_table(name, smpl, &nc, &nl, -1);
@@ -1013,12 +998,12 @@ int B_ExcelSet(char *arg, int type)
                 goto the_end;
 
             /* Name Period nVal */
-            per = new Period(std::string(args[1]));
+            per = new Period(args[1]);
             shift = per->difference(global_ws_var->get_sample()->start_period);
-            if(per == NULL || shift< 0) 
+            if(per == NULL || shift< 0)
                 shift = 0;
-            else 
-                item = args[2];
+            else
+                item = args[2].data();
     
             ptr = IodeDdeCreateSeries(name, shift);
             nc = 1 + global_ws_var->get_sample()->nb_periods - shift;
@@ -1034,7 +1019,6 @@ the_end:
     if(!found)
         error_manager.append_error(name + " : not found");
 
-    SCR_free_tbl((unsigned char**) args);
     delete per;
     per = nullptr;
     SCR_free(ptr);

@@ -202,4 +202,4 @@ int T_find_opf(const std::vector<COL>& file_columns, const COL& column);
 int T_graph_tbl_1(const std::shared_ptr<Table> tbl_ptr, const std::string& gsmpl, int mode);
 int T_prep_smpl(const std::vector<COL>& columns, std::vector<COL>& file_columns, std::shared_ptr<Sample>& smpl);
 int V_graph(int view, int mode, int type, int xgrid, int ygrid, int axis, double ymin, double ymax, 
-    const std::shared_ptr<Sample> smpl, char **names);
+    const std::shared_ptr<Sample> smpl, const std::vector<std::string>& names);

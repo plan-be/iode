@@ -105,7 +105,6 @@ int B_PrintDestExt(char* file, int type)
  */
 int B_PrintDestFile(char *arg)
 {
-    char    **args = NULL;
     int     nb_args, type, rc;
 
     // If a printing session is currently open, that session is first flushed and closed 
@@ -116,8 +115,8 @@ int B_PrintDestFile(char *arg)
     SCR_strip((unsigned char*) arg);
     if(arg != NULL && arg[0] != 0) 
     {
-        args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-        nb_args = SCR_tbl_size((unsigned char**) args);
+        std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
+        nb_args = (int) args.size();
         if(nb_args > 1) 
         {
             switch(args[1][0]) 
@@ -151,8 +150,9 @@ int B_PrintDestFile(char *arg)
         else 
             type = W_A2M;
         
-        rc = B_PrintDestExt(args[0], type);
-        SCR_free_tbl((unsigned char**) args);
+        // NULL if arg only contains separators (as with SCR_vtoms())
+        char* filename = (nb_args > 0) ? args[0].data() : NULL;
+        rc = B_PrintDestExt(filename, type);
     }
     else 
         rc = B_PrintDestExt("", W_GDI);
