@@ -304,6 +304,7 @@ Then export it in `pyiode/iode/__init__.py.in` (both the imports and `__all__`) 
          - fixed renaming files and directories
          - do nothing if the new name is empty or unchanged
     ```
+  - append the message "Co-Authored-By: Claude <model> <version>" at the end of the commit message.
 - **Changelog**: every user-visible change gets an entry in the current version's file `doc/source/changes/v<version>.rst.inc` (the one marked "In development"). Put it under *New Features*, *Improvements* or *Fixed Bugs*, with an area prefix and an issue reference:
   ```
   - GUI: fixed pasting Variables values ... (closes :issue:`1343`)
