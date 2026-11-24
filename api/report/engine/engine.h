@@ -19,11 +19,9 @@ void RP_debug(char* txt);
 
 /* b_rep_engine.c */
 std::vector<std::string> RP_read_file(const std::string& filename);
-int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, std::string& arg, int lg);
 BFNS* RP_find_fn(char* c_name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
-int RP_err_dump(char* name, char* arg);
 char *RP_extract(char* buf, int* i, int ch);
 char *RP_gmacro(char* str);
 char *RP_gcmd(char* str);

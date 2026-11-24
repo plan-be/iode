@@ -35,6 +35,10 @@ struct REPFILE : public std::enable_shared_from_this<REPFILE>
     std::string read_multiline();
     int read_line(std::string& line, int mode);
     int execute();
+
+private:
+    static int chk_ignore(const std::string& line);
+    int err_dump(char* name, char* arg);
 };
 
 struct BFNS 
