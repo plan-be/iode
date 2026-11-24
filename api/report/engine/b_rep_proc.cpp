@@ -205,10 +205,11 @@ int RP_procdef(char* arg, int unused)
 {
     REP_PROC        *proc;
     REPFILE         *rf = CUR_REPFILE;
-    unsigned char   name[128], buf[1024], *list; // JMP 23/5/2019
+    unsigned char   name[128], buf[1024]; // JMP 23/5/2019
+    std::string     list;
     int             proc_nb, nblines = 0, line1;
 
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
+    if(RP_splitline(arg, (char*) name, list, 30) < 0) return -1;
 
     // Creates the REP_PROC object
     // if a proc with the same name already exists, first deletes the existing one
@@ -216,7 +217,7 @@ int RP_procdef(char* arg, int unused)
     proc = REP_PROCS[proc_nb];
 
     // Compute the formal parameters (sep = space)
-    proc->proc_parms = (char**) SCR_vtoms(list, (unsigned char*) " ");
+    proc->proc_parms = (char**) SCR_vtoms((unsigned char*) list.data(), (unsigned char*) " ");
     proc->proc_nb_parms = SCR_tbl_size((unsigned char**) proc->proc_parms);
 
     // Save the current position in CUR_REPFILE
@@ -263,9 +264,9 @@ int RP_procdef(char* arg, int unused)
  */
 int RP_procexec(char* arg, int unused)
 {   
-    unsigned char* list;
-    unsigned char name[128]; 
-    if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) 
+    std::string list;
+    unsigned char name[128];
+    if(RP_splitline(arg, (char*) name, list, 30) < 0)
         return -1;
 
     // Searches the proc definition
@@ -283,7 +284,7 @@ int RP_procexec(char* arg, int unused)
         return rc;
 
     // Creates macros with the actual parameters
-    std::vector<std::string> v_params = split_multi_quoted((char*) list, " ,\n\t", '"');
+    std::vector<std::string> v_params = split_multi_quoted(list, " ,\n\t", '"');
     int nactual = (int) v_params.size();
     int nformal = proc->proc_nb_parms;
 

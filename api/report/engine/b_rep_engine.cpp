@@ -54,7 +54,6 @@
  *                  RP_extractpar           Extracts an @function
  *                  RP_gfn                  Executes @functions and put the result in the report line
  *                      RP_expand...
- *                  RP_add                  Util : concatenates a string to the current line and reallocates
  *          RP_exec_fn()                    Executes the report command (if any)
  *              RP_find_fn                  Finds the right function
  *              (*B_fns[name].fn)           Executes the no-GUI function
@@ -240,41 +239,41 @@ char* RP_read_multiline(REPFILE* rf)
 
 /**
  *  Reads the current line from the REPFILE rf.
- *  Expands the line (%define%, {lex expression}...) and stores the expanded line in *line (allocated).
- *  
- *  @param [in, out]    REPFILE*    rf      REPFILE struct
- *  @param [in, out]    char**      line    pointer to the allocated line (having been expanded or not)
- *  @param [in]         int         mode    1 to expand the line, 
- *                                          0 to keep the line unchanged, for example when searching for $goto or $procend lines
- *  @return             int                 EOF if the last line is reached
- *                                          rc of RP_expand() on error
- *                                          0 on success
+ *  Expands the line (%define%, {lex expression}...) and stores the expanded line in line.
+ *
+ *  @param [in, out]    REPFILE*        rf      REPFILE struct
+ *  @param [out]        std::string&    line    line (having been expanded or not)
+ *  @param [in]         int             mode    1 to expand the line,
+ *                                              0 to keep the line unchanged, for example when searching for $goto or $procend lines
+ *  @return             int                     EOF if the last line is reached
+ *                                              rc of RP_expand() on error
+ *                                              0 on success
  */
-int RP_readline(REPFILE* rf, char** line, int mode)
+int RP_readline(REPFILE* rf, std::string& line, int mode)
 {
-    if(rf->current_line >= rf->nblines) 
+    if(rf->current_line >= rf->nblines)
         return EOF;
-    
-    char* multi_line = RP_read_multiline(rf); 
-    
+
+    char* multi_line = RP_read_multiline(rf);
+
     int rc = 0;
     if(mode)  // expand macros, {}, ...
         rc = RP_expand(line, multi_line);
     else
-        *line = (char*) SCR_stracpy((unsigned char*) multi_line);
+        line = std::string(multi_line);
 
     SCR_free(multi_line);
-    if(rc) 
+    if(rc)
         return rc;
-    
+
     // Shift text to the margin if $ or # and indent allowed
-    if(*line && RP_ALLOW_INDENT) 
+    if(RP_ALLOW_INDENT && !line.empty())
     {
         // Goto 1st non space
         int i;
-        for(i = 0 ; (*line)[i] && SCR_is_space((*line)[i]); i++);
-        if(U_is_in((*line)[i], "$#")) 
-            U_ljust_text((unsigned char*) *line);
+        for(i = 0 ; line[i] && SCR_is_space(line[i]); i++);
+        if(U_is_in(line[i], "$#"))
+            U_ljust_text((unsigned char*) line.data());
     }
 
     return rc;
@@ -300,18 +299,28 @@ int RP_chk_ignore(char* line)
 /**
  *  Splits a report line into the command and its arguments.
  *  
- *  @param [in, out] char*   text   line to split
- *  @param [in, out] char*   cmd    command (first word in text)
- *  @param [in, out] char**  arg    pointer to the first character of the arguments
- *  @param [in] lg   int            max length of cmd
- *  @return          int            -1 if the name of the cmd (first word on the line text) is too long (> lg)
- *                                  0 otherwise
+ *  @param [in, out] char*          text   line to split
+ *  @param [in, out] char*          cmd    command (first word in text)
+ *  @param [out]     std::string&   arg    arguments (text following the command, without leading
+ *                                         and trailing spaces)
+ *  @param [in] lg   int                   max length of cmd
+ *  @return          int                   -1 if the name of the cmd (first word on the line text) is too long (> lg)
+ *                                         0 otherwise
  */
-int RP_splitline(char* text, char* cmd, char** arg, int lg)
+int RP_splitline(char* text, char* cmd, std::string& arg, int lg)
 {
     int     i = 0, j = 0, rt = 0;
 
-    if(text == NULL || text[0] == '\0' || text[0] == '\n') 
+    char*   args;
+
+    if(text == NULL)
+    {
+        cmd[0] = 0;
+        arg.clear();
+        return -1;
+    }
+
+    if(text[0] == '\0' || text[0] == '\n')
     {
         rt = -1;
         goto done;
@@ -333,9 +342,10 @@ int RP_splitline(char* text, char* cmd, char** arg, int lg)
 
 done :
     cmd[i] = 0;
-    *arg = text + j;
-    U_ljust_text((unsigned char*) *arg);
-    SCR_strip((unsigned char*) *arg);
+    args = text + j;
+    U_ljust_text((unsigned char*) args);
+    SCR_strip((unsigned char*) args);
+    arg = std::string(args);
     return rt;
 }
 
@@ -512,9 +522,13 @@ char *RP_gmacro(char* str)
     if(str == NULL) 
         return NULL;
 
-    if(U_pos('%', (unsigned char*) str) >= 0 || U_pos('{', (unsigned char*) str) >= 0 || 
+    if(U_pos('%', (unsigned char*) str) >= 0 || U_pos('{', (unsigned char*) str) >= 0 ||
        U_pos('@', (unsigned char*) str) >= 0)
-        RP_expand(&tmp, str);
+    {
+        std::string expanded;
+        RP_expand(expanded, str);
+        tmp = (char*) SCR_stracpy((unsigned char*) expanded.c_str());
+    }
     else
         tmp = (char*) SCR_stracpy((unsigned char*) str);
 
@@ -574,21 +588,26 @@ char *RP_gmacro(char* str)
  */
 char *RP_gcmd(char* str) 
 {
-    char    *res = NULL, *tmp = 0;
+    char    *tmp = 0;
 
-    if(str == NULL) 
+    if(str == NULL)
         return NULL;
 
-    if(U_pos('%', (unsigned char*) str) >= 0 || 
-       U_pos('{', (unsigned char*) str) >= 0 || 
+    if(U_pos('%', (unsigned char*) str) >= 0 ||
+       U_pos('{', (unsigned char*) str) >= 0 ||
        U_pos('@', (unsigned char*) str) >= 0)
-        RP_expand(&tmp, str);
+    {
+        std::string expanded;
+        RP_expand(expanded, str);
+        tmp = (char*) SCR_stracpy((unsigned char*) expanded.c_str());
+    }
     else
         tmp = (char*) SCR_stracpy((unsigned char*) str);
 
-    RP_eval(&res, tmp);
+    std::string res;
+    RP_eval(res, tmp);
     SCR_free(tmp);
-    return res;
+    return (char*) SCR_stracpy((unsigned char*) res.c_str());
 }
 
 
@@ -757,11 +776,11 @@ normal:
  *      {lec_expressions}           a LEC expression value 
  *      {lec_expressions@format}    a LEC expression formatted value
  *                                 
- *  @param [in, out] char**  res    pointer to the memory address where the allocated result will be placed
- *  @param [in]      char*   farg   contents to be interpreted
- *  @return          char*          allocated string containing the result
+ *  @param [out]     std::string&   res    result (empty string on error)
+ *  @param [in]      char*          farg   contents to be interpreted
+ *  @return          int                   0 on success, -1 on error
  */
-int RP_eval(char** res, char* farg)
+int RP_eval(std::string& res, char* farg)
 {
     char        ch, name[31],
                 *lec, *fmt;
@@ -769,7 +788,7 @@ int RP_eval(char** res, char* farg)
     double      x;
     bool        inv = false;
 
-    *res = SW_nalloc(41);
+    res.clear();
     ch = farg[0];
     
     // farg = "$name args, #name args, $!name args or #!name args" => executes a report command 
@@ -799,19 +818,21 @@ int RP_eval(char** res, char* farg)
         if(inv) 
             rc = !rc;       
 
-        // Return code to save in *res
-        sprintf(*res, "%d", rc); // save in allocated *res (TODO: improve this!!!)
+        // Return code to save in res
+        res = std::to_string(rc);
         return 0;
     }
 
     // farg = "=ExcelAddress" => Excel Get via DDE
-    if(ch == '=') 
+    if(ch == '=')
     {
-        SCR_free(*res);
-        *res = B_ExcelGetItem(farg + 1);
-        if(*res == NULL) return -1;
-        SCR_replace((unsigned char*) *res, (unsigned char*) "\t", (unsigned char*) " ");
-        SCR_replace((unsigned char*) *res, (unsigned char*) "\r\n", (unsigned char*) " ");
+        char* item = B_ExcelGetItem(farg + 1);
+        if(item == NULL)
+            return -1;
+        SCR_replace((unsigned char*) item, (unsigned char*) "\t", (unsigned char*) " ");
+        SCR_replace((unsigned char*) item, (unsigned char*) "\r\n", (unsigned char*) " ");
+        res = std::string(item);
+        SCR_free(item);
         return 0;
     }
 
@@ -831,43 +852,9 @@ int RP_eval(char** res, char* farg)
     if(!IODE_IS_A_NUMBER(x)) 
         return -1;
     
-    RP_fmt(*res, fmt, x);       // The formatted value is returned
-    return 0;
-}
-
-
-/**
- *  Reallocates the string line (of length *lg) in order to concatenate res from the position *j.
- *  
- *  @param [in, out] char*   line   line to extend
- *  @param [in, out] int*    lg     length of line
- *  @param [in, out] int*    j      position in line where to write res
- *  @param [in]      char*   res    string to add to line
- *  @return          int            0 on success, -2 on allocation error.   
- *  
- *  TODO: rewrite thoroughly this function
- */
-int RP_add(char** line, int* lg, int* j, char* res)
-{
-    int i, add;
-
-    if(res == NULL) 
-        return 0;
-    add = (int)strlen(res);
-    *line = (char*) SW_nrealloc(*line, *lg, *lg + add);
-    if(*line == NULL) 
-    {
-        *lg = 0;
-        return -2;
-    }
-
-    for(i = 0; i < add; i++) 
-    {
-        (*line)[(*j)] = res[i];
-        (*j)++;
-    }
-
-    (*lg) += add;
+    char buf[41] = { 0 };
+    RP_fmt(buf, fmt, x);       // The formatted value is returned
+    res = std::string(buf);
     return 0;
 }
 
@@ -1003,10 +990,10 @@ U_ch *RP_gfn(U_ch* str)
     int  allc = 0;
     if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0) 
     {
-        RP_expand((char**) &res, (char*) str);
-        str = SCR_stracpy(res);
+        std::string expanded;
+        RP_expand(expanded, (char*) str);
+        str = SCR_stracpy((unsigned char*) expanded.c_str());
         allc = 1;
-        SW_nfree(res);
     }
 
     RP_fneval((char**) &res, (char*) str);
@@ -1102,19 +1089,19 @@ U_ch *RP_gfn(U_ch* str)
  *  Case '`': 
  *      - the text is left unchanged until the following ` or the end of line
  *  
- *  @param [in, out] char** line    expanded report line 
- *  @param [in]      char*  buf     partial input report line 
- *  @return 
+ *  @param [out]     std::string&   line    expanded report line
+ *  @param [in]      char*          buf     partial input report line
+ *  @return          int                    0 (always)
  */
-int RP_expand(char** line, char* buf)
+int RP_expand(std::string& line, char* buf)
 {
-    int     rc = 0, i, previ, j, lg, upper, sqz;
+    int     i, previ, upper, sqz;
     char    *w = NULL, *res = NULL;
 
-    lg = (int)strlen(buf);
-    *line = SW_nalloc(lg + 1);
+    line.clear();
+    line.reserve(strlen(buf));
 
-    for(i = 0, j = 0; buf[i]; i++) 
+    for(i = 0; buf[i]; i++)
     {
         upper = 0;
         sqz = 0;
@@ -1145,22 +1132,18 @@ int RP_expand(char** line, char* buf)
                         SCR_asqz((unsigned char*) res, (unsigned char*) "_");
                     if(upper < 0) 
                         SCR_lower((unsigned char*) res);
-                    if(upper > 0) 
+                    if(upper > 0)
                         SCR_upper((unsigned char*) res);
 
-                    rc = RP_add(line, &lg, &j, res);
+                    line += res;
                     SW_nfree(res);
                     RP_free(w);
                 }
-                else 
+                else
                 {
                     i--;
-                    (*line)[j] = buf[i];
-                    j++;
+                    line.push_back(buf[i]);
                 }
-
-                if(rc < 0) 
-                    goto done;
                 break;
 
             case '{' :      // LEC expression
@@ -1169,13 +1152,11 @@ int RP_expand(char** line, char* buf)
                     goto dft;
                 w = RP_extract(buf, &i, '}');
                 res = RP_gcmd(w);
-                rc = RP_add(line, &lg, &j, res);
+                if(res)
+                    line += res;
 
                 SW_nfree(res);
                 RP_free(w);
-
-                if(rc < 0) 
-                    goto done;
                 break;
 
             case '@' :      // IODE function
@@ -1191,13 +1172,10 @@ int RP_expand(char** line, char* buf)
                     SCR_free(w);
                     goto dft;
                 }
-                rc = RP_add(line, &lg, &j, res);
+                line += res;
 
                 SW_nfree(res);
                 SW_nfree(w);
-
-                if(rc < 0) 
-                    goto done;
                 break;
 
             default  :
@@ -1208,28 +1186,19 @@ int RP_expand(char** line, char* buf)
                     if(buf[i] == RP_NOPARSING_CHAR) 
                         goto dft;  
                     w = RP_extract(buf, &i, RP_NOPARSING_CHAR);
-                    rc = RP_add(line, &lg, &j, w);
-                    RP_free(w); 
-                    if(rc < 0) 
-                        goto done;
+                    if(w)
+                        line += w;
+                    RP_free(w);
                     break;
                 }
-            
+
             dft:
-                (*line)[j] = buf[i];
-                j++;
+                line.push_back(buf[i]);
                 break;
         }
     }
 
-done:
-    if(rc < 0) 
-    {
-        SW_nfree(*line);
-        *line = NULL;
-    }
-
-    return rc;
+    return 0;
 }
 
 
@@ -1254,27 +1223,28 @@ int RP_ReportExec_tbl(REPFILE *rf)
 {
     int     rc, rt = 0;
     int     ignore = 0; // ignore: 0 ignore code retour, 1 non
-    char    *line = NULL, *arg, name[31];
+    char    name[31];
     long    cline = 0L;
     REPFILE *oldrf;
     char    debug_line[1024];
+    std::string line;
+    std::string arg;
 
     oldrf = CUR_REPFILE;    // Save the current report context
     CUR_REPFILE = rf;       // change locally the current report context
 
-    while(1) 
+    while(1)
     {
         // Execute one line
-        SW_nfree(line);
-        line = 0;
-        
+        line.clear();
+
         // Reads the next line and expands the %macros%, {lec}, @fns()
-        rc = RP_readline(rf, &line, 1);
-        
+        rc = RP_readline(rf, line, 1);
+
         // Display the expanded line via kmsg() if RP_DEBUG or RP_STDOUT is not null
-        if(RP_DEBUG || RP_STDOUT) 
+        if(RP_DEBUG || RP_STDOUT)
         {
-            SCR_strlcpy((unsigned char*) debug_line, (unsigned char*) line, 1023);
+            SCR_strlcpy((unsigned char*) debug_line, (unsigned char*) line.c_str(), 1023);
             SCR_strip((unsigned char*) debug_line);
             if(debug_line[0]) 
             {
@@ -1303,16 +1273,16 @@ int RP_ReportExec_tbl(REPFILE *rf)
                 continue;
             
             // $command, #command, $-command or #-command
-            ignore = RP_chk_ignore(line);     // Ignore the errors if $-command or #-command
-            rt = RP_splitline(line + 1 + ignore, name, &arg, 30);
+            ignore = RP_chk_ignore(line.data());     // Ignore the errors if $-command or #-command
+            rt = RP_splitline(line.data() + 1 + ignore, name, arg, 30);
             
             // Executes the command
             if(rt == 0) 
             {
                 if(name[0]) 
-                    rt = RP_exec_fn(name, arg, line[0]);
+                    rt = RP_exec_fn(name, arg.data(), line[0]);
                 if(RP_DEBUG > 1) 
-                    RP_debug(line); // GB MEM
+                    RP_debug(line.data()); // GB MEM
             }
 
             CUR_REPFILE = rf; // restore the current REPFILE after RP_exec_fn() (recursivity)
@@ -1327,7 +1297,7 @@ int RP_ReportExec_tbl(REPFILE *rf)
                         break;
                     }
                     if(RP_PRINT) 
-                        RP_err_dump(name, arg);
+                        RP_err_dump(name, arg.data());
                     rt = RP_RT;         // replaces the error code by the value of RP_RT (defined by OnError)
                     switch(rt)  
                     {
@@ -1356,14 +1326,12 @@ int RP_ReportExec_tbl(REPFILE *rf)
         }
         else 
         {
-            W_printf((char*) "%s\n", line);
+            W_printf((char*) "%s\n", line.c_str());
             continue;
         }
     }
 
 done:
-    SW_nfree(line);
-    line = 0;
     W_putc('\n');
     W_flush();
     CUR_REPFILE = oldrf; // Reset the calling report context
