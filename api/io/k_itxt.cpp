@@ -123,26 +123,26 @@ int ImportCommentsTXT::read_header(char* file, int lang)
 
 int ImportCommentsTXT::read_comment(char* name, char** cmt)
 {
-    char    buf[1025], **tbl;
+    char    buf[1025];
     int     len;
 
     if(fgets(buf, 1024, TXT_fd) == NULL)  return -1;
-    tbl = (char**) SCR_vtom((unsigned char*) buf, (int) ';');
-    if(SCR_tbl_size((unsigned char**) tbl) < 7) {
-        SCR_free_tbl((unsigned char**) tbl);
+    std::vector<std::string> tbl = split_skip_empty(std::string(buf), ";");
+    if(tbl.size() < 7)
         return -1;
-    }
 
-    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[0], 79);              /* JMP 13-02-2013 */
-    SCR_AnsiToOem((unsigned char*) tbl[TXT_lang], (unsigned char*) tbl[TXT_lang]);
-    SCR_sqz((unsigned char*) tbl[5]);
-    SCR_sqz((unsigned char*) tbl[6]);
-    len = (int)(strlen(tbl[TXT_lang]) + strlen(tbl[5]) + strlen(tbl[6]) + 10);
+    // in-place modifications: the strings are then only used as C strings
+    char* text = tbl[TXT_lang].data();
+    char* col5 = tbl[5].data();
+    char* col6 = tbl[6].data();
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[0].c_str(), 79);              /* JMP 13-02-2013 */
+    SCR_AnsiToOem((unsigned char*) text, (unsigned char*) text);
+    SCR_sqz((unsigned char*) col5);
+    SCR_sqz((unsigned char*) col6);
+    len = (int)(strlen(text) + strlen(col5) + strlen(col6) + 10);
     *cmt = SW_nalloc(len);
 
-    sprintf(*cmt, "%s (%s, %s)",tbl[TXT_lang], tbl[5], tbl[6]);
-
-    SCR_free_tbl((unsigned char**) tbl);
+    sprintf(*cmt, "%s (%s, %s)", text, col5, col6);
     return 0;
 }
 

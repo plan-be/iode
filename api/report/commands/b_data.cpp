@@ -140,18 +140,18 @@ int B_DataPattern(char* arg,int type)
     char cvar[K_MAX_NAME + 1], rvar[K_MAX_NAME + 1], toappend[2*K_MAX_NAME +3];
     int  rc = -1, nrows = 0, ncols = 0, crow, ccol;
 
-    char** args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
-    int nbargs = SCR_tbl_size((unsigned char**) args);
-    if(nbargs < 3) 
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ");
+    int nbargs = (int) args.size();
+    if(nbargs < 3)
         goto cleanup;
-    else 
+    else
     {
-        lstname = args[0];
-        pattern = args[1];
+        lstname = args[0].data();
+        pattern = args[1].data();
         xvars = expand_args(args[2], 0);
         nrows = (int) xvars.size();
 
-        if(nbargs > 3) 
+        if(nbargs > 3)
         {
             yvars = expand_args(args[3], 0);
             ncols = (int) yvars.size();
@@ -193,7 +193,6 @@ int B_DataPattern(char* arg,int type)
     }
 
 cleanup:
-    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 
@@ -208,32 +207,30 @@ cleanup:
  */
 int B_DataRasVar(char* arg, int unused)
 {
-    char    **args;
     int     rc = 0, nbargs, maxit = 100;
     double  eps = 0.001;
 
-    args = (char**) SCR_vtom((unsigned char*) arg, (int) ' ');
-    nbargs = SCR_tbl_size((unsigned char**) args);
-    if(nbargs < 5) 
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ");
+    nbargs = (int) args.size();
+    if(nbargs < 5)
         rc = -1;
-    else 
+    else
     {
-        if(nbargs > 5) 
-            maxit = atoi(args[5]);
-        
-        if(nbargs > 6) 
-            eps = atof(args[6]);
+        if(nbargs > 5)
+            maxit = atoi(args[5].c_str());
 
-        Period *rper = new Period(std::string(args[3]));
-        Period *cper = new Period(std::string(args[4]));
-        rc = RasExecute(args[0], args[1], args[2], rper, cper, maxit, eps);
+        if(nbargs > 6)
+            eps = atof(args[6].c_str());
+
+        Period *rper = new Period(args[3]);
+        Period *cper = new Period(args[4]);
+        rc = RasExecute(args[0].data(), args[1].data(), args[2].data(), rper, cper, maxit, eps);
         delete rper;
         delete cper;
         rper = nullptr;
         cper = nullptr;
     }
 
-    SCR_free_tbl((unsigned char**) args);
     return rc;
 }
 

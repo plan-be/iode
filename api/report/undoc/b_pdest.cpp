@@ -351,27 +351,26 @@ int B_PrintPageFooter(char* arg, int unused)
 // $PrintFont Times|Helvetica|Courier|Bookman|Palatino [size [incr]]
 int B_PrintFont(char* arg, int unused)
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl > 0) {
-        A2M_FONTFAMILY = SCR_upper_char(tbl[0][0]);
+        A2M_FONTFAMILY = SCR_upper_char((unsigned char) tbl[0][0]);
         // BGUI_PrintFont1();
     }
     if(ntbl > 1) {
-        A2M_FONTSIZE = atoi((char*) tbl[1]);
+        A2M_FONTSIZE = atoi(tbl[1].data());
         A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
 
     if(ntbl > 2) {
-        A2M_FONTINCR = atoi((char*) tbl[2]);
+        A2M_FONTINCR = atoi(tbl[2].data());
         A2M_FONTINCR = std::max(A2M_FONTINCR, 1);
         // BGUI_PrintFont3();
     }
-    SCR_free_tbl(tbl);
 
     return 0;
 }
@@ -380,21 +379,20 @@ int B_PrintFont(char* arg, int unused)
 // $PrintTableFont Times|Helvetica|Courier|Bookman|Palatino [size]
 int B_PrintTFont(char* arg, int unused)
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl > 0) {
-        A2M_TFONTFAMILY = SCR_upper_char(tbl[0][0]);
+        A2M_TFONTFAMILY = SCR_upper_char((unsigned char) tbl[0][0]);
         // BGUI_PrintTFont1();
     }
     if(ntbl > 1) {
-        A2M_TFONTSIZE = atoi((char*) tbl[1]);
+        A2M_TFONTSIZE = atoi(tbl[1].data());
         A2M_TFONTSIZE = std::max(A2M_TFONTSIZE, 4);
         // BGUI_PrintTFont2();
     }
-    SCR_free_tbl(tbl);
     return 0;
 }
 
@@ -434,13 +432,13 @@ int B_PrintTColor(char* arg, int unused)
 // $PrintTableWidth width [col1 [coln]]
 int B_PrintTWidth(char* arg, int unused)
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, w, col1, coln;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl > 0) {
-        w = atoi((char*) tbl[0]);
+        w = atoi(tbl[0].data());
         w = std::max(w, 65);
         A2M_RTF_TWIDTH = w;
         A2M_FRM_TWIDTH = w;
@@ -448,7 +446,7 @@ int B_PrintTWidth(char* arg, int unused)
     }
 
     if(ntbl > 1) {
-        col1 = atoi((char*) tbl[1]);
+        col1 = atoi(tbl[1].data());
         col1 = std::max(col1, 50);
         A2M_RTF_TCOL1 = col1;
         A2M_FRM_TCOL1 = col1;
@@ -456,14 +454,13 @@ int B_PrintTWidth(char* arg, int unused)
     }
 
     if(ntbl > 2) {
-        coln = atoi((char*) tbl[2]);
+        coln = atoi(tbl[2].data());
         coln = std::max(coln, 15);
         A2M_RTF_TCOLN = coln;
         A2M_FRM_TCOLN = coln;
         // BGUI_PrintTWidth3();
     }
 
-    SCR_free_tbl(tbl);
     return 0;
 }
 
@@ -471,31 +468,30 @@ int B_PrintTWidth(char* arg, int unused)
 // $PrintGraphSize  width [height] [fontsize]
 int B_PrintGSize(char* arg, int unused)
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, w;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl > 0) {
-        w = atoi((char*) tbl[0]);
+        w = atoi(tbl[0].data());
         w = std::max(w, 35);
         A2M_GWIDTH = 0.1 * w;
         // BGUI_PrintGSize1();
     }
 
     if(ntbl > 1) {
-        w = atoi((char*) tbl[1]);
+        w = atoi(tbl[1].data());
         w = std::max(w, 20);
         A2M_GHEIGHT = 0.1 * w;
         // BGUI_PrintGSize2();
     }
     if(ntbl > 2) { // GB 16/03/2009
-        A2M_FONTSIZE = atoi((char*) tbl[2]);
+        A2M_FONTSIZE = atoi(tbl[2].data());
         A2M_FONTSIZE = std::max(A2M_FONTSIZE, 4);
         // BGUI_PrintFont2();
     }
 
-    SCR_free_tbl(tbl);
     return 0;
 }
 
@@ -516,30 +512,28 @@ int B_PrintGTheme(char* arg, int unused)
 int B_PrintGBand(char* arg, int unused)
 {
 #if !defined(_MSC_VER) && !defined(__GNUC__)    
-    char    **args;
     int     rc = 0, nbargs;
     double  startvalue = 0, endvalue = 0;
 
-    args = SCR_vtom(arg, ' ');
-    nbargs = SCR_tbl_size(args);
+    std::vector<std::string> args = split_skip_empty(std::string(arg), " ");
+    nbargs = (int) args.size();
 
-    if(nbargs == 2) 
+    if(nbargs == 2)
     {
         Period  *per;
-        
-        per = new Period(std::string(args[0]));
+
+        per = new Period(args[0]);
         startvalue = PER_per2real(per, 0);
         delete per;
         per = nullptr;
 
-        per = new Period(std::string(args[1]));
+        per = new Period(args[1]);
         endvalue = PER_per2real(per, 0);
         delete per;
         per = nullptr;
     }
 
     ChrtColorBand(startvalue, endvalue);
-    SCR_free_tbl(args);
 #endif    
     return 0;
 }
@@ -875,13 +869,13 @@ int B_PrintHtmlStyle(char* arg, int unused)
  */
 int B_A2mToAll(char* arg, int type)
 {
-    U_ch    **tbl = 0, ibuf[256], obuf[256], *ext;
+    U_ch    ibuf[256], obuf[256], *ext;
     int     ntbl;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    std::vector<std::string> tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl == 0) return -1;
-    SCR_cat_ext((char*) ibuf, (char*) tbl[0], (char*) "a2m");
+    SCR_cat_ext((char*) ibuf, tbl[0].data(), (char*) "a2m");
     switch(type) {
         case A2M_DESTFRM :
             ext = (unsigned char*) "mif";
@@ -900,9 +894,8 @@ int B_A2mToAll(char* arg, int type)
             break;                  
     }
 
-    if(ntbl > 1) SCR_cat_ext((char*) obuf, (char*) tbl[1], (char*) ext);
-    else         SCR_change_ext((char*) obuf, (char*) tbl[0], (char*) ext);
-    SCR_free_tbl(tbl);
+    if(ntbl > 1) SCR_cat_ext((char*) obuf, tbl[1].data(), (char*) ext);
+    else         SCR_change_ext((char*) obuf, tbl[0].data(), (char*) ext);
     switch(type) {
         case A2M_DESTFRM :
             return(A2mToMif((char*) ibuf, (char*) obuf));

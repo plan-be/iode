@@ -32,23 +32,22 @@
 
 int B_SysRename(char* arg, int unused) 
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl != 2) {
         error_manager.append_error("Failed to rename file due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
-    rc = SCR_rename((char*) tbl[0], (char*) tbl[1]);
+    rc = SCR_rename(tbl[0].data(), tbl[1].data());
     if(rc) 
         error_manager.append_error("Failed to rename file: '" + std::string(arg) + "'");
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
@@ -60,23 +59,22 @@ fin:
  */
 int B_SysCopy(char* arg, int unused) 
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl != 2) {
         error_manager.append_error("Failed to copy file dut to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
-    rc = SCR_copy_file((char*) tbl[0], (char*) tbl[1]);
+    rc = SCR_copy_file(tbl[0].data(), tbl[1].data());
     if(rc) 
         error_manager.append_error("Failed to copy file: '" + std::string(arg) + "'");
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
@@ -88,23 +86,22 @@ fin:
  */
 int B_SysAppend(char* arg, int unused) 
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl != 2) {
         error_manager.append_error("Failed to append file due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
         goto fin;
     }
 
-    rc = SCR_append_file((char*) tbl[0], (char*) tbl[1]);
+    rc = SCR_append_file(tbl[0].data(), tbl[1].data());
     if(rc) 
         error_manager.append_error("Failed to append file: '" + std::string(arg) + "'");
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
@@ -116,11 +113,11 @@ fin:
  */
 int B_SysDelete(char* arg, int unused) 
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0, i;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl < 1) {
         error_manager.append_error("Failed to delete file(s) due to syntax error: '" + std::string(arg) + "'");
         rc = -1;
@@ -128,10 +125,9 @@ int B_SysDelete(char* arg, int unused)
     }
 
     for(i = 0 ; i < ntbl ; i++) 
-        _unlink((char*) tbl[i]);
+        _unlink(tbl[i].data());
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
@@ -148,11 +144,11 @@ fin:
  */
 static int B_SysOemAnsiToUTF8(char *arg, int isansi)
 {
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
 
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl != 2) {
         std::string error_msg = "Failed to convert to UTF-8. Input and output file required: '";
         error_msg += std::string(arg) + "'";
@@ -162,15 +158,14 @@ static int B_SysOemAnsiToUTF8(char *arg, int isansi)
     }
 
     if(isansi) 
-        rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 1);
+        rc = SCR_ConvertToUTF8(tbl[0].data(), tbl[1].data(), 1, 1);
     else 
-        rc = SCR_ConvertToUTF8((char*) tbl[0], (char*) tbl[1], 1, 0);
+        rc = SCR_ConvertToUTF8(tbl[0].data(), tbl[1].data(), 1, 0);
 
     if(rc) 
         error_manager.append_error("Failed to convert to UTF-8: '" + std::string(arg) + "'");
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
@@ -210,11 +205,11 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
 {
     int     c;
     FILE    *fd1, *fd2;
-    U_ch    **tbl = 0;
+    std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
     
-    tbl = SCR_vtom((unsigned char*) arg, (int) ' ');
-    ntbl = SCR_tbl_size(tbl);
+    tbl = split_skip_empty(std::string(arg), " ");
+    ntbl = (int) tbl.size();
     if(ntbl != 2) {
         error_manager.append_error("Input and output file required: '" + std::string(arg) + "'");
         rc = -1;
@@ -222,14 +217,14 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
     }
     
 #ifdef DOS
-	fd1 = fopen((char*) tbl[0], "rb");
-	fd2 = fopen((char*) tbl[1], "wb+");
+	fd1 = fopen(tbl[0].data(), "rb");
+	fd2 = fopen(tbl[1].data(), "wb+");
 #else
-	fd1 = fopen((char*) tbl[0], "r");
-	fd2 = fopen((char*) tbl[1], "w+");
+	fd1 = fopen(tbl[0].data(), "r");
+	fd2 = fopen(tbl[1].data(), "w+");
 #endif
 	if(fd1 == 0 || fd2 == 0) {
-        std::string error_msg = std::string((char*) tbl[0]) + " or " + std::string((char*) tbl[1]);
+        std::string error_msg = std::string(tbl[0].data()) + " or " + std::string(tbl[1].data());
         error_msg += ": access denied";
 	    error_manager.append_error(error_msg);
 	    if(fd1 != 0) fclose(fd1);
@@ -249,7 +244,6 @@ static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
 	fclose(fd2);
 
 fin:
-    SCR_free_tbl(tbl);
     return rc;
 }
 
