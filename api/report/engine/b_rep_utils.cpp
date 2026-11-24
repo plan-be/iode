@@ -25,7 +25,7 @@
 
 
 // Structure to store one allocated memory block. 
-// Used (only when RP_STDALLOC is null) by RP_alloc(), RP_stracpy(), RP_vtoms()... 
+// Used (only when RP_STDALLOC is null) by RP_alloc() and RP_free().
 struct MEMBLK {
     int  used;      // 1 if in use, 0 otherwise
     int  size;      // allocated size
@@ -111,21 +111,6 @@ char *RP_alloc(int size)
 }
 
 
-// Not used
-// --------
-//  int RP_find_ptr(char *ptr)
-//  {
-//      int i;
-//  
-//      for(i = 0 ; i < RP_NBMEMBLKS ; i++) {
-//          if(RP_MEMBLKS[i].ptr == ptr) {
-//              return(i);
-//          }
-//      }
-//      return -1;
-//  }
-
-
 /**
  *  Mimics SCR_free() using RP_ALLOCATIONS if RP_STDALLOC is null.
  *  
@@ -170,134 +155,6 @@ void RP_free_bufs()
     SCR_free(RP_MEMBLKS);
     RP_MEMBLKS = 0;
     RP_NBMEMBLKS = 0;
-}
-
-
-/**
- *  Mimics SCR_stracpy() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *  
- *  @param [in] char* ptr   null or C string
- *  @return     char*       allocated copy of ptr
- */
-char *RP_stracpy(char *ptr)
-{
-    char        *ptr1;
-
-    if(RP_STDALLOC) 
-        return((char*) SCR_stracpy((unsigned char*) ptr));
-    ptr1 = RP_alloc((int)strlen(ptr) + 1);
-    strcpy(ptr1, ptr);
-    return(ptr1);
-}
-
-
-/**
- *  Mimics SCR_vtoms() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *  
- *  @param [in] unsigned char *     str     string to split
- *  @param [in] unsigned char *     seps    accepted separators
- *  @return     unsigned char **            table of strings 
- */
-unsigned char **RP_vtoms(unsigned char* str, unsigned char *seps)
-{
-    U_ch    **tbl = 0, *str2 = 0, *str1;
-    int     ntbl = 0, i;
-
-    if(RP_STDALLOC) {
-        tbl = SCR_vtoms(str, seps);
-        return(tbl);
-    }
-
-    if(str == 0) return(tbl);
-    str1 = str; // Mémoire du ptr initial
-
-    // 1. Compter les strings entre séparateurs
-    while(1) {
-        for(i = 0 ; str[i] ; i++)
-            if(!U_is_in(str[i], (char*) seps)) break; /* SKIP SEPS */
-        if(str[i] == 0) break;
-        str += i;
-        for(i = 0 ; str[i] ; i++)
-            if(U_is_in(str[i], (char*) seps)) break;
-        ntbl++;
-        if(str[i] == 0) break; /* JMP 07-06-96 */
-        str += i + 1;
-    }
-
-    tbl = (unsigned char **)RP_alloc((ntbl + 1) * sizeof(char *));
-    str = str1; // reset valeur initiale
-    ntbl = 0;
-    while(1) {
-        for(i = 0 ; str[i] ; i++)
-            if(!U_is_in(str[i], (char*) seps)) break; /* SKIP SEPS */
-        if(str[i] == 0) break;
-        str += i;
-        for(i = 0 ; str[i] ; i++)
-            if(U_is_in(str[i], (char*) seps)) break;
-
-        if(str2 == 0) {
-            str2 = (unsigned char*) RP_stracpy((char*) str);
-            str = str2;
-        }
-        tbl[ntbl] = str;
-        ntbl++;
-        if(str[i] == 0) break; /* JMP 07-06-96 */
-        str[i] = 0;
-        str += i + 1;
-    }
-
-    return(tbl);
-}
-
-/**
- *  Mimics SCR_vtom() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *  
- *  @param [in] unsigned char *     str     string to split
- *  @param [in] int      sep                separator
- *  @return     unsigned char **            table of strings 
- */
-unsigned char **RP_vtom(unsigned char* str, int sep)
-{
-    U_ch    seps[2];
-
-    seps[0] = sep;
-    seps[1] = 0;
-
-    return(RP_vtoms(str, seps));
-}
-
-/**
- *  Mimics SCR_free_tbl() using RP_ALLOCATIONS if RP_STDALLOC is null.
- *  
- *  @param [in] unsigned char **    tbl     table of strings terminated by a NULL
- *  @return     int                         always 0
- */
-int RP_free_tbl(unsigned char **tbl)
-{
-    if(RP_STDALLOC) {
-        SCR_free_tbl(tbl);
-        return 0;
-    }
-
-    RP_free((char*) tbl[0]);
-    RP_free((char*) tbl);
-    return 0;
-}
-
-
-/**
- *  Mimics SCR_tbl_size().
- *  
- *  @param [in] unsigned char **    tbl     table of strings terminated by a NULL
- *  @return     int                         number of strings in tbl
- */
-int RP_tbl_size(unsigned char **tbl)
-{
-    int i;
-
-    if(tbl == 0) return 0;
-    for(i = 0 ; tbl[i] ; i++);
-    return(i);
 }
 
 

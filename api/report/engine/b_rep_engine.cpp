@@ -1481,6 +1481,7 @@ int B_ReportLine(char* line, int cleanup)
     unsigned char       **o_argv;
     int                 rc = 0, o_arg0;
     REPFILE             *rf;
+    std::vector<std::string> report_lines;
 
     // Save current report execution context: command o_arg0 and parameters o_argv
     o_argv = (unsigned char**) RP_ARGV;
@@ -1512,17 +1513,14 @@ int B_ReportLine(char* line, int cleanup)
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
-    // Splits the line on '\n' and skips the empty lines (as RP_vtom() did)
+    // Splits the line on '\n' and skips the empty lines
+    if(line)
     {
-        std::vector<std::string> report_lines;
-        if(line)
-        {
-            for(const std::string& report_line : split(std::string(line), '\n'))
-                if(!report_line.empty())
-                    report_lines.push_back(report_line);
-        }
-        rf = RP_create_repfile("temp.rep", report_lines);
+        for(const std::string& report_line : split(std::string(line), '\n'))
+            if(!report_line.empty())
+                report_lines.push_back(report_line);
     }
+    rf = RP_create_repfile("temp.rep", report_lines);
 
     // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);
