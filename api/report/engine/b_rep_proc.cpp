@@ -201,9 +201,7 @@ int RP_procdef(char* arg, int unused)
     proc = REP_PROCS[proc_nb];
 
     // Compute the formal parameters (sep = space, empty names are skipped)
-    for(const std::string& parm : split(list, ' '))
-        if(!parm.empty())
-            proc->proc_parms.push_back(parm);
+    proc->proc_parms = split_skip_empty(list, " ");
     proc->proc_nb_parms = (int) proc->proc_parms.size();
 
     // Save the current position in CUR_REPFILE
