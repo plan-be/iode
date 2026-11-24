@@ -50,26 +50,22 @@ public:
         error_manager.clear();
     }
 
+	// returns -1 if tbl1 contains the elements of vec (separated by '|'), 0 otherwise
 	int U_cmp_tbls(char** tbl1, char* vec)
 	{
-	    int     i, rc = 0;
-	    char**  tbl2;
-	
-	    tbl2 = (char**)SCR_vtoms((unsigned char*) vec, (unsigned char*) "|");
-	    if(tbl1 == NULL) {
-	        if(tbl2 == NULL) return -1;
-	        goto fin;
-	    }
-	    if(tbl2 == NULL) return 0;
-	    if(SCR_tbl_size((unsigned char**) tbl1) != SCR_tbl_size((unsigned char**) tbl2)) goto fin;
-	    for(i = 0 ;  tbl1[i] ; i++)
-	        if(strcmp(tbl1[i], tbl2[i])) goto fin;
-	    rc = -1;
-	
-	fin:
-	    SCR_free_tbl((unsigned char**) tbl2);
-	    return rc;
-	
+	    // vec == NULL is the equivalent of an empty (NULL) table
+	    if(vec == NULL)
+	        return (tbl1 == NULL) ? -1 : 0;
+	    if(tbl1 == NULL)
+	        return 0;
+
+	    std::vector<std::string> tbl2 = split_skip_empty(std::string(vec), "|");
+	    if(SCR_tbl_size((unsigned char**) tbl1) != (int) tbl2.size())
+	        return 0;
+	    for(int i = 0 ;  tbl1[i] ; i++)
+	        if(tbl2[i] != tbl1[i])
+	            return 0;
+	    return -1;
 	}
 
 	char* U_test_read_file(char*filename, long *size)
@@ -871,7 +867,7 @@ TEST_F(LegacyAPITest, Tests_K_OBJFILE)
 TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
 {
     char    fullfilename[256];
-    char    **varlist;
+    std::vector<std::string> varlist;
     int     rc;
     std::shared_ptr<Sample> smpl;
 
@@ -909,11 +905,10 @@ TEST_F(LegacyAPITest, Tests_PrintTablesAndVars)
     EXPECT_EQ(rc, 0);
 
     // Print vars as graphs
-    varlist = (char**) SCR_vtoms((U_ch*) "ACAF,ACAG,ACAF+ACAG", (U_ch*) ",;");
+    varlist = split_skip_empty("ACAF,ACAG,ACAF+ACAG", ",;");
     smpl = std::make_shared<Sample>("1990Y1", "2010Y1");
     rc = V_graph(0, 0, 0, 1, 1, 0, IODE_NAN, IODE_NAN, smpl, varlist);
     EXPECT_EQ(rc, 0);
-    SCR_free_tbl((U_ch**) varlist);
 
     // Close the output file
     W_close();

@@ -80,28 +80,24 @@ int ImportObjsTXT::read_value(char* date, int* shift, char* tval, double* dval)
 
 int ImportObjsTXT::read_numerical_value(YYFILE* yy, char* name, int* shift, double* vector)
 {
-    char    buf[257], **tbl = NULL;
+    char    buf[257];
     long    nbper;
+    std::vector<std::string> tbl;
 
     while(1) {
         if(fgets(buf, 256, TXT_fd) == NULL)  return -1;
-        tbl = (char**) SCR_vtoms((unsigned char*) buf, (unsigned char*) "; ");
-        if(SCR_tbl_size((unsigned char**) tbl) != 6) {
-            SCR_free_tbl((unsigned char**) tbl);
+        tbl = split_skip_empty(std::string(buf), "; ");
+        if(tbl.size() != 6)
             continue;
-        }
         /* The same periodicity */
-        nbper = atoi(tbl[2]);
-        if(nbper != TXT_nbper) {
-            SCR_free_tbl((unsigned char**) tbl);
+        nbper = atoi(tbl[2].c_str());
+        if(nbper != TXT_nbper)
             continue;
-        }
         else break;
     }
 
-    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[1], 79); /* JMP 13-02-2013 */
-    read_value(tbl[3], shift, tbl[4], vector);
-    SCR_free_tbl((unsigned char**) tbl);
+    SCR_strlcpy((unsigned char*) name, (unsigned char*) tbl[1].c_str(), 79); /* JMP 13-02-2013 */
+    read_value(tbl[3].data(), shift, tbl[4].data(), vector);
     return 0;
 }
 

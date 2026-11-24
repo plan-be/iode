@@ -170,7 +170,7 @@ int RP_foreach_break(char *name)
 static int RP_foreach_goto_next(char* label)
 {
     int     rc, beg = 1;
-    char    name[128], **parms;
+    char    name[128];
     std::string line;
     std::string arg;
 
@@ -192,15 +192,13 @@ static int RP_foreach_goto_next(char* label)
 
             SCR_lower((unsigned char*) name);
             if(strcmp(name, "foreach") == 0) {
-                parms = (char**) SCR_vtoms((unsigned char*) arg.data(), (unsigned char*) " ");
-                if(parms && parms[0] && strcmp(label, parms[0]) == 0) {
-                    SCR_free_tbl((unsigned char**) parms);
+                std::vector<std::string> parms = split_skip_empty(arg, " ");
+                if(!parms.empty() && parms[0] == label) {
                     // Place la première valeur dans name et supprime cette valeur de la liste
                     rc = RP_foreach_next_index(label);
                     if(rc > 0) rc = 0;
                     goto done;
                 }
-                SCR_free_tbl((unsigned char**) parms);
             }
         }
     }

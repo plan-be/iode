@@ -44,8 +44,9 @@
 int IMP_readrule(char* filename)
 {
     int         nbr = 0, nbp = 0, blen;
-    char        buf[257], **tbl;
+    char        buf[257];
     FILE        *fd = NULL;
+    std::vector<std::string> tbl;
 
     if(filename == NULL) goto done;
 
@@ -65,15 +66,12 @@ int IMP_readrule(char* filename)
             if(isspace(buf[blen - 1])) buf[blen - 1] = '\0';
             else break;
         }
-        tbl = (char**) SCR_vtoms((unsigned char*) buf, (unsigned char*) " \t");
-        if(SCR_tbl_size((unsigned char**) tbl) != 2) {
-            SCR_free_tbl((unsigned char**) tbl);
+        tbl = split_skip_empty(std::string(buf), " \t");
+        if(tbl.size() != 2)
             continue;
-        }
 
-        SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, (unsigned char*) tbl[0]);
-        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) tbl[1]);
-        SCR_free_tbl((unsigned char**) tbl);
+        SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, (unsigned char*) tbl[0].c_str());
+        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) tbl[1].c_str());
     }
 
 done:

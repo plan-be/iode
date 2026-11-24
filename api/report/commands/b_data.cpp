@@ -600,7 +600,7 @@ int B_DataRename(char* arg, int type)
 int B_DataUpdate(char* arg, int type)
 {
     char c_name[K_MAX_NAME + 1];
-    char **args = NULL;
+    std::vector<std::string> args;
     int lg = get_next_arg(c_name, arg, K_MAX_NAME + 1);
     
     bool success = true;
@@ -662,18 +662,18 @@ int B_DataUpdate(char* arg, int type)
         }
         case SCALARS :
         {
-            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-            int nb_args = SCR_tbl_size((unsigned char**) args);
+            args = split_skip_empty(std::string(arg), " ,\n\t");
+            int nb_args = (int) args.size();
 
             std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
-            switch(nb_args) 
+            switch(nb_args)
             {
             case 2:
-                scl->value = (double) atof(args[1]);
+                scl->value = (double) atof(args[1].c_str());
                 break;
             case 3:
-                scl->value = (double) atof(args[1]);
-                scl->relax = (double) atof(args[2]);
+                scl->value = (double) atof(args[1].c_str());
+                scl->relax = (double) atof(args[2].c_str());
                 break;
             default :
                 error_manager.append_error("DataUpdateScl : Invalid Argument");
@@ -684,8 +684,8 @@ int B_DataUpdate(char* arg, int type)
         }
         case VARIABLES :
         {
-            args = (char**) SCR_vtoms((unsigned char*) arg, (unsigned char*) " ,\n\t");
-            int nb_args = SCR_tbl_size((unsigned char**) args);
+            args = split_skip_empty(std::string(arg), " ,\n\t");
+            int nb_args = (int) args.size();
             /* Name [D|d|G|g|L|l] Period nVal */
             if(nb_args > 1) 
             {
@@ -716,7 +716,13 @@ int B_DataUpdate(char* arg, int type)
                 }
                 int nb_upd = nb_args - nb_p - 1;
 
-                Period* per = new Period(std::string(args[nb_p]));
+                if(nb_p >= nb_args)
+                {
+                    error_manager.append_error("Syntax error: Period not defined");
+                    success = false;
+                    break;
+                }
+                Period* per = new Period(args[nb_p]);
                 if(per == 0) 
                 {
                     error_manager.append_error("Syntax error: Period not defined"); /* JMP 23-05-00 */
@@ -735,7 +741,7 @@ int B_DataUpdate(char* arg, int type)
                     std::string var_name(name);
                     for(int i = 0; i < nb_upd; i++) 
                     {
-                        var = (double) atof(args[i + nb_p]);
+                        var = (double) atof(args[i + nb_p].c_str());
                         if(var == 0.0 && !U_is_in(args[i + nb_p][0], "-0.+")) 
                             var = IODE_NAN;
                         KV_set(global_ws_var, var_name, shift + i, mode, var);
@@ -759,7 +765,6 @@ int B_DataUpdate(char* arg, int type)
         success = false;
     }
 
-    SCR_free_tbl((unsigned char**) args);
     return success ? 0 : -1;
 }
 
@@ -1624,13 +1629,9 @@ static int B_DataEditGraph(int view, char* arg)
         return -1;
     }
 
-    std::vector<char*> names;
-    for(size_t i = 9; i < v_args.size(); i++)
-        names.push_back(v_args[i].data());
-    names.push_back(NULL);
+    std::vector<std::string> names(v_args.begin() + 9, v_args.end());
 
-    int rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax,
-		             smpl, names.data());
+    int rc = V_graph(view, mode, type, xgrid, ygrid, axis, ymin, ymax, smpl, names);
     return rc;
 }
 

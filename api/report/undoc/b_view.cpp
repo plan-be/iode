@@ -237,10 +237,8 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
 int B_ViewPrintGr_1(char* names, char* gsmpl)
 {
     int rc = 0, hg, ng, i, view = !B_viewmode;
-    char** tbls;
-
-    tbls = (char**) SCR_vtoms((unsigned char*) names, (unsigned char*) "+-");
-    ng = SCR_tbl_size((unsigned char**) tbls);
+    std::vector<std::string> tbls = split_skip_empty(std::string(names), "+-");
+    ng = (int) tbls.size();
     if(ng == 0) 
     {
         error_manager.append_error("No tables defined");
@@ -254,11 +252,10 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         if(view) 
             W_InitDisplay();
 
-        name = std::string(tbls[i]);
-        name = global_ws_tbl->to_key(name);
-        if(!global_ws_tbl->contains(name)) 
+        name = global_ws_tbl->to_key(tbls[i]);
+        if(!global_ws_tbl->contains(name))
         {
-            error_manager.append_error("Table '" + std::string(tbls[i]) + "' not found");
+            error_manager.append_error("Table '" + tbls[i] + "' not found");
             rc = -1;
             break;
         }
@@ -279,7 +276,6 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
         }
     }
 
-    SCR_free_tbl((unsigned char**) tbls);
     return rc;
 }
 
