@@ -70,8 +70,7 @@
  *      
  *  List of global variables
  *  ------------------------
- *      REP_PROC    **REP_PROCS       Table of pointers to existing PROCs 
- *      int         REP_NB_PROCS      Size of REP_PROCS
+ *      std::vector<std::shared_ptr<REP_PROC>>  REP_PROCS   Existing PROCs
  */
 #include "api/b_errors.h"
 
@@ -81,15 +80,15 @@
 // REP_PROC: procedure parameters and code
 struct REP_PROC 
 {
-    char    proc_name[80] = { 0 };          // PROC name (case sensitive)
-    char    **proc_parms = NULL;            // List of parameter names
-    int     proc_nb_parms = 0;              // Number of parameters
-    std::shared_ptr<REPFILE> proc_rf;       // Procedure lines (= sub-report) including $procdef and $procend
+    char                        proc_name[80] = { 0 };  // PROC name (case sensitive)
+    std::vector<std::string>    proc_parms;             // List of parameter names
+    int                         proc_nb_parms = 0;      // Number of parameters
+    std::shared_ptr<REPFILE>    proc_rf;                // Procedure lines (= sub-report) including $procdef and $procend
 };
 
 // Global variables
-static REP_PROC    **REP_PROCS;            // Table of pointers to existing PROCs (including deleted ones as NULL pointers)
-static int         REP_NB_PROCS = 0;       // Size of REP_PROCS
+// Existing PROCs (including deleted ones as nullptr)
+static std::vector<std::shared_ptr<REP_PROC>> REP_PROCS;
 
 /**
  *  Retrieves the position of a REP_PROC in REP_PROCS by its name (case sensitive!).
@@ -99,11 +98,10 @@ static int         REP_NB_PROCS = 0;       // Size of REP_PROCS
  */
 static int RP_proc_find(char *name)
 {
-    int     i;
-
     SCR_sqz((unsigned char*) name);
-    for(i = 0 ; i < REP_NB_PROCS ; i++)
-        if(REP_PROCS[i] && strcmp(REP_PROCS[i]->proc_name, name) == 0) return(i);
+    for(int i = 0 ; i < (int) REP_PROCS.size() ; i++)
+        if(REP_PROCS[i] && strcmp(REP_PROCS[i]->proc_name, name) == 0)
+            return i;
 
     return -1;
 }
@@ -137,14 +135,9 @@ static int RP_proc_is_procend(char *line)
  */
 static void RP_proc_delete(int proc_nb)
 {
-    REP_PROC *proc;
-
-    if(proc_nb < 0) return;
-    proc = REP_PROCS[proc_nb];
-    if(proc == 0) return;
-    SCR_free_tbl((unsigned char**) proc->proc_parms);
-    delete proc;
-    REP_PROCS[proc_nb] = 0;
+    if(proc_nb < 0 || proc_nb >= (int) REP_PROCS.size())
+        return;
+    REP_PROCS[proc_nb] = nullptr;
 }
 
 
@@ -158,21 +151,20 @@ static void RP_proc_delete(int proc_nb)
  */
 static int RP_proc_create(char *name)
 {
-    int         proc_nb;
-    REP_PROC    *proc;
+    int proc_nb = RP_proc_find(name);
+    if(proc_nb >= 0)
+        RP_proc_delete(proc_nb);
 
-    proc_nb = RP_proc_find(name);
-    if(proc_nb >= 0) RP_proc_delete(proc_nb);
+    // Reuses the first free slot or adds a new one
+    for(proc_nb = 0 ; proc_nb < (int) REP_PROCS.size() ; proc_nb++)
+        if(!REP_PROCS[proc_nb])
+            break;
 
-    for(proc_nb = 0 ; proc_nb < REP_NB_PROCS ; proc_nb++)
-        if(REP_PROCS[proc_nb] == 0) break;
+    if(proc_nb == (int) REP_PROCS.size())
+        REP_PROCS.push_back(nullptr);
 
-    if(proc_nb == REP_NB_PROCS) {
-        REP_PROCS = (REP_PROC **) SCR_realloc((REP_PROC **)REP_PROCS, sizeof(REP_PROC *), REP_NB_PROCS, REP_NB_PROCS + 10);
-        REP_NB_PROCS += 10;
-    }
-
-    proc = REP_PROCS[proc_nb] = new REP_PROC();
+    std::shared_ptr<REP_PROC> proc = std::make_shared<REP_PROC>();
+    REP_PROCS[proc_nb] = proc;
     SCR_strlcpy((unsigned char*) proc->proc_name, (unsigned char*) name, sizeof(proc->proc_name) - 1);
     return(proc_nb);
 }
@@ -183,13 +175,7 @@ static int RP_proc_create(char *name)
  */
 void RP_proc_free_all()
 {
-    int         i;
-
-    for(i = 0; i < REP_NB_PROCS; i++)
-        RP_proc_delete(i);
-    SCR_free(REP_PROCS);
-    REP_NB_PROCS = 0;  // JMP 5/11/2022
-    REP_PROCS = 0;     // JMP 5/11/2022
+    REP_PROCS.clear();
 }
 
 
@@ -201,7 +187,7 @@ void RP_proc_free_all()
  */
 int RP_procdef(char* arg, int unused)
 {
-    REP_PROC        *proc;
+    std::shared_ptr<REP_PROC> proc;
     std::shared_ptr<REPFILE> rf = CUR_REPFILE;
     unsigned char   name[128], buf[1024]; // JMP 23/5/2019
     std::string     list;
@@ -214,9 +200,11 @@ int RP_procdef(char* arg, int unused)
     proc_nb = RP_proc_create((char*) name);
     proc = REP_PROCS[proc_nb];
 
-    // Compute the formal parameters (sep = space)
-    proc->proc_parms = (char**) SCR_vtoms((unsigned char*) list.data(), (unsigned char*) " ");
-    proc->proc_nb_parms = SCR_tbl_size((unsigned char**) proc->proc_parms);
+    // Compute the formal parameters (sep = space, empty names are skipped)
+    for(const std::string& parm : split(list, ' '))
+        if(!parm.empty())
+            proc->proc_parms.push_back(parm);
+    proc->proc_nb_parms = (int) proc->proc_parms.size();
 
     // Save the current position in CUR_REPFILE
     line1 =  rf->current_line;
@@ -274,7 +262,8 @@ int RP_procexec(char* arg, int unused)
         error_manager.append_error("Procedure '" + std::string((char*) name) + "': not defined");
         return -1;
     }
-    REP_PROC* proc = REP_PROCS[proc_nb];
+    // Local copy: keeps the PROC alive even if it is redefined during its execution
+    std::shared_ptr<REP_PROC> proc = REP_PROCS[proc_nb];
 
     // Saves (temporarily pushes) the defines with the same names as the formal parameters
     int rc = RP_define_save_list(proc->proc_parms);
@@ -292,7 +281,7 @@ int RP_procexec(char* arg, int unused)
     {
         for(int i = 0 ; i < nactual; i++) 
         {
-            rc = RP_define_1(proc->proc_parms[i], (char*) v_params[i].c_str());
+            rc = RP_define_1((char*) proc->proc_parms[i].c_str(), (char*) v_params[i].c_str());
             if(rc < 0) 
                 return rc;
         }
@@ -303,7 +292,7 @@ int RP_procexec(char* arg, int unused)
     {
         for(int i = 0; i < nformal - 1; i++) 
         {
-            rc = RP_define_1(proc->proc_parms[i], (char*) v_params[i].c_str());
+            rc = RP_define_1((char*) proc->proc_parms[i].c_str(), (char*) v_params[i].c_str());
             if(rc < 0) 
                 return rc;
         }
@@ -311,7 +300,7 @@ int RP_procexec(char* arg, int unused)
         std::string last_params; 
         for(int i = nformal - 1; i < nactual; i++) 
             last_params += v_params[i] + " ";
-        rc = RP_define_1(proc->proc_parms[nformal - 1], (char*) last_params.c_str());
+        rc = RP_define_1((char*) proc->proc_parms[nformal - 1].c_str(), (char*) last_params.c_str());
         if(rc < 0) 
             return rc;
     }

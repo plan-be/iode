@@ -18,8 +18,8 @@
  *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
  *      int RP_define_save(char *name)              Saves (pushes) a macro under the name "name#<depth+1>".
  *      int RP_define_restore(char *name)           Deletes the macro "name" and restores (pops) the macro "name#<depth>" under the name "name".
- *      int RP_define_save_list(char **list)        Saves (pushes) a list of macros using RP_define_save() for each macro.
- *      int RP_define_restore_list(char **list)     Restores a list of macros using RP_define_restore() for each macro.
+ *      int RP_define_save_list(const std::vector<std::string>& list)       Saves (pushes) a list of macros using RP_define_save() for each macro.
+ *      int RP_define_restore_list(const std::vector<std::string>& list)    Restores a list of macros using RP_define_restore() for each macro.
  */
 #include "api/pch.h"
 #include "api/b_args.h"
@@ -258,19 +258,18 @@ int RP_define_restore(char* c_name)
 /**
  *  Saves (pushes) a list of macros using RP_define_save() for each macro.
  *  
- *  @param [in] char**  list    list of macro names
- *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if RP_define_1() fails
- *                              0 on success
+ *  @param [in] const std::vector<std::string>&  list    list of macro names
+ *  @return     int                                     -3 if RP_MACRO cannot be created
+ *                                                      -1 if RP_define_1() fails
+ *                                                      0 on success
  */
-int RP_define_save_list(char **list)
+int RP_define_save_list(const std::vector<std::string>& list)
 {
-    int i, rc;
-
-    if(list == 0) return 0;
-    for(i = 0 ; list[i] ; i++) {
-        rc = RP_define_save(list[i]);
-        if(rc) return rc;
+    for(const std::string& name : list)
+    {
+        int rc = RP_define_save((char*) name.c_str());
+        if(rc)
+            return rc;
     }
     return 0;
 }
@@ -279,19 +278,18 @@ int RP_define_save_list(char **list)
 /**
  *  Restores a list of macros using RP_define_restore() for each macro.
  *  
- *  @param [in] char**  list    list of macro names
- *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if RP_define_1() fails
- *                              0 on success
+ *  @param [in] const std::vector<std::string>&  list    list of macro names
+ *  @return     int                                     -3 if RP_MACRO cannot be created
+ *                                                      -1 if RP_define_1() fails
+ *                                                      0 on success
  */
-int RP_define_restore_list(char **list)
+int RP_define_restore_list(const std::vector<std::string>& list)
 {
-    int i, rc;
-
-    if(list == 0) return 0;
-    for(i = 0 ; list[i] ; i++) {
-        rc = RP_define_restore(list[i]);
-        if(rc) return rc;
+    for(const std::string& name : list)
+    {
+        int rc = RP_define_restore((char*) name.c_str());
+        if(rc)
+            return rc;
     }
     return 0;
 }
