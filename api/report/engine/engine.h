@@ -12,7 +12,7 @@ int RP_alloc_ptrs();
 char *RP_alloc(int size);
 int RP_free(char* ptr);
 void RP_free_bufs();
-int RP_is_cmd(char* line);
+int RP_is_cmd(const std::string& line);
 
 /* b_rep_debug.c */
 void RP_debug(char* txt);

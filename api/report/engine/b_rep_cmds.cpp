@@ -202,44 +202,38 @@ int RP_label(char* arg, int unused)
  */
 int RP_goto_label(char *command, char *parm)
 {
-    int     rc, beg = 1;
+    int     rc;
     char    name[128];
     std::string line;
     std::string arg;
 
-    if(strcmp(command, "label") == 0)  // JMP 14/2/2013
+    if(strcmp(command, "label") == 0)
         CUR_REPFILE->current_line = 0;
     SCR_sqz((unsigned char*) parm);
     SCR_lower((unsigned char*) parm);
 
-    while(1) {
+    while(1) 
+    {
         line.clear();
         rc = RP_readline(CUR_REPFILE, line, 0);
-        if(rc == EOF) {
+        if(rc == EOF) 
+        {
             std::string error_msg = std::string(command) + " " + std::string(parm) + " not found";
             error_manager.append_error(error_msg);
-            rc = -3;
-            goto done;
+            return -3;
         }
 
-        //if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) {
-        //    if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;
-        if(!RP_is_cmd(line.data())) continue;
-        if(RP_splitline(line.data() + 1, name, arg, 30) < 0) {
-            rc = -1;
-            goto done;
-        }
+        if(!RP_is_cmd(line))
+            continue;
+        
+        if(RP_splitline(line.data() + 1, name, arg, 30) < 0) 
+            return -1;
 
         SCR_lower((unsigned char*) name);
         SCR_lower((unsigned char*) arg.data());
-        if(strcmp(name, command) == 0 && strcmp(parm, arg.c_str()) == 0) {
-            rc = 0;
-            goto done;
-        }
+        if(strcmp(name, command) == 0 && strcmp(parm, arg.c_str()) == 0) 
+            return 0;
     }
-
-done:
-    return rc;
 }
 
 
