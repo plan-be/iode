@@ -75,6 +75,34 @@ TEST_F(UtilsTest, splitSkipEmpty)
     EXPECT_EQ(split_skip_empty("a b", ""), std::vector<std::string>({"a b"}));
 }
 
+TEST_F(UtilsTest, textToLines)
+{
+    // example of SCR_text() (the lines keep their trailing separator, even a space)
+    EXPECT_EQ(text_to_lines("Jean, Marc, Pierre, Louis, Marie-Christine-Petit", ", ;", 15),
+              std::vector<std::string>({"Jean, Marc, ", "Pierre, Louis, ", "Marie-Christine", "-Petit"}));
+
+    // empty text, only white spaces, lg <= 0
+    EXPECT_EQ(text_to_lines("", ",", 10), std::vector<std::string>({}));
+    EXPECT_EQ(text_to_lines(" \t\n ", ",", 10), std::vector<std::string>({}));
+    EXPECT_EQ(text_to_lines("abc", ",", 0), std::vector<std::string>({}));
+
+    // short text: one line, leading spaces skipped, trailing spaces kept
+    EXPECT_EQ(text_to_lines("  abc  ", ",", 10), std::vector<std::string>({"abc  "}));
+
+    // '\n' ends a line
+    EXPECT_EQ(text_to_lines("ab\ncd\n\nef", ",", 10), std::vector<std::string>({"ab", "cd", "ef"}));
+
+    // no separator: words are cut after lg chars
+    EXPECT_EQ(text_to_lines("abcdefgh", ",", 3), std::vector<std::string>({"abc", "def", "gh"}));
+
+    // separator at index 0 is ignored
+    EXPECT_EQ(text_to_lines(",abcdef", ",", 3), std::vector<std::string>({",ab", "cde", "f"}));
+
+    // K_wrap() separators
+    EXPECT_EQ(text_to_lines("A+B*ln(C)-D", ";,*+-/) ", 5),
+              std::vector<std::string>({"A+B*", "ln(C)", "-D"}));
+}
+
 TEST_F(UtilsTest, replaceAll)
 {
     std::string str = "AAAA";
