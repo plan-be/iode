@@ -224,14 +224,14 @@ int RP_procdef(char* arg, int unused)
 
     // Reads CUR_REPFILE to the next $procend line (or EOF)
     for(nblines = 0; rf->curline < rf->nblines ; rf->curline++, nblines++) {
-        if(RP_proc_is_procend((char*) rf->tbl[rf->curline])) {                      // JMP 23/5/2019
+        if(RP_proc_is_procend((char*) rf->report_lines[rf->curline])) {                      // JMP 23/5/2019
             rf->curline++; // To go to the next line in the report execution (if any)
             
             // Creates a REPFILE in memory containing the PROC code 
             // REFILE filename is constructed as >>> proc <name> (in <file>[<line>])
             lines = (unsigned char **) SCR_malloc((nblines + 1) * sizeof(char *));
             for(i = 0 ; i < nblines ; i++)
-                lines[i] = SCR_stracpy(rf->tbl[line1 + i]);
+                lines[i] = SCR_stracpy(rf->report_lines[line1 + i]);
             sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename.c_str(), line1);
             proc->proc_rf = RP_create_repfile(std::string((char*) buf), lines);
             break;
