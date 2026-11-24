@@ -203,7 +203,6 @@ void RP_proc_free_all()
  */
 int RP_procdef(char* arg, int unused)
 {
-    //REPFILE			*RP_create_repfile(char *, unsigned char **);
     REP_PROC        *proc;
     REPFILE         *rf = CUR_REPFILE;
     unsigned char   name[128], buf[1024], *list, **lines; // JMP 23/5/2019
@@ -234,7 +233,7 @@ int RP_procdef(char* arg, int unused)
             for(i = 0 ; i < nblines ; i++)
                 lines[i] = SCR_stracpy(rf->tbl[line1 + i]);
             sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename, line1);
-            proc->proc_rf = RP_create_repfile((char*) buf, lines); 
+            proc->proc_rf = RP_create_repfile(std::string((char*) buf), lines);
             break;
         }
     }

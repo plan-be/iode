@@ -103,9 +103,9 @@
  *  
  *  List of functions
  *  -----------------
- *      REPFILE *RP_create_repfile(char *filename, unsigned char **tbl)     Creates and initialises a REPFILE struct. 
+ *      REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)  Creates and initialises a REPFILE struct. 
  *      int RP_free_repfile(REPFILE *rf)                                    Frees a REPFILE struct.                   
- *      unsigned char **RP_read_file(char* filename)                        Reads a report file (with no line expansion).
+ *      unsigned char **RP_read_file(const std::string& filename)           Reads a report file (with no line expansion).
  *      char* RP_read_multiline(REPFILE* rf)                                Reads the next line in a REPFILE struct. If the line ends with a " \\", joins the next line.
  *      int RP_readline(REPFILE* rf, char** line, int mode)                 Reads the current line from the REPFILE rf.
  *      int RP_chk_ignore(char* line)                                       Indicates if errors on a report line must be ignored
@@ -123,7 +123,7 @@
  *      int RP_add(char** line, int* lg, int* j, char* res)                 Reallocates the string line (of length *lg) in order to concatanate res from the position *j.
  *      int RP_expand(char** line, char* buf)                               Expands a report line by replacing macros, lec expressions and @-functions par their calculated values
  *      int RP_ReportExec_tbl(REPFILE *rf)                                  Executes the report stored in the REPFILE struct rf.
- *      int RP_ReportExec_1(char* file)                                     Executes a report file.
+ *      int RP_ReportExec_1(const std::string& file)                        Executes a report file.
  *  
  *  Main functions
  *  ---------------
@@ -152,9 +152,9 @@ int             RP_DEPTH = 0;              // Level of the current report in the
 
 // Function declarations
 // ---------------------
-REPFILE *RP_create_repfile(char *filename, unsigned char **tbl);
+REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl);
 int RP_free_repfile(REPFILE *rf);
-unsigned char **RP_read_file(char* filename);
+unsigned char **RP_read_file(const std::string& filename);
 int RP_readline(REPFILE* rf, char** line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, char** arg, int lg);
@@ -171,7 +171,7 @@ int RP_eval(char** res, char* farg);
 int RP_add(char** line, int* lg, int* j, char* res);
 int RP_expand(char** line, char* buf);
 int RP_ReportExec_tbl(REPFILE *rf);
-int RP_ReportExec_1(char* file);
+int RP_ReportExec_1(const std::string& file);
 int B_ReportExec(char* arg, int unused);
 int B_ReportLine(char* line, int cleanup);
 
@@ -184,16 +184,16 @@ int B_ReportLine(char* line, int cleanup);
  *  REPFILEs contain the source filename (or the PROC name) and the contents (the lines) of the report. 
  *  Other informations like the current line during execution are also stored in the REPFILE struct.
  *   
- *  @param [in]     char*       filename optional source filename
- *  @param [in]     U_ch**      table of report lines 
- *  @return         REPFILE*    struct used to execute a report 
+ *  @param [in]     const std::string&  filename    source filename (or PROC description)
+ *  @param [in]     U_ch**              tbl         table of report lines
+ *  @return         REPFILE*                        struct used to execute a report
  */
-REPFILE *RP_create_repfile(char *filename, unsigned char **tbl)  
+REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)
 {
     REPFILE *rf;
 
     rf = (REPFILE *) SCR_malloc(sizeof(REPFILE));
-    rf->filename = (char*) SCR_stracpy((unsigned char*) filename);
+    rf->filename = (char*) SCR_stracpy((unsigned char*) filename.c_str());
     rf->tbl = tbl;
     rf->curline = 0;
     rf->nblines = SCR_tbl_size(tbl);
@@ -224,53 +224,52 @@ int RP_free_repfile(REPFILE *rf)
  *  
  *  @global [in, out]   int     SCR_ADD_PTR_CHUNCK  number of newly allocated lines in SCR_add_ptr() when new lines are added
  *                                                  (to limit the nb of allocations)
- *  @param [in]         char*   filename            report file 
- *  @return             char**                      content of the file  
- *                                                  NULL if one of the line exceeds RP_LINELENGTH
+ *  @param [in]         const std::string&  filename    report file
+ *  @return             char**                          content of the file
+ *                                                      NULL if one of the line exceeds RP_LINELENGTH
  */
-unsigned char **RP_read_file(char* filename)
+unsigned char **RP_read_file(const std::string& filename)
 {
     FILE            *fd;
     unsigned char   **txt = 0,
                     buffer[RP_LINELENGTH + 1];
     int             len = 0, ch,
                     nb_line = 0,
-                    o_add_ptr = SCR_ADD_PTR_CHUNCK; // JMP 13-12-2012;
+                    o_add_ptr = SCR_ADD_PTR_CHUNCK;
 
     /* OPEN INFO FILE */
-    fd = fopen(filename, "r");
-    if(fd == NULL) return(txt);
+    fd = fopen(filename.c_str(), "r");
+    if(fd == NULL) 
+        return(txt);
 
     /* READ INFO */
-    SCR_ADD_PTR_CHUNCK = 1000; // JMP 13-12-2012
-    while(1) {
+    SCR_ADD_PTR_CHUNCK = 1000;
+    while(1) 
+    {
         ch = getc(fd);
-        switch(ch) {
+        switch(ch) 
+        {
             case EOF:
                 buffer[len] = 0;
                 SCR_add_ptr(&txt, &nb_line, buffer);
                 SCR_add_ptr(&txt, &nb_line, NULL);
                 fclose(fd);
-                SCR_ADD_PTR_CHUNCK = o_add_ptr; // JMP 13-12-2012
-                return(txt);
+                SCR_ADD_PTR_CHUNCK = o_add_ptr;
+                return txt;
             case '\n':
                 buffer[len] = 0;
                 SCR_add_ptr(&txt, &nb_line, buffer);
                 len = 0;
                 break;
-            /* case '\t':
-            for(i = len ; i < len + 8 - len%8 ; i++)
-                buffer[i] = ' ';
-            len = i - 1;
-            break;
-            */
             default:
-                if(len < sizeof(buffer) - 1) buffer[len++] = ch;
-                else {
+                if(len < sizeof(buffer) - 1) 
+                    buffer[len++] = ch;
+                else 
+                {
                     SCR_add_ptr(&txt, &nb_line, NULL);
                     fclose(fd);
                     SCR_free_tbl(txt);
-                    SCR_ADD_PTR_CHUNCK = o_add_ptr; // JMP 13-12-2012
+                    SCR_ADD_PTR_CHUNCK = o_add_ptr;
                     std::string error_msg = "Report line exceeds " + std::to_string(RP_LINELENGTH) + " characters";
                     error_manager.append_error(error_msg);
                     return NULL;
@@ -298,14 +297,17 @@ char* RP_read_multiline(REPFILE* rf)
     char*   multi_line = 0;
     int     lg;
     
-    while(1) {
-        if(rf->curline >= rf->nblines) return(multi_line);
+    while(1) 
+    {
+        if(rf->curline >= rf->nblines) 
+            return(multi_line);
         multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->tbl[rf->curline]);
         rf->curline++;
         
         lg = (int) strlen(multi_line);
         if(RP_ALLOW_MULTILINE && lg > 1  && 
-           multi_line[lg - 2] == ' ' && multi_line[lg - 1] == '\\') {
+           multi_line[lg - 2] == ' ' && multi_line[lg - 1] == '\\') 
+        {
                 multi_line[lg - 2] = '\n';
                 multi_line[lg - 1] = 0;
         }
@@ -313,7 +315,7 @@ char* RP_read_multiline(REPFILE* rf)
             break;
     }        
     
-    return(multi_line);    
+    return multi_line;    
 }
 
 /**
@@ -358,30 +360,6 @@ int RP_readline(REPFILE* rf, char** line, int mode)
     return rc;
 }
 
-// OLD VERSION (no multiline)
-// int RP_readline(REPFILE* rf, char** line, int mode) 
-// {
-//    int     rc = 0, i;
-//
-//    if(rf->curline >= rf->nblines) return(EOF); // EOF
-//    
-//    if(mode) { // expand macros, {}, ...
-//        rc = RP_expand(line, rf->tbl[rf->curline]);
-//        if(rc) return rc;
-//    }
-//    else
-//        *line = SCR_stracpy(rf->tbl[rf->curline]);
-//
-//    // Shift text to the margin if $ or # and indent allowed
-//    if(*line && RP_ALLOW_INDENT) {
-//        for(i = 0 ; (*line)[i] && SCR_is_space((*line)[i]); i++) ; // Goto 1st non space
-//        if(U_is_in((*line)[i], "$#")) U_ljust_text(*line);
-//    }
-//    rf->curline++;
-//    return rc;
-// }
-
-
 
 /**
  *  Indicates if errors on a report line must be ignored, ie if the second char of the line is '-'.
@@ -393,7 +371,8 @@ int RP_readline(REPFILE* rf, char** line, int mode)
  */
 int RP_chk_ignore(char* line)
 {
-    if(line[1] == '-') return(1);
+    if(line[1] == '-') 
+        return(1);
     return 0;
 }
 
@@ -412,16 +391,21 @@ int RP_splitline(char* text, char* cmd, char** arg, int lg)
 {
     int     i = 0, j = 0, rt = 0;
 
-    if(text == NULL || text[0] == '\0' || text[0] == '\n') {
+    if(text == NULL || text[0] == '\0' || text[0] == '\n') 
+    {
         rt = -1;
         goto done;
     }
 
-    while(1) {
-        if(SCR_is_anum(text[j]) || text[j] == '_') {
-            if(i < lg)  cmd[i] = text[j];
+    while(1) 
+    {
+        if(SCR_is_anum(text[j]) || text[j] == '_') 
+        {
+            if(i < lg)  
+                cmd[i] = text[j];
         }
-        else break;
+        else 
+            break;
 
         i++;
         j++;
@@ -432,7 +416,7 @@ done :
     *arg = text + j;
     U_ljust_text((unsigned char*) *arg);
     SCR_strip((unsigned char*) *arg);
-    return(rt);
+    return rt;
 }
 
 
@@ -672,7 +656,8 @@ char *RP_gcmd(char* str)
 {
     char    *res = NULL, *tmp = 0;
 
-    if(str == NULL) return NULL;
+    if(str == NULL) 
+        return NULL;
 
     if(U_pos('%', (unsigned char*) str) >= 0 || 
        U_pos('{', (unsigned char*) str) >= 0 || 
@@ -1475,22 +1460,21 @@ done:
  *    - frees the REPFILE 
  *    - resets the current report (CUR_REPFILE)
  *  
- *  @param [in] char*   file    report file name
- *  @return     int             -1 if file cannot be read or
- *                              RP_ReportExec_tbl() return code
+ *  @param [in] const std::string&   file   report file name
+ *  @return     int                         -1 if file cannot be read or
+ *                                          RP_ReportExec_tbl() return code
  */
-
-int RP_ReportExec_1(char* file)
+int RP_ReportExec_1(const std::string& file)
 {
-    std::string filename = set_file_extension(std::string(file), FILE_REP);
-    unsigned char** tbl = RP_read_file((char*) filename.c_str());
+    std::string filename = set_file_extension(file, FILE_REP);
+    unsigned char** tbl = RP_read_file(filename);
     if(!tbl) 
     {
         error_manager.append_error("Cannot open file '" + filename + "'");
         return -1;
     }
 
-    REPFILE* rf = RP_create_repfile((char*) filename.c_str(), tbl);
+    REPFILE* rf = RP_create_repfile(filename, tbl);
     int rc = RP_ReportExec_tbl(rf);
     RP_free_repfile(rf);
     CUR_REPFILE = 0;
@@ -1576,8 +1560,7 @@ done:
 int B_ReportLine(char* line, int cleanup)
 {
     unsigned char       **o_argv;
-    int                 rc = 0, o_arg0,
-                        RP_ReportExec_1();
+    int                 rc = 0, o_arg0;
     REPFILE             *rf;
 
     // Save current report execution context: command o_arg0 and parameters o_argv

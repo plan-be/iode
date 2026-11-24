@@ -24,9 +24,9 @@ int RP_is_cmd(char* line);
 void RP_debug(char* txt);
 
 /* b_rep_engine.c */
-REPFILE *RP_create_repfile(char* filename, unsigned char** tbl);
+REPFILE *RP_create_repfile(const std::string& filename, unsigned char** tbl);
 int RP_free_repfile(REPFILE* rf);
-unsigned char **RP_read_file(char* filename);
+unsigned char **RP_read_file(const std::string& filename);
 char* RP_read_multiline(REPFILE* rf);
 int RP_readline(REPFILE* rf, char** line, int mode);
 int RP_chk_ignore(char* line);
@@ -44,7 +44,7 @@ int RP_eval(char** res, char* farg);
 int RP_add(char** line, int* lg, int* j, char* res);
 int RP_expand(char** line, char* buf);
 int RP_ReportExec_tbl(REPFILE* rf);
-int RP_ReportExec_1(char* file);
+int RP_ReportExec_1(const std::string& file);
 int B_ReportExec(char* arg, int unused=-1);
 int B_ReportLine(char* line, int cleanup);
 
