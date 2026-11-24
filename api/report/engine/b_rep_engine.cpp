@@ -192,7 +192,7 @@ REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)
 {
     REPFILE *rf = new REPFILE();
     rf->filename = filename;
-    rf->tbl = tbl;
+    rf->report_lines = tbl;
     rf->curline = 0;
     rf->nblines = SCR_tbl_size(tbl);
     return(rf);
@@ -208,7 +208,7 @@ REPFILE *RP_create_repfile(const std::string& filename, unsigned char **tbl)
 int RP_free_repfile(REPFILE *rf)
 {
     if(rf) { 
-        SCR_free_tbl(rf->tbl);
+        SCR_free_tbl(rf->report_lines);
         delete rf;
     }
     return 0;
@@ -298,7 +298,7 @@ char* RP_read_multiline(REPFILE* rf)
     {
         if(rf->curline >= rf->nblines) 
             return(multi_line);
-        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->tbl[rf->curline]);
+        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->report_lines[rf->curline]);
         rf->curline++;
         
         lg = (int) strlen(multi_line);
