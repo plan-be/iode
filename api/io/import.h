@@ -90,7 +90,7 @@ struct ImportObjsASCII : public ImportVarFromFile
 /* k_irasc.c */
 class ImportObjsRevertASCII : public ImportVarFromFile 
 {
-    char** RASC_toc = NULL;  // List of VARs in the rotated ASCII file (following the sample defn).
+    std::vector<std::string> RASC_toc;  // List of VARs in the rotated ASCII file (following the sample defn).
     int RASC_cv = 0;        // current variable
     int RASC_cy = 0;        // current period
 
