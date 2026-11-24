@@ -19,7 +19,7 @@ void RP_debug(char* txt);
 
 /* b_rep_engine.c */
 std::vector<std::string> RP_read_file(const std::string& filename);
-char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf);
+std::string RP_read_multiline(const std::shared_ptr<REPFILE>& rf);
 int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode);
 int RP_chk_ignore(char* line);
 int RP_splitline(char* text, char* cmd, std::string& arg, int lg);

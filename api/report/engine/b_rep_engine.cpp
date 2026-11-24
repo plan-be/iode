@@ -174,34 +174,31 @@ std::vector<std::string> RP_read_file(const std::string& filename)
  *  The 2 chars " \\" at the end of the line(s) are replaced by a single '\n'. 
  *  
  *  @param [in] const std::shared_ptr<REPFILE>&     rf  a report struct
- *  @return     char*                                   allocated string containing the line(s)
+ *  @return     std::string                             line(s) (empty string if the end of the report is reached)
  */
 
-char* RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
+std::string RP_read_multiline(const std::shared_ptr<REPFILE>& rf)
 {
-    char*   multi_line = 0;
-    int     lg;
-    
-    while(1) 
+    std::string multi_line;
+
+    while(rf->current_line < (int) rf->report_lines.size())
     {
-        if(rf->current_line >= (int) rf->report_lines.size())
-            return(multi_line);
-        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line,
-                                          (unsigned char*) rf->report_lines[rf->current_line].c_str());
+        multi_line += rf->report_lines[rf->current_line];
         rf->current_line++;
-        
-        lg = (int) strlen(multi_line);
-        if(RP_ALLOW_MULTILINE && lg > 1  && 
-           multi_line[lg - 2] == ' ' && multi_line[lg - 1] == '\\') 
+
+        // replaces the final " \\" by '\n' and joins the next line
+        size_t lg = multi_line.size();
+        if(RP_ALLOW_MULTILINE && lg > 1 &&
+           multi_line[lg - 2] == ' ' && multi_line[lg - 1] == '\\')
         {
-                multi_line[lg - 2] = '\n';
-                multi_line[lg - 1] = 0;
+            multi_line.resize(lg - 2);
+            multi_line.push_back('\n');
         }
-        else 
+        else
             break;
-    }        
-    
-    return multi_line;    
+    }
+
+    return multi_line;
 }
 
 /**
@@ -221,15 +218,14 @@ int RP_readline(const std::shared_ptr<REPFILE>& rf, std::string& line, int mode)
     if(rf->current_line >= (int) rf->report_lines.size())
         return EOF;
 
-    char* multi_line = RP_read_multiline(rf);
+    std::string multi_line = RP_read_multiline(rf);
 
     int rc = 0;
     if(mode)  // expand macros, {}, ...
-        rc = RP_expand(line, multi_line);
+        rc = RP_expand(line, multi_line.data());
     else
-        line = std::string(multi_line);
+        line = multi_line;
 
-    SCR_free(multi_line);
     if(rc)
         return rc;
 
