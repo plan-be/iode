@@ -353,6 +353,66 @@ inline std::vector<std::string> split_whitespace(const std::string& str)
 }
 
 /**
+ * @brief Splits a string on any of the characters in delimiters and skips the empty tokens.
+ * Same behaviour as the scr4 functions SCR_vtoms() and SCR_vtom().
+ *
+ * For example:
+ * split_skip_empty("Jean    Marc;,,Pierre", " ,;") returns {"Jean", "Marc", "Pierre"}.
+ * split_skip_empty("", ",") and split_skip_empty(",,,", ",") return {}.
+ *
+ * @param str        string to split
+ * @param delimiters separator characters
+ * @return           non-empty substrings
+ */
+inline std::vector<std::string> split_skip_empty(const std::string& str, const std::string& delimiters)
+{
+    std::vector<std::string> result;
+    size_t start = str.find_first_not_of(delimiters);
+    while(start != std::string::npos)
+    {
+        size_t end = str.find_first_of(delimiters, start);
+        if(end == std::string::npos)
+        {
+            result.push_back(str.substr(start));
+            break;
+        }
+        result.push_back(str.substr(start, end - start));
+        start = str.find_first_not_of(delimiters, end);
+    }
+    return result;
+}
+
+/**
+ * @brief Replaces (in place) all the occurrences of repl by by in str.
+ * Occurrences are replaced from left to right, without overlap and without rescanning
+ * the inserted text. Same behaviour as the scr4 function SCR_replace().
+ *
+ * For example:
+ * replace_all(str = "AAAA", "AA", "B") gives "BB"
+ * replace_all(str = "AAAA", "AA", "A") gives "AA"
+ *
+ * @param str   string to modify
+ * @param repl  substring to replace (nothing is done if empty)
+ * @param by    replacement string
+ * @return      number of replacements
+ */
+inline int replace_all(std::string& str, const std::string& repl, const std::string& by)
+{
+    if(repl.empty())
+        return 0;
+
+    int nb_replacements = 0;
+    size_t pos = 0;
+    while((pos = str.find(repl, pos)) != std::string::npos)
+    {
+        str.replace(pos, repl.size(), by);
+        pos += by.size();
+        nb_replacements++;
+    }
+    return nb_replacements;
+}
+
+/**
  * @brief trim leading and trailing whitespace of a string
  * 
  * @param str 
