@@ -119,25 +119,6 @@ int RP_DEPTH = 0;           // Level of the current report in the report "stack"
 // Function implementation
 // -----------------------
 
-/**
- *  Creates and initialises a REPFILE struct. 
- *  REPFILEs contain the source filename (or the PROC name) and the contents (the lines) of the report. 
- *  Other informations like the current line during execution are also stored in the REPFILE struct.
- *   
- *  @param [in]     const std::string&                  filename        source filename (or PROC description)
- *  @param [in]     const std::vector<std::string>&     report_lines    report lines
- *  @return         std::shared_ptr<REPFILE>                            struct used to execute a report
- */
-std::shared_ptr<REPFILE> RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines)
-{
-    std::shared_ptr<REPFILE> rf = std::make_shared<REPFILE>();
-    rf->filename = filename;
-    rf->report_lines = report_lines;
-    rf->current_line = 0;
-    rf->nblines = (int) report_lines.size();
-    return rf;
-}
-
 
 /**
  *  Reads a report file (with no line expansion).
@@ -1347,7 +1328,7 @@ int RP_ReportExec_1(const std::string& file)
         return -1;
     }
 
-    std::shared_ptr<REPFILE> rf = RP_create_repfile(filename, report_lines);
+    std::shared_ptr<REPFILE> rf = std::make_shared<REPFILE>(filename, report_lines);
     int rc = RP_ReportExec_tbl(rf);
     CUR_REPFILE = nullptr;
     return rc;
@@ -1473,7 +1454,7 @@ int B_ReportLine(char* line, int cleanup)
             if(!report_line.empty())
                 report_lines.push_back(report_line);
     }
-    rf = RP_create_repfile("temp.rep", report_lines);
+    rf = std::make_shared<REPFILE>("temp.rep", report_lines);
 
     // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);
