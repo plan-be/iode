@@ -10,14 +10,8 @@
 /* b_rep_utils.c */
 int RP_alloc_ptrs();
 char *RP_alloc(int size);
-int RP_find_ptr(char* ptr);
 int RP_free(char* ptr);
 void RP_free_bufs();
-char *RP_stracpy(char* ptr);
-unsigned char **RP_vtoms(unsigned char* str, unsigned char* seps);
-unsigned char **RP_vtom(unsigned char* str, int sep);
-int RP_free_tbl(unsigned char** tbl);
-int RP_tbl_size(unsigned char** tbl);
 int RP_is_cmd(char* line);
 
 /* b_rep_debug.c */
