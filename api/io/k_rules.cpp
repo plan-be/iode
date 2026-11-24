@@ -6,7 +6,8 @@
  *  List of functions 
  *  -----------------
  *      int IMP_readrule(char* filename)                                Reads a "rule file" and stores its contents in 2 global variables IMP_rule and IMP_pat.
- *      int IMP_change(char** rule, char** pat, char* in, char* out)    Modifies an object name according to the rule definitions.
+ *      int IMP_change(const std::vector<std::string>& rule, const std::vector<std::string>& pat, char* in, char* out)
+ *                                                                      Modifies an object name according to the rule definitions.
  */
 #include "api/pch.h"
 #include "api/k_super.h"
@@ -36,17 +37,22 @@
  *  
  *      * ++++++++++++++++++
  *    
- *  @param  [in]    char*   filename    rule file name
- *  @global [out]   char**  IMP_rule    transcoding rules
- *  @global [out]   char**  IMP_pat     pattern to determine which rule must be applied to a specific name
- *  @return         int                 0 always
+ *  The previous rules (if any) are replaced.
+ *
+ *  @param  [in]    char*                       filename    rule file name
+ *  @global [out]   std::vector<std::string>    IMP_rule    transcoding rules
+ *  @global [out]   std::vector<std::string>    IMP_pat     pattern to determine which rule must be applied to a specific name
+ *  @return         int                                     0 always
  */
 int IMP_readrule(char* filename)
 {
-    int         nbr = 0, nbp = 0, blen;
+    int         blen;
     char        buf[257];
     FILE        *fd = NULL;
     std::vector<std::string> tbl;
+
+    IMP_pat.clear();
+    IMP_rule.clear();
 
     if(filename == NULL) goto done;
 
@@ -70,24 +76,18 @@ int IMP_readrule(char* filename)
         if(tbl.size() != 2)
             continue;
 
-        SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, (unsigned char*) tbl[0].c_str());
-        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) tbl[1].c_str());
+        IMP_pat.push_back(tbl[0]);
+        IMP_rule.push_back(tbl[1]);
     }
 
 done:
-    if(nbr == 0 || (nbr != nbp)) {
-        SCR_free_tbl((unsigned char**) IMP_pat);
-        SCR_free_tbl((unsigned char**) IMP_rule);
-        IMP_pat  = IMP_rule = NULL;
-        nbp = nbr = 0;
-        SCR_add_ptr((unsigned char***) &IMP_pat,  &nbp, (unsigned char*) "*");
-        // SCR_add_ptr(&IMP_rule, &nbr, "++++++++++");
-        SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, (unsigned char*) "++++++++++++++++++++"); /* JMP 11-08-11 */
+    // no rule found => default rule (keeps all names unchanged)
+    if(IMP_rule.empty() || IMP_rule.size() != IMP_pat.size()) {
+        IMP_pat  = { "*" };
+        IMP_rule = { "++++++++++++++++++++" }; /* JMP 11-08-11 */
     }
 
     if(fd) fclose(fd);
-    SCR_add_ptr((unsigned char***) &IMP_pat, &nbp, NULL);
-    SCR_add_ptr((unsigned char***) &IMP_rule, &nbr, NULL);
     return 0;
 }
 
@@ -98,17 +98,15 @@ done:
  *  
  *  Sub function of IMP_change().
  *  
- *  @param [in] char** rule     list of rules
- *  @param [in] char*  in       name to be tested
- *  @return     int             position of the first rule that "in" satisfies
+ *  @param [in] const std::vector<std::string>&  rule     list of rules
+ *  @param [in] char*                            in       name to be tested
+ *  @return     int                                       position of the first rule that "in" satisfies
  */
-static int IMP_grep(char** rule, char* in)
+static int IMP_grep(const std::vector<std::string>& rule, char* in)
 {
-    int i, rc = -1;
-
-    for(i = 0; i < SCR_tbl_size((unsigned char**) rule); i++) {
-        rc = SCR_grep(rule[i], in, 0);
-        if(rc == 0) return(i);
+    for(int i = 0; i < (int) rule.size(); i++) {
+        if(SCR_grep((char*) rule[i].c_str(), in, 0) == 0)
+            return i;
     }
     return -1;
 }
@@ -126,21 +124,21 @@ static int IMP_grep(char** rule, char* in)
  *      in = "AA"    => rc = -1, out = unchanged ("AA" not recognized in "B*" or "C+-+")
  *      in = "A123X" => rc = 0,  out = "A123X"
  *     
- *  @param [in]  char**  rule   table of name rules 
- *  @param [in]  char**  pat    table of patterns
- *  @param [in]  char*   in     input name
- *  @param [out] char*   out    output name
- *  @return      int            0 on success, -1 on error (name in not found in pat)
+ *  @param [in]  const std::vector<std::string>&  rule   name rules
+ *  @param [in]  const std::vector<std::string>&  pat    patterns
+ *  @param [in]  char*                            in     input name
+ *  @param [out] char*                            out    output name
+ *  @return      int                                     0 on success, -1 on error (name in not found in pat)
  */
-int IMP_change(char** rule, char** pat, char* in, char* out)
+int IMP_change(const std::vector<std::string>& rule, const std::vector<std::string>& pat, char* in, char* out)
 {
     int rc = -1,
         r, i, o, rlen, ilen, idone = 0;
 
     rc = IMP_grep(pat, in);
-    if(rc < 0) return -1;
+    if(rc < 0 || rc >= (int) rule.size()) return -1;
 
-    rlen = (int)strlen(rule[rc]);
+    rlen = (int) rule[rc].size();
     ilen = (int)strlen(in);
     for(r = i = o = 0; r < rlen && !idone && o < K_MAX_NAME ; r++) {
         switch(rule[rc][r]) {
@@ -166,7 +164,7 @@ int IMP_change(char** rule, char** pat, char* in, char* out)
     out[o] = '\0';
 
     if(IMP_trace)
-        W_printf((char*) "%s -> %s\t(Rule %s)\n", in, out, rule[rc]);
+        W_printf((char*) "%s -> %s\t(Rule %s)\n", in, out, rule[rc].c_str());
 
     return 0;
 }
