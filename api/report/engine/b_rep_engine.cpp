@@ -125,17 +125,17 @@ int RP_DEPTH = 0;           // Level of the current report in the report "stack"
  *  REPFILEs contain the source filename (or the PROC name) and the contents (the lines) of the report. 
  *  Other informations like the current line during execution are also stored in the REPFILE struct.
  *   
- *  @param [in]     const std::string&  filename    source filename (or PROC description)
- *  @param [in]     U_ch**              report_lines    table of report lines
- *  @return         REPFILE*                            struct used to execute a report
+ *  @param [in]     const std::string&                  filename        source filename (or PROC description)
+ *  @param [in]     const std::vector<std::string>&     report_lines    report lines
+ *  @return         REPFILE*                                            struct used to execute a report
  */
-REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines)
+REPFILE *RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines)
 {
     REPFILE *rf = new REPFILE();
     rf->filename = filename;
     rf->report_lines = report_lines;
     rf->current_line = 0;
-    rf->nblines = SCR_tbl_size(report_lines);
+    rf->nblines = (int) report_lines.size();
     return(rf);
 }
 
@@ -148,11 +148,8 @@ REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_l
  */
 int RP_free_repfile(REPFILE *rf)
 {
-    if(rf) 
-    { 
-        SCR_free_tbl(rf->report_lines);
+    if(rf)
         delete rf;
-    }
     return 0;
 }
 
@@ -240,7 +237,8 @@ char* RP_read_multiline(REPFILE* rf)
     {
         if(rf->current_line >= rf->nblines) 
             return(multi_line);
-        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->report_lines[rf->current_line]);
+        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line,
+                                          (unsigned char*) rf->report_lines[rf->current_line].c_str());
         rf->current_line++;
         
         lg = (int) strlen(multi_line);
@@ -1412,7 +1410,12 @@ int RP_ReportExec_1(const std::string& file)
         return -1;
     }
 
-    REPFILE* rf = RP_create_repfile(filename, tbl);
+    std::vector<std::string> report_lines;
+    for(int i = 0; tbl[i]; i++)
+        report_lines.push_back(std::string((char*) tbl[i]));
+    SCR_free_tbl(tbl);
+
+    REPFILE* rf = RP_create_repfile(filename, report_lines);
     int rc = RP_ReportExec_tbl(rf);
     RP_free_repfile(rf);
     CUR_REPFILE = 0;
@@ -1531,8 +1534,17 @@ int B_ReportLine(char* line, int cleanup)
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
-    // Crée une struct REPFILE
-    rf = RP_create_repfile("temp.rep", RP_vtom((unsigned char*) line, '\n'));
+    // Splits the line on '\n' and skips the empty lines (as RP_vtom() did)
+    {
+        std::vector<std::string> report_lines;
+        if(line)
+        {
+            for(const std::string& report_line : split(std::string(line), '\n'))
+                if(!report_line.empty())
+                    report_lines.push_back(report_line);
+        }
+        rf = RP_create_repfile("temp.rep", report_lines);
+    }
 
     // Exécute la ligne (non expandée à ce stade)
     rc = RP_ReportExec_tbl(rf);

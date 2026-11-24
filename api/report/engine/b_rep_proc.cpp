@@ -205,8 +205,8 @@ int RP_procdef(char* arg, int unused)
 {
     REP_PROC        *proc;
     REPFILE         *rf = CUR_REPFILE;
-    unsigned char   name[128], buf[1024], *list, **lines; // JMP 23/5/2019
-    int             proc_nb, nblines = 0, line1, i;
+    unsigned char   name[128], buf[1024], *list; // JMP 23/5/2019
+    int             proc_nb, nblines = 0, line1;
 
     if(RP_splitline(arg, (char*) name, (char**) &list, 30) < 0) return -1;
 
@@ -224,14 +224,13 @@ int RP_procdef(char* arg, int unused)
 
     // Reads CUR_REPFILE to the next $procend line (or EOF)
     for(nblines = 0; rf->current_line < rf->nblines ; rf->current_line++, nblines++) {
-        if(RP_proc_is_procend((char*) rf->report_lines[rf->current_line])) {                      // JMP 23/5/2019
+        if(RP_proc_is_procend((char*) rf->report_lines[rf->current_line].c_str())) {                      // JMP 23/5/2019
             rf->current_line++; // To go to the next line in the report execution (if any)
-            
-            // Creates a REPFILE in memory containing the PROC code 
+
+            // Creates a REPFILE in memory containing the PROC code
             // REFILE filename is constructed as >>> proc <name> (in <file>[<line>])
-            lines = (unsigned char **) SCR_malloc((nblines + 1) * sizeof(char *));
-            for(i = 0 ; i < nblines ; i++)
-                lines[i] = SCR_stracpy(rf->report_lines[line1 + i]);
+            std::vector<std::string> lines(rf->report_lines.begin() + line1,
+                                           rf->report_lines.begin() + line1 + nblines);
             sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename.c_str(), line1);
             proc->proc_rf = RP_create_repfile(std::string((char*) buf), lines);
             break;

@@ -24,7 +24,7 @@ int RP_is_cmd(char* line);
 void RP_debug(char* txt);
 
 /* b_rep_engine.c */
-REPFILE *RP_create_repfile(const std::string& filename, unsigned char** report_lines);
+REPFILE *RP_create_repfile(const std::string& filename, const std::vector<std::string>& report_lines);
 int RP_free_repfile(REPFILE* rf);
 unsigned char **RP_read_file(const std::string& filename);
 char* RP_read_multiline(REPFILE* rf);
