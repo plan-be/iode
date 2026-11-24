@@ -43,20 +43,19 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
     
     memcpy(smpl, rsmpl.get(), sizeof(Sample));
 
-    int done = 0, nbtoc = 0;
-    while(!done) 
+    int done = 0;
+    RASC_toc.clear();
+    while(!done)
     {
-        switch(YY_lex(yy)) 
+        switch(YY_lex(yy))
         {
             case YY_EOF :
-                SCR_free_tbl((unsigned char**) RASC_toc);
-                RASC_toc = 0;
+                RASC_toc.clear();
                 return -1;
             case YY_WORD :
-                SCR_add_ptr((unsigned char***) &RASC_toc, &nbtoc, yy->yy_text);
+                RASC_toc.push_back(std::string((char*) yy->yy_text));
                 break;
             default :
-                SCR_add_ptr((unsigned char***) &RASC_toc, &nbtoc, NULL);
                 YY_unread(yy);
                 done = 1;
                 break;
@@ -78,18 +77,22 @@ int ImportObjsRevertASCII::read_header(YYFILE* yy, Sample* smpl)
  *  @param [out]        int*        shift   read period position 
  *  @param [in, out]    double*  value   read value (IODE_NAN for na values)
  *  @return             int                 0 on success, -1 if EOF is reached before the first value
+ *                                          or if the file does not contain any VAR name
  */
 int ImportObjsRevertASCII::read_numerical_value(YYFILE* yy, char* name, int* shift, double* value)
 {
     if(YY_lex(yy) == YY_EOF) return -1;
     else YY_unread(yy);
 
-    if(RASC_cv >= SCR_tbl_size((unsigned char**) RASC_toc)) {
+    if(RASC_toc.empty())
+        return -1;
+
+    if(RASC_cv >= (int) RASC_toc.size()) {
         RASC_cv = 0;
         RASC_cy ++;
         *shift = RASC_cy;
     }
-    strcpy(name, RASC_toc[RASC_cv]);
+    strcpy(name, RASC_toc[RASC_cv].c_str());
     *value = K_read_real(yy);
     RASC_cv ++;
 
@@ -104,8 +107,7 @@ int ImportObjsRevertASCII::read_numerical_value(YYFILE* yy, char* name, int* shi
  */
 int ImportObjsRevertASCII::close()
 {
-    SCR_free_tbl((unsigned char**) RASC_toc);
-    RASC_toc = 0;
+    RASC_toc.clear();
     RASC_cv = RASC_cy = 0;
     return 0;
 }
