@@ -245,14 +245,14 @@ int REPFILE::read_line(std::string& line, int mode)
  *  Indicates if errors on a report line must be ignored, ie if the second char of the line is '-'.
  *  Example : $-command
  *  
- *  @param [in] char*   line    report line 
- *  @return     int             0 if the error must be ignored
- *                              1 else
+ *  @param [in] const std::string&  line    report line
+ *  @return     int                         1 if the error must be ignored
+ *                                          0 else
  */
-int RP_chk_ignore(char* line)
+int REPFILE::chk_ignore(const std::string& line)
 {
-    if(line[1] == '-') 
-        return(1);
+    if(line.size() > 1 && line[1] == '-')
+        return 1;
     return 0;
 }
 
@@ -410,7 +410,7 @@ int RP_exec_fn(char* name, char* arg, int fs)
  *  @param [in] char*   arg     function arguments
  *  @return             int     always 0
  */
-int RP_err_dump(char* name, char* arg)
+int REPFILE::err_dump(char* name, char* arg)
 {
     std::string error_msg = "Error: " + std::string(name) + " " + std::string(arg);
 
@@ -1236,7 +1236,7 @@ int REPFILE::execute()
                 continue;
             
             // $command, #command, $-command or #-command
-            ignore = RP_chk_ignore(line.data());     // Ignore the errors if $-command or #-command
+            ignore = chk_ignore(line);     // Ignore the errors if $-command or #-command
             rt = RP_splitline(line.data() + 1 + ignore, name, arg, 30);
             
             // Executes the command
@@ -1260,7 +1260,7 @@ int REPFILE::execute()
                         break;
                     }
                     if(RP_PRINT) 
-                        RP_err_dump(name, arg.data());
+                        err_dump(name, arg.data());
                     rt = RP_RT;         // replaces the error code by the value of RP_RT (defined by OnError)
                     switch(rt)  
                     {
