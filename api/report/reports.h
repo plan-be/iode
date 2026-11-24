@@ -12,8 +12,9 @@
 
 /*------------------------ STRUCTS ----------------------- */
 
-// REPFILE contains a report to be interpreted and the current line during interpretation
-struct REPFILE 
+// REPFILE contains a report to be interpreted and the current line during interpretation.
+// REPFILE objects must be created with std::make_shared (see execute()).
+struct REPFILE : public std::enable_shared_from_this<REPFILE>
 {
     std::string                 filename;           // Source file for report file (*.rep) or
                                                     // Proc name and position for procedures (PROCDEF)
@@ -30,6 +31,10 @@ struct REPFILE
      */
     REPFILE(const std::string& filename, const std::vector<std::string>& report_lines)
         : filename(filename), report_lines(report_lines), current_line(0) {}
+
+    std::string read_multiline();
+    int read_line(std::string& line, int mode);
+    int execute();
 };
 
 struct BFNS 

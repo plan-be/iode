@@ -215,7 +215,7 @@ int RP_goto_label(char *command, char *parm)
     while(1) 
     {
         line.clear();
-        rc = RP_readline(CUR_REPFILE, line, 0);
+        rc = CUR_REPFILE->read_line(line, 0);
         if(rc == EOF) 
         {
             std::string error_msg = std::string(command) + " " + std::string(parm) + " not found";
