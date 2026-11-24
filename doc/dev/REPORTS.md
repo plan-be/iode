@@ -13,68 +13,45 @@
     - [b\_rep\_engine.c](#T7)
       - [Hierarchy of the report engine functions](#T8)
       - [Examples of report line parsing](#T9)
-      - [List of functions](#T10)
     - [b\_rep\_cmds.c](#T11)
-      - [List of functions](#T12)
     - [b\_rep\_debug.c](#T13)
-      - [List of functions](#T14)
     - [b\_rep\_defs.c](#T15)
-      - [List of functions](#T16)
     - [b\_rep\_foreach.c](#T17)
       - [Example](#T18)
-      - [List of functions](#T19)
     - [b\_rep\_proc.c](#T20)
       - [Syntax of report procedures ($proc\*)](#T21)
       - [Example](#T22)
       - [Parameter usage](#T23)
-      - [List of functions](#T24)
       - [List of global variables](#T25)
     - [b\_rep\_syntax.c](#T26)
       - [List of global variables](#T27)
     - [b\_rep\_utils.c](#T28)
-      - [List of functions](#T29)
   - [IODE Report commands](#T30)
       - [Functions with an IODE object suffix (cmt, eqs...)](#T31)
       - [Functions with a file extension suffix (csv, txt...)](#T32)
       - [Other functions](#T33)
     - [List of source files](#T34)
     - [b\_fsys.c](#T35)
-      - [List of functions](#T36)
     - [b\_file.c](#T37)
-      - [List of functions](#T38)
     - [b\_xode.c](#T39)
-      - [List of functions](#T40)
     - [b\_htol.c](#T41)
-      - [List of functions](#T42)
     - [b\_ltoh.c](#T43)
-      - [List of functions](#T44)
     - [b\_trend.c](#T45)
-      - [List of functions](#T46)
     - [b\_ras.c](#T47)
-      - [List of functions](#T48)
     - [b\_data.c](#T49)
       - [Functions with a suffix](#T50)
       - [Other functions](#T51)
-      - [List of functions](#T52)
     - [b\_est.c](#T53)
-      - [List of functions](#T54)
     - [b\_step.c](#T55)
-      - [List of functions](#T56)
     - [b\_model.c](#T57)
-      - [List of functions](#T58)
     - [b\_ws.c](#T59)
-      - [List of functions](#T60)
     - [b\_rep\_super.c](#T61)
     - [b\_pdest.c](#T62)
-      - [List of functions](#T63)
     - [b\_print.c](#T64)
-      - [List of functions](#T65)
     - [b\_view.c](#T66)
-      - [List of functions](#T67)
   - [Iode Report @\-functions](#T68)
       - [@\-function parameters specifications](#T69)
       - [Examples](#T70)
-      - [List of functions](#T71)
   - [Example of report with @\-functions](#T72)
     - [Report](#T73)
     - [Resulting a2m file](#T74)
@@ -217,32 +194,6 @@ Note that this is not the exact result of a report execution: to keep some expre
      Example 6: @fn({lec})        : @drop({1+1},"A,BC,DE") -> BC,DE
 ```
 
-#### List of functions {#T10}
-
-|Syntax|Description|
-|:---|:---|
-|`REPFILE *RP_create_repfile(char *filename, unsigned char **tbl)`|Creates and initialises a REPFILE struct.|
-|`int RP_free_repfile(REPFILE *rf)`|Frees a REPFILE struct.|
-|`unsigned char **RP_read_file(char* filename)`|Reads a report file (with no line expansion).|
-|`char* RP_read_multiline(REPFILE* rf)`|Reads the next line in a REPFILE struct. If the line ends with a " \\", joins the next line.|
-|`int RP_readline(REPFILE* rf, char** line, int mode)`|Reads the current line from the REPFILE rf.|
-|`int RP_chk_ignore(char* line)`|Indicates if errors on a report line must be ignored|
-|`int RP_splitline(char* text, char* cmd, char** arg, int lg)`|Splits a report line into the command and its arguments.|
-|`BFNS* RP_find_fn(char* name, int* type, int fs)`|Returns the BFNS struct corresponding tp the function named "name"|
-|`int RP_exec_fn(char* name, char* arg, int fs)`|Retrieves a report command function pointer and executes the function with its parameters|
-|`int RP_err_dump(char* name, char* arg)`|Prints or displays the current report line if an error has occured.|
-|`char *RP_extract(char* buf, int* i, int ch)`|Extracts a string terminated by the specific character.|
-|`char *RP_gmacro(char* str)`|Calculates a macro value. The macro may contain expressions between \{\} or @\-functions|
-|`char *RP_gcmd(char* str)`|Calculates the value of an expression between curly brackets.|
-|`int RP_evaltime()`|Calculates RP\_T, the position in the current sample of the current calculation period RP\_PER.|
-|`double RP_evallec(char* lec)`|Evaluates a LEC expression in (the period) RP\_PER.|
-|`int RP_fmt(char* buf, char* format, double value)`|Formats a double.|
-|`int RP_eval(char** res, char* farg)`|Interprets strings between accolades found in a report line.|
-|`int RP_add(char** line, int* lg, int* j, char* res)`|Reallocates the string line (of length \*lg) in order to concatanate res from the position \*j.|
-|`int RP_expand(char** line, char* buf)`|Expands a report line by replacing macros, lec expressions and @\-functions par their calculated values|
-|`int RP_ReportExec_tbl(REPFILE *rf)`|Executes the report stored in the REPFILE struct rf.|
-|`int RP_ReportExec_1(char* file)`|Executes a report file.|
-
 ### b\_rep\_cmds.c {#T11}
 
 Commands related to the control flow of IODE reports ($msg, $goto, $return...) and to some operating system functions ($mkdir...). Some other commands of the same group can be found in other source files: b\_rep\_defs.c, b\_rep\_foreach.c, b\_rep\_proc.c, etc.
@@ -260,71 +211,15 @@ All functions have the same syntax:
     @return     int             return code: 0 on success
 ```
 
-#### List of functions {#T12}
-
-|Syntax|Description|
-|:---|:---|
-|`int RP_vseps(char* seps)`|$vseps <seps>|
-|`int RP_repeatstring(char* buf, int unused)`|$repeatstring <string>|
-|`int RP_repeat(char* buf, int unused)`|$repeat <command>|
-|`int RP_onerror_1(char* arg)`|Sub function of RP\_onerror() which assigns the 2 global variables RP\_RT and RP\_PRINT.|
-|`int RP_onerror(char* arg, int unused)`|$onerror \[\{return\|abort\|quitode\}\] \[\{display\|print\|noprint\}\]|
-|`int RP_abort(char* arg, int unused)`|$abort|
-|`int RP_quitode(char* arg, int unused)`|$quitode or $quit|
-|`int RP_return(char* arg, int unused)`|$return|
-|`int RP_label(char* arg, int unused)`|$label <label>|
-|`int RP_goto_label(char *command, char *parm)`|Search in the current REPFILE (CUR\_REPFILE) the line beginning with "$command parm" or "\#command parm", where command can be "label" or "next".|
-|`int RP_goto(char* arg, int unused)`|$goto label \[value\]|
-|`int RP_message(char* arg, int unused)`|$show message|
-|`int RP_information(char* arg, int unused)`|$msg text|
-|`int RP_beep()`|$beep|
-|`int RP_ask(char* arg, int unused)`|$ask <label> <question>|
-|`int B_ReportPrompt(char* arg)`|\#prompt <macro\_name> <question>|
-|`int RP_setdebug(char* arg, int unused)`|$debug \{0\|n\|N\|1\|2\|f\|F\}|
-|`int RP_setindent(char* arg, int unused)`|$indent \{0\|n\|N\|1\}|
-|`int RP_setmultiline(char* arg, int unused)`|$multiline \{0\|n\|N\|1\}|
-|`int RP_noparsingchar(char* arg)`|$noparsing \[0\|n\|N\|1\]|
-|`int RP_shift(char* arg)`|$shift \[n\] or $shift\_args \[n\]|
-|`int RP_chdir(char* arg, int unused)`|$chdir <dirname>|
-|`int RP_rmdir(char* arg, int unused)`|$rmdir <dirname>|
-|`int RP_mkdir(char* arg, int unused)`|$mkdir <dirname>|
-|`int RP_settime(char* arg, int unused)`|$settime <period>|
-|`int RP_incrtime(char* arg, int unused)`|$incrtime \[n\]|
-|`int RP_system(char* arg, int unused)`|$system <command>|
-|`int B_shellexec(char *arg, int unused)`|$shellexec <command>|
-|`int B_Sleep(char* arg, int unused)`|$sleep <msecs>|
-|`int B_GraphDefault(char* type, int unused)`|$graphdefault \{l\|L\|s\|S\|b\|B\}|
-
 ### b\_rep\_debug.c {#T13}
 
 Function to send a message and the memory status to the file `./memdbg.txt`.
-
-#### List of functions {#T14}
-
-|Syntax|Description|
-|:---|:---|
-|`void RP_debug(char* txt)`|Appends a message to the report debug file memdbg.txt.|
 
 ### b\_rep\_defs.c {#T15}
 
 Implementation of the report $defines and of the mechanism to push/pop macros in PROCDEF and FOREACH blocks.
 
 The $defines are stored in the special `KDB RP_MACRO` of type K\_ASIS.
-
-#### List of functions {#T16}
-
-|Syntax|Description|
-|:---|:---|
-|`int RP_define_1(char *name, char *macro)`|Adds or replaces a macro to RP\_MACRO.|
-|`int RP_define(char* arg, int unused)`|Report function to define a new macro.|
-|`std::string RP_get_macro(const std::string& name)`|Returns the pointer to a macro (aka define) value.|
-|`int RP_undef_1(char *name)`|Deletes one macro.|
-|`int RP_undef(char *arg, int unused)`|Report function to delete macros.|
-|`int RP_define_calcdepth(char *name)`|Returns the max depth of a saved (pushed) macro.|
-|`int RP_define_save(char *name)`|Saves (pushes) a macro under the name "name\#<depth\+1>".|
-|`int RP_define_restore(char *name)`|Deletes the macro "name" and restores (pops) the macro "name\#<depth>" under the name "name".|
-|`int RP_define_save_list(char **list)`|Saves (pushes) a list of macros using RP\_define\_save() for each macro.|
-|`int RP_define_restore_list(char **list)`|Restores a list of macros using RP\_define\_restore() for each macro.|
 
 ### b\_rep\_foreach.c {#T17}
 
@@ -352,14 +247,6 @@ A is XYZ
     A is 3
 A is XYZ
 ```
-
-#### List of functions {#T19}
-
-|Syntax|Description|
-|:---|:---|
-|`int RP_foreach(char* arg, int unused)`|Implemention of $foreach <index\_name> <list\_of\_values>|
-|`int RP_foreach_break(char *name)`|Exits the foreach block. Not implemented|
-|`int RP_foreach_next(char* arg, int unused)`|Implementation of $next <index\_name>|
 
 ### b\_rep\_proc.c {#T20}
 
