@@ -53,6 +53,61 @@ TEST_F(UtilsTest, splitMultiQuoted)
               std::vector<std::string>({"abc", "def,ghi"}));
 }
 
+TEST_F(UtilsTest, splitSkipEmpty)
+{
+    EXPECT_EQ(split_skip_empty("", ","), std::vector<std::string>({}));
+    EXPECT_EQ(split_skip_empty(",,,", ","), std::vector<std::string>({}));
+
+    // single separator (= SCR_vtom)
+    EXPECT_EQ(split_skip_empty("abc", ","), std::vector<std::string>({"abc"}));
+    EXPECT_EQ(split_skip_empty("abc,def,ghi", ","),
+              std::vector<std::string>({"abc", "def", "ghi"}));
+    EXPECT_EQ(split_skip_empty(",abc,,def,", ","),
+              std::vector<std::string>({"abc", "def"}));
+
+    // several separators (= SCR_vtoms)
+    EXPECT_EQ(split_skip_empty("Jean    Marc;,,Pierre", " ,;"),
+              std::vector<std::string>({"Jean", "Marc", "Pierre"}));
+    EXPECT_EQ(split_skip_empty("line1\n\nline2\n", "\n"),
+              std::vector<std::string>({"line1", "line2"}));
+
+    // no separator
+    EXPECT_EQ(split_skip_empty("a b", ""), std::vector<std::string>({"a b"}));
+}
+
+TEST_F(UtilsTest, replaceAll)
+{
+    std::string str = "AAAA";
+    EXPECT_EQ(replace_all(str, "AA", "B"), 2);
+    EXPECT_EQ(str, "BB");
+
+    // no rescan of the inserted text
+    str = "AAAA";
+    EXPECT_EQ(replace_all(str, "AA", "A"), 2);
+    EXPECT_EQ(str, "AA");
+
+    str = "a_b_c";
+    EXPECT_EQ(replace_all(str, "_", "__"), 2);
+    EXPECT_EQ(str, "a__b__c");
+
+    str = "x\ty\tz";
+    EXPECT_EQ(replace_all(str, "\t", " "), 2);
+    EXPECT_EQ(str, "x y z");
+
+    str = "unchanged";
+    EXPECT_EQ(replace_all(str, "zz", "y"), 0);
+    EXPECT_EQ(str, "unchanged");
+
+    // empty pattern: nothing is done
+    EXPECT_EQ(replace_all(str, "", "y"), 0);
+    EXPECT_EQ(str, "unchanged");
+
+    // empty replacement: removes the pattern
+    str = "a, b, c";
+    EXPECT_EQ(replace_all(str, ", ", ""), 2);
+    EXPECT_EQ(str, "abc");
+}
+
 
 TEST_F(UtilsTest, getIodeFileType)
 {
