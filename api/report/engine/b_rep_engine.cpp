@@ -99,40 +99,6 @@
  *       Example 4: @fn({lec})        : @drop({1+1},ABCDE)     -> CDE
  *       Example 5: @fn({lec})        : @drop({1+1},A BCDE)    -> BCDE
  *       Example 6: @fn({lec})        : @drop({1+1},"A,BC,DE") -> BC,DE
- * 
- *  
- *  List of functions
- *  -----------------
- *      REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines)  Creates and initialises a REPFILE struct. 
- *      int RP_free_repfile(REPFILE *rf)                                    Frees a REPFILE struct.                   
- *      unsigned char **RP_read_file(const std::string& filename)           Reads a report file (with no line expansion).
- *      char* RP_read_multiline(REPFILE* rf)                                Reads the next line in a REPFILE struct. If the line ends with a " \\", joins the next line.
- *      int RP_readline(REPFILE* rf, char** line, int mode)                 Reads the current line from the REPFILE rf.
- *      int RP_chk_ignore(char* line)                                       Indicates if errors on a report line must be ignored
- *      int RP_splitline(char* text, char* cmd, char** arg, int lg)         Splits a report line into the command and its arguments.
- *      BFNS* RP_find_fn(char* name, int* type, int fs)                     Returns the BFNS struct corresponding to the command name.
- *      int RP_exec_fn(char* name, char* arg, int fs)                       Retrieves a report command function pointer and executes the function with its parameters
- *      int RP_err_dump(char* name, char* arg)                              Prints or displays the current report line if an error has occured.
- *      char *RP_extract(char* buf, int* i, int ch)                         Extracts a string terminated by the specific character.
- *      char *RP_gmacro(char* str)                                          Calculates a macro value. The macro may contain expressions between {} or @-functions
- *      char *RP_gcmd(char* str)                                            Calculates the value of an expression between curly brackets.
- *      int RP_evaltime()                                                   Calculates RP_T, the position in the current sample of the current calculation period RP_PER.
- *      double RP_evallec(char* lec)                                        Evaluates a LEC expression in (the period) RP_PER. 
- *      int RP_fmt(char* buf, char* format, double value)                   Formats a double. 
- *      int RP_eval(char** res, char* farg)                                 Interprets strings between accolades found in a report line.
- *      int RP_add(char** line, int* lg, int* j, char* res)                 Reallocates the string line (of length *lg) in order to concatanate res from the position *j.
- *      int RP_expand(char** line, char* buf)                               Expands a report line by replacing macros, lec expressions and @-functions par their calculated values
- *      int RP_ReportExec_tbl(REPFILE *rf)                                  Executes the report stored in the REPFILE struct rf.
- *      int RP_ReportExec_1(const std::string& file)                        Executes a report file.
- *  
- *  Main functions
- *  ---------------
- *      int B_ReportExec(char* arg, int unused)                                         Executes a report file (recursive function).
- *      int B_ReportLine(char* line)                                        Executes a set of report lines separated by '\n'. 
- *
- *  List of global variables
- *  ------------------------
- *  See below.
  */
 #include "api/b_args.h"
 #include "api/k_super.h"
@@ -147,33 +113,8 @@
 
 // Global working variables
 // ------------------------
-char            **RP_ARGV = NULL;          // Current report arguments
-int             RP_DEPTH = 0;              // Level of the current report in the report "stack"
-
-// Function declarations
-// ---------------------
-REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_lines);
-int RP_free_repfile(REPFILE *rf);
-unsigned char **RP_read_file(const std::string& filename);
-int RP_readline(REPFILE* rf, char** line, int mode);
-int RP_chk_ignore(char* line);
-int RP_splitline(char* text, char* cmd, char** arg, int lg);
-BFNS* RP_find_fn(char* name, int* type, int fs);
-int RP_exec_fn(char* name, char* arg, int fs);
-int RP_err_dump(char* name, char* arg);
-char *RP_extract(char* buf, int* i, int ch);
-char *RP_gmacro(char* str);
-char *RP_gcmd(char* str);
-int RP_evaltime();
-double RP_evallec(char* lec);
-int RP_fmt(char* buf, char* format, double value);
-int RP_eval(char** res, char* farg);
-int RP_add(char** line, int* lg, int* j, char* res);
-int RP_expand(char** line, char* buf);
-int RP_ReportExec_tbl(REPFILE *rf);
-int RP_ReportExec_1(const std::string& file);
-int B_ReportExec(char* arg, int unused);
-int B_ReportLine(char* line, int cleanup);
+char** RP_ARGV = NULL;      // Current report arguments
+int RP_DEPTH = 0;           // Level of the current report in the report "stack"
 
 
 // Function implementation
@@ -193,7 +134,7 @@ REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_l
     REPFILE *rf = new REPFILE();
     rf->filename = filename;
     rf->report_lines = report_lines;
-    rf->curline = 0;
+    rf->current_line = 0;
     rf->nblines = SCR_tbl_size(report_lines);
     return(rf);
 }
@@ -207,7 +148,8 @@ REPFILE *RP_create_repfile(const std::string& filename, unsigned char **report_l
  */
 int RP_free_repfile(REPFILE *rf)
 {
-    if(rf) { 
+    if(rf) 
+    { 
         SCR_free_tbl(rf->report_lines);
         delete rf;
     }
@@ -296,10 +238,10 @@ char* RP_read_multiline(REPFILE* rf)
     
     while(1) 
     {
-        if(rf->curline >= rf->nblines) 
+        if(rf->current_line >= rf->nblines) 
             return(multi_line);
-        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->report_lines[rf->curline]);
-        rf->curline++;
+        multi_line = (char*) SCR_strafcat((unsigned char*) multi_line, rf->report_lines[rf->current_line]);
+        rf->current_line++;
         
         lg = (int) strlen(multi_line);
         if(RP_ALLOW_MULTILINE && lg > 1  && 
@@ -329,7 +271,7 @@ char* RP_read_multiline(REPFILE* rf)
  */
 int RP_readline(REPFILE* rf, char** line, int mode)
 {
-    if(rf->curline >= rf->nblines) 
+    if(rf->current_line >= rf->nblines) 
         return EOF;
     
     char* multi_line = RP_read_multiline(rf); 
@@ -1356,7 +1298,7 @@ int RP_ReportExec_tbl(REPFILE *rf)
             if(debug_line[0]) 
             {
                 if(RP_DEBUG)
-                    kmsg("[%d] - %s", rf->curline, debug_line);
+                    kmsg("[%d] - %s", rf->current_line, debug_line);
                 else if(RP_STDOUT)
                     kmsg("iode> %s", debug_line);
             }

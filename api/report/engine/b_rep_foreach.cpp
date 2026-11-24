@@ -177,8 +177,8 @@ static int RP_foreach_goto_next(char* label)
 
     while(1) {
         // Stoppe si début du fichier atteint
-        if(CUR_REPFILE->curline <= 1) return(-3);
-        CUR_REPFILE->curline -= 2;
+        if(CUR_REPFILE->current_line <= 1) return(-3);
+        CUR_REPFILE->current_line -= 2;
         SW_nfree(line);
         line = 0;
         rc = RP_readline(CUR_REPFILE, &line, 0);
@@ -221,7 +221,7 @@ done:
  */
 int RP_foreach_next(char* arg, int unused)
 {
-    int curline = CUR_REPFILE->curline;
+    int curline = CUR_REPFILE->current_line;
 
     int rc = 0;
     std::vector<std::string> v_args = split_multi_quoted(arg, " ,\n\t", '"');
@@ -240,7 +240,7 @@ int RP_foreach_next(char* arg, int unused)
 
     if(rc != 0) 
     {
-        CUR_REPFILE->curline = curline;
+        CUR_REPFILE->current_line = curline;
         rc = 0;
     }
 
