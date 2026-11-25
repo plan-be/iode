@@ -103,6 +103,50 @@ TEST_F(UtilsTest, textToLines)
               std::vector<std::string>({"A+B*", "ln(C)", "-D"}));
 }
 
+TEST_F(UtilsTest, longToDate)
+{
+    // default format
+    EXPECT_EQ(long_to_date(19901231), "31/12/1990");
+
+    // upper and lower case letters, any order
+    EXPECT_EQ(long_to_date(19901231, "dd/mm/yy"), "31/12/90");
+    EXPECT_EQ(long_to_date(19901231, "mm-dd-yy"), "12-31-90");
+    EXPECT_EQ(long_to_date(19901231, "YYYY-MM-DD"), "1990-12-31");
+    EXPECT_EQ(long_to_date(20260105, "yyyymmdd"), "20260105");
+
+    // n Y's => last n digits of the year
+    EXPECT_EQ(long_to_date(19901231, "Y"), "0");
+    EXPECT_EQ(long_to_date(19901231, "YYY"), "990");
+
+    // extra letters and other characters are kept as is
+    EXPECT_EQ(long_to_date(19901231, "YYYYY"), "1990Y");
+    EXPECT_EQ(long_to_date(19901231, "DDD MMM"), "31D 12M");
+    EXPECT_EQ(long_to_date(19901231, "on dd.mm"), "on 31.12");
+    EXPECT_EQ(long_to_date(19901231, ""), "");
+
+    // WARNING: every Y, M or D of fmt is a date letter, even inside a word
+    EXPECT_EQ(long_to_date(19901231, "Date: dd.mm"), "3ate: 1d.12");
+
+    // year on less than 4 digits
+    EXPECT_EQ(long_to_date(50501, "DD/MM/YYYY"), "01/05/0005");
+
+    // zero or negative date
+    EXPECT_THROW(long_to_date(0L), std::invalid_argument);
+    EXPECT_THROW(long_to_date(-19901231L, "dd/mm/yy"), std::invalid_argument);
+
+    // smallest date: year 0, month 0, day 1
+    EXPECT_EQ(long_to_date(1L), "01/00/0000");
+    EXPECT_EQ(long_to_date(99991231L, "YYYY-MM-DD"), "9999-12-31");
+
+    // year on 5 digits (12345): the Y's take the digits from the start of the year
+    // (as SCR_long_to_fdate() which assumes a year on 4 digits)
+    EXPECT_EQ(long_to_date(123456789L, "DD/MM/YYYY"), "89/67/1234");
+    EXPECT_EQ(long_to_date(123456789L, "dd/mm/yy"), "89/67/34");
+
+    // no date letter
+    EXPECT_EQ(long_to_date(19901231L, "abc"), "abc");
+}
+
 TEST_F(UtilsTest, replaceAll)
 {
     std::string str = "AAAA";
