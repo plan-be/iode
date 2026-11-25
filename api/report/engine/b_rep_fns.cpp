@@ -73,7 +73,7 @@
  *      U_ch *RPF_eqlhs(U_ch **args)
  *      U_ch *RPF_eqrhs(U_ch **args)
  *      U_ch *RPF_sample(U_ch** args)
- *      int RPF_vsliste1(CLEC* cl, U_ch*** tbl, int* nb, int type)
+ *      int RPF_vsliste1(const std::shared_ptr<CLEC> clec, std::vector<std::string>& tbl, const int type)
  *      U_ch *RPF_vsliste(U_ch** args, int type)
  *      U_ch **RPF_unique(U_ch** tbl)
  *      U_ch *RPF_vliste(U_ch** args)
@@ -1202,35 +1202,24 @@ U_ch *RPF_sample(U_ch** args)
 
 
 /**
- *  Searches in a CLEC struct the list of scalars or variables and adds to *tbl the new names found.
- *  
- *  @param [in] CLEC*   cl      input CLEC structure
- *  @param [in] U_ch*** tbl     pointer to the table of strings with the scalars or variables
- *  @param [in] int*    nb      pointer to the number of names found
- *  @param [in] int     type    type of object to retrieve: 'S' for scalars, 'V' for variables
- *  @return     int             0, always
+ *  Searches in a CLEC struct the list of scalars or variables and adds to tbl the new names found.
+ *
+ *  @param [in]      std::shared_ptr<CLEC>      clec    input CLEC structure
+ *  @param [in, out] std::vector<std::string>&  tbl     names of the scalars or variables already found
+ *  @param [in]      int                        type    type of object to retrieve: 'S' for scalars, 'V' for variables
+ *  @return          int                                0, always
  */
-int RPF_vsliste1(const std::shared_ptr<CLEC> clec, U_ch*** tbl, int* nb, const int type)
+int RPF_vsliste1(const std::shared_ptr<CLEC> clec, std::vector<std::string>& tbl, const int type)
 {
     if(type != 'S' && type != 'V')
         return 0;
-    
-    int k = 0;
-    std::string obj_name;
-    std::string tbl_name;
-    size_t nb_names = (type == 'S') ? clec->v_coeff_names.size() : clec->v_var_names.size();
-    for(int i = 0; i < nb_names; i++)
+
+    const std::vector<std::string>& names = (type == 'S') ? clec->v_coeff_names : clec->v_var_names;
+    for(const std::string& name : names)
     {
-        obj_name = (type == 'S') ? clec->v_coeff_names[i] : clec->v_var_names[i];
-        for(k = 0 ; k < *nb ; k++)
-        {
-            tbl_name = std::string((char*) (*tbl)[k]);
-            if(obj_name == tbl_name) 
-                break;
-        }
-        
-        if(*nb == 0 || k == *nb) 
-            SCR_add_ptr(tbl, nb, (unsigned char*) obj_name.c_str());
+        // adds the name only once
+        if(std::find(tbl.begin(), tbl.end(), name) == tbl.end())
+            tbl.push_back(name);
     }
 
     return 0;
@@ -1249,26 +1238,23 @@ U_ch *RPF_vsliste(U_ch** args, int type)
     if(SCR_tbl_size(args) < 1) 
         return NULL;
 
-    U_ch** tbl = 0;
-    int nb = 0;
+    std::vector<std::string> tbl;
 
     std::string name;
     std::shared_ptr<Equation> eq_ptr;
-    for(int i = 0; args[i]; i++) 
+    for(int i = 0; args[i]; i++)
     {
         name = std::string((char*) args[i]);
         name = global_ws_eqs->to_key(name);
-        if(!global_ws_eqs->contains(name)) 
+        if(!global_ws_eqs->contains(name))
             continue;
         eq_ptr = global_ws_eqs->get_obj_ptr(name) ;
-        RPF_vsliste1(eq_ptr->clec, &tbl, &nb, type);
+        RPF_vsliste1(eq_ptr->clec, tbl, type);
     }
 
-    SCR_add_ptr(&tbl, &nb, 0L);
-
-    U_ch* res = SCR_mtov(tbl, ';');
-    SCR_free_tbl(tbl);
-    return res;
+    // the result is freed by the caller (SCR_free())
+    std::string res = join(tbl, ";");
+    return SCR_stracpy((U_ch*) res.c_str());
 }
 
 
