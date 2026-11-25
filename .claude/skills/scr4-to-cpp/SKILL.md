@@ -170,14 +170,30 @@ scr4 functions when the exact behaviour matters.
 | `SCR_copy_file(a, b)` | `std::filesystem::copy_file(a, b, std::filesystem::copy_options::overwrite_existing)` | Check the scr4 source for the overwrite behaviour. |
 | reading a text file line by line with `SCR_add_ptr` | `std::ifstream` + `std::getline`, or `fopen`/`getc` + `std::string` | Keep the existing maximum line length checks (e.g. `RP_LINELENGTH`). |
 
+## Dates
+
+| scr4 | C++ replacement | Notes |
+|------|-----------------|-------|
+| `SCR_long_to_fdate(date, str, fmt)` | `long_to_date(date, fmt)` (utils.h) | `date` is a `long` `YYYYMMDD`. Returns a `std::string` instead of filling `str`. `fmt` defaults to `"DD/MM/YYYY"` (scr4: `fmt == NULL`). Same results as `SCR_long_to_fdate` for strictly positive dates (tested in `UtilsTest.longToDate`). **Throws `std::invalid_argument` if `date <= 0`** (scr4 formats them as `"00/00/0000"` or with `'-'` signs): check how the caller handles an empty or invalid date before replacing a call. |
+
+Format rules of `SCR_long_to_fdate` / `long_to_date`:
+- only `Y`, `M` and `D` (upper or lower case) are interpreted, **anywhere in `fmt`**: every
+  such letter is a date letter, even inside a word (`"Date: dd"` gives `"3ate: 1d"`);
+- `n` Y's give the last `n` digits of the year (formatted on 4 digits); Y's beyond the 4th are
+  kept as is: `"yy"` -> `"90"`, `"YYYYY"` -> `"1990Y"`;
+- the first 2 M's (D's) are replaced by the 2 digits of the month (day); the next ones are
+  kept as is;
+- the example in the scr4 comment is wrong: `SCR_long_to_fdate(19901231L, buf, "mm-dd-yy")`
+  gives `"12-31-90"`, not `"12/31/90"`.
+
 ## No direct equivalent (keep, or ask the user)
 
 These functions have no simple drop-in replacement. Keep them unless the user asks to migrate
 them, and then read their source first:
 
 - number formatting: `SCR_fmt_dbl`, `SCR_fmt_long` (IODE-specific formats).
-- dates and times: `SCR_current_date`, `SCR_current_time`, `SCR_long_to_fdate`,
-  `SCR_long_to_ftime`, `SCR_fdate_to_long`.
+- dates and times: `SCR_current_date`, `SCR_current_time`, `SCR_long_to_ftime`,
+  `SCR_fdate_to_long` (for `SCR_long_to_fdate`, see *Dates* above).
 - code pages: `SCR_OemToAnsi`, `SCR_AnsiToOem`, `SCR_ConvertToUTF8`: see
   `oem_to_utf8()` / `utf8_to_oem()` in utils.h for OEM <-> UTF-8.
 - a2m output (`SCR_fprintf_esc`...), swap allocator internals (`SW_init`, `SW_end`,
