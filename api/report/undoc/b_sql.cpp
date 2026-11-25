@@ -216,15 +216,18 @@ U_ch  *RPS_NbFlds(U_ch** args)
 U_ch  *RPS_Record(U_ch** args)
 {
     char    *ptr;
-    int     i, ntbl = 0, bt, et, nbargs;
-    U_ch    *res, **tbl = NULL, buf[4096];
+    int     i, bt, et, nbargs;
+    U_ch    buf[4096];
+    std::vector<std::string> tbl;
 
-    if(ocsr == NULL) return(SCR_stracpy("0"));
+    if(ocsr == NULL)
+        return(SCR_stracpy("0"));
 
     bt = 0;
     et = ocsr->otbl->ncols;
 
-    if(args != NULL) {
+    if(args != NULL) 
+    {
         nbargs = SCR_tbl_size(args);
         if(nbargs > 0) bt = atoi(args[0]);
         if(nbargs > 1) et = atoi(args[1]);
@@ -233,16 +236,16 @@ U_ch  *RPS_Record(U_ch** args)
     et = min(et, ocsr->otbl->ncols);
     bt = min(bt, ocsr->otbl->ncols);
 
-    for(i = bt ; i <  et; i++) {
+    for(i = bt ; i <  et; i++) 
+    {
         ptr = OGetCol(ocsr, i);
         RPS_GetFld(buf, ptr, ocsr->otbl->cols[i].Ctype);
-        SCR_add_ptr(&tbl, &ntbl, buf);
+        tbl.push_back(std::string((char*) buf));
     }
 
-    SCR_add_ptr(&tbl, &ntbl, NULL);
-    res = SCR_mtov(tbl, ' ');
-    SCR_free_tbl(tbl);
-    return res;
+    // the result is freed by the caller (SCR_free())
+    std::string res = join(tbl, " ");
+    return SCR_stracpy((U_ch*) res.c_str());
 }
 
 // @SqlQuery(sql_select)
