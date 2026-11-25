@@ -896,7 +896,7 @@ int B_ExcelSet(char *arg, int type)
     Period      *per = NULL;
     double      d;
     char        *ptr = NULL,
-                *item, *smpl;
+                *item;
     bool        found = false;
     std::string name;
     std::string lec;
@@ -976,12 +976,10 @@ int B_ExcelSet(char *arg, int type)
             if(!found)
                 goto the_end;
 
-            if(nb_args == 3)
-                smpl = args[1].data();
-            else
-                smpl = NULL;
-
-            ptr = global_ws_tbl->dde_create_table(name, smpl, &nc, &nl, -1);
+            // GSample: args[1] if given, otherwise the whole sample of the Variables workspace
+            std::string gsample = (nb_args == 3) ? args[1] : "";
+            std::string table = global_ws_tbl->dde_create_table(name, gsample, &nc, &nl, -1);
+            ptr = (char*) SCR_stracpy((unsigned char*) table.c_str());
             break;
         }
 

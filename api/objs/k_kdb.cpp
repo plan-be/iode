@@ -101,7 +101,8 @@ char* KDB::dde_create_obj(const std::string& name, int *nc, int *nl)
     else
     {
         KDBTables* tbl_db = (KDBTables*) this;
-        res = tbl_db->dde_create_table(name, NULL, nc, nl, -1);
+        std::string table = tbl_db->dde_create_table(name, "", nc, nl, -1);
+        res = (char*) SCR_stracpy((unsigned char*) table.c_str());
     }
 
     SCR_OemToAnsi((unsigned char*) res, (unsigned char*) res);

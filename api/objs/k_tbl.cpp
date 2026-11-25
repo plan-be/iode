@@ -1220,112 +1220,106 @@ bool KDBTables::grep_obj(const std::string& name, const std::string& pattern,
 }
 
 /**
- *  Compute a table on the GSample ismpl and return a string containing the result.
+ *  Computes a table on a GSample and returns a string containing the result
+ *  (one line per non empty table line, cells separated by '\t', lines separated by '\n').
+ *
+ *  @param [in]  const std::string&  name     table name
+ *  @param [in]  const std::string&  gsample  GSample (empty: the whole sample of the Variables workspace)
+ *  @param [out] int*                nc       number of columns of the result
+ *  @param [out] int*                nl       number of lines of the result
+ *  @param [in]  int                 nbdec    number of decimals
+ *  @return      std::string                  computed table, "" if no sample is defined,
+ *                                            "Error in Tbl or Smpl" if the table or the GSample is invalid
  */
-char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec)
+std::string KDBTables::dde_create_table(const std::string& name, const std::string& gsample,
+    int *nc, int *nl, int nbdec)
 {
-    int     dim, i, j, d, rc = 0, nli = 0,
-                          nf = 0, nm = 0;
-    char    gsmpl[128], **l = NULL, *buf, *res = NULL;
+    int nf = 0, nm = 0;
     std::vector<COL> columns;
 
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
 
-    /* date */
-    char date[11];
+    if(!smpl || smpl->nb_periods == 0)
+        return "";
 
-    if(!smpl || smpl->nb_periods == 0) 
-        return (char*) "";
+    // default GSample: the whole sample of the Variables workspace
+    std::string gsmpl = gsample;
+    if(gsmpl.empty())
+        gsmpl = smpl->start_period.to_string() + ":" + std::to_string(smpl->nb_periods);
 
-    /* mode */
-    if(!ismpl)
-        sprintf(gsmpl, "%s:%d", (char*) smpl->start_period.to_string().c_str(), smpl->nb_periods);
-    else
-        sprintf(gsmpl, "%s", ismpl);
-
-    dim = initialize_columns(tbl_ptr, gsmpl, columns);
-    if(dim < 0) 
-        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    int dim = initialize_columns(tbl_ptr, gsmpl, columns);
+    if(dim < 0)
+        return "Error in Tbl or Smpl";
 
     v_tbl_filenames = extract_files_tbl(columns);
-    if(v_tbl_filenames.empty()) 
-        return((char*) SCR_stracpy((unsigned char*) "Error in Tbl or Smpl"));
+    if(v_tbl_filenames.empty())
+        return "Error in Tbl or Smpl";
     tbl_find_mode(columns, tbl_mode, 2);
 
     *nc = dim + 1;
     *nl = 1;
 
-    TableLine* line;
-    buf = SCR_malloc(256 + dim * 128);
-    for(i = 0; rc == 0 && i < tbl_ptr->lines.size(); i++) 
+    std::vector<std::string> lines;
+    for(TableLine& line : tbl_ptr->lines)
     {
-        buf[0] = 0;
-        line = &(tbl_ptr->lines[i]);
-
-        switch(line->get_type()) 
+        std::string buf;
+        switch(line.get_type())
         {
             case TABLE_LINE_SEP   :
                 break;
             case TABLE_LINE_DATE  :
-                strcat(buf, long_to_date(current_date_to_long(), "dd/mm/yy").c_str());
+                buf += long_to_date(current_date_to_long(), "dd/mm/yy");
                 break;
             case TABLE_LINE_MODE  :
-                for(j = 0; j < MAX_MODE; j++) 
+                for(int j = 0; j < MAX_MODE; j++)
                 {
-                    if(tbl_mode[j] == 0) 
+                    if(tbl_mode[j] == 0)
                         continue;
-                    sprintf(date, "(%s) ", COL_OPERS[j + 1]);
-                    strcat(buf, date);
-                    strcat(buf, KLG_OPERS_TEXTS[j + 1][K_LANG]);
-                    strcat(buf, "\n");
-                    nm ++;
+                    buf += "(" + std::string(COL_OPERS[j + 1]) + ") ";
+                    buf += KLG_OPERS_TEXTS[j + 1][K_LANG];
+                    buf += "\n";
+                    nm++;
                 }
                 break;
             case TABLE_LINE_FILES :
-                for(const std::string& filename : v_tbl_filenames) 
+                for(const std::string& filename : v_tbl_filenames)
                 {
-                    strcat(buf, filename.c_str());
-                    strcat(buf, "\n");
+                    buf += filename + "\n";
                     nf++;
                 }
                 break;
             case TABLE_LINE_TITLE :
-                strcat(buf, IodeTblCell(&(line->cells[0]), NULL, nbdec));
-                //strcat(buf,"\x01\x02\03"); // JMP 13/7/2022
+                buf += IodeTblCell(&(line.cells[0]), NULL, nbdec);
                 break;
             case TABLE_LINE_CELL  :
-                    clear_tbl_columns(columns);
-                    if(execute_tbl_columns(*tbl_ptr, *line, columns) < 0)
-                    strcat(buf, "Error in calc");
+                clear_tbl_columns(columns);
+                if(execute_tbl_columns(*tbl_ptr, line, columns) < 0)
+                    buf += "Error in calc";
                 else
-                    for(j = 0; j < columns.size(); j++)
+                {
+                    for(int j = 0; j < (int) columns.size(); j++)
                     {
-                        d = j % tbl_ptr->nb_columns;
-                        if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0) 
+                        int d = j % tbl_ptr->nb_columns;
+                        if(tbl_ptr->repeat_columns == 0 && d == 0 && j != 0)
                             continue;
-                        strcat(buf, IodeTblCell(&(line->cells[d]), &columns[j], nbdec));
-                        strcat(buf, "\t");
+                        buf += IodeTblCell(&(line.cells[d]), &columns[j], nbdec);
+                        buf += "\t";
                     }
+                }
                 break;
         }
 
-        if(buf[0]) 
+        if(!buf.empty())
         {
-            SCR_add_ptr((unsigned char***) &l, &nli, (unsigned char*) buf);
+            lines.push_back(buf);
             (*nl)++;
         }
     }
-    
-    SCR_add_ptr((unsigned char***) &l, &nli, NULL);
+
     *nl += nf + nm;
-    res = (char*) SCR_mtov((unsigned char**) l, '\n');
-
-    SCR_free_tbl((unsigned char**) l);
-    SCR_free(buf);
-
     v_tbl_filenames.clear();
-    return res;
+    return join(lines, "\n");
 }
 
 char* KDBTables::dde_create_obj_by_name(const std::string& name, int* nc, int* nl)
