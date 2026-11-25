@@ -1268,7 +1268,7 @@ char* KDBTables::dde_create_table(const std::string& name, char *ismpl, int *nc,
             case TABLE_LINE_SEP   :
                 break;
             case TABLE_LINE_DATE  :
-                strcat(buf, SCR_long_to_fdate(SCR_current_date(), date, (char*) "dd/mm/yy"));
+                strcat(buf, long_to_date(current_date_to_long(), "dd/mm/yy").c_str());
                 break;
             case TABLE_LINE_MODE  :
                 for(j = 0; j < MAX_MODE; j++) 

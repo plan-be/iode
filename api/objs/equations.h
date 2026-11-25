@@ -439,24 +439,17 @@ public:
 
     std::string get_date_as_string(const std::string& date_format = "dd-mm-yyyy") const
     {
-        std::string date;
         // note: dates are stored as follow: yyyymmdd
-        //       for example, "18-06-2024" will be stored as long value 20240618 
-        long l_date = this->date;
-        if(l_date > 0)
-        {
-            char c_date[12];
-            char* c_date_format;
-            c_date_format = to_char_array(date_format);
-            date = SCR_long_to_fdate(l_date, c_date, c_date_format);
-        }
-
-        return date;
+        //       for example, "18-06-2024" will be stored as long value 20240618
+        // a date <= 0 means no date (empty string)
+        if(this->date <= 0)
+            return "";
+        return long_to_date(this->date, date_format);
     }
 
     void update_date()
     {
-        this->date = SCR_current_date();
+        this->date = current_date_to_long();
     }
 
     void set_date(const std::string& date, const std::string& date_format = "dd-mm-yyyy")

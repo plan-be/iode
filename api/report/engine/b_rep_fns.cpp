@@ -507,17 +507,13 @@ U_ch *RPF_void(U_ch **args)
  *      @date(mm/dd/yyyy)     =>  "10/26/2022"
  *      @date(mm/xxxx/zzzz)   =>  "10/xxxx/zzzz"
  *
- *  @see SCR_long_to_fdate() for more details (http://www.xon.be/scr4/libs1/libs122.htm)
+ *  @see long_to_date() in api/utils/utils.h for more details
  */
 U_ch *RPF_date(U_ch** args)
 {
-    U_ch    *res, *fmt;
-
-    res = (unsigned char*) SCR_malloc(60);
-    if(args[0]) fmt = args[0];
-    else        fmt = (unsigned char*) "dd-mm-yyyy";
-    SCR_long_to_fdate(SCR_current_date(), (char*) res, (char*) fmt);
-    return res;
+    std::string fmt = args[0] ? std::string((char*) args[0]) : std::string("dd-mm-yyyy");
+    std::string date = long_to_date(current_date_to_long(), fmt);
+    return SCR_stracpy((U_ch*) date.c_str());
 }
 
 

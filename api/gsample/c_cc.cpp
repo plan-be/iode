@@ -395,17 +395,17 @@ static void apply_file(COL* cl, const FIL& file)
 static void calculate_period_now(Period *per)
 {
     memcpy(per, &(global_ws_var->get_sample()->start_period), sizeof(Period));
-    per->year = SCR_current_date() / 10000L;
+    per->year = current_date_to_long() / 10000L;
     switch(per->periodicity)
     {
         case 'M' :
-            per->step = (SCR_current_date() / 100) % 100;
+            per->step = (current_date_to_long() / 100) % 100;
             break;
         case 'Q' :
-            per->step = 1 + ((SCR_current_date() / 100) % 100 - 1) / 3;
+            per->step = 1 + ((current_date_to_long() / 100) % 100 - 1) / 3;
             break;
         case 'W' :
-            per->step = DT_week_number(SCR_current_date());
+            per->step = DT_week_number(current_date_to_long());
             if(per->step == 0)
             {
                 per->year--;
@@ -645,11 +645,11 @@ static int calculate_sub_period()
     switch(per->periodicity)
     {
         case 'M' :
-            return((SCR_current_date() / 100) % 100);
+            return((current_date_to_long() / 100) % 100);
         case 'Q' :
-            return(1 + ((SCR_current_date() / 100) % 100 - 1) / 3);
+            return(1 + ((current_date_to_long() / 100) % 100 - 1) / 3);
         case 'W' :
-            p = DT_week_number(SCR_current_date());
+            p = DT_week_number(current_date_to_long());
             if(p == 0)
                 p = 53;
             return(p);
