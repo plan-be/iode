@@ -1021,7 +1021,7 @@ public:
     bool save_asc(const std::string& filename) override;
 
     char* dde_create_obj_by_name(const std::string& name, int* nc, int* nl) override;
-    char* dde_create_table(const std::string& name, char *ismpl, int *nc, int *nl, int nbdec);
+    std::string dde_create_table(const std::string& name, const std::string& gsample, int *nc, int *nl, int nbdec);
 
     bool print_obj_def(const std::string& name) override;
 
