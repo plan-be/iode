@@ -440,13 +440,10 @@ void ComputedTable::print_line_mode()
 
 void ComputedTable::print_line_date()
 {
-    long SCR_current_date();
-    char date[11];
-
-    SCR_long_to_fdate(SCR_current_date(), date, "dd/mm/yy");
+    std::string date = long_to_date(current_date_to_long(), "dd/mm/yy");
     TableCell cell(TABLE_CELL_STRING);
     cell.start_print(dim);
-    W_printf((char*) "%s", date);
+    W_printf((char*) "%s", date.c_str());
 }
 
 void ComputedTable::print_cell_left_column(const TableCell& cell) const

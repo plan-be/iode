@@ -98,9 +98,9 @@ TEST_F(EquationTest, Date)
     EXPECT_EQ(eq_ptr->get_date_as_string(), "12-06-1998");
 
     // set
-    int current_date = SCR_current_date();
+    long today = current_date_to_long();
     eq_ptr->update_date();
-    EXPECT_EQ(eq_ptr->date, current_date);
+    EXPECT_EQ(eq_ptr->date, today);
 
     std::string s_date = "20-05-2010";
     eq_ptr->set_date(s_date);
