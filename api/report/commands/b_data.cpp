@@ -767,22 +767,6 @@ int B_DataUpdate(char* arg, int type)
 
 
 /**
- *  Converts a NULL terminated table of strings (SCR table) into a vector of strings.
- *
- *  @param [in] tbl     char**                      NULL terminated table of strings (may be NULL)
- *  @return             std::vector<std::string>    copy of the strings in tbl
- */
-static std::vector<std::string> tbl_to_vector(char** tbl)
-{
-    std::vector<std::string> values;
-    if(tbl == NULL)
-        return values;
-    for(int i = 0; tbl[i] != NULL; i++)
-        values.push_back(std::string(tbl[i]));
-    return values;
-}
-
-/**
  *  Creates (or replaces) the list name in the global Lists workspace.
  *  See KDBLists::set_list().
  *
@@ -1433,9 +1417,10 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         return -1;
 
     int rc = 0;
-    char* c_name = NULL;
-    int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
-    char **l1 = NULL, **l2 = NULL, **l3 = NULL, **l4 = NULL;
+    std::vector<std::string> l1;    // names in global_db but not in file
+    std::vector<std::string> l2;    // names not in global_db but in file
+    std::vector<std::string> l3;    // names in both, same objects
+    std::vector<std::string> l4;    // names in both, different objects
 
     try
     {
@@ -1450,8 +1435,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         //      4 -> if name in both global_db and file, IODE object in global_db != IODE object in file
         for(const std::string& name : kdb1.get_names()) 
         {
-            c_name = (char*) name.c_str();
-            rc = K_compare(c_name, kdb1, *kdb2_ptr);
+            rc = K_compare(name, kdb1, *kdb2_ptr);
             switch(rc)
             {
             // name neither in global_db nor in file
@@ -1459,19 +1443,19 @@ int template_data_compare(const std::string& filename, const std::string& one, c
                 break;
             // name in global_db but not in file
             case 1 :
-                SCR_add_ptr((unsigned char***) &l1, &n1, (unsigned char*) c_name);
+                l1.push_back(name);
                 break;
             // if name not in global_db but in file
             case 2 :
-                SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
+                l2.push_back(name);
                 break;
             // name in both global_db and file, IODE object in global_db == IODE object in file
             case 3 :
-                SCR_add_ptr((unsigned char***) &l3, &n3, (unsigned char*) c_name);
+                l3.push_back(name);
                 break;
             // name in both global_db and file, IODE object in global_db != IODE object in file
             case 4 :
-                SCR_add_ptr((unsigned char***) &l4, &n4, (unsigned char*) c_name);
+                l4.push_back(name);
                 break;
             }
     
@@ -1485,26 +1469,14 @@ int template_data_compare(const std::string& filename, const std::string& one, c
         return -1;
     }
 
-    for(const std::string& name : kdb2_ptr->get_names()) 
-    {
-        c_name = (char*) name.c_str();
-        SCR_add_ptr((unsigned char***) &l2, &n2, (unsigned char*) c_name);
-    }
+    // the objects remaining in the file are not in global_db
+    for(const std::string& name : kdb2_ptr->get_names())
+        l2.push_back(name);
 
-    SCR_add_ptr((unsigned char***) &l1, &n1, NULL);
-    SCR_add_ptr((unsigned char***) &l2, &n2, NULL);
-    SCR_add_ptr((unsigned char***) &l3, &n3, NULL);
-    SCR_add_ptr((unsigned char***) &l4, &n4, NULL);
-
-    rc = set_global_list(one,   tbl_to_vector(l1), 10000);
-    rc = set_global_list(two,   tbl_to_vector(l2), 10000);
-    rc = set_global_list(three, tbl_to_vector(l3), 10000);
-    rc = set_global_list(four,  tbl_to_vector(l4), 10000);
-
-    SCR_free_tbl((unsigned char**) l1);
-    SCR_free_tbl((unsigned char**) l2);
-    SCR_free_tbl((unsigned char**) l3);
-    SCR_free_tbl((unsigned char**) l4);
+    rc = set_global_list(one,   l1, 10000);
+    rc = set_global_list(two,   l2, 10000);
+    rc = set_global_list(three, l3, 10000);
+    rc = set_global_list(four,  l4, 10000);
 
     return rc;
 }
