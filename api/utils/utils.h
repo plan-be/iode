@@ -469,6 +469,75 @@ inline std::vector<std::string> text_to_lines(const std::string& str, const std:
 }
 
 /**
+ * @brief Formats a date stored as a long (YYYYMMDD) according to the format fmt.
+ * Same behaviour as the scr4 function SCR_long_to_fdate().
+ *
+ * In fmt, only the letters Y, M and D (upper or lower case) are interpreted:
+ *   - the Y's are replaced by the last digits of the year (4 Y's at most: the year is
+ *     formatted on 4 digits and n Y's give its n last digits);
+ *   - the first 2 M's are replaced by the 2 digits of the month;
+ *   - the first 2 D's are replaced by the 2 digits of the day.
+ * The extra Y's (beyond the 4th), M's and D's (beyond the 2nd) and all the other characters
+ * are kept as is. The order of the letters in fmt does not matter.
+ *
+ * For example:
+ * long_to_date(19901231, "dd/mm/yy") returns "31/12/90"
+ * long_to_date(19901231, "YYYY-MM-DD") returns "1990-12-31"
+ * long_to_date(19901231) returns "31/12/1990"
+ *
+ * @param date  date as a long (YYYYMMDD), e.g. 19901231. Must be strictly positive.
+ * @param fmt   format of the result (default "DD/MM/YYYY")
+ * @return      formatted date
+ * @throw       std::invalid_argument if date is zero or negative
+ *              (SCR_long_to_fdate() accepts them and formats them as "00/00/0000" or with '-' signs)
+ */
+inline std::string long_to_date(const long date, const std::string& fmt = "DD/MM/YYYY")
+{
+    if(date <= 0)
+        throw std::invalid_argument("Argument 'date' cannot be zero or negative. Got " + std::to_string(date));
+
+    // formats a positive value on (at least) width chars, padded with zeros (same as printf("%0<width>ld"))
+    auto zero_pad = [](const long value, const size_t width) -> std::string
+    {
+        std::string digits = std::to_string(value);
+        if(digits.size() < width)
+            digits.insert(0, width - digits.size(), '0');
+        return digits;
+    };
+
+    // year on (at least) 4 digits, month and day on 2 digits
+    const std::string yy = zero_pad(date / 10000L, 4);
+    const std::string mm = zero_pad((date % 10000L) / 100L, 2);
+    const std::string dd = zero_pad(date % 100L, 2);
+
+    // n Y's in fmt (max 4) => the last n digits of the (4 digits) year
+    int nby = (int) std::count_if(fmt.begin(), fmt.end(), [](char c) { return c == 'Y' || c == 'y'; });
+    nby = std::min(4, nby);
+    const size_t first_year_digit = 4 - nby;
+
+    std::string res = fmt;
+    int y = 0, m = 0, d = 0;
+    for(char& c : res)
+    {
+        switch(c)
+        {
+            case 'Y': case 'y':
+                if(y < nby) c = yy[first_year_digit + y++];
+                break;
+            case 'M': case 'm':
+                if(m < 2) c = mm[m++];
+                break;
+            case 'D': case 'd':
+                if(d < 2) c = dd[d++];
+                break;
+            default:
+                break;
+        }
+    }
+    return res;
+}
+
+/**
  * @brief trim leading and trailing whitespace of a string
  * 
  * @param str 
