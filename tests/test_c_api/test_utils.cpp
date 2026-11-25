@@ -103,6 +103,35 @@ TEST_F(UtilsTest, textToLines)
               std::vector<std::string>({"A+B*", "ln(C)", "-D"}));
 }
 
+TEST_F(UtilsTest, currentDate)
+{
+    long today = current_date_to_long();
+
+    // YYYYMMDD with a plausible year, a valid month and a valid day
+    long year = today / 10000L;
+    long month = (today % 10000L) / 100L;
+    long day = today % 100L;
+    EXPECT_GE(year, 2024L);
+    EXPECT_LE(year, 9999L);
+    EXPECT_GE(month, 1L);
+    EXPECT_LE(month, 12L);
+    EXPECT_GE(day, 1L);
+    EXPECT_LE(day, 31L);
+
+    // same year as the year of the UTC date (they can only differ around New Year's Eve)
+    std::time_t now = std::time(nullptr);
+    std::tm tm_utc{};
+#ifdef _MSC_VER
+    gmtime_s(&tm_utc, &now);
+#else
+    gmtime_r(&now, &tm_utc);
+#endif
+    EXPECT_LE(std::abs(year - (1900L + tm_utc.tm_year)), 1L);
+
+    // can be formatted by long_to_date()
+    EXPECT_EQ(long_to_date(today, "YYYYMMDD"), std::to_string(today));
+}
+
 TEST_F(UtilsTest, longToDate)
 {
     // default format

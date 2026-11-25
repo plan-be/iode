@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <ctime>        // for std::time and std::tm
 #include <cctype>
 #include <numeric>      // for std::accumulate
 #include <sstream>
@@ -466,6 +467,29 @@ inline std::vector<std::string> text_to_lines(const std::string& str, const std:
         pos += len;
     }
     return lines;
+}
+
+/**
+ * @brief Returns the current local date as a long (YYYYMMDD).
+ * Same behaviour as the scr4 function SCR_current_date().
+ *
+ * For example: 20261125 for November 25, 2026.
+ *
+ * @return  current local date (YYYYMMDD) or 0 if the local date cannot be computed
+ */
+inline long current_date_to_long()
+{
+    std::time_t now = std::time(nullptr);
+    std::tm tm_now{};
+    // localtime_s / localtime_r: thread-safe versions of std::localtime
+#ifdef _MSC_VER
+    if(localtime_s(&tm_now, &now) != 0)
+        return 0L;
+#else
+    if(localtime_r(&now, &tm_now) == nullptr)
+        return 0L;
+#endif
+    return 10000L * (1900L + tm_now.tm_year) + 100L * (tm_now.tm_mon + 1L) + tm_now.tm_mday;
 }
 
 /**
