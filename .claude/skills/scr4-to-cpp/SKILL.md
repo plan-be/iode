@@ -174,6 +174,7 @@ scr4 functions when the exact behaviour matters.
 
 | scr4 | C++ replacement | Notes |
 |------|-----------------|-------|
+| `SCR_current_date()`, `_SCR_current_date()` | `current_date_to_long()` (utils.h) | Current **local** date as a `long` `YYYYMMDD` (e.g. `20261125`), 0 if the local date cannot be computed (same as scr4). Uses `std::time` + `localtime_s`/`localtime_r` (thread-safe). Do not use `std::chrono::floor<days>(system_clock::now())`: it gives the **UTC** date (different from the local date around midnight). |
 | `SCR_long_to_fdate(date, str, fmt)` | `long_to_date(date, fmt)` (utils.h) | `date` is a `long` `YYYYMMDD`. Returns a `std::string` instead of filling `str`. `fmt` defaults to `"DD/MM/YYYY"` (scr4: `fmt == NULL`). Same results as `SCR_long_to_fdate` for strictly positive dates (tested in `UtilsTest.longToDate`). **Throws `std::invalid_argument` if `date <= 0`** (scr4 formats them as `"00/00/0000"` or with `'-'` signs): check how the caller handles an empty or invalid date before replacing a call. |
 
 Format rules of `SCR_long_to_fdate` / `long_to_date`:
@@ -186,14 +187,18 @@ Format rules of `SCR_long_to_fdate` / `long_to_date`:
 - the example in the scr4 comment is wrong: `SCR_long_to_fdate(19901231L, buf, "mm-dd-yy")`
   gives `"12-31-90"`, not `"12/31/90"`.
 
+`SCR_long_to_fdate(SCR_current_date(), buf, fmt)` becomes `long_to_date(current_date_to_long(), fmt)`.
+Note that if `current_date_to_long()` fails, it returns 0 and `long_to_date()` then **throws** (scr4
+printed `"00/00/0000"`).
+
 ## No direct equivalent (keep, or ask the user)
 
 These functions have no simple drop-in replacement. Keep them unless the user asks to migrate
 them, and then read their source first:
 
 - number formatting: `SCR_fmt_dbl`, `SCR_fmt_long` (IODE-specific formats).
-- dates and times: `SCR_current_date`, `SCR_current_time`, `SCR_long_to_ftime`,
-  `SCR_fdate_to_long` (for `SCR_long_to_fdate`, see *Dates* above).
+- dates and times: `SCR_current_time`, `SCR_long_to_ftime`, `SCR_fdate_to_long`
+  (for `SCR_current_date` and `SCR_long_to_fdate`, see *Dates* above).
 - code pages: `SCR_OemToAnsi`, `SCR_AnsiToOem`, `SCR_ConvertToUTF8`: see
   `oem_to_utf8()` / `utf8_to_oem()` in utils.h for OEM <-> UTF-8.
 - a2m output (`SCR_fprintf_esc`...), swap allocator internals (`SW_init`, `SW_end`,
