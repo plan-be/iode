@@ -901,34 +901,38 @@ char *RP_extractpar(char* buf, int* i, char* brackets)
  *  @param [in, out] char**  res    pointer to the allocated string containing @fn(...) 
  *                                  calculated value. *res = NULL on error
  *  @param [in]      char*   str    function name and its arguments (ex: "take(2,abcd)")
- *  @return          int            0 on success, -1 on error (illegal function or @fn() returns NULL
+ *  @return          int            0 on success, -1 on error (illegal function or @fn() throws RPFunctionError)
  */
 int RP_fneval(char** res, char* str)
 {
     *res = 0;
     std::vector<std::string> v_args = split_multi_quoted(str, "(,", '"');
-    
+    if(v_args.empty())
+        return -1;
+
     // find the function name (in lowercase)
     std::string name = v_args[0];
     name = trim(name);
     name = to_lower(name);
 
-    int rc = -1;
-    char** tbl_args = vector_to_double_char(v_args);
-    for(auto& [func_name, fns]: RP_FNS)
+    auto it = RP_FNS.find(name);
+    if(it == RP_FNS.end())
+        return -1;
+
+    // execute the @function
+    std::vector<std::string> args(v_args.begin() + 1, v_args.end());
+    try
     {
-        if(name == func_name)
-        {
-            // execute the @function 
-            *res = (char*) fns.fn((unsigned char**) tbl_args + 1);
-            if(*res == NULL) 
-                rc = -1;
-            rc = 0;
-        }
+        std::string value = it->second.fn(args);
+        *res = (char*) SCR_stracpy((unsigned char*) value.c_str());
+    }
+    catch(const RPFunctionError&)
+    {
+        // invalid call: the text of the @function is left unchanged
+        return -1;
     }
 
-    SCR_free_tbl((unsigned char**) tbl_args);
-    return rc;
+    return 0;
 }
 
 

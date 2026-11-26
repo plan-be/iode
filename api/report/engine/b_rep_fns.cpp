@@ -27,11 +27,12 @@
  *  
  *  Each function in this group has the same syntax:
  *  
- *      U_ch* <function_name>(U_ch** arg)
+ *      std::string <function_name>(const std::vector<std::string>& args)
  *  
- *      @param [in] U_ch**   arg    List of arguments of the function (sep = ',')
- *      @return     U_ch*           allocated string containing the computed value of the function
- *                                  NULL on error
+ *      @param [in] const std::vector<std::string>&  args   List of arguments of the function (sep = ',')
+ *      @return     std::string                             computed value of the function
+ *      @throw      RPFunctionError                         on error (e.g. illegal number of arguments):
+ *                                                          the text of the function is then left unchanged
  *  To add a new @function:
  *      1. create the function based on an existing one. The syntax must be identical
  *      2. add the function name / pointer to the table RP_FNS[] (see at the end of the current file).
@@ -40,76 +41,76 @@
  *  
  *  List of functions
  *  -----------------
- *      U_ch *RPF_iode_version()
- *      U_ch *RPF_take(U_ch** args)
- *      U_ch *RPF_drop(U_ch** args)
- *      U_ch *RPF_replace(U_ch** args)
- *      U_ch *RPF_equal(U_ch** args)
- *      U_ch *RPF_upper(U_ch** args)
- *      U_ch *RPF_lower(U_ch** args)
- *      U_ch *RPF_sqz(U_ch** args)
- *      U_ch *RPF_strip(U_ch** args)
- *      U_ch *RPF_fmtint(U_ch** args)
- *      U_ch *RPF_ansi(U_ch** args)
- *      U_ch *RPF_count(U_ch** args)
- *      U_ch *RPF_index(U_ch** args)
- *      U_ch *RPF_void(U_ch **args)
- *      U_ch *RPF_date(U_ch** args)
- *      U_ch *RPF_time(U_ch** args)
- *      U_ch *RPF_month(U_ch** args)
- *      U_ch *RPF_sstderr(U_ch** args)
- *      U_ch *RPF_srelax(U_ch** args)
- *      U_ch *RPF_ttitle(U_ch** args)
- *      U_ch *RPF_cvalue(U_ch** args)
- *      U_ch *RPF_vvalue(U_ch** args)
- *      U_ch *RPF_lvalue(U_ch** args)
- *      U_ch *RPF_ivalue(U_ch** args)
- *      U_ch *RPF_evalue(U_ch** args)
- *      U_ch *RPF_eqsample(U_ch** args)
- *      U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
- *      U_ch *RPF_eqsamplefrom(U_ch **args)
- *      U_ch *RPF_eqsampleto(U_ch **args)
- *      U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
- *      U_ch *RPF_eqlhs(U_ch **args)
- *      U_ch *RPF_eqrhs(U_ch **args)
- *      U_ch *RPF_sample(U_ch** args)
+ *      std::string RPF_iode_version(const std::vector<std::string>& args)
+ *      std::string RPF_take(const std::vector<std::string>& args)
+ *      std::string RPF_drop(const std::vector<std::string>& args)
+ *      std::string RPF_replace(const std::vector<std::string>& args)
+ *      std::string RPF_equal(const std::vector<std::string>& args)
+ *      std::string RPF_upper(const std::vector<std::string>& args)
+ *      std::string RPF_lower(const std::vector<std::string>& args)
+ *      std::string RPF_sqz(const std::vector<std::string>& args)
+ *      std::string RPF_strip(const std::vector<std::string>& args)
+ *      std::string RPF_fmtint(const std::vector<std::string>& args)
+ *      std::string RPF_ansi(const std::vector<std::string>& args)
+ *      std::string RPF_count(const std::vector<std::string>& args)
+ *      std::string RPF_index(const std::vector<std::string>& args)
+ *      std::string RPF_void(const std::vector<std::string>& args)
+ *      std::string RPF_date(const std::vector<std::string>& args)
+ *      std::string RPF_time(const std::vector<std::string>& args)
+ *      std::string RPF_month(const std::vector<std::string>& args)
+ *      std::string RPF_sstderr(const std::vector<std::string>& args)
+ *      std::string RPF_srelax(const std::vector<std::string>& args)
+ *      std::string RPF_ttitle(const std::vector<std::string>& args)
+ *      std::string RPF_cvalue(const std::vector<std::string>& args)
+ *      std::string RPF_vvalue(const std::vector<std::string>& args)
+ *      std::string RPF_lvalue(const std::vector<std::string>& args)
+ *      std::string RPF_ivalue(const std::vector<std::string>& args)
+ *      std::string RPF_evalue(const std::vector<std::string>& args)
+ *      std::string RPF_eqsample(const std::vector<std::string>& args)
+ *      std::string RPF_eqsamplefromto(const std::vector<std::string>& args, int fromto)
+ *      std::string RPF_eqsamplefrom(const std::vector<std::string>& args)
+ *      std::string RPF_eqsampleto(const std::vector<std::string>& args)
+ *      std::string RPF_eqlhsrhs(const std::vector<std::string>& args, int lhsrhs)
+ *      std::string RPF_eqlhs(const std::vector<std::string>& args)
+ *      std::string RPF_eqrhs(const std::vector<std::string>& args)
+ *      std::string RPF_sample(const std::vector<std::string>& args)
  *      int RPF_vsliste1(const std::shared_ptr<CLEC> clec, std::vector<std::string>& tbl, const int type)
- *      U_ch *RPF_vsliste(U_ch** args, int type)
- *      U_ch **RPF_unique(U_ch** tbl)
- *      U_ch *RPF_vliste(U_ch** args)
- *      U_ch *RPF_sliste(U_ch** args)
- *      U_ch *RPF_expand(U_ch** args, int type)
- *      U_ch *RPF_cexpand(U_ch **args)
- *      U_ch *RPF_eexpand(U_ch **args)
- *      U_ch *RPF_iexpand(U_ch **args)
- *      U_ch *RPF_lexpand(U_ch **args)
- *      U_ch *RPF_sexpand(U_ch **args)
- *      U_ch *RPF_texpand(U_ch **args)
- *      U_ch *RPF_vexpand(U_ch **args)
- *      int RPF_CalcPeriod(U_ch** args)
- *      U_ch *RPF_SimNorm(U_ch** args)
- *      U_ch *RPF_SimNIter(U_ch** args)
- *      U_ch *RPF_SimCpu(U_ch** args)
- *      U_ch *RPF_SimMaxit(U_ch** unused)
- *      U_ch *RPF_SimEps(U_ch** unused)
- *      U_ch *RPF_SimRelax(U_ch** unused)
- *      U_ch *RPF_SimSortNbPasses(U_ch** unused)
- *      U_ch *RPF_SimSortAlgo(U_ch** unused)
- *      U_ch *RPF_SimInitValues(U_ch** unused)
- *      U_ch *RPF_SimCpuSCC(U_ch** unused)
- *      U_ch *RPF_SimCpuSort(U_ch** unused)
- *      U_ch *RPF_vtake(U_ch** args)
- *      U_ch *RPF_vdrop(U_ch** args)
- *      U_ch *RPF_vcount(U_ch** args)
- *      U_ch *RPF_memory(U_ch** args)
- *      U_ch *RPF_ChronoReset(U_ch** unused)
- *      U_ch *RPF_ChronoGet(U_ch** unused)
- *      U_ch *RPF_fappend(U_ch** args)
- *      U_ch *RPF_fdelete(U_ch** args)
- *      U_ch *RPF_getdir(U_ch** unused)
- *      U_ch *RPF_chdir(U_ch **args)
- *      U_ch *RPF_mkdir(U_ch **args)
- *      U_ch *RPF_rmdir(U_ch **args)
+ *      std::string RPF_vsliste(const std::vector<std::string>& args, int type)
+ *      std::vector<std::string> RPF_unique(const std::vector<std::string>& tbl)
+ *      std::string RPF_vliste(const std::vector<std::string>& args)
+ *      std::string RPF_sliste(const std::vector<std::string>& args)
+ *      std::string RPF_expand(const std::vector<std::string>& args, int type)
+ *      std::string RPF_cexpand(const std::vector<std::string>& args)
+ *      std::string RPF_eexpand(const std::vector<std::string>& args)
+ *      std::string RPF_iexpand(const std::vector<std::string>& args)
+ *      std::string RPF_lexpand(const std::vector<std::string>& args)
+ *      std::string RPF_sexpand(const std::vector<std::string>& args)
+ *      std::string RPF_texpand(const std::vector<std::string>& args)
+ *      std::string RPF_vexpand(const std::vector<std::string>& args)
+ *      int RPF_CalcPeriod(const std::vector<std::string>& args)
+ *      std::string RPF_SimNorm(const std::vector<std::string>& args)
+ *      std::string RPF_SimNIter(const std::vector<std::string>& args)
+ *      std::string RPF_SimCpu(const std::vector<std::string>& args)
+ *      std::string RPF_SimMaxit(const std::vector<std::string>& args)
+ *      std::string RPF_SimEps(const std::vector<std::string>& args)
+ *      std::string RPF_SimRelax(const std::vector<std::string>& args)
+ *      std::string RPF_SimSortNbPasses(const std::vector<std::string>& args)
+ *      std::string RPF_SimSortAlgo(const std::vector<std::string>& args)
+ *      std::string RPF_SimInitValues(const std::vector<std::string>& args)
+ *      std::string RPF_SimCpuSCC(const std::vector<std::string>& args)
+ *      std::string RPF_SimCpuSort(const std::vector<std::string>& args)
+ *      std::string RPF_vtake(const std::vector<std::string>& args)
+ *      std::string RPF_vdrop(const std::vector<std::string>& args)
+ *      std::string RPF_vcount(const std::vector<std::string>& args)
+ *      std::string RPF_memory(const std::vector<std::string>& args)
+ *      std::string RPF_ChronoReset(const std::vector<std::string>& args)
+ *      std::string RPF_ChronoGet(const std::vector<std::string>& args)
+ *      std::string RPF_fappend(const std::vector<std::string>& args)
+ *      std::string RPF_fdelete(const std::vector<std::string>& args)
+ *      std::string RPF_getdir(const std::vector<std::string>& args)
+ *      std::string RPF_chdir(const std::vector<std::string>& args)
+ *      std::string RPF_mkdir(const std::vector<std::string>& args)
+ *      std::string RPF_rmdir(const std::vector<std::string>& args)
  *      
  *  
  */
@@ -140,6 +141,22 @@
 #else
 #endif
 #include <time.h>
+#include <chrono>
+
+
+/**
+ *  Formats a double value using a printf-like format (e.g. "%lg").
+ *  
+ *  @param [in] const char*  fmt     printf-like format with one double conversion
+ *  @param [in] double       value   value to format
+ *  @return     std::string          formatted value
+ */
+static std::string format_double(const char* fmt, double value)
+{
+    char buf[128];
+    snprintf(buf, sizeof(buf), fmt, value);
+    return std::string(buf);
+}
 
 
 /*--------------------------- STRING MANIPULATIONS -------------------------------*/
@@ -162,41 +179,28 @@
  *       @take(2,A,B,C,D,E)    => "@take(2,A,B,C,D,E)"
  *       @take(2,A,BCDE)       => "@take(2,A,BCDE)" 
  */
-U_ch *RPF_take(U_ch** args)
+std::string RPF_take(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0;
-    int     n, lg;
+    if(args.size() != 2)
+        throw RPFunctionError("@take(): 2 arguments required");
 
-    if(SCR_tbl_size(args) != 2) return res;
-    n = atol((char*) args[0]);
-    lg = (int)strlen((char*) args[1]);
-    if(n > 0) {
-        res = (unsigned char*) SCR_malloc(n + 1);
-        if(n >= lg) {
-            strcpy((char*) res, (char*) args[1]);
-            memset(res + lg, ' ', n - lg);
-            res[n] = 0;
-            return res;
-        }
-        else {
-            memcpy(res, args[1], n);
-            res[n] = 0;
-            return res;
-        }
+    int n = atol(args[0].c_str());
+    const std::string& str = args[1];
+    int lg = (int) str.size();
+    if(n > 0)
+    {
+        if(n >= lg)
+            return str + std::string(n - lg, ' ');
+        else
+            return str.substr(0, n);
     }
-    else {
+    else
+    {
         n = -n;
-        res = (unsigned char*) SCR_malloc(n + 1);
-        if(n >= lg) {
-            memset(res, ' ', n - lg);
-            strcpy(((char*) res) + n - lg, (char*) args[1]);
-            return res;
-        }
-        else {
-            memcpy(res, args[1] + lg - n, n);
-            res[n] = 0;
-            return res;
-        }
+        if(n >= lg)
+            return std::string(n - lg, ' ') + str;
+        else
+            return str.substr(lg - n);
     }
 }
 
@@ -222,28 +226,29 @@ U_ch *RPF_take(U_ch** args)
  *         @drop(2,A,BCDE)       => "@drop(2,A,BCDE)"
  *         @drop(n,ABCDE)        => "ABCDE"
  */
-U_ch *RPF_drop(U_ch** args)
+std::string RPF_drop(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0;
-    int     n, lg;
+    if(args.size() != 2)
+        throw RPFunctionError("@drop(): 2 arguments required");
 
-    if(SCR_tbl_size(args) != 2) return res;
-    n = atol((char*) args[0]);
-    lg = (int)strlen((char*) args[1]);
-    if(lg == 0) return res;
+    int n = atol(args[0].c_str());
+    const std::string& str = args[1];
+    int lg = (int) str.size();
+    if(lg == 0)
+        throw RPFunctionError("@drop(): the string is empty");
 
-    if(n > 0) {
-        if(n >= lg) return((unsigned char*) SCR_malloc(1));
-        res = (unsigned char*) SCR_malloc(lg - n + 1);
-        strcpy((char*) res, (char*) args[1] + n);
-        return res;
+    if(n > 0)
+    {
+        if(n >= lg)
+            return "";
+        return str.substr(n);
     }
-    else {
+    else
+    {
         n = -n;
-        if(n >= lg) return((unsigned char*) SCR_malloc(1));
-        res = (unsigned char*) SCR_malloc(lg - n + 1);
-        SCR_strlcpy(res, args[1], lg - n);
-        return res;
+        if(n >= lg)
+            return "";
+        return str.substr(0, lg - n);
     }
 }
 
@@ -263,12 +268,13 @@ U_ch *RPF_drop(U_ch** args)
  *         @replace(Buro plan,Bureau du Plan)            => @replace(Buro plan,Bureau du Plan)
  *         @replace(AB,B,C,D)                            => @replace(AB,B,C,D)
  */
-U_ch *RPF_replace(U_ch** args)
+std::string RPF_replace(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0;
+    if(args.size() != 3)
+        throw RPFunctionError("@replace(): 3 arguments required");
 
-    if(SCR_tbl_size(args) != 3) return res;
-    res = SCR_areplace(args[0], args[1], args[2]);
+    std::string res = args[0];
+    replace_all(res, args[1], args[2]);
     return res;
 }
 
@@ -282,22 +288,12 @@ U_ch *RPF_replace(U_ch** args)
  *      @equal(aa, aa)        =>  0
  *      @equal(aa,bb)         =>  0
  *      @equal(aa,aa,aa)      =>  0
- *  
- *  TODO: return NULL if #args < 2 ? ou accepter plus d'args
  */
-U_ch *RPF_equal(U_ch** args)
+std::string RPF_equal(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0;
-
-    if(SCR_tbl_size(args) != 2)
-        res = SCR_stracpy((unsigned char*) "0");
-    else {
-        if(strcmp((char*) args[0], (char*) args[1]))
-            res = SCR_stracpy((unsigned char*) "0");
-        else
-            res = SCR_stracpy((unsigned char*) "1");
-    }
-    return res;
+    if(args.size() != 2)
+        return "0";
+    return (args[0] == args[1]) ? "1" : "0";
 }
 
 
@@ -311,11 +307,11 @@ U_ch *RPF_equal(U_ch** args)
  *      @upper("abc", "def")  =>  "ABC  "DEF""
  *      @upper("abc","def")   =>  "ABC DEF"
  */
-U_ch *RPF_upper(U_ch** args)
+std::string RPF_upper(const std::vector<std::string>& args)
 {
-    U_ch    *res = SCR_mtov(args, ' ');
-
-    SCR_upper(res);
+    std::string res = join(args, " ");
+    // SCR_upper() also converts the CP850 accented letters
+    SCR_upper((unsigned char*) res.data());
     return res;
 }
 
@@ -331,11 +327,11 @@ U_ch *RPF_upper(U_ch** args)
  *      @lower("abc","def")   =>  "abc def"
  *  
  */
-U_ch *RPF_lower(U_ch** args)
+std::string RPF_lower(const std::vector<std::string>& args)
 {
-    U_ch    *res = SCR_mtov(args, ' ');
-
-    SCR_lower(res);
+    std::string res = join(args, " ");
+    // SCR_lower() only converts A-Z (std::tolower() depends on the current locale)
+    SCR_lower((unsigned char*) res.data());
     return res;
 }
 
@@ -351,11 +347,11 @@ U_ch *RPF_lower(U_ch** args)
  *      @sqz( ab, " cd", ef)  =>  "ab"cd"ef"
  *  
  */
-U_ch *RPF_sqz(U_ch** args)
+std::string RPF_sqz(const std::vector<std::string>& args)
 {
-    U_ch    *res = SCR_mtov(args, ' ');
-
-    SCR_sqz(res);
+    std::string res = join(args, " ");
+    // removes only the ' ' characters (not the tabs)
+    res.erase(std::remove(res.begin(), res.end(), ' '), res.end());
     return res;
 }
 
@@ -371,11 +367,12 @@ U_ch *RPF_sqz(U_ch** args)
  *      @strip( ab, " cd", ef)  =>  " ab  " cd"  ef"
  *  
  */
-U_ch *RPF_strip(U_ch** args)
+std::string RPF_strip(const std::vector<std::string>& args)
 {
-    U_ch    *res = SCR_mtov(args, ' ');
-
-    SCR_strip(res);
+    std::string res = join(args, " ");
+    // removes all the trailing characters <= ' ' (spaces, tabs, control characters)
+    while(!res.empty() && (unsigned char) res.back() <= ' ')
+        res.pop_back();
     return res;
 }
 
@@ -398,20 +395,25 @@ U_ch *RPF_strip(U_ch** args)
  *  
  *  @see http://www.xon.be/scr4/libs1/libs1164.htm
  */
-U_ch *RPF_fmtint(U_ch** args)
+std::string RPF_fmtint(const std::vector<std::string>& args)
 {
-    U_ch    buf[512];
-    int     nb;
-
-    nb = SCR_tbl_size(args);
-    switch(nb) {
+    std::string fmt;
+    switch(args.size())
+    {
         case 0 :
-            return(SCR_mtov(args, ' '));
+            return "";
         case 2 :
-            return(SCR_stracpy(SCR_fmt_long(buf, args[1], atol((char*) args[0]))));
+            fmt = args[1];
+            break;
         default :
-            return(SCR_stracpy(SCR_fmt_long(buf, (unsigned char*) "999999", atol((char*) args[0]))));
+            fmt = "999999";
+            break;
     }
+
+    // the result has the same length as the format
+    std::string res(fmt.size(), ' ');
+    SCR_fmt_long((unsigned char*) res.data(), (unsigned char*) fmt.data(), atol(args[0].c_str()));
+    return res;
 }
 
 
@@ -421,13 +423,15 @@ U_ch *RPF_fmtint(U_ch** args)
  *  
  *  TODO: add fn  @oem / @utf8
  */
-U_ch *RPF_ansi(U_ch** args)
+std::string RPF_ansi(const std::vector<std::string>& args)
 {
-    U_ch    *buf;
+    if(args.size() < 1)
+        throw RPFunctionError("@ansi(): 1 argument required");
 
-    if(SCR_tbl_size(args) < 1) return((U_ch *)0);
-    buf = SCR_stracpy(args[0]);
-    return(SCR_OemToAnsi(buf, args[0]));
+    std::string res = args[0];
+    // in-place conversion
+    SCR_OemToAnsi((unsigned char*) res.data(), (unsigned char*) res.data());
+    return res;
 }
 
 
@@ -440,15 +444,9 @@ U_ch *RPF_ansi(U_ch** args)
  *      @count(ACAF;ACAG)         =>  "1"
  *      @count()                  =>  "0"
  */
-U_ch *RPF_count(U_ch** args)
+std::string RPF_count(const std::vector<std::string>& args)
 {
-    U_ch    *res;
-    int     n;
-
-    res = (unsigned char*) SCR_malloc(20);
-    n = SCR_tbl_size(args);
-    sprintf((char*) res, "%d", n);
-    return res;
+    return std::to_string(args.size());
 }
 
 
@@ -466,15 +464,16 @@ U_ch *RPF_count(U_ch** args)
  *      @index(A;B;C)             =>  ""
  *      @index()                  =>  ""
  */
-U_ch *RPF_index(U_ch** args)
+std::string RPF_index(const std::vector<std::string>& args)
 {
-    int     n, pos;
+    int n = (int) args.size() - 1;
+    if(n < 1)
+        return "";
 
-    n = SCR_tbl_size(args) - 1;
-    if(n < 1) return((unsigned char*) SCR_malloc(1));
-    pos = atol((char*) args[0]);
-    if(pos > n || pos < 1) return((unsigned char*) SCR_malloc(1));
-    return(SCR_stracpy(args[pos]));
+    int pos = atol(args[0].c_str());
+    if(pos > n || pos < 1)
+        return "";
+    return args[pos];
 }
 
 /**
@@ -486,9 +485,9 @@ U_ch *RPF_index(U_ch** args)
  *      @void(@getdir())          =>  ""
  *      @void(@vexpand(*))        =>  ""
  */
-U_ch *RPF_void(U_ch **args)
+std::string RPF_void(const std::vector<std::string>& args)
 {
-    return(SCR_stracpy((unsigned char*) ""));
+    return "";
 }
 
 
@@ -509,11 +508,10 @@ U_ch *RPF_void(U_ch **args)
  *
  *  @see long_to_date() in api/utils/utils.h for more details
  */
-U_ch *RPF_date(U_ch** args)
+std::string RPF_date(const std::vector<std::string>& args)
 {
-    std::string fmt = args[0] ? std::string((char*) args[0]) : std::string("dd-mm-yyyy");
-    std::string date = long_to_date(current_date_to_long(), fmt);
-    return SCR_stracpy((U_ch*) date.c_str());
+    std::string fmt = args.empty() ? std::string("dd-mm-yyyy") : args[0];
+    return long_to_date(current_date_to_long(), fmt);
 }
 
 
@@ -529,14 +527,12 @@ U_ch *RPF_date(U_ch** args)
  *
  *  @see SCR_long_to_ftime() for more details (http://www.xon.be/scr4/libs1/libs129.htm)
  */
-U_ch *RPF_time(U_ch** args)
+std::string RPF_time(const std::vector<std::string>& args)
 {
-    U_ch    *res, *fmt;
-
-    res = (unsigned char*) SCR_malloc(60);
-    if(args[0]) fmt = args[0];
-    else        fmt = (unsigned char*) "hh:mm:ss";
-    SCR_long_to_ftime(SCR_current_time(), (char*) res, (char*) fmt);
+    std::string fmt = args.empty() ? std::string("hh:mm:ss") : args[0];
+    // the result has the same length as the format
+    std::string res(fmt.size(), ' ');
+    SCR_long_to_ftime(SCR_current_time(), res.data(), fmt.data());
     return res;
 }
 
@@ -600,21 +596,27 @@ U_ch* RPF_MONTHSN[] =
  *      @month(1,e)           =>  "January"
  *      @month(1,N)           =>  "Januari"
  */
-U_ch *RPF_month(U_ch** args)
+std::string RPF_month(const std::vector<std::string>& args)
 {
-    int     m, lang = 'F';
+    if(args.size() < 1)
+        throw RPFunctionError("@month(): 1 argument required");
 
-    if(SCR_tbl_size(args) < 1) return((U_ch *)0);
-    m = atoi((char*) args[0]);
-    if(m < 1 || m > 12) return((U_ch *)0);
-    if(SCR_tbl_size(args) >= 2) lang = SCR_upper_char(args[1][0]);
-    switch(lang) {
+    int m = atoi(args[0].c_str());
+    if(m < 1 || m > 12)
+        throw RPFunctionError("@month(): the month must be between 1 and 12");
+
+    int lang = 'F';
+    if(args.size() >= 2)
+        lang = SCR_upper_char((unsigned char) args[1][0]);
+
+    switch(lang)
+    {
         case 'N' :
-            return(SCR_stracpy(RPF_MONTHSN[m - 1]));
+            return std::string((char*) RPF_MONTHSN[m - 1]);
         case 'F' :
-            return(SCR_stracpy(RPF_MONTHSF[m - 1]));
+            return std::string((char*) RPF_MONTHSF[m - 1]);
         default  :
-            return(SCR_stracpy(RPF_MONTHSE[m - 1]));
+            return std::string((char*) RPF_MONTHSE[m - 1]);
     }
 }
 
@@ -630,31 +632,28 @@ U_ch *RPF_month(U_ch** args)
  *      @sstderr(acaf1,xyz,acaf3)     =>  "0.001369 -- 0.873010"
  *      @sstderr(acaf1,acaf2, acaf3)  =>  "0.001369 0.000001 0.873010"
  */
-U_ch *RPF_sstderr(U_ch** args)
+std::string RPF_sstderr(const std::vector<std::string>& args)
 {
-    U_ch *res = 0, buf[80];
-    
-    std::string name;
-    std::shared_ptr<Scalar> scl_ptr;
-    for(int i = 0 ; args[i] ; i++) 
+    if(args.empty())
+        throw RPFunctionError("@sstderr(): at least 1 argument required");
+
+    std::vector<std::string> values;
+    for(const std::string& arg : args)
     {
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) " ");
-        name = std::string((char*) args[i]);
-        name = global_ws_scl->to_key(name);
+        std::string name = global_ws_scl->to_key(arg);
         if(!global_ws_scl->contains(name))
-            strcpy((char*) buf, "--");
-        else 
         {
-            scl_ptr = global_ws_scl->get_obj_ptr(name);
-            if(IODE_IS_A_NUMBER(scl_ptr->std))
-                sprintf((char*) buf, "%lf", (double) scl_ptr->std);
-            else
-                strcpy((char*) buf, "--");
+            values.push_back("--");
+            continue;
         }
-        res = SCR_strafcat(res, buf);
+
+        std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+        if(IODE_IS_A_NUMBER(scl_ptr->std))
+            values.push_back(std::to_string((double) scl_ptr->std));     // same as "%lf"
+        else
+            values.push_back("--");
     }
-    return res;
+    return join(values, " ");
 }
 
 /**
@@ -666,31 +665,28 @@ U_ch *RPF_sstderr(U_ch** args)
  *      @srelax(acaf1,xyz,acaf3)     =>  "1.000000 -- 1.000000"
  *      @srelax(acaf1,acaf2, acaf3)  =>  "1.000000 1.000000 1.000000"  
  */
-U_ch *RPF_srelax(U_ch** args)
+std::string RPF_srelax(const std::vector<std::string>& args)
 {
-    U_ch *res = 0, buf[80];
+    if(args.empty())
+        throw RPFunctionError("@srelax(): at least 1 argument required");
 
-    std::string name;
-    std::shared_ptr<Scalar> scl_ptr;
-    for(int i = 0 ; args[i] ; i++) 
+    std::vector<std::string> values;
+    for(const std::string& arg : args)
     {
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) " ");
-        name = std::string((char*) args[i]);
-        name = global_ws_scl->to_key(name);
+        std::string name = global_ws_scl->to_key(arg);
         if(!global_ws_scl->contains(name))
-            strcpy((char*) buf, "--");
-        else 
         {
-            scl_ptr = global_ws_scl->get_obj_ptr(name);
-            if(IODE_IS_A_NUMBER(scl_ptr->relax))
-                sprintf((char*) buf, "%lf", (double) scl_ptr->relax);
-            else
-                strcpy((char*) buf, "--");
+            values.push_back("--");
+            continue;
         }
-        res = SCR_strafcat(res, buf);
+
+        std::shared_ptr<Scalar> scl_ptr = global_ws_scl->get_obj_ptr(name);
+        if(IODE_IS_A_NUMBER(scl_ptr->relax))
+            values.push_back(std::to_string((double) scl_ptr->relax));   // same as "%lf"
+        else
+            values.push_back("--");
     }
-    return res;
+    return join(values, " ");
 }
 
 /**
@@ -704,32 +700,21 @@ U_ch *RPF_srelax(U_ch** args)
  *      @ttitle(C8_1, c8_10)    =>  "Déterminants de l'output potentiel
  *                                   Coin salarial parafiscal"
  */
-U_ch *RPF_ttitle(U_ch** args)
+std::string RPF_ttitle(const std::vector<std::string>& args)
 {
-    U_ch *res = 0, buf[128];
-    std::shared_ptr<Table> tbl_ptr;
+    if(args.empty())
+        throw RPFunctionError("@ttitle(): at least 1 argument required");
 
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    std::vector<std::string> titles;
+    for(const std::string& arg : args)
     {
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) "\n");
-        name = std::string((char*) args[i]);
-        name = global_ws_tbl->to_key(name);
-        if(!global_ws_tbl->contains(name)) 
-        {
-            sprintf((char*) buf, "Table %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
-        {
-            tbl_ptr = global_ws_tbl->get_obj_ptr(name);
-            std::string title = tbl_ptr->get_title(false);
-            res = SCR_strafcat(res, (unsigned char*) title.c_str());
-        }
+        std::string name = global_ws_tbl->to_key(arg);
+        if(!global_ws_tbl->contains(name))
+            titles.push_back("Table " + arg + " not found");
+        else
+            titles.push_back(global_ws_tbl->get_obj_ptr(name)->get_title(false));
     }
-
-    return res;
+    return join(titles, "\n");
 }
 
 
@@ -743,31 +728,27 @@ U_ch *RPF_ttitle(U_ch** args)
  *      @cvalue(ACAG)          =>  "Totale overheid: netto ontvangen kapitaaloverdrachten."
  *      @cvalue(ACAF,ACAG)     =>  "Ondernemingen: ontvangen kapitaaloverdrachten.;Totale overheid: netto ontvangen kapitaaloverdrachten."
  */
-U_ch *RPF_cvalue(U_ch** args)
+std::string RPF_cvalue(const std::vector<std::string>& args)
 {
-    U_ch *res = 0, buf[128];
     KDBCommentsPtr kdb = global_ws_cmt;
+    if(!kdb)
+        throw RPFunctionError("@cvalue(): no Comments workspace");
+    if(args.empty())
+        throw RPFunctionError("@cvalue(): at least 1 argument required");
 
-    if(!kdb) 
-        return res;
-
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    std::string res;
+    for(size_t i = 0; i < args.size(); i++)
     {
-        name = std::string((char*) args[i]);
-        name = kdb->to_key(name);
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) ";");
-        if(!kdb->contains(name)) 
-        {
-            sprintf((char*) buf, "Cmt %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
+        std::string name = kdb->to_key(args[i]);
+        if(i > 0)
+            res += ";";
+        if(!kdb->contains(name))
+            res += "Cmt " + args[i] + " not found";
+        else
         {
             Comment comment = kdb->get(name);
-            res = SCR_strafcat(res, (unsigned char*) comment.c_str());
-            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
+            res += comment.c_str();
+            replace_all(res, "\n", " ");
         }
     }
     return res;
@@ -784,38 +765,37 @@ U_ch *RPF_cvalue(U_ch** args)
  *      @vvalue(ACAG)          =>  "na  na  -11.028999  -15.847   ..."
  *      @vvalue(ACAF,ACAG)     =>  "na  na  1.2130001  5.2020001  ... ;  na  na  -11.028999  ...
  */
-U_ch *RPF_vvalue(U_ch** args)
+std::string RPF_vvalue(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0, buf[128];
+    char    buf[128];
     double  *val;
     KDBVariablesPtr kdb = global_ws_var;
 
-    if(!kdb) 
-        return res;
+    if(!kdb)
+        throw RPFunctionError("@vvalue(): no Variables workspace");
 
-    if(!kdb->get_sample() || kdb->get_sample()->nb_periods == 0) 
-        return (U_ch*) "";
+    if(!kdb->get_sample() || kdb->get_sample()->nb_periods == 0)
+        return "";
 
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    if(args.empty())
+        throw RPFunctionError("@vvalue(): at least 1 argument required");
+
+    std::string res;
+    for(size_t i = 0; i < args.size(); i++)
     {
-        name = std::string((char*) args[i]);
-        name = kdb->to_key(name);
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) ";");
-        if(!kdb->contains(name)) 
-        {
-            sprintf((char*) buf, "VAR %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
+        std::string name = kdb->to_key(args[i]);
+        if(i > 0)
+            res += ";";
+        if(!kdb->contains(name))
+            res += "VAR " + args[i] + " not found";
+        else
         {
             val = kdb->get_var_ptr(name);
-            for(int j = 0 ; j < kdb->get_sample()->nb_periods; j++, val++) 
+            for(int j = 0 ; j < kdb->get_sample()->nb_periods; j++, val++)
             {
-                IodeFmtVal((char*) buf, *val);
-                res = SCR_strafcat(res, buf);
-                res = SCR_strafcat(res, (unsigned char*) " ");
+                IodeFmtVal(buf, *val);
+                res += buf;
+                res += " ";
             }
         }
     }
@@ -835,31 +815,27 @@ U_ch *RPF_vvalue(U_ch** args)
  *      @lvalue(ENDO)            =>  "$endo0,$endo1,"
  *      @lvalue(_SEARCH,XENVI)   =>  "ZKF,XEX,XPWMAB,XPWMS,XPWXAB,XPWXS,XQWXAB,XQWXS,XPOIL,XNATY,XTFP"
  */
-U_ch *RPF_lvalue(U_ch** args)
+std::string RPF_lvalue(const std::vector<std::string>& args)
 {
-    U_ch *res = 0, buf[128];
     KDBListsPtr kdb = global_ws_lst;
+    if(!kdb)
+        throw RPFunctionError("@lvalue(): no Lists workspace");
+    if(args.empty())
+        throw RPFunctionError("@lvalue(): at least 1 argument required");
 
-    if(!kdb) 
-        return res;
-
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    std::string res;
+    for(size_t i = 0; i < args.size(); i++)
     {
-        name = std::string((char*) args[i]);
-        name = kdb->to_key(name);
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) ",");
-        if(!kdb->contains(name)) 
-        {
-            sprintf((char*) buf, "List %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
+        std::string name = kdb->to_key(args[i]);
+        if(i > 0)
+            res += ",";
+        if(!kdb->contains(name))
+            res += "List " + args[i] + " not found";
+        else
         {
             List lst = kdb->get(name);
-            res = SCR_strafcat(res, (unsigned char*) lst.c_str());
-            res = SCR_replace(res, (unsigned char*) ";", (unsigned char*) ",");
+            res += lst.c_str();
+            replace_all(res, ";", ",");
         }
     }
     return res;
@@ -879,31 +855,26 @@ U_ch *RPF_lvalue(U_ch** args)
  *      @ivalue(FLGR,IUGR)       =>  "FLG/VBBP;IUG/VBBP"
  *      @ivalue(flgr)            =>  "FLG/VBBP"
  */
-U_ch *RPF_ivalue(U_ch** args)                
+std::string RPF_ivalue(const std::vector<std::string>& args)
 {
-    U_ch    *res = 0, buf[128];
     KDBIdentitiesPtr kdb = global_ws_idt;
+    if(!kdb)
+        throw RPFunctionError("@ivalue(): no Identities workspace");
+    if(args.empty())
+        throw RPFunctionError("@ivalue(): at least 1 argument required");
 
-    if(!kdb) 
-        return res;
-
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    std::string res;
+    for(size_t i = 0; i < args.size(); i++)
     {
-        name = std::string((char*) args[i]);
-        name = kdb->to_key(name);
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) ";");
-        if(!kdb->contains(name)) 
+        std::string name = kdb->to_key(args[i]);
+        if(i > 0)
+            res += ";";
+        if(!kdb->contains(name))
+            res += "Idt " + args[i] + " not found";
+        else
         {
-            sprintf((char*) buf, "Idt %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
-        {
-            std::string lec = kdb->get_obj_ptr(name)->get_lec();
-            res = SCR_strafcat(res, (unsigned char*) lec.c_str());
-            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
+            res += kdb->get_obj_ptr(name)->get_lec();
+            replace_all(res, "\n", " ");
         }
     }
     return res;
@@ -925,32 +896,26 @@ U_ch *RPF_ivalue(U_ch** args)
  *      @evalue(XXX)             =>  "Eqs XXX not found"
  *      @evalue()                =>  "@evalue()"
  */
-U_ch *RPF_evalue(U_ch** args)                
+std::string RPF_evalue(const std::vector<std::string>& args)
 {
-    U_ch* res = 0, buf[128];
     KDBEquationsPtr kdb = global_ws_eqs;
+    if(!kdb)
+        throw RPFunctionError("@evalue(): no Equations workspace");
+    if(args.empty())
+        throw RPFunctionError("@evalue(): at least 1 argument required");
 
-    if(!kdb) 
-        return res;
-
-    std::string name;
-    for(int i = 0 ; args[i] ; i++) 
+    std::string res;
+    for(size_t i = 0; i < args.size(); i++)
     {
-        name = std::string((char*) args[i]);
-        name = kdb->to_key(name);
-        if(i > 0) 
-            res = SCR_strafcat(res, (unsigned char*) ";");
-        
-        if(!kdb->contains(name)) 
+        std::string name = kdb->to_key(args[i]);
+        if(i > 0)
+            res += ";";
+        if(!kdb->contains(name))
+            res += "Eqs " + args[i] + " not found";
+        else
         {
-            sprintf((char*) buf, "Eqs %s not found", args[i]);
-            res = SCR_strafcat(res, buf);
-        }
-        else 
-        {
-            std::string lec = kdb->get_obj_ptr(name)->lec;
-            res = SCR_strafcat(res, (unsigned char*) lec.c_str());
-            res = SCR_replace(res, (unsigned char*) "\n", (unsigned char*) " ");
+            res += kdb->get_obj_ptr(name)->lec;
+            replace_all(res, "\n", " ");
         }
     }
     return res;
@@ -967,76 +932,63 @@ U_ch *RPF_evalue(U_ch** args)
  *      @eqsample(XXX)                =>  "[Eqs XXX not found]"
  *      @eqsample()                   =>  "@eqsample()"
  */
-U_ch *RPF_eqsample(U_ch** args)            
+std::string RPF_eqsample(const std::vector<std::string>& args)
 {
-    U_ch* res = 0;
     KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
-    if(!kdb) 
-        return res;
-    
+    if(!kdb)
+        throw RPFunctionError("@eqsample(): no Equations workspace");
+
     // 1! eq
-    if(SCR_tbl_size(args) != 1) 
-        return res;
+    if(args.size() != 1)
+        throw RPFunctionError("@eqsample(): 1 argument required");
 
-    res = (unsigned char*) SCR_malloc(80);
+    std::string name = kdb->to_key(args[0]);
+    if(!kdb->contains(name))
+        return "[Eqs " + args[0] + " not found]";
 
-    std::string name = std::string((char*) args[0]); 
-    name = kdb->to_key(name);
-    if(!kdb->contains(name)) 
-        sprintf((char*) res, "[Eqs %s not found]", args[0]);
-    else
-    {
-        std::shared_ptr<Equation> eq = kdb->get_obj_ptr(name);
-        std::string str_smpl = eq->sample.to_string();
-        sprintf((char*) res, (char*) str_smpl.c_str());
-    }       
-
-    return res;
+    std::shared_ptr<Equation> eq = kdb->get_obj_ptr(name);
+    return eq->sample.to_string();
 }
 
 
 /**
  *  Sub fonction  of RPF_eqsamplefrom() and RPF_eqsampleto().
  *  
- *  @param [in] char**  args    args of RPF_eqsample*() => equation name
+ *  @param [in] const std::vector<std::string>&  args    args of RPF_eqsample*() => equation name
  *  @param [in] int     fromto  0 if sample.from must be returned, 1 for sample.to
- *  @return     char*           sample.from or sample.to in text format
+ *  @return     std::string                         sample.from or sample.to in text format
  *                              " " if there is no sample in the equation
  *                              "[Eq ... not found]" if the eq does not exist
  */
-U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)           
+std::string RPF_eqsamplefromto(const std::vector<std::string>& args, int fromto)
 {
-    U_ch* res = 0;
     KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
-    if(!kdb) 
-        return res;
+    if(!kdb)
+        throw RPFunctionError("@eqsamplefrom/to(): no Equations workspace");
 
     // 1! eq
-    if(SCR_tbl_size(args) != 1) 
-        return res;
+    if(args.size() != 1)
+        throw RPFunctionError("@eqsamplefrom/to(): 1 argument required");
 
-    res = (unsigned char*) SCR_malloc(30 + (int)strlen((char*) args[0]));
-
-    std::string name = std::string((char*) args[0]);
-    name = kdb->to_key(name);
-    if(!kdb->contains(name)) 
-        sprintf((char*) res, "[Eqs %s not found]", args[0]);
-    else 
+    std::string res;
+    std::string name = kdb->to_key(args[0]);
+    if(!kdb->contains(name))
+        res = "[Eqs " + args[0] + " not found]";
+    else
     {
         std::shared_ptr<Equation> eq = kdb->get_obj_ptr(name);
-        Sample smpl = eq->sample;
-        if(fromto == 0) 
-            sprintf((char*) res, (char*) smpl.start_period.to_string().c_str());
-        else            
-            sprintf((char*) res, (char*) smpl.end_period.to_string().c_str());
+        if(fromto == 0)
+            res = eq->sample.start_period.to_string();
+        else
+            res = eq->sample.end_period.to_string();
     }
 
-    if(res[0] == 0) 
-        strcpy((char*) res, " ");   // pour éviter de quitter le rapport si sample vide
+    if(res.empty())
+        res = " ";   // pour éviter de quitter le rapport si sample vide
 
     return res;
 }
@@ -1051,9 +1003,9 @@ U_ch *RPF_eqsamplefromto(U_ch** args, int fromto)
  *      @eqsamplefrom(XXX)            =>  "[Eqs XXX not found]"
  *      @eqsamplefrom()               =>  "@eqsamplefrom()"
  */
-U_ch *RPF_eqsamplefrom(U_ch **args)
+std::string RPF_eqsamplefrom(const std::vector<std::string>& args)
 {
-    return(RPF_eqsamplefromto(args, 0));
+    return RPF_eqsamplefromto(args, 0);
 }
 
 
@@ -1066,60 +1018,45 @@ U_ch *RPF_eqsamplefrom(U_ch **args)
  *      @eqsampleto(XXX)              =>  "[Eqs XXX not found]"
  *      @eqsampleto()                 =>  "@eqsampleto()"
  */
-U_ch *RPF_eqsampleto(U_ch **args)
+std::string RPF_eqsampleto(const std::vector<std::string>& args)
 {
-    return(RPF_eqsamplefromto(args, 1));
+    return RPF_eqsamplefromto(args, 1);
 }
 
 /**
  *  Sub fonction  of RPF_eqlhs() and RPF_eqrhs().
  *  
- *  @param [in] char**  args    args of RPF_eq?hs() => equation name
+ *  @param [in] const std::vector<std::string>&  args    args of RPF_eq?hs() => equation name
  *  @param [in] int     lhsrhs  0 for the LHS, 1 foir the RHS of the equation
- *  @return     char*           allocated LHS or RHS 
+ *  @return     std::string                         LHS or RHS 
  *                              "[Eq ... not found]" if the eq does not exist
  */
-U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs) 
+std::string RPF_eqlhsrhs(const std::vector<std::string>& args, int lhsrhs)
 {
-    U_ch* eq = 0, *rhs;
-    int poscolon;
     KDBEquationsPtr kdb = global_ws_eqs;
 
     // Equation WS  empty
-    if(!kdb) 
-        return(eq);
+    if(!kdb)
+        throw RPFunctionError("@eqlhs/rhs(): no Equations workspace");
 
     // 1! eq
-    if(SCR_tbl_size(args) != 1) 
-        return(eq);
+    if(args.size() != 1)
+        throw RPFunctionError("@eqlhs/rhs(): 1 argument required");
 
-    std::string name = std::string((char*) args[0]);
-    name = kdb->to_key(name);
-    if(!kdb->contains(name)) 
-    {
-        eq = (unsigned char*) SCR_malloc(80);
-        sprintf((char*) eq, "[Eqs %s not found]", args[0]);
-    }
-    else 
-    {
-        std::string lec = kdb->get_obj_ptr(name)->lec;
-        eq = SCR_stracpy((unsigned char*) lec.c_str());
-        poscolon = split_eq((char*) eq);
-        if(poscolon > 0) 
-        {
-            if(lhsrhs == 0) 
-                eq[poscolon] = 0;
-            else 
-            {
-                rhs = SCR_stracpy(eq);
-                strcpy((char*) rhs, ((char*) eq) + poscolon + 2);
-                SCR_free(eq);
-                eq = rhs;
-            }    
-        }
-    }
+    std::string name = kdb->to_key(args[0]);
+    if(!kdb->contains(name))
+        return "[Eqs " + args[0] + " not found]";
 
-    return(eq);
+    std::string lec = kdb->get_obj_ptr(name)->lec;
+    int poscolon = split_eq(lec);
+    if(poscolon > 0)
+    {
+        if(lhsrhs == 0)
+            lec = lec.substr(0, poscolon);
+        else
+            lec = lec.substr(poscolon + 2);     // skip ":="
+    }
+    return lec;
 }
 
 
@@ -1133,9 +1070,9 @@ U_ch *RPF_eqlhsrhs(U_ch** args, int lhsrhs)
  *      @eqlhs(XXX)              =>  "[Eqs XXX not found]"
  *      @eqlhs()                 =>  "@eqlhs()"
  */
-U_ch *RPF_eqlhs(U_ch **args)
+std::string RPF_eqlhs(const std::vector<std::string>& args)
 {
-    return(RPF_eqlhsrhs(args, 0));
+    return RPF_eqlhsrhs(args, 0);
 }
 
 
@@ -1150,9 +1087,9 @@ U_ch *RPF_eqlhs(U_ch **args)
  *      @eqrlhs(XXX)              =>  "[Eqs XXX not found]"
  *      @eqrlhs()                 =>  "@eqrhs()"
  */
-U_ch *RPF_eqrhs(U_ch **args)
+std::string RPF_eqrhs(const std::vector<std::string>& args)
 {
-    return(RPF_eqlhsrhs(args, 1));
+    return RPF_eqlhsrhs(args, 1);
 }
 
 
@@ -1166,38 +1103,27 @@ U_ch *RPF_eqrhs(U_ch **args)
  *      @sample(E)                =>  "2015Y1"
  *      @sample(X)                =>  "1960Y1 2015Y1"
  */
-U_ch *RPF_sample(U_ch** args)
+std::string RPF_sample(const std::vector<std::string>& args)
 {
     KDBVariablesPtr kdb = global_ws_var;
     std::shared_ptr<Sample> smpl = kdb->get_sample();
-    if(!smpl || smpl->nb_periods == 0) 
-        return 0;
-    
-    char what = 'F';
-    if(args[0]) 
-        what = args[0][0];
-    
-    what = toupper(what);
+    if(!smpl || smpl->nb_periods == 0)
+        throw RPFunctionError("@sample(): the sample of the Variables workspace is not defined");
+
+    char what = args.empty() ? 'F' : args[0][0];
+    what = (char) std::toupper((unsigned char) what);
+
     std::string s_per1 = smpl->start_period.to_string();
     std::string s_per2 = smpl->end_period.to_string();
-    
-    U_ch buf[128];
-    switch(what) 
+    switch(what)
     {
         case 'B':
-            sprintf((char*) buf, "%s", (char*) s_per1.c_str());
-            break;
+            return s_per1;
         case 'E':
-            sprintf((char*) buf, "%s", (char*) s_per2.c_str());
-            break;
+            return s_per2;
         default :
-            sprintf((char*) buf, "%s %s", (char*) s_per1.c_str(), (char*) s_per2.c_str());
-            break;
+            return s_per1 + " " + s_per2;
     }
-
-    U_ch* res = 0;
-    res = SCR_strafcat(res, buf);
-    return res;
 }
 
 
@@ -1229,57 +1155,44 @@ int RPF_vsliste1(const std::shared_ptr<CLEC> clec, std::vector<std::string>& tbl
 /**
  *  Searches in a list of equations all objects of a given type ('S' or 'V').
  *  
- *  @param [in] U_ch**  args    list of equations to analyse
+ *  @param [in] const std::vector<std::string>&  args    list of equations to analyse
  *  @param [in] int     type    type of objects to retrieve:  'S' for scalars, 'V' for variables
- *  @return     U_ch*           allocated string with found object names separated by semi-colon (';')
+ *  @return     std::string                         found object names separated by semi-colon (';')
  */
-U_ch *RPF_vsliste(U_ch** args, int type)
+std::string RPF_vsliste(const std::vector<std::string>& args, int type)
 {
-    if(SCR_tbl_size(args) < 1) 
-        return NULL;
+    if(args.empty())
+        throw RPFunctionError("@vliste/sliste(): at least 1 argument required");
 
     std::vector<std::string> tbl;
-
-    std::string name;
-    std::shared_ptr<Equation> eq_ptr;
-    for(int i = 0; args[i]; i++)
+    for(const std::string& arg : args)
     {
-        name = std::string((char*) args[i]);
-        name = global_ws_eqs->to_key(name);
+        std::string name = global_ws_eqs->to_key(arg);
         if(!global_ws_eqs->contains(name))
             continue;
-        eq_ptr = global_ws_eqs->get_obj_ptr(name) ;
+        std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_obj_ptr(name);
         RPF_vsliste1(eq_ptr->clec, tbl, type);
     }
 
-    // the result is freed by the caller (SCR_free())
-    std::string res = join(tbl, ";");
-    return SCR_stracpy((U_ch*) res.c_str());
+    return join(tbl, ";");
 }
 
 
 /**
  *  Returns a list of unique strings in a table of strings.
  *  
- *  @param [in] U_ch**  tbl     input table of strings
- *  @return     U_ch**          table of unique strings in tbl
+ *  @param [in] const std::vector<std::string>&  tbl     input table of strings
+ *  @return     std::vector<std::string>            unique strings of tbl (in the order of their first occurrence)
  */
-U_ch **RPF_unique(U_ch** tbl)
+std::vector<std::string> RPF_unique(const std::vector<std::string>& tbl)
 {
-    U_ch    **tbl2 = 0;
-    int     nl = 0, i, j;
-
-    if(tbl == 0 || tbl[0] == 0) return(tbl2);
-    SCR_add_ptr(&tbl2, &nl, tbl[0]);
-    for(i = 1 ; tbl[i] ; i++) {
-        for(j = 0 ; j < nl ; j++) {
-            if(strcmp((char*) tbl[i], (char*) tbl2[j]) == 0) break;
-        }
-        if(j == nl)
-            SCR_add_ptr(&tbl2, &nl, tbl[i]);
+    std::vector<std::string> tbl2;
+    for(const std::string& str : tbl)
+    {
+        if(std::find(tbl2.begin(), tbl2.end(), str) == tbl2.end())
+            tbl2.push_back(str);
     }
-    SCR_add_ptr(&tbl2, &nl, 0L);
-    return(tbl2);
+    return tbl2;
 }
 
 
@@ -1291,9 +1204,9 @@ U_ch **RPF_unique(U_ch** tbl)
  *      @vliste(ACAF)             =>  "ACAF;VAF;GOSF;TIME"
  *      @vliste(ACAF,ACAG)        =>  "ACAF;VAF;GOSF;TIME;ACAG;VBBP"
  */
-U_ch *RPF_vliste(U_ch** args)
+std::string RPF_vliste(const std::vector<std::string>& args)
 {
-    return(RPF_vsliste(args, 'V'));
+    return RPF_vsliste(args, 'V');
 }
 
 
@@ -1305,25 +1218,26 @@ U_ch *RPF_vliste(U_ch** args)
  *      @sliste(ACAF)             =>  "acaf1;acaf2;acaf4"
  *      @sliste(ACAF,ACAG)        =>  "acaf1;acaf2;acaf4"
  */
-U_ch *RPF_sliste(U_ch** args)
+std::string RPF_sliste(const std::vector<std::string>& args)
 {
-    return(RPF_vsliste(args, 'S'));
+    return RPF_vsliste(args, 'S');
 }
 
 
 /**
  *  Expands a list of name patterns for a given object type.
  *  
- *  @param [in] U_ch**  args    table of name patterns
+ *  @param [in] const std::vector<std::string>&  args    table of name patterns
  *  @param [in] int     type    object type
- *  @return     U_ch*           list of object names sep by ";"
+ *  @return     std::string                         list of object names sep by ";"
  */
-U_ch *RPF_expand(U_ch** args, int type)
+std::string RPF_expand(const std::vector<std::string>& args, int type)
 {
     std::vector<std::string> names;
-    for(int i = 0; args[i]; i++)
+    for(const std::string& arg : args)
     {
-        char* tmp = K_expand(type, 0L, (char*) args[i], (int) '*');
+        std::string pattern = arg;
+        char* tmp = K_expand(type, 0L, pattern.data(), (int) '*');
         if(tmp)
         {
             for(const std::string& name : split_skip_empty(std::string(tmp), ";"))
@@ -1332,10 +1246,9 @@ U_ch *RPF_expand(U_ch** args, int type)
         }
     }
 
-    // removes the duplicates (keeps the first occurrence, as RPF_unique())
-    names = vector_union(names, {});
-    std::string res = join(names, ";");
-    return SCR_stracpy((unsigned char*) res.c_str());
+    // removes the duplicates (keeps the first occurrence)
+    names = RPF_unique(names);
+    return join(names, ";");
 }
 
 
@@ -1349,9 +1262,9 @@ U_ch *RPF_expand(U_ch** args, int type)
  *      @cexpand(AC*,*U)        =>  "ACAF;ACAG;DPU;DPUU;IFU;IHU;WBU"
  *      @cexpand()              =>  "@cexpand()"
  */
-U_ch *RPF_cexpand(U_ch **args)
+std::string RPF_cexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, COMMENTS));
+    return RPF_expand(args, COMMENTS);
 }
 
 
@@ -1365,9 +1278,9 @@ U_ch *RPF_cexpand(U_ch **args)
  *      @eexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;WBU"
  *      @eexpand()              =>  ""
  */
-U_ch *RPF_eexpand(U_ch **args)
+std::string RPF_eexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, EQUATIONS));
+    return RPF_expand(args, EQUATIONS);
 }
 
 
@@ -1381,9 +1294,9 @@ U_ch *RPF_eexpand(U_ch **args)
  *      @iexpand(AC*,*U)        =>  "MU;NAWRU"
  *      @iexpand()              =>  ""
  */
-U_ch *RPF_iexpand(U_ch **args)
+std::string RPF_iexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, IDENTITIES));
+    return RPF_expand(args, IDENTITIES);
 }
 
 
@@ -1397,9 +1310,9 @@ U_ch *RPF_iexpand(U_ch **args)
  *      @lexpand(AC*,*0)        =>  "COPY0;ENDO0;TOTAL0"
  *      @lexpand()              =>  ""
  */
-U_ch *RPF_lexpand(U_ch **args)
+std::string RPF_lexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, LISTS));
+    return RPF_expand(args, LISTS);
 }
 
 
@@ -1414,9 +1327,9 @@ U_ch *RPF_lexpand(U_ch **args)
  *      @sexpand(AC*,*4)        =>  "acaf1;acaf2;acaf3;acaf4;dtf4;gamma4;k4;kl14;nfyh4;pc4;pmab4;pxs4;qc4;qi5_4;qmab_4;qms4;qxab4;qxs4;y4"
  *      @sexpand()              =>  ""
  */
-U_ch *RPF_sexpand(U_ch **args)
+std::string RPF_sexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, SCALARS));
+    return RPF_expand(args, SCALARS);
 }
 
 
@@ -1430,9 +1343,9 @@ U_ch *RPF_sexpand(U_ch **args)
  *      @texpand(AC*,*U)        =>  "MULT1RESU;MULT2RESU;NAWRU;T1NIVEAU"
  *      @texpand()              =>  ""
  */
-U_ch *RPF_texpand(U_ch **args)
+std::string RPF_texpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, TABLES));
+    return RPF_expand(args, TABLES);
 }
 
 
@@ -1446,9 +1359,9 @@ U_ch *RPF_texpand(U_ch **args)
  * @vexpand(AC*,*U)        =>  "ACAF;ACAG;CGU;DPU;DPUU;IFU;IHU;MU;NAWRU;WBU"
  * @vexpand()              =>  ""
  */
-U_ch *RPF_vexpand(U_ch **args)
+std::string RPF_vexpand(const std::vector<std::string>& args)
 {
-    return(RPF_expand(args, VARIABLES));
+    return RPF_expand(args, VARIABLES);
 }
 
 
@@ -1458,29 +1371,29 @@ U_ch *RPF_vexpand(U_ch **args)
 /**
  *  Calculated the position in the current WS of the period args[0].
  *  
- *  @param [in] U_ch** args     argument (args[0] = period)
+ *  @param [in] const std::vector<std::string>& args     argument (args[0] = period)
  *  @return     int              position of the period of -1 on error (out of range...) 
  */
-int RPF_CalcPeriod(U_ch** args)
+int RPF_CalcPeriod(const std::vector<std::string>& args)
 {
     // Check args
-    if(SCR_tbl_size(args) == 0) 
+    if(args.empty())
         return -1; // Erreur, arg required
-    
-    Period per(std::string((char*) args[0]));
-    if(per.year == 0) 
+
+    Period per(args[0]);
+    if(per.year == 0)
         return -1; // Error
 
     // Calc diff bw per and WS sample
     int t = per.difference(global_ws_var->get_sample()->start_period);
-    if(t < 0)  
+    if(t < 0)
         return -1;
 
     int at = per.difference(global_ws_var->get_sample()->end_period);
     if(at > 0)
         return -1;
 
-    return(t);
+    return t;
 }
 
 
@@ -1491,12 +1404,9 @@ int RPF_CalcPeriod(U_ch** args)
  *  --------
  *      @SimMaxit()             =>  "100"
  */
-U_ch *RPF_SimMaxit(U_ch** unused)
+std::string RPF_SimMaxit(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d", global_simu->max_iter);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->max_iter);
 }
 
 
@@ -1507,12 +1417,9 @@ U_ch *RPF_SimMaxit(U_ch** unused)
  *  --------
  *      @SimEps()               =>  "0.001"
  */
-U_ch *RPF_SimEps(U_ch** unused)
+std::string RPF_SimEps(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%lg", global_simu->epsilon);
-    return(SCR_stracpy(buf));
+    return format_double("%lg", global_simu->epsilon);
 }
 
 
@@ -1523,12 +1430,9 @@ U_ch *RPF_SimEps(U_ch** unused)
  *  --------
  *        @SimRelax()             =>  "1.000000"
  */
-U_ch *RPF_SimRelax(U_ch** unused)
+std::string RPF_SimRelax(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%lf", global_simu->relax);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->relax);      // same as "%lf"
 }
 
 
@@ -1539,12 +1443,9 @@ U_ch *RPF_SimRelax(U_ch** unused)
  *  --------
  *        @SimSortNbPasses()        =>  "5"
  */
-U_ch *RPF_SimSortNbPasses(U_ch** unused)
+std::string RPF_SimSortNbPasses(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d", global_simu->nb_passes);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->nb_passes);
 }
 
 /**
@@ -1554,17 +1455,15 @@ U_ch *RPF_SimSortNbPasses(U_ch** unused)
  *  --------
  *        @SimSortAlgo()        =>  "Triangulation"
  */
-U_ch *RPF_SimSortAlgo(U_ch** unused)
+std::string RPF_SimSortAlgo(const std::vector<std::string>& args)
 {
-    char *algos[] = {"Connex", "Triangulation", "None"};
-    
-    int     isort;
+    static const char* algos[] = {"Connex", "Triangulation", "None"};
 
-    isort = global_simu->sorting_algo;
+    int isort = global_simu->sorting_algo;
     if(isort < 0 || isort > 2)
         isort = 1; // Default value
-        
-    return(SCR_stracpy((unsigned char*) algos[isort]));
+
+    return std::string(algos[isort]);
 }
 
 
@@ -1575,29 +1474,26 @@ U_ch *RPF_SimSortAlgo(U_ch** unused)
  *  --------
  *        @SimInitValues()        =>  "1"
  */
-U_ch *RPF_SimInitValues(U_ch** unused)
+std::string RPF_SimInitValues(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d", global_simu->init_algo);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->init_algo);
 }
 
 
 /**
  *  Sub-fn of RPF_SimNorm().
  *  
- *  @param [in] args U_ch*  period from which norm has to be to retrieved
+ *  @param [in] args const std::vector<std::string>&  period from which norm has to be to retrieved
  *  @return          double convergence criteria of the period arg or -1.0 if no simulation       
  */
-double RPF_SimNormReal(U_ch** args)
+double RPF_SimNormReal(const std::vector<std::string>& args)
 {
     int t = RPF_CalcPeriod(args);
-    if(t < 0) 
+    if(t < 0)
         return -1.0;
 
     // Pas encore de simulation
-    if(global_simu->v_norm.empty()) 
+    if(global_simu->v_norm.empty())
         return -1.0;
 
     // Return norme t
@@ -1614,31 +1510,28 @@ double RPF_SimNormReal(U_ch** args)
  *      @SimNorm(2002Y1)        =>  "0"
  *      @SimNorm(1990Y1)        =>  "0"
  */
-U_ch *RPF_SimNorm(U_ch** args)
+std::string RPF_SimNorm(const std::vector<std::string>& args)
 {
-    char	buf[128];
-    double  value;
-
-    value = RPF_SimNormReal(args);
-    if(value < 0) return((unsigned char*) SCR_malloc(1));
-    sprintf((char*) buf, "%lg", value);
-    return(SCR_stracpy((unsigned char*) buf));
+    double value = RPF_SimNormReal(args);
+    if(value < 0)
+        return "";
+    return format_double("%lg", value);
 }
 
 /**
  *  Subfunction of RPF_SimNIter().
  *  
- *  @param [in] args    char**  period  (eg: args[0] => "2001Y1")
+ *  @param [in] args    const std::vector<std::string>&  period  (eg: args[0] => "2001Y1")
  *  @return             int     nb of iterations to converge in the last simulation for period arg[0]
  */
-int RPF_SimNIterInt(U_ch** args)
+int RPF_SimNIterInt(const std::vector<std::string>& args)
 {
     int t = RPF_CalcPeriod(args);
-    if(t < 0) 
+    if(t < 0)
         return -1;
 
     // Pas encore de simulation
-    if(global_simu->v_nb_iterations.empty()) 
+    if(global_simu->v_nb_iterations.empty())
         return -1;
 
     // Return norme t
@@ -1655,36 +1548,29 @@ int RPF_SimNIterInt(U_ch** args)
  *      @SimNiter(2002Y1)       =>  "0"
  *      @SimNiter(1990Y1)       =>  "0"
  */
-U_ch *RPF_SimNIter(U_ch** args)
+std::string RPF_SimNIter(const std::vector<std::string>& args)
 {
-    int		niter;
-    char	buf[128];
-
-    niter = RPF_SimNIterInt(args);
-    if(niter < 0) return((unsigned char*) SCR_malloc(1));
-
-    // Return niter in t
-    sprintf((char*) buf, "%d", niter);
-    return(SCR_stracpy((unsigned char*) buf));
+    int niter = RPF_SimNIterInt(args);
+    if(niter < 0)
+        return "";
+    return std::to_string(niter);
 }
 
 
 /**
  *  Subfunction of RPF_SimCpu().
  *  
- *  @param [in] args    char**  period  (eg: args[0] => "2001Y1")
+ *  @param [in] args    const std::vector<std::string>&  period  (eg: args[0] => "2001Y1")
  *  @return             int     time (in ms) elapsed to reach convergence in the last simulation for period arg[0]
  */
-int RPF_SimCpuInt(U_ch** args)
+int RPF_SimCpuInt(const std::vector<std::string>& args)
 {
-    int		t;
-
-    t = RPF_CalcPeriod(args);
-    if(t < 0) 
+    int t = RPF_CalcPeriod(args);
+    if(t < 0)
         return -1;
 
     // No simulation done yet
-    if(global_simu->v_cpu_time.empty()) 
+    if(global_simu->v_cpu_time.empty())
         return -1;
 
     return global_simu->v_cpu_time[t];
@@ -1703,16 +1589,12 @@ int RPF_SimCpuInt(U_ch** args)
  *      @SimCpu(2002Y1)       =>  "0"
  *      @SimCpu(1990Y1)       =>  "0"
  */
-U_ch *RPF_SimCpu(U_ch** args)
+std::string RPF_SimCpu(const std::vector<std::string>& args)
 {
-    int		cpu;
-    char	buf[128];
-
-    cpu = RPF_SimCpuInt(args);
-    if(cpu < 0) return((unsigned char*) SCR_malloc(1));
-
-    sprintf((char*) buf, "%d", cpu);
-    return(SCR_stracpy((unsigned char*) buf));
+    int cpu = RPF_SimCpuInt(args);
+    if(cpu < 0)
+        return "";
+    return std::to_string(cpu);
 }
 
 
@@ -1724,12 +1606,9 @@ U_ch *RPF_SimCpu(U_ch** args)
  *  --------
  *        @SimCpuSCC()        =>  "31343"
  */
-U_ch *RPF_SimCpuSCC(U_ch** unused)
+std::string RPF_SimCpuSCC(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d", global_simu->cpu_time_scc);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->cpu_time_scc);
 }
 
 /**
@@ -1739,12 +1618,9 @@ U_ch *RPF_SimCpuSCC(U_ch** unused)
  *  --------
  *        @SimCpuSort()        =>  "1234"
  */
-U_ch *RPF_SimCpuSort(U_ch** unused)
+std::string RPF_SimCpuSort(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d", global_simu->cpu_time_sorting);
-    return(SCR_stracpy(buf));
+    return std::to_string(global_simu->cpu_time_sorting);
 }
 
 /*=================== VTake, ... ==============================*/
@@ -1766,20 +1642,20 @@ U_ch *RPF_SimCpuSort(U_ch** unused)
  *      @vtake(A,B)             =>  ""
  *      @vtake()                =>  ""
  */
-U_ch *RPF_vtake(U_ch** args)
+std::string RPF_vtake(const std::vector<std::string>& args)
 {
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
-    if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
-    U_ch* arg = SCR_mtov(args, RP_VSEPS[0]);
-    std::vector<std::string> v_args = split_skip_empty(std::string((char*) arg), std::string(RP_VSEPS));
-    SCR_free(arg);
-    lg = (int) v_args.size() - 1;
-    if(lg <= 0)
-        return((unsigned char*) SCR_malloc(1));
+    if(args.empty())
+        return "";
 
     std::string sep(1, RP_VSEPS[0]);
+    std::vector<std::string> v_args = split_skip_empty(join(args, sep), std::string(RP_VSEPS));
+    lg = (int) v_args.size() - 1;
+    if(lg <= 0)
+        return "";
+
     std::vector<std::string> v_res;
     n = atol(v_args[0].c_str());
     if(n > 0) {
@@ -1790,8 +1666,7 @@ U_ch *RPF_vtake(U_ch** args)
         n = lg - std::min(lg, -n);
         v_res.assign(v_args.begin() + n + 1, v_args.end());
     }
-    std::string res = join(v_res, sep);
-    return SCR_stracpy((unsigned char*) res.c_str());
+    return join(v_res, sep);
 }
 
 
@@ -1811,20 +1686,20 @@ U_ch *RPF_vtake(U_ch** args)
  *      @vdrop(A,B,C)           =>  "B;C"
  *      @vdrop()                =>  ""
  */
-U_ch *RPF_vdrop(U_ch** args)
+std::string RPF_vdrop(const std::vector<std::string>& args)
 {
     int     n, lg;
 
     if(RP_VSEPS == 0) RP_vseps(0);
-    if(SCR_tbl_size(args) < 1) return((unsigned char*) SCR_malloc(1));
-    U_ch* arg = SCR_mtov(args, RP_VSEPS[0]);
-    std::vector<std::string> v_args = split_skip_empty(std::string((char*) arg), std::string(RP_VSEPS));
-    SCR_free(arg);
-    lg = (int) v_args.size() - 1;
-    if(lg <= 0)
-        return((unsigned char*) SCR_malloc(1));
+    if(args.empty())
+        return "";
 
     std::string sep(1, RP_VSEPS[0]);
+    std::vector<std::string> v_args = split_skip_empty(join(args, sep), std::string(RP_VSEPS));
+    lg = (int) v_args.size() - 1;
+    if(lg <= 0)
+        return "";
+
     std::vector<std::string> v_res;
     n = atol(v_args[0].c_str());
     if(n < 0) {
@@ -1835,8 +1710,7 @@ U_ch *RPF_vdrop(U_ch** args)
         n = std::min(lg, n);
         v_res.assign(v_args.begin() + n + 1, v_args.end());
     }
-    std::string res = join(v_res, sep);
-    return SCR_stracpy((unsigned char*) res.c_str());
+    return join(v_res, sep);
 }
 
 
@@ -1853,19 +1727,12 @@ U_ch *RPF_vdrop(U_ch** args)
  *      @vcount(3 "A B")        =>  "3"
  *      @vcount()               =>  "0"
  */
-U_ch *RPF_vcount(U_ch** args)
+std::string RPF_vcount(const std::vector<std::string>& args)
 {
-    char    buf[128], *arg;
-
     if(RP_VSEPS == 0) RP_vseps(0);
-    arg = (char*) SCR_mtov(args, RP_VSEPS[0]);
-    std::vector<std::string> v_args;
-    if(arg)
-        v_args = split_skip_empty(std::string(arg), std::string(RP_VSEPS));
-    SCR_free(arg);
-
-    sprintf((char*) buf,  "%d", (int) v_args.size());
-    return(SCR_stracpy((unsigned char*) buf));
+    std::string sep(1, RP_VSEPS[0]);
+    std::vector<std::string> v_args = split_skip_empty(join(args, sep), std::string(RP_VSEPS));
+    return std::to_string(v_args.size());
 }
 
 
@@ -1878,12 +1745,9 @@ U_ch *RPF_vcount(U_ch** args)
  *  --------
  *        @IodeVersion()             =>  "6.69"
  */
-U_ch *RPF_IodeVersion(U_ch** unused)
+std::string RPF_IodeVersion(const std::vector<std::string>& args)
 {
-    U_ch    buf[128];
-
-    sprintf((char*) buf, "%d.%d", IODE_VERSION_MAJOR, IODE_VERSION_MINOR);
-    return(SCR_stracpy(buf));
+    return std::to_string(IODE_VERSION_MAJOR) + "." + std::to_string(IODE_VERSION_MINOR);
 }
 
 
@@ -1896,9 +1760,9 @@ U_ch *RPF_IodeVersion(U_ch** unused)
  *  --------
  *      @memory()    =>  "NBA=1260, NBB=15, ALLOC=0.5 MB, FREE=2048.0 MB, USED=0.4 MB "
  */
-U_ch *RPF_memory(U_ch** args)
+std::string RPF_memory(const std::vector<std::string>& args)
 {
-    U_ch     *res = 0, buf[128];
+    char     buf[256];
     double   convfree, convused, convalloc;
 
     SWSTAT  st;
@@ -1908,23 +1772,21 @@ U_ch *RPF_memory(U_ch** args)
     convalloc = ((double)st.st_convalloc)/(1024.0 * 1024.0),
     convfree = ((double)st.st_convafree + (double)st.st_convfree)/(1024.0*1024.0);
     convused = ((double)st.st_convalloc - (double)st.st_convafree)/(1024.0*1024.0);
-    
-    sprintf((char*) buf, "NBA=%ld, NBB=%ld, ALLOC=%.1lf MB, FREE=%.1lf MB, USED=%.1lf MB",
+
+    snprintf(buf, sizeof(buf), "NBA=%ld, NBB=%ld, ALLOC=%.1lf MB, FREE=%.1lf MB, USED=%.1lf MB",
             st.st_nballoc - st.st_nbfree,
             st.st_nbblks,
             //(st.st_convalloc)/(1024 * 1024),
             //(st.st_convafree + st.st_convfree)/(1024L*1024L),
             //(st.st_convalloc - st.st_convafree)/(1024L*1024L));  // JMP 29/09/2021 : misplaced )
             convalloc, convfree, convused);
-            
 
-    res = SCR_strafcat(res, buf);
-    return res;
+    return std::string(buf);
 }
 
 /*--------------------------- CHRONO ------------------------------- */
 
-static long RPF_CHRONO = 0;     // Current chrono initial time 
+static std::chrono::steady_clock::time_point RPF_CHRONO = std::chrono::steady_clock::now();     // Current chrono initial time
 
 /**
  *  Resets the timer to the current millisecond.
@@ -1936,15 +1798,15 @@ static long RPF_CHRONO = 0;     // Current chrono initial time
  *  -------
  *      @chronoreset()            =>  ""
  */
-U_ch *RPF_ChronoReset(U_ch** unused)
-{    
-    RPF_CHRONO = WscrGetMS();
-    return((unsigned char*) SCR_malloc(1));
+std::string RPF_ChronoReset(const std::vector<std::string>& args)
+{
+    RPF_CHRONO = std::chrono::steady_clock::now();
+    return "";
 }
 
 
 /**
- *  Returns the number of millisecond elapsed since the last call to RPF_ChronoReset(U_ch** unused).
+ *  Returns the number of millisecond elapsed since the last call to RPF_ChronoReset().
  *  
  *  Syntax: @chronoget()
  *  
@@ -1952,14 +1814,11 @@ U_ch *RPF_ChronoReset(U_ch** unused)
  *  -------
  *      @chronoget()              =>  "47"
  */
-U_ch *RPF_ChronoGet(U_ch** unused)
+std::string RPF_ChronoGet(const std::vector<std::string>& args)
 {
-    U_ch        buf[128];
-    long	    ms;
-
-    ms = WscrGetMS() - RPF_CHRONO;
-    sprintf((char*) buf, "%ld", ms);
-    return(SCR_stracpy(buf));
+    auto elapsed = std::chrono::steady_clock::now() - RPF_CHRONO;
+    long long ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+    return std::to_string(ms);
 }
 
 
@@ -1972,20 +1831,23 @@ U_ch *RPF_ChronoGet(U_ch** unused)
  *  --------
  *     @fappend(essais.txt,"line 1",NL,line 2,NL,NL,line 4)  =>  ""
  */
-U_ch *RPF_fappend(U_ch** args)
+std::string RPF_fappend(const std::vector<std::string>& args)
 {
-    FILE    *fd;
-    int     i;
+    if(args.size() < 1)
+        throw RPFunctionError("@fappend(): at least 1 argument required");
 
-    if(SCR_tbl_size(args) < 1) return NULL;
-    fd = fopen((char*) args[0], "a+");
-    if(fd == 0) return NULL;
-    for(i = 1 ; args[i] ; i++) {
-        if(strcmp((char*) args[i], "NL") == 0) fprintf(fd, "\n");
-        else                                   fprintf(fd, "%s", args[i]);
+    std::ofstream fd(args[0], std::ios::app);
+    if(!fd)
+        throw RPFunctionError("@fappend(): cannot open the file '" + args[0] + "'");
+
+    for(size_t i = 1; i < args.size(); i++)
+    {
+        if(args[i] == "NL")
+            fd << "\n";
+        else
+            fd << args[i];
     }
-    fclose(fd);
-    return((unsigned char*) SCR_malloc(1));
+    return "";
 }
 
 
@@ -1996,11 +1858,13 @@ U_ch *RPF_fappend(U_ch** args)
  *  --------
  *     @fdelete(essais.txt)  =>  ""
  */
-U_ch *RPF_fdelete(U_ch** args)
+std::string RPF_fdelete(const std::vector<std::string>& args)
 {
-    if(SCR_tbl_size(args) < 1) return NULL;
-    _unlink((char*) args[0]);
-    return((unsigned char*) SCR_malloc(1));
+    if(args.size() < 1)
+        throw RPFunctionError("@fdelete(): 1 argument required");
+
+    std::remove(args[0].c_str());
+    return "";
 }
 
 
@@ -2011,14 +1875,22 @@ U_ch *RPF_fdelete(U_ch** args)
  *  --------
  *      `@getdir()`                 =>  "C:\Usr\iode"
  */
-U_ch *RPF_getdir(U_ch** unused)
+std::string RPF_getdir(const std::vector<std::string>& args)
 {
-    U_ch    dir[512];
+    std::error_code ec;
+    std::filesystem::path dir = std::filesystem::current_path(ec);
+    if(ec)
+        return "";
 
-    if(SCR_getcwd(0, (char*) dir) == 0)
-        return(SCR_stracpy((unsigned char*) ""));
-    else
-        return(SCR_stracpy(dir));
+    try
+    {
+        return dir.string();
+    }
+    catch(const std::exception&)
+    {
+        // the path cannot be converted to the current code page
+        return "";
+    }
 }
 
 
@@ -2031,20 +1903,16 @@ U_ch *RPF_getdir(U_ch** unused)
  *      @getdir()                 =>  "C:\Usr\iode"
  *      @chdir(hermes)            =>  "C:\Usr\iode\hermes"
  */
-U_ch *RPF_chdir(U_ch **args)
+std::string RPF_chdir(const std::vector<std::string>& args)
 {
-    int     rc = 0;
-
-    if(SCR_tbl_size(args) > 0) {
-        #ifdef _MSC_VER
-            rc = _chdir((char*) args[0]); 
-        #else
-            rc = chdir((char*) args[0]); 
-        #endif
-    }    
+    if(args.size() > 0)
+    {
+        std::error_code ec;
+        std::filesystem::current_path(std::filesystem::path(args[0]), ec);
+    }
 
     ksettitle();
-    return(RPF_getdir(NULL));
+    return RPF_getdir({});
 }
 
 
@@ -2058,18 +1926,14 @@ U_ch *RPF_chdir(U_ch **args)
  *      @chdir(testdir)           =>  "C:\Usr\iode\testdir"
  *      @getdir()                 =>  "C:\Usr\iode\testdir"
  */
-U_ch *RPF_mkdir(U_ch **args)
+std::string RPF_mkdir(const std::vector<std::string>& args)
 {
-    int     rc = 0;
-
-    if(SCR_tbl_size(args) > 0)
-    #ifdef _MSC_VER
-        _mkdir((char*) args[0]);
-    #else
-        mkdir((char*) args[0], 0777);
-    #endif
-
-    return(SCR_stracpy((unsigned char*) ""));
+    if(args.size() > 0)
+    {
+        std::error_code ec;
+        std::filesystem::create_directory(std::filesystem::path(args[0]), ec);
+    }
+    return "";
 }
 
 /**
@@ -2083,12 +1947,15 @@ U_ch *RPF_mkdir(U_ch **args)
  *      @chdir(..)                =>  "C:\Usr\iode"
  *      @rmdir(testdir)           =>  ""
  */
-U_ch *RPF_rmdir(U_ch **args)
+std::string RPF_rmdir(const std::vector<std::string>& args)
 {
-    int     rc = 0;
-
-    if(SCR_tbl_size(args) > 0)
-        _rmdir((char*) args[0]);
-
-    return(SCR_stracpy((unsigned char*) ""));
+    if(args.size() > 0)
+    {
+        // removes only an empty directory (like _rmdir()): std::filesystem::remove() also removes files
+        std::error_code ec;
+        std::filesystem::path dir(args[0]);
+        if(std::filesystem::is_directory(dir, ec))
+            std::filesystem::remove(dir, ec);
+    }
+    return "";
 }

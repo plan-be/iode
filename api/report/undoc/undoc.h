@@ -165,14 +165,14 @@ int DS_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<Sample> 
 int DS_extr(double* vec, int dim, int nbper, double* bi, double shift);
 
 /* b_sql.c */
-U_ch *RPS_Open(U_ch** args);
-U_ch *RPS_Field(U_ch** args);
-U_ch *RPS_NbFlds(U_ch** args);
-U_ch *RPS_Record(U_ch** args);
-U_ch *RPS_Query(U_ch** args);
-U_ch *RPS_Sql(U_ch** args);
-U_ch *RPS_Next(U_ch** args);
-U_ch *RPS_Close(U_ch** args);
+std::string RPS_Open(const std::vector<std::string>& args);
+std::string RPS_Field(const std::vector<std::string>& args);
+std::string RPS_NbFlds(const std::vector<std::string>& args);
+std::string RPS_Record(const std::vector<std::string>& args);
+std::string RPS_Query(const std::vector<std::string>& args);
+std::string RPS_Sql(const std::vector<std::string>& args);
+std::string RPS_Next(const std::vector<std::string>& args);
+std::string RPS_Close(const std::vector<std::string>& args);
 
 /* b_step.c */
 int B_EqsStepWise(char* arg, int unused=-1);
