@@ -203,7 +203,7 @@ int RP_label(char* arg, int unused)
 int RP_goto_label(char *command, char *parm)
 {
     int     rc;
-    char    name[128];
+    std::string name;
     std::string line;
     std::string arg;
 
@@ -226,12 +226,12 @@ int RP_goto_label(char *command, char *parm)
         if(!RP_is_cmd(line))
             continue;
         
-        if(RP_splitline(line.data() + 1, name, arg, 30) < 0) 
+        if(RP_splitline(line.substr(1), name, arg, 30) < 0)
             return -1;
 
-        SCR_lower((unsigned char*) name);
+        SCR_lower((unsigned char*) name.data());
         SCR_lower((unsigned char*) arg.data());
-        if(strcmp(name, command) == 0 && strcmp(parm, arg.c_str()) == 0) 
+        if(strcmp(name.c_str(), command) == 0 && strcmp(parm, arg.c_str()) == 0)  
             return 0;
     }
 }

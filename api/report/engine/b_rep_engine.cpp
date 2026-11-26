@@ -259,53 +259,37 @@ int REPFILE::chk_ignore(const std::string& line)
 /**
  *  Splits a report line into the command and its arguments.
  *  
- *  @param [in, out] char*          text   line to split
- *  @param [in, out] char*          cmd    command (first word in text)
- *  @param [out]     std::string&   arg    arguments (text following the command, without leading
- *                                         and trailing spaces)
- *  @param [in] lg   int                   max length of cmd
- *  @return          int                   -1 if the name of the cmd (first word on the line text) is too long (> lg)
- *                                         0 otherwise
+ *  @param [in]      const std::string& text   line to split
+ *  @param [out]     std::string&       cmd    command (first word in text: letters, digits and '_'),
+ *                                             truncated to lg characters
+ *  @param [out]     std::string&       arg    arguments (text following the command, without leading
+ *                                             white spaces and trailing characters <= ' ')
+ *  @param [in]      int                lg     max length of cmd
+ *  @return          int                       -1 if text is empty or starts with '\n'
+ *                                             0 otherwise
  */
-int RP_splitline(char* text, char* cmd, std::string& arg, int lg)
+int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, int lg)
 {
-    int     i = 0, j = 0, rt = 0;
+    int     rt = 0;
+    size_t  j = 0;
 
-    char*   args;
-
-    if(text == NULL)
-    {
-        cmd[0] = 0;
-        arg.clear();
-        return -1;
-    }
-
-    if(text[0] == '\0' || text[0] == '\n')
-    {
+    if(text.empty() || text[0] == '\n')
         rt = -1;
-        goto done;
-    }
-
-    while(1) 
+    else
     {
-        if(SCR_is_anum(text[j]) || text[j] == '_') 
-        {
-            if(i < lg)  
-                cmd[i] = text[j];
-        }
-        else 
-            break;
-
-        i++;
-        j++;
+        // NOTE: text[j] is passed as a (signed) char, as in the previous version:
+        //       the CP850 accented letters are not part of the command name
+        while(j < text.size() && (SCR_is_anum(text[j]) || text[j] == '_'))
+            j++;
     }
+    cmd = text.substr(0, std::min(j, (size_t) std::max(lg, 0)));
 
-done :
-    cmd[i] = 0;
-    args = text + j;
-    U_ljust_text((unsigned char*) args);
-    SCR_strip((unsigned char*) args);
-    arg = std::string(args);
+    // arguments: removes the leading white spaces and the trailing characters <= ' '
+    // (same as U_ljust_text() + SCR_strip())
+    size_t start = text.find_first_not_of(" \t\n\r\v\f", j);
+    arg = (start == std::string::npos) ? std::string() : text.substr(start);
+    while(!arg.empty() && (unsigned char) arg.back() <= ' ')
+        arg.pop_back();
     return rt;
 }
 
@@ -1180,7 +1164,7 @@ int REPFILE::execute()
     std::shared_ptr<REPFILE> rf = shared_from_this();
     int     rc, rt = 0;
     int     ignore = 0; // ignore: 0 ignore code retour, 1 non
-    char    name[31];
+    std::string name;
     std::shared_ptr<REPFILE> oldrf;
     char    debug_line[1024];
     std::string line;
@@ -1230,13 +1214,13 @@ int REPFILE::execute()
             
             // $command, #command, $-command or #-command
             ignore = chk_ignore(line);     // Ignore the errors if $-command or #-command
-            rt = RP_splitline(line.data() + 1 + ignore, name, arg, 30);
+            rt = RP_splitline(line.substr(1 + ignore), name, arg, 30);
             
             // Executes the command
             if(rt == 0) 
             {
-                if(name[0]) 
-                    rt = RP_exec_fn(name, arg.data(), line[0]);
+                if(!name.empty())
+                    rt = RP_exec_fn(name.data(), arg.data(), line[0]);
                 if(RP_DEBUG > 1) 
                     RP_debug(line.data()); // GB MEM
             }
@@ -1253,7 +1237,7 @@ int REPFILE::execute()
                         break;
                     }
                     if(RP_PRINT) 
-                        err_dump(name, arg.data());
+                        err_dump(name.data(), arg.data());
                     rt = RP_RT;         // replaces the error code by the value of RP_RT (defined by OnError)
                     switch(rt)  
                     {

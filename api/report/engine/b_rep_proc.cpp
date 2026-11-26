@@ -189,15 +189,17 @@ int RP_procdef(char* arg, int unused)
 {
     std::shared_ptr<REP_PROC> proc;
     std::shared_ptr<REPFILE> rf = CUR_REPFILE;
-    unsigned char   name[128], buf[1024]; // JMP 23/5/2019
+    unsigned char   buf[1024]; // JMP 23/5/2019
+    std::string     name;
     std::string     list;
     int             proc_nb, nblines = 0, line1;
 
-    if(RP_splitline(arg, (char*) name, list, 30) < 0) return -1;
+    if(arg == NULL) return -1;
+    if(RP_splitline(arg, name, list, 30) < 0) return -1;
 
     // Creates the REP_PROC object
     // if a proc with the same name already exists, first deletes the existing one
-    proc_nb = RP_proc_create((char*) name);
+    proc_nb = RP_proc_create(name.data());
     proc = REP_PROCS[proc_nb];
 
     // Compute the formal parameters (sep = space, empty names are skipped)
@@ -216,7 +218,7 @@ int RP_procdef(char* arg, int unused)
             // REFILE filename is constructed as >>> proc <name> (in <file>[<line>])
             std::vector<std::string> lines(rf->report_lines.begin() + line1,
                                            rf->report_lines.begin() + line1 + nblines);
-            sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name, rf->filename.c_str(), line1);
+            sprintf((char*) buf, ">>> proc %s (in %s[%d]) + ", name.c_str(), rf->filename.c_str(), line1);
             proc->proc_rf = std::make_shared<REPFILE>(std::string((char*) buf), lines);
             break;
         }
@@ -224,7 +226,7 @@ int RP_procdef(char* arg, int unused)
 
     // Checks that a $procend statement has  been found (if not -> error)
     if(rf->current_line > (int) rf->report_lines.size())  {
-        std::string error_msg = "Procedure '" + std::string((char*) name) + "': missing $procend statement";
+        std::string error_msg = "Procedure '" + name + "': missing $procend statement";
         error_manager.append_error(error_msg);
         //TODO: delete the REP_PROCS[proc_nb]
         return -1;
@@ -249,15 +251,17 @@ int RP_procdef(char* arg, int unused)
 int RP_procexec(char* arg, int unused)
 {   
     std::string list;
-    unsigned char name[128];
-    if(RP_splitline(arg, (char*) name, list, 30) < 0)
+    std::string name;
+    if(arg == NULL)
+        return -1;
+    if(RP_splitline(arg, name, list, 30) < 0)
         return -1;
 
     // Searches the proc definition
-    int proc_nb = RP_proc_find((char*) name);
-    if(proc_nb < 0) 
+    int proc_nb = RP_proc_find(name.data());
+    if(proc_nb < 0)
     {
-        error_manager.append_error("Procedure '" + std::string((char*) name) + "': not defined");
+        error_manager.append_error("Procedure '" + name + "': not defined");
         return -1;
     }
     // Local copy: keeps the PROC alive even if it is redefined during its execution
