@@ -345,9 +345,6 @@ TEST_F(ReportTest, REPORT_PROC)
     // U_test_reset_kmsg_msgs();
 }
 
-// RP_ARGV is defined in api/report/engine/b_rep_engine.cpp (not declared in a header)
-extern char** RP_ARGV;
-
 TEST_F(ReportTest, RP_EXPAND_MACROS)
 {
     std::string line;
@@ -373,10 +370,9 @@ TEST_F(ReportTest, RP_EXPAND_MACROS)
     EXPECT_EQ(line, "10% increase");
 
     // report arguments
-    char** o_argv = RP_ARGV;
+    std::vector<std::string> o_argv = RP_ARGV;
     int o_arg0 = RP_ARG0;
-    std::vector<char*> argv = { (char*) "a", (char*) "b", NULL };
-    RP_ARGV = argv.data();
+    RP_ARGV = { "a", "b" };
     RP_ARG0 = 0;
 
     RP_expand(line, "%0%|%1%|%2%|%*%");
@@ -385,10 +381,18 @@ TEST_F(ReportTest, RP_EXPAND_MACROS)
     RP_expand(line, "x=%3%");
     EXPECT_EQ(line, "x=%3%");
 
-    // no report arguments -> %*% left unchanged
-    RP_ARGV = NULL;
-    RP_expand(line, "x=%*%");
-    EXPECT_EQ(line, "x=%*%");
+    // $shift: the first argument is skipped
+    RP_ARG0 = 1;
+    RP_expand(line, "%0%|%1%|%*%");
+    EXPECT_EQ(line, "1|b|b");
+    RP_expand(line, "x=%2%");
+    EXPECT_EQ(line, "x=%2%");
+    RP_ARG0 = 0;
+
+    // no report arguments
+    RP_ARGV.clear();
+    RP_expand(line, "%0%|%*%|x=%1%");
+    EXPECT_EQ(line, "0||x=%1%");
 
     RP_ARGV = o_argv;
     RP_ARG0 = o_arg0;

@@ -112,7 +112,6 @@
 
 // Global working variables
 // ------------------------
-char** RP_ARGV = NULL;      // Current report arguments
 int RP_DEPTH = 0;           // Level of the current report in the report "stack"
 
 
@@ -474,8 +473,7 @@ char *RP_extract(const char* buf, int* i, int ch)
  *      
  *  @param [in] const std::string&  str  text between the 2 % on the report line
  *  @return     std::string              value of the macro after transformation
- *  @throw      RPMacroError             if the macro is not defined or the report argument is missing
- *                                       (or if the report arguments are not defined for %*%):
+ *  @throw      RPMacroError             if the macro is not defined or the report argument is missing:
  *                                       the caller (RP_expand()) then leaves the text %str% unchanged
  */
 std::string RP_gmacro(const std::string& str)
@@ -487,7 +485,7 @@ std::string RP_gmacro(const std::string& str)
     else
         tmp = str;
 
-    int nb_args = SCR_tbl_size((unsigned char**) RP_ARGV);
+    int nb_args = (int) RP_ARGV.size();
     if(tmp[0] >= '0' && tmp[0] <= '9')
     {
         // %0% = number of arguments, %1%, %2%... = arguments of the report
@@ -496,21 +494,19 @@ std::string RP_gmacro(const std::string& str)
             return std::to_string(nb_args - RP_ARG0);
 
         pos += RP_ARG0;
-        if(pos < 0 || pos > nb_args)
+        if(pos < 1 || pos > nb_args)
         {
             error_manager.append_error("Report : Argument (" + std::to_string(pos) + ") is missing");
             throw RPMacroError("Report : Argument (" + std::to_string(pos) + ") is missing");
         }
-        return std::string(RP_ARGV[pos - 1]);
+        return RP_ARGV[pos - 1];
     }
 
-    // %*% = all the arguments of the report separated by ';'
+    // %*% = all the arguments of the report (after the $shift's) separated by ';'
     if(tmp[0] == '*')
     {
-        if(RP_ARGV == NULL)
-            throw RPMacroError("Report : no arguments defined");
         std::vector<std::string> args;
-        for(int i = RP_ARG0; i < nb_args; i++)
+        for(int i = std::max(RP_ARG0, 0); i < nb_args; i++)
             args.push_back(RP_ARGV[i]);
         return join(args, ";");
     }
@@ -1332,16 +1328,14 @@ int RP_ReportExec_1(const std::string& file)
 
 int B_ReportExec(char* arg, int unused)
 {
-    unsigned char   **o_argv;
     int             rc = 0, 
                     o_arg0;
 
     // Save current report execution context: command = o_arg0 and parameters = o_argv
-    o_argv = (unsigned char**) RP_ARGV;
+    std::vector<std::string> o_argv = std::move(RP_ARGV);
     o_arg0 = RP_ARG0;
 
     std::vector<std::string> v_args = expand_args(arg, 0);
-    std::vector<char*> argv;
     if(v_args.empty())
     {
         rc = -1;
@@ -1354,23 +1348,18 @@ int B_ReportExec(char* arg, int unused)
         memset(&RP_PER, 0, sizeof(Period));
     }
     
-    argv.reserve(v_args.size() + 1);
-    for(std::string& item : v_args)
-        argv.push_back(item.data());
-    argv.push_back(NULL);
-
-    // Changes the report context
-    RP_ARGV = argv.data() + 1;
+    // Changes the report context: v_args[0] is the report filename, the next ones its arguments
+    RP_ARGV.assign(v_args.begin() + 1, v_args.end());
     RP_ARG0 = 0;
 
-    // Executes the report argv[0]
+    // Executes the report v_args[0]
     RP_DEPTH ++; // Recursive level of the current report
-    rc = RP_ReportExec_1(argv[0]);
+    rc = RP_ReportExec_1(v_args[0]);
     RP_DEPTH --;
 
 done:
     // Restores the report context at the time of entering the function
-    RP_ARGV = (char**) o_argv;
+    RP_ARGV = std::move(o_argv);
     RP_ARG0 = o_arg0;
     
     // When exiting the top level report, all $defines are deleted
@@ -1396,18 +1385,16 @@ done:
 
 int B_ReportLine(char* line, int cleanup)
 {
-    unsigned char       **o_argv;
     int                 rc = 0, o_arg0;
     std::shared_ptr<REPFILE> rf;
     std::vector<std::string> report_lines;
 
     // Save current report execution context: command o_arg0 and parameters o_argv
-    o_argv = (unsigned char**) RP_ARGV;
+    std::vector<std::string> o_argv = std::move(RP_ARGV);
     o_arg0 = RP_ARG0;
 
     // To mimic B_Report(), args is artificially created as if a report called "temp.rep" were executed
     std::vector<std::string> v_args = expand_args("temp.rep", 0);
-    std::vector<char*> argv;
     if(v_args.empty())
     {
         rc = -1;
@@ -1421,13 +1408,8 @@ int B_ReportLine(char* line, int cleanup)
         memset(&RP_PER, 0, sizeof(Period));
     }
 
-    argv.reserve(v_args.size() + 1);
-    for(std::string& item : v_args)
-        argv.push_back(item.data());
-    argv.push_back(NULL);
-
-    // Sauve les arguments pour usage dans les ss fonctions
-    RP_ARGV = argv.data() + 1;
+    // Sauve les arguments pour usage dans les ss fonctions (v_args[0] = "temp.rep")
+    RP_ARGV.assign(v_args.begin() + 1, v_args.end());
     RP_ARG0 = 0;
     RP_DEPTH ++;
 
@@ -1444,7 +1426,7 @@ int B_ReportLine(char* line, int cleanup)
 
 done:
     // Resets previous report context 
-    RP_ARGV = (char**) o_argv;
+    RP_ARGV = std::move(o_argv);
     RP_ARG0 = o_arg0;
 
     // Si fin des rapports vide les macros
