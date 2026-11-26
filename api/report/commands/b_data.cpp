@@ -248,14 +248,17 @@ int B_DataRasVar(char* arg, int unused)
  */
 int B_DataCalcVar(char* arg, int unused)
 {
-    char name[K_MAX_NAME + 1];
+    std::string name;
+    std::string args(arg);
     KDBVariablesPtr kdb = global_ws_var;
     int nb_periods = kdb->get_nb_periods();
 
-    int lg = get_next_arg(name, arg, K_MAX_NAME + 1);
+    int lg = get_next_arg(name, args, K_MAX_NAME + 1);
 
-    char* lec = arg + lg + 1;
-    SCR_strip((unsigned char*) lec);
+    // LEC formula: after the separator following the name, trailing chars <= ' ' removed
+    std::string lec = args.substr(std::min((size_t) lg + 1, args.size()));
+    while(!lec.empty() && (unsigned char) lec.back() <= ' ')
+        lec.pop_back();
 
     std::string var_name(name);
     var_name = kdb->to_key(var_name);
@@ -275,16 +278,16 @@ int B_DataCalcVar(char* arg, int unused)
         }
     }
 
-    if(lec[0]) 
+    if(!lec.empty())
     {
-        std::shared_ptr<CLEC> clec = nullptr; 
+        std::shared_ptr<CLEC> clec = nullptr;
         try
         {
             clec = std::make_shared<CLEC>(lec);
         }
         catch(const std::runtime_error& e)
         {
-            std::string error_msg = "Error in LEC formula '" + std::string(lec) + "':\n";
+            std::string error_msg = "Error in LEC formula '" + lec + "':\n";
             error_msg += e.what();
             kwarning(error_msg.c_str());
             return -1;
@@ -596,16 +599,16 @@ int B_DataRename(char* arg, int type)
 
 int B_DataUpdate(char* arg, int type)
 {
-    char c_name[K_MAX_NAME + 1];
+    std::string name;
+    std::string str_arg(arg);
     std::vector<std::string> args;
-    int lg = get_next_arg(c_name, arg, K_MAX_NAME + 1);
-    
+    int lg = get_next_arg(name, str_arg, K_MAX_NAME + 1);
+
     bool success = true;
     try
     {
         KDB& kdb = get_global_db(type);
-        
-        std::string name(c_name);
+
         name = kdb.to_key(name);
         if(!kdb.contains(name)) 
         {
@@ -614,8 +617,7 @@ int B_DataUpdate(char* arg, int type)
         }
         
         success = true;
-        char* c_value = arg + lg + 1;
-        std::string value(c_value);
+        std::string value = str_arg.substr(std::min((size_t) lg + 1, str_arg.size()));
         switch(type) 
         {
         case COMMENTS :
@@ -659,7 +661,7 @@ int B_DataUpdate(char* arg, int type)
         }
         case SCALARS :
         {
-            args = split_skip_empty(std::string(arg), " ,\n\t");
+            args = split_skip_empty(str_arg, " ,\n\t");
             int nb_args = (int) args.size();
 
             std::shared_ptr<Scalar> scl = global_ws_scl->get_obj_ptr(name);
@@ -681,7 +683,7 @@ int B_DataUpdate(char* arg, int type)
         }
         case VARIABLES :
         {
-            args = split_skip_empty(std::string(arg), " ,\n\t");
+            args = split_skip_empty(str_arg, " ,\n\t");
             int nb_args = (int) args.size();
             /* Name [D|d|G|g|L|l] Period nVal */
             if(nb_args > 1) 
@@ -1147,11 +1149,10 @@ int B_DataAppend(char* arg, int type)
         return -1;
     }
 
-    char c_name[K_MAX_NAME + 1];
-    int lg = get_next_arg(c_name, arg, K_MAX_NAME + 1);
-    std::string text_to_append = std::string(arg + lg + 1);
-
-    std::string name(c_name);
+    std::string name;
+    std::string args(arg);
+    int lg = get_next_arg(name, args, K_MAX_NAME + 1);
+    std::string text_to_append = args.substr(std::min((size_t) lg + 1, args.size()));
     try
     {    
         if(type == COMMENTS)

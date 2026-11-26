@@ -320,18 +320,20 @@ static int LTOH_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr
 static int B_ltoh(int type, char* arg)
 {
     int res, rc = 0, shift, skip;
-    char method[81], file[K_MAX_FILE + 1];
+    std::string method, file;
     int file_type;
     std::shared_ptr<Sample> t_smpl = nullptr;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
-    int lg = get_next_arg(method, arg, 80);
-    U_sqz_text((unsigned char*) method);
+    // method: cannot contain spaces (a space ends the argument) -> no need to squeeze it
+    std::string args(arg);
+    int lg = get_next_arg(method, args, 80);
 
-    lg += get_next_arg(file, arg + lg, K_MAX_FILE);
+    std::string rest = args.substr(lg);
+    int lg2 = get_next_arg(file, rest, K_MAX_FILE);
 
-    std::vector<std::string> v_data = expand_args(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(rest.substr(lg2), 0);
     if(v_data.empty()) 
         goto done;
 

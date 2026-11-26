@@ -71,19 +71,19 @@ int B_ModelSimulate(char *const_arg, int unused)
 {
     int     lg1, lg2;
     int     rc = -1;
-    char    from[16], to[16];
+    std::string from, to;
     Sample  *smpl = nullptr;
     std::vector<std::string> v_eqs;
-    char    *arg;
 
-    // Copy for C++ strings = read only (const)
-    arg = (char*) SCR_stracpy((unsigned char*) const_arg);
-    
-    lg1 = get_next_arg(from, arg, 15);
-    lg2 = get_next_arg(to, arg + lg1, 15);
+    // Copy (get_next_arg() modifies its argument)
+    std::string args(const_arg);
+
+    lg1 = get_next_arg(from, args, 15);
+    std::string rest = args.substr(lg1);
+    lg2 = get_next_arg(to, rest, 15);
     try
     {
-        smpl = new Sample(std::string((char*) from), std::string((char*) to));
+        smpl = new Sample(from, to);
     }
     catch(const std::exception& e)
     {
@@ -92,12 +92,11 @@ int B_ModelSimulate(char *const_arg, int unused)
         goto err;
     }
 
-    v_eqs = expand_args(arg + lg1 + lg2, 0);
+    v_eqs = expand_args(rest.substr(lg2), 0);
     rc = B_ModelSimulateEqs(smpl, v_eqs);
 
 err:
     if(smpl) delete smpl;
-    SCR_free(arg);
     return rc;
 }
 
@@ -191,29 +190,27 @@ int B_ModelCompile(char* arg, int unused)
  */
 int B_ModelCalcSCC(char *const_arg, int unused)
 {
-    // Copy for C++ strings = read only (const)
-    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
-    
+    // Copy (get_next_arg() modifies its argument)
+    std::string args(const_arg);
+
     // Tri
-    char buf[256];
-    int lg1 = get_next_arg(buf, arg, 15);
-    int tris = atoi(buf); 
-    if(tris < 0) 
+    std::string buf;
+    int lg1 = get_next_arg(buf, args, 15);
+    int tris = atoi(buf.c_str());
+    if(tris < 0)
         tris = 0;
 
-    // result list names
-    char pre[64], inter[64], post[64];
-    lg1 += get_next_arg(pre,   arg + lg1, 20);
-    lg1 += get_next_arg(inter, arg + lg1, 20);
-    lg1 += get_next_arg(post,  arg + lg1, 20);
-    if(strlen(pre) == 0 || strlen(inter) == 0 || strlen(post) == 0)
-    {
-        SCR_free(arg);
+    // result list names (each get_next_arg() call left-justifies the rest of args)
+    std::string pre, inter, post;
+    args = args.substr(lg1);
+    args = args.substr(get_next_arg(pre, args, 20));
+    args = args.substr(get_next_arg(inter, args, 20));
+    args = args.substr(get_next_arg(post, args, 20));
+    if(pre.empty() || inter.empty() || post.empty())
         return -1;
-    } 
 
     KDBEquationsPtr tdbe = nullptr;
-    std::string list_eqs = std::string(arg + lg1);
+    std::string list_eqs = args;
     list_eqs = trim(list_eqs);
     if(list_eqs.empty())
         tdbe = global_ws_eqs;
@@ -232,31 +229,30 @@ int B_ModelCalcSCC(char *const_arg, int unused)
  */
 int B_ModelSimulateSCC(char *const_arg, int unused)
 {
-    // Copy for C++ strings = read only (const)
-    char* arg = (char*) SCR_stracpy((unsigned char*) const_arg);
+    // Copy (get_next_arg() modifies its argument)
+    std::string args(const_arg);
 
     Sample* smpl = nullptr;
-    char from[16], to[16];
-    int lg1 = get_next_arg(from, arg, 15);
-    int lg2 = get_next_arg(to, arg + lg1, 15);
+    std::string from, to;
+    int lg1 = get_next_arg(from, args, 15);
+    std::string rest = args.substr(lg1);
+    int lg2 = get_next_arg(to, rest, 15);
     try
     {
-        smpl = new Sample(std::string((char*) from), std::string((char*) to));
+        smpl = new Sample(from, to);
     }
     catch(const std::exception& e)
     {
         std::string error_msg = "ModelSimulateSCC: invalid sample\n" + std::string(e.what());
         error_manager.append_error(error_msg);
-        SCR_free(arg);
         return -1;
     }
 
     // Extrait les listes restantes
-    std::vector<std::string> v_lst = expand_args(arg + lg1 + lg2, 0);
+    std::vector<std::string> v_lst = expand_args(rest.substr(lg2), 0);
     if(v_lst.size() != 3)
     {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");
-        SCR_free(arg);
         if(smpl) delete smpl;
         return -1;
     }
@@ -268,7 +264,6 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
         && global_ws_lst->contains(post_list_name))) 
     {
         error_manager.append_error("ModelSimulateSCC: pre, post or inter list not found in the Lists workspace");
-        SCR_free(arg);
         if(smpl) delete smpl;
         return -1;
     }

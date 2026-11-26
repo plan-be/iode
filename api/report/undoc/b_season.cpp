@@ -36,8 +36,10 @@ int B_season(char* arg)
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
-    int lg = get_next_arg(name, arg, 80);
-    std::vector<std::string> v_data = expand_args(arg + lg, 0);
+    std::string file;
+    std::string args(arg);
+    int lg = get_next_arg(file, args, 80);
+    std::vector<std::string> v_data = expand_args(args.substr(lg), 0);
     if(v_data.empty()) 
         goto done;
 
@@ -51,11 +53,11 @@ int B_season(char* arg)
         nb --;
     }
 
-    file_type = get_file_type_from_file(name, VARIABLES);
-    if(file_type < 0) 
-        from->load_asc(name);
+    file_type = get_file_type_from_file(file, VARIABLES);
+    if(file_type < 0)
+        from->load_asc(file);
     else
-        from->load_binary(name, v_data);
+        from->load_binary(file, v_data);
     if(!from || nb != from->size()) 
     {
         error_manager.append_error("Empty data set or inexistent variable");

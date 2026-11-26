@@ -104,15 +104,16 @@ static int HTOL_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr
 static int B_htol(int method, char* arg)
 {
     int res, rc = 0, f, t, shift, skip;
-    char file[K_MAX_FILE + 1];
+    std::string file;
+    std::string args(arg);
     int file_type;
     std::shared_ptr<Sample> t_smpl = nullptr;
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
-    int lg = get_next_arg(file, arg, K_MAX_FILE);
+    int lg = get_next_arg(file, args, K_MAX_FILE);
 
-    std::vector<std::string> v_data = expand_args(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(args.substr(lg), 0);
     if(v_data.empty()) 
         goto done;
     

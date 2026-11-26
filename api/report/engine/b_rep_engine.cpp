@@ -709,7 +709,8 @@ int RP_fmt(std::string& buf, const std::string& format, double value)
  */
 int RP_eval(std::string& res, const std::string& farg)
 {
-    char        ch, name[31];
+    char        ch;
+    std::string name;
     int         rc, rp_rt;
     double      x;
     bool        inv = false;
@@ -727,15 +728,16 @@ int RP_eval(std::string& res, const std::string& farg)
         if(farg[1] == '!')
             inv = true;
 
-        // get_next_arg() and the report commands modify their argument: works on a copy of farg
-        std::string cmd = farg;
-
         // Retrieve the command name (max 30 chars)
-        get_next_arg(name, cmd.data() + 1 + (int) inv, 30);
+        // get_next_arg() left-justifies the text after "$" or "$!" (in a copy of farg)
+        size_t prefix_lg = 1 + (int) inv;
+        std::string text = farg.substr(prefix_lg);
+        get_next_arg(name, text, 30);
+        std::string cmd = farg.substr(0, prefix_lg) + text;
 
         // Execute the function name
         // (the arguments start 2 chars after the length of the name, but not after the end of cmd)
-        size_t args_pos = std::min(strlen(name) + 2, cmd.size());
+        size_t args_pos = std::min(name.size() + 2, cmd.size());
         rc = RP_exec_fn(name, cmd.substr(args_pos), ch);
         
         // Reset the previous OnError value (before calling RP_exec_fn)
