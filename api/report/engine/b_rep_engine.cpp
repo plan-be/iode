@@ -898,14 +898,13 @@ char *RP_extractpar(char* buf, int* i, char* brackets)
 /**
  *  Evaluates an @function. 
  *  
- *  @param [in, out] char**  res    pointer to the allocated string containing @fn(...) 
- *                                  calculated value. *res = NULL on error
- *  @param [in]      char*   str    function name and its arguments (ex: "take(2,abcd)")
- *  @return          int            0 on success, -1 on error (illegal function or @fn() throws RPFunctionError)
+ *  @param [out] std::string&  res  calculated value of @fn(...). Empty string on error
+ *  @param [in]  const std::string&  str  function name and its arguments (ex: "take(2,abcd)")
+ *  @return      int                0 on success, -1 on error (illegal function or @fn() throws RPFunctionError)
  */
-int RP_fneval(char** res, char* str)
+int RP_fneval(std::string& res, const std::string& str)
 {
-    *res = 0;
+    res.clear();
     std::vector<std::string> v_args = split_multi_quoted(str, "(,", '"');
     if(v_args.empty())
         return -1;
@@ -923,8 +922,7 @@ int RP_fneval(char** res, char* str)
     std::vector<std::string> args(v_args.begin() + 1, v_args.end());
     try
     {
-        std::string value = it->second.fn(args);
-        *res = (char*) SCR_stracpy((unsigned char*) value.c_str());
+        res = it->second.fn(args);
     }
     catch(const RPFunctionError&)
     {
@@ -949,20 +947,18 @@ U_ch *RP_gfn(U_ch* str)
     if(str == NULL) 
         return NULL;
 
-    U_ch* res = NULL;
-    int  allc = 0;
-    if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0) 
-    {
-        std::string expanded;
-        RP_expand(expanded, (char*) str);
-        str = SCR_stracpy((unsigned char*) expanded.c_str());
-        allc = 1;
-    }
+    // expands the macros, LEC expressions and @functions in the arguments
+    std::string fn_call;
+    if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0)
+        RP_expand(fn_call, (char*) str);
+    else
+        fn_call = (char*) str;
 
-    RP_fneval((char**) &res, (char*) str);
-    if(allc) 
-        SCR_free(str);
-    return res;
+    // returns NULL on error: the caller then leaves the text of the @function unchanged
+    std::string value;
+    if(RP_fneval(value, fn_call) != 0)
+        return NULL;
+    return SCR_stracpy((unsigned char*) value.c_str());
 }
 
 
