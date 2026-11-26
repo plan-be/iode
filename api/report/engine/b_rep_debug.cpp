@@ -9,7 +9,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      void RP_debug(char* txt) : appends a message to the report debug file memdbg.txt.
+ *      void RP_debug(const std::string& txt) : appends a message to the report debug file memdbg.txt.
  */
 
 #include <scr4.h>
@@ -17,39 +17,35 @@
 
 /**
  *  Sub-function of RP_debug() to create a summary message of the swap memory usage.
- *  
- *  @param [in, out] char*  txt     buffer that will receive the message
- *  @return          char*          pointer to txt  
- *          
+ *
+ *  Example: RP_mem("+++") => "+++NBA=12 NBB=3 ALLOC=1 FREE=0 USED=1"
+ *
+ *  @param [in] const std::string&  txt     prefix of the message
+ *  @return     std::string                 txt followed by the memory usage summary
+ *
  */
-static char *RP_mem(char *txt)
+static std::string RP_mem(const std::string& txt)
 {
     SWSTAT  st;
+    const long MB = 1024L * 1024L;
 
     SW_status(&st);
-    sprintf(txt,"NBA=%ld NBB=%ld ALLOC=%ld FREE=%ld USED=%ld",
-            st.st_nballoc - st.st_nbfree,
-            st.st_nbblks,
-            (st.st_convalloc)/(1024 * 1024),
-            (st.st_convafree + st.st_convfree)/(1024L*1024L),
-            (st.st_convalloc - st.st_convafree)/(1024L*1024L));
-    return(txt);
+    return txt + "NBA=" + std::to_string(st.st_nballoc - st.st_nbfree)
+               + " NBB=" + std::to_string(st.st_nbblks)
+               + " ALLOC=" + std::to_string(st.st_convalloc / MB)
+               + " FREE=" + std::to_string((st.st_convafree + st.st_convfree) / MB)
+               + " USED=" + std::to_string((st.st_convalloc - st.st_convafree) / MB);
 }
 
 /**
- *  Appends a message to the report debug file memdbg.txt.
- *  
- *  @param [in, out] char*  txt to print in memdb.txt
+ *  Appends a message, followed by the memory usage summary, to the report debug file memdbg.txt.
+ *
+ *  @param [in] const std::string&  txt     message to print in memdbg.txt
  */
-void RP_debug(char* txt)
+void RP_debug(const std::string& txt)
 {
-    FILE 	*fd = 0;
-    char	buf[512];
-
-    fd = fopen("memdbg.txt", "a+");
-    if(fd) {
-        fprintf(fd, "%s", txt);
-        fprintf(fd, "\n+++%s\n", RP_mem(buf));
-    }
-    fclose(fd);
+    std::ofstream fd("memdbg.txt", std::ios::app);
+    if(!fd)
+        return;
+    fd << txt << "\n" << RP_mem("+++") << "\n";
 }
