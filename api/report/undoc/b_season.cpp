@@ -36,10 +36,9 @@ int B_season(char* arg)
     KDBVariablesPtr to = nullptr;
     KDBVariablesPtr from = KDBVariables::Create(false);
 
-    std::string file;
     std::string args(arg);
-    int lg = get_next_arg(file, args, 80);
-    std::vector<std::string> v_data = expand_args(args.substr(lg), 0);
+    std::string file = get_next_arg(args, 80);
+    std::vector<std::string> v_data = expand_args(args, 0);
     if(v_data.empty()) 
         goto done;
 

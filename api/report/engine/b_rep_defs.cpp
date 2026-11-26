@@ -63,14 +63,11 @@ int RP_define_1(const std::string& name, const std::string& macro)
  */
 int RP_define(char* arg, int unused)
 {
-    std::string name;
-    std::string args(arg);
+    std::string macro(arg);
+    std::string name = get_next_arg(macro, K_MAX_NAME + 1);
 
-    int lg = get_next_arg(name, args, K_MAX_NAME + 1);
-    // value: after the separator following the name (empty if there is no value),
-    // without leading white spaces and trailing chars <= ' '
-    // (same as U_ljust_text() + SCR_strip())
-    std::string macro = args.substr(std::min((size_t) lg + 1, args.size()));
+    // value: rest of the arguments (empty if there is no value), without leading white
+    // spaces and trailing chars <= ' ' (same as U_ljust_text() + SCR_strip())
     size_t start = macro.find_first_not_of(" \t\n\r\v\f");
     macro = (start == std::string::npos) ? std::string() : macro.substr(start);
     while(!macro.empty() && (unsigned char) macro.back() <= ' ')

@@ -69,7 +69,6 @@ static int B_ModelSimulateEqs(Sample* smpl, const std::vector<std::string>& v_eq
  */
 int B_ModelSimulate(char *const_arg, int unused)
 {
-    int     lg1, lg2;
     int     rc = -1;
     std::string from, to;
     Sample  *smpl = nullptr;
@@ -78,9 +77,8 @@ int B_ModelSimulate(char *const_arg, int unused)
     // Copy (get_next_arg() modifies its argument)
     std::string args(const_arg);
 
-    lg1 = get_next_arg(from, args, 15);
-    std::string rest = args.substr(lg1);
-    lg2 = get_next_arg(to, rest, 15);
+    from = get_next_arg(args, 15);
+    to = get_next_arg(args, 15);
     try
     {
         smpl = new Sample(from, to);
@@ -92,7 +90,7 @@ int B_ModelSimulate(char *const_arg, int unused)
         goto err;
     }
 
-    v_eqs = expand_args(rest.substr(lg2), 0);
+    v_eqs = expand_args(args, 0);
     rc = B_ModelSimulateEqs(smpl, v_eqs);
 
 err:
@@ -194,18 +192,15 @@ int B_ModelCalcSCC(char *const_arg, int unused)
     std::string args(const_arg);
 
     // Tri
-    std::string buf;
-    int lg1 = get_next_arg(buf, args, 15);
+    std::string buf = get_next_arg(args, 15);
     int tris = atoi(buf.c_str());
     if(tris < 0)
         tris = 0;
 
-    // result list names (each get_next_arg() call left-justifies the rest of args)
-    std::string pre, inter, post;
-    args = args.substr(lg1);
-    args = args.substr(get_next_arg(pre, args, 20));
-    args = args.substr(get_next_arg(inter, args, 20));
-    args = args.substr(get_next_arg(post, args, 20));
+    // result list names
+    std::string pre = get_next_arg(args, 20);
+    std::string inter = get_next_arg(args, 20);
+    std::string post = get_next_arg(args, 20);
     if(pre.empty() || inter.empty() || post.empty())
         return -1;
 
@@ -233,10 +228,8 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     std::string args(const_arg);
 
     Sample* smpl = nullptr;
-    std::string from, to;
-    int lg1 = get_next_arg(from, args, 15);
-    std::string rest = args.substr(lg1);
-    int lg2 = get_next_arg(to, rest, 15);
+    std::string from = get_next_arg(args, 15);
+    std::string to = get_next_arg(args, 15);
     try
     {
         smpl = new Sample(from, to);
@@ -249,7 +242,7 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
     }
 
     // Extrait les listes restantes
-    std::vector<std::string> v_lst = expand_args(rest.substr(lg2), 0);
+    std::vector<std::string> v_lst = expand_args(args, 0);
     if(v_lst.size() != 3)
     {
         error_manager.append_error("ModelSimulateSCC: syntax error in lists");

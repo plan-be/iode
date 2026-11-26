@@ -773,31 +773,41 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     create_dummy_lists_and_vars();
 
     // get_next_arg
+    // tabs replaced by spaces, leading white spaces moved to the end, the first argument
+    // and the following separator are removed from args
     std::string args = "\t  ACAF\tACAG XYZ ";
-    std::string arg0;
-    EXPECT_EQ(get_next_arg(arg0, args, 21), 4);
-    EXPECT_EQ(arg0, "ACAF");
-    // tabs replaced by spaces, leading white spaces moved to the end (same length)
-    EXPECT_EQ(args, "ACAF ACAG XYZ    ");
+    EXPECT_EQ(get_next_arg(args, 21), "ACAF");
+    EXPECT_EQ(args, "ACAG XYZ    ");
+    EXPECT_EQ(get_next_arg(args, 21), "ACAG");
+    EXPECT_EQ(args, "XYZ    ");
+    EXPECT_EQ(get_next_arg(args, 21), "XYZ");
+    EXPECT_EQ(args, "   ");
+    // only white spaces -> "" (the separator of the empty argument is removed)
+    EXPECT_EQ(get_next_arg(args, 21), "");
+    EXPECT_EQ(args, "  ");
 
+    // empty first argument
+    std::string empty_first = ",B2";
+    EXPECT_EQ(get_next_arg(empty_first, 21), "");
+    EXPECT_EQ(empty_first, "B2");
+
+    // argument truncated to lg - 1 chars: the remaining chars stay in args
     std::string truncated_args = " ABCDE";
-    std::string truncated_arg;
-    EXPECT_EQ(get_next_arg(truncated_arg, truncated_args, 4), 3);
-    EXPECT_EQ(truncated_arg, "ABC");
+    EXPECT_EQ(get_next_arg(truncated_args, 4), "ABC");
+    EXPECT_EQ(truncated_args, "DE ");
 
-    // separators: ' ', ',', '\n' (and '\t')
+    // separators: ' ', ',', '\n' (and '\t'): only one separator is removed
     std::string comma_args = "A1,B2";
-    EXPECT_EQ(get_next_arg(arg0, comma_args, 21), 2);
-    EXPECT_EQ(arg0, "A1");
+    EXPECT_EQ(get_next_arg(comma_args, 21), "A1");
+    EXPECT_EQ(comma_args, "B2");
+    std::string two_seps = "A1  B2";
+    EXPECT_EQ(get_next_arg(two_seps, 21), "A1");
+    EXPECT_EQ(two_seps, " B2");
 
-    // empty string or only white spaces -> "" (args unchanged)
+    // empty string
     std::string empty_args = "";
-    EXPECT_EQ(get_next_arg(arg0, empty_args, 21), 0);
-    EXPECT_EQ(arg0, "");
-    std::string spaces_args = "  \n ";
-    EXPECT_EQ(get_next_arg(arg0, spaces_args, 21), 0);
-    EXPECT_EQ(arg0, "");
-    EXPECT_EQ(spaces_args, "  \n ");
+    EXPECT_EQ(get_next_arg(empty_args, 21), "");
+    EXPECT_EQ(empty_args, "");
 
     // B_argpos
     EXPECT_EQ(B_argpos("LSBM", 'b'), 2);

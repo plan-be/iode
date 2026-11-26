@@ -37,7 +37,6 @@
 
 int B_IdtExecute(char* arg, int unused)
 {
-    int     lg1, lg2;
     int     rc = 0;
     std::string from, to;
     Sample  *smpl;
@@ -45,9 +44,8 @@ int B_IdtExecute(char* arg, int unused)
     error_manager.clear();
 
     std::string args(arg);
-    lg1 = get_next_arg(from, args, 15);
-    std::string rest = args.substr(lg1);
-    lg2 = get_next_arg(to, rest, 15);
+    from = get_next_arg(args, 15);
+    to = get_next_arg(args, 15);
     try
     {
         smpl = new Sample(from, to);
@@ -59,7 +57,7 @@ int B_IdtExecute(char* arg, int unused)
         return -1;
     }
 
-    std::vector<std::string> v_idts = expand_args(rest.substr(lg2), 0);
+    std::vector<std::string> v_idts = expand_args(args, 0);
 
     rc = B_IdtExecuteIdts(smpl, v_idts);
 

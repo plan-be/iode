@@ -728,17 +728,13 @@ int RP_eval(std::string& res, const std::string& farg)
         if(farg[1] == '!')
             inv = true;
 
-        // Retrieve the command name (max 30 chars)
-        // get_next_arg() left-justifies the text after "$" or "$!" (in a copy of farg)
-        size_t prefix_lg = 1 + (int) inv;
-        std::string text = farg.substr(prefix_lg);
-        get_next_arg(name, text, 30);
-        std::string cmd = farg.substr(0, prefix_lg) + text;
+        // Retrieve the command name (max 30 chars) from the text after "$" or "$!"
+        // -> cmd_args = the arguments of the command
+        std::string cmd_args = farg.substr(1 + (int) inv);
+        name = get_next_arg(cmd_args, 30);
 
         // Execute the function name
-        // (the arguments start 2 chars after the length of the name, but not after the end of cmd)
-        size_t args_pos = std::min(name.size() + 2, cmd.size());
-        rc = RP_exec_fn(name, cmd.substr(args_pos), ch);
+        rc = RP_exec_fn(name, cmd_args, ch);
         
         // Reset the previous OnError value (before calling RP_exec_fn)
         RP_RT = rp_rt;          

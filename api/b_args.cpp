@@ -285,26 +285,31 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Extracts the first argument (= word) of max 'lg - 1' chars from the string 'args'.
+ *  Extracts (consumes) the first argument (= word) of max 'lg - 1' chars from the string 'args'.
  *
- *  args is modified in place (its length is unchanged): the tabs are replaced by spaces and
- *  the leading white spaces are moved to the end of args (see U_ljust_text()).
- *  The first argument is therefore always at the beginning of args and the rest of the
- *  arguments can be found at position lg (return value) in args.
+ *  On return, args contains the rest of the arguments: the first argument and the separator
+ *  that follows it (' ', ',' or '\n') are removed from args.
+ *
+ *  Before extracting the argument, the tabs are replaced by spaces and the leading white
+ *  spaces are moved to the end of args (as U_ljust_text() did): the rest of args may
+ *  therefore end with spaces.
+ *
+ *  If the argument is longer than lg - 1 chars, it is truncated and the remaining chars stay
+ *  at the beginning of args.
  *
  *  Example:
- *      std::string args = " ACAF ACAG XYZ ";
- *      std::string arg0;
- *      int lg = get_next_arg(arg0, args, 21);
- *      // => lg = 4, arg0 = "ACAF", args = "ACAF ACAG XYZ  "
+ *      std::string args = " ACAF ACAG XYZ";
+ *      std::string arg0 = get_next_arg(args, 21);
+ *      // => arg0 = "ACAF", args = "ACAG XYZ "
+ *      arg0 = get_next_arg(args, 21);
+ *      // => arg0 = "ACAG", args = "XYZ "
  *
- *  @param [out]     arg0    std::string&   first arg in args
- *  @param [in, out] args    std::string&   any string (modified, see above)
- *  @param [in]      lg      int            size of the C buffer used before: arg0 contains
- *                                          at most lg - 1 chars
- *  @return                  int            length of arg0
+ *  @param [in, out] args    std::string&   any string. On return: the rest of the arguments
+ *  @param [in]      lg      int            arg0 contains at most lg - 1 chars
+ *  @return                  std::string    first argument of args ("" if args is empty,
+ *                                          contains only white spaces or starts with ',')
  */
-int get_next_arg(std::string& arg0, std::string& args, int lg)
+std::string get_next_arg(std::string& args, int lg)
 {
     // tabs -> spaces
     std::replace(args.begin(), args.end(), '\t', ' ');
@@ -324,8 +329,14 @@ int get_next_arg(std::string& arg0, std::string& args, int lg)
     while((int) i < lg - 1 && i < args.size() && args[i] && separators.find(args[i]) == std::string::npos)
         i++;
 
-    arg0 = args.substr(0, i);
-    return (int) i;
+    std::string arg0 = args.substr(0, i);
+
+    // removes the first word and the separator that follows it
+    if(i < args.size() && separators.find(args[i]) != std::string::npos)
+        i++;
+    args.erase(0, i);
+
+    return arg0;
 }
 
 
