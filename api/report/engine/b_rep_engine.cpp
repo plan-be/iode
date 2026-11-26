@@ -591,24 +591,23 @@ int RP_evaltime()
 /**
  *  Evaluates a LEC expression in (the period) RP_PER. 
  *  
- *  @param [in, out]    char*       lec     LEC expression or empty string (the expression is first stripped, hence the [out]).
+ *  @param [in]         const std::string&  lec   LEC expression or empty string (trimmed before evaluation)
  *  @return             double              IODE_NAN on error or if RP_PER is before the current WS sample
  *                                          calculated LEC value on success
  */
-double RP_evallec(char* c_lec)
+double RP_evallec(const std::string& lec)
 {
-    if(RP_evaltime() < 0) 
+    if(RP_evaltime() < 0)
         return IODE_NAN;
 
-    std::string lec(c_lec);
-    lec = trim(lec);
+    std::string _lec_ = trim(lec);
     double x = IODE_NAN;
     std::shared_ptr<CLEC> clec = nullptr;
-    if(lec[0]) 
+    if(_lec_[0]) 
     {
         try
         {
-            clec = std::make_shared<CLEC>(lec);
+            clec = std::make_shared<CLEC>(_lec_);
         }
         catch(const std::exception&) 
         {
@@ -784,7 +783,7 @@ int RP_eval(std::string& res, const std::string& farg)
         fmt = farg.substr(pos + 1);     // format
     }
 
-    x = RP_evallec(lec.data());
+    x = RP_evallec(lec);
     // Empty string on error
     if(!IODE_IS_A_NUMBER(x))
         return -1;
