@@ -92,16 +92,23 @@ if(Python_FOUND)
     #        - https://github.com/cython/cython/pull/4548 
     #          In Python, when running 'import xxx', Python will look for a function named PyInit_xxx
     #          in the xxx.pyd file. By default, Cython will use the name of the compiled .pyx file to generate 
-    #          the PyInit_xxx function. This behavior is override by the --module-name option. 
+    #          the PyInit_xxx function. This behavior is override by the --module-name option.
+    #        - iode_cython.pyx is the single compilation unit: it includes all the other *.pyx files, which
+    #          cimport the *.pxd files. The --depfile option makes Cython write the list of all these files
+    #          in iode_cython.cpp.dep (paths relative to the WORKING_DIRECTORY). The DEPFILE argument passes
+    #          this list to the build tool, so that iode_cython.cpp is regenerated when any included *.pyx
+    #          or cimported *.pxd file changes (not only iode_cython.pyx).
     add_custom_command(OUTPUT iode_cython.cpp
                       DEPENDS iode_cython.pyx super.h super.cpp cli.cpp a2m_print.cpp iode_database/variables_database.cpp
+                      DEPFILE ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp.dep
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                       VERBATIM
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/super.h ${CMAKE_CURRENT_BINARY_DIR}/super.h
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/super.cpp ${CMAKE_CURRENT_BINARY_DIR}/super.cpp
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/cli.cpp ${CMAKE_CURRENT_BINARY_DIR}/cli.cpp
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/a2m_print.cpp ${CMAKE_CURRENT_BINARY_DIR}/a2m_print.cpp
                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/iode_database/variables_database.cpp ${CMAKE_CURRENT_BINARY_DIR}/iode_database/variables_database.cpp
-                      COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_cython.pyx -3 --verbose --cplus 
+                      COMMAND cython ${CMAKE_CURRENT_SOURCE_DIR}/iode_cython.pyx -3 --verbose --cplus --depfile
                       --line-directives --include-dir ${CMAKE_CURRENT_SOURCE_DIR} --module-name iode.iode_cython
                       --directive cpp_locals=True,binding=True,embedsignature=True,embedsignature.format=python
                       --output-file ${CMAKE_CURRENT_BINARY_DIR}/iode_cython.cpp)
