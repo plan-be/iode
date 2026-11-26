@@ -220,7 +220,7 @@ int REPFILE::read_line(std::string& line, int mode)
 
     int rc = 0;
     if(mode)  // expand macros, {}, ...
-        rc = RP_expand(line, multi_line.data());
+        rc = RP_expand(line, multi_line);
     else
         line = multi_line;
 
@@ -437,12 +437,12 @@ int REPFILE::err_dump(char* name, char* arg)
  *      pos = 8; // starting search position = 1 + position of '{'
  *      RP_extract(str, &pos, '}') => "A[1990Y1] + 2", pos = 22
  *      
- *  @param [in]      char*    buf     input string
+ *  @param [in]      const char* buf  input string
  *  @param [in, out] int*     i       position of the current pointer in buf (=first character in the resulting string)
  *  @param [in]      int      ch      ending character
  *  @return          char*            allocated string 
  */
-char *RP_extract(char* buf, int* i, int ch)
+char *RP_extract(const char* buf, int* i, int ch)
 {
     int     pos, j;
     char    *res;
@@ -842,7 +842,7 @@ int RP_eval(std::string& res, char* farg)
  *      pos = 6;
  *      RP_extractpar(str, &pos, '()') => "upper(@take(10,b-1000))", pos = 29
  *      
- *  @param [in]      char*    buf     input string
+ *  @param [in]      const char* buf  input string
  *  @param [in, out] int*     i       in: position of the current pointer in buf (=first character in the resulting string)
  *                                    out: position of the next character in buf after the closing parenthesis. 
  *                                    If no closing par is found, unchanged
@@ -850,7 +850,7 @@ int RP_eval(std::string& res, char* farg)
  *  @return          char*            allocated string containing the string bw parentheses
  *                                    NULL is no closing parenthesis of level 0 is found
  */
-char *RP_extractpar(char* buf, int* i, char* brackets)
+char *RP_extractpar(const char* buf, int* i, char* brackets)
 {
     int     nb = 0, k, instr = 0;
     char    *res;
@@ -950,8 +950,7 @@ std::string RP_gfn(const std::string& str)
     std::string fn_call;
     if(str.find_first_of("%{@") != std::string::npos)
     {
-        std::string buf = str;    // RP_expand() takes a char*
-        RP_expand(fn_call, buf.data());
+        RP_expand(fn_call, str);
     }
     else
         fn_call = str;
@@ -1050,18 +1049,19 @@ std::string RP_gfn(const std::string& str)
  *      - the text is left unchanged until the following ` or the end of line
  *  
  *  @param [out]     std::string&   line    expanded report line
- *  @param [in]      char*          buf     partial input report line
+ *  @param [in]      const std::string& buf     partial input report line
  *  @return          int                    0 (always)
  */
-int RP_expand(std::string& line, char* buf)
+int RP_expand(std::string& line, const std::string& buf)
 {
     int     i, previ, upper, sqz;
     char    *w = NULL, *res = NULL;
 
     line.clear();
-    line.reserve(strlen(buf));
+    line.reserve(buf.size());
 
-    for(i = 0; buf[i]; i++)
+    // i < buf.size(): a '{' at the end of buf makes i jump over the end of the string
+    for(i = 0; i < (int) buf.size() && buf[i]; i++)
     {
         upper = 0;
         sqz = 0;
@@ -1079,7 +1079,7 @@ int RP_expand(std::string& line, char* buf)
                     sqz = 1;
                 if(upper || sqz) 
                     i++;
-                w = RP_extract(buf, &i, '%');
+                w = RP_extract(buf.c_str(), &i, '%');
                 if(w != NULL) 
                 {
                     res = RP_gmacro(w);
@@ -1110,7 +1110,7 @@ int RP_expand(std::string& line, char* buf)
                 i++;
                 if(buf[i] == '{') 
                     goto dft;
-                w = RP_extract(buf, &i, '}');
+                w = RP_extract(buf.c_str(), &i, '}');
                 res = RP_gcmd(w);
                 if(res)
                     line += res;
@@ -1124,7 +1124,7 @@ int RP_expand(std::string& line, char* buf)
                 if(buf[i] == '@') 
                     goto dft;
                 previ = i;  // Keeps the previous value of i in case of error in RP_gfn()
-                w = RP_extractpar(buf, &i, "()");
+                w = RP_extractpar(buf.c_str(), &i, "()");
                 if(w == NULL)
                 {
                     // no closing parenthesis: the text is left unchanged
@@ -1153,7 +1153,7 @@ int RP_expand(std::string& line, char* buf)
                     i++;
                     if(buf[i] == RP_NOPARSING_CHAR) 
                         goto dft;  
-                    w = RP_extract(buf, &i, RP_NOPARSING_CHAR);
+                    w = RP_extract(buf.c_str(), &i, RP_NOPARSING_CHAR);
                     if(w)
                         line += w;
                     RP_free(w);
