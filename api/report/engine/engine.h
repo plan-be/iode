@@ -36,7 +36,7 @@ int B_ReportExec(char* arg, int unused=-1);
 int B_ReportLine(char* line, int cleanup);
 
 /* b_rep_defs.c */
-int RP_define_1(char* name, char* c_macro);
+int RP_define_1(const std::string& name, const std::string& macro);
 int RP_define(char* arg, int unused=-1);
 bool RP_macro_exists(const std::string& name);
 std::string RP_get_macro(const std::string& name);

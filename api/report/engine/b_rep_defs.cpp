@@ -10,7 +10,7 @@
  *  
  *  List of functions
  *  -----------------
- *      int RP_define_1(char *name, char *macro)    Adds or replaces a macro to RP_MACRO.
+ *      int RP_define_1(const std::string& name, const std::string& macro)    Adds or replaces a macro to RP_MACRO.
  *      int RP_define(char* arg, int unused)        Report function to define a new macro.
  *      std::string RP_get_macro(const std::string& name)    Returns the pointer to a macro (aka define) value.    
  *      int RP_undef_1(char *name)                  Deletes one macro.
@@ -31,22 +31,19 @@
 /**
  *  Adds or replaces a macro to RP_MACRO.
  *  
- *  @param [in] char*   name    macro name
- *  @param [in] char*   macro   macro content
- *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if add() fails
- *                              0 on success
+ *  @param [in] const std::string&  name    macro name
+ *  @param [in] const std::string&  macro   macro content
+ *  @return     int                         -1 if set_macro() fails
+ *                                          0 on success
  */
-int RP_define_1(char* c_name, char* c_macro)
+int RP_define_1(const std::string& name, const std::string& macro)
 {
-    if(c_macro == 0) 
-        c_macro = "";
-    
-    std::string macro(c_macro);
-    bool success = RP_MACRO->set_macro(c_name, macro);
-    if(!success) 
+    // set_macro() takes a non-const std::string&
+    std::string value = macro;
+    bool success = RP_MACRO->set_macro(name, value);
+    if(!success)
     {
-        std::string error_msg = "Report: Define of " + std::string(c_name);
+        std::string error_msg = "Report: Define of " + name;
         error_msg += " (" + macro + ") not possible";
         error_manager.append_error(error_msg);
         return -1;
@@ -218,7 +215,7 @@ int RP_define_save(char* c_name)
     // Create a copy of existing name in name#(maxdepth+1)
     std::string macro = RP_MACRO->get_macro(name);
     std::string fullname = name + K_SECRETSEP + std::to_string(maxdepth + 1);
-    int rc = RP_define_1((char*) fullname.c_str(), (char*) macro.c_str());
+    int rc = RP_define_1(fullname, macro);
     return rc;
 }
 
@@ -246,7 +243,7 @@ int RP_define_restore(char* c_name)
     // Restore 'name' from the copy of 'name#maxdepth' 
     std::string fullname = std::string(c_name) + K_SECRETSEP + std::to_string(maxdepth);
     std::string macro = RP_MACRO->get_macro(fullname);
-    int rc = RP_define_1(c_name, (char*) macro.c_str());
+    int rc = RP_define_1(c_name, macro);
 
     // Delete the copy 'name#maxdepth' 
     RP_undef_1((char*) fullname.c_str());
