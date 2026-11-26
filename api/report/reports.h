@@ -65,7 +65,8 @@ struct RPFN
 /**
  *  Exception thrown by a report @function (RPF_* functions) when it cannot be evaluated
  *  (wrong number of arguments, empty workspace...).
- *  The text of the @function call is then left unchanged in the report line (see RP_fneval()).
+ *  Also thrown by RP_gfn() when the @function does not exist.
+ *  The text of the @function call is then left unchanged in the report line (see RP_expand()).
  */
 struct RPFunctionError : public std::runtime_error
 {

@@ -939,26 +939,27 @@ int RP_fneval(std::string& res, const std::string& str)
  *  
  *  For example: "upper(@take(5,abcdef))".
  *  
- *  @param [in] U_ch*   str     input string beginning after the @-char. (upper(...), not @upper(...))
- *  @return     U_ch*           allocated resulting string
+ *  @param [in] const std::string&  str  input string beginning after the @-char. (upper(...), not @upper(...))
+ *  @return     std::string              resulting string
+ *  @throw      RPFunctionError          if the @function does not exist or cannot be evaluated:
+ *                                       the caller (RP_expand()) then leaves the text of the @function unchanged
  */
-U_ch *RP_gfn(U_ch* str)
+std::string RP_gfn(const std::string& str)
 {
-    if(str == NULL) 
-        return NULL;
-
     // expands the macros, LEC expressions and @functions in the arguments
     std::string fn_call;
-    if(U_pos('%', str) >= 0 || U_pos('{', str) >= 0 || U_pos('@', str) >= 0)
-        RP_expand(fn_call, (char*) str);
+    if(str.find_first_of("%{@") != std::string::npos)
+    {
+        std::string buf = str;    // RP_expand() takes a char*
+        RP_expand(fn_call, buf.data());
+    }
     else
-        fn_call = (char*) str;
+        fn_call = str;
 
-    // returns NULL on error: the caller then leaves the text of the @function unchanged
     std::string value;
     if(RP_fneval(value, fn_call) != 0)
-        return NULL;
-    return SCR_stracpy((unsigned char*) value.c_str());
+        throw RPFunctionError("invalid @function call: @" + str + ")");
+    return value;
 }
 
 
@@ -1124,16 +1125,24 @@ int RP_expand(std::string& line, char* buf)
                     goto dft;
                 previ = i;  // Keeps the previous value of i in case of error in RP_gfn()
                 w = RP_extractpar(buf, &i, "()");
-                res = (char*) RP_gfn((unsigned char*) w);
-                if(res == 0) 
+                if(w == NULL)
                 {
+                    // no closing parenthesis: the text is left unchanged
                     i = previ - 1;
-                    SCR_free(w);
                     goto dft;
                 }
-                line += res;
+                try
+                {
+                    line += RP_gfn(std::string(w));
+                }
+                catch(const RPFunctionError&)
+                {
+                    // invalid @function: the text is left unchanged
+                    i = previ - 1;
+                    SW_nfree(w);
+                    goto dft;
+                }
 
-                SW_nfree(res);
                 SW_nfree(w);
                 break;
 
