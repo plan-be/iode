@@ -59,7 +59,17 @@ const static int BFNS_NB_GROUPS = 2;
 
 struct RPFN 
 {
-    unsigned char*   (*fn)(unsigned char** args);     // Pointer to the corresponding function
+    std::string (*fn)(const std::vector<std::string>& args);     // Pointer to the corresponding function
+};
+
+/**
+ *  Exception thrown by a report @function (RPF_* functions) when it cannot be evaluated
+ *  (wrong number of arguments, empty workspace...).
+ *  The text of the @function call is then left unchanged in the report line (see RP_fneval()).
+ */
+struct RPFunctionError : public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
 };
 
 /*------------------------ GLOBALS ----------------------- */

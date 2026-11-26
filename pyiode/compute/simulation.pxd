@@ -13,8 +13,8 @@ from pyiode.common cimport SimuSortAlgorithm, VariablesInitialization
 
 
 cdef extern from "api/all.h":
-    int RPF_SimNIterInt(unsigned char** args)
-    double RPF_SimNormReal(unsigned char** args)
+    int RPF_SimNIterInt(const vector[string]& args)
+    double RPF_SimNormReal(const vector[string]& args)
     int B_ModelSimulateSaveNIters(char *arg)
     int B_ModelSimulateSaveNorms(char *arg)
 

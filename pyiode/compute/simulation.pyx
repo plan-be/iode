@@ -86,15 +86,13 @@ cdef class CythonSimulation:
         self.c_simulation.nb_passes = value
 
     def get_nb_iterations(self, period: str) -> int:
-        cdef bytes b_period = period.encode('utf-8')
-        cdef unsigned char* c_period = b_period
-        nb_iter: int = RPF_SimNIterInt(&c_period)
+        cdef vector[string] c_args = [period.encode('utf-8')]
+        nb_iter: int = RPF_SimNIterInt(c_args)
         return nb_iter
 
     def get_norm(self, period: str) -> float:
-        cdef bytes b_period = period.encode('utf-8')
-        cdef unsigned char* c_period = b_period
-        norm: float = RPF_SimNormReal(&c_period)
+        cdef vector[string] c_args = [period.encode('utf-8')]
+        norm: float = RPF_SimNormReal(c_args)
         return norm
 
     def save_nb_iterations(self, var_name: str) -> bool:

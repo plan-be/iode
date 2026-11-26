@@ -39,7 +39,7 @@ extern "C" int SW_ACTIVE;
 int IodeInit()
 {             
     // Initialize chrono for report functions
-    RPF_ChronoReset(NULL);      
+    RPF_ChronoReset({});
     
     // Initialize scr4 SWAP memory management if not yet done
     if(SW_ACTIVE == 0) 
