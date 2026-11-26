@@ -37,22 +37,25 @@ int B_ReportLine(char* line, int cleanup);
 
 /* b_rep_defs.c */
 int RP_define_1(const std::string& name, const std::string& macro);
-int RP_define(char* arg, int unused=-1);
 bool RP_macro_exists(const std::string& name);
 std::string RP_get_macro(const std::string& name);
-int RP_undef_1(char* name);
-int RP_undef(char* arg, int unused=-1);
+int RP_undef_1(const std::string& name);
 int RP_define_calcdepth(char* name);
 int RP_define_save(char* name);
 int RP_define_restore(char* name);
 int RP_define_save_list(const std::vector<std::string>& list);
 int RP_define_restore_list(const std::vector<std::string>& list);
 
+int RP_define(char* arg, int unused=-1);
+int RP_undef(char* arg, int unused=-1);
+
 /* b_rep_cmds.c */
+int RP_onerror_1(char* arg);
+int B_ReportPrompt(char* arg);
+
 int RP_vseps(char* seps, int unused=-1);
 int RP_repeatstring(char* buf, int unused=-1);
 int RP_repeat(char* buf, int unused=-1);
-int RP_onerror_1(char* arg);
 int RP_onerror(char* arg, int unused=-1);
 int RP_abort(char* arg, int unused=-1);
 int RP_quitode(char* arg, int unused=-1);
@@ -65,7 +68,6 @@ int RP_information(char* arg, int unused=-1);
 int RP_silent(char* arg, int unused=-1);
 int RP_beep(char* arg, int unused=-1);
 int RP_ask(char* arg, int unused=-1);
-int B_ReportPrompt(char* arg);
 int RP_setdebug(char* arg, int unused=-1);
 int RP_setindent(char* arg, int unused=-1);
 int RP_setmultiline(char* arg, int unused=-1);
@@ -163,8 +165,8 @@ std::string RPF_mkdir(const std::vector<std::string>& args);
 std::string RPF_rmdir(const std::vector<std::string>& args);
 
 /* b_rep_foreach.C */ 
-int RP_foreach(char* arg, int unused=-1);
 int RP_foreach_break(char* name);
+int RP_foreach(char* arg, int unused=-1);
 int RP_foreach_next(char* arg, int unused=-1);
 
 /* b_rep_proc.c */
