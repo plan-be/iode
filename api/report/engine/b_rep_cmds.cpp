@@ -331,12 +331,14 @@ int RP_beep(char* arg, int unused)
 int RP_ask(char* arg, int unused)
 {
     int     lg;
-    U_ch    name[31];
+    std::string name;
+    std::string args(arg);
 
-    lg = get_next_arg((char*) name, arg, 30);
-    if(kconfirm(arg + lg + 1) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
+    lg = get_next_arg(name, args, 30);
+    std::string question = args.substr(std::min((size_t) lg + 1, args.size()));
+    if(kconfirm(question.c_str()) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
-    if(RP_goto_label("label", (char*) name) != 0) return(-3);
+    if(RP_goto_label("label", name.data()) != 0) return(-3);
     return 0;
 }
 

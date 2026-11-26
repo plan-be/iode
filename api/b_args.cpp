@@ -285,38 +285,47 @@ int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Extract the first argument (= word) of max 'lg' bytes, in the string 'args'. 
- *  
- *  Example: 
- *      char arg0[21];
- *      get_next_arg(arg0 , " ACAF ACAG XYZ ", sizeof(arg0));  
- *      printf("'%s'", txt);
- * 
- *      returns 'ACAF'
- *  
- *  @param [out] arg0    char*  first arg in the string arg 
- *  @param [in]  arg     char*  any string 
- *  @param [in]  lg      int    max length of arg0
- *  @return              int    length of arg0
- *  
- *  @details 
+ *  Extracts the first argument (= word) of max 'lg - 1' chars from the string 'args'.
+ *
+ *  args is modified in place (its length is unchanged): the tabs are replaced by spaces and
+ *  the leading white spaces are moved to the end of args (see U_ljust_text()).
+ *  The first argument is therefore always at the beginning of args and the rest of the
+ *  arguments can be found at position lg (return value) in args.
+ *
+ *  Example:
+ *      std::string args = " ACAF ACAG XYZ ";
+ *      std::string arg0;
+ *      int lg = get_next_arg(arg0, args, 21);
+ *      // => lg = 4, arg0 = "ACAF", args = "ACAF ACAG XYZ  "
+ *
+ *  @param [out]     arg0    std::string&   first arg in args
+ *  @param [in, out] args    std::string&   any string (modified, see above)
+ *  @param [in]      lg      int            size of the C buffer used before: arg0 contains
+ *                                          at most lg - 1 chars
+ *  @return                  int            length of arg0
  */
-int get_next_arg(char* arg0, char* args, int lg)
+int get_next_arg(std::string& arg0, std::string& args, int lg)
 {
-    SCR_replace((unsigned char*) args, (unsigned char*) "\t", (unsigned char*) " ");
-    U_ljust_text((unsigned char*) args);
+    // tabs -> spaces
+    std::replace(args.begin(), args.end(), '\t', ' ');
 
-    int i;
-    std::string separators = " ,\n\t";
-    for(i = 0; i < lg - 1 && args[i]; i++) 
-    {
-        if(separators.find(args[i]) != std::string::npos) 
-            break;
-        arg0[i] = args[i];
-    }
-    arg0[i] = 0;
-    
-    return i;
+    // leading white spaces moved to the end (same as U_ljust_text(): nothing changes if
+    // args contains only white spaces)
+    size_t n = 0;
+    while(n < args.size() && SCR_is_space(args[n]))
+        n++;
+    if(n > 0 && n < args.size())
+        args = args.substr(n) + std::string(n, ' ');
+
+    // first word: ends at the first separator, at the end of args (or at a '\0') or
+    // after lg - 1 chars
+    const std::string separators = " ,\n\t";
+    size_t i = 0;
+    while((int) i < lg - 1 && i < args.size() && args[i] && separators.find(args[i]) == std::string::npos)
+        i++;
+
+    arg0 = args.substr(0, i);
+    return (int) i;
 }
 
 
@@ -326,15 +335,16 @@ int get_next_arg(char* arg0, char* args, int lg)
  *  
  *  ch is translated in uppercase before searching. str must therefore be in uppercase.
  *  
- *  @param [in] str     char*   list of uppercase characters
- *  @param [in] ch      int     character to search in str
- *  @return             int     position of upper(ch) in str or 0 if not found
- *  
+ *  @param [in] str     const std::string&  list of uppercase characters
+ *  @param [in] ch      int                 character to search in str
+ *  @return             int                 position of upper(ch) in str or 0 if not found
+ *
  */
-int B_argpos(char* str, int ch)
+int B_argpos(const std::string& str, int ch)
 {
     ch = SCR_upper_char(ch);
-    int pos = get_pos_in_char_array(str, ch);
-    pos = std::max(0, pos);
-    return pos;
+    if(ch == 0)
+        return 0;
+    size_t pos = str.find((char) ch);
+    return (pos == std::string::npos) ? 0 : (int) pos;
 }

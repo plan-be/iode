@@ -58,7 +58,7 @@ static int HP_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<S
 static int B_WsTrendAll(char* arg, int std)
 {
     int     res, rc = 0, shift = 0, beg, dim = 0, nb;
-    char    file[K_MAX_FILE + 1];
+    std::string file;
     double  *t_vec = NULL, *f_vec = NULL;
     int     file_type;
     std::shared_ptr<Sample> t_smpl = nullptr;
@@ -66,9 +66,10 @@ static int B_WsTrendAll(char* arg, int std)
     KDBVariablesPtr from = KDBVariables::Create(false);
     std::shared_ptr<Variable> var_ptr;
 
-    int lg = get_next_arg(file, arg, 80);
+    std::string args(arg);
+    int lg = get_next_arg(file, args, 80);
 
-    std::vector<std::string> v_data = expand_args(arg + lg, 0);
+    std::vector<std::string> v_data = expand_args(args.substr(lg), 0);
     double lambda = atof(v_data[0].c_str());
     if(v_data.empty()) 
         goto done;

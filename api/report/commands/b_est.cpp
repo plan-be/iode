@@ -185,10 +185,11 @@ int B_EqsSetSample(char* arg, int unused)
  */
 int B_EqsSetMethod(char* arg, int unused)
 {
-    char tmeth[16];
-    int lg1 = get_next_arg(tmeth, arg, 15);
-    int meth = atoi(tmeth);
-    std::vector<std::string> v_eqs = expand_args(arg + lg1, 0);
+    std::string tmeth;
+    std::string args(arg);
+    int lg1 = get_next_arg(tmeth, args, 15);
+    int meth = atoi(tmeth.c_str());
+    std::vector<std::string> v_eqs = expand_args(args.substr(lg1), 0);
     
     int rc = 0;
     std::shared_ptr<Equation> eq_ptr;
@@ -255,10 +256,11 @@ int B_EqsSetBloc(char* arg, int unused)
 int B_EqsSetCmt(char* arg, int unused)
 {
     int     lg1;
-    char    name[16];
+    std::string name;
+    std::string args(arg);
 
-    lg1 = get_next_arg(name, arg, K_MAX_NAME + 1);
-    Comment cmt(arg + lg1 + 1);
+    lg1 = get_next_arg(name, args, K_MAX_NAME + 1);
+    Comment cmt(args.substr(std::min((size_t) lg1 + 1, args.size())));
 
     std::string eq_name(name);
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);
@@ -284,10 +286,11 @@ int B_EqsSetCmt(char* arg, int unused)
 int B_EqsSetInstrs(char* arg, int unused)
 {
     int     lg1;
-    char    name[16];
+    std::string name;
+    std::string args(arg);
 
-    lg1 = get_next_arg(name, arg, K_MAX_NAME + 1);
-    std::string instrs(arg + lg1 + 1);
+    lg1 = get_next_arg(name, args, K_MAX_NAME + 1);
+    std::string instrs = args.substr(std::min((size_t) lg1 + 1, args.size()));
 
     std::string eq_name(name);
     std::shared_ptr<Equation> eq_ptr = global_ws_eqs->get_and_check_obj_ptr(eq_name);

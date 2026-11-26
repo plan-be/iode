@@ -400,16 +400,17 @@ int B_WsName(char* arg, int type)
  */
 int B_WsCopy(char* arg, int type)
 {   
-    char c_files[K_MAX_FILE + 1];
-    int lg = get_next_arg(c_files, arg, K_MAX_FILE);
-    std::vector<std::string> v_files = split_multi(std::string(c_files), " ,;\t\n");
+    std::string files;
+    std::string args(arg);
+    int lg = get_next_arg(files, args, K_MAX_FILE);
+    std::vector<std::string> v_files = split_multi(files, " ,;\t\n");
     if(v_files.size() == 0)
     {
         error_manager.append_error("WsCopy : filename(s) required");
         return -1;
     }
 
-    std::string data = std::string(arg + lg);
+    std::string data = args.substr(lg);
     data = trim(data);
     if(data.empty())
     {
@@ -495,8 +496,9 @@ int B_WsCopy(char* arg, int type)
  */
 int B_WsMerge(char* arg, int type)
 {
-    char file[K_MAX_FILE + 1];
-    int lg = get_next_arg(file, arg, K_MAX_FILE);
+    std::string file;
+    std::string args(arg);
+    get_next_arg(file, args, K_MAX_FILE);
 
     try
     {
@@ -683,23 +685,31 @@ double *B_StatUnitRoot_1(char* arg, int print)
     int     lg, drift, trend, order, rc = -1;
     char    name[80], buf[1024];
     double    *df = NULL;
+    std::string word;
+    std::string args(arg);
 
-    lg = get_next_arg(name, arg, K_MAX_NAME + 1);
-    drift = atoi(name);
+    // each get_next_arg() call left-justifies the rest of args
+    lg = get_next_arg(word, args, K_MAX_NAME + 1);
+    drift = atoi(word.c_str());
+    args = args.substr(std::min((size_t) lg + 1, args.size()));
 
-    lg = get_next_arg(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
-    trend = atoi(name);
+    lg = get_next_arg(word, args, K_MAX_NAME + 1);
+    trend = atoi(word.c_str());
+    args = args.substr(lg);
 
-    lg = get_next_arg(name, arg + lg + 1, K_MAX_NAME + 1) + lg;
-    order = atoi(name);
+    lg = get_next_arg(word, args, K_MAX_NAME + 1);
+    order = atoi(word.c_str());
 
-    df = E_UnitRoot(arg + lg + 1, drift, trend, order);
-    if(print && df != NULL) 
-        E_PrintDF(arg + lg + 1, df, drift, trend, order);
+    // LEC expression (starts with the separator following the order)
+    std::string lec = args.substr(lg);
 
-    if(df) 
+    df = E_UnitRoot(lec.data(), drift, trend, order);
+    if(print && df != NULL)
+        E_PrintDF(lec.data(), df, drift, trend, order);
+
+    if(df)
     {
-        E_GetLecName(arg + lg + 1, name);
+        E_GetLecName(lec.data(), name);
         // set variable name to lower case
         for (int i = 0; i < 80 && name[i]; i++)
             name[i] = tolower((unsigned char) name[i]);
@@ -752,13 +762,14 @@ int B_CsvSave(char* arg, int type)
         return -1;
 
     // filename
-    char c_file[K_MAX_FILE + 1];
-    int lg = get_next_arg(c_file, arg, K_MAX_FILE);
-    std::string filepath = std::string(c_file);
+    std::string filepath;
+    std::string args(arg);
+    int lg = get_next_arg(filepath, args, K_MAX_FILE);
     filepath = set_file_extension(filepath, FILE_CSV);
 
     // [sample] [vars]
-    char* lst = K_expand(type, NULL, arg + lg, '*');
+    std::string data = args.substr(lg);
+    char* lst = K_expand(type, NULL, data.data(), '*');
     std::vector<std::string> v_data0 = lst ? expand_args(lst, 0, " ,;\t\n") : std::vector<std::string>();
     SCR_free(lst);
     

@@ -63,16 +63,18 @@ int RP_define_1(const std::string& name, const std::string& macro)
  */
 int RP_define(char* arg, int unused)
 {
-    int     lg;
-    ONAME   name;
-    char    *macro;
+    std::string name;
+    std::string args(arg);
 
-    lg = get_next_arg(name, arg, K_MAX_NAME + 1);
-    // no value after the name ("$define NAME"): arg[lg] is the final '\0' -> empty macro
-    // (arg + lg + 1 would be after the end of arg)
-    macro = arg[lg] ? arg + lg + 1 : arg + lg;
-    U_ljust_text((unsigned char*) macro);
-    SCR_strip((unsigned char*) macro);
+    int lg = get_next_arg(name, args, K_MAX_NAME + 1);
+    // value: after the separator following the name (empty if there is no value),
+    // without leading white spaces and trailing chars <= ' '
+    // (same as U_ljust_text() + SCR_strip())
+    std::string macro = args.substr(std::min((size_t) lg + 1, args.size()));
+    size_t start = macro.find_first_not_of(" \t\n\r\v\f");
+    macro = (start == std::string::npos) ? std::string() : macro.substr(start);
+    while(!macro.empty() && (unsigned char) macro.back() <= ' ')
+        macro.pop_back();
 
     return(RP_define_1(name, macro));
 }

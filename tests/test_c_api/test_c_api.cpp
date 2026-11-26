@@ -773,16 +773,37 @@ TEST_F(LegacyAPITest, Tests_ARGS)
     create_dummy_lists_and_vars();
 
     // get_next_arg
-    char args[] = "\t  ACAF ACAG XYZ ";
-    char arg0[21];
-    EXPECT_EQ(get_next_arg(arg0, args, sizeof(arg0)), 4);
-    EXPECT_STREQ(arg0, "ACAF");
-    EXPECT_STREQ(args, "ACAF ACAG XYZ    ");
+    std::string args = "\t  ACAF\tACAG XYZ ";
+    std::string arg0;
+    EXPECT_EQ(get_next_arg(arg0, args, 21), 4);
+    EXPECT_EQ(arg0, "ACAF");
+    // tabs replaced by spaces, leading white spaces moved to the end (same length)
+    EXPECT_EQ(args, "ACAF ACAG XYZ    ");
 
-    char truncated_args[] = " ABCDE";
-    char truncated_arg[4];
-    EXPECT_EQ(get_next_arg(truncated_arg, truncated_args, sizeof(truncated_arg)), 3);
-    EXPECT_STREQ(truncated_arg, "ABC");
+    std::string truncated_args = " ABCDE";
+    std::string truncated_arg;
+    EXPECT_EQ(get_next_arg(truncated_arg, truncated_args, 4), 3);
+    EXPECT_EQ(truncated_arg, "ABC");
+
+    // separators: ' ', ',', '\n' (and '\t')
+    std::string comma_args = "A1,B2";
+    EXPECT_EQ(get_next_arg(arg0, comma_args, 21), 2);
+    EXPECT_EQ(arg0, "A1");
+
+    // empty string or only white spaces -> "" (args unchanged)
+    std::string empty_args = "";
+    EXPECT_EQ(get_next_arg(arg0, empty_args, 21), 0);
+    EXPECT_EQ(arg0, "");
+    std::string spaces_args = "  \n ";
+    EXPECT_EQ(get_next_arg(arg0, spaces_args, 21), 0);
+    EXPECT_EQ(arg0, "");
+    EXPECT_EQ(spaces_args, "  \n ");
+
+    // B_argpos
+    EXPECT_EQ(B_argpos("LSBM", 'b'), 2);
+    EXPECT_EQ(B_argpos("LSBM", 'M'), 3);
+    EXPECT_EQ(B_argpos("LSBM", 'X'), 0);
+    EXPECT_EQ(B_argpos("LSBM", '\0'), 0);
 
     // expand_args
     v_args = expand_args("A B;C,D", 0); // => "A" "B" "C" "D"
