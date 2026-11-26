@@ -19,7 +19,7 @@ void RP_debug(char* txt);
 
 /* b_rep_engine.c */
 std::vector<std::string> RP_read_file(const std::string& filename);
-int RP_splitline(char* text, char* cmd, std::string& arg, int lg);
+int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, int lg);
 BFNS* RP_find_fn(char* c_name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 char *RP_extract(const char* buf, int* i, int ch);

@@ -109,34 +109,37 @@ static int RP_foreach_next_index(char *name)
  */
 int RP_foreach(char* arg, int unused)
 {
-    unsigned char   name[128], buf[512];
+    unsigned char   buf[512];
+    std::string     name;
     std::string     list;
     int             rc = 0;
 
+    if(arg == NULL) return -1;
+
     // Crée l'index (name) et la liste de valeurs à traiter (list)
-    if(RP_splitline(arg, (char*) name, list, 30) < 0) return -1;
-    
+    if(RP_splitline(arg, name, list, 30) < 0) return -1;
+
     // Sauve la valeur avant la boucle de l'index de la boucle (name)
-    RP_define_save((char*) name);
-    
+    RP_define_save(name.data());
+
     // Sauve de la même façon l'éventuel define FOREACH__<name>
-    sprintf((char*) buf, "FOREACH__%s", name);
+    sprintf((char*) buf, "FOREACH__%s", name.c_str());
     RP_define_save((char*) buf);
-    
+
     // Crée le define name avec la liste des indices de la boucle
-    RP_define_1((char*) name, list.data());
+    RP_define_1(name.data(), list.data());
 
     // Crée un define identique avec comme nom FOREACH__<nom>
-    sprintf((char*) buf, "$define FOREACH__%s %%%s%%", name, name);
+    sprintf((char*) buf, "$define FOREACH__%s %%%s%%", name.c_str(), name.c_str());
     B_ReportLine((char*) buf, 1);
 
     // Place la première valeur dans name et supprime cette valeur de la liste
     // Si la liste est vide, saute à la fin ($next name)
-    if(RP_foreach_next_index((char*) name) < 0) {
+    if(RP_foreach_next_index(name.data()) < 0) {
         //RP_define_restore(name);        // Restores the $define <name>
         //sprintf(buf, "FOREACH__%s", name);
         //RP_define_restore(buf);         // Restores the $define FOREACH__<name>
-        RP_goto_label("next", (char*) name);    // move to the line "$next <name>"
+        RP_goto_label("next", name.data());    // move to the line "$next <name>"
     }    
 
     return rc;
@@ -170,7 +173,7 @@ int RP_foreach_break(char *name)
 static int RP_foreach_goto_next(char* label)
 {
     int     rc, beg = 1;
-    char    name[128];
+    std::string name;
     std::string line;
     std::string arg;
 
@@ -185,13 +188,13 @@ static int RP_foreach_goto_next(char* label)
 
         if((line[0] == '#' || line[0] == '$') && line[1] != line[0]) {
             if(line[1] == 0 || U_is_in(line[1], " \n\r\t")) continue;
-            if(RP_splitline(line.data() + 1, name, arg, 30) < 0) {
+            if(RP_splitline(line.substr(1), name, arg, 30) < 0) {
                 rc = -1;
                 goto done;
             }
 
-            SCR_lower((unsigned char*) name);
-            if(strcmp(name, "foreach") == 0) {
+            SCR_lower((unsigned char*) name.data());
+            if(name == "foreach") {
                 std::vector<std::string> parms = split_skip_empty(arg, " ");
                 if(!parms.empty() && parms[0] == label) {
                     // Place la première valeur dans name et supprime cette valeur de la liste

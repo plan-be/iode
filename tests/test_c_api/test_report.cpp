@@ -433,3 +433,44 @@ TEST_F(ReportTest, RP_EXPAND_LEC_FORMATS)
     }
     global_ws_var->clear();
 }
+
+TEST_F(ReportTest, RP_SPLITLINE)
+{
+    std::string cmd;
+    std::string arg;
+    int rc;
+
+    // command + arguments: leading white spaces and trailing chars <= ' ' removed from the args
+    rc = RP_splitline("define A 1 2 \t", cmd, arg, 30);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(cmd, "define");
+    EXPECT_EQ(arg, "A 1 2");
+
+    // the command name contains only letters, digits and '_'
+    rc = RP_splitline("my_cmd_1(x, y)", cmd, arg, 30);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(cmd, "my_cmd_1");
+    EXPECT_EQ(arg, "(x, y)");
+
+    // no command name
+    rc = RP_splitline("  abc", cmd, arg, 30);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(cmd, "");
+    EXPECT_EQ(arg, "abc");
+
+    // command name longer than lg -> truncated
+    rc = RP_splitline("abcdefghij_klmnopqrst_uvwxyz_0123456789 args", cmd, arg, 30);
+    EXPECT_EQ(rc, 0);
+    EXPECT_EQ(cmd, "abcdefghij_klmnopqrst_uvwxyz_0");
+    EXPECT_EQ(arg, "args");
+
+    // empty line or line starting with '\n' -> -1
+    rc = RP_splitline("", cmd, arg, 30);
+    EXPECT_EQ(rc, -1);
+    EXPECT_EQ(cmd, "");
+    EXPECT_EQ(arg, "");
+    rc = RP_splitline("\nabc ", cmd, arg, 30);
+    EXPECT_EQ(rc, -1);
+    EXPECT_EQ(cmd, "");
+    EXPECT_EQ(arg, "abc");
+}
