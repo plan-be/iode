@@ -532,31 +532,21 @@ std::string RP_gmacro(const std::string& str)
  *  Before evaluating the value, expands the line contents by replacing expressions bw %% and the @-functions 
  *  by their calculated values (@see RP_expand()).
  *  
- *  @param [in] char*   str     report line containing optionaly macros, lec expressions and @-functions
- *  @return     char*           allocated report line after replacement of macros, lec expressions and @-functions
+ *  @param [in] const std::string&  str  text between {} containing optionally macros, lec expressions and @-functions
+ *  @return     std::string              calculated value (empty string on error)
  */
-char *RP_gcmd(char* str) 
+std::string RP_gcmd(const std::string& str)
 {
-    char    *tmp = 0;
-
-    if(str == NULL)
-        return NULL;
-
-    if(U_pos('%', (unsigned char*) str) >= 0 ||
-       U_pos('{', (unsigned char*) str) >= 0 ||
-       U_pos('@', (unsigned char*) str) >= 0)
-    {
-        std::string expanded;
-        RP_expand(expanded, str);
-        tmp = (char*) SCR_stracpy((unsigned char*) expanded.c_str());
-    }
+    std::string tmp;
+    if(str.find_first_of("%{@") != std::string::npos)
+        RP_expand(tmp, str);
     else
-        tmp = (char*) SCR_stracpy((unsigned char*) str);
+        tmp = str;
 
+    // RP_eval() modifies its argument (tmp is a local copy)
     std::string res;
-    RP_eval(res, tmp);
-    SCR_free(tmp);
-    return (char*) SCR_stracpy((unsigned char*) res.c_str());
+    RP_eval(res, tmp.data());
+    return res;
 }
 
 
@@ -1043,7 +1033,7 @@ std::string RP_gfn(const std::string& str)
 int RP_expand(std::string& line, const std::string& buf)
 {
     int     i, previ, upper, sqz;
-    char    *w = NULL, *res = NULL;
+    char    *w = NULL;
 
     line.clear();
     line.reserve(buf.size());
@@ -1104,11 +1094,10 @@ int RP_expand(std::string& line, const std::string& buf)
                 if(buf[i] == '{') 
                     goto dft;
                 w = RP_extract(buf.c_str(), &i, '}');
-                res = RP_gcmd(w);
-                if(res)
-                    line += res;
+                // w == NULL: no closing '}' -> nothing is added to line
+                if(w != NULL)
+                    line += RP_gcmd(w);
 
-                SW_nfree(res);
                 RP_free(w);
                 break;
 
