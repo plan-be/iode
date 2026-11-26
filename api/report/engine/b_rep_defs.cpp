@@ -68,7 +68,9 @@ int RP_define(char* arg, int unused)
     char    *macro;
 
     lg = get_next_arg(name, arg, K_MAX_NAME + 1);
-    macro = arg + lg + 1;
+    // no value after the name ("$define NAME"): arg[lg] is the final '\0' -> empty macro
+    // (arg + lg + 1 would be after the end of arg)
+    macro = arg[lg] ? arg + lg + 1 : arg + lg;
     U_ljust_text((unsigned char*) macro);
     SCR_strip((unsigned char*) macro);
 

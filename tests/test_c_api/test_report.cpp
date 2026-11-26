@@ -475,6 +475,27 @@ TEST_F(ReportTest, RP_SPLITLINE)
     EXPECT_EQ(arg, "abc");
 }
 
+TEST_F(ReportTest, RP_DEFINE)
+{
+    // name + value: leading and trailing spaces of the value removed
+    char arg1[] = "MYDEF   a b c  ";
+    EXPECT_EQ(RP_define(arg1), 0);
+    EXPECT_TRUE(RP_macro_exists("MYDEF"));
+    EXPECT_EQ(RP_get_macro("MYDEF"), "a b c");
+
+    // name without value -> empty macro (was reading after the end of arg)
+    // arg is followed by garbage chars to detect a read after the final '\0'
+    char arg2[] = "MYEMPTY\0XYZ";
+    EXPECT_EQ(RP_define(arg2), 0);
+    EXPECT_TRUE(RP_macro_exists("MYEMPTY"));
+    EXPECT_EQ(RP_get_macro("MYEMPTY"), "");
+
+    // same through a report line
+    execute_report_line("$define MYEMPTY2");
+    EXPECT_TRUE(RP_macro_exists("MYEMPTY2"));
+    EXPECT_EQ(RP_get_macro("MYEMPTY2"), "");
+}
+
 TEST_F(ReportTest, RP_EXTRACT)
 {
     std::string str = "Value: {A[1990Y1] + 2} EUR";
