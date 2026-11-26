@@ -361,26 +361,29 @@ BFNS* RP_find_fn(const std::string& name, int& type, int fs)
 /**
  *  Retrieves a report command function pointer and executes the function with its parameters.
  *  
- *  @param [in] char*   name    report function name ("WsLoadVar")
- *  @param [in] char*   arg     parameters of the report function ("fun.var")
- *  @param [in] int     fs      full screen: character preceding the command in the report ('#' or '$').
- *  @return     int             -1 if the fns does not exist
- *                              return code of the called function otherwise
+ *  @param [in] const std::string&  name    report function name ("WsLoadVar")
+ *  @param [in] const std::string&  arg     parameters of the report function ("fun.var")
+ *  @param [in] int                 fs      full screen: character preceding the command in the report ('#' or '$').
+ *  @return     int                         -1 if the fns does not exist
+ *                                          return code of the called function otherwise
  */
-int RP_exec_fn(char* name, char* arg, int fs)
+int RP_exec_fn(const std::string& name, const std::string& arg, int fs)
 {
-    int parm;
+    int parm = 0;
 
     BFNS* fns = RP_find_fn(name, parm, fs);
-    if(!fns) 
+    if(!fns)
         return -1;
-    
+
+    // the report commands take a char* and may modify their argument: passes a copy of arg
+    std::string args = arg;
+
     if(fs == '#' && fns->sfn != 0)
-        return((*fns->sfn)(arg, parm));
-    
+        return((*fns->sfn)(args.data(), parm));
+
     if(fs == '$' && fns->fn != 0)
-        return((*fns->fn)(arg, parm));
-    
+        return((*fns->fn)(args.data(), parm));
+
     return -1;
 }
 
@@ -733,7 +736,7 @@ int RP_eval(std::string& res, const std::string& farg)
         // Execute the function name
         // (the arguments start 2 chars after the length of the name, but not after the end of cmd)
         size_t args_pos = std::min(strlen(name) + 2, cmd.size());
-        rc = RP_exec_fn(name, cmd.data() + args_pos, ch);
+        rc = RP_exec_fn(name, cmd.substr(args_pos), ch);
         
         // Reset the previous OnError value (before calling RP_exec_fn)
         RP_RT = rp_rt;          
@@ -1230,7 +1233,7 @@ int REPFILE::execute()
             if(rt == 0) 
             {
                 if(!name.empty())
-                    rt = RP_exec_fn(name.data(), arg.data(), line[0]);
+                    rt = RP_exec_fn(name, arg, line[0]);
                 if(RP_DEBUG > 1) 
                     RP_debug(line.data()); // GB MEM
             }
