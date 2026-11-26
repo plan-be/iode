@@ -514,3 +514,48 @@ TEST_F(ReportTest, RP_EXTRACT)
     RP_expand(line, "x {");
     EXPECT_EQ(line, "x ");
 }
+
+TEST_F(ReportTest, RP_EXTRACTPAR)
+{
+    std::string str = "Zip: @upper(@take(10,\"b-(1000)\")) ";
+    int i;
+
+    // the closing parenthesis of level 1 is excluded; parentheses between "" are ignored
+    i = 6;
+    EXPECT_EQ(RP_extractpar(str, i, "()"), "upper(@take(10,\"b-(1000)\")");
+    EXPECT_EQ(i, 32);
+
+    // function without argument
+    i = 1;
+    EXPECT_EQ(RP_extractpar("@date() abc", i, "()"), "date(");
+    EXPECT_EQ(i, 6);
+
+    // other brackets
+    i = 0;
+    EXPECT_EQ(RP_extractpar("A[1990Y1] + 1", i, "[]"), "A[1990Y1");
+    EXPECT_EQ(i, 8);
+
+    // no closing parenthesis -> "" and i = -1
+    i = 6;
+    EXPECT_EQ(RP_extractpar("Zip: @upper(abc ", i, "()"), "");
+    EXPECT_EQ(i, -1);
+
+    // invalid character before the opening parenthesis -> "" and i = -1
+    i = 1;
+    EXPECT_EQ(RP_extractpar("@gb.plan.be(x)", i, "()"), "");
+    EXPECT_EQ(i, -1);
+
+    // no opening parenthesis: stops at the first invalid character
+    i = 0;
+    EXPECT_EQ(RP_extractpar("abc", i, "()"), "");
+    EXPECT_EQ(i, -1);
+
+    // RP_expand(): text left as is when the @function cannot be extracted
+    std::string line;
+    RP_expand(line, "mail: gb@plan.be");
+    EXPECT_EQ(line, "mail: gb@plan.be");
+    RP_expand(line, "@upper(abc");
+    EXPECT_EQ(line, "@upper(abc");
+    RP_expand(line, "@upper(abc) @@x");
+    EXPECT_EQ(line, "ABC @x");
+}
