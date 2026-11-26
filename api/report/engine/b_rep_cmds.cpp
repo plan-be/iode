@@ -330,12 +330,8 @@ int RP_beep(char* arg, int unused)
 // $ask <label> <question>
 int RP_ask(char* arg, int unused)
 {
-    int     lg;
-    std::string name;
-    std::string args(arg);
-
-    lg = get_next_arg(name, args, 30);
-    std::string question = args.substr(std::min((size_t) lg + 1, args.size()));
+    std::string question(arg);
+    std::string name = get_next_arg(question, 30);
     // the question is not a format: a '%' in the question must be printed as is
     if(kconfirm("%s", question.c_str()) != 0) return 0;       /* rep. NON -> ligne suivante */  // JMP 10/12/2021
     /* rep OUI -> va en label */
