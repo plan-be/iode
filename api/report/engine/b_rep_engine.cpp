@@ -539,9 +539,8 @@ std::string RP_gcmd(const std::string& str)
     else
         tmp = str;
 
-    // RP_eval() modifies its argument (tmp is a local copy)
     std::string res;
-    RP_eval(res, tmp.data());
+    RP_eval(res, tmp);
     return res;
 }
 
@@ -710,35 +709,39 @@ normal:
  *      {lec_expressions@format}    a LEC expression formatted value
  *                                 
  *  @param [out]     std::string&   res    result (empty string on error)
- *  @param [in]      char*          farg   contents to be interpreted
+ *  @param [in]      const std::string& farg   contents to be interpreted
  *  @return          int                   0 on success, -1 on error
  */
-int RP_eval(std::string& res, char* farg)
+int RP_eval(std::string& res, const std::string& farg)
 {
-    char        ch, name[31],
-                *lec, *fmt;
-    int         rc, rp_rt, pos;
+    char        ch, name[31];
+    int         rc, rp_rt;
     double      x;
     bool        inv = false;
 
     res.clear();
     ch = farg[0];
-    
-    // farg = "$name args, #name args, $!name args or #!name args" => executes a report command 
-    if(ch == '$' || ch == '#') 
+
+    // farg = "$name args, #name args, $!name args or #!name args" => executes a report command
+    if(ch == '$' || ch == '#')
     {
         rp_rt = RP_RT;      // Memorise the current return value
         RP_RT = 0;          // Reset RT to "$Onerror Ignore"
-        
+
         // if $!name of #!name: inverts the return code
-        if(farg[1] == '!') 
-            inv = true; 
-        
+        if(farg[1] == '!')
+            inv = true;
+
+        // get_next_arg() and the report commands modify their argument: works on a copy of farg
+        std::string cmd = farg;
+
         // Retrieve the command name (max 30 chars)
-        get_next_arg(name, farg + 1 + (int) inv, 30);
+        get_next_arg(name, cmd.data() + 1 + (int) inv, 30);
 
         // Execute the function name
-        rc = RP_exec_fn(name, farg + strlen(name) + 2, ch);
+        // (the arguments start 2 chars after the length of the name, but not after the end of cmd)
+        size_t args_pos = std::min(strlen(name) + 2, cmd.size());
+        rc = RP_exec_fn(name, cmd.data() + args_pos, ch);
         
         // Reset the previous OnError value (before calling RP_exec_fn)
         RP_RT = rp_rt;          
@@ -759,34 +762,36 @@ int RP_eval(std::string& res, char* farg)
     // farg = "=ExcelAddress" => Excel Get via DDE
     if(ch == '=')
     {
-        char* item = B_ExcelGetItem(farg + 1);
+        std::string address = farg.substr(1);
+        char* item = B_ExcelGetItem(address.data());
         if(item == NULL)
             return -1;
-        SCR_replace((unsigned char*) item, (unsigned char*) "\t", (unsigned char*) " ");
-        SCR_replace((unsigned char*) item, (unsigned char*) "\r\n", (unsigned char*) " ");
         res = std::string(item);
         SCR_free(item);
+        replace_all(res, "\t", " ");
+        replace_all(res, "\r\n", " ");
         return 0;
     }
 
     // farg = "lec_expression" or "lec_expression@format"
-    lec = farg;    
-    fmt = NULL;
-    pos = U_pos('@', (unsigned char*) farg);
-    if(pos >= 0) 
+    std::string lec = farg;
+    std::string fmt;
+    size_t pos = farg.find('@');
+    bool has_fmt = (pos != std::string::npos);
+    if(has_fmt)
     {
-        farg[pos] = '\0';       // LEC formula ends with a 0 
-        fmt = farg + pos + 1;   // format 
+        lec = farg.substr(0, pos);      // LEC formula
+        fmt = farg.substr(pos + 1);     // format
     }
 
-    x = RP_evallec(lec);
-    // TODO: reset farg[pos] = '@' ?
+    x = RP_evallec(lec.data());
     // Empty string on error
-    if(!IODE_IS_A_NUMBER(x)) 
+    if(!IODE_IS_A_NUMBER(x))
         return -1;
-    
+
+    // RP_fmt() modifies the format (fmt is a local copy)
     char buf[41] = { 0 };
-    RP_fmt(buf, fmt, x);       // The formatted value is returned
+    RP_fmt(buf, has_fmt ? fmt.data() : NULL, x);       // The formatted value is returned
     res = std::string(buf);
     return 0;
 }
