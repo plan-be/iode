@@ -472,69 +472,57 @@ char *RP_extract(const char* buf, int* i, int ch)
  *      $show %%A@@upper({{1})A%%   = %A@upper({1})A%  | %A@upper({1})A% = XXX
  *
  *      
- *  @param [in] char*   str     pointer to the first character following % on the report line
- *  @return     char*           allocated value of the macro after transformation
+ *  @param [in] const std::string&  str  text between the 2 % on the report line
+ *  @return     std::string              value of the macro after transformation
+ *  @throw      RPMacroError             if the macro is not defined or the report argument is missing
+ *                                       (or if the report arguments are not defined for %*%):
+ *                                       the caller (RP_expand()) then leaves the text %str% unchanged
  */
-char *RP_gmacro(char* str) 
+std::string RP_gmacro(const std::string& str)
 {
-    int     pos;
-    char    *res = NULL, buf[20], *tmp = 0;
-
-    if(str == NULL) 
-        return NULL;
-
-    if(U_pos('%', (unsigned char*) str) >= 0 || U_pos('{', (unsigned char*) str) >= 0 ||
-       U_pos('@', (unsigned char*) str) >= 0)
-    {
-        std::string expanded;
-        RP_expand(expanded, str);
-        tmp = (char*) SCR_stracpy((unsigned char*) expanded.c_str());
-    }
+    // expands the macros, LEC expressions and @functions in the name of the macro
+    std::string tmp;
+    if(str.find_first_of("%{@") != std::string::npos)
+        RP_expand(tmp, str);
     else
-        tmp = (char*) SCR_stracpy((unsigned char*) str);
+        tmp = str;
 
-    if(tmp[0] >= '0' && tmp[0] <= '9') 
+    int nb_args = SCR_tbl_size((unsigned char**) RP_ARGV);
+    if(tmp[0] >= '0' && tmp[0] <= '9')
     {
-        pos = atoi(tmp);
+        // %0% = number of arguments, %1%, %2%... = arguments of the report
+        int pos = atoi(tmp.c_str());
+        if(pos == 0)
+            return std::to_string(nb_args - RP_ARG0);
 
-        if(pos == 0) 
+        pos += RP_ARG0;
+        if(pos < 0 || pos > nb_args)
         {
-            sprintf(buf, "%d", SCR_tbl_size((unsigned char**) RP_ARGV) - RP_ARG0);
-            res = (char*) SCR_stracpy((unsigned char*) buf);
+            error_manager.append_error("Report : Argument (" + std::to_string(pos) + ") is missing");
+            throw RPMacroError("Report : Argument (" + std::to_string(pos) + ") is missing");
         }
-        else 
-        {
-            pos += RP_ARG0;
-            if(pos < 0 || pos > SCR_tbl_size((unsigned char**) RP_ARGV)) {
-                error_manager.append_error("Report : Argument (" + std::to_string(pos) + ") is missing");
-                SCR_free(tmp); // JMP 24/8/2012
-                return NULL;
-            }
-            res = (char*) SCR_stracpy((unsigned char*) RP_ARGV[pos - 1]);
-        }
-    }
-    else 
-    {
-        if(tmp[0] == '*') 
-            res = (char*) SCR_mtov(((unsigned char**) RP_ARGV) + RP_ARG0, ';');
-        else 
-        {
-            std::string name(copy_char_array(tmp));
-            name = RP_MACRO->to_key(name);
-            if(!RP_MACRO->contains(name)) 
-            {
-                std::string error_msg = "Report: Macro '" + name + "' is not defined";
-                kwarning(error_msg.c_str());
-                SCR_free(tmp);
-                return NULL;
-            }
-            std::string macro = RP_MACRO->get_macro(name);
-            res = (char*) SCR_stracpy((unsigned char*) macro.c_str());
-        }
+        return std::string(RP_ARGV[pos - 1]);
     }
 
-    SCR_free(tmp);
-    return res;
+    // %*% = all the arguments of the report separated by ';'
+    if(tmp[0] == '*')
+    {
+        if(RP_ARGV == NULL)
+            throw RPMacroError("Report : no arguments defined");
+        std::vector<std::string> args;
+        for(int i = RP_ARG0; i < nb_args; i++)
+            args.push_back(RP_ARGV[i]);
+        return join(args, ";");
+    }
+
+    std::string name = RP_MACRO->to_key(tmp);
+    if(!RP_MACRO->contains(name))
+    {
+        std::string error_msg = "Report: Macro '" + name + "' is not defined";
+        kwarning(error_msg.c_str());
+        throw RPMacroError(error_msg);
+    }
+    return RP_MACRO->get_macro(name);
 }
 
 
@@ -1080,23 +1068,28 @@ int RP_expand(std::string& line, const std::string& buf)
                 if(upper || sqz) 
                     i++;
                 w = RP_extract(buf.c_str(), &i, '%');
-                if(w != NULL) 
+                if(w != NULL)
                 {
-                    res = RP_gmacro(w);
-                    if(res == 0) 
+                    std::string value;
+                    try
                     {
-                        res = SW_nalloc(10 + (int)strlen(w));
-                        sprintf(res, "%%%s%%", w);
+                        value = RP_gmacro(w);
                     }
-                    if(sqz) 
-                        SCR_asqz((unsigned char*) res, (unsigned char*) "_");
-                    if(upper < 0) 
-                        SCR_lower((unsigned char*) res);
+                    catch(const RPMacroError&)
+                    {
+                        // undefined macro or missing argument: the text is left unchanged
+                        value = "%" + std::string(w) + "%";
+                    }
+                    // keeps only letters (CP850 accented letters included), digits and '_'
+                    if(sqz)
+                        std::erase_if(value, [](unsigned char c) { return !(SCR_is_anum(c) || c == '_'); });
+                    // SCR_lower() / SCR_upper() are CP850 aware (and do not change the length)
+                    if(upper < 0)
+                        SCR_lower((unsigned char*) value.data());
                     if(upper > 0)
-                        SCR_upper((unsigned char*) res);
+                        SCR_upper((unsigned char*) value.data());
 
-                    line += res;
-                    SW_nfree(res);
+                    line += value;
                     RP_free(w);
                 }
                 else

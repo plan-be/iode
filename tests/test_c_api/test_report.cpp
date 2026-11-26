@@ -344,3 +344,53 @@ TEST_F(ReportTest, REPORT_PROC)
 
     // U_test_reset_kmsg_msgs();
 }
+
+// RP_ARGV is defined in api/report/engine/b_rep_engine.cpp (not declared in a header)
+extern char** RP_ARGV;
+
+TEST_F(ReportTest, RP_EXPAND_MACROS)
+{
+    std::string line;
+
+    RP_define_1((char*) "MYMACRO", (char*) "Ab c-d_1");
+
+    // defined macro and the modifiers ! (lower), # (upper) and - (keep letters, digits and '_')
+    RP_expand(line, "x=%MYMACRO%");
+    EXPECT_EQ(line, "x=Ab c-d_1");
+    RP_expand(line, "x=%!MYMACRO%");
+    EXPECT_EQ(line, "x=ab c-d_1");
+    RP_expand(line, "x=%#MYMACRO%");
+    EXPECT_EQ(line, "x=AB C-D_1");
+    RP_expand(line, "x=%-MYMACRO%");
+    EXPECT_EQ(line, "x=Abcd_1");
+
+    // undefined macro -> text left unchanged
+    RP_expand(line, "x=%UNDEFINED_MACRO%");
+    EXPECT_EQ(line, "x=%UNDEFINED_MACRO%");
+
+    // %% -> %
+    RP_expand(line, "10%% increase");
+    EXPECT_EQ(line, "10% increase");
+
+    // report arguments
+    char** o_argv = RP_ARGV;
+    int o_arg0 = RP_ARG0;
+    std::vector<char*> argv = { (char*) "a", (char*) "b", NULL };
+    RP_ARGV = argv.data();
+    RP_ARG0 = 0;
+
+    RP_expand(line, "%0%|%1%|%2%|%*%");
+    EXPECT_EQ(line, "2|a|b|a;b");
+    // missing argument -> text left unchanged
+    RP_expand(line, "x=%3%");
+    EXPECT_EQ(line, "x=%3%");
+
+    // no report arguments -> %*% left unchanged
+    RP_ARGV = NULL;
+    RP_expand(line, "x=%*%");
+    EXPECT_EQ(line, "x=%*%");
+
+    RP_ARGV = o_argv;
+    RP_ARG0 = o_arg0;
+    RP_undef_1((char*) "MYMACRO");
+}

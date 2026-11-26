@@ -73,6 +73,16 @@ struct RPFunctionError : public std::runtime_error
     using std::runtime_error::runtime_error;
 };
 
+/**
+ *  Exception thrown by RP_gmacro() when a macro (%name%) is not defined or when a report
+ *  argument (%1%, %2%...) is missing.
+ *  The text of the macro (%name%) is then left unchanged in the report line (see RP_expand()).
+ */
+struct RPMacroError : public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
 /*------------------------ GLOBALS ----------------------- */
 
 extern std::map<std::string, BFNS> B_fns;  // Table of report command names and function pointers
