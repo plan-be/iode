@@ -27,7 +27,7 @@ std::string RP_gmacro(const std::string& str);
 std::string RP_gcmd(const std::string& str);
 int RP_evaltime();
 double RP_evallec(const std::string& lec);
-int RP_fmt(char* buf, char* format, double value);
+int RP_fmt(std::string& buf, const std::string& format, double value);
 int RP_eval(std::string& res, const std::string& farg);
 int RP_expand(std::string& line, const std::string& buf);
 int RP_ReportExec_1(const std::string& file);

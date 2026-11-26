@@ -637,57 +637,65 @@ double RP_evallec(const std::string& lec)
  *  
  *  Examples can be found in RP_expand().
  *  
- *  @param [in, out] char*       buf        formatted double
- *  @param [in]      char*       format     format (see above)
- *  @param [in]      double   value      any double 
- *  @return          int                    0 always              
+ *  @param [out]     std::string&       buf     formatted double
+ *  @param [in]      const std::string& format  format (see above). Empty string for the default format
+ *  @param [in]      double             value   any double
+ *  @return          int                        0 always
  */
-int RP_fmt(char* buf, char* format, double value)
+int RP_fmt(std::string& buf, const std::string& format, double value)
 {
-    int     t, lg = 20, nbdec = -1;
-    std::vector<std::string> fmt;
+    int lg = 20, nbdec = -1;
 
-    if(format == NULL)
-        goto normal;
-
-    U_ljust_text((unsigned char*) format);
-    SCR_strip((unsigned char*) format);
-    SCR_upper((unsigned char*) format);
-    if(format[0] == '\0') 
-        goto normal;
-
-    if(format[0] == 'T') 
-    {
-        t = (int) value;
-        Period per = global_ws_var->get_sample()->start_period.shift(t);
-        strcpy(buf, (char*) per.to_string().c_str());
-        return 0;
-    }
-
-    fmt = split_skip_empty(std::string(format), ".");
-    if(fmt.empty())
-        goto normal;
-
-    lg = (int) fmt[0].size();
-    if(fmt.size() > 1)
-    {
-        nbdec = (int) fmt[1].size();
-        lg += nbdec + 1;
-    }
-    else if(format[0] == '.')
-    {
-        lg = 30;
-        nbdec = (int) fmt[0].size();
-    }
+    // removes the leading white spaces and the trailing characters <= ' '
+    // (same as U_ljust_text() + SCR_strip())
+    std::string fmt_str = format;
+    size_t start = fmt_str.find_first_not_of(" \t\n\r\v\f");
+    if(start == std::string::npos)
+        fmt_str.clear();
     else
-        nbdec = 0;
+        fmt_str.erase(0, start);
+    while(!fmt_str.empty() && (unsigned char) fmt_str.back() <= ' ')
+        fmt_str.pop_back();
 
-normal:
-    if(value > 0) 
-        SCR_fmt_dbl((double) value, (unsigned char*) buf, lg, nbdec);
-    else          
-        SCR_fmt_dbl((double) value, (unsigned char*) buf, lg + 1, nbdec);
-    SCR_sqz((unsigned char*) buf);
+    if(!fmt_str.empty())
+    {
+        // format "T" (or "t") => Period
+        if(fmt_str[0] == 'T' || fmt_str[0] == 't')
+        {
+            int t = (int) value;
+            Period per = global_ws_var->get_sample()->start_period.shift(t);
+            buf = per.to_string();
+            return 0;
+        }
+
+        std::vector<std::string> fmt = split_skip_empty(fmt_str, ".");
+        if(!fmt.empty())
+        {
+            lg = (int) fmt[0].size();
+            if(fmt.size() > 1)
+            {
+                nbdec = (int) fmt[1].size();
+                lg += nbdec + 1;
+            }
+            else if(fmt_str[0] == '.')
+            {
+                lg = 30;
+                nbdec = (int) fmt[0].size();
+            }
+            else
+                nbdec = 0;
+        }
+    }
+
+    // SCR_fmt_dbl() writes size characters (or "--" for NaN).
+    // Its internal buffers are 80 bytes long => size is limited to 79.
+    int size = (value > 0) ? lg : lg + 1;
+    size = std::min(size, 79);
+    std::vector<unsigned char> tmp(size + 3, 0);
+    SCR_fmt_dbl(value, tmp.data(), size, nbdec);
+    buf = std::string((char*) tmp.data());
+    // removes the spaces (same as SCR_sqz())
+    buf.erase(std::remove(buf.begin(), buf.end(), ' '), buf.end());
     return 0;
 }
 
@@ -774,10 +782,9 @@ int RP_eval(std::string& res, const std::string& farg)
 
     // farg = "lec_expression" or "lec_expression@format"
     std::string lec = farg;
-    std::string fmt;
+    std::string fmt;                    // empty => default format
     size_t pos = farg.find('@');
-    bool has_fmt = (pos != std::string::npos);
-    if(has_fmt)
+    if(pos != std::string::npos)
     {
         lec = farg.substr(0, pos);      // LEC formula
         fmt = farg.substr(pos + 1);     // format
@@ -788,10 +795,7 @@ int RP_eval(std::string& res, const std::string& farg)
     if(!IODE_IS_A_NUMBER(x))
         return -1;
 
-    // RP_fmt() modifies the format (fmt is a local copy)
-    char buf[41] = { 0 };
-    RP_fmt(buf, has_fmt ? fmt.data() : NULL, x);       // The formatted value is returned
-    res = std::string(buf);
+    RP_fmt(res, fmt, x);       // The formatted value is returned
     return 0;
 }
 
