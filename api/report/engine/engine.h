@@ -40,9 +40,9 @@ int RP_define_1(const std::string& name, const std::string& macro);
 bool RP_macro_exists(const std::string& name);
 std::string RP_get_macro(const std::string& name);
 int RP_undef_1(const std::string& name);
-int RP_define_calcdepth(char* name);
-int RP_define_save(char* name);
-int RP_define_restore(char* name);
+int RP_define_calcdepth(const std::string& name);
+int RP_define_save(const std::string& name);
+int RP_define_restore(const std::string& name);
 int RP_define_save_list(const std::vector<std::string>& list);
 int RP_define_restore_list(const std::vector<std::string>& list);
 

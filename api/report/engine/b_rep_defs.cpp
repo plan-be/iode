@@ -15,9 +15,9 @@
  *      std::string RP_get_macro(const std::string& name)    Returns the pointer to a macro (aka define) value.    
  *      int RP_undef_1(const std::string& name)     Deletes one macro.
  *      int RP_undef(char *arg, int unused)         Report function to delete macros.
- *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
- *      int RP_define_save(char *name)              Saves (pushes) a macro under the name "name#<depth+1>".
- *      int RP_define_restore(char *name)           Deletes the macro "name" and restores (pops) the macro "name#<depth>" under the name "name".
+ *      int RP_define_calcdepth(const std::string& name)    Returns the max depth of a saved (pushed) macro.
+ *      int RP_define_save(const std::string& name)         Saves (pushes) a macro under the name "name#<depth+1>".
+ *      int RP_define_restore(const std::string& name)      Deletes the macro "name" and restores (pops) the macro "name#<depth>" under the name "name".
  *      int RP_define_save_list(const std::vector<std::string>& list)       Saves (pushes) a list of macros using RP_define_save() for each macro.
  *      int RP_define_restore_list(const std::vector<std::string>& list)    Restores a list of macros using RP_define_restore() for each macro.
  */
@@ -166,13 +166,13 @@ int RP_undef(char *arg, int unused)
  *      if mymacro#2 exists and 2 is the max level    => 2
  *      if mymacro   exists but no mymacro#<n> exists => -1
  *  
- *  @param [in] char*   name    macro name (without #<n>)
- *  @return     int             max <n> in macros name#<n>
+ *  @param [in] const std::string&  name    macro name (without #<n>)
+ *  @return     int                         max <n> in macros name#<n>
  */
-int RP_define_calcdepth(char* c_name)
+int RP_define_calcdepth(const std::string& name)
 {    
     // add the secret separator to the name to find all macros with this prefix
-    std::string prefix = std::string(c_name) + K_SECRETSEP;
+    std::string prefix = name + K_SECRETSEP;
     int lg = (int) prefix.length();
 
     int maxdepth = -1, depth;
@@ -198,26 +198,24 @@ int RP_define_calcdepth(char* c_name)
 /**
  *  Saves (pushes) a macro under the name "name#<depth+1>".
  *  
- *  @param [in] char*   name    macro name (w/o suffix)
- *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if RP_define_1() fails
- *                              0 on success
+ *  @param [in] const std::string&  name    macro name (w/o suffix)
+ *  @return     int                         -1 if RP_define_1() fails
+ *                                          0 on success
  */
-int RP_define_save(char* c_name)
+int RP_define_save(const std::string& name)
 {
-    std::string name(c_name);
-    name = RP_MACRO->to_key(name);
+    std::string key = RP_MACRO->to_key(name);
 
     // if the macro "name" does not yet exist, no need to push its definition
-    if(!RP_MACRO->contains(name)) 
+    if(!RP_MACRO->contains(key)) 
         return 0;
 
     // Try to find object name#*
-    int maxdepth = RP_define_calcdepth(c_name);
+    int maxdepth = RP_define_calcdepth(name);
 
     // Create a copy of existing name in name#(maxdepth+1)
-    std::string macro = RP_MACRO->get_macro(name);
-    std::string fullname = name + K_SECRETSEP + std::to_string(maxdepth + 1);
+    std::string macro = RP_MACRO->get_macro(key);
+    std::string fullname = key + K_SECRETSEP + std::to_string(maxdepth + 1);
     int rc = RP_define_1(fullname, macro);
     return rc;
 }
@@ -228,25 +226,24 @@ int RP_define_save(char* c_name)
  *  If there is no macro "name#depth", the macro name is simply deleted.
  *  The macro "name#depth" is also deleted.
  *  
- *  @param [in] char*   name    macro name (w/o suffix)
- *  @return     int             -3 if RP_MACRO cannot be created
- *                              -1 if RP_define_1() fails
- *                              0 on success
+ *  @param [in] const std::string&  name    macro name (w/o suffix)
+ *  @return     int                         -1 if RP_define_1() fails
+ *                                          0 on success
  */
-int RP_define_restore(char* c_name)
+int RP_define_restore(const std::string& name)
 {
     // Undefine the current
-    RP_undef_1(c_name);
+    RP_undef_1(name);
 
     // Try to find object name#* - Nothing to do if not found
-    int maxdepth = RP_define_calcdepth(c_name);
+    int maxdepth = RP_define_calcdepth(name);
     if(maxdepth < 0) 
         return 0;
 
     // Restore 'name' from the copy of 'name#maxdepth' 
-    std::string fullname = std::string(c_name) + K_SECRETSEP + std::to_string(maxdepth);
+    std::string fullname = name + K_SECRETSEP + std::to_string(maxdepth);
     std::string macro = RP_MACRO->get_macro(fullname);
-    int rc = RP_define_1(c_name, macro);
+    int rc = RP_define_1(name, macro);
 
     // Delete the copy 'name#maxdepth' 
     RP_undef_1(fullname);
@@ -267,7 +264,7 @@ int RP_define_save_list(const std::vector<std::string>& list)
 {
     for(const std::string& name : list)
     {
-        int rc = RP_define_save((char*) name.c_str());
+        int rc = RP_define_save(name);
         if(rc)
             return rc;
     }
@@ -287,7 +284,7 @@ int RP_define_restore_list(const std::vector<std::string>& list)
 {
     for(const std::string& name : list)
     {
-        int rc = RP_define_restore((char*) name.c_str());
+        int rc = RP_define_restore(name);
         if(rc)
             return rc;
     }
