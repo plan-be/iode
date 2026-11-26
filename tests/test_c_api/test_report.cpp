@@ -398,3 +398,38 @@ TEST_F(ReportTest, RP_EXPAND_MACROS)
     RP_ARG0 = o_arg0;
     RP_undef_1((char*) "MYMACRO");
 }
+
+TEST_F(ReportTest, RP_EXPAND_LEC_FORMATS)
+{
+    std::string line;
+    global_ws_var->clear();
+    Sample smpl("2000Y1", "2010Y1");
+    global_ws_var->set_sample(smpl);
+    RP_PER = Period();
+
+    // {lec@format}: expected results computed with the previous (char*) version of RP_fmt()
+    std::vector<std::pair<std::string, std::string>> cases = {
+        { "{1234.567@00999.9}",   "1234.6" },
+        { "{123456.789@99.99}",   "*****" },
+        { "{-1234.567@9999.99}",  "-1234.57" },
+        { "{1/3}",                "0.33333333" },
+        { "{-1/3}",               "-0.33333333" },
+        { "{1/3@.99}",            "0.33" },
+        { "{2@999}",              "2" },
+        { "{2@ 99.9 }",           "2.0" },
+        { "{3@T}",                "2003Y1" },
+        { "{3@t}",                "2003Y1" },
+        { "{1@}",                 "1" },
+        { "{1e30@99}",            "**" },
+        { "{-1e30}",              "-1e+30" },
+        { "{1/3@9999999999999999999999999999999.99}", "0.33" },
+        // format longer than 40 chars (was overflowing a buffer of 41 chars)
+        { "{1/3@9999999999999999999999999999999999999999999999.99}", "0.33" },
+    };
+    for(const auto& [expr, expected] : cases)
+    {
+        RP_expand(line, expr);
+        EXPECT_EQ(line, expected) << "expression: " << expr;
+    }
+    global_ws_var->clear();
+}
