@@ -474,3 +474,43 @@ TEST_F(ReportTest, RP_SPLITLINE)
     EXPECT_EQ(cmd, "");
     EXPECT_EQ(arg, "abc");
 }
+
+TEST_F(ReportTest, RP_EXTRACT)
+{
+    std::string str = "Value: {A[1990Y1] + 2} EUR";
+    int i;
+
+    // ch found: i = position of ch
+    i = 8;
+    EXPECT_EQ(RP_extract(str, i, '}'), "A[1990Y1] + 2");
+    EXPECT_EQ(i, 21);
+
+    // empty result
+    i = 1;
+    EXPECT_EQ(RP_extract("{}{}", i, '}'), "");
+    EXPECT_EQ(i, 1);
+
+    // ch not found -> "" and i = -1
+    i = 8;
+    EXPECT_EQ(RP_extract(str, i, '%'), "");
+    EXPECT_EQ(i, -1);
+
+    // start at the end of the string
+    i = (int) str.size();
+    EXPECT_EQ(RP_extract(str, i, '}'), "");
+    EXPECT_EQ(i, -1);
+
+    // RP_expand(): text left as is when the closing char is missing (same results as
+    // before RP_extract() returned a std::string)
+    std::string line;
+    RP_expand(line, "50% off");
+    EXPECT_EQ(line, "50% off");
+    RP_expand(line, "%!abc");
+    EXPECT_EQ(line, "!abc");
+    RP_expand(line, "a {b c");
+    EXPECT_EQ(line, "a  c");
+    RP_expand(line, "x `y z");
+    EXPECT_EQ(line, "x  z");
+    RP_expand(line, "x {");
+    EXPECT_EQ(line, "x ");
+}

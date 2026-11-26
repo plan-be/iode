@@ -408,36 +408,38 @@ int REPFILE::err_dump(char* name, char* arg)
 
 
 /**
- *  Extracts from (buf + *i) the string terminated by the specific character ch (eg '%' or '}').
- *  Increments *i, the current position in buf.
- *  
- *  If ch is not found in buf, the result goes to the end of buf.
- *  
+ *  Extracts from buf, starting at position i, the string terminated by the specific character
+ *  ch (eg '%' or '}').
+ *  On success, i is set to the position of ch in buf.
+ *
+ *  If ch is not found in buf, returns an empty string and sets i to -1
+ *  (the result may also be empty when ch is found, eg "{}").
+ *
  *  Example:
  *      str = "Value: {A[1990Y1] + 2} EUR";
- *             01234567890123456789012345 
+ *             01234567890123456789012345
  *      pos = 8; // starting search position = 1 + position of '{'
- *      RP_extract(str, &pos, '}') => "A[1990Y1] + 2", pos = 22
- *      
- *  @param [in]      const char* buf  input string
- *  @param [in, out] int*     i       position of the current pointer in buf (=first character in the resulting string)
- *  @param [in]      int      ch      ending character
- *  @return          char*            allocated string 
+ *      RP_extract(str, pos, '}') => "A[1990Y1] + 2", pos = 21
+ *
+ *  @param [in]      const std::string& buf  input string
+ *  @param [in, out] int&               i    position in buf of the first character of the
+ *                                           resulting string. On return: position of ch,
+ *                                           or -1 if ch is not found
+ *  @param [in]      int                ch   ending character
+ *  @return          std::string             extracted string (without ch)
  */
-char *RP_extract(const char* buf, int* i, int ch)
+std::string RP_extract(const std::string& buf, int& i, int ch)
 {
-    int     pos, j;
-    char    *res;
+    size_t start = (size_t) std::max(i, 0);
+    size_t pos = (ch == '\0' || start > buf.size()) ? std::string::npos : buf.find((char) ch, start);
+    if(pos == std::string::npos)
+    {
+        i = -1;
+        return std::string();
+    }
 
-    pos = U_pos(ch, ((unsigned char*) buf) + (*i));
-    if(pos < 0) 
-        return NULL;
-
-    res = RP_alloc(pos + 1);
-    for(j = 0; j < pos; j++, (*i)++) 
-        res[j] = buf[*i];
-
-    return res;
+    i = (int) pos;
+    return buf.substr(start, pos - start);
 }
 
 
@@ -1021,6 +1023,7 @@ int RP_expand(std::string& line, const std::string& buf)
 {
     int     i, previ, upper, sqz;
     char    *w = NULL;
+    std::string macro, lec, text;
 
     line.clear();
     line.reserve(buf.size());
@@ -1042,20 +1045,21 @@ int RP_expand(std::string& line, const std::string& buf)
                     upper = 1;
                 else if(buf[i] == '-') 
                     sqz = 1;
-                if(upper || sqz) 
+                if(upper || sqz)
                     i++;
-                w = RP_extract(buf.c_str(), &i, '%');
-                if(w != NULL)
+                previ = i;
+                macro = RP_extract(buf, i, '%');
+                if(i >= 0)
                 {
                     std::string value;
                     try
                     {
-                        value = RP_gmacro(w);
+                        value = RP_gmacro(macro);
                     }
                     catch(const RPMacroError&)
                     {
                         // undefined macro or missing argument: the text is left unchanged
-                        value = "%" + std::string(w) + "%";
+                        value = "%" + macro + "%";
                     }
                     // keeps only letters (CP850 accented letters included), digits and '_'
                     if(sqz)
@@ -1067,25 +1071,27 @@ int RP_expand(std::string& line, const std::string& buf)
                         SCR_upper((unsigned char*) value.data());
 
                     line += value;
-                    RP_free(w);
                 }
                 else
                 {
-                    i--;
+                    // no closing '%': i goes back to the character preceding the macro name
+                    i = previ - 1;
                     line.push_back(buf[i]);
                 }
                 break;
 
             case '{' :      // LEC expression
                 i++;
-                if(buf[i] == '{') 
+                if(buf[i] == '{')
                     goto dft;
-                w = RP_extract(buf.c_str(), &i, '}');
-                // w == NULL: no closing '}' -> nothing is added to line
-                if(w != NULL)
-                    line += RP_gcmd(w);
-
-                RP_free(w);
+                previ = i;
+                lec = RP_extract(buf, i, '}');
+                // no closing '}': nothing is added to line and the rest of the line is
+                // left as is (i = previ)
+                if(i >= 0)
+                    line += RP_gcmd(lec);
+                else
+                    i = previ;
                 break;
 
             case '@' :      // IODE function
@@ -1122,10 +1128,12 @@ int RP_expand(std::string& line, const std::string& buf)
                     i++;
                     if(buf[i] == RP_NOPARSING_CHAR) 
                         goto dft;  
-                    w = RP_extract(buf.c_str(), &i, RP_NOPARSING_CHAR);
-                    if(w)
-                        line += w;
-                    RP_free(w);
+                    previ = i;
+                    text = RP_extract(buf, i, RP_NOPARSING_CHAR);
+                    if(i >= 0)
+                        line += text;
+                    else
+                        i = previ;
                     break;
                 }
 
