@@ -15,7 +15,7 @@ void RP_free_bufs();
 int RP_is_cmd(const std::string& line);
 
 /* b_rep_debug.c */
-void RP_debug(char* txt);
+void RP_debug(const std::string& txt);
 
 /* b_rep_engine.c */
 std::vector<std::string> RP_read_file(const std::string& filename);

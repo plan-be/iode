@@ -1235,7 +1235,7 @@ int REPFILE::execute()
                 if(!name.empty())
                     rt = RP_exec_fn(name, arg, line[0]);
                 if(RP_DEBUG > 1) 
-                    RP_debug(line.data()); // GB MEM
+                    RP_debug(line); // GB MEM
             }
 
             CUR_REPFILE = rf; // restore the current REPFILE after RP_exec_fn() (recursivity)
