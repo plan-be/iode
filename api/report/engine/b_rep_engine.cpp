@@ -300,17 +300,16 @@ int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, in
  *  See in b_rep_syntax.c the definition of the table B_fns for more details.
  *  
  *  @global [in]     BFNS   B_fns   table of command names and fn pointers
- *  @param [in, out] char*  name    command name ($name)
- *  @param [out]     int*   type    type of object or file to which the command must be assigned
- *  @param [in]      int    fs      full screen : character preceding the command in the report ('#' or '$').
- *  @return          BFNS*          BFNS struct corresponding to the command name (nullptr if not found)  
- *  
+ *  @param [in]      const std::string&  name    command name ($name), possibly followed by an
+ *                                               extension (e.g. "WsLoadVar")
+ *  @param [out]     int&                type    type of object or file to which the command must be assigned
+ *  @param [in]      int                 fs      full screen : character preceding the command in the report ('#' or '$').
+ *  @return          BFNS*                       BFNS struct corresponding to the command name (nullptr if not found)
+ *
  */
-BFNS* RP_find_fn(char* c_name, int* type, int fs)
+BFNS* RP_find_fn(const std::string& name, int& type, int fs)
 {
-    std::string name = std::string(c_name);
-    name = trim(name);
-    name = to_lower(name);
+    std::string cmd_name = to_lower(trim(name));
 
     size_t n;
     std::string prefix;
@@ -321,14 +320,14 @@ BFNS* RP_find_fn(char* c_name, int* type, int fs)
         // command without extension 
         if(fns.type == 0) 
         {
-            if(name == func_name) 
+            if(cmd_name == func_name)
                 return &fns;
             continue;
         }
         else 
         {
             n = func_name.length();
-            prefix = name.substr(0, n);
+            prefix = cmd_name.substr(0, n);
             if(prefix != func_name) 
                 continue;
             
@@ -337,11 +336,11 @@ BFNS* RP_find_fn(char* c_name, int* type, int fs)
                 if(j > VARIABLES && fns.type % 2) 
                     break;
                 
-                suffix = name.substr(n);
+                suffix = cmd_name.substr(n);
                 extension = std::string(k_ext[j]);
-                if(suffix == extension) 
+                if(suffix == extension)
                 {
-                    *type = j;
+                    type = j;
                     return &fns;
                 }
             }
@@ -349,7 +348,7 @@ BFNS* RP_find_fn(char* c_name, int* type, int fs)
             // if(fns.type > 2 && fs == "#") { => erreur "" => ''
             if(fns.type > 2 && fs == '#') 
             {
-                *type = 0;
+                type = 0;
                 return &fns;
             }
         }
@@ -372,7 +371,7 @@ int RP_exec_fn(char* name, char* arg, int fs)
 {
     int parm;
 
-    BFNS* fns = RP_find_fn(name, &parm, fs);
+    BFNS* fns = RP_find_fn(name, parm, fs);
     if(!fns) 
         return -1;
     
