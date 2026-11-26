@@ -13,7 +13,7 @@
  *      int RP_define_1(const std::string& name, const std::string& macro)    Adds or replaces a macro to RP_MACRO.
  *      int RP_define(char* arg, int unused)        Report function to define a new macro.
  *      std::string RP_get_macro(const std::string& name)    Returns the pointer to a macro (aka define) value.    
- *      int RP_undef_1(char *name)                  Deletes one macro.
+ *      int RP_undef_1(const std::string& name)     Deletes one macro.
  *      int RP_undef(char *arg, int unused)         Report function to delete macros.
  *      int RP_define_calcdepth(char *name)         Returns the max depth of a saved (pushed) macro.
  *      int RP_define_save(char *name)              Saves (pushes) a macro under the name "name#<depth+1>".
@@ -113,10 +113,11 @@ std::string RP_get_macro(const std::string& name)
 /**
  *  Deletes one macro.
  *  
- *  @param [in] char*   name    macro to delete
- *  @return     int             always 0    
+ *  @param [in] const std::string&  name    macro to delete
+ *  @return     int                         1 if the macro has been deleted
+ *                                          0 if the macro does not exist (or cannot be deleted)
  */
-int RP_undef_1(char *name)
+int RP_undef_1(const std::string& name)
 {
     std::string key = RP_MACRO->to_key(name);
     if(!RP_MACRO->contains(key)) 
@@ -248,7 +249,7 @@ int RP_define_restore(char* c_name)
     int rc = RP_define_1(c_name, macro);
 
     // Delete the copy 'name#maxdepth' 
-    RP_undef_1((char*) fullname.c_str());
+    RP_undef_1(fullname);
 
     return rc;
 }

@@ -396,7 +396,7 @@ TEST_F(ReportTest, RP_EXPAND_MACROS)
 
     RP_ARGV = o_argv;
     RP_ARG0 = o_arg0;
-    RP_undef_1((char*) "MYMACRO");
+    RP_undef_1("MYMACRO");
 }
 
 TEST_F(ReportTest, RP_EXPAND_LEC_FORMATS)
