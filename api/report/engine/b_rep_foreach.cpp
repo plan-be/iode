@@ -120,7 +120,7 @@ int RP_foreach(char* arg, int unused)
     if(RP_splitline(arg, name, list, 30) < 0) return -1;
 
     // Sauve la valeur avant la boucle de l'index de la boucle (name)
-    RP_define_save(name.data());
+    RP_define_save(name);
 
     // Sauve de la même façon l'éventuel define FOREACH__<name>
     sprintf((char*) buf, "FOREACH__%s", name.c_str());
