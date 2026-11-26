@@ -148,10 +148,10 @@ int B_ModelSimulateParms(char* arg, int unused)
  */
 int B_ModelExchange(char* const_arg, int unused)
 {
-    char* arg = copy_char_array(const_arg);
-    std::string list_exo(arg);
+    // no need for an intermediate copy (was allocated with new[] by copy_char_array()
+    // but freed with free())
+    std::string list_exo = const_arg ? std::string(const_arg) : std::string();
     global_simu->set_exchange(list_exo);
-    free(arg);
     return 0;
 }
 
