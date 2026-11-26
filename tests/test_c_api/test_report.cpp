@@ -349,7 +349,7 @@ TEST_F(ReportTest, RP_EXPAND_MACROS)
 {
     std::string line;
 
-    RP_define_1((char*) "MYMACRO", (char*) "Ab c-d_1");
+    RP_define_1("MYMACRO", "Ab c-d_1");
 
     // defined macro and the modifiers ! (lower), # (upper) and - (keep letters, digits and '_')
     RP_expand(line, "x=%MYMACRO%");

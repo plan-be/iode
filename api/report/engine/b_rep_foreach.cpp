@@ -127,7 +127,7 @@ int RP_foreach(char* arg, int unused)
     RP_define_save((char*) buf);
 
     // Crée le define name avec la liste des indices de la boucle
-    RP_define_1(name.data(), list.data());
+    RP_define_1(name, list);
 
     // Crée un define identique avec comme nom FOREACH__<nom>
     sprintf((char*) buf, "$define FOREACH__%s %%%s%%", name.c_str(), name.c_str());

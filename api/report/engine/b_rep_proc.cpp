@@ -283,8 +283,8 @@ int RP_procexec(char* arg, int unused)
     {
         for(int i = 0 ; i < nactual; i++) 
         {
-            rc = RP_define_1((char*) proc->proc_parms[i].c_str(), (char*) v_params[i].c_str());
-            if(rc < 0) 
+            rc = RP_define_1(proc->proc_parms[i], v_params[i]);
+            if(rc < 0)
                 return rc;
         }
     }
@@ -292,9 +292,9 @@ int RP_procexec(char* arg, int unused)
     // is created with the list of all remaining actual parms separated by a space
     else 
     {
-        for(int i = 0; i < nformal - 1; i++) 
+        for(int i = 0; i < nformal - 1; i++)
         {
-            rc = RP_define_1((char*) proc->proc_parms[i].c_str(), (char*) v_params[i].c_str());
+            rc = RP_define_1(proc->proc_parms[i], v_params[i]);
             if(rc < 0) 
                 return rc;
         }
@@ -302,7 +302,7 @@ int RP_procexec(char* arg, int unused)
         std::string last_params; 
         for(int i = nformal - 1; i < nactual; i++) 
             last_params += v_params[i] + " ";
-        rc = RP_define_1((char*) proc->proc_parms[nformal - 1].c_str(), (char*) last_params.c_str());
+        rc = RP_define_1(proc->proc_parms[nformal - 1], last_params);
         if(rc < 0) 
             return rc;
     }
