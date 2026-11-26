@@ -23,6 +23,7 @@ int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, in
 BFNS* RP_find_fn(const std::string& name, int& type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 std::string RP_extract(const std::string& buf, int& i, int ch);
+std::string RP_extractpar(const std::string& buf, int& i, const std::string& brackets);
 std::string RP_gmacro(const std::string& str);
 std::string RP_gcmd(const std::string& str);
 int RP_evaltime();

@@ -789,76 +789,83 @@ int RP_eval(std::string& res, const std::string& farg)
 // ========= Report "@functions" interpretation and execution =========================
 
 /**
- *  Extracts from (buf + *i) the string terminated by a closing parenthesis or bracket of level 0. 
+ *  Extracts from buf, starting at position i, the string terminated by the closing parenthesis
+ *  of the first opening parenthesis (the closing parenthesis is not included in the result).
  *  Each new opening parenthesis raises the level by 1, each closing lowers the level by 1.
  *  The parenthesis between double quotes are ignored.
- *  
- *  @note the function name is RP_extractpar because originally the idea was to use the 
- *  same function for different types of parentheses: '[]', '{}', '()'..., not only for functions 
+ *  Before the first opening parenthesis (level 0), only letters, digits, '_' and ' ' are
+ *  accepted (function name).
+ *
+ *  @note the function name is RP_extractpar because originally the idea was to use the
+ *  same function for different types of parentheses: '[]', '{}', '()'..., not only for functions
  *  but also for {lec} formulas for example.
- *  
- *  If no closing parenthesis is found, returns NULL.
- *  
- *  Increments *i, the current position in buf.
- *  
+ *
+ *  If no closing parenthesis is found or if an invalid character is found at level 0,
+ *  returns an empty string and sets i to -1.
+ *
  *  Example:
  *      str          = "Zip: @upper(@take(10,"b-(1000)")) ";
  *      position        0123456789012345678901234567890123
- *      level           0000000000010000022222222222222100
- *  
+ *      level           0000000000011111122222222222222210
+ *
  *      pos = 6;
- *      RP_extractpar(str, &pos, '()') => "upper(@take(10,b-1000))", pos = 29
- *      
- *  @param [in]      const char* buf  input string
- *  @param [in, out] int*     i       in: position of the current pointer in buf (=first character in the resulting string)
- *                                    out: position of the next character in buf after the closing parenthesis. 
- *                                    If no closing par is found, unchanged
- *  @param [in]      int      ch      opening and ending character (eg "()" or "[]")
- *  @return          char*            allocated string containing the string bw parentheses
- *                                    NULL is no closing parenthesis of level 0 is found
+ *      RP_extractpar(str, pos, "()") => "upper(@take(10,\"b-(1000)\")", pos = 32
+ *
+ *  @param [in]      const std::string& buf       input string
+ *  @param [in, out] int&               i         in: position in buf of the first character of
+ *                                                the resulting string
+ *                                                out: position of the closing parenthesis in buf,
+ *                                                or -1 if not found
+ *  @param [in]      const std::string& brackets  opening and closing characters (eg "()" or "[]")
+ *  @return          std::string                  string between position i and the closing
+ *                                                parenthesis (excluded)
  */
-char *RP_extractpar(const char* buf, int* i, char* brackets)
+std::string RP_extractpar(const std::string& buf, int& i, const std::string& brackets)
 {
-    int     nb = 0, k, instr = 0;
-    char    *res;
+    int     nb = 0;
+    bool    instr = false;
+    size_t  start = (size_t) std::max(i, 0);
+    size_t  k;
 
-    for(k = *i ; buf[k] ; k++) 
+    if(brackets.size() < 2)
     {
-        if(buf[k] == '"') 
-        {
-            if(instr) 
-                instr = 0;
-            else      
-                instr = 1;
-            continue;
-        }
-        if(instr) 
-            continue;
-        if(buf[k] == brackets[1] && nb <= 1) 
-            break;
-        if(buf[k] == brackets[1]) 
-            nb--;
-        else
-        {
-            if(buf[k] == brackets[0]) 
-                nb++;   
-            else
-            {
-                if(nb == 0 && !(SCR_is_anum(buf[k]) || buf[k] == '_') && buf[k] != ' ') 
-                    return NULL;    
-            }
-        } 
+        i = -1;
+        return std::string();
     }
 
-    if(buf[k] == 0) 
-        return NULL;
+    // buf[k] != '\0': stops at the first '\0' (as with the previous const char* buf)
+    for(k = start; k < buf.size() && buf[k]; k++)
+    {
+        if(buf[k] == '"')
+        {
+            instr = !instr;
+            continue;
+        }
+        if(instr)
+            continue;
+        if(buf[k] == brackets[1] && nb <= 1)
+            break;
+        if(buf[k] == brackets[1])
+            nb--;
+        else if(buf[k] == brackets[0])
+            nb++;
+        // buf[k] passed as a (signed) char as before: CP850 accented letters are invalid
+        else if(nb == 0 && !(SCR_is_anum(buf[k]) || buf[k] == '_') && buf[k] != ' ')
+        {
+            i = -1;
+            return std::string();
+        }
+    }
 
-    k -= *i;
-    res = SW_nalloc(k + 1);
-    memcpy(res, buf + *i, k);
-    *i += k;
+    // no closing parenthesis
+    if(k >= buf.size() || buf[k] == '\0')
+    {
+        i = -1;
+        return std::string();
+    }
 
-    return res;
+    i = (int) k;
+    return buf.substr(start, k - start);
 }
 
 
@@ -1022,8 +1029,7 @@ std::string RP_gfn(const std::string& str)
 int RP_expand(std::string& line, const std::string& buf)
 {
     int     i, previ, upper, sqz;
-    char    *w = NULL;
-    std::string macro, lec, text;
+    std::string macro, lec, fn, text;
 
     line.clear();
     line.reserve(buf.size());
@@ -1099,8 +1105,8 @@ int RP_expand(std::string& line, const std::string& buf)
                 if(buf[i] == '@') 
                     goto dft;
                 previ = i;  // Keeps the previous value of i in case of error in RP_gfn()
-                w = RP_extractpar(buf.c_str(), &i, "()");
-                if(w == NULL)
+                fn = RP_extractpar(buf, i, "()");
+                if(i < 0)
                 {
                     // no closing parenthesis: the text is left unchanged
                     i = previ - 1;
@@ -1108,17 +1114,14 @@ int RP_expand(std::string& line, const std::string& buf)
                 }
                 try
                 {
-                    line += RP_gfn(std::string(w));
+                    line += RP_gfn(fn);
                 }
                 catch(const RPFunctionError&)
                 {
                     // invalid @function: the text is left unchanged
                     i = previ - 1;
-                    SW_nfree(w);
                     goto dft;
                 }
-
-                SW_nfree(w);
                 break;
 
             default  :
