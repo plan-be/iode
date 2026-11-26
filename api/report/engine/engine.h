@@ -24,7 +24,7 @@ BFNS* RP_find_fn(char* c_name, int* type, int fs);
 int RP_exec_fn(char* name, char* arg, int fs);
 char *RP_extract(const char* buf, int* i, int ch);
 std::string RP_gmacro(const std::string& str);
-char *RP_gcmd(char* str);
+std::string RP_gcmd(const std::string& str);
 int RP_evaltime();
 double RP_evallec(char* lec);
 int RP_fmt(char* buf, char* format, double value);
