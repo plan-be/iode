@@ -118,7 +118,7 @@ struct RPMacroError : public std::runtime_error
 
 /*------------------------ GLOBALS ----------------------- */
 
-extern const std::map<std::string, BFNS> B_fns;                // Table of report command names and function pointers
+extern const std::map<std::string, BFNS> B_FNS;                 // Table of report command names and function pointers
 extern const std::map<std::string, ReportFunctionFn> RP_FNS;    // Table of report @functions names and function pointers
 
 inline std::shared_ptr<REPFILE> CUR_REPFILE = nullptr;  // Current REPFILE during report execution

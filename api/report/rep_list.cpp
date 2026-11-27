@@ -49,7 +49,7 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
     bool test_func;
     bool test_group;
     int i = 0;
-    for(const auto& [name, fns] : B_fns)
+    for(const auto& [name, fns] : B_FNS)
     {
         func_name = prefix + fns.func_name_camel_case;
         func_group = fns.group;

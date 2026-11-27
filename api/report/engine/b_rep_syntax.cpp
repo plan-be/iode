@@ -5,10 +5,10 @@
  *  ---------------------------------------------
  *  
  *  Definition of the global tables:
- *      - B_fns[] that lists all report $commands and #commands names and pointers.
+ *      - B_FNS[] that lists all report $commands and #commands names and pointers.
  *      - RP_FNS[] that lists all report @functions names and pointers.
  *  
- *  To add a new $command to IODE reports, add a new line in B_fns[] with the name in lowercase
+ *  To add a new $command to IODE reports, add a new line in B_FNS[] with the name in lowercase
  *  and the function pointer(s).
  *  
  *  To add a new @function to IODE reports, add a new line in RP_FNS[] with the name in lowercase
@@ -16,7 +16,7 @@
  *  
  *  List of global variables
  *  ------------------------
- *      BFNS B_fns[]    Names of the report commands + GUI and non-GUI function pointers + type defining the allowed suffixes).
+ *      BFNS B_FNS[]    Names of the report commands + GUI and non-GUI function pointers + type defining the allowed suffixes).
  *      RP_FNS          Names of the report @functions and their function pointers
  */
 #include "api/report/commands/commands.h"
@@ -26,7 +26,7 @@
 /* 
     Names of the report $commands + called functions in non GUI and GUI modes + type (allowed suffixes).
 
-    Possible values of of B_fns[].type: 
+    Possible values of of B_FNS[].type: 
         0 = the command has no suffix allowed (eg. goto)
         1 = a suffix is required and must be an object type => $DataUpdateIdt: name = DataUpdateIdt
         3 = for $command: a suffix is required and must be an object type => $WsLoadEqs: name = WsLoadEqs
@@ -34,11 +34,11 @@
         4 = for $command: suffix required = file type => $FileRenameTxt : name = FileRenameTxt
             for #command: does not exist => #FileRename
 
-    Values of B_fns[].group are used to defined groups for the color highlighting.
+    Values of B_FNS[].group are used to defined groups for the color highlighting.
 
 */
 
-extern const std::map<std::string, BFNS> B_fns =
+extern const std::map<std::string, BFNS> B_FNS =
 {
     // NAMES                  CamelCase NAMES             FN NON GUI              FN GUI              TYPE      GROUP   
     {"label",                  {"label",                    RP_label,               RP_label,           0,        0}},

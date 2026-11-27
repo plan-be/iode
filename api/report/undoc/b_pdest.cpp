@@ -4,7 +4,7 @@
  *  Functions (and their subfunctions) called by the report engine to set up printing parameters and
  *  to generate outputs in various formats.
  *  
- *  @See B_fns in b_rep_syntax.c for the correspondance between report commands and C functions.
+ *  @See B_FNS in b_rep_syntax.c for the correspondance between report commands and C functions.
  *  
  *  The syntax of the report commands being thouroughly described in the manual, 
  *  only the command syntax is included here.
