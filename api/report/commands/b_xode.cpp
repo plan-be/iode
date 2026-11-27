@@ -7,8 +7,8 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_FileImportCmt(char* arg, int unused)  $FileImportCmt format rule infile outfile language [trace]
- *      int B_FileImportVar(char* arg, int unused)  $FileImportVar format rule infile outfile from to  [trace]
+ *      int B_FileImportCmt(const std::string& arg, int unused)  $FileImportCmt format rule infile outfile language [trace]
+ *      int B_FileImportVar(const std::string& arg, int unused)  $FileImportVar format rule infile outfile from to  [trace]
  */
 
  
@@ -31,7 +31,7 @@
  *  
  *
  */
-int B_FileImportCmt(char* arg, int unused)
+int B_FileImportCmt(const std::string& arg, int unused)
 {
     int     rc = 0, format, lang;
     char    *trace, *rule, *infile, *oufile, empty_buf[1];
@@ -78,7 +78,7 @@ fin:
  *  
  *
  */
-int B_FileImportVar(char* arg, int unused)
+int B_FileImportVar(const std::string& arg, int unused)
 {
     int     rc = 0, format;
     char    *trace, *rule, *from, *to, *infile, *oufile, empty_buf[1];

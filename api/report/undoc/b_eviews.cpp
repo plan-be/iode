@@ -58,7 +58,7 @@
  *      EV_cc_idt(char *idt, char *endo, char *lec)               | Transform E-views identity idt into LEC format and returns the first encountered var name as endogenous.
  *      int EV_read_line(char *buf)                               | Read a line in EV_FD and delete the optional comment as from the first ' char.
  *      int EV_cc_file(char *filename)                            | Interpret an E-Views file and store all read objects into the current equation and scalar WS. 
- *      int B_WsImportEviews(char* arg, int unused)                           | $WsImportEviews filename
+ *      int B_WsImportEviews(const std::string& arg, int unused)              | $WsImportEviews filename
  */
  
 // 2012-05-04 : version 1
@@ -574,7 +574,8 @@ err:
 
 
 // $WsImportEviews filename
-int B_WsImportEviews(char* arg, int unused)
+int B_WsImportEviews(const std::string& arg, int unused)
 {
-    return(EV_cc_file(arg));
+    std::string filename = arg;     // EV_cc_file() takes a char*
+    return(EV_cc_file(filename.data()));
 }

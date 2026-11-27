@@ -11,8 +11,8 @@
  *  
  *  List of public functions 
  *  ------------------------
- *      int B_WsLtoHStock(char* arg, int unused)    $WsLtoHStock {L|C|S} Filename VarList
- *      int B_WsLtoHFlow(char* arg, int unused)     $WsLtoHFlow  {L|C|S} Filename VarList
+ *      int B_WsLtoHStock(const std::string& arg, int unused)    $WsLtoHStock {L|C|S} Filename VarList
+ *      int B_WsLtoHFlow(const std::string& arg, int unused)     $WsLtoHFlow  {L|C|S} Filename VarList
  */
 #include <math.h>
 
@@ -313,11 +313,11 @@ static int LTOH_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr
  *  Sub-function of the report functions B_WsLtoHStock() and B_WsLtoHFlow().
  *  
  *  @param [in] int     type    type of series: LTOH_FLOW or LTOH_STOCK
- *  @param [in] char*   arg     parameter passed from the calling report function
- *  @return     int             0 on success, not null on error (file not found, incompatible samples...)
+ *  @param [in] const std::string&  arg     parameter passed from the calling report function
+ *  @return     int                         0 on success, not null on error (file not found, incompatible samples...)
  */
 
-static int B_ltoh(int type, char* arg)
+static int B_ltoh(int type, const std::string& arg)
 {
     int res, rc = 0, shift, skip;
     std::string method;
@@ -418,7 +418,7 @@ done:
  *  
  *
  */
-int B_WsLtoHStock(char* arg, int unused)
+int B_WsLtoHStock(const std::string& arg, int unused)
 {
     return(B_ltoh(LTOH_STOCK, arg));
 }
@@ -433,7 +433,7 @@ int B_WsLtoHStock(char* arg, int unused)
  *  
  *
  */
-int B_WsLtoHFlow(char* arg, int unused)
+int B_WsLtoHFlow(const std::string& arg, int unused)
 {
     return(B_ltoh(LTOH_FLOW, arg));
 }

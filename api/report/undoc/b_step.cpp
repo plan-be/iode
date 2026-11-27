@@ -6,7 +6,7 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_EqsStepWise(char* arg, int unused) | $EqsStepWise from to eqname leccond {r2|fstat}
+ *      int B_EqsStepWise(const std::string& arg, int unused) | $EqsStepWise from to eqname leccond {r2|fstat}
  */
 #include "api/pch.h"
 #include "api/b_args.h"
@@ -69,7 +69,7 @@ static int check_scl_var(const std::string& name)
  *       eqname  : equation to estimate
  *       leccond : condition of eligibility
  */
-int B_EqsStepWise(char* arg, int unused)                                                 
+int B_EqsStepWise(const std::string& arg, int unused)                                                 
 {
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 

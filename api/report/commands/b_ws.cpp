@@ -8,32 +8,32 @@
  *  List of functions 
  *  -----------------
  *  
- * int B_WsLoad(char* arg, int type)                 $WsLoad<type> filename
+ * int B_WsLoad(const std::string& arg, int type)                 $WsLoad<type> filename
  * int B_WsDump(KDB* kdb, char* filename)            Dumps the content of KDB in a file
- * int B_WsSave(char* arg, int type)                 $WsSave<type> filename
- * int B_WsSaveCmp(char* arg, int type)              $WsSaveCmp<type> filename
- * int B_WsExport(char* arg, int type)               $WsExport<type> filename
- * int B_WsImport(char* arg, int type)               $WsImport<type> filename
- * int B_WsSample(char* arg, int unused)                         $WsSample period_from period_to
- * int B_WsClear(char* arg, int type)                $WsClear<type> 
- * int B_WsClearAll(char* arg, int unused)                       $WsClearAll
- * int B_WsDescr(char* arg, int type)                $WsDescr<type> free text
+ * int B_WsSave(const std::string& arg, int type)                 $WsSave<type> filename
+ * int B_WsSaveCmp(const std::string& arg, int type)              $WsSaveCmp<type> filename
+ * int B_WsExport(const std::string& arg, int type)               $WsExport<type> filename
+ * int B_WsImport(const std::string& arg, int type)               $WsImport<type> filename
+ * int B_WsSample(const std::string& arg, int unused)                         $WsSample period_from period_to
+ * int B_WsClear(const std::string& arg, int type)                $WsClear<type> 
+ * int B_WsClearAll(const std::string& arg, int unused)                       $WsClearAll
+ * int B_WsDescr(const std::string& arg, int type)                $WsDescr<type> free text
  * int B_WsName(char* arg, int type)                 Sets the WS name. Obsolete as report function.
- * int B_WsCopy(char* arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
- * int B_WsMerge(char* arg, int type)                $WsMerge<type> filename
- * int B_WsExtrapolate(char* arg, int unused)                    $WsExtrapolate [method] from to [variable list]
- * int B_WsAggrChar(char* arg, int unused)                       $WsAggrChar char
- * int B_WsAggrSum(char* arg, int unused)                        $WsAggrSum pattern filename
- * int B_WsAggrProd(char* arg, int unused)                       $WsAggrProd pattern filename
- * int B_WsAggrMean(char* arg, int unused)                       $WsAggrMean pattern filename
- * double *B_StatUnitRoot_1(char* arg, int print) Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
- * int B_StatUnitRoot(char* arg, int unused)                     $StatUnitRoot drift trend order expression
- * int B_CsvSave(char* arg, int type)                $CsvSave<type> file name1 name2 ...
- * int B_CsvNbDec(char *nbdec, int unused)                       $CsvNbDec nn
- * int B_CsvSep(char *sep, int unused)                           $CsvSep char
- * int B_CsvNaN(char *nan, int unused)                           $CsvNaN text
- * int B_CsvAxes(char *var, int unused)                          $CsvAxes AxisName
- * int B_CsvDec(char *dec, int unused)                           $CsvDec char
+ * int B_WsCopy(const std::string& arg, int type)                 $WsCopy<type> fichier;fichier;.. obj1 obj2... or $WsCopyVar file;file;.. [from to] obj1 obj2...
+ * int B_WsMerge(const std::string& arg, int type)                $WsMerge<type> filename
+ * int B_WsExtrapolate(const std::string& arg, int unused)                    $WsExtrapolate [method] from to [variable list]
+ * int B_WsAggrChar(const std::string& arg, int unused)                       $WsAggrChar char
+ * int B_WsAggrSum(const std::string& arg, int unused)                        $WsAggrSum pattern filename
+ * int B_WsAggrProd(const std::string& arg, int unused)                       $WsAggrProd pattern filename
+ * int B_WsAggrMean(const std::string& arg, int unused)                       $WsAggrMean pattern filename
+ * double *B_StatUnitRoot_1(const std::string& arg, int print) Sub function of B_StatUnitRoot() with an optional parameter to print the result (or not).
+ * int B_StatUnitRoot(const std::string& arg, int unused)                     $StatUnitRoot drift trend order expression
+ * int B_CsvSave(const std::string& arg, int type)                $CsvSave<type> file name1 name2 ...
+ * int B_CsvNbDec(const std::string& nbdec, int unused)                       $CsvNbDec nn
+ * int B_CsvSep(const std::string& sep, int unused)                           $CsvSep char
+ * int B_CsvNaN(const std::string& nan, int unused)                           $CsvNaN text
+ * int B_CsvAxes(const std::string& var, int unused)                          $CsvAxes AxisName
+ * int B_CsvDec(const std::string& dec, int unused)                           $CsvDec char
  */
 #include "api/iode_scr4.h"
 
@@ -73,18 +73,12 @@ static bool load_global_database(std::shared_ptr<T>& global_ptr, const std::stri
  *  Syntax: $WsLoad<type> filename
  *  where type is in {Cmt, Eqs, Idt, Lst, Scl, Tbl, Var}
  *  
- *  @param [in] char*   arg     parameters if the command on the report line
- *  @param [in] int     type    object type
- *  @return     int             0 on success, -1 on error
+ *  @param [in] const std::string&  arg     parameters if the command on the report line
+ *  @param [in] int                 type    object type
+ *  @return     int                         0 on success, -1 on error
  */
-int B_WsLoad(char* arg, int type)
+int B_WsLoad(const std::string& arg, int type)
 {
-    if(!arg) 
-    {
-        kwarning("Syntax error: no argument passed to $WsLoad<type>");
-        return -1;
-    }
-
     std::string buf(arg);
     if(buf.empty())
     {
@@ -157,21 +151,22 @@ int B_WsDump(KDB* kdb, char* filename)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-int B_WsSave(char* arg, int type)
+int B_WsSave(const std::string& arg, int type)
 {
     char buf[K_MAX_FILE + 1];
 
-    SCR_strip((unsigned char*) arg);
-    if(strlen(arg) >= sizeof(FNAME)) 
+    std::string filename = arg;
+    SCR_strip((unsigned char*) filename.data());
+    if(strlen(filename.c_str()) >= sizeof(FNAME))
     {
         error_manager.append_error("WsSave: filename too long");
         return -1;
     }
-    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE);
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) filename.c_str(), K_MAX_FILE);
     SCR_strip((unsigned char*) buf);
-    if(buf[0] == 0) 
+    if(buf[0] == 0)
         return 0;
-    
+
     try
     {
         KDB& kdb = get_global_db(type);
@@ -196,12 +191,12 @@ int B_WsSave(char* arg, int type)
  *
  */
  
- int B_WsSaveCmp(char* arg, int type)
+ int B_WsSaveCmp(const std::string& arg, int type)
 {
     char        buf[K_MAX_FILE + 1];
     int         rc = 0, klzh;
 
-    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg, K_MAX_FILE); /* JMP 18-04-98 */
+    SCR_strlcpy((unsigned char*) buf, (unsigned char*) arg.c_str(), K_MAX_FILE); /* JMP 18-04-98 */
     SCR_strip((unsigned char*) buf);
     if(buf[0] == 0) 
         return 0;
@@ -231,7 +226,7 @@ int B_WsSave(char* arg, int type)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-int B_WsExport(char* arg, int type)
+int B_WsExport(const std::string& arg, int type)
 {
     try
     {
@@ -256,7 +251,7 @@ int B_WsExport(char* arg, int type)
  *
  */
 
-int B_WsImport(char* arg, int type)
+int B_WsImport(const std::string& arg, int type)
 {
     return(B_WsLoad(arg, type));
 }
@@ -268,7 +263,7 @@ int B_WsImport(char* arg, int type)
  *
  */
 
-int B_WsSample(char* arg, int unused)
+int B_WsSample(const std::string& arg, int unused)
 {
     bool success = false;
     Sample* new_smpl = nullptr;
@@ -317,7 +312,7 @@ err:
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-int B_WsClear(char* arg, int type)
+int B_WsClear(const std::string& arg, int type)
 {
     B_WsDescr("", type);
     B_WsName("", type);
@@ -340,7 +335,7 @@ int B_WsClear(char* arg, int type)
  *    
  *
  */
-int B_WsClearAll(char* arg, int unused)
+int B_WsClearAll(const std::string& arg, int unused)
 {
     int i;
 
@@ -355,7 +350,7 @@ int B_WsClearAll(char* arg, int unused)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-int B_WsDescr(char* arg, int type)
+int B_WsDescr(const std::string& arg, int type)
 {
     try
     {
@@ -398,7 +393,7 @@ int B_WsName(char* arg, int type)
  *          where type is in {cmt | eqs | idt | lst | scl | tbl}
  *      $WsCopyVar file;file;.. [from to] obj1 obj2... 
  */
-int B_WsCopy(char* arg, int type)
+int B_WsCopy(const std::string& arg, int type)
 {   
     std::string args(arg);
     std::string files = get_next_arg(args, K_MAX_FILE);
@@ -492,7 +487,7 @@ int B_WsCopy(char* arg, int type)
  *  
  *  @see B_WsLoad() for the syntax of that group of functions.
  */
-int B_WsMerge(char* arg, int type)
+int B_WsMerge(const std::string& arg, int type)
 {
     std::string args(arg);
     std::string file = get_next_arg(args, K_MAX_FILE);
@@ -527,7 +522,7 @@ int B_WsMerge(char* arg, int type)
  *  
  *
  */
-int B_WsExtrapolate(char* arg, int unused)
+int B_WsExtrapolate(const std::string& arg, int unused)
 {
     int     p = 0, method = 0, nb_vars = 0, rc = -1;
     Sample* smpl = nullptr;
@@ -595,7 +590,7 @@ done:
  *  @param [in] char*   arg     pattern and optional filename
  *  @return     int             0 on success, < 0 on error
  */
-int B_WsAggr(int method, char* arg)
+int B_WsAggr(int method, const std::string& arg)
 {
     std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.empty()) 
@@ -626,9 +621,9 @@ int B_WsAggr(int method, char* arg)
  *  Syntax: $WsAggrChar char
  *  
  */
-int B_WsAggrChar(char* arg, int unused)
+int B_WsAggrChar(const std::string& arg, int unused)
 {
-    if(arg == NULL || arg[0] == 0) K_AggrChar = ' ';
+    if(arg.empty() || arg[0] == 0) K_AggrChar = ' ';
     else K_AggrChar = arg[0];
     return 0;
 }
@@ -640,7 +635,7 @@ int B_WsAggrChar(char* arg, int unused)
  *
  */
 
-int B_WsAggrSum(char* arg, int unused)
+int B_WsAggrSum(const std::string& arg, int unused)
 {
     return(B_WsAggr(0, arg));
 }
@@ -652,7 +647,7 @@ int B_WsAggrSum(char* arg, int unused)
  *
  * for an example.
  */
-int B_WsAggrProd(char* arg, int unused)
+int B_WsAggrProd(const std::string& arg, int unused)
 {
     return(B_WsAggr(1, arg));
 }
@@ -664,7 +659,7 @@ int B_WsAggrProd(char* arg, int unused)
  *
  * for an example.
  */
-int B_WsAggrMean(char* arg, int unused)
+int B_WsAggrMean(const std::string& arg, int unused)
 {
     return(B_WsAggr(2, arg));
 }
@@ -677,7 +672,7 @@ int B_WsAggrMean(char* arg, int unused)
  *  @param [in] print       0 to not print, print otherwise
  *  @return     double*  result of E_UnitRoot()
  */
-double *B_StatUnitRoot_1(char* arg, int print)
+double *B_StatUnitRoot_1(const std::string& arg, int print)
 {
     int     drift, trend, order, rc = -1;
     char    name[80], buf[1024];
@@ -720,7 +715,7 @@ double *B_StatUnitRoot_1(char* arg, int print)
  *  
  *
  */
-int B_StatUnitRoot(char* arg, int unused)
+int B_StatUnitRoot(const std::string& arg, int unused)
 {
     int     rc = -1;
     double    *df;
@@ -741,7 +736,7 @@ int B_StatUnitRoot(char* arg, int unused)
  *  
  *  For Variables: $CsvSave<type> file [sample] [vars]
  */
-int B_CsvSave(char* arg, int type)
+int B_CsvSave(const std::string& arg, int type)
 {
     if(type != VARIABLES)
         return -1;
@@ -805,11 +800,11 @@ int B_CsvSave(char* arg, int type)
  *  
  *
  */
-int B_CsvNbDec(char *nbdec, int unused)
+int B_CsvNbDec(const std::string& nbdec, int unused)
 {
-    KDBVariables::CSV_NBDEC = atoi(nbdec);
+    KDBVariables::CSV_NBDEC = atoi(nbdec.c_str());
     if(KDBVariables::CSV_NBDEC > 99 || (KDBVariables::CSV_NBDEC < 0 && KDBVariables::CSV_NBDEC != -1)) {
-        error_manager.append_error(std::string(nbdec) + ": invalid number of decimals (value = 2)");
+        error_manager.append_error(nbdec + ": invalid number of decimals (value = 2)");
         KDBVariables::CSV_NBDEC = 10;
         return -1;
     }
@@ -822,10 +817,10 @@ int B_CsvNbDec(char *nbdec, int unused)
  *  
  *
  */
-int B_CsvSep(char *sep, int unused)
+int B_CsvSep(const std::string& sep, int unused)
 {
     SCR_free(KDBVariables::CSV_SEP);
-    KDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep);
+    KDBVariables::CSV_SEP = (char*) SCR_stracpy((unsigned char*) sep.c_str());
     return 0;
 }
 
@@ -835,10 +830,10 @@ int B_CsvSep(char *sep, int unused)
  *  
  *
  */
-int B_CsvNaN(char *nan, int unused)
+int B_CsvNaN(const std::string& nan, int unused)
 {
     SCR_free(KDBVariables::CSV_NAN);
-    KDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan);
+    KDBVariables::CSV_NAN = (char*) SCR_stracpy((unsigned char*) nan.c_str());
     return 0;
 }
 
@@ -849,10 +844,10 @@ int B_CsvNaN(char *nan, int unused)
  *  
  *
  */
-int B_CsvAxes(char *var, int unused)
+int B_CsvAxes(const std::string& var, int unused)
 {
     SCR_free(KDBVariables::CSV_AXES);
-    KDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var);
+    KDBVariables::CSV_AXES = (char*) SCR_stracpy((unsigned char*) var.c_str());
     return 0;
 }
 
@@ -863,10 +858,10 @@ int B_CsvAxes(char *var, int unused)
  *  
  *
  */
-int B_CsvDec(char *dec, int unused)
+int B_CsvDec(const std::string& dec, int unused)
 {
     SCR_free(KDBVariables::CSV_DEC);
-    KDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec);
+    KDBVariables::CSV_DEC = (char*) SCR_stracpy((unsigned char*) dec.c_str());
     return 0;
 }
 

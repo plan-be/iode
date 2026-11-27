@@ -211,8 +211,8 @@ public:
 
     bool scan(const std::string& list_var, const std::string& list_scal) override;
 
-    void set_scl_files(char* arg);
-    void set_var_files(char* arg);
+    void set_scl_files(const std::string& arg);
+    void set_var_files(const std::string& arg);
     void clear_files();
 
     KDBVariablesPtr exec(KDBVariablesPtr dbv_ptr, KDBScalarsPtr dbs_ptr, Sample* in_smpl);

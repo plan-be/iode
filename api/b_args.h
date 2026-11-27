@@ -7,7 +7,7 @@
 
 std::vector<std::string> expand_args(const std::string& arg, const int nb,
     const std::string& separators = " ,;\n\t\r");
-int B_loop(char** argv, int (*fn)(char*, void*), char* client);
-int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client);
+int B_loop(const std::vector<std::string>& argv, const std::function<int(const std::string&)>& fn);
+int B_ainit_loop(const std::string& arg, const std::function<int(const std::string&)>& fn);
 std::string get_next_arg(std::string& args, int lg);
 int B_argpos(const std::string& str, int ch);

@@ -27,29 +27,29 @@
  *  
  *      char *B_ExcelGetItem(char *arg)
  *      int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
- *      int B_ExcelDecimal(char *arg, int unused)
- *      int B_ExcelThousand(char *arg, int unused)
- *      int B_ExcelCurrency(char *arg, int unused)
- *      int B_ExcelLang(char *arg, int unused)
- *      int B_ExcelGet(char *arg, int type)
- *      int B_ExcelSet(char *arg, int type)
- *      int B_ExcelExecute(char *arg, int unused)
- *      int B_ExcelCmd(char *cmd, char *arg)
- *      int B_DDEGet(char *arg, int unused)
- *      int B_ExcelWrite(char *ptr, int unused)
- *      int B_DDEGet(char *arg, int unused)
+ *      int B_ExcelDecimal(const std::string& arg, int unused)
+ *      int B_ExcelThousand(const std::string& arg, int unused)
+ *      int B_ExcelCurrency(const std::string& arg, int unused)
+ *      int B_ExcelLang(const std::string& arg, int unused)
+ *      int B_ExcelGet(const std::string& arg, int type)
+ *      int B_ExcelSet(const std::string& arg, int type)
+ *      int B_ExcelExecute(const std::string& arg, int unused)
+ *      int B_ExcelCmd(const std::string& cmd, const std::string& arg)
+ *      int B_DDEGet(const std::string& arg, int unused)
+ *      int B_ExcelWrite(const std::string& arg, int unused)
+ *      int B_DDEGet(const std::string& arg, int unused)
  *      char *B_ExcelGetItem(char *arg)
- *      int B_ExcelGet(char *arg, int type)
- *      int B_ExcelSet(char *arg, int type)
- *      int B_ExcelExecute(char *arg, int unused)
- *      int B_ExcelCmd(char *cmd, char *arg)
- *      int B_ExcelWrite(char *ptr, int unused)
- *      int B_ExcelOpen(char *arg, int unused)
- *      int B_ExcelClose(char *arg, int unused)
- *      int B_ExcelPrint(char *arg, int unused)
- *      int B_ExcelSave(char *arg, int unused)
- *      int B_ExcelSaveAs(char *arg, int unused)
- *      int B_ExcelNew(char *arg, int unused)
+ *      int B_ExcelGet(const std::string& arg, int type)
+ *      int B_ExcelSet(const std::string& arg, int type)
+ *      int B_ExcelExecute(const std::string& arg, int unused)
+ *      int B_ExcelCmd(const std::string& cmd, const std::string& arg)
+ *      int B_ExcelWrite(const std::string& arg, int unused)
+ *      int B_ExcelOpen(const std::string& arg, int unused)
+ *      int B_ExcelClose(const std::string& arg, int unused)
+ *      int B_ExcelPrint(const std::string& arg, int unused)
+ *      int B_ExcelSave(const std::string& arg, int unused)
+ *      int B_ExcelSaveAs(const std::string& arg, int unused)
+ *      int B_ExcelNew(const std::string& arg, int unused)
  *      int IodeFmtVal(char *buf, double val)
  */
 #include "api/iode_scr4.h"
@@ -718,7 +718,7 @@ int B_ExcelSetItem(char *ddeitem, char *ptr, int nc, int nl)
     return rc;
 }
 
-int B_ExcelDecimal(char *arg, int unused)
+int B_ExcelDecimal(const std::string& arg, int unused)
 {
     int     nb_args, rc= 0;
 
@@ -752,7 +752,7 @@ $ExcelSetThousand Period => skip periods when reading from excel sheet (! decima
   - no arg => no sep
 */
 
-int B_ExcelThousand(char *arg, int unused)
+int B_ExcelThousand(const std::string& arg, int unused)
 {
     int     nb_args, rc = 0;
 
@@ -803,7 +803,7 @@ $ExcelSetCurrency c => skip c (any c)
 $ExcelSetCurrency [no arg] => no sep
 */
 
-int B_ExcelCurrency(char *arg, int unused)
+int B_ExcelCurrency(const std::string& arg, int unused)
 {
     int     nb_args, rc = 0;
 
@@ -838,7 +838,7 @@ int B_ExcelCurrency(char *arg, int unused)
 }
 
 
-int B_ExcelLang(char *arg, int unused)
+int B_ExcelLang(const std::string& arg, int unused)
 {
     int     nb_args, rc = 0;
 
@@ -869,7 +869,7 @@ int B_ExcelLang(char *arg, int unused)
     return rc;
 }
 
-int B_ExcelGet(char *arg, int type)
+int B_ExcelGet(const std::string& arg, int type)
 {
     std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
     if(args.empty())
@@ -886,10 +886,10 @@ int B_ExcelGet(char *arg, int type)
     SCR_free(ddeptr);
 
     std::string update_args = join(values, " ");
-    return B_DataUpdate(update_args.data(), type);
+    return B_DataUpdate(update_args, type);
 }
 
-int B_ExcelSet(char *arg, int type)
+int B_ExcelSet(const std::string& arg, int type)
 {
     int         shift, rc = -1, 
                 nb_args, nbr = 1, nc = 1, nl = 1;
@@ -1022,45 +1022,41 @@ the_end:
     return rc;
 }
 
-int B_ExcelExecute(char *arg, int unused)
+int B_ExcelExecute(const std::string& arg, int unused)
 {
-    int     rc;
-    char    *cmd;
+    // removes the trailing chars <= ' ' (as SCR_strip())
+    std::string s_arg = arg;
+    SCR_strip((unsigned char*) s_arg.data());
 
-    SCR_strip((unsigned char*) arg);
-    cmd = SCR_malloc((int)strlen(arg)+2);
-    sprintf(cmd, "[%s]", arg);
-    rc = WscrDdeExecute("Excel", "System", (unsigned char*) cmd);
-
-    SCR_free(cmd);
-    return rc;
+    std::string cmd = "[" + std::string(s_arg.c_str()) + "]";
+    return WscrDdeExecute("Excel", "System", (unsigned char*) cmd.data());
 }
 
-int B_ExcelCmd(char *cmd, char *arg)
+int B_ExcelCmd(const std::string& cmd, const std::string& arg)
 {
-    int     rc;
-    char    *xlscmd;
+    // removes the trailing chars <= ' ' (as SCR_strip())
+    std::string s_cmd = cmd;
+    SCR_strip((unsigned char*) s_cmd.data());
+    s_cmd = s_cmd.c_str();
+    std::string s_arg = arg;
+    SCR_strip((unsigned char*) s_arg.data());
+    s_arg = s_arg.c_str();
 
-    SCR_strip((unsigned char*) cmd);
-    if(arg) SCR_strip((unsigned char*) arg);
-    if(arg != NULL && arg[0] != '\0') {
-        xlscmd = SCR_malloc((int)strlen(cmd) + (int)strlen(arg) + 10);
-
-        if(U_is_in('"', arg)) sprintf(xlscmd, "[%s(%s)]", cmd, arg);
-        else                  sprintf(xlscmd, "[%s(\"%s\")]", cmd, arg);
+    std::string xlscmd;
+    if(!s_arg.empty())
+    {
+        if(s_arg.find('"') != std::string::npos)
+            xlscmd = "[" + s_cmd + "(" + s_arg + ")]";
+        else
+            xlscmd = "[" + s_cmd + "(\"" + s_arg + "\")]";
     }
-    else {
-        xlscmd = SCR_malloc((int)strlen(cmd) + 2);
-        sprintf(xlscmd, "[%s]", cmd);
-    }
+    else
+        xlscmd = "[" + s_cmd + "]";
 
-    rc = WscrDdeExecute("Excel", "System", (unsigned char*) xlscmd);
-
-    SCR_free(xlscmd);
-    return rc;
+    return WscrDdeExecute("Excel", "System", (unsigned char*) xlscmd.data());
 }
 
-int B_DDEGet(char *arg, int unused)
+int B_DDEGet(const std::string& arg, int unused)
 {
     U_ch    *ddeptr;
 
@@ -1073,11 +1069,14 @@ int B_DDEGet(char *arg, int unused)
 }
 
 /* JMP 03-08-2004 */
-int B_ExcelWrite(char *ptr, int unused)
+int B_ExcelWrite(const std::string& arg, int unused)
 {
     char    *topic, *item, *val;
     int     i, nb_args, rc = -1, pos, nl = 1, nc = 1, nc1;
 
+    // modifiable copy of arg
+    std::string buf = arg;
+    char*   ptr = buf.data();
 
     U_ljust_text((unsigned char*) ptr);
     pos = U_pos(' ', (unsigned char*) ptr);
@@ -1117,7 +1116,7 @@ int B_ExcelWrite(char *ptr, int unused)
 }
 
 #else
-int B_DDEGet(char *arg, int unused)
+int B_DDEGet(const std::string& arg, int unused)
 {
     return -1;
 }
@@ -1126,61 +1125,61 @@ char    *B_ExcelGetItem(char *arg)
 {
     return 0;
 }
-int B_ExcelGet(char *arg, int type)
+int B_ExcelGet(const std::string& arg, int type)
 {
     return -1;
 }
 
-int B_ExcelSet(char *arg, int type)
+int B_ExcelSet(const std::string& arg, int type)
 {
     return -1;
 }
 
-int B_ExcelExecute(char *arg, int unused)
+int B_ExcelExecute(const std::string& arg, int unused)
 {
     return -1;
 }
 
-int B_ExcelCmd(char *cmd, char *arg)
+int B_ExcelCmd(const std::string& cmd, const std::string& arg)
 {
     return -1;
 }
 
-int B_ExcelWrite(char *ptr, int unused)
+int B_ExcelWrite(const std::string& arg, int unused)
 {
     return -1;
 }
 
 #endif
 
-int B_ExcelOpen(char *arg, int unused)
+int B_ExcelOpen(const std::string& arg, int unused)
 {
     return(B_ExcelCmd("OPEN", arg));
 }
 
-int B_ExcelClose(char *arg, int unused)
+int B_ExcelClose(const std::string& arg, int unused)
 {
-    return(B_ExcelCmd("CLOSE", NULL));
+    return(B_ExcelCmd("CLOSE", ""));
 }
 
-int B_ExcelPrint(char *arg, int unused)
+int B_ExcelPrint(const std::string& arg, int unused)
 {
-    return(B_ExcelCmd("PRINT", NULL));
+    return(B_ExcelCmd("PRINT", ""));
 }
 
-int B_ExcelSave(char *arg, int unused)
+int B_ExcelSave(const std::string& arg, int unused)
 {
-    return(B_ExcelCmd("SAVE", NULL));
+    return(B_ExcelCmd("SAVE", ""));
 }
 
-int B_ExcelSaveAs(char *arg, int unused)
+int B_ExcelSaveAs(const std::string& arg, int unused)
 {
     return(B_ExcelCmd("SAVE.AS", arg));
 }
 
-int B_ExcelNew(char *arg, int unused)
+int B_ExcelNew(const std::string& arg, int unused)
 {
-    return(B_ExcelCmd("NEW(5)", NULL));
+    return(B_ExcelCmd("NEW(5)", ""));
 }
 
 /*
