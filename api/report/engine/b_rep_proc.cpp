@@ -65,8 +65,8 @@
  *      static void RP_proc_delete(int proc_nb)     Deletes a REP_PROC object and frees its reference in the table REP_PROCS.
  *      static int RP_proc_create(char *name)       Adds a new empty PROC in REP_PROCS.
  *      void RP_proc_free_all()                     Frees all the defined procedures and the table REP_PROCS.
- *      int RP_procdef(char* arg, int unused)                   Reads and creates a new PROC.
- *      int RP_procexec(char* arg, int unused)                  Executes a procedure (called by $procexec parms).
+ *      int RP_procdef(const std::string& arg, int unused)                   Reads and creates a new PROC.
+ *      int RP_procexec(const std::string& arg, int unused)                  Executes a procedure (called by $procexec parms).
  *      
  *  List of global variables
  *  ------------------------
@@ -185,7 +185,7 @@ void RP_proc_free_all()
  *  @param [in] char*   arg     line starting with "$procdef" 
  *  @return     int             0 if a PROC is created, -1 on error
  */
-int RP_procdef(char* arg, int unused)
+int RP_procdef(const std::string& arg, int unused)
 {
     std::shared_ptr<REP_PROC> proc;
     std::shared_ptr<REPFILE> rf = CUR_REPFILE;
@@ -194,7 +194,6 @@ int RP_procdef(char* arg, int unused)
     std::string     list;
     int             proc_nb, nblines = 0, line1;
 
-    if(arg == NULL) return -1;
     if(RP_splitline(arg, name, list, 30) < 0) return -1;
 
     // Creates the REP_PROC object
@@ -248,12 +247,10 @@ int RP_procdef(char* arg, int unused)
  *  @param [in] char*   arg     line beginning with "$procexec"
  *  @return     int             -1 if the PROC does not exist
  */
-int RP_procexec(char* arg, int unused)
+int RP_procexec(const std::string& arg, int unused)
 {   
     std::string list;
     std::string name;
-    if(arg == NULL)
-        return -1;
     if(RP_splitline(arg, name, list, 30) < 0)
         return -1;
 

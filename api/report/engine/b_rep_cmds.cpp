@@ -18,10 +18,10 @@
  *      
  *  All functions have the same syntax:
  *  
- *      int <function>(char* arg)
- *  
- *      @param [in] char*   arg     parameters of the function
- *      @return     int             return code: 0 on success
+ *      int <function>(const std::string& arg, int unused)
+ *
+ *      @param [in] const std::string&  arg     parameters of the function
+ *      @return     int                         return code: 0 on success
  *      
  *  Note that RP_exec_fn() calls the function with a second parameter "type" which, being
  *  not needed by these functions, is ignored. 
@@ -44,28 +44,31 @@ extern "C" int  SCR_sleep(int);
 
 
 // $vseps <seps> 
-int RP_vseps(char* seps, int unused)  
+int RP_vseps(const std::string& seps, int unused)
 {
-    if(seps == 0 || strlen(seps) == 0) seps = ";, ";
+    std::string new_seps = seps.empty() ? std::string(";, ") : seps;
     SCR_free(RP_VSEPS);
-    RP_VSEPS = (char*) SCR_stracpy((unsigned char*) seps);
+    RP_VSEPS = (char*) SCR_stracpy((unsigned char*) new_seps.c_str());
     return 0;
 }
 
 
 // $repeatstring <string>
-int RP_repeatstring(char* buf, int unused)   /* JMP 06-06-99 */
+int RP_repeatstring(const std::string& buf, int unused)   /* JMP 06-06-99 */
 {
-    SCR_sqz((unsigned char*) buf);
-    if(strlen(buf) == 0) buf = "_";
+    // removes the spaces (as SCR_sqz())
+    std::string rpt_str = buf;
+    rpt_str.erase(std::remove(rpt_str.begin(), rpt_str.end(), ' '), rpt_str.end());
+    if(rpt_str.empty())
+        rpt_str = "_";
     SCR_free(RP_RPTSTR);
-    RP_RPTSTR = (char*) SCR_stracpy((unsigned char*) buf);
+    RP_RPTSTR = (char*) SCR_stracpy((unsigned char*) rpt_str.c_str());
     return 0;
 }
 
 // $repeat <command>
 // Nouvelle version améliorée pour les allocs JAN 2009
-int RP_repeat(char* buf, int unused)
+int RP_repeat(const std::string& buf, int unused)
 {    
     std::string expanded;
     int rc = RP_expand(expanded, buf);
@@ -124,34 +127,30 @@ int RP_repeat(char* buf, int unused)
  *  - RP_RT indicates what to do on error (ignore, return...)
  *  - RP_PRINT indicates how to use error messages (print, display...)
  */
-int RP_onerror_1(char* arg)
+int RP_onerror_1(const std::string& arg)
 {
-    SCR_upper((unsigned char*) arg);
+    std::string option = arg;
+    SCR_upper((unsigned char*) option.data());
 
-    if(strcmp(arg, "IGNORE")  == 0) RP_RT = 0;
-    else    if(strcmp(arg, "RETURN")  == 0) RP_RT = -2;
-    else    if(strcmp(arg, "ABORT")   == 0) RP_RT = -3;
-    else    if(strcmp(arg, "QUITODE") == 0) RP_RT = -4;
-    else    if(strcmp(arg, "DISPLAY") == 0) RP_PRINT = 2;
-    else    if(strcmp(arg, "PRINT")   == 0) RP_PRINT = 1;
-    else    if(strcmp(arg, "NOPRINT") == 0) RP_PRINT = 0;
+    if(option == "IGNORE")          RP_RT = 0;
+    else    if(option == "RETURN")  RP_RT = -2;
+    else    if(option == "ABORT")   RP_RT = -3;
+    else    if(option == "QUITODE") RP_RT = -4;
+    else    if(option == "DISPLAY") RP_PRINT = 2;
+    else    if(option == "PRINT")   RP_PRINT = 1;
+    else    if(option == "NOPRINT") RP_PRINT = 0;
     return 0;
 }
 
-int wrapper_RP_onerror_1(char* arg, void* unused)
-{
-    return RP_onerror_1(arg);
-}
-
 // $onerror [{return|abort|quitode}] [{display|print|noprint}]
-int RP_onerror(char* arg, int unused)
+int RP_onerror(const std::string& arg, int unused)
 {
-    return(B_ainit_loop(arg, wrapper_RP_onerror_1, NULL));
+    return(B_ainit_loop(arg, RP_onerror_1));
 }
 
 // $abort 
 // Quits the current report execution stack.
-int RP_abort(char* arg, int unused)
+int RP_abort(const std::string& arg, int unused)
 {
     return(-3);
 }
@@ -163,7 +162,7 @@ int RP_abort(char* arg, int unused)
 // ODE stands for "Outils de Développements Econométriques"
 // IODE for "Intégrateur d'Outils de Développements Econométriques".
 
-int RP_quitode(char* arg, int unused)
+int RP_quitode(const std::string& arg, int unused)
 {
     SCR_APP_ABORT = ACT_APPL_QUIT;
     //K_end_ws(0);
@@ -174,7 +173,7 @@ int RP_quitode(char* arg, int unused)
 
 // $return
 // Quits the current report and goes up one level in the report stack (depth decreased by 1).
-int RP_return(char* arg, int unused)
+int RP_return(const std::string& arg, int unused)
 {
     return(-2);
 }
@@ -182,7 +181,7 @@ int RP_return(char* arg, int unused)
 
 // $label <label>
 // Note that there is no action associated with $label: it is only a marker used by $goto.
-int RP_label(char* arg, int unused)
+int RP_label(const std::string& arg, int unused)
 {
     return 0;
 }
@@ -239,7 +238,7 @@ int RP_goto_label(char *command, char *parm)
 
 // $goto label [value]
 // See RP_goto_label().
-int RP_goto(char* arg, int unused)
+int RP_goto(const std::string& arg, int unused)
 {
     int rc = 0;
     std::vector<std::string> v_args = split_multi_quoted(arg, " ,\n\t", '"');
@@ -278,30 +277,30 @@ int RP_goto(char* arg, int unused)
 // ====================
 
 // $show message
-int RP_message(char* arg, int unused)
+int RP_message(const std::string& arg, int unused)
 {
     char    fmt[2048];
 
-    if(arg == NULL || arg[0] == 0) return 0;
+    if(arg.empty() || arg[0] == 0) return 0;
 
     sprintf(fmt, "%%.%ds", SCR_PAGE_SIZE[1]-20);
-    kmsg(fmt, arg);
+    kmsg(fmt, arg.c_str());
     return 0;
 }
 
 
 // $msg text
-int RP_information(char* arg, int unused)            
+int RP_information(const std::string& arg, int unused)            
 {
-    if(arg == NULL || arg[0] == 0) return 0; /* JMP 11-07-96 */
+    if(arg.empty() || arg[0] == 0) return 0; /* JMP 11-07-96 */
 
-    if(strlen(arg) > 512) arg[512] = 0;
-    kinformation("%s", arg); 
+    std::string msg = arg.substr(0, 512);
+    kinformation("%s", msg.c_str());
     return 0;
 }
 
 // $silent {0|1|n|N|Y|y}
-int RP_silent(char* arg, int unused)   
+int RP_silent(const std::string& arg, int unused)   
 {  
      int     ch;
     
@@ -321,14 +320,14 @@ int RP_silent(char* arg, int unused)
 }
 
 // $beep
-int RP_beep(char* arg, int unused)
+int RP_beep(const std::string& arg, int unused)
 {
     kbeep();
     return 0;
 }
 
 // $ask <label> <question>
-int RP_ask(char* arg, int unused)
+int RP_ask(const std::string& arg, int unused)
 {
     std::string question(arg);
     std::string name = get_next_arg(question, 30);
@@ -343,7 +342,7 @@ int RP_ask(char* arg, int unused)
 // See https://iode.plan.be/doku.php?id=prompt
 // Warning: $prompt does not exist. Only #prompt is valid (in GUI mode)
 // TODO: implement $prompt 
-int B_ReportPrompt(char* arg)
+int B_ReportPrompt(const std::string& arg)
 {
     return(RP_define(arg, -1));
 }
@@ -352,7 +351,7 @@ int B_ReportPrompt(char* arg)
 // ==========================
 
 // $debug {0|n|N|1|2|f|F}
-int RP_setdebug(char* arg, int unused)   
+int RP_setdebug(const std::string& arg, int unused)   
 {  
     int     ch;
     
@@ -377,7 +376,7 @@ int RP_setdebug(char* arg, int unused)
 }
 
 // $indent {0|n|N|1}
-int RP_setindent(char* arg, int unused) 
+int RP_setindent(const std::string& arg, int unused) 
 {
     int     ch;
     
@@ -397,7 +396,7 @@ int RP_setindent(char* arg, int unused)
 }
 
 // $multiline {0|n|N|1} 
-int RP_setmultiline(char* arg, int unused) 
+int RP_setmultiline(const std::string& arg, int unused) 
 {
     int     ch;
     
@@ -417,7 +416,7 @@ int RP_setmultiline(char* arg, int unused)
 }
 
 // $noparsing [0|n|N|1]
-int RP_noparsing(char* arg, int unused) 
+int RP_noparsing(const std::string& arg, int unused) 
 {
     int     ch;
     
@@ -443,12 +442,13 @@ int RP_noparsing(char* arg, int unused)
 // $shift [n]
 // $shift_args [n]
 // Pops or Pushes current report arguments
-int RP_shift_args(char* arg, int unused)
+int RP_shift_args(const std::string& arg, int unused)
 {
     int     incr = 1;
 
-    SCR_strip((unsigned char*) arg);
-    if(arg[0]) incr = atoi(arg);
+    std::string s_incr = arg;
+    SCR_strip((unsigned char*) s_incr.data());
+    if(s_incr[0]) incr = atoi(s_incr.c_str());
 
     RP_ARG0 += incr;
     return 0;
@@ -459,14 +459,14 @@ int RP_shift_args(char* arg, int unused)
 // ====================
 
 // $chdir <dirname>
-int RP_chdir(char* arg, int unused)
+int RP_chdir(const std::string& arg, int unused)
 {
     int rc;
 
 #ifdef _MSC_VER
-    rc = _chdir(arg); 
+    rc = _chdir(arg.c_str());
 #else
-    rc = chdir(arg); 
+    rc = chdir(arg.c_str());
 #endif
 
     ksettitle();
@@ -474,18 +474,18 @@ int RP_chdir(char* arg, int unused)
 }
 
 // $rmdir <dirname>
-int RP_rmdir(char* arg, int unused)
+int RP_rmdir(const std::string& arg, int unused)
 {
-    return(_rmdir(arg));
+    return(_rmdir(arg.c_str()));
 }
 
 // $mkdir <dirname>
-int RP_mkdir(char* arg, int unused)
+int RP_mkdir(const std::string& arg, int unused)
 {
 #ifdef _MSC_VER
-    return(_mkdir(arg));
+    return(_mkdir(arg.c_str()));
 #else
-    return(mkdir(arg, 0777)); // 0777 is the permissions mask
+    return(mkdir(arg.c_str(), 0777)); // 0777 is the permissions mask
 #endif
 }
 
@@ -493,14 +493,14 @@ int RP_mkdir(char* arg, int unused)
 // Current value of t in {report expressions}
 // ==========================================
 // $settime <period>
-int RP_settime(char* arg, int unused)
+int RP_settime(const std::string& arg, int unused)
 {
     Period *rp_per;
 
     rp_per = new Period(arg);
     if(!rp_per) 
     {
-        std::string error_msg = "SetTime " + std::string(arg) + ": invalid syntax";
+        std::string error_msg = "SetTime " + arg + ": invalid syntax";
         error_manager.append_error(error_msg);
         return -1;
     }
@@ -512,12 +512,13 @@ int RP_settime(char* arg, int unused)
 }
 
 // $incrtime [n]
-int RP_incrtime(char* arg, int unused)
+int RP_incrtime(const std::string& arg, int unused)
 {
     int     incr = 1;
 
-    SCR_strip((unsigned char*) arg);
-    if(arg[0]) incr = atoi(arg);
+    std::string s_incr = arg;
+    SCR_strip((unsigned char*) s_incr.data());
+    if(s_incr[0]) incr = atoi(s_incr.c_str());
 
     Period per = RP_PER.shift(incr);
     RP_PER = per;
@@ -529,21 +530,21 @@ int RP_incrtime(char* arg, int unused)
 // ===============
 
 // $system <command>
-int RP_system(char* arg, int unused)
+int RP_system(const std::string& arg, int unused)
 {
-    return(kexecsystem(arg)); // JMP 13/12/2021
+    return(kexecsystem(arg.c_str())); // JMP 13/12/2021
 }
 
 // $shellexec <command>
-int B_shellexec(char *arg, int unused)
+int B_shellexec(const std::string& arg, int unused)
 {
-    return(kshellexec(arg));
+    return(kshellexec(arg.c_str()));
 }
 
 // $sleep <msecs>
-int B_Sleep(char* arg, int unused)
+int B_Sleep(const std::string& arg, int unused)
 {
-    int ms = atoi(arg);
+    int ms = atoi(arg.c_str());
     SCR_sleep(ms);
     return 0;
 }
@@ -553,7 +554,7 @@ int B_Sleep(char* arg, int unused)
 //
 // Defines the default table graph default (Line, Bar...). 
 // Used when creating a new line in a table.
-int B_GraphDefault(char* type, int unused) 
+int B_GraphDefault(const std::string& type, int unused) 
 {   
     switch(type[0]) {
         case 'l' :

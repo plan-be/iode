@@ -5,10 +5,10 @@
  *  
  *  List of Functions
  *  ------------------
- *      int B_IdtExecute(char* arg, int unused)             $IdtExecute period_from period_to [idt1 idt2...]
- *      int B_IdtExecuteVarFiles(char* arg, int unused)     $IdtExecuteVarFiles file1 [file2 ...]
- *      int B_IdtExecuteSclFiles(char* arg, int unused)     $IdtExecuteSclFiles file1 [file2 ...]
- *      int B_IdtExecuteTrace(char* arg, int unused)        $IdtExecuteTrace {Yes | No}
+ *      int B_IdtExecute(const std::string& arg, int unused)             $IdtExecute period_from period_to [idt1 idt2...]
+ *      int B_IdtExecuteVarFiles(const std::string& arg, int unused)     $IdtExecuteVarFiles file1 [file2 ...]
+ *      int B_IdtExecuteSclFiles(const std::string& arg, int unused)     $IdtExecuteSclFiles file1 [file2 ...]
+ *      int B_IdtExecuteTrace(const std::string& arg, int unused)        $IdtExecuteTrace {Yes | No}
  */
 #include "api/b_args.h"
 #include "api/b_errors.h"
@@ -19,9 +19,9 @@
 
 /**
  *  Report function to execute identities. Used in conjunction with report functions
- *      B_IdtExecuteVarFiles(char* arg, int unused)
- *      B_IdtExecuteSclFiles(char* arg, int unused)
- *      B_IdtExecuteTrace(char* arg, int unused)
+ *      B_IdtExecuteVarFiles(const std::string& arg, int unused)
+ *      B_IdtExecuteSclFiles(const std::string& arg, int unused)
+ *      B_IdtExecuteTrace(const std::string& arg, int unused)
  *  
  *  Syntax: $IdtExecute period_from period_to [idt1 idt2...]
  *  
@@ -35,7 +35,7 @@
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
 
-int B_IdtExecute(char* arg, int unused)
+int B_IdtExecute(const std::string& arg, int unused)
 {
     int     rc = 0;
     std::string from, to;
@@ -142,7 +142,7 @@ int B_IdtExecuteIdts(Sample* smpl, const std::vector<std::string>& idts)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteVarFiles(char* arg, int unused)
+int B_IdtExecuteVarFiles(const std::string& arg, int unused)
 {
     global_ws_idt->set_var_files(arg);
     return 0;
@@ -162,7 +162,7 @@ int B_IdtExecuteVarFiles(char* arg, int unused)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteSclFiles(char* arg, int unused)
+int B_IdtExecuteSclFiles(const std::string& arg, int unused)
 {
     global_ws_idt->set_scl_files(arg);
     return 0;
@@ -183,7 +183,7 @@ int B_IdtExecuteSclFiles(char* arg, int unused)
  *  @return int     0 on success, -1 on error 
  */
 
-int B_IdtExecuteTrace(char* arg, int unused)
+int B_IdtExecuteTrace(const std::string& arg, int unused)
 {
     KEXEC_TRACE = (SCR_upper_char(arg[0]) == 'Y') ? 1 : 0;  /* JMP 19-12-97 */
     return 0;

@@ -44,8 +44,8 @@ private:
 struct BFNS 
 {
     char*   func_name_camel_case;           // function name in CamelCase
-    int     (*fn)(char* arg, int type_);    // function pointer in *non GUI* mode
-    int     (*sfn)(char* arg, int type_);   // function pointer in GUI mode
+    int     (*fn)(const std::string& arg, int type_);    // function pointer in *non GUI* mode
+    int     (*sfn)(const std::string& arg, int type_);   // function pointer in GUI mode
     int     type;                           // suffix required after function name (var, idt...) or not:
 			                                //   0=not required
 						                    //   1=ws type required: cmt, idt, ... see k_ext => not used ?

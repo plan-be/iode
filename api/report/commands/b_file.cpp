@@ -5,9 +5,9 @@
  *  
  *  List of Functions
  *  ------------------
- *      int B_FileCopy(char* arg, int type)    $FileCopy<type> source_file dest_file
- *      int B_FileRename(char* arg, int type)  $FileRename<type> source_file dest_file
- *      int B_FileDelete(char* arg, int type)  $FileDelete<type> file1 [file2...]
+ *      int B_FileCopy(const std::string& arg, int type)    $FileCopy<type> source_file dest_file
+ *      int B_FileRename(const std::string& arg, int type)  $FileRename<type> source_file dest_file
+ *      int B_FileDelete(const std::string& arg, int type)  $FileDelete<type> file1 [file2...]
  */
 
 
@@ -33,7 +33,7 @@
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
 
-int B_FileCopy(char* arg, int type)
+int B_FileCopy(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
@@ -99,7 +99,7 @@ int B_FileCopy(char* arg, int type)
  *  @params See b_data.c for details
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
-int B_FileRename(char* arg, int type)
+int B_FileRename(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())
@@ -157,7 +157,7 @@ int B_FileRename(char* arg, int type)
  *  @params see b_data.c 
  *  @return int 0 always 
  */
-int B_FileDelete(char* arg, int type)
+int B_FileDelete(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = expand_args(arg, 2);
     if(v_args.empty())

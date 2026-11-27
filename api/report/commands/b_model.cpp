@@ -8,10 +8,10 @@
  *  List of functions 
  *  -----------------
  *      int B_ModelSimulate(char *arg)                              $ModelSimulate per_from per_to equation_list
- *      int B_ModelSimulateParms(char* arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
- *      int B_ModelExchange(char* arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
+ *      int B_ModelSimulateParms(const std::string& arg, int unused)                         $ModelSimulateParms eps relax maxit {Connex | Triang | None } 0 - 4 (starting values) {Yes | no } nbtri {yes | No } 
+ *      int B_ModelExchange(const std::string& arg, int unused)                              $ModelExchange eqname1-varname1,eqname2-varname2,...
  *      int KE_compile(KDBEquations& dbe)                                    Recompiles a KDB of equations. Tests and other informations saved in the equation object are left unchanged.
- *      int B_ModelCompile(char* arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
+ *      int B_ModelCompile(const std::string& arg, int unused)                               $ModelCompile  [eqname1, eqname2, ... ]
  *      int B_ModelCalcSCC(char *arg)                               $ModelCalcSCC nbtris prename intername postname [eqs]
  *      int B_ModelSimulateSCC(char *arg)                           $ModelSimulateSCC from to pre inter post
  *      int B_ModelSimulateSaveNIters(char *arg)                    $ModelSimulateSaveNiters varname
@@ -67,7 +67,7 @@ static int B_ModelSimulateEqs(Sample* smpl, const std::vector<std::string>& v_eq
  *  
  *
  */
-int B_ModelSimulate(char *const_arg, int unused)
+int B_ModelSimulate(const std::string& arg, int unused)
 {
     int     rc = -1;
     std::string from, to;
@@ -75,7 +75,7 @@ int B_ModelSimulate(char *const_arg, int unused)
     std::vector<std::string> v_eqs;
 
     // Copy (get_next_arg() modifies its argument)
-    std::string args(const_arg);
+    std::string args(arg);
 
     from = get_next_arg(args, 15);
     to = get_next_arg(args, 15);
@@ -109,7 +109,7 @@ err:
  *          
  *
  */
-int B_ModelSimulateParms(char* arg, int unused)
+int B_ModelSimulateParms(const std::string& arg, int unused)
 {
     std::vector<std::string> args = split_skip_empty(std::string(arg), " ,\n\t");
     int nargs = (int) args.size();
@@ -144,11 +144,9 @@ int B_ModelSimulateParms(char* arg, int unused)
  *           where eqname1, eqname2 are equation names (thus also endogenous vars)
  *                 varname1, varname2 are exogenous variables
  */
-int B_ModelExchange(char* const_arg, int unused)
+int B_ModelExchange(const std::string& arg, int unused)
 {
-    // no need for an intermediate copy (was allocated with new[] by copy_char_array()
-    // but freed with free())
-    std::string list_exo = const_arg ? std::string(const_arg) : std::string();
+    std::string list_exo = arg;
     global_simu->set_exchange(list_exo);
     return 0;
 }
@@ -159,12 +157,12 @@ int B_ModelExchange(char* const_arg, int unused)
  *  
  *
  */
-int B_ModelCompile(char* arg, int unused)
+int B_ModelCompile(const std::string& arg, int unused)
 {
     int rc = -1;
 
     /* EndoExo whole WS */
-    if(arg == NULL || arg[0] == 0) 
+    if(arg.empty() || arg[0] == 0)
         rc = KE_compile(*global_ws_eqs);
     else 
     {
@@ -186,10 +184,10 @@ int B_ModelCompile(char* arg, int unused)
 /**
  *  Syntax: $ModelCalcSCC nbtris prename intername postname [eqs]
  */
-int B_ModelCalcSCC(char *const_arg, int unused)
+int B_ModelCalcSCC(const std::string& arg, int unused)
 {
     // Copy (get_next_arg() modifies its argument)
-    std::string args(const_arg);
+    std::string args(arg);
 
     // Tri
     std::string buf = get_next_arg(args, 15);
@@ -222,10 +220,10 @@ int B_ModelCalcSCC(char *const_arg, int unused)
  *  
  *  Syntax: $ModelSimulateSCC from to pre inter post
  */
-int B_ModelSimulateSCC(char *const_arg, int unused)
+int B_ModelSimulateSCC(const std::string& arg, int unused)
 {
     // Copy (get_next_arg() modifies its argument)
-    std::string args(const_arg);
+    std::string args(arg);
 
     Sample* smpl = nullptr;
     std::string from = get_next_arg(args, 15);
@@ -290,18 +288,16 @@ int B_ModelSimulateSCC(char *const_arg, int unused)
 /**
  *  Set all values of the variable name to NaN. The variable is created if it does not exist.
  *  
- *  @param [in] char*   name    var name
- *  @return     int             0 always    
+ *  @param [in] const std::string&  name    var name
+ *  @return     int                         0 always
  */
-static int B_CreateEmptyVar(char *name)
+static int B_CreateEmptyVar(const std::string& name)
 {
-    char        uname[1024], buf[4096];
-
-    // Create var
-    strcpy(uname, name);
-    SCR_sqz(SCR_upper((unsigned char*) uname));
-    sprintf(buf, "%s 1/0", uname);
-    B_DataCalcVar(buf);
+    // Create var: name in uppercase (CP850 aware), without spaces
+    std::string uname = name;
+    SCR_upper((unsigned char*) uname.data());
+    uname.erase(std::remove(uname.begin(), uname.end(), ' '), uname.end());
+    B_DataCalcVar(uname + " 1/0");
     return 0;
 }
 
@@ -309,13 +305,12 @@ static int B_CreateEmptyVar(char *name)
 /**
  *  Retrieves the pointer to the first value of a variable data.
  *  
- *  @param [in] char*       name    variable name
- *  @return     double*          pointer to the var "name"
+ *  @param [in] const std::string&  var_name    variable name
+ *  @return     double*                         pointer to the var "name"
  */
-static double *B_GetVarPtr(char* c_name)
+static double *B_GetVarPtr(const std::string& var_name)
 {
-    std::string name = std::string(c_name);
-    name = global_ws_var->to_key(name);
+    std::string name = global_ws_var->to_key(var_name);
     if(!global_ws_var->contains(name))
         return NULL;
     else
@@ -327,10 +322,10 @@ static double *B_GetVarPtr(char* c_name)
  *  Saves the values of the vector of double vec in the variable name. 
  *  Creates name if it does not exist.
  *  
- *  @param [in, out] char*       name   variable name
- *  @param [in]      double*  vec    pointer to the values to copy in name
+ *  @param [in, out] const std::string&  name   variable name
+ *  @param [in]      double*             vec    pointer to the values to copy in name
  */
-static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
+static int B_CreateVarFromVecOfDoubles(const std::string& name, double *vec)
 {
     if(!global_ws_var)
         return -1;
@@ -341,7 +336,7 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
     if(x == 0) 
     {
         std::string error_msg = "B_CreateVarFromVecOfDoubles: failed to create the variable '";
-        error_msg += std::string(name) + "'";
+        error_msg += name + "'";
         error_manager.append_error(error_msg);
         return -1;
     }
@@ -359,10 +354,10 @@ static int B_CreateVarFromVecOfDoubles(char *name, double *vec)
  *  Saves into the variable "name" the values of the vector vec of integers.
  *  Creates name if it does not exist.
  *  
- *  @param [in, out] char*      name   variable name
- *  @param [in]      int*       vec    pointer to the values to copy in name
+ *  @param [in, out] const std::string&  name   variable name
+ *  @param [in]      int*                vec    pointer to the values to copy in name
  */
-static int B_CreateVarFromVecOfInts(char *name, int *vec)
+static int B_CreateVarFromVecOfInts(const std::string& name, int *vec)
 {
     if(!global_ws_var)
         return -1;
@@ -373,7 +368,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
     if(x == 0) 
     {
         std::string error_msg = "B_CreateVarFromVecOfInts: failed to create the variable '";
-        error_msg += std::string(name) + "'";
+        error_msg += name + "'";
         error_manager.append_error(error_msg);
         return -1;
     }
@@ -395,7 +390,7 @@ static int B_CreateVarFromVecOfInts(char *name, int *vec)
  *  
  *
  */
-int B_ModelSimulateSaveNIters(char *arg, int unused)
+int B_ModelSimulateSaveNIters(const std::string& arg, int unused)
 {
     return(B_CreateVarFromVecOfInts(arg, global_simu->v_nb_iterations.empty() ? NULL : global_simu->v_nb_iterations.data()));
 }
@@ -408,7 +403,7 @@ int B_ModelSimulateSaveNIters(char *arg, int unused)
  *  
  *
  */
-int B_ModelSimulateSaveNorms(char *arg, int unused)
+int B_ModelSimulateSaveNorms(const std::string& arg, int unused)
 {
     return(B_CreateVarFromVecOfDoubles(arg, global_simu->v_norm.empty() ? NULL : global_simu->v_norm.data()));
 }

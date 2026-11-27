@@ -78,13 +78,13 @@
 #include <unordered_set>
 
 
-void KDBIdentities::set_scl_files(char* arg)
+void KDBIdentities::set_scl_files(const std::string& arg)
 {
     v_scl_files.clear();
     v_scl_files = expand_args(arg, 0);
 }
 
-void KDBIdentities::set_var_files(char* arg)
+void KDBIdentities::set_var_files(const std::string& arg)
 {
     v_var_files.clear();
     v_var_files = expand_args(arg, 0);

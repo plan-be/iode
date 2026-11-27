@@ -5,10 +5,10 @@
  *  
  *  List of Functions
  *  -----------------
- *      int B_SysRename(char* arg, int unused)      $SysMoveFile filein fileout
- *      int B_SysCopy(char* arg, int unused)        $SysCopyFile filein fileout
- *      int B_SysAppend(char* arg, int unused)      $SysAppendFile filein fileout
- *      int B_SysDelete(char* arg, int unused)      $SysDeleteFile file1 file2 ...
+ *      int B_SysRename(const std::string& arg, int unused)      $SysMoveFile filein fileout
+ *      int B_SysCopy(const std::string& arg, int unused)        $SysCopyFile filein fileout
+ *      int B_SysAppend(const std::string& arg, int unused)      $SysAppendFile filein fileout
+ *      int B_SysDelete(const std::string& arg, int unused)      $SysDeleteFile file1 file2 ...
  *      int B_SysOemToUTF8(char *arg)   $SysOemToUTF8 inputfile outputfile
  *      int B_SysAnsiToUTF8(char *arg)  $SysAnsiToUTF8 inputfile outputfile
  *      int B_SysAnsiToOem(char *arg)   $SysAnsiToOem inputfile outputfile    
@@ -30,7 +30,7 @@
  *  @return int     0 on success, -1 on error (file not found, syntax error...)
  */
 
-int B_SysRename(char* arg, int unused) 
+int B_SysRename(const std::string& arg, int unused) 
 {
     std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
@@ -57,7 +57,7 @@ fin:
  *  
  *
  */
-int B_SysCopy(char* arg, int unused) 
+int B_SysCopy(const std::string& arg, int unused) 
 {
     std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
@@ -84,7 +84,7 @@ fin:
  *  
  *
  */
-int B_SysAppend(char* arg, int unused) 
+int B_SysAppend(const std::string& arg, int unused) 
 {
     std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
@@ -111,7 +111,7 @@ fin:
  *  
  *
  */
-int B_SysDelete(char* arg, int unused) 
+int B_SysDelete(const std::string& arg, int unused) 
 {
     std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0, i;
@@ -142,7 +142,7 @@ fin:
  *  @see scr4/SCR_ConvertToUTF8()
  *  
  */
-static int B_SysOemAnsiToUTF8(char *arg, int isansi)
+static int B_SysOemAnsiToUTF8(const std::string& arg, int isansi)
 {
     std::vector<std::string> tbl;
     int     ntbl = 0, rc = 0;
@@ -174,7 +174,7 @@ fin:
  *  
  *
  */
-int B_SysOemToUTF8(char *arg, int unused)
+int B_SysOemToUTF8(const std::string& arg, int unused)
 {
     return(B_SysOemAnsiToUTF8(arg, 0));
 }
@@ -185,7 +185,7 @@ int B_SysOemToUTF8(char *arg, int unused)
  *  
  *
  */
-int B_SysAnsiToUTF8(char *arg, int unused)
+int B_SysAnsiToUTF8(const std::string& arg, int unused)
 {
     return(B_SysOemAnsiToUTF8(arg, 1));
 }
@@ -201,7 +201,7 @@ int B_SysAnsiToUTF8(char *arg, int unused)
  *  @return     int             0 on success, -1 on error (syntax, file does not exist...)
  *  
  */
-static int B_SysOemOrAnsiToAnsiOrOem(char *arg, int isansi)
+static int B_SysOemOrAnsiToAnsiOrOem(const std::string& arg, int isansi)
 {
     int     c;
     FILE    *fd1, *fd2;
@@ -252,7 +252,7 @@ fin:
  *  
  *
  */
-int B_SysAnsiToOem(char *arg, int unused)
+int B_SysAnsiToOem(const std::string& arg, int unused)
 {
      return(B_SysOemOrAnsiToAnsiOrOem(arg, 1));
 }
@@ -262,7 +262,7 @@ int B_SysAnsiToOem(char *arg, int unused)
  *  
  *
  */
-int B_SysOemToAnsi(char *arg, int unused)
+int B_SysOemToAnsi(const std::string& arg, int unused)
 {
      return(B_SysOemOrAnsiToAnsiOrOem(arg, 0));
 }

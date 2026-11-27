@@ -52,9 +52,9 @@
  *  List of functions
  *  -----------------
  *      static int RP_foreach_next_index(char *name)    Goes to the next element and decreases the number of elements in a foreach loop.
- *      int RP_foreach(char* arg, int unused)                       Implemention of $foreach <index_name> <list_of_values>
+ *      int RP_foreach(const std::string& arg, int unused)                       Implemention of $foreach <index_name> <list_of_values>
  *      int RP_foreach_break(char *name)                Exits the foreach block. Not implemented
- *      int RP_foreach_next(char* arg, int unused)                  Implementation of $next <index_name>
+ *      int RP_foreach_next(const std::string& arg, int unused)                  Implementation of $next <index_name>
  *      static int RP_foreach_goto_next(char* label)    Reads a report backwards until the previous $foreach line then goes to the next index in the loop.
  *  
  */
@@ -107,14 +107,12 @@ static int RP_foreach_next_index(char *name)
  *  See above for details.
  *  
  */
-int RP_foreach(char* arg, int unused)
+int RP_foreach(const std::string& arg, int unused)
 {
     unsigned char   buf[512];
     std::string     name;
     std::string     list;
     int             rc = 0;
-
-    if(arg == NULL) return -1;
 
     // Crée l'index (name) et la liste de valeurs à traiter (list)
     if(RP_splitline(arg, name, list, 30) < 0) return -1;
@@ -218,7 +216,7 @@ done:
  *  See above for details. 
  *  
  */
-int RP_foreach_next(char* arg, int unused)
+int RP_foreach_next(const std::string& arg, int unused)
 {
     int curline = CUR_REPFILE->current_line;
 

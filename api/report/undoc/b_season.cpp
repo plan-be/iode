@@ -20,12 +20,12 @@ double  SEASON_EPS = 5.0;
 
 
 // $WsSeasonAdj Filename VarList
-int B_WsSeasonAdj(char *arg, int unused)
+int B_WsSeasonAdj(const std::string& arg, int unused)
 {
     return(B_season(arg));
 }
 
-int B_season(char* arg)
+int B_season(const std::string& arg)
 {
     int     res, rc = -1, shift, beg, dim, nbper, nb;
     char    name[K_MAX_FILE + 1];

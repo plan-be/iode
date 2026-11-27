@@ -26,6 +26,9 @@ Fixed Bugs
 
 - IODE REPORT: fixed a crash of `$ModelExchange` without argument.
 
+- IODE REPORT: fixed a possible memory corruption in `$DataCreateEqs` when the equation name
+  is longer than 18 characters.
+
 - IODE REPORT: fixed `$define NAME` without value: the macro is now empty (its value
   was read after the end of the command line).
 

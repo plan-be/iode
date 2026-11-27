@@ -7,9 +7,9 @@
  *  
  *  List of functions 
  *  -----------------
- *  int B_WsHtoLLast(char* arg, int unused)     $WsHtoLLast Filename VarList
- *  int B_WsHtoLMean(char* arg, int unused)     $WsHtoLMean Filename VarList
- *  int B_WsHtoLSum(char* arg, int unused)      $WsHtoLSum Filename VarList
+ *  int B_WsHtoLLast(const std::string& arg, int unused)     $WsHtoLLast Filename VarList
+ *  int B_WsHtoLMean(const std::string& arg, int unused)     $WsHtoLMean Filename VarList
+ *  int B_WsHtoLSum(const std::string& arg, int unused)      $WsHtoLSum Filename VarList
  */
 #include "api/b_args.h"
 #include "api/b_errors.h"
@@ -97,11 +97,11 @@ static int HTOL_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr
  *  The source periodicity is that of the source file. The target periodicity is the current WS periodicity.
  *  
  *  @param [in] int     method  aggregation method : HTOL_LAST, HTOL_MEAN or HTOL_SUM
- *  @param [in] char*   arg     parameter of the report function (see B_WsHtoLLast() for an example of the syntax)
- *  @return     int             0 on success, -1 on error (file not found, Samples incompatible...)    
+ *  @param [in] const std::string&  arg     parameter of the report function (see B_WsHtoLLast() for an example of the syntax)
+ *  @return     int                         0 on success, -1 on error (file not found, Samples incompatible...)
  */
 
-static int B_htol(int method, char* arg)
+static int B_htol(int method, const std::string& arg)
 {
     int res, rc = 0, f, t, shift, skip;
     std::string args(arg);
@@ -285,7 +285,7 @@ done:
  *  
  *
  */
-int B_WsHtoLLast(char* arg, int unused)
+int B_WsHtoLLast(const std::string& arg, int unused)
 {
     return(B_htol(HTOL_LAST, arg));
 }
@@ -296,7 +296,7 @@ int B_WsHtoLLast(char* arg, int unused)
  *  
  *
  */
-int B_WsHtoLMean(char* arg, int unused)
+int B_WsHtoLMean(const std::string& arg, int unused)
 {
     return(B_htol(HTOL_MEAN, arg));
 }
@@ -307,7 +307,7 @@ int B_WsHtoLMean(char* arg, int unused)
  *  
  *
  */
-int B_WsHtoLSum(char* arg, int unused)
+int B_WsHtoLSum(const std::string& arg, int unused)
 {
     return(B_htol(HTOL_SUM, arg));
 }

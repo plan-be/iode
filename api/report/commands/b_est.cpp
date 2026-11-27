@@ -15,12 +15,12 @@
  *  List of functions 
  *  -----------------
  * int B_EqsEstimateEqs(Sample* smpl, char* pattern)            Estimates a bloc of equations on a defined Sample.
- * int B_EqsEstimate(char* arg, int unused)                     Implementation of the report function $EqsEstimate.
- * int B_EqsSetSample(char* arg, int unused)                    Implementation of the report function $EqsSetSample.
- * int B_EqsSetMethod(char* arg, int unused)                    Implementation of the report function $EqsSetMethod.   
- * int B_EqsSetBloc(char* arg, int unused)                      Implementation of the report function $EqsSetBlock
- * int B_EqsSetCmt(char* arg, int unused)                       Implementation of the report function $EqsSetCmt.
- * int B_EqsSetInstrs(char* arg, int unused)                    Implementation of the report function $EqsSetInstrs.
+ * int B_EqsEstimate(const std::string& arg, int unused)                     Implementation of the report function $EqsEstimate.
+ * int B_EqsSetSample(const std::string& arg, int unused)                    Implementation of the report function $EqsSetSample.
+ * int B_EqsSetMethod(const std::string& arg, int unused)                    Implementation of the report function $EqsSetMethod.   
+ * int B_EqsSetBloc(const std::string& arg, int unused)                      Implementation of the report function $EqsSetBlock
+ * int B_EqsSetCmt(const std::string& arg, int unused)                       Implementation of the report function $EqsSetCmt.
+ * int B_EqsSetInstrs(const std::string& arg, int unused)                    Implementation of the report function $EqsSetInstrs.
  */
 
 #include "api/pch.h"
@@ -111,7 +111,7 @@ int B_EqsEstimateEqs(Sample* smpl, char* pattern)
  *  @See https://iode.plan.be/doku.php?id=eqsestimate for details. 
  *  
  */
-int B_EqsEstimate(char* arg, int unused)
+int B_EqsEstimate(const std::string& arg, int unused)
 {
     Sample* smpl = nullptr;
     std::vector<std::string> eq_names = B_EqsSplitSmplName(std::string(arg), &smpl);
@@ -139,7 +139,7 @@ int B_EqsEstimate(char* arg, int unused)
  *  @See https://iode.plan.be/doku.php?id=eqssetsample for details. 
  *  
  */
-int B_EqsSetSample(char* arg, int unused)
+int B_EqsSetSample(const std::string& arg, int unused)
 {
     Sample  *smpl = nullptr;
 
@@ -183,7 +183,7 @@ int B_EqsSetSample(char* arg, int unused)
  *  @See https://iode.plan.be/doku.php?id=eqssetmethod for details. 
  *  
  */
-int B_EqsSetMethod(char* arg, int unused)
+int B_EqsSetMethod(const std::string& arg, int unused)
 {
     std::string args(arg);
     std::string tmeth = get_next_arg(args, 15);
@@ -218,7 +218,7 @@ int B_EqsSetMethod(char* arg, int unused)
  *  @See https://iode.plan.be/doku.php?id=eqssetbloc for details. 
  *  
  */
-int B_EqsSetBloc(char* arg, int unused)
+int B_EqsSetBloc(const std::string& arg, int unused)
 {
     std::vector<std::string> v_eqs = expand_args(arg, 0);
     std::string bloc = join(v_eqs, ";");
@@ -252,7 +252,7 @@ int B_EqsSetBloc(char* arg, int unused)
  *  @See https://iode.plan.be/doku.php?id=eqssetcmt for details. 
  *  
  */
-int B_EqsSetCmt(char* arg, int unused)
+int B_EqsSetCmt(const std::string& arg, int unused)
 {
     std::string args(arg);
     std::string name = get_next_arg(args, K_MAX_NAME + 1);
@@ -279,7 +279,7 @@ int B_EqsSetCmt(char* arg, int unused)
  *  @See https://iode.plan.be/doku.php?id=eqssetinstrs for details. 
  *  
  */
-int B_EqsSetInstrs(char* arg, int unused)
+int B_EqsSetInstrs(const std::string& arg, int unused)
 {
     std::string instrs(arg);
     std::string name = get_next_arg(instrs, K_MAX_NAME + 1);

@@ -223,32 +223,24 @@ std::vector<std::string> expand_args(const std::string& arg, const int nb,
 
 
 /**
- *  Executes the function fn(char*, char*) for each string in the table of strings argv.
+ *  Executes the function fn(const std::string&) for each string in the vector argv.
  *  Stops as soon as fn(arg) returns a non null value.
- *  
- *  Syntax of fn if client is not null:
- *      int fn(char* arg, char* client)
- *  
- *  Syntax of fn if client is null:
- *      int fn(char* arg)
- *   
- *  @param [in] argv    char**                  table of strings
- *  @param [in] fn      int (*fn)(char*, char*) fn pointer
- *  @param [in] client  char*                   2d param of fn() 
- *  @return             int                     result of the last call to fn()
- *  
+ *
+ *  fn can be any callable: a function pointer or a lambda capturing the extra parameters
+ *  it needs. Example:
+ *
+ *      B_loop(names, [type](const std::string& name) { return B_DataCreate_1(name, type); });
+ *
+ *  @param [in] argv    const std::vector<std::string>&                     vector of strings
+ *  @param [in] fn      const std::function<int(const std::string&)>&       function to call
+ *  @return             int                                                 result of the last call to fn()
+ *
  */
-int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
+int B_loop(const std::vector<std::string>& argv, const std::function<int(const std::string&)>& fn)
 {
-    int     i, rc;
-
-    for(i = 0 ; argv[i] ; i++) 
+    for(const std::string& arg : argv)
     {
-        if(client == NULL) 
-            rc = (*fn)(argv[i], NULL);
-        else 
-            rc = (*fn)(argv[i], client);
-        
+        int rc = fn(arg);
         if(rc) 
             return rc;
     }
@@ -258,29 +250,23 @@ int B_loop(char *argv[], int (*fn)(char*, void*), char* client)
 
 
 /**
- *  Calls expand_args() to expand arg, then calls B_loop() on the resulting table of strings.
+ *  Calls expand_args() to expand arg, then calls B_loop() on the resulting vector of strings.
  *  
  *  @see expand_args() and B_loop().
  *  
- *  @param [in] arg     char*                   argument 
- *  @param [in] fn      int (*fn)(char*, char*) fn pointer
- *  @param [in] client  char*                   2d param of fn()
- *  @return             int                     result of the last call to fn()
- *  
+ *  @param [in] arg     const std::string&                                  argument
+ *  @param [in] fn      const std::function<int(const std::string&)>&       function to call (see B_loop())
+ *  @return             int                                                 result of the last call to fn(),
+ *                                                                          -1 if arg cannot be expanded
+ *
  */
-int B_ainit_loop(char* arg, int (*fn)(char*, void*), char* client)
+int B_ainit_loop(const std::string& arg, const std::function<int(const std::string&)>& fn)
 {
     std::vector<std::string> args = expand_args(arg, 0);
-    if(args.empty()) return -1;
+    if(args.empty())
+        return -1;
 
-    std::vector<char*> argv;
-    argv.reserve(args.size() + 1);
-    for(std::string& item : args)
-        argv.push_back(item.data());
-    argv.push_back(NULL);
-
-    int rc = B_loop(argv.data(), fn, client);
-    return rc;
+    return B_loop(args, fn);
 }
 
 

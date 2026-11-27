@@ -375,14 +375,11 @@ int RP_exec_fn(const std::string& name, const std::string& arg, int fs)
     if(!fns)
         return -1;
 
-    // the report commands take a char* and may modify their argument: passes a copy of arg
-    std::string args = arg;
-
     if(fs == '#' && fns->sfn != 0)
-        return((*fns->sfn)(args.data(), parm));
+        return((*fns->sfn)(arg, parm));
 
     if(fs == '$' && fns->fn != 0)
-        return((*fns->fn)(args.data(), parm));
+        return((*fns->fn)(arg, parm));
 
     return -1;
 }
@@ -1325,11 +1322,11 @@ int RP_ReportExec_1(const std::string& file)
  *  The current Report Context at the time of the call (calling Report and parameters) 
  *  is restored at the end of the function.
  *  
- *  @param [in] char*   line    Sets of report command(s) separated by '\n'
- *  @return     int             0 on success, report error code on error
+ *  @param [in] const std::string&  arg     report filename followed by the report arguments
+ *  @return     int                         0 on success, report error code on error
  */
 
-int B_ReportExec(char* arg, int unused)
+int B_ReportExec(const std::string& arg, int unused)
 {
     int             rc = 0, 
                     o_arg0;

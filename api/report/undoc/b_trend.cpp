@@ -55,7 +55,7 @@ static int HP_smpl(const std::shared_ptr<Sample> f_smpl, const std::shared_ptr<S
 }
 
 
-static int B_WsTrendAll(char* arg, int std)
+static int B_WsTrendAll(const std::string& arg, int std)
 {
     int     res, rc = 0, shift = 0, beg, dim = 0, nb;
     double  *t_vec = NULL, *f_vec = NULL;
@@ -130,7 +130,7 @@ done:
 
 
 // $WsTrend VarFilename Lambda series1 series2 ...
-int B_WsTrend(char* arg, int unused)
+int B_WsTrend(const std::string& arg, int unused)
 {
     return(B_WsTrendAll(arg, 0));
 }
@@ -139,7 +139,7 @@ int B_WsTrend(char* arg, int unused)
 // $WsTrendStd VarFilename Lambda series1 series2 ...
 // Unlike the $WsTrend function, the series are not transformed before the calculation. 
 // The positivity constraint does not apply.
-int B_WsTrendStd(char* arg, int unused)
+int B_WsTrendStd(const std::string& arg, int unused)
 {
     return(B_WsTrendAll(arg, 1));
 }

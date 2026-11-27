@@ -78,14 +78,14 @@ int B_isdef(char* txt)
 /**
  *  Return the integer value of the beginning of a string.
  *  
- *  @param [in] arg char*   string beginning with a number
- *  @return         int     value of the first number in the string         
- *                          -100 if arg is empty
- *  
+ *  @param [in] arg const std::string&  string beginning with a number
+ *  @return         int                 value of the first number in the string
+ *                                      -100 if arg is empty
+ *
  *  TODO: rewrite this!
- *  
+ *
  */
-int B_get1int(char* arg)
+int B_get1int(const std::string& arg)
 {
     std::vector<std::string> v_args = expand_args(arg, 1);
     if(v_args.empty()) 
@@ -103,13 +103,13 @@ int B_get1int(char* arg)
  *  
  *  @note Moved from sb_global.c
  *  
- *  @param [in]  arg   char*    string beginning with an integer 
- *  @param [out] plong long*    pointer to the calculated value
- *  @param [in]  inf   int      min value
- *  @param [in]  sup   int      max value
- *  @return            int      0 on success, -1 if arg is NULL
+ *  @param [in]  arg   const std::string&   string beginning with an integer
+ *  @param [out] plong long*                pointer to the calculated value
+ *  @param [in]  inf   int                  min value
+ *  @param [in]  sup   int                  max value
+ *  @return            int                  0 on success, -1 if arg is empty
  */
-int B_ScrollSet(char* arg, long *plong, int inf, int sup)
+int B_ScrollSet(const std::string& arg, long *plong, int inf, int sup)
 {
     int     n;
 
@@ -125,7 +125,7 @@ int B_ScrollSet(char* arg, long *plong, int inf, int sup)
 // $PrintObjTitle 0 or 1
 //      0 : print table full definitions
 //      1 : print only table titles
-int B_PrintObjTblTitle(char* arg, int unused)
+int B_PrintObjTblTitle(const std::string& arg, int unused)
 {
     long    l;
     int     rc;
@@ -141,7 +141,7 @@ int B_PrintObjTblTitle(char* arg, int unused)
 //     0 : print the LEC equation
 //     1 : replace all scalars by their values
 //     2 : replaced all scalars by their values + t-tests
-int B_PrintObjLec(char* arg, int unused)
+int B_PrintObjLec(const std::string& arg, int unused)
 {
     long    l;
     int     rc;
@@ -157,7 +157,7 @@ int B_PrintObjLec(char* arg, int unused)
 //    0: equation only 
 //    1: equation + comment
 //    2: equation + comment + estimation results
-int B_PrintObjEqsInfos(char* arg, int unused)
+int B_PrintObjEqsInfos(const std::string& arg, int unused)
 {
     long    l;
     int     rc;
@@ -177,33 +177,33 @@ static int     BEG = 0;     // Nb of the current printed variable (to limit each
  * If the object does not exist or type is illegal, 
  * an error message is added to the stack using IodeErrorManager::append_error().
  *  
- *  @param [in] arg     char*   object name
- *  @param [in] type    int     object type
- *  @return             int     0 on success, -1 on error
+ *  @param [in] arg     const std::string&  object name
+ *  @param [in] type    int                 object type
+ *  @return             int                 0 on success, -1 on error
  */
-int B_PrintObjDef_1(char* arg, int* type)
+int B_PrintObjDef_1(const std::string& arg, int type)
 {
     int rc = 0;
     bool success = false;
 
     try
     {
-        KDB& kdb = get_global_db(*type);
-        
+        KDB& kdb = get_global_db(type);
+
         std::string name = std::string(arg);
         name = kdb.to_key(name);
         bool found = kdb.contains(name);
         if(!found) 
             goto err;
     
-        kmsg("Printing %s ...", arg);
+        kmsg("Printing %s ...", arg.c_str());
         if(khitkey() != 0) 
             kgetkey();
     
-        if (*type < COMMENTS || *type > VARIABLES) 
+        if (type < COMMENTS || type > VARIABLES)
             goto err;
     
-        if(*type == VARIABLES && BEG % 47 == 0)
+        if(type == VARIABLES && BEG % 47 == 0)
         {
             if(BEG > 0) 
             {
@@ -214,7 +214,7 @@ int B_PrintObjDef_1(char* arg, int* type)
             std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
             if(!smpl || smpl->nb_periods == 0) 
             {
-                std::string msg = "Cannot print the variable '" + std::string(arg) + "' because ";
+                std::string msg = "Cannot print the variable '" + arg + "' because ";
                 msg += "the variable database has no sample defined";
                 kwarning((char*) msg.c_str());
                 return -1;
@@ -233,7 +233,7 @@ int B_PrintObjDef_1(char* arg, int* type)
         
         success = kdb.print_obj_def(name);
     
-        if(*type == VARIABLES)
+        if(type == VARIABLES)
             BEG++;
         else
             W_flush();
@@ -242,12 +242,12 @@ int B_PrintObjDef_1(char* arg, int* type)
     }
     catch(const std::exception& e)
     {
-        error_manager.append_error("Error while printing object '" + std::string(arg) + "': " + std::string(e.what()));
+        error_manager.append_error("Error while printing object '" + arg + "': " + std::string(e.what()));
         return -1;
     }
 
 err:
-    error_manager.append_error("Object '" + std::string(arg) + "' not found !");
+    error_manager.append_error("Object '" + arg + "' not found !");
     return -1;
 }
 
@@ -255,37 +255,32 @@ err:
 
 // $PrintObjDefXxx object_list
 //   where Xxx = {cmt | idt | lst | scl | tbl | var}
-int B_PrintObjDef(char* arg, int type)
+int B_PrintObjDef(const std::string& arg, int type)
 {
     return(B_PrintObjDefArgs(arg, type));
 }
 
 
-int wrapper_B_PrintObjDef_1(char* arg, void* type)
-{
-    return B_PrintObjDef_1(arg, (int*) type);
-}
-
 /**
  *  Print a list of objects of a given type.
  *  
- *  @param [in] arg  char*      list of objects to print. If NULL or empty, prints all objects in the WS.
- *  @param [in] type int        object type
- *  @return          int        0 on success, -1 on error: return code of B_PrintObjDef_1()   
+ *  @param [in] arg  const std::string&  list of objects to print. If empty, prints all objects in the WS.
+ *  @param [in] type int                 object type
+ *  @return          int                 0 on success, -1 on error: return code of B_PrintObjDef_1()
  */
-int B_PrintObjDefArgs(char* arg, int type)
+int B_PrintObjDefArgs(const std::string& arg, int type)
 {
     int rc = 0;
 
     kmsg("Printing IODE objects definition to file '%s'...", W_filename);
-    if(arg == 0 || arg[0] == 0)
+    if(arg.empty() || arg[0] == 0)
     {
         try
         {
             KDB& kdb = get_global_db(type);
             for(const std::string& name : kdb.get_names())
             {
-                rc = B_PrintObjDef_1((char*) name.c_str(), &type);
+                rc = B_PrintObjDef_1(name, type);
                 if(rc) break;
             }
         }
@@ -296,7 +291,7 @@ int B_PrintObjDefArgs(char* arg, int type)
         }
     }
     else
-        rc = B_ainit_loop(arg, wrapper_B_PrintObjDef_1, (char *) &type);
+        rc = B_ainit_loop(arg, [type](const std::string& name) { return B_PrintObjDef_1(name, type); });
 
     if(BEG) 
     {

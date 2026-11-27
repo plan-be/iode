@@ -17,7 +17,7 @@
  *      int B_DSUpdateVar(char *name, Period *per, char *val)
  *      int B_DSInterpret(char *code, char freq, char *contents)
  *      int B_DSImportDb_1(char *arg, Sample *smpl)
- *      int B_DSImportDb(char *arg, int unused)
+ *      int B_DSImportDb(const std::string& arg, int unused)
  */ 
 #include "api/iode_scr4.h"
 #include "scr4/a2m/s_a2m.h"
@@ -261,12 +261,7 @@ int B_DSImportDb_1(char *arg, Sample *smpl)
 #endif
 }
 
-int wrapper_B_DSImportDb_1(char *arg, void *smpl)
-{
-    return B_DSImportDb_1(arg, (Sample*) smpl);
-}
-
-int B_DSImportDb(char *arg, int unused)
+int B_DSImportDb(const std::string& arg, int unused)
 {
 #ifdef WIN32
     if(global_ws_var->get_sample()->nb_periods == 0) 
@@ -274,7 +269,10 @@ int B_DSImportDb(char *arg, int unused)
 
     WscrDdeSetTimeOut(10000, 3);
     std::shared_ptr<Sample> smpl = global_ws_var->get_sample();
-    return(B_ainit_loop(arg, wrapper_B_DSImportDb_1, (char *) smpl.get()));
+    return(B_ainit_loop(arg, [&smpl](const std::string& arg_1) {
+        std::string name = arg_1;
+        return B_DSImportDb_1(name.data(), smpl.get());
+    }));
 #else
     return -1;
 #endif

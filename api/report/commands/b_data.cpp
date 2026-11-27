@@ -71,26 +71,26 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_DataPattern(char* arg,int type)       Creates an IODE list with all existing objects of a given type having the name constructed by the combinations of 2 lists.
- *      int B_DataRasVar(char* arg, int unused)                 RAS method implementation. 
- *      int B_DataCalcVar(char* arg, int unused)                Computes a new variable based on a LEC expression.
- *      int B_DataCreate(char* arg, int type)       Creates one or more new objects.
- *      int B_DataDelete(char* arg, int type)       Deletes one or more objects.
- *      int B_DataRename(char* arg, int type)       Renames an object. Equations cannot be renamed.
- *      int B_DataDuplicate(char* arg, int type)    Duplicates an object. Equations cannot be duplicated.
- *      int B_DataUpdate(char* arg, int type)       Updates an object. The syntax can differ according to the object type.
- *      int B_DataSearch(char* arg, int type)       Searches all objects containing a given string in their names and/or definitions.
- *      int B_DataListSort(char* arg, int unused)               Sorts a list alphanumerically. 
- *      int B_DataScan(char* arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects.
- *      int B_DataExist(char* arg, int type)        Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
- *      int B_DataAppend(char* arg, int type)       Appends data (a string) to a CMT or a LST.
- *      int B_DataList(char* arg, int type)         Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.
- *      int B_DataCalcLst(char* arg, int unused)                List calculus: 4 operations between 2 lists.
+ *      int B_DataPattern(const std::string& arg,int type)       Creates an IODE list with all existing objects of a given type having the name constructed by the combinations of 2 lists.
+ *      int B_DataRasVar(const std::string& arg, int unused)                 RAS method implementation. 
+ *      int B_DataCalcVar(const std::string& arg, int unused)                Computes a new variable based on a LEC expression.
+ *      int B_DataCreate(const std::string& arg, int type)       Creates one or more new objects.
+ *      int B_DataDelete(const std::string& arg, int type)       Deletes one or more objects.
+ *      int B_DataRename(const std::string& arg, int type)       Renames an object. Equations cannot be renamed.
+ *      int B_DataDuplicate(const std::string& arg, int type)    Duplicates an object. Equations cannot be duplicated.
+ *      int B_DataUpdate(const std::string& arg, int type)       Updates an object. The syntax can differ according to the object type.
+ *      int B_DataSearch(const std::string& arg, int type)       Searches all objects containing a given string in their names and/or definitions.
+ *      int B_DataListSort(const std::string& arg, int unused)               Sorts a list alphanumerically. 
+ *      int B_DataScan(const std::string& arg, int type)         Analyses a KDB content and creates 2 lists _EXO and _SCAL with all VAR and all Scalar found in the kdb objects.
+ *      int B_DataExist(const std::string& arg, int type)        Checks that an object exists. Returns -1 if not, the object position in WS otherwise.
+ *      int B_DataAppend(const std::string& arg, int type)       Appends data (a string) to a CMT or a LST.
+ *      int B_DataList(const std::string& arg, int type)         Constructs a list of objects corresponding to a given name pattern. Objects can be in WS or in a file.
+ *      int B_DataCalcLst(const std::string& arg, int unused)                List calculus: 4 operations between 2 lists.
  *      int B_DataListCount(char* arg, int unused)              Returns the number of elements in a list.
- *      int B_DataCompareEps(char* arg, int unused)             Defines the threshold under which the difference between 2 variables are considered equal.
- *      int B_DataCompare(char* arg, int type)      Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
- *      int B_DataDisplayGraph(char* arg, int unused)           This function allows you to view VARs or combinations of VARS in graphical form.
- *      int B_DataPrintGraph(char* arg, int unused)             This function allows you to print VARs or combinations of VARS in graphical form.
+ *      int B_DataCompareEps(const std::string& arg, int unused)             Defines the threshold under which the difference between 2 variables are considered equal.
+ *      int B_DataCompare(const std::string& arg, int type)      Compares the objects in the current WS to the content of an IODE file and stores the results in 4 lists.
+ *      int B_DataDisplayGraph(const std::string& arg, int unused)           This function allows you to view VARs or combinations of VARS in graphical form.
+ *      int B_DataPrintGraph(const std::string& arg, int unused)             This function allows you to print VARs or combinations of VARS in graphical form.
  */
 #include "api/iode_scr4.h"
 
@@ -132,7 +132,7 @@
  *  @return     int             0 on success, -1 on error (not enough args)
  */
  
-int B_DataPattern(char* arg,int type)
+int B_DataPattern(const std::string& arg,int type)
 {
     char *lstname, *pattern;
     std::vector<std::string> xvars;
@@ -205,7 +205,7 @@ cleanup:
  *  
  *  @params See file header 
  */
-int B_DataRasVar(char* arg, int unused)
+int B_DataRasVar(const std::string& arg, int unused)
 {
     int     rc = 0, nbargs, maxit = 100;
     double  eps = 0.001;
@@ -246,7 +246,7 @@ int B_DataRasVar(char* arg, int unused)
  *  @return int     0 on success, 
  *                  -1 on error: variable cannot be created, error in LEC formula, link impossible...
  */
-int B_DataCalcVar(char* arg, int unused)
+int B_DataCalcVar(const std::string& arg, int unused)
 {
     std::string lec(arg);
     KDBVariablesPtr kdb = global_ws_var;
@@ -315,24 +315,24 @@ int B_DataCalcVar(char* arg, int unused)
 
 /**
  *  Creates one new object. Sub function of B_DataCreate().
- *  
- *  @params [in]    char*   arg     new object name
- *  @params [in]    int*    ptype   new object type
- *  @return         int             0 on success, -1 on error
- *  
+ *
+ *  @params [in]    const std::string&  arg     new object name
+ *  @params [in]    int                 type    new object type
+ *  @return         int                         0 on success, -1 on error
+ *
  */
-int B_DataCreate_1(char* arg, int* ptype)
+int B_DataCreate_1(const std::string& arg, int type)
 {
-    try 
+    try
     {
-        KDB& kdb = get_global_db(*ptype);
+        KDB& kdb = get_global_db(type);
 
         std::string name = std::string(arg);
         name = kdb.to_key(name);
         if(kdb.contains(name)) 
             return -1;
 
-        switch(*ptype) 
+        switch(type)
         {
             case COMMENTS :
             {
@@ -342,9 +342,7 @@ int B_DataCreate_1(char* arg, int* ptype)
             }
             case EQUATIONS :
             {
-                char deflt[41];
-                sprintf(deflt, "%s := %s", arg, arg);
-                std::string lec = std::string(deflt);
+                std::string lec = arg + " := " + arg;
                 Equation eq(name, lec, EQ_LSQ, "", "", "", "", "", false);
                 global_ws_eqs->set(name, eq);
                 break;
@@ -393,11 +391,6 @@ int B_DataCreate_1(char* arg, int* ptype)
     }
 }
 
-int wrapper_B_DataCreate_1(char* arg, void* ptype)
-{
-    return B_DataCreate_1(arg, (int*) ptype);
-}
-
 /**
  *  Creates one or more new objects.
  *  
@@ -410,27 +403,27 @@ int wrapper_B_DataCreate_1(char* arg, void* ptype)
  *                  -1 on error: variable cannot be created
  */
 
-int B_DataCreate(char* arg, int type)
+int B_DataCreate(const std::string& arg, int type)
 {
-    return(B_ainit_loop(arg, wrapper_B_DataCreate_1, (char *) &type));
+    return(B_ainit_loop(arg, [type](const std::string& name) { return B_DataCreate_1(name, type); }));
 }
 
 
 /**
  *  Deletes an object. Sub function of B_DataDelete().
- *  
- *  
- *  @params [in]    char*   arg     new object name
- *  @params [in]    int*    ptype   new object type
- *  @return         int             0 on success, -1 on error
- *  
+ *
+ *
+ *  @params [in]    const std::string&  arg     name of the object to delete
+ *  @params [in]    int                 type    object type
+ *  @return         int                         0 on success, -1 on error
+ *
  */
-int B_DataDelete_1(char* arg, int* ptype)
+int B_DataDelete_1(const std::string& arg, int type)
 {
     try
     {
-        KDB& kdb = get_global_db(*ptype);
-        
+        KDB& kdb = get_global_db(type);
+
         std::string name = std::string(arg);
         name = kdb.to_key(name);
         if(!kdb.contains(name)) 
@@ -452,11 +445,6 @@ int B_DataDelete_1(char* arg, int* ptype)
     }
 }
 
-int wrapper_B_DataDelete_1(char* arg, void* ptype)
-{
-    return B_DataDelete_1(arg, (int*) ptype);
-}
-
 /**
  *  Deletes one or more objects. Name may contain * to delete all objects with the same pattern.
  *  
@@ -468,13 +456,15 @@ int wrapper_B_DataDelete_1(char* arg, void* ptype)
  *  @return int     0 on success, 
  *                  -1 on error: variable cannot be deleted (does not exist)
  */
-int B_DataDelete(char* arg, int type)
+int B_DataDelete(const std::string& arg, int type)
 {
     char    *lst;
     int     rc;
 
-    lst = K_expand(type, NULL, arg, '*');
-    rc = B_ainit_loop(lst, wrapper_B_DataDelete_1, (char*) &type);
+    std::string pattern = arg;
+    lst = K_expand(type, NULL, pattern.data(), '*');
+    std::string loop_arg = lst ? lst : "";
+    rc = B_ainit_loop(loop_arg, [type](const std::string& name) { return B_DataDelete_1(name, type); });
     SCR_free(lst);
     return rc;
 }
@@ -492,7 +482,7 @@ int B_DataDelete(char* arg, int type)
  *  @return int     0 on success, 
  *                  -1 on error: object cannot be renamed
  */
-int B_DataRename(char* arg, int type)
+int B_DataRename(const std::string& arg, int type)
 {
     if(type == EQUATIONS) 
         return -1; /* Rename of EQS has no sense */
@@ -535,7 +525,7 @@ int B_DataRename(char* arg, int type)
  *  @return int     0 on success, 
  *                  -1 on error: object cannot be renamed
  */
- int B_DataDuplicate(char* arg, int type)
+ int B_DataDuplicate(const std::string& arg, int type)
 {   
     if(type == EQUATIONS) 
     {
@@ -595,7 +585,7 @@ int B_DataRename(char* arg, int type)
  *                  -1 on error: object cannot be updated
  */
 
-int B_DataUpdate(char* arg, int type)
+int B_DataUpdate(const std::string& arg, int type)
 {
     std::string value(arg);
     std::vector<std::string> args;
@@ -835,7 +825,7 @@ std::vector<std::string> B_DataSearchParms(const std::string& name, bool word, b
  *  @return int     0 on success, 
  *                  -1 on error: object cannot be renamed
  */
-int B_DataSearch(char* arg, int type)
+int B_DataSearch(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 
@@ -864,7 +854,7 @@ int B_DataSearch(char* arg, int type)
 /**
  *  Obsolete. Was used only with a GUI to specify the way variables must be displayed.
  */
-int B_DataEditCnf(char* arg, int unused)
+int B_DataEditCnf(const std::string& arg, int unused)
 {
     // JMP 2/8/2022 => no used 
     // BGUI_DataEditGlobal(VM, VN);
@@ -904,7 +894,7 @@ static int my_strcmp(const void *pa, const void *pb)
  *                  -1 on error: variable cannot be created
  */
 
-int B_DataListSort(char* arg, int unused)
+int B_DataListSort(const std::string& arg, int unused)
 {
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 
@@ -1002,7 +992,7 @@ int template_data_scan(const int type, const std::string& objs, const std::strin
  *                  -1 on error: object cannot be renamed
  */
 
-int B_DataScan(char* arg, int type)
+int B_DataScan(const std::string& arg, int type)
 {
     if(type != IDENTITIES && type != EQUATIONS && type != TABLES) 
     {
@@ -1013,7 +1003,7 @@ int B_DataScan(char* arg, int type)
     int rc = -1;
     bool success = false;
     /* Exo whole WS */
-    if(arg == NULL || arg[0] == 0) 
+    if(arg.empty() || arg[0] == 0)
     {
         try
         {
@@ -1097,7 +1087,7 @@ int B_DataScan(char* arg, int type)
  *  @return int     >= if object exist (return its position)
  *                  -1 if object is not found
  */
-int B_DataExist(char* arg, int type)
+int B_DataExist(const std::string& arg, int type)
 {
     try
     {
@@ -1128,7 +1118,7 @@ int B_DataExist(char* arg, int type)
  *  @return int     0 on success
  *                  -1 if type is incorrect or the object cannot be created / expanded 
  */
-int B_DataAppend(char* arg, int type)
+int B_DataAppend(const std::string& arg, int type)
 {    
     switch(type) 
     {
@@ -1212,7 +1202,7 @@ std::vector<std::string> template_data_list(const std::string& filename, const s
  *  @return int     0 on success
  *                  -1 if type is incorrect or the object cannot be created / expanded 
  */
-int B_DataList(char* arg, int type)
+int B_DataList(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 
@@ -1298,7 +1288,7 @@ int B_DataList(char* arg, int type)
  *  @return int     0 on success
  *                  -1 on error (list non found...)
  */
-int B_DataCalcLst(char* arg, int unused)
+int B_DataCalcLst(const std::string& arg, int unused)
 {
     /* arg: res list1 op list2 */
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
@@ -1393,10 +1383,10 @@ int B_DataListCount(char* name, int unused)
  *  @params See file header 
  *  @return int     0 always
  */
-int B_DataCompareEps(char* arg, int unused)
+int B_DataCompareEps(const std::string& arg, int unused)
 {
     // Set Vars threshold
-    K_COMPARE_EPS = atof(arg);
+    K_COMPARE_EPS = atof(arg.c_str());
     if(K_COMPARE_EPS < 1e-15) K_COMPARE_EPS = 1e-15;
     if(K_COMPARE_EPS > 1) K_COMPARE_EPS = 1;
     return 0;
@@ -1494,7 +1484,7 @@ int template_data_compare(const std::string& filename, const std::string& one, c
  *  @return int     -1 on error (incorrect syntax, file not found...
  *                  0 on success
  */
-int B_DataCompare(char* arg, int type)
+int B_DataCompare(const std::string& arg, int type)
 {
     std::vector<std::string> v_args = split_multi_quoted(std::string(arg), " ,\n\t", '"');
     if(v_args.empty()) 
@@ -1552,7 +1542,7 @@ int B_DataCompare(char* arg, int type)
 /**
  *  Sub function of B_DataDisplayGraph() and B_DataPrintGraph().
  */
-static int B_DataEditGraph(int view, char* arg)
+static int B_DataEditGraph(int view, const std::string& arg)
 {
     std::vector<std::string> v_args = expand_args(arg, 0);
     if(v_args.size() < 10) 
@@ -1618,7 +1608,7 @@ static int B_DataEditGraph(int view, char* arg)
  *  @params See file header 
  */
  
-int B_DataDisplayGraph(char* arg, int unused)
+int B_DataDisplayGraph(const std::string& arg, int unused)
 {
     return(B_DataEditGraph(1, arg));
 }
@@ -1646,7 +1636,7 @@ int B_DataDisplayGraph(char* arg, int unused)
  *  @params See file header 
  */
 
-int B_DataPrintGraph(char* arg, int unused) 
+int B_DataPrintGraph(const std::string& arg, int unused) 
 {
     return(B_DataEditGraph(0, arg));
 }

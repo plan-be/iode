@@ -8,18 +8,18 @@
  *  
  *  List of functions 
  *  -----------------
- *      int B_ViewVar(char* arg, int unused)                | Display a list of variables in the form of tables of max 50 variables.
- *      int B_PrintVar(char* arg, int unused)               | Print a list of variables in the form of tables of max 50 variables.
- *      int B_ViewPrintVar(char* arg, int mode)             | Print or display (according to the mode parameter) variables in the form of tables. 
- *      int B_ViewByTbl(char* arg, int unused)              | $ViewTbl sample table [list of tables]
- *      int B_ViewTbl(char* arg, int unused)                | Alias of B_ViewByTbl()
- *      int B_PrintTbl(char* arg, int unused)               | $PrintTbl gsample table1 [table2...]
- *      int B_ViewGr(char* arg, int unused)                 | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
- *      int B_PrintGr(char* arg, int unused)                | $PrintGr gsample table1 [table2...]
- *      int B_ViewPrintTbl_1(char* name, char* smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSample.
- *      int B_ViewPrintGr_1(char* names, char* gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on Table definition(s).
- *      int B_ViewPrintTbl(char* arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE Tables either in the form of graphs or in the form of text (SCROLLs).
- *      int B_ViewTblFile(char* arg, int unused)            | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
+ *      int B_ViewVar(const std::string& arg, int unused)                | Display a list of variables in the form of tables of max 50 variables.
+ *      int B_PrintVar(const std::string& arg, int unused)               | Print a list of variables in the form of tables of max 50 variables.
+ *      int B_ViewPrintVar(const std::string& arg, int mode)             | Print or display (according to the mode parameter) variables in the form of tables. 
+ *      int B_ViewByTbl(const std::string& arg, int unused)              | $ViewTbl sample table [list of tables]
+ *      int B_ViewTbl(const std::string& arg, int unused)                | Alias of B_ViewByTbl()
+ *      int B_PrintTbl(const std::string& arg, int unused)               | $PrintTbl gsample table1 [table2...]
+ *      int B_ViewGr(const std::string& arg, int unused)                 | $ViewGr gsample tbl1[+tbl2] tbl3 ... 
+ *      int B_PrintGr(const std::string& arg, int unused)                | $PrintGr gsample table1 [table2...]
+ *      int B_ViewPrintTbl_1(const std::string& c_name, const std::string& smpl)        | Calculate and display (or print according to the value of B_viewmode) a table on a specified GSample.
+ *      int B_ViewPrintGr_1(const std::string& names, const std::string& gsmpl)       | Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, based on Table definition(s).
+ *      int B_ViewPrintTbl(const std::string& arg, int type, int mode)   | Calculate, then print or display (according to the mode parameter) IODE Tables either in the form of graphs or in the form of text (SCROLLs).
+ *      int B_ViewTblFile(const std::string& arg, int unused)            | $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
  *      int B_ViewTblEnd()                                  | Close a Print tables or Print variables session.
  */
 #include "api/iode_scr4.h"
@@ -47,13 +47,13 @@ char    ODE_SMPL[81];   // Current GSample for printing / displaying tables and 
 
 
 // Display a list of variables in the form of tables of max 50 variables.
-int B_ViewVar(char* arg, int unused)
+int B_ViewVar(const std::string& arg, int unused)
 {
     return(B_ViewPrintVar(arg, 0));
 }
 
 // Print a list of variables in the form of tables of max 50 variables.
-int B_PrintVar(char* arg, int unused)
+int B_PrintVar(const std::string& arg, int unused)
 {
     return(B_ViewPrintVar(arg, 1));
 }
@@ -63,18 +63,12 @@ int B_PrintVar(char* arg, int unused)
  *  Print or display (according to the mode parameter) variables in the form of tables. 
  *  Temporary tables of maximum 50 variables are constructed then printed of displayed.
  *  
- *  @param [in] arg  char*  sample + list of variables to be printed
- *  @param [in] mode int    0 to display, 1 to print
- *  @return          int 
+ *  @param [in] arg  const std::string&  sample + list of variables to be printed
+ *  @param [in] mode int                 0 to display, 1 to print
+ *  @return          int
  */
-int B_ViewPrintVar(char* arg, int mode)
+int B_ViewPrintVar(const std::string& arg, int mode)
 {
-    if(arg == NULL) 
-    {
-        error_manager.append_error("Invalid argument");
-        return -1;
-    }
-
     std::string arg_str(arg);
     arg_str = trim(arg_str);
     if(arg_str.empty()) 
@@ -147,20 +141,20 @@ int B_ViewPrintVar(char* arg, int mode)
 
 // Display a list of tables
 // $ViewTbl sample table [list of tables]
-int B_ViewByTbl(char* arg, int unused)
+int B_ViewByTbl(const std::string& arg, int unused)
 {
     return(B_ViewPrintTbl(arg, 0, 0));
 }
 
 // Alias of B_ViewByTbl()
-int B_ViewTbl(char* arg, int unused)
+int B_ViewTbl(const std::string& arg, int unused)
 {
     return(B_ViewPrintTbl(arg, 0, 0));
 }
 
 // Print a list of tables
 // $PrintTbl gsample table1 [table2...]
-int B_PrintTbl(char* arg, int unused)
+int B_PrintTbl(const std::string& arg, int unused)
 {
     return(B_ViewPrintTbl(arg, 0, 1));
 }
@@ -168,14 +162,14 @@ int B_PrintTbl(char* arg, int unused)
 
 // Display a list of tables as graphs
 // $ViewGr gsample tbl1[+tbl2] tbl3 ... 
-int B_ViewGr(char* arg, int unused)
+int B_ViewGr(const std::string& arg, int unused)
 {
     return(B_ViewPrintTbl(arg, 1, 0));
 }
 
 // Print a list of tables as graphs
 // $PrintGr gsample table1 [table2...]
-int B_PrintGr(char* arg, int unused)
+int B_PrintGr(const std::string& arg, int unused)
 {
     return(B_ViewPrintTbl(arg, 1, 1));
 }
@@ -184,14 +178,13 @@ int B_PrintGr(char* arg, int unused)
 /**
  *  Calculate and display (or print, according to the value of B_viewmode) a table on a specified GSample.
  *  
- *  @param [in] name char*  table name
- *  @param [in] smpl char*  GSample
- *  @return          int    0 on success, -1 on error (table not found, illegal gsample...)
+ *  @param [in] c_name const std::string&    table name
+ *  @param [in] smpl   const std::string&    GSample
+ *  @return            int                   0 on success, -1 on error (table not found, illegal gsample...)
  */
-int B_ViewPrintTbl_1(char* c_name, char* smpl)
+int B_ViewPrintTbl_1(const std::string& c_name, const std::string& smpl)
 {
-    std::string name = std::string(c_name);
-    name = global_ws_tbl->to_key(name);
+    std::string name = global_ws_tbl->to_key(c_name);
     if(!global_ws_tbl->contains(name)) 
     {
         error_manager.append_error("Table '" + std::string(name) + "' not found");
@@ -202,7 +195,11 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
     int nb_decimals = tbl_nb_decimals;
     std::shared_ptr<Table> tbl_ptr = global_ws_tbl->get_obj_ptr(name);
     if(B_viewmode == 0)
-        rc = T_view_tbl(tbl_ptr.get(), smpl, (char*) name.c_str());
+    {
+        // T_view_tbl() takes char* arguments
+        std::string gsmpl = smpl;
+        rc = T_view_tbl(tbl_ptr.get(), gsmpl.data(), name.data());
+    }
     else
     {
         try
@@ -230,14 +227,14 @@ int B_ViewPrintTbl_1(char* c_name, char* smpl)
  *  Calculate and display (or print according to the value of B_viewmode) a graph on a specified GSample, 
  *  based on Table definition(s).
  *  
- *  @param [in] names   char*  list of table names
- *  @param [in] smpl    char*  GSample
- *  @return             int    0 on success, -1 on error (table not found, illegal gsample...)
+ *  @param [in] names   const std::string&  list of table names
+ *  @param [in] gsmpl   const std::string&  GSample
+ *  @return             int                 0 on success, -1 on error (table not found, illegal gsample...)
  */
-int B_ViewPrintGr_1(char* names, char* gsmpl)
+int B_ViewPrintGr_1(const std::string& names, const std::string& gsmpl)
 {
     int rc = 0, hg, ng, i, view = !B_viewmode;
-    std::vector<std::string> tbls = split_skip_empty(std::string(names), "+-");
+    std::vector<std::string> tbls = split_skip_empty(names, "+-");
     ng = (int) tbls.size();
     if(ng == 0) 
     {
@@ -280,66 +277,59 @@ int B_ViewPrintGr_1(char* names, char* gsmpl)
 }
 
 
-int wrapper_B_ViewPrintGr_1(char* names, void* gsmpl)
-{
-    return B_ViewPrintGr_1(names, (char*) gsmpl);
-}
-
-int wrapper_B_ViewPrintTbl_1(char* names, void* gsmpl)
-{
-    return B_ViewPrintTbl_1(names, (char*) gsmpl);
-}
-
 
 /**
  *  Calculate, then print or display (according to the mode parameter) IODE Tables either 
  *  in the form of graphs or in the form of text (SCROLLs).
  *  
- *  @param [in] char* arg   sample + list of tables to print  
- *  @param [in] int   type  0: print or view in table format
- *                          1: print in graph format 
- *  @param [in] int   mode  0: view
- *                          1: print
- *  @return     int         0 on success-1 on error (no arg, error in execution of tables) 
+ *  @param [in] const std::string&  arg   sample + list of tables to print
+ *  @param [in] int                 type  0: print or view in table format
+ *                                        1: print in graph format
+ *  @param [in] int                 mode  0: view
+ *                                        1: print
+ *  @return     int                       0 on success-1 on error (no arg, error in execution of tables)
  */
-int B_ViewPrintTbl(char* arg, int type, int mode)
+int B_ViewPrintTbl(const std::string& arg, int type, int mode)
 {
-    int     rc = 0;
-    char    *smpl;
+    int         rc = 0;
+    std::string smpl;
+    std::string tables;     // arg without the sample
 
     B_viewmode = mode;
-        
-    if(arg == NULL || arg[0] == 0) 
+
+    if(arg.empty() || arg[0] == 0)
     {
         kwarning("No argument passed");
         return -1;
     }
-    else 
+    else
     {
-        std::vector<std::string> args = split_skip_empty(std::string(arg), " ");
+        std::vector<std::string> args = split_skip_empty(arg, " ");
         if(args.empty())
         {
-            std::string error_msg = "Invalid argument '" + std::string(arg) + "'";
+            std::string error_msg = "Invalid argument '" + arg + "'";
             kwarning(error_msg.c_str());
             return -1;
         }
 
-        smpl = (char*) SCR_stracpy((unsigned char*) args[0].c_str());
+        smpl = args[0];
+        // skips the sample and the separator that follows it
+        tables = (arg.size() > smpl.size()) ? arg.substr(smpl.size() + 1) : std::string();
 
         if(mode == 1 || args.size() < 3)
         {
             if(type == 0)
-                rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintTbl_1, smpl);
+                rc = B_ainit_loop(tables, [&smpl](const std::string& name) { return B_ViewPrintTbl_1(name, smpl); });
             else
-                rc = B_ainit_loop(arg + strlen(smpl) + 1, wrapper_B_ViewPrintGr_1, smpl);
+                rc = B_ainit_loop(tables, [&smpl](const std::string& names) { return B_ViewPrintGr_1(names, smpl); });
         }
-        else 
+        else
         {
-            if(type == 0) 
+            if(type == 0)
                 ODE_VIEW = 1;
-            else 
+            else
                 ODE_VIEW = 2;
-            SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl, sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
+            SCR_strlcpy((unsigned char*) ODE_SMPL, (unsigned char*) smpl.c_str(), sizeof(ODE_SMPL) - 1); // JMP 10/04/2023
             // ODE_scroll() expects a NULL terminated table of table names
             std::vector<char*> names;
             for(size_t i = 1; i < args.size(); i++)
@@ -349,15 +339,13 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
         }
     }
 
-    SCR_free(smpl);
-
     W_flush();
     B_ViewTblEnd();
 
     if(rc < 0)
     {
         std::string action = (mode == 0) ? "display" : "print";
-        std::string names = trim(std::string(arg + strlen(smpl) + 1));
+        std::string names = trim(tables);
         std::string error_msg = "Cannot " + action + " table(s) '" + names + "'";
         error_manager.prepend_error(error_msg);
         if(error_manager.has_errors())
@@ -370,20 +358,20 @@ int B_ViewPrintTbl(char* arg, int type, int mode)
 
 // Report function:
 //      $PrintTblFile n varfilename    (n := 2, 3, 4, 5)
-int B_ViewTblFile(char* arg, int unused)
+int B_ViewTblFile(const std::string& arg, int unused)
 {
     bool   success;
     int    ref, rc = 0;
     std::vector<std::string> args;
 
-    if(arg == 0 || arg[0] == 0) 
+    if(arg.empty() || arg[0] == 0)
     {
         error_manager.append_error("Invalid argument");
         return -1;
     }
     else 
     {
-        args = split_skip_empty(std::string(arg), " ");
+        args = split_skip_empty(arg, " ");
         if(args.size() < 2) goto err;
 
         ref = atoi(args[0].c_str());

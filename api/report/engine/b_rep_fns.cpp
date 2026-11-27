@@ -1646,7 +1646,7 @@ std::string RPF_vtake(const std::vector<std::string>& args)
 {
     int     n, lg;
 
-    if(RP_VSEPS == 0) RP_vseps(0);
+    if(RP_VSEPS == 0) RP_vseps("");
     if(args.empty())
         return "";
 
@@ -1690,7 +1690,7 @@ std::string RPF_vdrop(const std::vector<std::string>& args)
 {
     int     n, lg;
 
-    if(RP_VSEPS == 0) RP_vseps(0);
+    if(RP_VSEPS == 0) RP_vseps("");
     if(args.empty())
         return "";
 
@@ -1729,7 +1729,7 @@ std::string RPF_vdrop(const std::vector<std::string>& args)
  */
 std::string RPF_vcount(const std::vector<std::string>& args)
 {
-    if(RP_VSEPS == 0) RP_vseps(0);
+    if(RP_VSEPS == 0) RP_vseps("");
     std::string sep(1, RP_VSEPS[0]);
     std::vector<std::string> v_args = split_skip_empty(join(args, sep), std::string(RP_VSEPS));
     return std::to_string(v_args.size());
