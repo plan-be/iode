@@ -292,10 +292,10 @@ Then export it in `pyiode/iode/__init__.py.in` (both the imports and `__all__`) 
   | Keyword | Effect |
   |---------|--------|
   | `gui` | runs the GUI tests only |
-  | `python` | runs the Python build and tests only |
+  | `python` | runs `github-actions-python.yml` (`release` config): builds the C++ API and `iode_cython` and runs pytest (Windows only). The C/C++ API tests (`test_all`, ctest) and the big-files tests also run, but only on Windows with Python 3.14. No debug build and no sanitizer job |
   | `doc` | runs the docs build only |
   | `release` | skips the C++ build. Reserved for maintainers; agents must never create such a branch |
-  | none of the above | builds and tests the C/C++ API, plus a sanitizer job |
+  | none of the above | builds and tests the C/C++ API (`debug` config, incl. big-files tests), plus a sanitizer job |
 - **Commit messages**:
   - Start with an UPPERCASE area prefix: `C++ API:`, `C API:`, `PYTHON:`, `GUI:`, `DOC:`, `TESTS C++:`, `TESTS PYTHON:`, `TESTS GUI:`, `TESTS DATA:`, `CMAKE:`. The `RELEASE:` prefix is reserved for maintainers.
   - Usually follow it with `(ClassName)` and an indented bullet list of changes:
