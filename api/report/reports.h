@@ -41,26 +41,59 @@ private:
     int err_dump(char* name, char* arg);
 };
 
-struct BFNS 
+// Report $command or #command: arg = parameters of the command, type_ = object or file type
+// given by the suffix of the command name (e.g. VARIABLES for $WsLoadVar)
+using ReportCommandFn = int (*)(const std::string& arg, int type_);
+
+// Report @function: args = arguments of the @function, returns the result as text
+using ReportFunctionFn = std::string (*)(const std::vector<std::string>& args);
+
+struct BFNS
 {
-    char*   func_name_camel_case;           // function name in CamelCase
-    int     (*fn)(const std::string& arg, int type_);    // function pointer in *non GUI* mode
-    int     (*sfn)(const std::string& arg, int type_);   // function pointer in GUI mode
-    int     type;                           // suffix required after function name (var, idt...) or not:
+    std::string     func_name_camel_case;   // function name in CamelCase
+    ReportCommandFn fn = nullptr;           // function pointer in *non GUI* mode ($command), may be null
+    ReportCommandFn sfn = nullptr;          // function pointer in GUI mode (#command), may be null
+    int     type = 0;                       // suffix required after function name (var, idt...) or not:
 			                                //   0=not required
 						                    //   1=ws type required: cmt, idt, ... see k_ext => not used ?
 						                    //   2=suffix required: file extensions defined in k_ext
 						                    //   3=ws type required in non GUI, no extension in GUI
 						                    //   4=suffix required: file extensions defined in k_ext if non GUI, not required in GUI
-    int     group;                          // for color highlighting
+    int     group = 0;                      // for color highlighting
+
+    /**
+     *  Returns the function to call for a command preceded by fs.
+     *
+     *  @param [in] int     fs      character preceding the command in the report ('#' or '$')
+     *  @return     ReportCommandFn sfn if fs is '#', fn if fs is '$', nullptr otherwise
+     *                              (may also be nullptr if the command has no version for fs)
+     */
+    ReportCommandFn get_fn(int fs) const
+    {
+        if(fs == '#') return sfn;
+        if(fs == '$') return fn;
+        return nullptr;
+    }
+
+    /**
+     *  Calls the function corresponding to fs (see get_fn()).
+     *
+     *  @param [in] int                 fs      character preceding the command ('#' or '$')
+     *  @param [in] const std::string&  arg     parameters of the command
+     *  @param [in] int                 type_   object or file type (suffix of the command name)
+     *  @return     int                         -1 if there is no function for fs,
+     *                                          return code of the function otherwise
+     */
+    int call(int fs, const std::string& arg, int type_) const
+    {
+        ReportCommandFn func = get_fn(fs);
+        if(!func)
+            return -1;
+        return func(arg, type_);
+    }
 };
 
 const static int BFNS_NB_GROUPS = 2;
-
-struct RPFN 
-{
-    std::string (*fn)(const std::vector<std::string>& args);     // Pointer to the corresponding function
-};
 
 /**
  *  Exception thrown by a report @function (RPF_* functions) when it cannot be evaluated
@@ -85,8 +118,8 @@ struct RPMacroError : public std::runtime_error
 
 /*------------------------ GLOBALS ----------------------- */
 
-extern std::map<std::string, BFNS> B_fns;  // Table of report command names and function pointers
-extern std::map<std::string, RPFN> RP_FNS; // Table of report @functions names and function pointers
+extern const std::map<std::string, BFNS> B_fns;                // Table of report command names and function pointers
+extern const std::map<std::string, ReportFunctionFn> RP_FNS;    // Table of report @functions names and function pointers
 
 inline std::shared_ptr<REPFILE> CUR_REPFILE = nullptr;  // Current REPFILE during report execution
 inline std::vector<std::string> RP_ARGV;    // Arguments of the current report (without the report name)
