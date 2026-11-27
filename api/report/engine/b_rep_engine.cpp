@@ -304,10 +304,10 @@ int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, in
  *                                               extension (e.g. "WsLoadVar")
  *  @param [out]     int&                type    type of object or file to which the command must be assigned
  *  @param [in]      int                 fs      full screen : character preceding the command in the report ('#' or '$').
- *  @return          BFNS*                       BFNS struct corresponding to the command name (nullptr if not found)
+ *  @return          const BFNS*                 BFNS struct corresponding to the command name (nullptr if not found)
  *
  */
-BFNS* RP_find_fn(const std::string& name, int& type, int fs)
+const BFNS* RP_find_fn(const std::string& name, int& type, int fs)
 {
     std::string cmd_name = to_lower(trim(name));
 
@@ -315,7 +315,7 @@ BFNS* RP_find_fn(const std::string& name, int& type, int fs)
     std::string prefix;
     std::string suffix;
     std::string extension;
-    for(auto& [func_name, fns]: B_fns) 
+    for(const auto& [func_name, fns]: B_fns)
     {
         // command without extension 
         if(fns.type == 0) 
@@ -371,17 +371,11 @@ int RP_exec_fn(const std::string& name, const std::string& arg, int fs)
 {
     int parm = 0;
 
-    BFNS* fns = RP_find_fn(name, parm, fs);
+    const BFNS* fns = RP_find_fn(name, parm, fs);
     if(!fns)
         return -1;
 
-    if(fs == '#' && fns->sfn != 0)
-        return((*fns->sfn)(arg, parm));
-
-    if(fs == '$' && fns->fn != 0)
-        return((*fns->fn)(arg, parm));
-
-    return -1;
+    return fns->call(fs, arg, parm);
 }
 
 
@@ -894,7 +888,7 @@ int RP_fneval(std::string& res, const std::string& str)
     std::vector<std::string> args(v_args.begin() + 1, v_args.end());
     try
     {
-        res = it->second.fn(args);
+        res = it->second(args);
     }
     catch(const RPFunctionError&)
     {

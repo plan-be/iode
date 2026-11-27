@@ -20,7 +20,7 @@ void RP_debug(const std::string& txt);
 /* b_rep_engine.c */
 std::vector<std::string> RP_read_file(const std::string& filename);
 int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, int lg);
-BFNS* RP_find_fn(const std::string& name, int& type, int fs);
+const BFNS* RP_find_fn(const std::string& name, int& type, int fs);
 int RP_exec_fn(const std::string& name, const std::string& arg, int fs);
 std::string RP_extract(const std::string& buf, int& i, int ch);
 std::string RP_extractpar(const std::string& buf, int& i, const std::string& brackets);

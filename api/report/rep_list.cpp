@@ -49,12 +49,12 @@ std::vector<std::string> build_command_functions_list(const int group, const boo
     bool test_func;
     bool test_group;
     int i = 0;
-    for(auto& [name, fns] : B_fns)
+    for(const auto& [name, fns] : B_fns)
     {
-        func_name = prefix + std::string(fns.func_name_camel_case);
+        func_name = prefix + fns.func_name_camel_case;
         func_group = fns.group;
 
-        test_func = gui ? fns.sfn != NULL : fns.fn != NULL;
+        test_func = fns.get_fn(gui ? '#' : '$') != nullptr;
         test_group = (group < 0) ? true : func_group == group;
         if(test_func && test_group)
         {
@@ -108,7 +108,7 @@ std::vector<std::string> build_report_functions_list()
 {
     std::vector<std::string> func_list;
 
-    for(auto& [name, fns] : RP_FNS)
+    for(const auto& [name, fns] : RP_FNS)
         func_list.push_back("@" + name);
     
     return func_list;
