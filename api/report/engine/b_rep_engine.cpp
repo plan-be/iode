@@ -5,7 +5,7 @@
  *  ------------------------
  *  Main functions for parsing and executing of IODE reports.
  *  
- *  See also the variable B_fns in b_rep_syntax.c: there are 2 fn pointers, 
+ *  See also the variable B_FNS in b_rep_syntax.c: there are 2 fn pointers, 
  *  one for the non GUI mode ($function), the other for the GUI mode (#function).
  *  
  *  Report description
@@ -25,8 +25,8 @@
  *  - %macro%: macros (between %%) are replaced by their value
  *  - {lex}: LEC expressions (between {}) are calculated and replaced by their (formatted) value
  *  - {$command}: IODE command between {} are executed and their result replaces the 
- *      original {} sequence. See the variable B_fns in b_rep_syntax.c for the current list of commands.
- *      B_fns contains 2 fn pointers, one for the non GUI mode ($function), 
+ *      original {} sequence. See the variable B_FNS in b_rep_syntax.c for the current list of commands.
+ *      B_FNS contains 2 fn pointers, one for the non GUI mode ($function), 
  *      the other for the GUI mode (#function).
 
  *  - @function(): report functions (@function()) are executed and replaced by their value. 
@@ -56,8 +56,8 @@
  *                      RP_expand...
  *          RP_exec_fn()                    Executes the report command (if any)
  *              RP_find_fn                  Finds the right function
- *              (*B_fns[name].fn)           Executes the no-GUI function
- *              (*B_fns[name].sfn)          Executes the GUI function
+ *              (*B_FNS[name].fn)           Executes the no-GUI function
+ *              (*B_FNS[name].sfn)          Executes the GUI function
  *              
  *  
  *  Examples of report line parsing
@@ -297,9 +297,9 @@ int RP_splitline(const std::string& text, std::string& cmd, std::string& arg, in
 /**
  *  Returns the BFNS struct corresponding to the command name.
  *  
- *  See in b_rep_syntax.c the definition of the table B_fns for more details.
+ *  See in b_rep_syntax.c the definition of the table B_FNS for more details.
  *  
- *  @global [in]     BFNS   B_fns   table of command names and fn pointers
+ *  @global [in]     BFNS   B_FNS   table of command names and fn pointers
  *  @param [in]      const std::string&  name    command name ($name), possibly followed by an
  *                                               extension (e.g. "WsLoadVar")
  *  @param [out]     int&                type    type of object or file to which the command must be assigned
@@ -315,7 +315,7 @@ const BFNS* RP_find_fn(const std::string& name, int& type, int fs)
     std::string prefix;
     std::string suffix;
     std::string extension;
-    for(const auto& [func_name, fns]: B_fns)
+    for(const auto& [func_name, fns]: B_FNS)
     {
         // command without extension 
         if(fns.type == 0) 
